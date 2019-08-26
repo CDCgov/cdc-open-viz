@@ -1,0 +1,37 @@
+@import "scss/reset";
+
+@mixin breakpoint($class) {
+  @if $class == xs {
+    @media (max-width: 767px) { @content; }
+  }
+
+  @else if $class == sm {
+    @media (min-width: 768px) { @content; }
+  }
+
+  @else if $class == md {
+    @media (min-width: 960px) { @content; }
+  }
+
+  @else if $class == lg {
+    @media (min-width: 1300px) { @content; }
+  }
+
+  @else {
+    @warn "Breakpoint mixin supports: xs, sm, md, lg";
+  }
+}
+
+@import "scss/general";
+
+@import "scss/tooltips";
+
+@import "scss/map";
+
+@import "scss/sidebar";
+
+@import "scss/datatable";
+
+@import "scss/animations";
+
+@import "scss/editor";

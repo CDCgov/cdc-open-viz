@@ -1,0 +1,546 @@
+{
+	"columns": {
+		"geo": {
+			"name": "state",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"name": "yes",
+			"label": "Data Label",
+			"prefix": "",
+			"suffix": "%",
+			"dataTable": true,
+			"tooltip": true
+		},
+		"navigate": {
+			"name": "link",
+			"tooltip": false,
+			"dataTable": false
+		}
+	},
+	"legend": {
+		"numberOfItems": 3,
+		"position": "side",
+		"title": "Legend Title",
+		"description": "Legend Text",
+		"type": "equalnumber",
+		"specialClasses": [],
+		"data": []
+	},
+	"data": [{
+			"yes": "83.8",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.2",
+			"state": "Alabama",
+			"year": "2010",
+			"link": "",
+			"$$hashKey": "object:158"
+		},
+		{
+			"yes": "82.4",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "17.6",
+			"state": "Alaska",
+			"year": "2010",
+			"link": "",
+			"$$hashKey": "object:159"
+		},
+		{
+			"yes": "86.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "13.3",
+			"state": "Arizona",
+			"year": "2010",
+			"link": "https://search.cdc.gov/search/?query=Arizona&utf8=%E2%9C%93&affiliate=cdc-main",
+			"$$hashKey": "object:160"
+		},
+		{
+			"yes": "78.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "21.3",
+			"state": "Arkansas",
+			"year": "2010",
+			"link": "",
+			"$$hashKey": "object:161"
+		},
+		{
+			"yes": "82.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "17.8",
+			"state": "California",
+			"year": "2010",
+			"link": "https://search.cdc.gov/search/?query=California&utf8=%E2%9C%93&affiliate=cdc-main",
+			"$$hashKey": "object:162"
+		},
+		{
+			"yes": "83.6",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.39",
+			"state": "Colorado",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "90.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "9.87",
+			"state": "Connecticut",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "90",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10",
+			"state": "Delaware",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "93",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "7",
+			"state": "District of Columbia",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "17",
+			"state": "Florida",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.3",
+			"state": "Georgia",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "93.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "6.8",
+			"state": "Hawaii",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "80.96",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "19.1",
+			"state": "Idaho",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "86.9",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "13.1",
+			"state": "Illinois",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "85",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "15",
+			"state": "Indiana",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.6",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.4",
+			"state": "Iowa",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "87.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "12.5",
+			"state": "Kansas",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.1",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.89",
+			"state": "Kentucky",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "79.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "20.8",
+			"state": "Louisiana",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "12",
+			"state": "Maine",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.1",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.9",
+			"state": "Maryland",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "95.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "4.3",
+			"state": "Massachusetts",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "86.1",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "13.9",
+			"state": "Michigan",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "91",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "9",
+			"state": "Minnesota",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "78.46",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "21.6",
+			"state": "Mississippi",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "85",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "15",
+			"state": "Missouri",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "81.599999999999994",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "18.39",
+			"state": "Montana",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "86.3",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "13.7",
+			"state": "Nebraska",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "80.3",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "19.7",
+			"state": "Nevada",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "11.3",
+			"state": "New Hampshire",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "11.5",
+			"state": "New Jersey",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "80.96",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "19.1",
+			"state": "New Mexico",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88.6",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "11.4",
+			"state": "New York",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "81",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "19",
+			"state": "North Carolina",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88.9",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "11.1",
+			"state": "North Dakota",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "87.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "12.8",
+			"state": "Ohio",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "80.8",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "19.2",
+			"state": "Oklahoma",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.5",
+			"state": "Oregon",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "88.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "11.5",
+			"state": "Pennsylvania",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "87.7",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "12.3",
+			"state": "Rhode Island",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "81.2",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "18.8",
+			"state": "South Carolina",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.4",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.6",
+			"state": "South Dakota",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.5",
+			"state": "Tennessee",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "76.96",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "23.1",
+			"state": "Texas",
+			"year": "2010",
+			"link": "https://search.cdc.gov/search/?query=Texas&utf8=%E2%9C%93&affiliate=cdc-main"
+		},
+		{
+			"yes": "84.1",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "15.9",
+			"state": "Utah",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "91.6",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "8.4",
+			"state": "Vermont",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "87.8",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "12.2",
+			"state": "Virginia",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "84.9",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "15.1",
+			"state": "Washington",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "82.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "17.5",
+			"state": "West Virginia",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.3",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.7",
+			"state": "Wisconsin",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.3",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.7",
+			"state": "Los Angeles",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "89.3",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "10.7",
+			"state": "Dallas",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.5",
+			"state": "Wyoming",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.5",
+			"state": "Virgin Islands",
+			"year": "2010",
+			"link": ""
+		},
+		{
+			"yes": "83.5",
+			"category": "HealthCareAccess/Coverage",
+			"condition": "Doyouhaveanykindofhealthcarecoverage?",
+			"no": "16.5",
+			"state": "Puerto Rico",
+			"year": "2010",
+			"link": ""
+		}
+	],
+	"filters": [],
+	"general": {
+		"title": "Map Title",
+		"subtext": "",
+		"type": "data",
+		"geoType": "us",
+		"headerColor": "theme-blue",
+		"showSidebar": true,
+		"showTitle": true,
+		"showDownloadButton": true,
+		"expandDataTable": true
+	},
+	"color": "pinkpurple"
+}

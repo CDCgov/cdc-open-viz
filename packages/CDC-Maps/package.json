@@ -1,0 +1,45 @@
+{
+  "name": "state-maps-react",
+  "homepage": "/TemplatePackage/contrib/widgets/cdcMaps/build/",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "array-move": "^2.1.0",
+    "chroma": "0.0.1",
+    "chroma-js": "^2.0.3",
+    "classlist-polyfill": "^1.2.0",
+    "d3-geo": "^1.11.3",
+    "mdn-polyfills": "^5.18.0",
+    "node-sass": "^4.11.0",
+    "papaparse": "^5.0.0",
+    "radium": "^0.25.2",
+    "react": "^16.8.6",
+    "react-accessible-accordion": "^3.0.0",
+    "react-addons-css-transition-group": "^15.6.2",
+    "react-app-polyfill": "^1.0.1",
+    "react-csv": "^1.1.1",
+    "react-dom": "^16.8.6",
+    "react-html-parser": "^2.0.2",
+    "react-scripts": "2.1.8",
+    "react-select": "^3.0.4",
+    "react-simple-maps": "^0.12.1",
+    "react-sortable-hoc": "^1.9.1",
+    "react-table": "^6.10.0",
+    "react-tag-autocomplete": "^5.11.1",
+    "react-tooltip": "^3.10.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ]
+}
