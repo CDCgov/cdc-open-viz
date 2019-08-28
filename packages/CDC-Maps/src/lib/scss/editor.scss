@@ -149,21 +149,43 @@
       }
     }
   }
-  input[type="text"], input[role="combobox"], input[type="number"], textarea {
-    padding: .5em .3em;
-    min-width: 100%;
-    max-width: 100%; // Doing this prevents width of textarea from being changed
-    font-size: 1.2em;
-    font-family: sans-serif;
-    border: rgba(0,0,0,.3) 1px solid;
-    &:focus {
-      border: rgba(0,0,0,.7) 1px solid;
-      outline: 0;
+  .accordion {   
+    input[type="text"], input[role="combobox"], input[type="number"], textarea {
+      padding: .5em .3em;
+      min-width: 100%;
+      max-width: 100%; // Doing this prevents width of textarea from being changed
+      font-size: 1.2em;
+      font-family: sans-serif;
+      border: rgba(0,0,0,.3) 1px solid;
+      &:focus {
+        border: rgba(0,0,0,.7) 1px solid;
+        outline: 0;
+      }
+    }
+    textarea {
+      min-height: 140px;
     }
   }
-  textarea {
-    min-height: 140px;
+
+  .confirmation-area {
+    padding: 1em 1.25em 2em;
+    p {
+      font-size: .9em;
+      padding: 1em 0;
+    }
+    button {
+      cursor: pointer;
+    }
+    textarea {
+      height: 100px;
+      width: 100%;
+      cursor: pointer;
+      padding: .5em;
+      font-family: monospace;
+      box-sizing: border-box
+    }  
   }
+
   select {
     width: 100%;
     font-size: 1.4em;
@@ -360,7 +382,7 @@
     }
   }
 
-  button.add-column {
+  button.blue-block {
     background: #005eaa;
     color: #fff;
     border: 0;

@@ -110,7 +110,7 @@ class Editor extends React.Component {
     return (
         <section className={this.props.state.editor.expanded ? 'editor-sidebar' : 'hidden editor-sidebar'}>
         <h2>Map Editor <button className="editor-toggle" title="Collapse Editor" onClick={() => { this.props.toggleEditor() }}></button></h2>
-        <form onSubmit={this.handleSubmit}>
+        <form>
           <Accordion>
             <AccordionItem> {/* Data */}
               <AccordionItemHeading>
@@ -159,7 +159,7 @@ class Editor extends React.Component {
                     </label>
                   </li>
                 </ul>
-                <button className="add-column" onClick={(e) => { e.preventDefault(); this.props.editorLoadData()}}>Load Data</button>
+                <button className="blue-block" onClick={(e) => { e.preventDefault(); this.props.editorLoadData()}}>Load Data</button>
               </AccordionItemPanel>
             </AccordionItem>
             <AccordionItem> {/* General */}
@@ -295,7 +295,7 @@ class Editor extends React.Component {
                       </ul>
                     </fieldset>
                 ))}
-                <button className={"add-column"} onClick={(event) => {event.preventDefault(); this.props.addAdditionalColumn(additionalColumns.length + 1)}}>Add Column</button>
+                <button className={"blue-block"} onClick={(event) => {event.preventDefault(); this.props.addAdditionalColumn(additionalColumns.length + 1)}}>Add Column</button>
               </AccordionItemPanel>
             </AccordionItem>
             <AccordionItem> {/* Filters */}
@@ -306,7 +306,7 @@ class Editor extends React.Component {
               </AccordionItemHeading>
               <AccordionItemPanel>
                 {filters.length > 0 ? filters : (<p style={{textAlign: "center"}}>There are currently no filters.</p>) }
-                <button className={"add-column"} onClick={(event) => {event.preventDefault(); this.props.changeFilter(null, "addNew")}}>Add Filter</button>
+                <button className={"blue-block"} onClick={(event) => {event.preventDefault(); this.props.changeFilter(null, "addNew")}}>Add Filter</button>
               </AccordionItemPanel>
             </AccordionItem>
             <AccordionItem> {/* Legend */}
@@ -465,6 +465,15 @@ class Editor extends React.Component {
               </AccordionItemPanel>
             </AccordionItem>
           </Accordion>
+          <section className="confirmation-area">
+            <button onClick={ (e) => { e.preventDefault(); this.props.createConfig() } } className="blue-block">Create Configuration JSON</button>
+            {this.props.state.jsonConfigString.length > 0 && (
+              <React.Fragment>
+                <p>Copy the configuration json below and save to a file. Refer to the documentation for more information on how to implement this configuration file into your project.</p>
+                <textarea className="json-config" onFocus={(event) => event.target.select()}>{this.props.state.jsonConfigString}</textarea>
+              </React.Fragment>
+            )}
+          </section>
         </form>
       </section>
   );

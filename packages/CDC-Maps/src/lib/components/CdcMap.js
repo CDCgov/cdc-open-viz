@@ -5,31 +5,32 @@ import {
     ZoomableGroup,
     Geography,
 } from 'react-simple-maps'
-import './App.scss'
+import '../App.scss'
 import { geoAlbersUsa } from 'd3-geo'
 import ReactTooltip from 'react-tooltip'
-import topoJsonStates from './json/usa.json'
+import topoJsonStates from '../json/usa.json'
 import chroma from 'chroma-js'
-import Sidebar from './components/Sidebar'
-import Editor from './components/Editor'
-import Loading from './components/Loading'
-import SquareGeo from './components/SquareGeo'
+import Sidebar from './Sidebar'
+import Editor from './Editor'
+import Loading from './Loading'
+import SquareGeo from './SquareGeo'
 import ReactTable from 'react-table'
 import { CSVLink } from 'react-csv'
-import defaultConfig from './json/default.json'
+import defaultConfig from '../json/default.json'
 import Papa from 'papaparse'
 import ReactHtmlParser from 'react-html-parser'
 import arrayMove from 'array-move';
+import supportedGeos from '../json/supportedGeos'
 
-class cdcMap extends Component {
+class CdcMap extends Component {
 
     constructor (props) {
         super(props)
 
         this.state = {
             editor: {
-                active: true,
-                expanded: true
+                active: false,
+                expanded: false
             },
             columns: {
                 primary: {},
@@ -51,6 +52,7 @@ class cdcMap extends Component {
                 showTitle: true,
                 showSidebar: true
             },
+            jsonConfigString: ''
         }
 
         this.colorDistributions = {
@@ -246,123 +248,6 @@ class cdcMap extends Component {
 		        '#b1dafb'],
         }
 
-        // List of every single geographical area that can be displayed on the map. Some U.S. territories are listed twice. The first entry is for displaying on world map. This includes states, territories and cities. For extended versions of this, it could add countries, counties, etc... depending on what is being displayed.
-        this.supportedGeos = {
-            // States
-            'Alabama': 'AL',
-            'Alaska': 'AK',
-            'Arizona': 'AZ',
-            'Arkansas': 'AR',
-            'California': 'CA',
-            'Colorado': 'CO',
-            'Connecticut': 'CT',
-            'Delaware': 'DE',
-            'Florida': 'FL',
-            'Georgia': 'GA',
-            'Hawaii': 'HI',
-            'Idaho': 'ID',
-            'Illinois': 'IL',
-            'Indiana': 'IN',
-            'Iowa': 'IA',
-            'Kansas': 'KS',
-            'Kentucky': 'KY',
-            'Louisiana': 'LA',
-            'Maine': 'ME',
-            'Maryland': 'MD',
-            'Massachusetts': 'MA',
-            'Michigan': 'MI',
-            'Minnesota': 'MN',
-            'Mississippi': 'MS',
-            'Missouri': 'MO',
-            'Montana': 'MT',
-            'Nebraska': 'NE',
-            'Nevada': 'NV',
-            'New Hampshire': 'NH',
-            'New Jersey': 'NJ',
-            'New Mexico': 'NM',
-            'New York': 'NY',
-            'North Carolina': 'NC',
-            'North Dakota': 'ND',
-            'Ohio': 'OH',
-            'Oklahoma': 'OK',
-            'Oregon': 'OR',
-            'Pennsylvania': 'PA',
-            'Rhode Island': 'RI',
-            'South Carolina': 'SC',
-            'South Dakota': 'SD',
-            'Tennessee': 'TN',
-            'Texas': 'TX',
-            'Utah': 'UT',
-            'Vermont': 'VT',
-            'Virginia': 'VA',
-            'Washington': 'WA',
-            'West Virginia': 'WV',
-            'Wisconsin': 'WI',
-            'Wyoming': 'WY',
-            'District of Columbia': 'DC',
-            // Territories
-            'American Samoa': 'AS',
-            'Guam': 'GU',
-            'Micronesia': 'FM',
-            'Northern Marianas': 'MP',
-            'Palau': 'PW',
-            'Puerto Rico': 'PR',
-            'Virgin Islands': 'VI',
-            'Marshall Islands': 'MH',
-            // Cities
-            'Los Angeles County': 'LAC',
-            'Mesa': 'MESA',
-            'Phoenix': 'PHO',
-            'Tucson': 'TUC',
-            'Fresno': 'FRES',
-            'Long Beach': 'LG. BCH',
-            'Los Angeles': 'LA',
-            'Oakland': 'OAK',
-            'Sacramento': 'SAC',
-            'San Diego': 'SD',
-            'San Francisco': 'SF',
-            'San Jose': 'SJ',
-            'Colorado Springs': 'COL. SPR',
-            'Denver': 'DEN',
-            'Jacksonville': 'JAX',
-            'Miami': 'MIA',
-            'Atlanta': 'ATL',
-            'Chicago': 'CHI',
-            'Indianapolis': 'IND',
-            'Wichita': 'WIC',
-            'Louisville': 'LOU',
-            'New Orleans': 'NOLA',
-            'Boston': 'BOS',
-            'Baltimore': 'BAL',
-            'Detroit': 'DET',
-            'Minneapolis': 'MIN',
-            'Kansas City': 'KC',
-            'Charlotte': 'CHAR',
-            'Raleigh': 'RAL',
-            'Albuquerque': 'ALB',
-            'New York City': 'NYC',
-            'Omaha': 'OMA',
-            'Las Vegas': 'LV',
-            'Cleveland': 'CLE',
-            'Columbus': 'COL',
-            'Oklahoma City': 'OKC',
-            'Tulsa': 'TUL',
-            'Portland': 'PDX',
-            'Philadelphia': 'PHL',
-            'Nashville': 'NSH',
-            'Memphis': 'MEM',
-            'Arlington': 'ARL',
-            'Austin': 'AUS',
-            'Dallas': 'DAL',
-            'El Paso': 'EL PASO',
-            'Fort Worth': 'FT. WTH',
-            'Houston': 'HOU',
-            'San Antonio': 'SAN ANT',
-            'Virginia Beach': 'VIR. BCH',
-            'Seattle': 'SEA',
-            'Milwaukee': 'MIL',
-        }
-
         // We only check this against processed data, so can just check full names
         this.supportedTerritories = [
             'American Samoa',
@@ -433,14 +318,15 @@ class cdcMap extends Component {
         this.citiesInData = []
         this.territoriesInData = []
 
-        this.geoAbbreviations = Object.values(this.supportedGeos)
+        this.geoAbbreviations = Object.values(supportedGeos)
 
-        this.geoNames = Object.keys(this.supportedGeos)
+        this.geoNames = Object.keys(supportedGeos)
 
         this.isLoading = true
         this.isError = false
         this.isEditor = false
 
+        this.createConfig = this.createConfig.bind(this)
         this.handleEditorChanges = this.handleEditorChanges.bind(this)
         this.processData = this.processData.bind(this)
         this.applyLegendToValue = this.applyLegendToValue.bind(this)
@@ -598,17 +484,6 @@ class cdcMap extends Component {
             return false;
         }
 
-        // If we've got a nav map, simply give them all the same color and be done with it. This basically mirrors legacy functionality but the color does switch depending on what scheme you've selected whereas before it was always the same shade of blue.
-        if("navigation" === this.state.general.type) {
-	        let mapColorPalette = this.colorPalettes[ this.state.color ]
-
-	        if ( 'legacyNavigation' === this.state.color ) {
-		        color = mapColorPalette[ 0 ]
-	        } else {
-		        color = mapColorPalette[ 3 ]
-	        }
-        }
-
         // First, check if it's a special class
         if (this.state.legend.specialClasses !== false &&
             this.state.legend.specialClasses.includes(value)) {
@@ -716,10 +591,6 @@ class cdcMap extends Component {
     applyTooltipsToGeo (geoName, data) {
 
         let toolTipText = `<strong>${geoName}</strong>`
-
-        if("navigation" === this.state.general.type) {
-            return toolTipText
-        }
 
         Object.keys(this.state.columns).forEach((columnKey) => {
             const column = this.state.columns[columnKey]
@@ -1154,20 +1025,6 @@ class cdcMap extends Component {
                     continue
                 }
 
-                // If this is a navigation only map, skip if it doesn't have a URL
-                if("navigation" === this.state.general.type ) {
-                    let navigateUrl = item[this.state.columns.navigate.name] || "";
-                    if ( undefined !== navigateUrl ) {
-                        // Strip hidden characters before we check length
-
-                        navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
-                    }
-
-                    if ( 0 === navigateUrl.length ) {
-                        continue
-                    }
-                }
-
                 // Push to map
                 if (parsedData[geoName] === undefined) {
                     parsedData[geoName] = item
@@ -1261,35 +1118,7 @@ class cdcMap extends Component {
 
         e.preventDefault();
 
-        const s = window.parent.s || {}
-
-        const extension = urlString.length > 0 ? urlString.substring( urlString.lastIndexOf( '.' ) + 1 ) : ''
-
-        if ( s.linkDownloadFileTypes.split( ',' ).includes(extension) ) {
-
-            s.linkTrackVars = 'prop1,eVar1,events,event56'
-
-            s.linkTrackEvents = 'event56'
-
-            s.events = 'event56'
-
-            s.linkURL = urlString
-
-            s.tl( true, 'd', null )
-
-        }
-
-        if(urlString.includes('#')) {
-            let hashID = urlString.split('#')[1]
-
-            let scrollSection = window.parent.document.querySelector(`*[id="${hashID}"]`) || window.parent.document.querySelector(`*[name="${hashID}"]`)
-
-            scrollSection.scrollIntoView({
-                behavior: 'smooth'
-            })
-        } else {
-            window.parent.location = urlString
-        }
+        window.parent.location = urlString
 
     }
 
@@ -1421,21 +1250,14 @@ class cdcMap extends Component {
         // Rebuild tooltips
         ReactTooltip.rebuild()
 
-        // If we're in an editor, pass the information to the hidden input
-        if(true === this.state.editor.active) {
+    }
 
-        	var data = this.convertStateToJson()
+    createConfig () {
+        var data = this.convertStateToJson()
 
-            var event = new CustomEvent('updateConfig', { detail: data })
-
-            window.parent.document.dispatchEvent(event)
-        }
-
-        // Resize based on height. parentIFrame.size() is a method added by the widget loader
-        if (window.parentIFrame) {
-            window.parentIFrame.size(document.body.clientHeight)
-        }
-
+        this.setState({
+            jsonConfigString: data
+        })
     }
 
     async componentDidMount () {
@@ -1531,9 +1353,6 @@ class cdcMap extends Component {
             })
 
         }
-
-        // Set browser title to the name of the map
-        document.title = initialState.general.title
 
         // Set properties that can be passed directly and require no additional computation
         await this.setState((prev) => {
@@ -2130,7 +1949,7 @@ class cdcMap extends Component {
         return (
             <React.Fragment>
                 {true === this.isLoading && <Loading />}
-                {true === this.state.editor.active && <Editor state={this.state} editorLoadData={this.editorLoadData} toggleEditor={this.toggleEditor} generateValuesForFilter={this.generateValuesForFilter} colorPalettes={this.colorPalettes} removeAdditionalColumn={this.removeAdditionalColumn} addAdditionalColumn={this.addAdditionalColumn} editColumn={this.editColumn} changeFilter={this.changeFilter} handleEditorChanges={this.handleEditorChanges} />}
+                {true === this.state.editor.active && <Editor state={this.state} createConfig={this.createConfig} editorLoadData={this.editorLoadData} toggleEditor={this.toggleEditor} generateValuesForFilter={this.generateValuesForFilter} colorPalettes={this.colorPalettes} removeAdditionalColumn={this.removeAdditionalColumn} addAdditionalColumn={this.addAdditionalColumn} editColumn={this.editColumn} changeFilter={this.changeFilter} handleEditorChanges={this.handleEditorChanges} />}
                 <section className={true === this.state.editor.expanded ? "editor-active full-container" : "full-container"}>
                     <ReactTooltip
                         id="tooltip"
@@ -2272,7 +2091,7 @@ class cdcMap extends Component {
                                 {this.territoriesInData.length > 0 &&
                                 <SquareGeo type="Territories" state={this.state}
                                            data={processedData}
-                                           supportedGeos={this.supportedGeos} list={this.territoriesInData}
+                                           supportedGeos={supportedGeos} list={this.territoriesInData}
                                            applyTooltipsToGeo={(
                                                geoName,
                                                data) => this.applyTooltipsToGeo(
@@ -2282,7 +2101,7 @@ class cdcMap extends Component {
                                 }
                                 {this.citiesInData.length > 0 &&
                                 <SquareGeo type="Cities" state={this.state} data={processedData}
-                                           supportedGeos={this.supportedGeos} list={this.citiesInData}
+                                           supportedGeos={supportedGeos} list={this.citiesInData}
                                            applyTooltipsToGeo={(
                                                geoName,
                                                data) => this.applyTooltipsToGeo(
@@ -2332,4 +2151,4 @@ class cdcMap extends Component {
     }
 }
 
-export default cdcMap
+export default CdcMap
