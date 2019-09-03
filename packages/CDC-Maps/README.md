@@ -131,10 +131,3 @@ Please refer to [CDC's Template Repository](https://github.com/CDCgov/template)
 for more information about [contributing to this repository](https://github.com/CDCgov/template/blob/master/CONTRIBUTING.md),
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
 and [code of conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
-
-## Hat-tips
-Thanks to [18F](https://18f.gsa.gov/)'s [open source policy](https://github.com/18F/open-source-policy)
-and [code of conduct](https://github.com/CDCgov/code-of-conduct/blob/master/code-of-conduct.md)
-that were very useful in setting up this GitHub organization. Thanks to CDC's
-[Informatics Innovation Unit](https://www.phiresearchlab.org/index.php/code-of-conduct/)
-that was helpful in modeling the code of conduct.
