@@ -470,7 +470,7 @@ class Editor extends React.Component {
             {this.props.state.jsonConfigString.length > 0 && (
               <React.Fragment>
                 <p>Copy the configuration json below and save to a file. Refer to the documentation for more information on how to implement this configuration file into your project.</p>
-                <textarea className="json-config" onFocus={(event) => event.target.select()}>{this.props.state.jsonConfigString}</textarea>
+                <textarea className="json-config" onFocus={(event) => event.target.select()} value={this.props.state.jsonConfigString}></textarea>
               </React.Fragment>
             )}
           </section>

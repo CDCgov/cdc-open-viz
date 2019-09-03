@@ -1,5 +1,82 @@
 # CDC Maps
 
+![](screenshot.png)
+
+`<CdcMap />` is a React component for visualizing your data on a map of the United States. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
+
+It builds off the foundational work done on using D3 Geo and React by [React Simple Maps](https://github.com/zcreativelabs/react-simple-maps).
+
+
+## Installation
+
+```sh
+npm install cdc-map
+```
+
+## Usage
+
+1 . Import the component at the top of your file.
+```js
+import CdcMap from 'cdc-map'
+import 'cdc-map/build/static/css/index.css'
+```
+
+2 . Use the component freely in your React application.
+```jsx
+import React from 'react';
+import CdcMap from 'cdc-map'
+import 'cdc-map/build/static/css/index.css'
+
+function App() {
+  return (
+    <div className="App">
+        <CdcMap />
+    </div>
+  );
+}
+
+export default App;
+```
+
+### Parameters
+
+The component supports two different methods of loading a configuration. You can pass it directly as an object or via an external JSON configuration url.
+
+1. Loading an object using the `config` parameter.
+```jsx
+const configObj = {...}
+
+<CdcMap config={configObj} />
+```
+2. Loading an external URL using the `configUrl` parameter.
+```jsx
+<CdcMap configUrl="http://example.com/configuration.json" />
+```
+
+### Data Formatting
+The actual data that you are mapping needs to be formatted in a specific way where there is one column for each row that represents the state or city for the rest of the data on that row.
+
+The supported formats are CSV and JSON files.
+
+Reference the `/example-data/` folder for examples of both.
+
+For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html) on how to use the map tool.
+
+### Editor
+
+![](editor.gif)
+
+While it is possible to hand edit values in the configuration object, it is easier to use an editor which will help you quickly build the map you want to display. To enable this editor in your project, make sure your configuration is passing the following as part of the object:
+
+```js
+editor: {
+    active: true,
+    expanded: true
+}
+```
+
+Once you have configured the map as you wanted, click "Create Configuration Object" and you will get a string of JSON you can use for that map.
+
 ## Public Domain
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in

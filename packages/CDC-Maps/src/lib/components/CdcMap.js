@@ -1260,20 +1260,18 @@ class CdcMap extends Component {
   }
 
   async componentDidMount() {
-    // Checks for url parameter. This should only be used for quickly testing config files. When loaded through the widget loader, this is provided in the callParams.
-    const params = new URLSearchParams(window.location.search);
-    const configUrlFromQS = params.get("url");
 
     // Load default JSON
-    let data = defaultConfig;
+    let data;
 
-    // If we pass a config via the querystring, use that as the config. Otherwise, read from the configParams
-    let jsonConfigUrl = configUrlFromQS || "";
-
-    // If we successfully found some kind of reference file, load that instead.
-    if (jsonConfigUrl.length > 0) {
-      let config = await fetch(jsonConfigUrl, { cache: "reload" });
-      data = await config.json();
+    // If passed a URL, use that.
+    if (this.props.configUrl) {
+        let config = await fetch(this.props.configUrl, { cache: "reload" });
+        data = await config.json();
+    } else if(this.props.config) {
+        data = this.props.config;
+    } else {
+        data = defaultConfig;
     }
 
     // Load the state directly from the config file that is passed. This also adds new top level properties that are defined in the first state declaration at the very top.
@@ -1915,6 +1913,13 @@ class CdcMap extends Component {
 
     return (
       <section className="cdc-map">
+        <ReactTooltip
+            id="tooltip"
+            place="right"
+            type="light"
+            html={true}
+            className={"tooltip"}
+        />
         {true === this.isLoading && <Loading />}
         {true === this.state.editor.active && (
           <Editor
@@ -1938,13 +1943,6 @@ class CdcMap extends Component {
               : "full-container"
           }
         >
-          <ReactTooltip
-            id="tooltip"
-            place="right"
-            type="light"
-            html={true}
-            className={"tooltip"}
-          />
           {this.state.editor.expanded === false &&
             true === this.state.editor.active &&
             false === this.state.general.showTitle && (

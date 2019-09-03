@@ -1,8 +1,10 @@
 aside {
   width: 100%;
   min-width: 200px;
+  padding: 1em;
   @include breakpoint(sm) {
     width: auto;
+    padding: 0 2em 0 0;
   }
   .container {
     background: #fff;
@@ -11,10 +13,8 @@ aside {
     line-height: 1.3em;
     flex-shrink: 0;
     position: relative;
-    margin: 1em 1em 1.5em;
     font-size: .8em; /* Needed because legends can take up quite a bit of space at mobile viewport sizes. */
     max-width: 100%;
-    min-width: 250px;
     @include breakpoint(sm) {
       font-size: .9em;
       margin: 1em 1em 1em 0;
@@ -22,12 +22,9 @@ aside {
     }
     @include breakpoint(md) {
       font-size: .9em;
-      max-width: 30%;
-      margin: 3em 3em 2.5em 0;
       box-shadow: rgba(0,22,39,.3) 0 10px 25px;
     }
     @include breakpoint(lg) {
-      margin: 3em 6em 2.5em 0;
       max-width: 550px;
     }
   }

@@ -30,9 +30,9 @@
   font-family: sans-serif;
   font-size: 14px;
   min-width: 100%;
-  position: relative;
   display: flex; // This is for when the editor is active
   align-items: stretch;
+
   @include breakpoint(lg) {
     font-size: 16px;
   }
