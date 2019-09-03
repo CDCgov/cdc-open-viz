@@ -2,7 +2,7 @@
 .data-table {
   margin: 1em 0 0;
   overflow: hidden;
-  max-width: 100vw;
+  max-width: 100%;
   @include breakpoint(sm) {
     margin: 1em 0 0;
   }

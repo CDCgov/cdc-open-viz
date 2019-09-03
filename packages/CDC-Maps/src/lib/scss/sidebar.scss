@@ -21,14 +21,13 @@ aside {
       box-shadow: rgba(0,22,39,.3) 0 5px 10px;
     }
     @include breakpoint(md) {
-      font-size: 1em;
-      max-width: 30vw;
-      margin: 3vw 3vw 2.5em 0;
+      font-size: .9em;
+      max-width: 30%;
+      margin: 3em 3em 2.5em 0;
       box-shadow: rgba(0,22,39,.3) 0 10px 25px;
     }
     @include breakpoint(lg) {
-      margin: 3vw 6vw 2.5em 0;
-      min-width: 340px;
+      margin: 3em 6em 2.5em 0;
       max-width: 550px;
     }
   }

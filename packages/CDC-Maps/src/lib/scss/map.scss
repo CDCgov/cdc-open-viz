@@ -3,17 +3,6 @@
   flex-grow: 1;
   position: relative;
   min-width: 65%;
-  .cdc-hhs-logo {
-    display: block;
-    position: absolute;
-    bottom: 0;
-    right: 1em;
-    width: 12vw;
-    max-width: 120px;
-    @include breakpoint(md) {
-      width: 7vw;
-    }
-  }
   svg {
     padding: 0;
     width: 100%;

@@ -5,22 +5,25 @@ import {
     ZoomableGroup,
     Geography,
 } from 'react-simple-maps'
-import '../App.scss'
 import { geoAlbersUsa } from 'd3-geo'
 import ReactTooltip from 'react-tooltip'
-import topoJsonStates from '../json/usa.json'
 import chroma from 'chroma-js'
+import ReactTable from 'react-table'
+import { CSVLink } from 'react-csv'
+import Papa from 'papaparse'
+import ReactHtmlParser from 'react-html-parser'
+import arrayMove from 'array-move';
+
+// Local imports
+import '../App.scss'
+import defaultConfig from '../json/default.json'
+import supportedGeos from '../json/supportedGeos'
+import topoJsonStates from '../json/usa.json'
 import Sidebar from './Sidebar'
 import Editor from './Editor'
 import Loading from './Loading'
 import SquareGeo from './SquareGeo'
-import ReactTable from 'react-table'
-import { CSVLink } from 'react-csv'
-import defaultConfig from '../json/default.json'
-import Papa from 'papaparse'
-import ReactHtmlParser from 'react-html-parser'
-import arrayMove from 'array-move';
-import supportedGeos from '../json/supportedGeos'
+
 
 class CdcMap extends Component {
 
@@ -1947,7 +1950,7 @@ class CdcMap extends Component {
         let processedDataTableColumns = this.processDataTableOnRender()
 
         return (
-            <React.Fragment>
+            <section className="cdc-map">
                 {true === this.isLoading && <Loading />}
                 {true === this.state.editor.active && <Editor state={this.state} createConfig={this.createConfig} editorLoadData={this.editorLoadData} toggleEditor={this.toggleEditor} generateValuesForFilter={this.generateValuesForFilter} colorPalettes={this.colorPalettes} removeAdditionalColumn={this.removeAdditionalColumn} addAdditionalColumn={this.addAdditionalColumn} editColumn={this.editColumn} changeFilter={this.changeFilter} handleEditorChanges={this.handleEditorChanges} />}
                 <section className={true === this.state.editor.expanded ? "editor-active full-container" : "full-container"}>
@@ -2146,7 +2149,7 @@ class CdcMap extends Component {
                     <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>
                     }
                 </section>
-            </React.Fragment>
+            </section>
         )
     }
 }

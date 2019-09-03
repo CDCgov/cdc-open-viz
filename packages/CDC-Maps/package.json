@@ -1,8 +1,8 @@
 {
   "name": "cdc-map",
+  "version": "1.0.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/cdcgov/CdcMap",
-  "version": "1.0.0",
   "main": "build/index.js",
   "scripts": {
     "start": "node scripts/start.js",
@@ -42,6 +42,10 @@
     "react-tag-autocomplete": "^5.11.1",
     "react-tooltip": "^3.10.0"
   },
+  "peerDependencies": {
+    "react": ">=0.14",
+    "react-dom": ">=0.14"
+  },
   "devDependencies": {
     "@babel/core": "7.4.3",
     "@svgr/webpack": "^4.2.0",
@@ -56,14 +60,15 @@
     "css-loader": "2.1.1",
     "dotenv": "6.2.0",
     "dotenv-expand": "4.2.0",
-    "eslint": "^5.16.0",
+    "eslint": "6.1.0",
+    "eslint-config-airbnb": "18.0.1",
     "eslint-config-react-app": "^4.0.0",
     "eslint-loader": "2.1.2",
     "eslint-plugin-flowtype": "2.50.1",
-    "eslint-plugin-import": "2.16.0",
-    "eslint-plugin-jsx-a11y": "6.2.1",
-    "eslint-plugin-react": "7.12.4",
-    "eslint-plugin-react-hooks": "^1.5.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
     "file-loader": "3.0.1",
     "fs-extra": "7.0.1",
     "html-webpack-plugin": "4.0.0-beta.5",
@@ -82,7 +87,6 @@
     "postcss-preset-env": "6.6.0",
     "postcss-safe-parser": "4.0.1",
     "react": "^16.8.6",
-    "react-app-polyfill": "^1.0.0",
     "react-dev-utils": "^9.0.0",
     "react-dom": "^16.8.6",
     "resolve": "1.10.0",

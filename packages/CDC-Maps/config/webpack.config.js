@@ -620,6 +620,20 @@ module.exports = function(webpackEnv) {
       ? {
         react: 'react',
         'react-dom': 'react-dom',
+        'react-simple-maps': 'react-simple-maps',
+        'd3-geo': 'd3-geo',
+        'react-tooltip': 'react-tooltip',
+        'react-table': 'react-table',
+        'react-csv': 'react-csv',
+        'papaparse': 'papaparse',
+        'react-html-parser': 'react-html-parser',
+        'array-move': 'array-move',
+        'react-accessible-accordion': 'react-accessible-accordion',
+        'react-tag-autocomplete': 'react-tag-autocomplete',
+        'react-sortable-hoc': 'react-sortable-hoc',
+        'react-addons-css-transition-group': 'react-addons-css-transition-group',
+        'chroma-js': 'chroma-js',
+        'radium': 'radium'
       }
       : {},
     // Some libraries import Node modules but don't use them in the browser.
