@@ -2,7 +2,7 @@
 
 ![](screenshot.png)
 
-`<CdcMap />` is a React component for visualizing your data on a map of the United States. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
+`<CdcMap />` is a React component for visualizing your data on a map of the United States. This was built for the Center for Disease Control's internal use and has been open sourced. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
 
 It builds off the foundational work done on using D3 Geo and React by [React Simple Maps](https://github.com/zcreativelabs/react-simple-maps).
 
