@@ -66,16 +66,13 @@ For more information, read the [CDC's official guidance](https://www.cdc.gov/wcm
 
 ![](editor.gif)
 
-While it is possible to hand edit values in the configuration object, it is easier to use an editor which will help you quickly build the map you want to display. To enable this editor in your project, make sure your configuration is passing the following as part of the object:
+While it is possible to hand edit values in the configuration object, it is easier to use the editor which will help you quickly build the map you want to display. To enable it in your project simply pass it as a property to the component with no configuration:
 
 ```js
-editor: {
-    active: true,
-    expanded: true
-}
+<CdcMap editor={true} />
 ```
 
-Once you have configured the map as you wanted, click "Create Configuration Object" and you will get a string of JSON you can use for that map.
+This will load the map with its default configuration file (located in `/src/json/default.json`) and the editor pane open. Once you have configured the map as you wanted, click "Create Configuration Object" and you will get a string of JSON you can use for that map.
 
 ## Public Domain
 This repository constitutes a work of the United States Government and is not

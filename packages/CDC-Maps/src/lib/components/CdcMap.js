@@ -1285,7 +1285,8 @@ class CdcMap extends Component {
         initialState.general.backgroundColor;
     }
 
-    if (true === this.isEditor || true === this.state.editor.active) {
+    // If editor prop is passed, load editor
+    if (this.props.editor && true === this.props.editor) {
       initialState.editor = {
         active: true,
         expanded: true
