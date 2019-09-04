@@ -8,6 +8,13 @@ It builds off the foundational work done on using D3 Geo and React by [React Sim
 
 **This repository was created for use by CDC programs. Github is not hosted by the CDC, but is used by CDC and its partners to share information and collaborate on software.**
 
+## Demos
+
+The following are examples to show various examples of CDC Maps in action:
+* [Example Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
+* [Example Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
+* [Example Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
+
 ## Installation
 
 ```sh
