@@ -2,7 +2,7 @@
 
 ![](screenshot.png)
 
-`<CdcMap />` is a React component for visualizing your data on a map of the United States. This was built for the Center for Disease Control's internal use and has been open sourced. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
+`<CdcMap />` is a React component for visualizing your data on a map of the United States. This was built for the Centers for Disease Control and Prevention's internal use and has been open sourced. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
 
 It builds off the foundational work done on using D3 Geo and React by [React Simple Maps](https://github.com/zcreativelabs/react-simple-maps).
 
@@ -55,13 +55,13 @@ const configObj = {...}
 ```
 
 ### Data Formatting
-The actual data that you are mapping needs to be formatted in a specific way where there is one column for each row that represents the state or city for the rest of the data on that row.
+The actual data that you are mapping needs to be formatted in a specific way where there is one column for each row that represents the state or city for the rest of the data on that row. There needs to be an additional column that represents the data you are trying to display on the map. This can be categorical or numerical data. You will specifically map these columns in the editor.
 
 The supported formats are CSV and JSON files.
 
 Reference the `/example-data/` folder for examples of both.
 
-For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html) on how to use the map tool.
+For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/instructions/data-map-instructions.html) on how to use the map tool.
 
 ### Editor
 
@@ -74,6 +74,13 @@ While it is possible to hand edit values in the configuration object, it is easi
 ```
 
 This will load the map with its default configuration file (located in `/src/json/default.json`) and the editor pane open. Once you have configured the map as you wanted, click "Create Configuration Object" and you will get a string of JSON you can use for that map.
+
+### Things to Avoid
+
+* **Avoid restricting the width below 675px on fullsize screens.**
+CDC Maps was originally designed to utilize full viewport width and be embedded in an iframe. It's responsive but the viewport width of the page must be below a certain size for that to take effect. Including the component at smaller widths than 675px can lead to unforseen rendering issues.
+* **Do not use this component where a parent element has `position: relative` set.**
+The tooltips are positioned absolutely relative to the viewport they're in. If you're including the component inside an element where `position: relative` is set they will be relative to that container element, causing the tooltips to be offset.
 
 ## Public Domain
 This repository constitutes a work of the United States Government and is not

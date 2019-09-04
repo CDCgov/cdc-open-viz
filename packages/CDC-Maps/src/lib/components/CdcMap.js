@@ -2020,11 +2020,6 @@ class CdcMap extends Component {
 
                             let legendColors;
 
-                            // Remove Antarctica
-                            if ("Antarctica" === geoName) {
-                              return true;
-                            }
-
                             // Once we receive data for this geographic item, setup variables.
                             if (geoData !== undefined) {
                               // This method either returns an array with colors to add to the state or false
