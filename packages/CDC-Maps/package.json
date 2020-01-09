@@ -2,7 +2,7 @@
   "name": "cdc-map",
   "version": "1.0.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
-  "homepage": "https://github.com/cdcgov/CdcMap",
+  "homepage": "https://github.com/CDCgov/CDC-Maps",
   "main": "build/index.js",
   "scripts": {
     "start": "node scripts/start.js",
