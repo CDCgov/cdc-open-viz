@@ -32,7 +32,7 @@ export default ({ backgroundColor }) => {
   return (
       <section style={styleObj} className="container mt-5">
         <h2 className="mb-3">CDC React Starter Kit</h2>
-        <p>This is an example component showing foundational React concepts like state, props and JSX. View the source code for more helpful information.</p>
+        <p>This is an example component showing foundational React concepts like state, props and JSX. View the source code for more helpful information. </p>
         <p>Before using this starter kit it's very important that you read the <a href="https://github.com/CDCgov/react-starter-kit/blob/master/README.md">documentation</a> which contains helpful tips and guidelines to adhere to when creating your codebase that keep things easy to understand and maintainable for the entire team.</p>
         <p className="h5 mt-5"><strong>You've clicked the button: {number} times.</strong></p>
         <div className="mt-4">
