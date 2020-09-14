@@ -17,4 +17,10 @@ Modern front-end development has become very complex. The most important guiding
 2. Run `npm install` to install the needed packages
 3. Run `npm start` to start up the development server. It should open your default browser with the URL and refresh to reflect code changes you make upon save.
 
+### Building
+
+To build the project, run `npm run build` and it will compile everything down into bundle.js.
+
+This folder works in a self contained way so you can put it on a server and it will load the index.html or you can take that bundle.js file and include it on a different page, as long as you have a container element with the same ID that is specified in `index.js` for React to lock onto and render inside of.
+
 **Note: Please use NPM, not Yarn to prevent multiple lock files.**

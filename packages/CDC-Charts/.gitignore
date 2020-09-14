@@ -2,6 +2,9 @@
 .DS_Store
 ._*
 
+# Build files
+bundle.js
+
 # Logs
 logs
 *.log

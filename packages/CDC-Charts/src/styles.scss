@@ -4,3 +4,8 @@
 @import 'scss/mixins';
 
 // Your custom SASS here
+
+// Example styles
+.container p + p {
+    padding-top: 1em;
+}
