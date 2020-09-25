@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
     mode: 'production',
     output: {
-        path: path.resolve(__dirname),
+        path: path.resolve(__dirname, './dist'),
         filename: 'bundle.js'
     },
     devServer: {
@@ -11,6 +11,17 @@ module.exports = {
     },
     module: {
         rules: [
+          {
+            test: /\.(png|jpe?g|gif|svg)$/i,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: 'assets/[name].[ext]'
+                }
+              },
+            ],
+          },
           {
             test: /\.m?js$/,
             exclude: /(node_modules)/,

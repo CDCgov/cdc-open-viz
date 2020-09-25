@@ -4,13 +4,6 @@ The project is a simple starter kit for creating new React based projects at CDC
 ### Keep it Simple
 Modern front-end development has become very complex. The most important guiding principle of this starter kit is to keep things simple and easy to understand. We want to make it easy for anybody looking at the code to understand what is happening so they can extend and modify things to suit their specific needs. Adding extra steps into the build process should be considered carefully and discussed amongst the team.
 
-### Roadmap
-* Make sure all necessary polyfills are in for IE11 and any other assistive packages
-* Add in scaffolding for context/very large state
-* Finalize code linting standards based on feedback
-* Add optional TypeScript support
-* Finalize README
-
 ## Getting Started
 
 1. Clone this repository
@@ -60,7 +53,11 @@ Obviously if there's a need, we can be flexible here but best to discuss with th
 
 **Popular React Extensions and Packages**
 
-There are many packages that are used with React for common things like state management or routing etc... like Redux as discussed above. These packages rise and fall in popularity. This starter kit does not attempt to be prescriptive when it comes to individual packages, just this guiding principal: If the larger React ecosystem has coalesced around a particular package and it meets our requirements, we should use that package. For instance, [React Router](https://reactrouter.com/) is the de facto routing package at the time of this writing for React, but there's another package called [Reach Router](https://reach.tech/router/). If they both support the thing we're trying to do, the developer should favor the more popular package.
+There are many packages that are used with React for common things like state management or routing etc... like Redux as discussed above. These packages rise and fall in popularity. We only try to standardize very large packages. You can see a table below of recommended packages. For most things, we do not attempt to be prescriptive when it comes to individual packages, just adhere to this guiding principal: If the larger React ecosystem has coalesced around a particular package for something and it meets our requirements, we should use that package. If they both support the thing we're trying to do, the developer should favor the more popular package.
+
+Purpose | Package
+--- | ---
+Routing | [React Router](https://reactrouter.com/)
 
 ## Browser Support
 

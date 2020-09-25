@@ -5,7 +5,11 @@ module.exports = {
   },
   extends: [
     'plugin:react/recommended',
-    'airbnb',
+    'plugin:@wordpress/eslint-plugin/custom',
+    'plugin:@wordpress/eslint-plugin/es5',
+    'plugin:@wordpress/eslint-plugin/esnext',
+    'plugin:@wordpress/eslint-plugin/jsx-a11y',
+    'plugin:@wordpress/eslint-plugin/react'
   ],
   parserOptions: {
     ecmaFeatures: {
@@ -21,6 +25,8 @@ module.exports = {
     'react/jsx-filename-extension': [1, { 'extensions': ['.js', '.jsx'] }],
     'react/prop-types': 0,
     'react/jsx-one-expression-per-line': 0,
-    'max-len': 0
+    'max-len': 0,
+    'jsdoc/require-param': 0,
+    'comma-dangle': 0
   },
 };
