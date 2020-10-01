@@ -6,9 +6,11 @@ Modern front-end development has become very complex. The most important guiding
 
 ## Getting Started
 
-1. Clone this repository
-2. Run `npm install` to install the needed packages
-3. Run `npm start` to start up the development server. It should open your default browser with the URL and refresh to reflect code changes you make upon save.
+1. Click the "Use This Template" green button at the top right on Github, or simply follow [this link](https://github.com/CDCgov/react-starter-kit/generate).
+   - Make sure you select the appropriate organization. If this is for an internal project that will not be shared as open source, please select **`cdcent`** not `cdcgov`.
+2. Clone the newly created repository
+3. Run `npm install` to install the needed packages
+4. Run `npm start` to start up the development server. It should open your system's default browser with the URL and refresh to reflect code changes you make upon save.
 
 ### Building
 
@@ -64,3 +66,9 @@ Routing | [React Router](https://reactrouter.com/)
 Chrome | Firefox | IE | Safari | Edge
 --- | --- | --- | --- | --- |
 Latest ✔ | Latest ✔ | 11 ✔ | Latest ✔ | Latest ✔ |
+
+## Open Sourcing
+
+While a lot of the code used in this starter kit will be for internal code, we should attempt to open source when we can. If you plan on open sourcing the code, be sure to use the `cdcgov` organization (the organization that this starter kit is hosted with) instead of the `cdcent` organization. You might have to request access to do this, and there are also policies and procedures that should be followed before open sourcing a project. [This repository](https://github.com/CDCgov/template) has a good starting point with a link to a form to get access to `cdcgov`, the process and additional information you need to add to your repository if you want to make it an open source project.
+
+The reason this repository does not have a lot of those files is because it is a template for specific use by teams in CDC and not oriented towards larger community contributions at this time.
