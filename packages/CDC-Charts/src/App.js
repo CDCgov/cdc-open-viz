@@ -5,7 +5,7 @@ import Example from './components/Example';
 
 import './styles.scss';
 
-export default () => {
+export default function App() {
 	const [ pageTitle, setPageTitle ] = useState( 'CDC React Starter Kit' );
 
 	return (
@@ -13,4 +13,4 @@ export default () => {
 			<Example backgroundColor="#F5F5F5" />
 		</Context.Provider>
 	);
-};
+}

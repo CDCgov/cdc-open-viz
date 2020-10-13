@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import Context from '../context';
 import testImage from '../assets/test-image.png';
 
-export default ( { backgroundColor } ) => {
+export default function Example( { backgroundColor } ) {
 	/**
 	 * A simple piece of state that is a number we display on the page.
 	 * This code creates the actual state variable `number` and `setNumber`
@@ -114,4 +114,4 @@ export default ( { backgroundColor } ) => {
 			</form>
 		</section>
 	);
-};
+}
