@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 
 import App from './App';
 
+const domContainer = document.querySelector('#react-container');
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App configUrl={domContainer.attributes['data-config'].value} />
   </React.StrictMode>,
-  document.querySelector('#react-container')
+  domContainer
 );

@@ -5,11 +5,11 @@ import Example from './components/Example';
 
 import './styles.scss';
 
-export default function App() {
-  const [pageTitle, setPageTitle] = useState('CDC React Starter Kit');
+export default function App({ configUrl }) {
+  const [pageContext, setPageContext] = useState({ title: 'CDC React Starter Kit', configUrl });
 
   return (
-    <Context.Provider value={{ pageTitle, setPageTitle }}>
+    <Context.Provider value={{ pageContext, setPageContext }}>
       <Example backgroundColor="#F5F5F5" />
     </Context.Provider>
   );

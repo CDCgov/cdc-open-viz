@@ -31,6 +31,10 @@
   },
   "dependencies": {
     "react-app-polyfill": "^1.0.4",
+    "@visx/axis": "^1.0.0",
+    "@visx/group": "^1.0.0",
+    "@visx/scale": "^1.0.0",
+    "@visx/shape": "^1.0.0",
     "bootstrap": "^4.3.1",
     "html-react-parser": "^0.14.0",
     "react": "^16.11.0",
