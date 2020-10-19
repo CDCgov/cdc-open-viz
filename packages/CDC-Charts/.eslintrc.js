@@ -1,17 +1,14 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true,
   },
   extends: [
-    'plugin:react/recommended',
-    'plugin:@wordpress/eslint-plugin/custom',
-    'plugin:@wordpress/eslint-plugin/es5',
-    'plugin:@wordpress/eslint-plugin/esnext',
-    'plugin:@wordpress/eslint-plugin/jsx-a11y',
-    'plugin:@wordpress/eslint-plugin/react'
+    'airbnb',
+    'airbnb/hooks',
+    'eslint-config-airbnb/whitespace',
   ],
   parserOptions: {
+    es2021: true,
     ecmaFeatures: {
       jsx: true,
     },

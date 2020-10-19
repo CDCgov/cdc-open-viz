@@ -36,7 +36,7 @@ Similar to older projects like Gulp and Grunt, this is the main "task runner" fo
 The configuration is stored in `webpack.config.js` it is recommended that you look at the Webpack documentation before trying to edit it.
 
 **ESLint**
-This checks and enforces code quality when you commit so that the code is standardized among all developers.
+This checks and enforces code quality when you commit so that the code is standardized among all developers. It uses the [AirBnb JavaScript Coding Standards](https://github.com/airbnb/javascript).
 
 ## Best Practices and Recommended Extensions
 
