@@ -1,0 +1,189 @@
+.map-container.full-border {
+  border: #C2C2C2 1px solid;
+}
+
+header + .map-container.full-border {
+  border-top: 0; // When they have a header, don't add a border top
+}
+
+// World Specific Styles
+.map-container.world {
+  &.data .geography-container {
+    border-bottom: $mediumGray 1px solid;
+  }
+  @include breakpoint(md) {
+    aside.bottom {
+      margin-top: 1em;
+    }
+  }
+  .geography-container {
+    cursor: move;
+  }
+}
+
+// US Specific Styles
+.map-container.us {
+  .geography-container {
+    svg path {
+      stroke-width: 1.3px !important;
+    }
+  }
+}
+
+// Data Specific Styles
+.map-container.data {
+  @include breakpoint(md) {
+    &.side {
+      flex-direction: row;
+    }
+  }
+}
+
+// Navigation Specific Styles
+.map-container.navigation {
+  @include breakpoint(md) {
+    &:not(.full-border) {
+      .navigation-menu {
+        //border: $mediumGray 1px solid; // Some centers don't want a forced border. Leaving out for now.
+      }
+    }
+  }
+}
+
+.geography-container {
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  .city-dot {
+    transition: .3s all;
+    circle {
+      stroke-width: 1.3px;
+      transition: .3s transform;
+    }
+    &:hover {
+      transition: .3s all;
+      circle {
+        transition: .3s transform;
+        transform: scale(1.2);
+      }
+    }
+  }
+  .cdc-hhs-logo {
+    position: absolute;
+    bottom: 2em;
+    right: 1em;
+    z-index: 3;
+    width: 100px;
+  }
+  svg {
+    padding: 0;
+    width: 100%;
+    height: auto;
+    z-index: 2;
+    position: relative;
+    .label {
+      fill: rgba(0,0,0,.8);
+      font-size: .8em;
+    }
+    path {
+      fill: #E6E6E6;
+      stroke-width: 0.7px;
+      transition: .3s all;
+      position: relative;
+      opacity: 1;
+      &:focus {
+        outline: 0;
+      }
+    }
+  }
+}
+
+// Border colors for territories
+.rsm-geography {
+  > path.darkGray, &.darkGray {
+    stroke: rgba(0,0,0,.2) !important;
+  }
+}
+
+// Cities and Territories
+.territories {
+  padding: 1em 100px 0 1em;
+  margin-bottom: 2em;
+  font-size: .8em;
+  @include breakpoint(md) {
+  }
+  @include breakpoint(lg) {
+    font-size: 1em;
+    padding-top: 3em;
+  }
+  ul {
+    @include breakpoint(lg) {
+      max-width: none;
+    }
+    li {
+      text-align: center;
+      min-width: 30px;
+      display: inline-block;
+      margin-right: .5em;
+      margin-bottom: .5em;
+      transition: .3s all;
+      &.label {
+        max-width: 30%;
+        vertical-align: middle;
+        display: inline-block;
+        text-align: left;
+        font-size: 1rem !important;
+        margin-bottom: 0;
+      }
+      &:not(:first-child) {
+        transition: .3s all;
+        padding: .3em;
+        border-radius: 5px;
+        font-weight: 600;
+        line-height: 15px;
+      }
+      &.darkGray {
+        border: rgba(0,0,0,.2) 1px solid !important;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+    }
+  }
+}
+.zoom-controls {
+  display: flex;
+  position: absolute;
+  bottom: 2em;
+  left: 1em;
+  z-index: 4;
+  > button {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: .2em;
+    height: 1.75rem;
+    width: 1.75rem;
+    background: rgba(0,0,0,.65);
+    transition: .2s all;
+    color: #fff;
+    border-radius: 100%;
+    border: 0;
+    @include breakpoint(sm) {
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+    &:hover {
+      background: rgba(0,0,0,.8);
+      transition: .2s all;
+    }
+    &:active {
+      transform:scale(0.9);
+    }
+  }
+  > button:first-child {
+    margin-right: 0.25rem;
+  }
+}
