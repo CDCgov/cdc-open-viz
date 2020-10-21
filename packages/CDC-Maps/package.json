@@ -6,7 +6,8 @@
   "main": "dist/bundle.js",
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npx webpack"
+    "build": "npx webpack",
+    "postinstall": "npx webpack"
   },
   "repository": {
     "type": "git",
