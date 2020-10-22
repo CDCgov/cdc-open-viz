@@ -1,3 +1,4 @@
 {
-    "dataUrl":  "/assets/data.json"
+    "dataUrl":  "/assets/data.json",
+    "visualizationType": "Line"
 }
