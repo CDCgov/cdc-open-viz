@@ -29,11 +29,6 @@ module.exports = (env, { mode }) => {
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },
-    optimization: {
-      splitChunks: {
-        chunks: 'all'
-      }
-    },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -57,7 +52,7 @@ module.exports = (env, { mode }) => {
             loader: 'babel-loader',
             options: {
               presets: [
-                ["@babel/preset-env", {"modules": false}],
+                '@babel/preset-env',
                 '@babel/preset-react',
                 {
                   plugins: ['@babel/plugin-proposal-class-properties']
