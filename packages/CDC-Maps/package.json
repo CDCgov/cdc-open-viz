@@ -4,11 +4,15 @@
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/CDC-Maps",
   "main": "dist/main.js",
+  "module": "dist/main.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack",
     "prepare": "npx webpack"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/CDC-Maps"
