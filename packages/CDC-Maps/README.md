@@ -1,56 +1,59 @@
-# CDC Maps
+# @cdc/map
 
-![](screenshot.png)
+`<CdcMap />` is a React component for visualizing your data on a map of the United States. This was built for the Centers for Disease Control and Prevention's internal use and has been open sourced. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes. It can be used standalone or in conjunction with the larger CDC Open Visualization framework.
 
-`<CdcMap />` is a React component for visualizing your data on a map of the United States. This was built for the Centers for Disease Control and Prevention's internal use and has been open sourced. There is support for filtering, toggling, numeric and categorical mapping as well as many other visual configuration options like color schemes.
+* Supports both U.S. and World maps.
+* Focus on accessibility and 508 compliance.
+* IE11 support.
 
-It builds off the foundational work done on using D3 Geo and React by [React Simple Maps](https://github.com/zcreativelabs/react-simple-maps).
+**Demos**
+* [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
+* [World Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-world-data-map.html)
+* [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
+* [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
 
-**This repository was created for use by CDC programs. Github is not hosted by the CDC, but is used by CDC and its partners to share information and collaborate on software.**
+### Installation
 
-## Demos
+1. Install the package in your React project `npm install @cdc/map`
+2. Import the component and begin using in your code.
+```JSX
+import CdcMap from '@cdc/map'
 
-The following are examples to show various examples of CDC Maps in action:
-* [Example Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
-* [Example Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
-* [Example Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
+function App() {
 
-## Installation
+  return (
+    <div className="App">
+      <CdcMap />
+    </div>
+  );
+}
 
-```sh
-npm install cdc-map
+export default App;
 ```
 
-## Usage
+Note: If no `config` property is passed, the map will load a default configuration file.
 
-TODO: Write new usage instructions.
+### Configuration
 
-### Parameters
+```JSX
+/* External URL */
+<CdcMap config="https://example.com/config.json" />
 
-The component supports two different methods of loading a configuration. You can pass it directly as an object or via an external JSON configuration url.
+/* JavaScript Object */
+<CdcMap config={configObj} />
+```
 
-TODO: Rewrite
+The component supports accepts a simple `config` prop that has all of the configuration for your map. You can pass it in directly as an object or via an external JSON configuration url. You can configure the configuration file with the [@cdc/editor](#) **(TODO: Add link once available)** package or view and adopt from a sample configuration. Reference `/src/data/examples/` folder for examples of both a U.S. Map and World Map.
 
 ### Data Formatting
-The actual data that you are mapping needs to be formatted in a specific way where there is one column for each row that represents the state or city for the rest of the data on that row. There needs to be an additional column that represents the data you are trying to display on the map. This can be categorical or numerical data. You will specifically map these columns in the editor.
+
+**TODO: Move this to data designer/editor package once that is finished.**
+
+The data that you are mapping needs to be formatted in a specific way where there is one column for each row that represents the state or city for the rest of the data on that row. There needs to be an additional column that represents the data you are trying to display on the map. This can be categorical or numerical data. You will specifically map these columns in the editor.
 
 The supported formats are CSV and JSON files.
 
-Reference the `/example-data/` folder for examples of both.
-
-For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/instructions/data-map-instructions.html) on how to use the map tool.
-
-### Editor
-
-![](editor.gif)
-
-While it is possible to hand edit values in the configuration object, it is easier to use the editor which will help you quickly build the map you want to display. To enable it in your project simply pass it as a property to the component with no configuration:
-
-```js
-<CdcMap editor={true} />
-```
-
-This will load the map with its default configuration file (located in `/src/json/default.json`) and the editor pane open. Once you have configured the map as you wanted, click "Create Configuration Object" and you will get a string of JSON you can use for that map.
+For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/instructions/data-map-instructions.html) on formatting and to get example data files.
 
 ### Things to Avoid
 
@@ -59,7 +62,17 @@ The tooltips are positioned absolutely relative to the viewport they're in. If y
 
 ## Contributing
 
-Contributions from outside users are welcome. If you are not an approved contributor, you will have to [fork this repository](https://help.github.com/articles/fork-a-repo) and submit a pull request that way.
+To get started working on this repository, follow these steps:
+1. Clone the repo and do an `npm install`.
+2. Then do `npm i -g react && npm i -g react-dom`.
+  * This installs `React` and `ReactDOM` globally. Because this is a library, having them as direct dependencies causes issues so we will link them.
+3. Inside the repo folder, do `npm link react && npm link react-dom` which will give us access to these libraries without having to install them.
+4. Simply run `npm start` and it will open the project in development mode.
+5. To create an actual built version of the library for testing, run `npm run build`
+6. To test the package out locally inside a different project, after building you need to [link your local version](https://docs.npmjs.com/cli/link) of the package to that codebase.
+
+**Submitting a Pull Request**
+Contributions from users are welcome. If you are not an approved contributor, you will have to [fork this repository](https://help.github.com/articles/fork-a-repo) and submit a pull request that way.
 
 All comments, messages, pull requests, and other submissions received through CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at http://www.cdc.gov/other/privacy.html.
 

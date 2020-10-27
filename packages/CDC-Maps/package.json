@@ -1,5 +1,5 @@
 {
-  "name": "cdc-map",
+  "name": "@cdc/map",
   "version": "2.0.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/CDC-Maps",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CDCgov/CDC-Maps"
+    "url": "git+https://github.com/CDCgov/CDC-Maps#2.0.0"
   },
   "author": "Daniel Immke <npm@daniel.do>",
   "bugs": {
