@@ -16,7 +16,7 @@ import ReactHtmlParser from 'react-html-parser'
 import { Base64 } from 'js-base64';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos'
 import 'array-flat-polyfill'
-import usaDefaultConfig from './data/examples/default-usa.json'
+import usaDefaultConfig from './examples/default-usa.json'
 import UsaMap from './components/UsaMap'
 import WorldMap from './components/WorldMap'
 import Modal from './components/Modal'

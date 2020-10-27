@@ -23,7 +23,9 @@ module.exports = (env, { mode }) => {
   const entry = {
     index: mode === 'development' ? './src/index.js' : './src/App.js',
     colorPalettes: './src/data/color-palettes.js',
-    supportedGeos: './src/data/supported-geos.js'
+    supportedGeos: './src/data/supported-geos.js',
+    usaExampleConfig: './src/examples/default-usa.json',
+    worldExampleConfig: './src/examples/default-world.json'
   }
 
   const configObj = {

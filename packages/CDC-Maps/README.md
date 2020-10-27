@@ -43,7 +43,7 @@ Note: If no `config` property is passed, the map will load a default configurati
 <CdcMap config={configObj} />
 ```
 
-The component supports accepts a simple `config` prop that has all of the configuration for your map. You can pass it in directly as an object or via an external JSON configuration url. You can configure the configuration file with the [@cdc/editor](#) **(TODO: Add link once available)** package or view and adopt from a sample configuration. Reference `/src/data/examples/` folder for examples of both a U.S. Map and World Map.
+The component supports accepts a simple `config` prop that has all of the configuration for your map. You can pass it in directly as an object or via an external JSON configuration url. You can configure the configuration file with the [@cdc/editor](#) **(TODO: Add link once available)** package or view and adopt from a sample configuration. Reference `/src/examples/` folder for examples of both a U.S. Map and World Map.
 
 ### Data Formatting
 
