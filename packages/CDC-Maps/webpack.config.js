@@ -25,7 +25,7 @@ module.exports = (env, { mode }) => {
     entry: mode === 'development' ? './src/index.js' : './src/App.js',
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
-      hints: mode === 'development' ? false : 'error',
+      hints: mode === 'development' ? 'error' : false,
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },

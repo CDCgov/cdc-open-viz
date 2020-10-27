@@ -8,7 +8,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack",
-    "prepare": "npx webpack"
+    "prepare": "npx webpack --mode production"
   },
   "files": [
     "dist"
