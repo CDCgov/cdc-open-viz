@@ -1,34 +1,57 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-// Development Configuration
 module.exports = (env, { mode }) => {
-  return {
+
+  const prodExternals = {
+    react: {
+      root: 'React',
+      commonjs2: 'react',
+      commonjs: 'react',
+      amd: 'react'
+  },
+    'react-dom': {
+      root: 'ReactDOM',
+      commonjs2: 'react-dom',
+      commonjs: 'react-dom',
+      amd: 'react-dom'
+  },
+  'react-router': 'ReactRouter',
+  'react-addons-transition-group': 'var window.React.addons.TransitionGroup',
+  'react-addons-css-transition-group': 'var window.React.addons.CSSTransitionGroup',
+  'react/lib/ReactTransitionGroup': 'var window.React.addons.TransitionGroup',
+  'react/lib/ReactCSSTransitionGroup': 'var window.React.addons.CSSTransitionGroup',
+  'history': 'History'
+  };
+
+  const configObj = {
     mode,
-    entry: './src/index.js',
+    entry: mode === 'development' ? './src/index.js' : './src/App.js',
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
       hints: mode === 'development' ? false : 'error',
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },
-    optimization: {
-      splitChunks: {
-        chunks: 'all'
-      }
-    },
+    // optimization: {
+    //   splitChunks: {
+    //     chunks: 'all'
+    //   }
+    // },
     plugins: [
       new HtmlWebpackPlugin({
         template: './src/index.html'
       })
     ],
-    stats: 'minimal',
+    stats: 'verbose',
     output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: '[name].bundle.js'
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        libraryTarget: 'umd'
     },
     devServer: {
         open: true,
+        compress: true,
         overlay: {
           warnings: false,
           errors: true
@@ -54,7 +77,9 @@ module.exports = (env, { mode }) => {
             loader: 'babel-loader',
             options: {
               presets: [
-                '@babel/preset-env',
+                ["@babel/preset-env",{
+                  "modules": false
+                }],
                 '@babel/preset-react',
                 {
                   plugins: ['@babel/plugin-proposal-class-properties']
@@ -77,4 +102,16 @@ module.exports = (env, { mode }) => {
       ]
     }
   }
+
+  if(mode !== 'development') {
+    configObj.externals = prodExternals;
+    configObj.output = {
+      ...configObj.output,
+      libraryTarget: 'umd',
+      library: 'CdcMap',
+      globalObject: 'this'
+    }
+  }
+
+  return configObj
 }

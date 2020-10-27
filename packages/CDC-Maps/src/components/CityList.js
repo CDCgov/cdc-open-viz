@@ -1,94 +1,94 @@
-import React, { useState, useEffect } from 'react'
-import { Marker } from 'react-simple-maps'
-import { supportedCities } from '../data/supported-geos'
+import React, { useState, useEffect } from 'react';
+import { Marker } from 'react-simple-maps';
+import { supportedCities } from '../data/supported-geos';
 
-const CityList = (({ processedData, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToValue }) => {
-
-  const [ citiesData, setCitiesData ] = useState({})
+const CityList = (({
+  processedData, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToValue
+}) => {
+  const [citiesData, setCitiesData] = useState({});
 
   useEffect(() => {
-    const citiesList = Object.keys(processedData).filter((item) => Object.keys(supportedCities).includes(item))
-    
-    const citiesDictionary = {}
-    
-    citiesList.map((city) => citiesDictionary[city] = processedData[city])
+    const citiesList = Object.keys(processedData).filter((item) => Object.keys(supportedCities).includes(item));
 
-    setCitiesData(citiesDictionary)
-  }, [processedData])
+    const citiesDictionary = {};
 
-  let cityList = Object.keys(citiesData).filter( (c) => undefined !== processedData[c] )
+    citiesList.map((city) => citiesDictionary[city] = processedData[city]);
 
-  const cities = cityList.map( (city, i) => {
+    setCitiesData(citiesDictionary);
+  }, [processedData]);
 
-    const cityDisplayName = displayGeoName( city )
+  const cityList = Object.keys(citiesData).filter((c) => undefined !== processedData[c]);
 
-    const legendColors = applyLegendToValue(processedData[city])
+  const cities = cityList.map((city, i) => {
+    const cityDisplayName = displayGeoName(city);
 
-    if(false === legendColors) {
-        return true;
+    const legendColors = applyLegendToValue(processedData[city]);
+
+    if (legendColors === false) {
+      return true;
     }
 
     const styles = {
-        default: {
-            fill: legendColors[0],
-            outline: 0,
-        },
-        hover: {
-            fill: legendColors[1],
-            outline: 0
-        },
-        pressed: {
-            fill: legendColors[2],
-            outline: 0
-        }
-    }
+      default: {
+        fill: legendColors[0],
+        outline: 0,
+      },
+      hover: {
+        fill: legendColors[1],
+        outline: 0
+      },
+      pressed: {
+        fill: legendColors[2],
+        outline: 0
+      }
+    };
 
-    let geoData = processedData[city]
+    const geoData = processedData[city];
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, processedData[city])
+    const toolTip = applyTooltipsToGeo(cityDisplayName, processedData[city]);
 
-    let cityBorderColor = `rgba(0,0,0,.5)`
+    const cityBorderColor = 'rgba(0,0,0,.5)';
 
     let cityDotStyles = {
-        stroke: cityBorderColor
-    }
+      stroke: cityBorderColor
+    };
 
     // If we need to add a cursor pointer
-    if ( (state.columns.navigate && geoData[state.columns.navigate.name]) || 'click' === state.tooltips.appearanceType) {
-        cityDotStyles = {
-            ...cityDotStyles,
-            cursor: "pointer"
-        }
+    if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+      cityDotStyles = {
+        ...cityDotStyles,
+        cursor: 'pointer'
+      };
     }
 
-    let radius = 'us' === state.general.geoType ? 8 : 4
+    const radius = state.general.geoType === 'us' ? 8 : 4;
 
-    let circle = (
-        <circle
-            data-tip={toolTip}
-            data-for="tooltip"
-            cx={0}
-            cy={0}
-            r={radius}
-            style={cityDotStyles}
-            title="Click for more information"
-            onClick={ () => geoClickHandler(cityDisplayName, geoData) }
-        />
-    )
+    const circle = (
+      <circle
+        data-tip={toolTip}
+        data-for="tooltip"
+        cx={0}
+        cy={0}
+        r={radius}
+        style={cityDotStyles}
+        title="Click for more information"
+        onClick={() => geoClickHandler(cityDisplayName, geoData)}
+      />
+    );
 
     return (
-        <Marker
-            key={i}
-            coordinates={supportedCities[city]}
-            style={styles}
-            className="city-dot">
-            {circle}
-        </Marker>
-    )
-  })
+      <Marker
+        key={i}
+        coordinates={supportedCities[city]}
+        style={styles}
+        className="city-dot"
+      >
+        {circle}
+      </Marker>
+    );
+  });
 
-  return cities
+  return cities;
+});
 
-})
-
-export default CityList
+export default CityList;

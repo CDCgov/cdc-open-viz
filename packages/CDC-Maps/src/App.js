@@ -1420,4 +1420,4 @@ class CdcMap extends Component {
     }
 }
 
-export default CdcMap
+export default CdcMap;
