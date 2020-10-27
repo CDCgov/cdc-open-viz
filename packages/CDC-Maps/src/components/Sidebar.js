@@ -1,8 +1,5 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import facebookSvg from '../images/facebook.svg';
-import twitterSvg from '../images/twitter.svg';
-import emailSvg from '../images/email.svg';
 
 export default (props) => {
   const {
