@@ -25,7 +25,8 @@ module.exports = (env, { mode }) => {
     colorPalettes: './src/data/color-palettes.js',
     supportedGeos: './src/data/supported-geos.js',
     usaExampleConfig: './src/examples/default-usa.json',
-    worldExampleConfig: './src/examples/default-world.json'
+    worldExampleConfig: './src/examples/default-world.json',
+    initialState: './src/data/initial-state.js'
   }
 
   const configObj = {

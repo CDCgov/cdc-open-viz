@@ -11,7 +11,7 @@ import Sidebar from './components/Sidebar'
 import Loading from './components/Loading'
 import externalIcon from './images/external-link.svg'
 import Papa from 'papaparse'
-import { colorPalettes } from './data/color-palettes'
+import colorPalettes from './data/color-palettes'
 import ReactHtmlParser from 'react-html-parser'
 import { Base64 } from 'js-base64';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos'
@@ -23,67 +23,14 @@ import Modal from './components/Modal'
 import DataTable from './components/DataTable'
 import NavigationMenu from './components/NavigationMenu'
 import cdcHhsLogo from './images/hhs-cdc.svg'
+import initialState from './data/initial-state'
 
 class CdcMap extends Component {
 
     constructor (props) {
         super(props)
 
-        this.initialState = {
-            general: {
-                backgroundColor: "#FFF",
-                geoBorderColor: "darkGray",
-                showTitle: true,
-                showSidebar: true,
-                showDownloadButton: true,
-                territoriesLabel: "Territories",
-                modalOpen: false,
-                modalContent: null,
-                language: "en",
-                parentUrl: false,
-                hasRegions: false,
-                expandDataTable: true,
-                fullBorder: false
-            },
-            columns: {
-                primary: {},
-                geo: {},
-                geosInRegion: {
-                    name: ''
-                }
-            },
-            legend: {
-                descriptions: {},
-                specialClasses: [],
-                unified: false,
-                singleColumn: false,
-                dynamicDescription: false
-            },
-            data: [
-                {},
-            ],
-            filters: [],
-            sharing: {
-                enabled: false
-            },
-            dataTable: {
-                title: "Data Table",
-                forceDisplay: true // When standalone, this can't be removed. When this component is used in larger composed configurations there will be a different data table.
-            },
-            tooltips: {
-                appearanceType: "hover",
-                linkLabel: "Learn More",
-                capitalizeLabels: true
-            },
-            processedData: {},
-            processedLegend: {
-                data: [],
-                categoryValuesOrder: []
-            },
-            loading: true
-        }
-
-        this.state = JSON.parse(JSON.stringify(this.initialState));
+        this.state = JSON.parse(JSON.stringify(initialState));
 
         this.stateValues = Object.values(supportedStates).flat()
         this.stateKeys = Object.keys(supportedStates)
@@ -1104,7 +1051,7 @@ class CdcMap extends Component {
 
         // Create new config object the same way each time no matter when this method is called.
         let newState = {
-            ...this.initialState,
+            ...initialState,
             ...newConfig
         }
 
@@ -1121,11 +1068,11 @@ class CdcMap extends Component {
         // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childprop1
         Object.keys(newState).forEach( (key) => {
             if("object" === typeof newState[key] && false === Array.isArray(newState[key])) {
-                if(this.initialState[key] ) {
+                if(initialState[key] ) {
 
-                    Object.keys(this.initialState[key]).forEach( (property) => {
+                    Object.keys(initialState[key]).forEach( (property) => {
                         if(undefined === newState[key][property]) {
-                            newState[key][property] = this.initialState[key][property]
+                            newState[key][property] = initialState[key][property]
                         }
                     })
 
