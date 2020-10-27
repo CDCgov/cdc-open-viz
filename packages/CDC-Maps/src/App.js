@@ -11,7 +11,7 @@ import Sidebar from './components/Sidebar'
 import Loading from './components/Loading'
 import externalIcon from './images/external-link.svg'
 import Papa from 'papaparse'
-import colorPalettes from './data/color-palettes'
+import { colorPalettes } from './data/color-palettes'
 import ReactHtmlParser from 'react-html-parser'
 import { Base64 } from 'js-base64';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos'

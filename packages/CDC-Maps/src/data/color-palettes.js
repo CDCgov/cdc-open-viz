@@ -1,4 +1,4 @@
-export default {
+export const colorPalettes = {
   yelloworangered: [
     '#ffffcc',
     '#ffeda0',

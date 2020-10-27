@@ -20,12 +20,18 @@ module.exports = (env, { mode }) => {
     }
   };
 
+  const entry = {
+    index: mode === 'development' ? './src/index.js' : './src/App.js',
+    colorPalettes: './src/data/color-palettes.js',
+    supportedGeos: './src/data/supported-geos.js'
+  }
+
   const configObj = {
     mode,
-    entry: mode === 'development' ? './src/index.js' : './src/App.js',
+    entry,
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
-      hints: mode === 'development' ? 'error' : false,
+      hints: false,
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },

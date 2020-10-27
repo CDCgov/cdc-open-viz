@@ -3,11 +3,11 @@
   "version": "2.0.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/CDC-Maps",
-  "main": "dist/main.js",
-  "module": "dist/main.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "npx webpack",
+    "build": "npx webpack --mode production",
     "prepare": "npx webpack --mode production"
   },
   "files": [
@@ -27,20 +27,19 @@
     "react-dom": "^16.11.0"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
-    "react-app-polyfill": "^1.0.4",
-    "html-react-parser": "^0.14.0",
     "@emotion/core": "^10.0.28",
     "array-flat-polyfill": "^1.0.1",
     "array-move": "^2.2.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "classlist-polyfill": "^1.2.0",
+    "core-js": "^3.6.5",
     "d3-interpolate-path": "^2.2.1",
     "js-base64": "^2.5.2",
     "mdn-polyfills": "^5.19.0",
     "papaparse": "^5.2.0",
     "react-accessible-accordion": "^3.0.1",
+    "react-app-polyfill": "^1.0.4",
     "react-html-parser": "^2.0.2",
     "react-select": "^3.0.8",
     "react-simple-maps": "^2.1.2",
