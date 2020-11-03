@@ -760,40 +760,44 @@ class CdcMap extends Component {
 
     // Supports JSON or CSV
     async fetchRemoteData (url) {
+        try {
+            const urlObj = new URL(url);
 
-        const regex = /(?:\.([^.]+))?$/
+            const regex = /(?:\.([^.]+))?$/
 
-        let data = []
+            let data = []
 
-        if ('csv' === regex.exec(url)[1]) {
+            if ('csv' === regex.exec(urlObj.pathname)[1]) {
 
-            data = await fetch(url)
-                .then(response => response.text())
-                .then(responseText =>{
-                    const parsedCsv = Papa.parse(responseText, {
-                        header: true,
-                        dynamicTyping: true
+                data = await fetch(url)
+                    .then(response => response.text())
+                    .then(responseText =>{
+                        const parsedCsv = Papa.parse(responseText, {
+                            header: true,
+                            dynamicTyping: true
+                        })
+
+                        return parsedCsv.data
+                    })
+                    .then(result => {
+                        return result
                     })
 
-                    return parsedCsv.data
-                })
-                .then(result => {
-                    return result
-                })
+                return data
+            }
 
-            return data
+            if ('json' === regex.exec(url)[1]) {
+                data = await fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        return data
+                    })
+
+                return data
+            }
+        } catch {
+            console.error(`Cannot parse URL: ${url}`);
         }
-
-        if ('json' === regex.exec(url)[1]) {
-            data = await fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    return data
-                })
-
-            return data
-        }
-
     }
 
     // Attempts to find the corresponding value
@@ -1105,16 +1109,6 @@ class CdcMap extends Component {
         // Set properties that can be passed directly and require no additional computation
         this.setState(() => newState)
 
-        // Side effects - set background color and browser title
-        if(this.state.general.backgroundColor) {
-            document.body.style.backgroundColor = newState.general.backgroundColor;
-        }
-
-        // Set browser title
-        if(this.state.general.backgroundColor) {
-            document.title = newState.general.title
-        }
-
         // Done loading
         this.setState(() => { return {loading: false} } )
     }
@@ -1147,9 +1141,12 @@ class CdcMap extends Component {
 
         // Load the configuration data passed to this component if it exists
         if(this.props.config) {
-
-            // If the config passed is a string, try to load it as an ajax
             configData = this.props.config
+        }
+
+        // If the config passed is a string, try to load it as an ajax
+        if('string' === typeof configData) {
+            configData = await this.fetchRemoteData(configData)
         }
 
         // Finally, load the default configuration if nothing else was found.
@@ -1301,7 +1298,7 @@ class CdcMap extends Component {
         return (
             <>
                 {true === this.state.loading && <Loading />}
-                <section className="full-container" aria-label={'Map: ' + this.state.general.title}>
+                <section className="cdc-maps-react-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
                     {'hover' === this.state.tooltips.appearanceType && 'mobile' !== this.state.general.viewportSize && <ReactTooltip
                         id="tooltip"
                         place="right"

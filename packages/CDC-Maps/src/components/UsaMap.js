@@ -63,7 +63,7 @@ export default (props) => {
     let territoryStyles = {
       backgroundColor: '#E6E6E6',
       color: '#202020',
-      borderColor: geoBorderColor,
+      borderColor: `${geoBorderColor} !important`,
       borderWidth: 1,
       borderStyle: 'solid'
     };
@@ -91,7 +91,7 @@ export default (props) => {
         territoryStyles = {
           color: textColor,
           backgroundColor: legendColors[0],
-          borderColor: geoBorderColor,
+          borderColor: `${geoBorderColor} !important`,
           borderWidth: 1,
           borderStyle: 'solid',
           cursor: needsPointer ? 'pointer' : 'default',

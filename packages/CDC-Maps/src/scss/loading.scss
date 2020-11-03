@@ -1,0 +1,28 @@
+// loading
+.loading {
+  padding: 2em;
+  text-align: center;
+  position: absolute;
+  z-index: 3;
+  background: rgba(255,255,255,.5);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  .container {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-70%);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  span {
+    display: block;
+    margin-bottom: 1em;
+    font-size: 1.3em;
+  }
+  .la-ball-beat.la-2x {
+    margin: 1em auto 0;
+    display: block;
+  }
+}

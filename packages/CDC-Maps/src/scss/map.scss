@@ -141,6 +141,8 @@ header + .map-container.full-border {
         border-radius: 5px;
         font-weight: 600;
         line-height: 15px;
+        border-width: 1px !important;
+        border-style: solid !important;
       }
       &.darkGray {
         border: rgba(0,0,0,.2) 1px solid !important;
