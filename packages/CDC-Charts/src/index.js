@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom';
 
 import App from './App';
 
-const domContainer = document.querySelector('#react-container');
+const domContainers = document.querySelectorAll('.react-container');
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App configUrl={domContainer.attributes['data-config'].value} />
-  </React.StrictMode>,
-  domContainer
-);
+domContainers.forEach((domContainer) => {
+  ReactDOM.render(
+    <React.StrictMode>
+      <App configUrl={domContainer.attributes['data-config'].value} />
+    </React.StrictMode>,
+    domContainer
+  );
+});
