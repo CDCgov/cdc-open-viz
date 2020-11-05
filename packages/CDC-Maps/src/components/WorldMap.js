@@ -7,17 +7,26 @@ import {
   Geography,
 } from 'react-simple-maps';
 import { jsx } from '@emotion/core';
-import topoJsonWorld from 'world-atlas/countries-110m.json';
+import topoJsonWorld from 'world-atlas/countries-50m.json';
 import { interpolatePath } from 'd3-interpolate-path';
-import { supportedCountries } from '../data/supported-geos';
 import CityList from './CityList';
 
-export default (props) => {
+const WorldMap = (props) => {
   const {
-    state, applyTooltipsToGeo, processedData, geoClickHandler, applyLegendToValue, displayGeoName, countryValues
+    state,
+    applyTooltipsToGeo,
+    processedData,
+    geoClickHandler,
+    applyLegendToValue,
+    displayGeoName,
+    supportedCountries,
+    countryValues,
+    rebuildTooltips
   } = props;
 
   const [position, setPosition] = useState({ coordinates: [0, 20], zoom: 1.3 });
+
+  useEffect(() => rebuildTooltips());
 
   const handleZoomIn = () => {
     if (position.zoom >= 4) return;
@@ -288,7 +297,7 @@ export default (props) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       {state.general.type === 'data' && ZoomControls}
       <div style={styles.container}>
         <div style={styles.innerContainer}>
@@ -319,6 +328,8 @@ export default (props) => {
           </ComposableMap>
         </div>
       </div>
-    </React.Fragment>
+    </>
   );
 };
+
+export default WorldMap;

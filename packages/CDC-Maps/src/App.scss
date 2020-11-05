@@ -32,36 +32,25 @@
   }
 }
 
-@import "scss/loading";
-@import "scss/variables";
+@mixin legendDot() {
+  margin-right: 5px;
+  border-radius: 300px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: rgba(0,0,0,.3) 1px solid;
+}
 
-.cdc-maps-react-container {
+.cdc-map-outer-container {
   @import "scss/reset";
+  @import "scss/loading";
+  @import "scss/variables";
+  @import "scss/heading_colors";
 
-  @import "scss/general";
-
-  @import "scss/tooltips";
-
-  @import "scss/map";
-
-  @import "scss/sidebar";
-
-  @import "scss/datatable";
-
-  @import "scss/animations";
-
-  flex-grow: 1;
-  text-rendering: geometricPrecision;
-  color: #202020;
-  border: 0;
   font-family: $fontStack;
-  font-size: 14px;
-  text-align: left;
-  @include breakpoint(lg) {
-    font-size: 16px;
-  }
-  .btn {
-    padding: .375rem .75rem;
-    border-radius: .3rem;
-  }
+  display: flex; // Needed for the main content
+
+  @import "scss/editor";
+  @import "scss/main";
 }

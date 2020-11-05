@@ -8,15 +8,22 @@ import {
 import { jsx } from '@emotion/core';
 import topoJsonStates from 'us-atlas/states-10m.json';
 import chroma from 'chroma-js';
-import { supportedTerritories } from '../data/supported-geos';
 import Territory from './Territory';
 import CityList from './CityList';
 
-export default (props) => {
+const UsaMap = (props) => {
   const {
-    state, applyTooltipsToGeo, processedData, geoClickHandler, applyLegendToValue, displayGeoName, supportedStates
+    state,
+    applyTooltipsToGeo,
+    processedData,
+    geoClickHandler,
+    applyLegendToValue,
+    displayGeoName,
+    supportedStates,
+    supportedTerritories,
+    rebuildTooltips
   } = props;
-
+  
   const [territoriesData, setTerritoriesData] = useState([]);
 
   useEffect(() => {
@@ -30,6 +37,8 @@ export default (props) => {
     setTerritoriesData(territoriesList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [processedData]);
+
+  useEffect(() => rebuildTooltips());
 
   const styles = {
     container: {
@@ -301,7 +310,7 @@ export default (props) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <div style={styles.container}>
         <div style={styles.innerContainer}>
           <ComposableMap
@@ -333,6 +342,8 @@ export default (props) => {
                   </ul>
                 </section>
                 )}
-    </React.Fragment>
+    </>
   );
 };
+
+export default UsaMap;

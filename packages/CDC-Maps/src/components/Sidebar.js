@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-export default (props) => {
+const Sidebar = (props) => {
   const {
     legend,
     filters,
@@ -9,7 +9,6 @@ export default (props) => {
     announceChange,
     applyColorToLegend,
     changeFilterActive,
-    sharing,
     resetLegendToggles,
     setState,
     processedLegend,
@@ -56,12 +55,12 @@ export default (props) => {
 
     const entryMin = addCommas(entry.min);
 
-    let formattedText = `${prefix + entryMin + suffix} — ${prefix + entryMax + suffix}`;
+    let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
 
     // If interval, add some formatting
     if (legend.type === 'equalinterval' && index
       !== processedLegend.data.length - 1) {
-      formattedText = `${prefix + entryMin + suffix} — < ${prefix + entryMax + suffix}`;
+      formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
     }
 
     const { disabled } = entry;
@@ -175,3 +174,5 @@ export default (props) => {
     </aside>
   );
 };
+
+export default Sidebar;

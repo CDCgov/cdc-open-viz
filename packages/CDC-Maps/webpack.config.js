@@ -22,10 +22,6 @@ module.exports = (env, { mode }) => {
 
   const entry = {
     index: mode === 'development' ? './src/index.js' : './src/App.js',
-    colorPalettes: './src/data/color-palettes.js',
-    supportedGeos: './src/data/supported-geos.js',
-    usaExampleConfig: './src/examples/default-usa.json',
-    worldExampleConfig: './src/examples/default-world.json',
   }
 
   const configObj = {
@@ -63,7 +59,7 @@ module.exports = (env, { mode }) => {
                 '@babel/preset-env',
                 '@babel/preset-react',
                 {
-                  plugins: ['@babel/plugin-proposal-class-properties']
+                  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import']
                 }
               ]
             },
@@ -116,8 +112,7 @@ module.exports = (env, { mode }) => {
     configObj.output = {
       ...configObj.output,
       libraryTarget: 'umd',
-      library: 'CdcMap',
-      globalObject: 'this'
+      library: 'CdcMap'
     }
   }
 

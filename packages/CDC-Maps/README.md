@@ -12,7 +12,7 @@
 * [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
 * [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
 
-### Installation
+### Installation and Usage
 
 1. Install the package in your React project `npm install @cdc/map`
 2. Import the component and begin using in your code.
@@ -31,19 +31,17 @@ function App() {
 export default App;
 ```
 
-Note: If no `config` property is passed, the map will load a default configuration file.
+Note: If no properties are passed, the map will load a default configuration file.
 
-### Configuration
+### Properties
 
-```JSX
-/* External URL */
-<CdcMap config="https://example.com/config.json" />
-
-/* JavaScript Object */
-<CdcMap config={configObj} />
-```
-
-The component supports accepts a simple `config` prop that has all of the configuration for your map. You can pass it in directly as an object or via an external JSON configuration url. You can configure the configuration file with the [@cdc/editor](#) **(TODO: Add link once available)** package or view and adopt from a sample configuration. Reference `/src/examples/` folder for examples of both a U.S. Map and World Map.
+| Property          | Type     | Description                                                                                                                                                                                                                                                                             |
+|-------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| navigationHandler | Function | A custom function that will receive the URL of the item that was clicked by the user. This will override the built in navigationHandler. It's helpful if you need to implement a custom metrics call or some other kind of intermediate behavior before you direct the user to the URL. |
+| configUrl         | String   | Pass a URL to a .json file and it will be consumed and used as the configuration.                                                                                                                                                                                                       |
+| config            | Object   | You can pass the raw configuration object directly as a prop. For help generating such an object, use the built in editor.                                                                                                                                                              |
+| isEditor          | Boolean  | A simple flag that will load the editor for the maps inside your app. Helpful to provide a user interface instead of having to edit raw JSON.                                                                                                                                           |
+| className         | String   | Lets you add a custom class name to the outermost container element of the map.                                                                                                                                                                                                         |
 
 ### Data Formatting
 
@@ -54,11 +52,6 @@ The data that you are mapping needs to be formatted in a specific way where ther
 The supported formats are CSV and JSON files.
 
 For more information, read the [CDC's official guidance](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/instructions/data-map-instructions.html) on formatting and to get example data files.
-
-### Things to Avoid
-
-* **Do not use this component where a parent element has `position: relative` set.**
-The tooltips are positioned absolutely relative to the viewport they're in. If you're including the component inside an element where `position: relative` is set they will be relative to that container element, causing the tooltips to be offset.
 
 ## Contributing
 

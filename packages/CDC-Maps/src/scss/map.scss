@@ -39,17 +39,6 @@ header + .map-container.full-border {
   }
 }
 
-// Navigation Specific Styles
-.map-container.navigation {
-  @include breakpoint(md) {
-    &:not(.full-border) {
-      .navigation-menu {
-        //border: $mediumGray 1px solid; // Some centers don't want a forced border. Leaving out for now.
-      }
-    }
-  }
-}
-
 .geography-container {
   position: relative;
   flex-grow: 1;
@@ -68,7 +57,7 @@ header + .map-container.full-border {
       }
     }
   }
-  .cdc-hhs-logo {
+  .map-logo {
     position: absolute;
     bottom: 2em;
     right: 1em;

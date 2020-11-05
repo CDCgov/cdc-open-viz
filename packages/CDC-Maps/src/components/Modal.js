@@ -1,7 +1,7 @@
 import React from 'react';
 import closeIcon from '../images/close.svg';
 
-export default (props) => {
+const Modal = (props) => {
   const {
     applyTooltipsToGeo, content, closeModal, capitalize, applyLegendToValue, state
   } = props;
@@ -20,3 +20,6 @@ export default (props) => {
     </section>
   );
 };
+
+
+export default Modal;

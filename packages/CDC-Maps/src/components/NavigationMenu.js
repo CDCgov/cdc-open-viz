@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default ({
+export default NavigationMenu = ({
   processedData, navigationHandler, options, columns, displayGeoName
 }) => {
   const [activeGeo, setActiveGeo] = useState('');

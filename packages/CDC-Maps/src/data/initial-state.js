@@ -2,6 +2,7 @@ export default {
   general: {
     backgroundColor: '#FFF',
     geoBorderColor: 'darkGray',
+    headerColor: 'theme-blue',
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,

@@ -1,37 +1,53 @@
-import React, { Component } from 'react'
+// Polyfills
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import 'mdn-polyfills/String.prototype.repeat';
 import 'mdn-polyfills/CustomEvent';
 import 'mdn-polyfills/Element.prototype.classList';
-import './App.scss';
-import ReactTooltip from 'react-tooltip'
-import chroma from 'chroma-js'
-import Sidebar from './components/Sidebar'
-import Loading from './components/Loading'
-import externalIcon from './images/external-link.svg'
-import Papa from 'papaparse'
-import colorPalettes from './data/color-palettes'
-import ReactHtmlParser from 'react-html-parser'
+import 'array-flat-polyfill';
+
+// External
+import React, { Component, Suspense, lazy, createRef } from 'react';
+import ReactTooltip from 'react-tooltip';
+import chroma from 'chroma-js';
+import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos'
-import 'array-flat-polyfill'
-import usaDefaultConfig from './examples/default-usa.json'
-import UsaMap from './components/UsaMap'
-import WorldMap from './components/WorldMap'
-import Modal from './components/Modal'
-import DataTable from './components/DataTable'
-import NavigationMenu from './components/NavigationMenu'
-import cdcHhsLogo from './images/hhs-cdc.svg'
-import initialState from './data/initial-state'
+import ReactHtmlParser from 'react-html-parser';
+
+// Data
+import externalIcon from './images/external-link.svg';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
+import colorPalettes from './data/color-palettes';
+import initialState from './data/initial-state';
+
+// Sass
+import './App.scss';
+
+// Components
+import Sidebar from './components/Sidebar';
+import Loading from './components/Loading';
+import Modal from './components/Modal';
+
+// Lazy loaded components
+const Editor = lazy(() => import('./components/Editor'));
+const UsaMap = lazy(() => import('./components/UsaMap'));
+const WorldMap = lazy(() => import('./components/WorldMap'));
+const DataTable = lazy(() => import('./components/DataTable'));
+const NavigationMenu = lazy(() => import('./components/NavigationMenu'));
 
 class CdcMap extends Component {
 
     constructor (props) {
         super(props)
 
+        // Initial state property
         this.state = JSON.parse(JSON.stringify(initialState));
 
+        // Data props
+        this.outerContainerRef = React.createRef();
+        this.supportedStates = supportedStates;
+        this.supportedCountries = supportedCountries;
+        this.supportedTerritories = supportedTerritories;
         this.stateValues = Object.values(supportedStates).flat()
         this.stateKeys = Object.keys(supportedStates)
         this.territoryValues = Object.values(supportedTerritories).flat()
@@ -39,6 +55,8 @@ class CdcMap extends Component {
         this.countryValues = Object.values(supportedCountries).flat()
         this.countryKeys = Object.keys(supportedCountries)
         this.cityNames = Object.keys(supportedCities)
+
+        // Binding context
         this.processData = this.processData.bind(this)
         this.applyLegendToValue = this.applyLegendToValue.bind(this)
         this.applyColorToLegend = this.applyColorToLegend.bind(this)
@@ -51,12 +69,10 @@ class CdcMap extends Component {
         this.announceChange = this.announceChange.bind(this)
         this.geoClickHandler = this.geoClickHandler.bind(this)
         this.closeModal = this.closeModal.bind(this)
-        this.metricsCall = this.metricsCall.bind(this)
         this.navigationHandler = this.navigationHandler.bind(this)
         this.displayDataAsText = this.displayDataAsText.bind(this)
         this.loadConfig = this.loadConfig.bind(this)
         this.setState = this.setState.bind(this)
-        this.convertStateToConfigFile = this.convertStateToConfigFile.bind(this)
         this.processUnifiedData = this.processUnifiedData.bind(this)
     }
 
@@ -430,7 +446,7 @@ class CdcMap extends Component {
 
         // We convert the tooltip markup into JSX if it's not going into an actual tooltip. This is so we can use the same navigation method used everywhere else for the navigation link.
         // The only reason we aren't using JSX for both is because the react-tooltip package doesn't support JSX as the content of a tooltip for some reason. That may change in the future, but leaving note explaining this bit of odd code.
-        if('click' === this.state.tooltips.appearanceType || 'mobile' === this.state.general.viewportSize) {
+        if('click' === this.state.tooltips.appearanceType || 'xs' === this.getViewport()) {
             toolTipText = [(<div key="modal-content">{ReactHtmlParser(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
@@ -919,134 +935,22 @@ class CdcMap extends Component {
     }
 
     navigationHandler(urlString) {
+        // Call custom navigation method if there is one
+        if(this.props.navigationHandler) {
+            this.props.navigationHandler(urlString);
+
+            return;
+        }
+
         // Abort if value is blank
         if(0 === urlString.length) {
             throw Error("Blank string passed as URL. Navigation aborted."); 
         }
 
-        // Determine if link is a hash link
-        const isHashLink = urlString[0] === '#' ? true : false;
+        const urlObj = new URL(urlString);
 
-        if(true === isHashLink) {
-            let sameOrigin = this.state.general.parentUrl !== false ? true: false
-
-            if(true === sameOrigin) {
-                let hashName = urlString.substr(1);
-                let scrollSection = window.parent.document.querySelector(`*[id="${hashName}"]`) || window.parent.document.querySelector(`*[name="${hashName}"]`)
-
-                if(scrollSection) {
-                    scrollSection.scrollIntoView({
-                        behavior: 'smooth'
-                    })
-    
-                    // End function since navigation is compelted.
-                    return true;
-                } else {
-                    throw Error("Internal hash link detected but unable to find element on page. Navigation aborted.");
-                }
-            }
-        }
-
-        // Metrics Call
-        const extension = urlString.substring( urlString.lastIndexOf( '.' ) + 1 )
-
-        const s = window.s || {}
-
-        if ( s.hasOwnProperty('linkDownloadFileTypes') && s.linkDownloadFileTypes.includes(extension) ) {
-            this.metricsCall('d', urlString) // Different parameter for downloads
-        } else {
-            this.metricsCall('e', urlString) // Regular call for opening external link
-        }
-
-        let urlObj;
-
-        if(this.state.general.parentUrl.length > 0) {
-            // Insert proper base for relative URLs
-            const parentUrlObj = new URL(this.state.general.parentUrl)
-
-            // Only insert a dynamic base if this is embedded on a CDC.gov page, regardless of environment.
-            // This prevents security concerns where a party could embed a CDC map on their own site and have the relative URLs go to their own content making it look like its endorsed by the CDC.
-            let urlBase = parentUrlObj.host.endsWith('cdc.gov') ? parentUrlObj.origin : 'https://www.cdc.gov/';
-
-            urlObj = new URL(urlString, urlBase);
-        } else {
-            urlObj = new URL(urlString);
-        }
         // Open constructed link in new tab/window
         window.open(urlObj.toString(), '_blank');
-    }
-
-    metricsCall(type, url) {
-
-        // Don't make metrics call if this map isn't hosted on cdc.gov
-        if(false === this.state.general.parentUrl) {
-            return true;
-        }
-
-        // Don't make metrics call if this link is going to a cdc.gov page and is not a download link
-        if( true === url.includes('cdc.gov') && 'e' === type ) {
-            return true;
-        }
-
-        const s = window.s || {}
-
-        if(true === s.hasOwnProperty('tl')) {
-            let newObj = {...s}
-
-
-            newObj.pageURL = this.state.general.parentUrl
-            newObj.linkTrackVars = "pageURL";
-            newObj.linkURL = url // URL We are navigating to
-
-            s.tl( true, type, null, newObj )
-        }
-    }
-
-    convertStateToConfigFile () {
-        let strippedState = JSON.parse(JSON.stringify(this.state))
-
-        // Strip ref
-        delete strippedState[""]
-
-        // Delete processed data and legend
-        delete strippedState.processedData
-        delete strippedState.processedLegend
-
-        // Remove the legend
-        let strippedLegend = JSON.parse(JSON.stringify(this.state.legend))
-
-        delete strippedLegend.data
-        delete strippedLegend.disabledAmt
-
-        strippedState.legend = strippedLegend
-
-        // Remove loading status
-        delete strippedState.loading
-
-        // Remove default data marker if the user started this map from default data
-        delete strippedState.defaultData
-        
-        // Remove tooltips if they're active in the editor
-        let strippedGeneral = JSON.parse(JSON.stringify(this.state.general))
-
-        delete strippedGeneral.modalOpen;
-        delete strippedGeneral.modalContent;
-        delete strippedGeneral.parentUrl;
-
-        // Strip out computed items
-        delete strippedGeneral.viewportSize;
-
-        strippedState.general = strippedGeneral
-
-        if(this.state.dataUrl && true === this.state.editor.keepUrl) {
-            delete strippedState.data // If the data is pulled dynamically from a URL, don't store the data locally
-        }
-
-        if(this.state.dataUrl && false === this.state.editor.keepUrl) {
-            delete strippedState.dataUrl
-        }
-
-        return JSON.stringify( strippedState )
     }
 
     async loadConfig (newConfig) {
@@ -1131,9 +1035,6 @@ class CdcMap extends Component {
                 this.setState(() => { return {processedLegend} })
             }
         }
-
-        // Rebuild tooltips
-        ReactTooltip.rebuild()
     }
 
     async componentDidMount () {
@@ -1145,13 +1046,13 @@ class CdcMap extends Component {
         }
 
         // If the config passed is a string, try to load it as an ajax
-        if('string' === typeof configData) {
+        if(this.props.configUrl) {
             configData = await this.fetchRemoteData(configData)
         }
 
-        // Finally, load the default configuration if nothing else was found.
+        // Finally, dynamically import the default configuration if nothing else was found.
         if(!configData) {
-            configData = usaDefaultConfig
+            configData = await import('./examples/default-usa.json');
         }
 
         // Once we have a config verify that it is an object and load it
@@ -1215,16 +1116,25 @@ class CdcMap extends Component {
         })
     }
 
-    geoClickHandler (key, value) {
-        // If this is a map with hover tooltips and the item has a link specified for it, do regular navigation.
-        if (this.state.columns.navigate &&
-            value[this.state.columns.navigate.name] &&
-            'hover' === this.state.tooltips.appearanceType) {
-                this.navigationHandler(value[this.state.columns.navigate.name])
-            }
+    getViewport(width = this.outerContainerRef.current.offsetWidth) {
+        if(width >= 1300) {
+            return'lg';
+        }
 
-        // If tooltips are showing on click, toggle the modal
-        if ('click' === this.state.tooltips.appearanceType) {
+        if(width >= 960) {
+            return'md';
+        }
+        if(width >= 768) {
+            return'sm';
+        }
+        if(width < 768) {
+            return'xs';
+        }
+    }
+
+    geoClickHandler (key, value) {
+        // If modals are set or we are on a mobile viewport, display modal
+        if ('click' === this.state.tooltips.appearanceType || 'xs' === this.getViewport()) {
             this.setState( (prevState) => {
                 return {
                     ...prevState,
@@ -1245,121 +1155,125 @@ class CdcMap extends Component {
                     this.closeModal()
                 }
             });
+
+            return;
         }
+
+        // Otherwise if this is a map with hover tooltips and the item has a link specified for it, do regular navigation.
+        if (this.state.columns.navigate &&
+            value[this.state.columns.navigate.name] &&
+            'hover' === this.state.tooltips.appearanceType) {
+                this.navigationHandler(value[this.state.columns.navigate.name])
+            }
     }
 
-    // Render method. This is called again each time the state changes. For more information, refer to React's official documentation.
     render () {
-        let mapContainerClasses = `map-container ${this.state.legend.position} ${this.state.general.type} ${this.state.general.geoType}`
+        // Map Container Classes
+        let mapContainerClasses = [
+            'map-container',
+            this.state.legend.position,
+            this.state.general.type,
+            this.state.general.geoType
+        ]
 
-        let displayModal = false
-
-        if( true === this.state.general.modalOpen ) {
-            displayModal = true
+        if(true === this.state.general.modalOpen) {
+            mapContainerClasses.push('modal-background')
         }
 
         if(this.state.general.type === 'navigation' && true === this.state.general.fullBorder) {
-            mapContainerClasses += ' full-border'
+            mapContainerClasses.push('full-border')
         }
 
-        if(true === displayModal) {
-            mapContainerClasses += ' modal-background'
-        }
-
-        let displayMap = (
-            <UsaMap
-                state={this.state}
-                applyTooltipsToGeo={this.applyTooltipsToGeo}
-                processedData={this.state.processedData}
-                navigationHandler={this.navigationHandler}
-                geoClickHandler={this.geoClickHandler}
-                applyLegendToValue={this.applyLegendToValue}
-                displayGeoName={this.displayGeoName}
-                supportedStates={supportedStates}
-            />
-        )
-
-        if('world' === this.state.general.geoType) {
-            displayMap = (
-                <WorldMap
-                    state={this.state}
-                    applyTooltipsToGeo={this.applyTooltipsToGeo}
-                    closeModal={this.closeModal}
-                    processedData={this.state.processedData}
-                    navigationHandler={this.navigationHandler}
-                    geoClickHandler={this.geoClickHandler}
-                    applyLegendToValue={this.applyLegendToValue}
-                    displayGeoName={this.displayGeoName}
-                    countryValues={this.countryValues}
-                />
-            )
+        const mapProps = {
+            state : this.state,
+            applyTooltipsToGeo : this.applyTooltipsToGeo,
+            rebuildTooltips : ReactTooltip.rebuild,
+            closeModal : this.closeModal,
+            processedData : this.state.processedData,
+            navigationHandler : this.navigationHandler,
+            geoClickHandler : this.geoClickHandler,
+            applyLegendToValue : this.applyLegendToValue,
+            displayGeoName : this.displayGeoName
         }
 
         return (
-            <>
-                {true === this.state.loading && <Loading />}
-                <section className="cdc-maps-react-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
-                    {'hover' === this.state.tooltips.appearanceType && 'mobile' !== this.state.general.viewportSize && <ReactTooltip
-                        id="tooltip"
-                        place="right"
-                        type="light"
-                        html={true}
-                        className={this.state.tooltips.capitalizeLabels ? 'capitalize' : 'tooltip'}/>}
-                    <section className={mapContainerClasses}>
-                        <section className="geography-container" aria-hidden="true">
-                            {true === displayModal && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue} closeModal={this.closeModal} capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                            {displayMap}
-                            {"data" === this.state.general.type && <img src={cdcHhsLogo} alt="" className="cdc-hhs-logo"/>}
+            <div className={this.props.className ? `cdc-map-outer-container ${this.props.className}` : 'cdc-map-outer-container' } ref={this.outerContainerRef}>
+                <Suspense fallback={<Loading />}>
+                    {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} />}
+                    <section className="cdc-map-inner-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
+                        {'hover' === this.state.tooltips.appearanceType &&
+                            <ReactTooltip
+                                id="tooltip"
+                                place="right"
+                                type="light"
+                                html={true}
+                                className={this.state.tooltips.capitalizeLabels ? 'capitalize' : 'tooltip'}
+                            />
+                        }
+                        <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
+                            <h1 className={'site-title ' + this.state.general.headerColor}>
+                                { ReactHtmlParser(this.state.general.title) }
+                            </h1>
+                        </header>
+                        <section className={mapContainerClasses.join(' ')}>
+                            <Suspense fallback={<Loading />}>
+                                <section className="geography-container" aria-hidden="true">
+                                    {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue} closeModal={this.closeModal} capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
+                                    {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                    {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
+                                    {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
+                                </section>
+                                {"navigation" === this.state.general.type &&
+                                    <NavigationMenu
+                                        displayGeoName={this.displayGeoName}
+                                        processedData={this.state.processedData}
+                                        options={this.state.general}
+                                        columns={this.state.columns}
+                                        navigationHandler={(val) => this.navigationHandler(val)}
+                                    />
+                                }
+                                {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
+                                    <Sidebar
+                                        legend={this.state.legend}
+                                        filters={this.state.filters}
+                                        columns={this.state.columns}
+                                        sharing={this.state.sharing}
+                                        prefix={this.state.columns.primary.prefix}
+                                        suffix={this.state.columns.primary.suffix}
+                                        processedLegend={this.state.processedLegend}
+                                        setState={this.setState}
+                                        resetLegendToggles={this.resetLegendToggles}
+                                        applyColorToLegend={this.applyColorToLegend}
+                                        changeFilterActive={this.changeFilterActive}
+                                        announceChange={this.announceChange}
+                                    />
+                                }
+                            </Suspense>
                         </section>
-                        {"navigation" === this.state.general.type &&
-                            <NavigationMenu
-                                displayGeoName={this.displayGeoName}
+                        {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
+                            <DataTable
+                                state={this.state}
+                                navigationHandler={this.navigationHandler}
+                                expandDataTable={this.state.general.expandDataTable}
+                                headerColor={this.state.general.headerColor}
+                                columns={this.state.columns}
+                                showDownloadButton={this.state.general.showDownloadButton}
+                                data={this.state.data}
                                 processedData={this.state.processedData}
-                                options={this.state.general}
-                                columns={this.state.columns}
-                                navigationHandler={(val) => this.navigationHandler(val)}
-                            />
-                        }
-                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
-                            <Sidebar
-                                legend={this.state.legend}
-                                filters={this.state.filters}
-                                columns={this.state.columns}
-                                sharing={this.state.sharing}
-                                prefix={this.state.columns.primary.prefix}
-                                suffix={this.state.columns.primary.suffix}
                                 processedLegend={this.state.processedLegend}
-                                setState={this.setState}
-                                resetLegendToggles={this.resetLegendToggles}
-                                applyColorToLegend={this.applyColorToLegend}
-                                changeFilterActive={this.changeFilterActive}
-                                announceChange={this.announceChange}
+                                displayDataAsText={this.displayDataAsText}
+                                displayGeoName={this.displayGeoName}
+                                applyLegendToValue={this.applyLegendToValue}
+                                geoNames={this.geoNames}
+                                tableTitle={this.state.dataTable.title}
+                                mapTitle={this.state.general.title}
                             />
                         }
+                        {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
                     </section>
-                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
-                        <DataTable
-                            state={this.state}
-                            navigationHandler={this.navigationHandler}
-                            expandDataTable={this.state.general.expandDataTable}
-                            headerColor={this.state.general.headerColor}
-                            columns={this.state.columns}
-                            showDownloadButton={this.state.general.showDownloadButton}
-                            data={this.state.data}
-                            processedData={this.state.processedData}
-                            processedLegend={this.state.processedLegend}
-                            displayDataAsText={this.displayDataAsText}
-                            displayGeoName={this.displayGeoName}
-                            applyLegendToValue={this.applyLegendToValue}
-                            geoNames={this.geoNames}
-                            tableTitle={this.state.dataTable.title}
-                            mapTitle={this.state.general.title}
-                        />
-                    }
-                    {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
-                </section>
-                <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
-            </>
+                    <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
+                </Suspense>
+            </div>
         )
     }
 }
