@@ -3,23 +3,27 @@ module.exports = {
     browser: true,
   },
   extends: [
-    'airbnb',
+    'airbnb-typescript',
     'airbnb/hooks',
-    'eslint-config-airbnb/whitespace',
+    'eslint-config-airbnb/whitespace'
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
+    project: './tsconfig.eslint.json',
     es2021: true,
     ecmaFeatures: {
       jsx: true,
     },
     ecmaVersion: 12,
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: [
-    'react',
+    '@typescript-eslint',
+    'react'
   ],
   rules: {
-    'react/jsx-filename-extension': [1, { 'extensions': ['.js', '.jsx'] }],
+    "no-use-before-define": "off",
+    'react/jsx-filename-extension': [1, { 'extensions': ['.js', '.jsx', '.ts', '.tsx'] }],
     'react/prop-types': 0,
     'react/jsx-one-expression-per-line': 0,
     'max-len': 0,

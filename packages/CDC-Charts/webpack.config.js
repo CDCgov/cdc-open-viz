@@ -9,6 +9,9 @@ module.exports = {
     devServer: {
         open: true
     },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
+    },
     module: {
         rules: [
           {
@@ -43,6 +46,11 @@ module.exports = {
               'sass-loader',
             ],
           },
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+          }
         ]
     }
 };

@@ -6,7 +6,7 @@ import { Group } from '@visx/group';
 import { LinePath } from '@visx/shape';
 import { scaleTime, scaleLinear } from '@visx/scale';
 import {
-  MarkerArrow, MarkerCross, MarkerX, MarkerCircle, MarkerLine
+  MarkerArrow, MarkerCross, MarkerX, MarkerCircle, MarkerLine,
 } from '@visx/marker';
 import generateDateValue from '@visx/mock-data/lib/generators/genDateValue';
 
@@ -14,16 +14,16 @@ const curveTypes = Object.keys(allCurves);
 const lineCount = 5;
 const series = new Array(lineCount)
   .fill(null)
-  .map(() => generateDateValue(25).sort((a, b) => a.date.getTime() - b.date.getTime()),);
+  .map(() => generateDateValue(25).sort((a, b) => a.date.getTime() - b.date.getTime()));
 const allData = series.reduce((rec, d) => rec.concat(d), []);
 
 const getX = (d) => d.date;
 const getY = (d) => d.value;
 
-const xScale = scaleTime({
+const xScale: any = scaleTime({
   domain: extent(allData, getX),
 });
-const yScale = scaleLinear({
+const yScale: any = scaleLinear({
   domain: [0, max(allData, getY)],
 });
 
@@ -122,12 +122,6 @@ export default function LineChart() {
             );
           })}
       </svg>
-      <style jsx>{`
-        .visx-curves-demo label {
-          font-size: 12px;
-        }
-      `}
-      </style>
     </div>
   );
 }

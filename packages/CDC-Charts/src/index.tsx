@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './App';
+import App from './App.tsx';
 
 const domContainers = document.querySelectorAll('.react-container');
 
@@ -10,6 +10,6 @@ domContainers.forEach((domContainer) => {
     <React.StrictMode>
       <App configUrl={domContainer.attributes['data-config'].value} />
     </React.StrictMode>,
-    domContainer
+    domContainer,
   );
 });

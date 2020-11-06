@@ -4,10 +4,10 @@ import { Group } from '@visx/group';
 import { Bar } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
-import Context from '../context';
+import Context from '../context.tsx';
 
 export default function BarChart() {
-  const { pageContext } = useContext(Context);
+  const { pageContext } = useContext<any>(Context);
 
   let xScale;
   let yScale;
@@ -70,7 +70,6 @@ export default function BarChart() {
               left={30}
               label="Frequency"
               stroke="#1b1a1e"
-              tickTextFill="#1b1a1e"
             />
 
             <AxisBottom
@@ -80,7 +79,6 @@ export default function BarChart() {
               label="Letter"
               numTicks={26}
               stroke="#1b1a1e"
-              tickTextFill="#1b1a1e"
             />
 
             <Bar
