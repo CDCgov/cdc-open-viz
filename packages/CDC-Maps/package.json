@@ -8,8 +8,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack --mode production",
-    "prepare": "npx webpack --mode production",
-    "postinstall": "cd ./node_modules/react-sortable-hoc && npm install && npm run build"
+    "prepare": "npx webpack --mode production"
   },
   "files": [
     "dist"
