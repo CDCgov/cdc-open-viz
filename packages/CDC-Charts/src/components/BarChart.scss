@@ -1,0 +1,27 @@
+#bar-chart-container {
+  svg, #legend-container {
+      display: inline-block;
+  }
+
+  #legend-container {
+    padding: 15px;
+    vertical-align: top;
+    text-align: center;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  caption {
+    caption-side: top;
+    font-size: x-large;
+    font-weight: bold;
+    text-align: center;
+    color: black;
+  }
+
+  th, td {
+    border: 1px solid black;
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "title": "Average Temperature By City",
+    "dataUrl":  "/assets/temp-example-data.json",
+    "visualizationType": "Bar",
+    "padding": {
+        "top": 0,
+        "left": 80,
+        "right": 0,
+        "bottom": 80
+    },
+    "yAxis": {
+        "label": "Temperature"
+    },
+    "xAxis": {
+        "label": "Date"
+    },
+    "legend": {
+        "label": "Legend"
+    },
+    "table": {
+        "label": "Table"
+    }
+}

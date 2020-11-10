@@ -3,13 +3,7 @@
 @import 'scss/variables';
 @import 'scss/mixins';
 
-// Your custom SASS here
-
-// Example styles
-.container p + p {
-    padding-top: 1em;
-}
-
-.visx-curves-demo label {
-    font-size: 12px;
+#chart-title {
+    text-align: center;
+    margin-bottom: 40px;
 }
