@@ -33,11 +33,18 @@ module.exports = (env, { mode }) => {
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          vendors: false
+        }
+      }
+    },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
     },
     devServer: {
         open: true,
@@ -112,7 +119,7 @@ module.exports = (env, { mode }) => {
     configObj.output = {
       ...configObj.output,
       libraryTarget: 'umd',
-      library: 'CdcMap'
+      library: 'CdcMap',
     }
   }
 

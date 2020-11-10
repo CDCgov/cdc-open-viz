@@ -422,7 +422,7 @@ const Editor = (props) => {
       case 'geoType':
           // If we're still working with default data, switch to the world default to show it as an example
           if(true === loadedDefault && 'world' === value) {
-            const worldDefaultConfig = await import('../examples/default-world.json');
+            const worldDefaultConfig = await import(/* webpackChunkName: "default-world" */'../examples/default-world.json');
 
             loadConfig(worldDefaultConfig)
             ReactTooltip.rebuild()
@@ -430,7 +430,7 @@ const Editor = (props) => {
           }
 
           if(true === loadedDefault && 'us' === value) {
-            const usaDefaultConfig = await import('../examples/default-usa.json');
+            const usaDefaultConfig = await import(/* webpackChunkName: "default-usa" */'../examples/default-usa.json');
 
             loadConfig(usaDefaultConfig)
             ReactTooltip.rebuild()

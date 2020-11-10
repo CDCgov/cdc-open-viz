@@ -29,11 +29,11 @@ import Loading from './components/Loading';
 import Modal from './components/Modal';
 
 // Lazy loaded components
-const Editor = lazy(() => import('./components/Editor'));
-const UsaMap = lazy(() => import('./components/UsaMap'));
-const WorldMap = lazy(() => import('./components/WorldMap'));
-const DataTable = lazy(() => import('./components/DataTable'));
-const NavigationMenu = lazy(() => import('./components/NavigationMenu'));
+const Editor = lazy(() => import(/* webpackChunkName: "editor" */'./components/Editor'));
+const UsaMap = lazy(() => import(/* webpackChunkName: "usa-map" */'./components/UsaMap'));
+const DataTable = lazy(() => import(/* webpackChunkName: "data-table" */'./components/DataTable'));
+const NavigationMenu = lazy(() => import(/* webpackChunkName: "navigation-menu" */'./components/NavigationMenu'));
+const WorldMap = lazy(() => import(/* webpackChunkName: "world-map" */'./components/WorldMap'));
 
 class CdcMap extends Component {
 
@@ -1052,7 +1052,7 @@ class CdcMap extends Component {
 
         // Finally, dynamically import the default configuration if nothing else was found.
         if(!configData) {
-            configData = await import('./examples/default-usa.json');
+            configData = await import(/* webpackChunkName: "default-usa" */'./examples/default-usa.json');
         }
 
         // Once we have a config verify that it is an object and load it
