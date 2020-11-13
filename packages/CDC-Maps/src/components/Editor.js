@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
-import ReactTooltip from 'react-tooltip'
+import React, { useRef, useState, useEffect, useCallback, memo } from 'react'
+
 import {
   Accordion,
   AccordionItem,
@@ -7,17 +7,18 @@ import {
   AccordionItemPanel,
   AccordionItemButton,
 } from 'react-accessible-accordion';
-// import {SortableContainer, SortableElement} from 'react-sortable-hoc';
-import Papa from 'papaparse';
-
-import Waiting from './Waiting'
-import mapIcon from '../images/map-folded.svg'
-import UsaGraphic from '../images/united-states-editor.svg'
-import WorldGraphic from '../images/globe-editor.svg'
-import colorPalettes from '../data/color-palettes'
+import ReactTooltip from 'react-tooltip'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import arrayMove from 'array-move'
-
+import Papa from 'papaparse';
 const ReactTags = require('react-tag-autocomplete');
+
+import Waiting from './Waiting';
+import mapIcon from '../images/map-folded.svg';
+import UsaGraphic from '../images/united-states-editor.svg';
+import WorldGraphic from '../images/globe-editor.svg';
+import colorPalettes from '../data/color-palettes';
+import worldDefaultConfig from '../examples/default-world.json'; // Future: Lazy
 
 const Editor = (props) => {
 
@@ -30,7 +31,8 @@ const Editor = (props) => {
     processLegend,
     cleanCsvData,
     fetchRemoteData,
-    loading
+    loading,
+    usaDefaultConfig
   } = props
 
   const { legend, processedData, processedLegend } = state
@@ -41,7 +43,7 @@ const Editor = (props) => {
 
   const [ configData, setConfigData ] = useState({})
 
-  const [ loadedDefault, setLoadedDefault ] = useState(state.defaultData)
+  const [ loadedDefault, setLoadedDefault ] = useState(false)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   
@@ -54,6 +56,8 @@ const Editor = (props) => {
   const [ localData, setLocalData ] = useState(null)
 
   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState(null)
+
+  const [ editorCatOrder, setEditorCatOrder ] = useState([])
 
   const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
@@ -422,16 +426,12 @@ const Editor = (props) => {
       case 'geoType':
           // If we're still working with default data, switch to the world default to show it as an example
           if(true === loadedDefault && 'world' === value) {
-            const worldDefaultConfig = await import(/* webpackChunkName: "default-world" */'../examples/default-world.json');
-
             loadConfig(worldDefaultConfig)
             ReactTooltip.rebuild()
             break;
           }
 
           if(true === loadedDefault && 'us' === value) {
-            const usaDefaultConfig = await import(/* webpackChunkName: "default-usa" */'../examples/default-usa.json');
-
             loadConfig(usaDefaultConfig)
             ReactTooltip.rebuild()
             break;
@@ -466,12 +466,14 @@ const Editor = (props) => {
           ReactTooltip.rebuild()
       break;
       case 'categoryOrder':
+          const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
+
           setState( (prevState) => {
               return {
-                  legend: {
-                    ...prevState.legend,
-                    categoryValuesOrder: arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
-                  }
+                legend: {
+                  ...prevState.legend,
+                  categoryValuesOrder
+                }
               }
           })
       break;
@@ -559,7 +561,7 @@ const Editor = (props) => {
       default:
           console.warn(`Did not recognize editor property.`)
       break;
-  }
+    }
   }
 
   const loadData = async (e) => {
@@ -832,6 +834,8 @@ const Editor = (props) => {
     return JSON.stringify( strippedState )
   }
 
+  useEffect(() => setLoadedDefault(state.defaultData), [state.defaultData])
+
   useEffect(() => columnsRequiredChecker(), [columnsRequiredChecker, state.columns, state.general])
 
   useEffect(() => {
@@ -842,22 +846,6 @@ const Editor = (props) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requiredColumns])
-
-  // const SortableItem = SortableElement(({value}) => <li style={sortableItemStyles}>{value}</li>);
-
-  // const SortableList = SortableContainer(({items}) => {
-  //   if(undefined === items) {
-  //     return (<div></div>)
-  //   }
-
-  //   return (
-  //       <ul className="sort-list">
-  //         {items.map((value, index) => (
-  //             <SortableItem key={`item-${index}`} index={index} value={value} />
-  //         ))}
-  //       </ul>
-  //   )
-  // });
 
   // Generate all columns available by looping through the data - add a blank value at the top
   const columnsInData = [""]
@@ -971,9 +959,37 @@ const Editor = (props) => {
 
   let numberOfItemsLimit = 8
 
+  const getItemStyle = (isDragging, draggableStyle) => ({  
+    ...draggableStyle
+  });
+
+  useEffect(() => {
+    setEditorCatOrder(processedLegend.categoryValuesOrder)
+  }, [processedLegend.categoryValuesOrder])
+
+  const CategoryList = () => {
+    return editorCatOrder.map((value, index) => (
+      <Draggable key={value} draggableId={`${value}`} index={index}>
+        {(provided, snapshot) => (
+          <li
+            style={getItemStyle(
+              snapshot.isDragging,
+              provided.draggableProps.style,
+              sortableItemStyles
+            )}
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >{value}</li>
+        )}
+      </Draggable>
+    ))
+  }
+  
+
   return (
     <>
-      {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} />}
+      {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <h2>Configuration </h2>
@@ -1249,8 +1265,22 @@ const Editor = (props) => {
                       <label>
                         <span className="edit-label">Category Order</span>
                       </label>
-                      {/* <SortableList items={processedLegend.categoryValuesOrder} onSortEnd={(obj) => {  handleEditorChanges("categoryOrder", [obj.oldIndex, obj.newIndex]) }} /> */}
-                      {processedLegend.categoryValuesOrder.length === 9 && <section className="warning"><strong>Warning</strong> The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</section>}
+                      {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
+                      <DragDropContext onDragEnd={({source, destination}) => { setEditorCatOrder(arrayMove(editorCatOrder, source.index, destination.index));  handleEditorChanges("categoryOrder", [source.index, destination.index]); }}>
+                        <Droppable droppableId="category_order">
+                          {(provided, snapshot) => (
+                            <ul
+                              {...provided.droppableProps}
+                              className="sort-list"
+                              ref={provided.innerRef}
+                            >
+                              <CategoryList />
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                      {editorCatOrder.length === 9 && <section className="warning"><strong>Warning</strong> The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</section>}
                     </React.Fragment>
                   }
                   <label>

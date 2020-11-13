@@ -4,20 +4,9 @@ const svgToMiniDataURI = require('mini-svg-data-uri');
 
 module.exports = (env, { mode }) => {
 
-  // Make sure that React and ReactDOM never get included in the built package, as any codebase that is using this library will have them already.
   const prodExternals = {
-    react: {
-      root: 'React',
-      commonjs2: 'react',
-      commonjs: 'react',
-      amd: 'react'
-    },
-    reactDOM: {
-      root: 'ReactDOM',
-      commonjs2: 'react-dom',
-      commonjs: 'react-dom',
-      amd: 'react-dom'
-    }
+    'react': true,
+    'react-dom': true
   };
 
   const entry = {
@@ -27,7 +16,7 @@ module.exports = (env, { mode }) => {
   const configObj = {
     mode,
     entry,
-    devtool: mode === 'development' ? 'inline-source-map' : false,
+    devtool: mode === 'development' ? 'inline-source-map' : 'inline-source-map',
     performance: {
       hints: false,
       maxEntrypointSize: 512000,
@@ -43,7 +32,7 @@ module.exports = (env, { mode }) => {
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].js',
+        filename: 'cdcmap.js',
         libraryTarget: 'umd',
     },
     devServer: {

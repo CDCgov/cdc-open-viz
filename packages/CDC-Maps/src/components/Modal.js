@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import closeIcon from '../images/close.svg';
 
 const Modal = (props) => {
   const {
     applyTooltipsToGeo, content, closeModal, capitalize, applyLegendToValue, state
   } = props;
+
+  if(!content) {
+    return null;
+  }
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.geoData);
 

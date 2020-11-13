@@ -7,7 +7,9 @@ import 'mdn-polyfills/Element.prototype.classList';
 import 'array-flat-polyfill';
 
 // External
-import React, { Component, Suspense, lazy, createRef } from 'react';
+import React, { Component, Suspense } from 'react';
+
+// Third party
 import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
 import Papa from 'papaparse';
@@ -19,6 +21,7 @@ import externalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
+import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './App.scss';
@@ -27,13 +30,11 @@ import './App.scss';
 import Sidebar from './components/Sidebar';
 import Loading from './components/Loading';
 import Modal from './components/Modal';
-
-// Lazy loaded components
-const Editor = lazy(() => import(/* webpackChunkName: "editor" */'./components/Editor'));
-const UsaMap = lazy(() => import(/* webpackChunkName: "usa-map" */'./components/UsaMap'));
-const DataTable = lazy(() => import(/* webpackChunkName: "data-table" */'./components/DataTable'));
-const NavigationMenu = lazy(() => import(/* webpackChunkName: "navigation-menu" */'./components/NavigationMenu'));
-const WorldMap = lazy(() => import(/* webpackChunkName: "world-map" */'./components/WorldMap'));
+import Editor from './components/Editor'; // Future: Lazy
+import UsaMap from './components/UsaMap'; // Future: Lazy
+import DataTable from './components/DataTable'; // Future: Lazy
+import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
+import WorldMap from './components/WorldMap'; // Future: Lazy
 
 class CdcMap extends Component {
 
@@ -953,14 +954,14 @@ class CdcMap extends Component {
         window.open(urlObj.toString(), '_blank');
     }
 
-    async loadConfig (newConfig) {
+    async loadConfig (configObj) {
         // Set loading flag
-        this.setState(() => { return {loading: true} } )
+        this.setState(() => {loading: true})
 
         // Create new config object the same way each time no matter when this method is called.
         let newState = {
             ...initialState,
-            ...newConfig
+            ...configObj
         }
 
         // If there is no raw data stored, we grab and store the rawdata from the URL provided in the config file
@@ -1052,7 +1053,7 @@ class CdcMap extends Component {
 
         // Finally, dynamically import the default configuration if nothing else was found.
         if(!configData) {
-            configData = await import(/* webpackChunkName: "default-usa" */'./examples/default-usa.json');
+            configData = usaDefaultConfig
         }
 
         // Once we have a config verify that it is an object and load it
@@ -1198,81 +1199,79 @@ class CdcMap extends Component {
 
         return (
             <div className={this.props.className ? `cdc-map-outer-container ${this.props.className}` : 'cdc-map-outer-container' } ref={this.outerContainerRef}>
-                <Suspense fallback={<Loading />}>
-                    {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} />}
-                    <section className="cdc-map-inner-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
-                        {'hover' === this.state.tooltips.appearanceType &&
-                            <ReactTooltip
-                                id="tooltip"
-                                place="right"
-                                type="light"
-                                html={true}
-                                className={this.state.tooltips.capitalizeLabels ? 'capitalize' : 'tooltip'}
-                            />
-                        }
-                        <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                            <h1 className={'site-title ' + this.state.general.headerColor}>
-                                { ReactHtmlParser(this.state.general.title) }
-                            </h1>
-                        </header>
-                        <section className={mapContainerClasses.join(' ')}>
-                            <Suspense fallback={<Loading />}>
-                                <section className="geography-container" aria-hidden="true">
-                                    {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue} closeModal={this.closeModal} capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                                    {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
-                                    {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
-                                    {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
-                                </section>
-                                {"navigation" === this.state.general.type &&
-                                    <NavigationMenu
-                                        displayGeoName={this.displayGeoName}
-                                        processedData={this.state.processedData}
-                                        options={this.state.general}
-                                        columns={this.state.columns}
-                                        navigationHandler={(val) => this.navigationHandler(val)}
-                                    />
-                                }
-                                {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
-                                    <Sidebar
-                                        legend={this.state.legend}
-                                        filters={this.state.filters}
-                                        columns={this.state.columns}
-                                        sharing={this.state.sharing}
-                                        prefix={this.state.columns.primary.prefix}
-                                        suffix={this.state.columns.primary.suffix}
-                                        processedLegend={this.state.processedLegend}
-                                        setState={this.setState}
-                                        resetLegendToggles={this.resetLegendToggles}
-                                        applyColorToLegend={this.applyColorToLegend}
-                                        changeFilterActive={this.changeFilterActive}
-                                        announceChange={this.announceChange}
-                                    />
-                                }
-                            </Suspense>
+                {true === this.state.loading && <Loading />}
+                {/* {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} />} */}
+                {true && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
+                <section className="cdc-map-inner-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
+                    {'hover' === this.state.tooltips.appearanceType &&
+                        <ReactTooltip
+                            id="tooltip"
+                            place="right"
+                            type="light"
+                            html={true}
+                            className={this.state.tooltips.capitalizeLabels ? 'capitalize' : 'tooltip'}
+                        />
+                    }
+                    <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
+                        <h1 className={'site-title ' + this.state.general.headerColor}>
+                            { ReactHtmlParser(this.state.general.title) }
+                        </h1>
+                    </header>
+                    <section className={mapContainerClasses.join(' ')}>
+                        <section className="geography-container" aria-hidden="true">
+                            {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue} closeModal={this.closeModal} capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
+                            {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                            {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
+                            {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
                         </section>
-                        {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
-                            <DataTable
-                                state={this.state}
-                                navigationHandler={this.navigationHandler}
-                                expandDataTable={this.state.general.expandDataTable}
-                                headerColor={this.state.general.headerColor}
-                                columns={this.state.columns}
-                                showDownloadButton={this.state.general.showDownloadButton}
-                                data={this.state.data}
-                                processedData={this.state.processedData}
-                                processedLegend={this.state.processedLegend}
-                                displayDataAsText={this.displayDataAsText}
+                        {"navigation" === this.state.general.type &&
+                            <NavigationMenu
                                 displayGeoName={this.displayGeoName}
-                                applyLegendToValue={this.applyLegendToValue}
-                                geoNames={this.geoNames}
-                                tableTitle={this.state.dataTable.title}
-                                mapTitle={this.state.general.title}
+                                processedData={this.state.processedData}
+                                options={this.state.general}
+                                columns={this.state.columns}
+                                navigationHandler={(val) => this.navigationHandler(val)}
                             />
                         }
-                        {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
+                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
+                            <Sidebar
+                                legend={this.state.legend}
+                                filters={this.state.filters}
+                                columns={this.state.columns}
+                                sharing={this.state.sharing}
+                                prefix={this.state.columns.primary.prefix}
+                                suffix={this.state.columns.primary.suffix}
+                                processedLegend={this.state.processedLegend}
+                                setState={this.setState}
+                                resetLegendToggles={this.resetLegendToggles}
+                                applyColorToLegend={this.applyColorToLegend}
+                                changeFilterActive={this.changeFilterActive}
+                                announceChange={this.announceChange}
+                            />
+                        }
                     </section>
-                    <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
-                </Suspense>
+                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
+                        <DataTable
+                            state={this.state}
+                            navigationHandler={this.navigationHandler}
+                            expandDataTable={this.state.general.expandDataTable}
+                            headerColor={this.state.general.headerColor}
+                            columns={this.state.columns}
+                            showDownloadButton={this.state.general.showDownloadButton}
+                            data={this.state.data}
+                            processedData={this.state.processedData}
+                            processedLegend={this.state.processedLegend}
+                            displayDataAsText={this.displayDataAsText}
+                            displayGeoName={this.displayGeoName}
+                            applyLegendToValue={this.applyLegendToValue}
+                            geoNames={this.geoNames}
+                            tableTitle={this.state.dataTable.title}
+                            mapTitle={this.state.general.title}
+                        />
+                    }
+                    {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
+                </section>
+                <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
             </div>
         )
     }

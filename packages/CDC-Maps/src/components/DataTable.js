@@ -7,7 +7,7 @@ import {
 import Papa from 'papaparse';
 import externalIcon from '../images/external-link.svg';
 
-export default (props) => {
+const DataTable = (props) => {
   const {
     tableTitle, mapTitle, data, showDownloadButton, processedData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToValue, displayGeoName, navigationHandler, processedLegend
   } = props;
@@ -258,3 +258,5 @@ export default (props) => {
     </section>
   );
 };
+
+export default DataTable;

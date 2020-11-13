@@ -3,15 +3,12 @@
   "version": "2.0.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/CDC-Maps",
-  "main": "dist/index",
+  "main": "dist/cdcmap",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack --mode production",
     "prepare": "npx webpack --mode production"
   },
-  "files": [
-    "dist"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/CDC-Maps#2.0.0"
@@ -37,12 +34,14 @@
     "js-base64": "^2.5.2",
     "mdn-polyfills": "^5.19.0",
     "papaparse": "^5.2.0",
+    "react": "^16.11.0",
     "react-accessible-accordion": "^3.0.1",
     "react-app-polyfill": "^1.0.4",
+    "react-beautiful-dnd": "^13.0.0",
+    "react-dom": "^16.11.0",
     "react-html-parser": "^2.0.2",
     "react-select": "^3.0.8",
     "react-simple-maps": "^2.1.2",
-    "react-sortable-hoc": "git+https://github.com/danielimmke/react-sortable-hoc.git",
     "react-table": "^7.5.0",
     "react-tag-autocomplete": "^6.0.0",
     "react-tooltip": "^3.11.1",
@@ -79,8 +78,6 @@
     "lint-staged": "^10.4.0",
     "mini-svg-data-uri": "^1.2.3",
     "node-sass": "^4.13.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
     "sass-loader": "^10.0.2",
     "style-loader": "^1.0.0",
     "url-loader": "^4.1.1",
