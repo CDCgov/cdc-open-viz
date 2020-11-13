@@ -18,6 +18,7 @@
         "label": "Legend"
     },
     "table": {
-        "label": "Table"
+        "label": "Table",
+        "expanded": false
     }
 }

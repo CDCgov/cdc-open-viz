@@ -1,5 +1,5 @@
 import 'react-app-polyfill/ie11';
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { Group } from '@visx/group';
 import { BarGroup } from '@visx/shape';
 import { LegendOrdinal } from '@visx/legend';
@@ -35,6 +35,7 @@ const tooltipStyles = {
 
 export default function BarChart() {
   const { pageContext } = useContext<any>(Context);
+  const [tableExpanded, setTableExpanded] = useState<boolean>(pageContext.config.table.expanded);
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
@@ -229,14 +230,14 @@ export default function BarChart() {
 
       <div id="table-container">
         <table>
-          <caption>{pageContext.config.table.label}</caption>
-          <thead>
+          <caption onClick={() => { setTableExpanded(!tableExpanded); }}>{pageContext.config.table.label}</caption>
+          <thead hidden={!tableExpanded}>
             <tr>
               <td>&nbsp;</td>
               {keys.map((key) => <th>{key}</th>)}
             </tr>
           </thead>
-          <tbody>
+          <tbody hidden={!tableExpanded}>
             {data.map((d) => (
               <tr>
                 <th>{d.date}</th>
