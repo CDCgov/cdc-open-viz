@@ -25,7 +25,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.28",
     "array-flat-polyfill": "^1.0.1",
-    "array-move": "^2.2.1",
+    "array-move": "^3.0.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "classlist-polyfill": "^1.2.0",
@@ -62,6 +62,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-arrow-functions": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.1",
     "babel-loader": "^8.1.0",

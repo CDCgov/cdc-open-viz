@@ -47,7 +47,7 @@ module.exports = (env, { mode }) => {
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /(node_modules)/,
+          exclude: /(node_modules)\/(?!array-move)/,
           use: {
             loader: 'babel-loader',
             options: {
@@ -55,7 +55,7 @@ module.exports = (env, { mode }) => {
                 '@babel/preset-env',
                 '@babel/preset-react',
                 {
-                  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import']
+                  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import','@babel/plugin-transform-arrow-functions']
                 }
               ]
             },
