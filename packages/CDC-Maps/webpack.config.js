@@ -1,13 +1,14 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = (env, { mode }) => {
 
-  const prodExternals = {
-    'react': true,
-    'react-dom': true
-  };
+  const prodExternals = [nodeExternals({
+    // this WILL include `jquery` and `webpack/hot/dev-server` in the bundle, as well as `lodash/*`
+    allowlist: ['array-move']
+  })];
 
   const entry = {
     index: mode === 'development' ? './src/index.js' : './src/App.js',
@@ -16,23 +17,16 @@ module.exports = (env, { mode }) => {
   const configObj = {
     mode,
     entry,
-    devtool: mode === 'development' ? 'inline-source-map' : 'inline-source-map',
+    devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
       hints: false,
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
     },
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          vendors: false
-        }
-      }
-    },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'cdcmap.js',
+        filename: (pathData) => pathData.chunk.name === 'index' ? `cdcmap.js` : '[name].js',
         libraryTarget: 'umd',
     },
     devServer: {
@@ -47,7 +41,7 @@ module.exports = (env, { mode }) => {
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /(node_modules)\/(?!array-move)/,
+          exclude: /node_modules\/(?!array-move\/).*/,
           use: {
             loader: 'babel-loader',
             options: {
