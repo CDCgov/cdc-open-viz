@@ -1,12 +1,14 @@
-#bar-chart-container {
-  svg, #legend-container {
+.bar-chart-container {
+  svg, .legend-container {
       display: inline-block;
   }
 
-  #legend-container {
+  .legend-container {
     padding: 15px;
     vertical-align: top;
     text-align: center;
+    border: 1px solid black;
+    margin-bottom: 20px;
   }
 
   table {
@@ -17,8 +19,18 @@
     caption-side: top;
     font-size: x-large;
     font-weight: bold;
-    text-align: center;
+    line-height: 2em;
+    padding-left: 10px;
+    border: 1px solid black;
     color: black;
+    cursor: pointer;
+    padding: 0.25em 1em;
+
+    .table-indicator {
+      float: right;
+      font-size: xx-large;
+      font-weight: bold;
+    }
   }
 
   th, td {

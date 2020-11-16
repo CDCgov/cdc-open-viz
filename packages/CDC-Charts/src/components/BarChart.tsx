@@ -26,12 +26,16 @@ type TooltipData = {
 };
 const tooltipStyles = {
   ...defaultStyles,
-  backgroundColor: 'rgba(53,71,125,0.8)',
-  color: 'white',
+  backgroundColor: 'white',
+  color: 'black',
+  border: '1px solid black',
   width: 152,
   height: 72,
   padding: 12,
 };
+
+const viewportCutoff = 900;
+const legendPercent = 0.2;
 
 export default function BarChart() {
   const { pageContext } = useContext<any>(Context);
@@ -44,69 +48,64 @@ export default function BarChart() {
 
   const {
     showTooltip,
-    /* hideTooltip, */
+    hideTooltip,
     tooltipOpen,
     tooltipData,
     tooltipLeft = 0,
     tooltipTop = 0,
   } = useTooltip<TooltipData>({
-    // initial tooltip state
-    tooltipOpen: true,
+    tooltipOpen: false,
     tooltipLeft: tooltipStyles.width / 3,
     tooltipTop: tooltipStyles.height / 3,
-    tooltipData: { __html: 'Move me with your mouse or finger' },
+    tooltipData: { __html: '' },
   });
-
-  const TooltipComponent = TooltipInPortal;
 
   const blue = '#222299';
   const green = '#229922';
   const red = '#992222';
   const font = '#000000';
 
-  const width = pageContext.dimensions.width > 900 ? pageContext.dimensions.width * 0.7 : pageContext.dimensions.width;
+  const width = (!pageContext.config.legend.hide && pageContext.dimensions.width > viewportCutoff) ? pageContext.dimensions.width * (1 - legendPercent) : pageContext.dimensions.width;
   const height = 600;
 
   const xMax = width - pageContext.config.padding.left - pageContext.config.padding.right;
   const yMax = height - pageContext.config.padding.top - pageContext.config.padding.bottom;
 
-  const parseDate = timeParse('%Y-%m-%d');
+  const parseDate = timeParse(pageContext.config.xAxis.dateFormat);
   const format = timeFormat('%b %d');
   const formatDate = (date: string) => format(parseDate(date) as Date);
 
   // accessors
-  const getDate = (d: any) => d.date;
+  const getXAxisData = (d: any) => d[pageContext.config.xAxis.dataKey];
 
   let data;
-  let keys;
-  let dateScale;
+  let xScale;
   let cityScale;
   let tempScale;
   let colorScale;
 
   if (pageContext.data) {
     data = pageContext.data.slice(0, 8);
-    keys = Object.keys(data[0]).filter((d) => d !== 'date');
 
     // scales
-    dateScale = scaleBand<string>({
-      domain: data.map(getDate),
+    xScale = scaleBand<string>({
+      domain: data.map(getXAxisData),
       padding: 0.2,
     });
     cityScale = scaleBand<string>({
-      domain: keys,
+      domain: pageContext.config.seriesKeys,
       padding: 0.1,
     });
     tempScale = scaleLinear<number>({
-      domain: [0, Math.max(...data.map((d) => Math.max(...keys.map((key) => Number(d[key])))))],
+      domain: [0, Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
     });
     colorScale = scaleOrdinal<string, string>({
-      domain: keys,
+      domain: pageContext.config.seriesKeys,
       range: [blue, green, red],
     });
 
-    dateScale.rangeRound([0, xMax]);
-    cityScale.rangeRound([0, dateScale.bandwidth()]);
+    xScale.rangeRound([0, xMax]);
+    cityScale.rangeRound([0, xScale.bandwidth()]);
     tempScale.range([yMax, 0]);
   }
 
@@ -120,15 +119,15 @@ export default function BarChart() {
         tooltipTop: containerY,
         tooltipData: {
           __html: `<div>
-            City: ${bar.key}
-            Temperature: ${bar.value}
-            Date: ${data[group.index].date}
+            ${pageContext.config.xAxis.label}: ${data[group.index][pageContext.config.xAxis.dataKey]}
+            ${pageContext.config.yAxis.label}: ${bar.value}
+            ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${bar.key}` : ''}
           </div>
         `,
         },
       });
     },
-    [showTooltip, containerBounds, data],
+    [showTooltip, containerBounds, data, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
   );
 
   /**
@@ -139,16 +138,16 @@ export default function BarChart() {
    * Learn more: https://reactjs.org/docs/introducing-jsx.html
    */
   return (
-    <div id="bar-chart-container" style={{ width: pageContext.dimensions.width }}>
+    <div className="bar-chart-container" style={{ width: pageContext.dimensions.width }}>
       <svg width={width} height={height}>
         <rect x={0} y={0} width={width} height={height} fill="white" rx={14} />
         <Group top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
           <BarGroup
             data={data}
-            keys={keys}
+            keys={pageContext.config.seriesKeys}
             height={yMax}
-            x0={getDate}
-            x0Scale={dateScale}
+            x0={getXAxisData}
+            x0Scale={xScale}
             x1Scale={cityScale}
             yScale={tempScale}
             color={colorScale}
@@ -165,6 +164,7 @@ export default function BarChart() {
                     fill={bar.color}
                     rx={4}
                     onPointerMove={(e) => { handlePointerMove(e, bar, barGroup); }}
+                    onPointerLeave={hideTooltip}
                   />
                 ))}
               </Group>
@@ -186,8 +186,8 @@ export default function BarChart() {
           top={yMax + pageContext.config.padding.top}
           left={pageContext.config.padding.left}
           label={pageContext.config.xAxis.label}
-          tickFormat={formatDate}
-          scale={dateScale}
+          tickFormat={pageContext.config.xAxis.type === 'date' ? formatDate : (tick) => tick}
+          scale={xScale}
           stroke={font}
           tickStroke={font}
           labelProps={{
@@ -204,20 +204,18 @@ export default function BarChart() {
 
       {tooltipOpen ? (
         <>
-          <TooltipComponent
+          <TooltipInPortal
             key={Math.random()} // needed for bounds to update correctly
             left={tooltipLeft}
             top={tooltipTop}
             style={tooltipStyles}
           >
             <div dangerouslySetInnerHTML={tooltipData}></div>
-          </TooltipComponent>
+          </TooltipInPortal>
         </>
-      ) : (
-        <div className="no-tooltip">Move or touch the canvas to see the tooltip</div>
-      )}
+      ) : ''}
 
-      <div id="legend-container" style={{ width: pageContext.dimensions.width > 900 ? pageContext.dimensions.width * 0.3 : pageContext.dimensions.width }}>
+      <div className="legend-container" hidden={pageContext.config.legend.hide} style={{ width: pageContext.dimensions.width > viewportCutoff ? pageContext.dimensions.width * legendPercent : pageContext.dimensions.width }}>
         <h2>{pageContext.config.legend.label}</h2>
         <LegendOrdinal
           scale={colorScale}
@@ -228,20 +226,23 @@ export default function BarChart() {
         />
       </div>
 
-      <div id="table-container">
+      <div className="table-container">
         <table>
-          <caption onClick={() => { setTableExpanded(!tableExpanded); }}>{pageContext.config.table.label}</caption>
+          <caption tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') setTableExpanded(!tableExpanded); }} onClick={() => { setTableExpanded(!tableExpanded); }}>
+            {pageContext.config.table.label}
+            <span className="table-indicator">{tableExpanded ? '-' : '+'}</span>
+          </caption>
           <thead hidden={!tableExpanded}>
             <tr>
               <td>&nbsp;</td>
-              {keys.map((key) => <th>{key}</th>)}
+              {pageContext.config.seriesKeys.map((key) => <th>{key}</th>)}
             </tr>
           </thead>
           <tbody hidden={!tableExpanded}>
             {data.map((d) => (
               <tr>
-                <th>{d.date}</th>
-                {keys.map((key) => <td>{d[key]}</td>)}
+                <th>{d[pageContext.config.xAxis.dataKey]}</th>
+                {pageContext.config.seriesKeys.map((key) => <td>{d[key]}</td>)}
               </tr>
             ))}
           </tbody>

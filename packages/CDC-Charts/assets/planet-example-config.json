@@ -1,0 +1,27 @@
+{
+    "title": "Planet Radius",
+    "dataUrl":  "/assets/planet-example-data.json",
+    "visualizationType": "Bar",
+    "seriesKeys": ["Radius"],
+    "padding": {
+        "top": 0,
+        "left": 80,
+        "right": 0,
+        "bottom": 80
+    },
+    "yAxis": {
+        "label": "Radius",
+        "dataKey": "Radius"
+    },
+    "xAxis": {
+        "label": "Planet",
+        "dataKey": "name"
+    },
+    "legend": {
+        "hide": true
+    },
+    "table": {
+        "label": "Table",
+        "expanded": false
+    }
+}

@@ -2,6 +2,8 @@
     "title": "Average Temperature By City",
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Bar",
+    "seriesKeys": ["New York", "San Francisco", "Austin"],
+    "seriesLabel": "City",
     "padding": {
         "top": 0,
         "left": 80,
@@ -12,7 +14,10 @@
         "label": "Temperature"
     },
     "xAxis": {
-        "label": "Date"
+        "label": "Date",
+        "dataKey": "date",
+        "type": "date",
+        "dateFormat": "%Y-%m-%d"
     },
     "legend": {
         "label": "Legend"
