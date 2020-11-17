@@ -933,17 +933,10 @@ const Editor = (props) => {
 
     setConfigData(formattedData)
 
-    if(true === state.usingWidgetLoader) {
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
 
-      const event = new CustomEvent('updateConfig', { detail: parsedData})
-
-      try {
-        // Pass the information to the hidden input in the WCMS
-        window.parent.document.dispatchEvent(event)
-      } catch {
-        console.warn(`Unable to reach WCMS to store edits.`)
-      }
-    }
+    window.dispatchEvent(event)
       
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])

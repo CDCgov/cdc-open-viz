@@ -62,7 +62,7 @@ header + .map-container.full-border {
     bottom: 2em;
     right: 1em;
     z-index: 3;
-    width: 100px;
+    width: 75px;
   }
   svg {
     padding: 0;
@@ -121,17 +121,20 @@ header + .map-container.full-border {
         vertical-align: middle;
         display: inline-block;
         text-align: left;
-        font-size: 1rem !important;
+        font-size: 1em !important;
         margin-bottom: 0;
       }
       &:not(:first-child) {
         transition: .3s all;
-        padding: .3em;
+        padding: .15em .2em;
         border-radius: 5px;
         font-weight: 600;
         line-height: 15px;
         border-width: 1px !important;
         border-style: solid !important;
+        @include breakpoint(lg) {
+          padding: .3em;
+        }
       }
       &.darkGray {
         border: rgba(0,0,0,.2) 1px solid !important;
@@ -155,16 +158,16 @@ header + .map-container.full-border {
     flex-direction: row;
     flex-wrap: wrap;
     padding: .2em;
-    height: 1.75rem;
-    width: 1.75rem;
+    height: 1.75em;
+    width: 1.75em;
     background: rgba(0,0,0,.65);
     transition: .2s all;
     color: #fff;
     border-radius: 100%;
     border: 0;
     @include breakpoint(sm) {
-      height: 2.5rem;
-      width: 2.5rem;
+      height: 2.5em;
+      width: 2.5em;
     }
     &:hover {
       background: rgba(0,0,0,.8);
@@ -175,6 +178,6 @@ header + .map-container.full-border {
     }
   }
   > button:first-child {
-    margin-right: 0.25rem;
+    margin-right: 0.25em;
   }
 }

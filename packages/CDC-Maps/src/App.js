@@ -77,15 +77,17 @@ class CdcMap extends Component {
         this.processUnifiedData = this.processUnifiedData.bind(this)
     }
 
-    closeModal() {
-        this.setState( (prevState) => {
-            return {
-                general: {
-                    ...prevState.general,
-                    modalOpen: false
+    closeModal({target}) {
+        if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && this.state.general.modalOpen) {
+            this.setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        modalOpen: false
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     async changeFilterActive (num, activeValue) {
@@ -420,8 +422,8 @@ class CdcMap extends Component {
         return generateColorsArray( color )
     }
 
-    applyTooltipsToGeo (geoName, data) {
-        let toolTipText = `<strong>${geoName}</strong>`
+    applyTooltipsToGeo (geoName, data, returnType = 'string') {
+        let toolTipText = `<strong>${this.displayGeoName(geoName)}</strong>`
 
         if('data' === this.state.general.type) {
             toolTipText += `<dl>`
@@ -445,9 +447,8 @@ class CdcMap extends Component {
             toolTipText += `</dl>`
         }
 
-        // We convert the tooltip markup into JSX if it's not going into an actual tooltip. This is so we can use the same navigation method used everywhere else for the navigation link.
-        // The only reason we aren't using JSX for both is because the react-tooltip package doesn't support JSX as the content of a tooltip for some reason. That may change in the future, but leaving note explaining this bit of odd code.
-        if('click' === this.state.tooltips.appearanceType || 'xs' === this.getViewport()) {
+        // We convert the markup into JSX and add a navigation link if it's going into a modal.
+        if('jsx' === returnType) {
             toolTipText = [(<div key="modal-content">{ReactHtmlParser(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
@@ -743,7 +744,6 @@ class CdcMap extends Component {
 
     // Checks if the string is a number and returns it as a number if it is
     numberFromString = (value) => {
-
         // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
         let nonNumeric = /[^\d.]/g
 
@@ -1135,7 +1135,7 @@ class CdcMap extends Component {
 
     geoClickHandler (key, value) {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('click' === this.state.tooltips.appearanceType || 'xs' === this.getViewport()) {
+        if ('xs' === this.getViewport() || 'click' === this.state.tooltips.appearanceType) {
             this.setState( (prevState) => {
                 return {
                     ...prevState,
@@ -1150,22 +1150,13 @@ class CdcMap extends Component {
                 }
             })
 
-            // Add event listener to close if detecting a click outside of modal content area
-            document.addEventListener("mousedown", (e) => {
-                if(e.toElement && 'map-container modal-background' === e.toElement.className) {
-                    this.closeModal()
-                }
-            });
-
             return;
         }
 
-        // Otherwise if this is a map with hover tooltips and the item has a link specified for it, do regular navigation.
-        if (this.state.columns.navigate &&
-            value[this.state.columns.navigate.name] &&
-            'hover' === this.state.tooltips.appearanceType) {
-                this.navigationHandler(value[this.state.columns.navigate.name])
-            }
+        // Otherwise if this item has a link specified for it, do regular navigation.
+        if (this.state.columns.navigate && value[this.state.columns.navigate.name]) {
+            this.navigationHandler(value[this.state.columns.navigate.name])
+        }
     }
 
     render () {
@@ -1200,7 +1191,7 @@ class CdcMap extends Component {
         return (
             <div className={this.props.className ? `cdc-map-outer-container ${this.props.className}` : 'cdc-map-outer-container' } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
-                {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
+                {true && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
                 <section className="cdc-map-inner-container" style={{backgroundColor: this.state.general.backgroundColor}} aria-label={'Map: ' + this.state.general.title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip
@@ -1208,17 +1199,17 @@ class CdcMap extends Component {
                             place="right"
                             type="light"
                             html={true}
-                            className={this.state.tooltips.capitalizeLabels ? 'capitalize' : 'tooltip'}
+                            className={this.state.tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
                         />
                     }
                     <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                        <h1 className={'site-title ' + this.state.general.headerColor}>
+                        <h1 className={'map-title ' + this.state.general.headerColor}>
                             { ReactHtmlParser(this.state.general.title) }
                         </h1>
                     </header>
-                    <section className={mapContainerClasses.join(' ')}>
+                    <section className={mapContainerClasses.join(' ')} onClick={(e) => this.closeModal(e)}>
                         <section className="geography-container" aria-hidden="true">
-                            {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue} closeModal={this.closeModal} capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
+                            {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
                             {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
                             {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
                             {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}

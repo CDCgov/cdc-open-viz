@@ -286,7 +286,7 @@ const UsaMap = (props) => {
             className={`rsm-geography ${state.general.geoBorderColor}`}
             key={geo.rsmKey}
             geography={geo}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)} // Generic click handler to move all of the logic that needs to happen out of
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
             style={stylesObj}
           />
         );

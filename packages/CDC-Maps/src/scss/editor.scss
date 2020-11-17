@@ -2,7 +2,9 @@
   .editor-panel:not(.hidden) + .cdc-map-inner-container {
     padding-left: $editorWidth;
   }
-  .editor-panel.hidden + .cdc-map-inner-container h1.site-title { padding-left: 3em; } 
+  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
+    padding-left: 3em;
+  } 
 }
 
 .waiting {
@@ -50,8 +52,8 @@
     box-sizing: border-box;
   }
   li {
-    border-radius: .4rem;
-    padding: .3rem .75rem;
+    border-radius: .4em;
+    padding: .3em .75em;
     display: flex;
     border: $mediumGray 1px solid;
     width: 40%;
@@ -133,7 +135,6 @@
 .editor-panel {
   background: #fff;
   width: $editorWidth;
-  height: 100vh;
   overflow-y: overlay;
   overflow-x: hidden;
   position: fixed;
@@ -142,6 +143,8 @@
   display: flex;
   flex-direction: column;
   left: 0;
+  top: 0;
+  bottom: 0;
   .accordion__heading {
     background: $lightGray;
   }
@@ -151,9 +154,9 @@
   }
   .guidance-link {
     font-family: $fontStack;
-    margin: 2rem 1em 1rem;
-    border-radius: .4rem;
-    padding: .75rem 1rem;
+    margin: 2em 1em 1em;
+    border-radius: .4em;
+    padding: .75em 1em;
     display: flex;
     text-decoration: none;
     color: #444;
@@ -186,11 +189,11 @@
   .warning {
     color: #D8000C;
     background-color: #FFD2D2;
-    padding: .75rem 1rem;
+    padding: .75em 1em;
     margin: 1em 0;
     font-size: .8em;
     border: #D8000C 1px solid;
-    border-radius: .4rem;
+    border-radius: .4em;
     strong {
       font-weight: 600;
       display: block;
@@ -282,11 +285,11 @@
   }
 
   h2 {
-    background: rgba(0, 0, 0, 0.7);
+    background: #565656;
+    border-bottom: #565656 3px solid;
     color: #fff;
-    border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
     font-size: 1.1em;
-    padding: .65rem 1em;
+    padding: .6em .8em;
     position: relative;
     z-index: 3;
   }
@@ -411,7 +414,7 @@
     display: none;
   }
 
-  .remove-column {
+  .emove-column {
     float: right;
     text-transform: uppercase;
     color: #C32B2B;
@@ -648,7 +651,7 @@
     /* prevent autoresize overflowing the container */
     max-width: 100%;
 
-    /* remove styles and layout from this element */
+    /* emove styles and layout from this element */
     margin: 0;
     outline: none;
     padding: .5em .3em;

@@ -48,8 +48,13 @@
   @import "scss/variables";
   @import "scss/heading_colors";
 
+  position: relative;
   font-family: $fontStack;
   display: flex; // Needed for the main content
+  font-size: 14px;
+  @include breakpoint(lg) {
+    font-size: 16px;
+  }
 
   @import "scss/editor";
   @import "scss/main";

@@ -1,5 +1,5 @@
 /* Tooltip Styles - overrides some default ones provided by <ReactTooltip /> */
-#tooltip {
+.tooltip {
   border: rgba(0,0,0,.3) 1px solid;
   box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
   opacity: 1;
@@ -8,7 +8,7 @@
   border-radius: 4px;
   padding: 8px 12px;
   &:before, &:after {
-    // Remove arrows for now
+    // emove arrows for now
     display: none;
   }
 

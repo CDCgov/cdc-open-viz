@@ -1,14 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = (env, { mode }) => {
 
-  const prodExternals = [nodeExternals({
-    // this WILL include `jquery` and `webpack/hot/dev-server` in the bundle, as well as `lodash/*`
-    allowlist: ['array-move']
-  })];
+  const prodExternals = {
+    'react': true,
+    'react-dom': true
+  };
 
   const entry = {
     index: mode === 'development' ? './src/index.js' : './src/App.js',

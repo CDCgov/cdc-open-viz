@@ -22,14 +22,11 @@
   text-rendering: geometricPrecision;
   color: #202020;
   border: 0;
-  font-size: 14px;
   text-align: left;
-  @include breakpoint(lg) {
-    font-size: 16px;
-  }
+  max-width: 100%;
   .btn {
-    padding: .375rem .75rem;
-    border-radius: .3rem;
+    padding: .375em .75em;
+    border-radius: .3em;
   }
 
   header.hidden {
@@ -40,7 +37,8 @@
     border: 0;
   }
 
-  h1 {
+  h1.map-title {
+    margin: 0;
     color: #fff;
     font-size: 1.1em;
     position: relative;
@@ -52,8 +50,9 @@
     }
   }
 
-  h1:not(:empty) {
-    padding: .6rem .8rem;
+  h1.map-title:not(:empty) {
+    margin: 0 !important;
+    padding: .6em .8em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
   }
@@ -86,6 +85,7 @@
         top: 50%;
         left: 50%;
         display: flex;
+        flex-direction: row;
         border-radius: 5px;
         transform: translate(-50%, -50%);
         border: rgba(0, 0, 0, 0.3) 1px solid;
@@ -96,6 +96,10 @@
         border-radius: 4px;
         min-width: 250px;
         padding: 16px 40px 16px 20px;
+        width: auto;
+        .content {
+          flex-grow: 1;
+        }
         .legend-color {
           @include legendDot;
           margin-right: .75em;
