@@ -2,7 +2,7 @@ import 'react-app-polyfill/ie11';
 import React, { useContext, useState, useCallback } from 'react';
 import { Group } from '@visx/group';
 import { BarGroup } from '@visx/shape';
-import { LegendOrdinal } from '@visx/legend';
+import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleLinear, scaleBand, scaleOrdinal } from '@visx/scale';
 import {
   useTooltip,
@@ -37,9 +37,17 @@ const tooltipStyles = {
 const viewportCutoff = 900;
 const legendPercent = 0.2;
 
+const blue = '#222299';
+const green = '#229922';
+const red = '#992222';
+const font = '#000000';
+
+const legendGlyphSize = 15;
+
 export default function BarChart() {
   const { pageContext } = useContext<any>(Context);
   const [tableExpanded, setTableExpanded] = useState<boolean>(pageContext.config.table.expanded);
+  const [seriesHighlight, setSeriesHighlight] = useState<Array<any>>([]);
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
@@ -59,11 +67,6 @@ export default function BarChart() {
     tooltipTop: tooltipStyles.height / 3,
     tooltipData: { __html: '' },
   });
-
-  const blue = '#222299';
-  const green = '#229922';
-  const red = '#992222';
-  const font = '#000000';
 
   const width = (!pageContext.config.legend.hide && pageContext.dimensions.width > viewportCutoff) ? pageContext.dimensions.width * (1 - legendPercent) : pageContext.dimensions.width;
   const height = 600;
@@ -163,6 +166,7 @@ export default function BarChart() {
                     height={bar.height}
                     fill={bar.color}
                     rx={4}
+                    display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                     onPointerMove={(e) => { handlePointerMove(e, bar, barGroup); }}
                     onPointerLeave={hideTooltip}
                   />
@@ -219,11 +223,40 @@ export default function BarChart() {
         <h2>{pageContext.config.legend.label}</h2>
         <LegendOrdinal
           scale={colorScale}
-          direction={pageContext.dimensions.width > 900 ? 'column-reverse' : 'row'}
           itemDirection="row"
           labelMargin="0 20px 0 0"
           shapeMargin="0 10px 0"
-        />
+        >{labels => (
+          <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > 900 ? 'column-reverse' : 'row' }}>
+            {labels.map((label, i) => (
+              <LegendItem
+                key={`legend-quantile-${i}`}
+                margin="0 5px"
+                onClick={() => {
+                  let newSeriesHighlight = [];
+                  seriesHighlight.forEach((value) => {
+                    newSeriesHighlight.push(value);
+                  });
+                  if (newSeriesHighlight.indexOf(label.datum) !== -1) {
+                    newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
+                  } else {
+                    newSeriesHighlight.push(label.datum);
+                  }
+
+                  setSeriesHighlight(newSeriesHighlight);
+                }}
+              >
+                <svg width={legendGlyphSize} height={legendGlyphSize}>
+                  <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+                </svg>
+                <LegendLabel align="left" margin="0 0 0 4px">
+                  {label.text}
+                </LegendLabel>
+              </LegendItem>
+            ))}
+          </div>
+        )}
+        </LegendOrdinal>
       </div>
 
       <div className="table-container">
