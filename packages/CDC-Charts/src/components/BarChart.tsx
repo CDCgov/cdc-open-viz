@@ -133,6 +133,20 @@ export default function BarChart() {
     [showTooltip, containerBounds, data, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
   );
 
+  const highlight = (label) => {
+    let newSeriesHighlight = [];
+    seriesHighlight.forEach((value) => {
+      newSeriesHighlight.push(value);
+    });
+    if (newSeriesHighlight.indexOf(label.datum) !== -1) {
+      newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
+    } else {
+      newSeriesHighlight.push(label.datum);
+    }
+
+    setSeriesHighlight(newSeriesHighlight);
+  };
+
   /**
    * Functional components always return a JSX object, which is
    * the templating language React uses. It's a modified form of HTML
@@ -230,20 +244,16 @@ export default function BarChart() {
           <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > 900 ? 'column-reverse' : 'row' }}>
             {labels.map((label, i) => (
               <LegendItem
+                tabIndex={0}
                 key={`legend-quantile-${i}`}
                 margin="0 5px"
-                onClick={() => {
-                  let newSeriesHighlight = [];
-                  seriesHighlight.forEach((value) => {
-                    newSeriesHighlight.push(value);
-                  });
-                  if (newSeriesHighlight.indexOf(label.datum) !== -1) {
-                    newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
-                  } else {
-                    newSeriesHighlight.push(label.datum);
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    highlight(label);
                   }
-
-                  setSeriesHighlight(newSeriesHighlight);
+                }}
+                onClick={() => {
+                  highlight(label);
                 }}
               >
                 <svg width={legendGlyphSize} height={legendGlyphSize}>
