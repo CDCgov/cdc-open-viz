@@ -48,6 +48,7 @@ export default function BarChart() {
   const { pageContext } = useContext<any>(Context);
   const [tableExpanded, setTableExpanded] = useState<boolean>(pageContext.config.table.expanded);
   const [seriesHighlight, setSeriesHighlight] = useState<Array<any>>([]);
+  const [tableSortConfig, setTableSortConfig] = useState<any>({ sortKey: '', sortReverse: false });
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
@@ -134,7 +135,7 @@ export default function BarChart() {
   );
 
   const highlight = (label) => {
-    let newSeriesHighlight = [];
+    const newSeriesHighlight = [];
     seriesHighlight.forEach((value) => {
       newSeriesHighlight.push(value);
     });
@@ -145,6 +146,28 @@ export default function BarChart() {
     }
 
     setSeriesHighlight(newSeriesHighlight);
+  };
+
+  const tableSort = (a, b) => {
+    if (tableSortConfig.sortKey) {
+      let pos = 1;
+      let neg = -1;
+
+      if (tableSortConfig.sortReverse) {
+        pos = -1;
+        neg = 1;
+      }
+
+      if (a[tableSortConfig.sortKey] > b[tableSortConfig.sortKey]) {
+        return neg;
+      } else if (b[tableSortConfig.sortKey] > a[tableSortConfig.sortKey]) {
+        return pos;
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
   };
 
   /**
@@ -278,11 +301,17 @@ export default function BarChart() {
           <thead hidden={!tableExpanded}>
             <tr>
               <td>&nbsp;</td>
-              {pageContext.config.seriesKeys.map((key) => <th>{key}</th>)}
+              {pageContext.config.seriesKeys.map((key) => (
+                <th tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
+                  <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
+                    ^
+                  </span>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody hidden={!tableExpanded}>
-            {data.map((d) => (
+            {data.sort(tableSort).map((d) => (
               <tr>
                 <th>{d[pageContext.config.xAxis.dataKey]}</th>
                 {pageContext.config.seriesKeys.map((key) => <td>{d[key]}</td>)}

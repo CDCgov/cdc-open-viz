@@ -36,4 +36,22 @@
   th, td {
     border: 1px solid black;
   }
+
+  th {
+    line-height: 1.5em;
+    padding: 5px;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .table-sort-indicator {
+    float: right;
+    display: inline-block;
+    font-weight: bold;
+    font-size: x-large;
+
+    &.down {
+      transform: rotate(180deg);
+    }
+  }
 }
