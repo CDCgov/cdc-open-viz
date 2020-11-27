@@ -2,6 +2,7 @@
     "title": "Average Temperature By City",
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Bar",
+    "visualizationSubType": "stacked",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
     "seriesLabel": "City",
     "padding": {

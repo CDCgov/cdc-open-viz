@@ -1,7 +1,7 @@
 import 'react-app-polyfill/ie11';
 import React, { useContext, useState, useCallback } from 'react';
 import { Group } from '@visx/group';
-import { BarGroup } from '@visx/shape';
+import { BarGroup, BarStack } from '@visx/shape';
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleLinear, scaleBand, scaleOrdinal } from '@visx/scale';
 import {
@@ -84,8 +84,8 @@ export default function BarChart() {
 
   let data;
   let xScale;
-  let cityScale;
-  let tempScale;
+  let seriesScale;
+  let yScale;
   let colorScale;
 
   if (pageContext.data) {
@@ -96,21 +96,39 @@ export default function BarChart() {
       domain: data.map(getXAxisData),
       padding: 0.2,
     });
-    cityScale = scaleBand<string>({
+
+    seriesScale = scaleBand<string>({
       domain: pageContext.config.seriesKeys,
       padding: 0.1,
     });
-    tempScale = scaleLinear<number>({
-      domain: [0, Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
-    });
+
+    if (pageContext.config.visualizationSubType === 'stacked') {
+      const yTotals = data.reduce((allTotals, xValue) => {
+        const totalTemperature = pageContext.config.seriesKeys.reduce((dailyTotal, k) => {
+          dailyTotal += Number(xValue[k]);
+          return dailyTotal;
+        }, 0);
+        allTotals.push(totalTemperature);
+        return allTotals;
+      }, [] as number[]);
+
+      yScale = scaleLinear<number>({
+        domain: [0, Math.max(...yTotals)],
+      });
+    } else {
+      yScale = scaleLinear<number>({
+        domain: [0, Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
+      });
+    }
+
     colorScale = scaleOrdinal<string, string>({
       domain: pageContext.config.seriesKeys,
       range: [blue, green, red],
     });
 
     xScale.rangeRound([0, xMax]);
-    cityScale.rangeRound([0, xScale.bandwidth()]);
-    tempScale.range([yMax, 0]);
+    seriesScale.rangeRound([0, xScale.bandwidth()]);
+    yScale.range([yMax, 0]);
   }
 
   // event handlers
@@ -182,38 +200,65 @@ export default function BarChart() {
       <svg width={width} height={height}>
         <rect x={0} y={0} width={width} height={height} fill="white" rx={14} />
         <Group top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
-          <BarGroup
-            data={data}
-            keys={pageContext.config.seriesKeys}
-            height={yMax}
-            x0={getXAxisData}
-            x0Scale={xScale}
-            x1Scale={cityScale}
-            yScale={tempScale}
-            color={colorScale}
-          >
-            {(barGroups) => barGroups.map((barGroup) => (
-              <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={barGroup.x0}>
-                {barGroup.bars.map((bar) => (
-                  <rect
-                    key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                    x={bar.x}
-                    y={bar.y}
-                    width={bar.width}
-                    height={bar.height}
-                    fill={bar.color}
-                    rx={4}
-                    display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                    onPointerMove={(e) => { handlePointerMove(e, bar, barGroup); }}
-                    onPointerLeave={hideTooltip}
-                  />
-                ))}
-              </Group>
-            ))}
-          </BarGroup>
+          { pageContext.config.visualizationSubType === 'stacked' ? (
+            <BarStack
+              data={data}
+              keys={pageContext.config.seriesKeys}
+              x={getXAxisData}
+              xScale={xScale}
+              yScale={yScale}
+              color={colorScale}
+            >
+              {barStacks => barStacks.map(barStack => barStack.bars.map(bar => (
+                <rect
+                  key={`bar-stack-${barStack.index}-${bar.index}`}
+                  x={bar.x}
+                  y={bar.y}
+                  height={bar.height}
+                  width={bar.width}
+                  fill={bar.color}
+                  display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                  onPointerMove={(e) => { handlePointerMove(e, bar, barStack); }}
+                  onPointerLeave={hideTooltip}
+                />
+              )))
+              }
+            </BarStack>
+          ) : (
+            <BarGroup
+              data={data}
+              keys={pageContext.config.seriesKeys}
+              height={yMax}
+              x0={getXAxisData}
+              x0Scale={xScale}
+              x1Scale={seriesScale}
+              yScale={yScale}
+              color={colorScale}
+            >
+              {(barGroups) => barGroups.map((barGroup) => (
+                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={barGroup.x0}>
+                  {barGroup.bars.map((bar) => (
+                    <rect
+                      key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
+                      x={bar.x}
+                      y={bar.y}
+                      width={bar.width}
+                      height={bar.height}
+                      fill={bar.color}
+                      rx={4}
+                      display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                      onPointerMove={(e) => { handlePointerMove(e, bar, barGroup); }}
+                      onPointerLeave={hideTooltip}
+                    />
+                  ))}
+                </Group>
+              ))}
+            </BarGroup>
+          )
+          }
         </Group>
         <AxisLeft
-          scale={tempScale}
+          scale={yScale}
           left={pageContext.config.padding.left}
           label={pageContext.config.yAxis.label}
           labelProps={{
