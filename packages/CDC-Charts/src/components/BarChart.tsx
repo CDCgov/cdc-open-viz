@@ -1,9 +1,8 @@
 import 'react-app-polyfill/ie11';
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
-import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
-import { scaleLinear, scaleBand, scaleOrdinal } from '@visx/scale';
+import { scaleLinear, scaleBand } from '@visx/scale';
 import {
   useTooltip,
   useTooltipInPortal,
@@ -33,22 +32,10 @@ const tooltipStyles = {
   height: 72,
   padding: 12,
 };
-
-const viewportCutoff = 900;
-const legendPercent = 0.2;
-
-const blue = '#222299';
-const green = '#229922';
-const red = '#992222';
 const font = '#000000';
-
-const legendGlyphSize = 15;
 
 export default function BarChart() {
   const { pageContext } = useContext<any>(Context);
-  const [tableExpanded, setTableExpanded] = useState<boolean>(pageContext.config.table.expanded);
-  const [seriesHighlight, setSeriesHighlight] = useState<Array<any>>([]);
-  const [tableSortConfig, setTableSortConfig] = useState<any>({ sortKey: '', sortReverse: false });
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
@@ -69,7 +56,7 @@ export default function BarChart() {
     tooltipData: { __html: '' },
   });
 
-  const width = (!pageContext.config.legend.hide && pageContext.dimensions.width > viewportCutoff) ? pageContext.dimensions.width * (1 - legendPercent) : pageContext.dimensions.width;
+  const width = pageContext.dimensions.chartWidth;
   const height = 600;
 
   const xMax = width - pageContext.config.padding.left - pageContext.config.padding.right;
@@ -86,7 +73,6 @@ export default function BarChart() {
   let xScale;
   let seriesScale;
   let yScale;
-  let colorScale;
 
   if (pageContext.data) {
     data = pageContext.data.slice(0, 8);
@@ -121,11 +107,6 @@ export default function BarChart() {
       });
     }
 
-    colorScale = scaleOrdinal<string, string>({
-      domain: pageContext.config.seriesKeys,
-      range: [blue, green, red],
-    });
-
     xScale.rangeRound([0, xMax]);
     seriesScale.rangeRound([0, xScale.bandwidth()]);
     yScale.range([yMax, 0]);
@@ -142,7 +123,7 @@ export default function BarChart() {
         tooltipData: {
           __html: `<div>
             ${pageContext.config.xAxis.label}: ${data[group.index][pageContext.config.xAxis.dataKey]}
-            ${pageContext.config.yAxis.label}: ${bar.value}
+            ${pageContext.config.yAxis.label}: ${bar.bar ? bar.bar.data[bar.key] : bar.value}
             ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${bar.key}` : ''}
           </div>
         `,
@@ -152,42 +133,6 @@ export default function BarChart() {
     [showTooltip, containerBounds, data, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
   );
 
-  const highlight = (label) => {
-    const newSeriesHighlight = [];
-    seriesHighlight.forEach((value) => {
-      newSeriesHighlight.push(value);
-    });
-    if (newSeriesHighlight.indexOf(label.datum) !== -1) {
-      newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
-    } else {
-      newSeriesHighlight.push(label.datum);
-    }
-
-    setSeriesHighlight(newSeriesHighlight);
-  };
-
-  const tableSort = (a, b) => {
-    if (tableSortConfig.sortKey) {
-      let pos = 1;
-      let neg = -1;
-
-      if (tableSortConfig.sortReverse) {
-        pos = -1;
-        neg = 1;
-      }
-
-      if (a[tableSortConfig.sortKey] > b[tableSortConfig.sortKey]) {
-        return neg;
-      } else if (b[tableSortConfig.sortKey] > a[tableSortConfig.sortKey]) {
-        return pos;
-      } else {
-        return 0;
-      }
-    } else {
-      return 0;
-    }
-  };
-
   /**
    * Functional components always return a JSX object, which is
    * the templating language React uses. It's a modified form of HTML
@@ -195,8 +140,8 @@ export default function BarChart() {
    * usually in attribute names.
    * Learn more: https://reactjs.org/docs/introducing-jsx.html
    */
-  return (
-    <div className="bar-chart-container" style={{ width: pageContext.dimensions.width }}>
+  return pageContext.colorScale ? (
+    <div className="bar-chart-container">
       <svg width={width} height={height}>
         <rect x={0} y={0} width={width} height={height} fill="white" rx={14} />
         <Group top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
@@ -207,7 +152,7 @@ export default function BarChart() {
               x={getXAxisData}
               xScale={xScale}
               yScale={yScale}
-              color={colorScale}
+              color={pageContext.colorScale}
             >
               {barStacks => barStacks.map(barStack => barStack.bars.map(bar => (
                 <rect
@@ -217,7 +162,7 @@ export default function BarChart() {
                   height={bar.height}
                   width={bar.width}
                   fill={bar.color}
-                  display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                  display={pageContext.seriesHighlight.length === 0 || pageContext.seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                   onPointerMove={(e) => { handlePointerMove(e, bar, barStack); }}
                   onPointerLeave={hideTooltip}
                 />
@@ -233,7 +178,7 @@ export default function BarChart() {
               x0Scale={xScale}
               x1Scale={seriesScale}
               yScale={yScale}
-              color={colorScale}
+              color={pageContext.colorScale}
             >
               {(barGroups) => barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={barGroup.x0}>
@@ -246,7 +191,7 @@ export default function BarChart() {
                       height={bar.height}
                       fill={bar.color}
                       rx={4}
-                      display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                      display={pageContext.seriesHighlight.length === 0 || pageContext.seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                       onPointerMove={(e) => { handlePointerMove(e, bar, barGroup); }}
                       onPointerLeave={hideTooltip}
                     />
@@ -300,71 +245,6 @@ export default function BarChart() {
           </TooltipInPortal>
         </>
       ) : ''}
-
-      <div className="legend-container" hidden={pageContext.config.legend.hide} style={{ width: pageContext.dimensions.width > viewportCutoff ? pageContext.dimensions.width * legendPercent : pageContext.dimensions.width }}>
-        <h2>{pageContext.config.legend.label}</h2>
-        <LegendOrdinal
-          scale={colorScale}
-          itemDirection="row"
-          labelMargin="0 20px 0 0"
-          shapeMargin="0 10px 0"
-        >{labels => (
-          <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > 900 ? 'column-reverse' : 'row' }}>
-            {labels.map((label, i) => (
-              <LegendItem
-                tabIndex={0}
-                key={`legend-quantile-${i}`}
-                margin="0 5px"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    highlight(label);
-                  }
-                }}
-                onClick={() => {
-                  highlight(label);
-                }}
-              >
-                <svg width={legendGlyphSize} height={legendGlyphSize}>
-                  <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
-                </svg>
-                <LegendLabel align="left" margin="0 0 0 4px">
-                  {label.text}
-                </LegendLabel>
-              </LegendItem>
-            ))}
-          </div>
-        )}
-        </LegendOrdinal>
-      </div>
-
-      <div className="table-container">
-        <table>
-          <caption tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') setTableExpanded(!tableExpanded); }} onClick={() => { setTableExpanded(!tableExpanded); }}>
-            {pageContext.config.table.label}
-            <span className="table-indicator">{tableExpanded ? '-' : '+'}</span>
-          </caption>
-          <thead hidden={!tableExpanded}>
-            <tr>
-              <td>&nbsp;</td>
-              {pageContext.config.seriesKeys.map((key) => (
-                <th tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
-                  <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
-                    ^
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody hidden={!tableExpanded}>
-            {data.sort(tableSort).map((d) => (
-              <tr>
-                <th>{d[pageContext.config.xAxis.dataKey]}</th>
-                {pageContext.config.seriesKeys.map((key) => <td>{d[key]}</td>)}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
-  );
+  ) : <div></div>;
 }

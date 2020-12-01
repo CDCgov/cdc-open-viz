@@ -5,24 +5,35 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import Context from './context.tsx';
+import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
+import { scaleOrdinal } from '@visx/scale';
 import BarChart from './components/BarChart.tsx';
 import LineChart from './components/LineChart.tsx';
+import Context from './context.tsx';
 
 import './styles.scss';
 
 export default function App({ configUrl, element }) {
   const [pageContext, setPageContext] = useState({
-    title: 'CDC React Starter Kit',
     config: undefined,
     data: undefined,
-    error: false,
     dimensions: {
       width: 0,
       height: 0,
+      chartWidth: 0,
+      legendWidth: 0,
     },
-    resizeInit: false,
+    seriesHighlight: [],
+    colorScale: undefined,
   });
+  const [resizeInit, setResizeInit] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [tableExpanded, setTableExpanded] = useState<number>(-1);
+  const [tableSortConfig, setTableSortConfig] = useState<any>({ sortKey: '', sortReverse: false });
+
+  const viewportCutoff = 900;
+  const legendPercent = 0.2;
+  const legendGlyphSize = 15;
 
   const debounce = useRef(null);
 
@@ -34,37 +45,31 @@ export default function App({ configUrl, element }) {
       }
 
       debounce.current = setTimeout(() => {
+        let chartWidth = element.offsetWidth;
+        let legendWidth = element.offsetWidth;
+        if ((pageContext.config && !pageContext.config.legend.hide) && element.offsetWidth > viewportCutoff) {
+          chartWidth = element.offsetWidth * (1 - legendPercent);
+          legendWidth = element.offsetWidth - chartWidth;
+        }
+
         setPageContext({
-          title: pageContext.title,
           config: pageContext.config,
           data: pageContext.data,
-          error: pageContext.error,
           dimensions: {
             width: element.offsetWidth,
             height: element.offsetHeight,
+            chartWidth: chartWidth,
+            legendWidth: legendWidth,
           },
-          resizeInit: true,
+          seriesHighlight: pageContext.seriesHighlight,
+          colorScale: pageContext.colorScale,
         });
       }, 250);
     }
-  }, [element.offsetHeight, element.offsetWidth, pageContext.config, pageContext.data, pageContext.dimensions.height, pageContext.dimensions.width, pageContext.error, pageContext.title]);
+  }, [element.offsetHeight, element.offsetWidth, pageContext.config, pageContext.data, pageContext.dimensions.height, pageContext.dimensions.width, pageContext.colorScale, pageContext.seriesHighlight]);
 
   useEffect(() => {
-    if (!pageContext.resizeInit) {
-      window.addEventListener('resize', onResize);
-      onResize();
-
-      setPageContext({
-        title: pageContext.title,
-        config: pageContext.config,
-        data: pageContext.data,
-        error: pageContext.error,
-        dimensions: pageContext.dimensions,
-        resizeInit: true,
-      });
-    }
-
-    if (!pageContext.error) {
+    if (!error) {
       if (!pageContext.config) {
         fetch(configUrl)
           .then((response) => response.json())
@@ -74,23 +79,15 @@ export default function App({ configUrl, element }) {
               if (!response.padding.left) response.padding.left = 80;
 
               setPageContext({
-                title: pageContext.title,
                 config: response,
                 data: pageContext.data,
-                error: pageContext.error,
                 dimensions: pageContext.dimensions,
-                resizeInit: true,
+                seriesHighlight: pageContext.seriesHighlight,
+                colorScale: pageContext.colorScale,
               });
             },
             () => {
-              setPageContext({
-                title: pageContext.title,
-                config: pageContext.config,
-                data: pageContext.data,
-                error: true,
-                dimensions: pageContext.dimensions,
-                resizeInit: true,
-              });
+              setError(true);
             },
           );
       } else if (pageContext.data === undefined && pageContext.config.dataUrl !== undefined) {
@@ -98,52 +95,200 @@ export default function App({ configUrl, element }) {
           .then((dataResponse) => dataResponse.json())
           .then((dataResponse) => {
             setPageContext({
-              title: pageContext.title,
               config: pageContext.config,
               data: dataResponse,
-              error: pageContext.error,
               dimensions: pageContext.dimensions,
-              resizeInit: true,
+              seriesHighlight: pageContext.seriesHighlight,
+              colorScale: pageContext.colorScale,
             });
           }, () => {
-            setPageContext({
-              title: pageContext.title,
-              config: pageContext.config,
-              data: pageContext.data,
-              error: true,
-              dimensions: pageContext.dimensions,
-              resizeInit: true,
-            });
+            setError(true);
           });
       }
+
+      if (pageContext.config && !pageContext.colorScale) {
+        setPageContext({
+          config: pageContext.config,
+          data: pageContext.data,
+          dimensions: pageContext.dimensions,
+          seriesHighlight: pageContext.seriesHighlight,
+          colorScale: scaleOrdinal<string, string>({
+            domain: pageContext.config.seriesKeys,
+            range: ['#222299', '#229922', '#992229'],
+          }),
+        });
+      }
+
+      if (pageContext.config && !resizeInit) {
+        window.addEventListener('resize', onResize);
+        onResize();
+
+        setResizeInit(true);
+      }
     }
-  }, [pageContext.resizeInit, pageContext.error, pageContext.title, pageContext.config, pageContext.data, pageContext.dimensions, onResize, configUrl]);
+  }, [pageContext.config, pageContext.data, pageContext.dimensions, onResize, configUrl, error, pageContext.colorScale, pageContext.seriesHighlight, resizeInit]);
+
+  const tableSort = (a, b) => {
+    if (tableSortConfig.sortKey) {
+      let pos = 1;
+      let neg = -1;
+
+      if (tableSortConfig.sortReverse) {
+        pos = -1;
+        neg = 1;
+      }
+
+      if (a[tableSortConfig.sortKey] > b[tableSortConfig.sortKey]) {
+        return neg;
+      } else if (b[tableSortConfig.sortKey] > a[tableSortConfig.sortKey]) {
+        return pos;
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  };
+
+  const isTableExpanded = () => {
+    if (tableExpanded !== -1) {
+      return tableExpanded === 1 ? true : false;
+    } else {
+      if (pageContext.config.table.expanded) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  const changeTableExpanded = () => {
+    if (tableExpanded !== -1) {
+      setTableExpanded((tableExpanded + 1) % 2);
+    } else {
+      setTableExpanded(pageContext.config.table.expanded ? 0 : 1);
+    }
+  };
+
+  const highlight = (label) => {
+    const newSeriesHighlight = [];
+    pageContext.seriesHighlight.forEach((value) => {
+      newSeriesHighlight.push(value);
+    });
+    if (newSeriesHighlight.indexOf(label.datum) !== -1) {
+      newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
+    } else {
+      newSeriesHighlight.push(label.datum);
+    }
+
+    setPageContext({
+      config: pageContext.config,
+      data: pageContext.data,
+      dimensions: pageContext.dimensions,
+      seriesHighlight: newSeriesHighlight,
+      colorScale: pageContext.colorScale,
+    });
+  };
 
   return (
-    <Context.Provider value={{ pageContext, setPageContext }}>
-      <h1 id="chart-title">
+    <div style={{ width: pageContext.dimensions ? pageContext.dimensions.width : '100%' }}>
+      <h1 className="chart-title">
         {pageContext.config ? pageContext.config.title : ''}
       </h1>
-      {
-        (() => {
-          if (pageContext.error) {
-            return <p>There was an error loading the visualization</p>;
-          }
 
-          if (pageContext.config && pageContext.data) {
-            switch (pageContext.config.visualizationType) {
-              case 'Bar':
-                return <BarChart />;
-              case 'Line':
-                return <LineChart />;
-              default:
-                return <p>Error rendering visualization configuration</p>;
-            }
-          }
+      <div className="chart-container" style={{ width: pageContext.dimensions.chartWidth }}>
+        <Context.Provider value={{ pageContext, setPageContext }}>
+          {
+            (() => {
+              if (error) {
+                return <p>There was an error loading the visualization</p>;
+              }
 
-          return <p>Loading...</p>;
-        })()
-      }
-    </Context.Provider>
+              if (pageContext.config && pageContext.data) {
+                switch (pageContext.config.visualizationType) {
+                  case 'Bar':
+                    return <BarChart />;
+                  case 'Line':
+                    return <LineChart />;
+                  default:
+                    return <p>Error rendering visualization configuration</p>;
+                }
+              }
+
+              return <p>Loading...</p>;
+            })()
+          }
+        </Context.Provider>
+      </div>
+
+      { pageContext.config && pageContext.data && pageContext.colorScale ? (
+        <div className="legend-container" hidden={pageContext.config.legend.hide} style={{ width: pageContext.dimensions.legendWidth }}>
+          <h2>{pageContext.config.legend.label}</h2>
+          <LegendOrdinal
+            scale={pageContext.colorScale}
+            itemDirection="row"
+            labelMargin="0 20px 0 0"
+            shapeMargin="0 10px 0"
+          >{labels => (
+            <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > viewportCutoff ? 'column-reverse' : 'row' }}>
+              {labels.map((label, i) => (
+                <LegendItem
+                  tabIndex={0}
+                  key={`legend-quantile-${i}`}
+                  margin="0 5px"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      highlight(label);
+                    }
+                  }}
+                  onClick={() => {
+                    highlight(label);
+                  }}
+                >
+                  <svg width={legendGlyphSize} height={legendGlyphSize}>
+                    <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+                  </svg>
+                  <LegendLabel align="left" margin="0 0 0 4px">
+                    {label.text}
+                  </LegendLabel>
+                </LegendItem>
+              ))}
+            </div>
+          )}
+          </LegendOrdinal>
+        </div>
+      ) : ''}
+
+      { pageContext.config && pageContext.data ? (
+        <div className="table-container">
+          <table>
+            <caption tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') changeTableExpanded(); }} onClick={changeTableExpanded}>
+              {pageContext.config.table.label}
+              <span className="table-indicator">{isTableExpanded() ? '-' : '+'}</span>
+            </caption>
+            <thead hidden={!isTableExpanded()}>
+              <tr>
+                <td>&nbsp;</td>
+                {pageContext.config.seriesKeys.map((key) => (
+                  <th tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
+                    <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
+                      ^
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody hidden={!isTableExpanded()}>
+              {pageContext.data.sort(tableSort).map((d) => (
+                <tr>
+                  <th>{d[pageContext.config.xAxis.dataKey]}</th>
+                  {pageContext.config.seriesKeys.map((key) => <td>{d[key]}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : ''}
+    </div>
   );
 }
