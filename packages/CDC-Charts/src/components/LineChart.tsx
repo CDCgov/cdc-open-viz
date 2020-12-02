@@ -10,11 +10,11 @@ import {
   useTooltipInPortal,
   defaultStyles,
 } from '@visx/tooltip';
-import {
-  MarkerArrow, MarkerCross, MarkerX, MarkerCircle, MarkerLine,
-} from '@visx/marker';
+import { MarkerCircle } from '@visx/marker';
 import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
+
+import './LineChart.scss';
 
 export type TooltipProps = {
   width: number;
@@ -35,8 +35,6 @@ const tooltipStyles = {
   padding: 12,
 };
 const font = '#000000';
-
-const curveTypes = Object.keys(allCurves);
 
 export default function LineChart() {
   const { pageContext } = useContext<any>(Context);
@@ -87,7 +85,7 @@ export default function LineChart() {
     });
 
     yScale = scaleLinear<number>({
-      domain: [0, Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
+      domain: [Math.min(...data.map((d) => Math.min(...pageContext.config.seriesKeys.map((key) => Number(d[key]))))), Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
     });
 
     xScale.rangeRound([0, xMax]);
@@ -95,7 +93,7 @@ export default function LineChart() {
   }
 
   const handlePointerMove = useCallback(
-    (event: React.PointerEvent<SVGRectElement>, point) => {
+    (event: React.PointerEvent<SVGCircleElement>, point, seriesKey) => {
       const containerX = ('clientX' in event ? event.clientX : 0) - containerBounds.left;
       const containerY = ('clientY' in event ? event.clientY : 0) - containerBounds.top;
       showTooltip({
@@ -103,59 +101,42 @@ export default function LineChart() {
         tooltipTop: containerY,
         tooltipData: {
           __html: `<div>
-            ${pageContext.config.xAxis.label}: ${data[point.index][pageContext.config.xAxis.dataKey]}
-            ${pageContext.config.yAxis.label}: ${point.value}
-            ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${point.key}` : ''}
+            ${pageContext.config.xAxis.label}: ${point[pageContext.config.xAxis.dataKey]}
+            ${pageContext.config.yAxis.label}: ${point[seriesKey]}
+            ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${seriesKey}` : ''}
           </div>
         `,
         },
       });
     },
-    [showTooltip, containerBounds, data, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
+    [showTooltip, containerBounds, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
   );
 
   return (
     <div className="line-chart-container">
       <svg width={width} height={height}>
-        <MarkerX
-          id="marker-x"
-          stroke="#333"
-          size={22}
-          strokeWidth={4}
-          markerUnits="userSpaceOnUse"
-        />
-        <MarkerCross
-          id="marker-cross"
-          stroke="#333"
-          size={22}
-          strokeWidth={4}
-          strokeOpacity={0.6}
-          markerUnits="userSpaceOnUse"
-        />
         <MarkerCircle id="marker-circle" fill="#333" size={2} refX={2} />
-        <MarkerArrow id="marker-arrow-odd" stroke="#333" size={8} strokeWidth={1} />
-        <MarkerLine id="marker-line" fill="#333" size={16} strokeWidth={1} />
-        <MarkerArrow id="marker-arrow" fill="#333" refX={2} size={6} />
         <rect width={width} height={height} fill="#efefef" rx={14} ry={14} />
         { pageContext.config.seriesKeys.map((seriesKey) => (
-          <Group top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
-            { data.map((d) => (
+          <Group key={`series-${seriesKey}`} top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
+            { data.map((d, dataIndex) => (
               <circle
+                key={`${seriesKey}-${dataIndex}`}
                 r={3}
                 cx={xScale(getXAxisData(d))}
                 cy={yScale(getYAxisData(d, seriesKey))}
-                stroke="rgba(33,33,33,0.5)"
-                fill="transparent"
-                onPointerMove={(e) => { handlePointerMove(e, d); }}
+                stroke={pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'}
+                fill="pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'"
+                onPointerMove={(e) => { handlePointerMove(e, d, seriesKey); }}
                 onPointerLeave={hideTooltip}
               />
             ))}
             <LinePath
-              curve={allCurves[curveTypes[0]]}
+              curve={allCurves.curveLinear}
               data={data}
               x={(d) => xScale(getXAxisData(d))}
               y={(d) => yScale(getYAxisData(d, seriesKey))}
-              stroke="#333"
+              stroke={pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'}
               strokeWidth={2}
               strokeOpacity={1}
               shapeRendering="geometricPrecision"

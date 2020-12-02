@@ -269,8 +269,8 @@ export default function App({ configUrl, element }) {
             <thead hidden={!isTableExpanded()}>
               <tr>
                 <td>&nbsp;</td>
-                {pageContext.config.seriesKeys.map((key) => (
-                  <th tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
+                {pageContext.config.seriesKeys.map((key, index) => (
+                  <th key={`table-header-item-${index}`} tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
                     <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
                       ^
                     </span>
@@ -279,10 +279,10 @@ export default function App({ configUrl, element }) {
               </tr>
             </thead>
             <tbody hidden={!isTableExpanded()}>
-              {pageContext.data.sort(tableSort).map((d) => (
-                <tr>
+              {[...pageContext.data].sort(tableSort).map((d, rowIndex) => (
+                <tr key={`table-row-${rowIndex}`}>
                   <th>{d[pageContext.config.xAxis.dataKey]}</th>
-                  {pageContext.config.seriesKeys.map((key) => <td>{d[key]}</td>)}
+                  {pageContext.config.seriesKeys.map((key, colIndex) => <td key={`table-item-${rowIndex}-${colIndex}`}>{d[key]}</td>)}
                 </tr>
               ))}
             </tbody>
