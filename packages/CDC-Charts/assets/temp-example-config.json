@@ -25,6 +25,6 @@
     },
     "table": {
         "label": "Table",
-        "expanded": true
+        "expanded": false
     }
 }

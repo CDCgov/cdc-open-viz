@@ -2,4 +2,8 @@
     rect {
         fill: white;
     }
+
+    path {
+        pointer-events: none;
+    }
 }

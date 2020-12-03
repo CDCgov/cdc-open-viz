@@ -92,17 +92,18 @@ export default function LineChart() {
     yScale.range([yMax, 0]);
   }
 
-  const handlePointerMove = useCallback(
+  const handlePointerEnter = useCallback(
     (event: React.PointerEvent<SVGCircleElement>, point, seriesKey) => {
       const containerX = ('clientX' in event ? event.clientX : 0) - containerBounds.left;
       const containerY = ('clientY' in event ? event.clientY : 0) - containerBounds.top;
+
       showTooltip({
         tooltipLeft: containerX,
         tooltipTop: containerY,
         tooltipData: {
           __html: `<div>
-            ${pageContext.config.xAxis.label}: ${point[pageContext.config.xAxis.dataKey]}
-            ${pageContext.config.yAxis.label}: ${point[seriesKey]}
+            ${pageContext.config.xAxis.label}: ${point[pageContext.config.xAxis.dataKey]} <br/>
+            ${pageContext.config.yAxis.label}: ${point[seriesKey]} <br/>
             ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${seriesKey}` : ''}
           </div>
         `,
@@ -118,16 +119,22 @@ export default function LineChart() {
         <MarkerCircle id="marker-circle" fill="#333" size={2} refX={2} />
         <rect width={width} height={height} fill="#efefef" rx={14} ry={14} />
         { pageContext.config.seriesKeys.map((seriesKey) => (
-          <Group key={`series-${seriesKey}`} top={pageContext.config.padding.top} left={pageContext.config.padding.left}>
+          <Group
+            key={`series-${seriesKey}`}
+            top={pageContext.config.padding.top}
+            left={pageContext.config.padding.left}
+            display={pageContext.seriesHighlight.length === 0 || pageContext.seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+          >
             { data.map((d, dataIndex) => (
               <circle
                 key={`${seriesKey}-${dataIndex}`}
                 r={3}
                 cx={xScale(getXAxisData(d))}
                 cy={yScale(getYAxisData(d, seriesKey))}
-                stroke={pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'}
+                strokeWidth="25px"
+                stroke="transparent"
                 fill="pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'"
-                onPointerMove={(e) => { handlePointerMove(e, d, seriesKey); }}
+                onPointerEnter={(e) => { handlePointerEnter(e, d, seriesKey); }}
                 onPointerLeave={hideTooltip}
               />
             ))}
