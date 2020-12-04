@@ -11,8 +11,7 @@
 		"showTitle": true,
 		"geoBorderColor": "darkGray",
 		"showDownloadButton": true,
-		"expandDataTable": true,
-		"backgroundColor": "#FFF"
+		"expandDataTable": true
 	},
 	"color": "pinkpurple",
 	"columns": {
@@ -45,67 +44,6 @@
 		"specialClasses": ["N/A"]
 	},
 	"data": [
-		{
-			"Region Name": "Region 1",
-			"States in Region": "Maine, New Hampshire, Vermont, Massachusetts, Connecticut, Rhode Island",
-			"Insured Rate": "10",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Region 2",
-			"States in Region": "New York, New York City, New Jersey",
-			"Insured Rate": "50",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Region 3",
-			"States in Region": "Pennsylvania, Delaware, Maryland, Virginia, West Virginia",
-			"Insured Rate": "13",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Region 4",
-			"States in Region": "Tennessee, Kentucky, North Carolina, South Carolina, Georgia, Alabama, Mississippi, Florida",
-			"Insured Rate": "20",
-			"Coverage Status": "Uninsured"
-		},
-		{
-			"Region Name": "Region 5",
-			"States in Region": "Illinois, Indiana, Ohio, Michigan, Wisconsin, Minnesota",
-			"Insured Rate": "134",
-			"Coverage Status": "Insured",
-			"link": "https://cdc.gov/"
-		},
-		{
-			"Region Name": "Region 6",
-			"States in Region": "Texas, New Mexico, Oklahoma, Arkansas, Louisiana",
-			"Insured Rate": "75",
-			"Coverage Status": "Uninsured"
-		},
-		{
-			"Region Name": "Region 7",
-			"States in Region": "Nebraska, Kansas, Missouri, Iowa",
-			"Insured Rate": "60",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Region 8",
-			"States in Region": "Montana, Wyoming, Utah, Colorado, South Dakota, North Dakota",
-			"Insured Rate": "16",
-			"Coverage Status": "Medicaid"
-		},
-		{
-			"Region Name": "Region 9",
-			"States in Region": "Nevada, California, Arizona, Hawaii",
-			"Insured Rate": "88",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Region 10",
-			"States in Region": "Alaska, Washington, Oregon",
-			"Insured Rate": "30",
-			"Coverage Status": "Medicaid"
-		},
 		{
 			"Insured Rate": "43",
 			"Coverage Status": "Insured",
@@ -875,6 +813,67 @@
 			"state": "PR",
 			"Year (Good filter option)": "2015",
 			"link": "https://cdc.gov/"
+		},
+		{
+			"Region Name": "Region 1",
+			"States in Region": "Maine, New Hampshire, Vermont, Massachusetts, Connecticut, Rhode Island",
+			"Insured Rate": "10",
+			"Coverage Status": "Insured"
+		},
+		{
+			"Region Name": "Region 2",
+			"States in Region": "New York, New York City, New Jersey",
+			"Insured Rate": "50",
+			"Coverage Status": "Insured"
+		},
+		{
+			"Region Name": "Region 3",
+			"States in Region": "Pennsylvania, Delaware, Maryland, Virginia, West Virginia",
+			"Insured Rate": "13",
+			"Coverage Status": "Insured"
+		},
+		{
+			"Region Name": "Region 4",
+			"States in Region": "Tennessee, Kentucky, North Carolina, South Carolina, Georgia, Alabama, Mississippi, Florida",
+			"Insured Rate": "20",
+			"Coverage Status": "Uninsured"
+		},
+		{
+			"Region Name": "Region 5",
+			"States in Region": "Illinois, Indiana, Ohio, Michigan, Wisconsin, Minnesota",
+			"Insured Rate": "134",
+			"Coverage Status": "Insured",
+			"link": "https://cdc.gov/"
+		},
+		{
+			"Region Name": "Region 6",
+			"States in Region": "Texas, New Mexico, Oklahoma, Arkansas, Louisiana",
+			"Insured Rate": "75",
+			"Coverage Status": "Uninsured"
+		},
+		{
+			"Region Name": "Region 7",
+			"States in Region": "Nebraska, Kansas, Missouri, Iowa",
+			"Insured Rate": "60",
+			"Coverage Status": "Insured"
+		},
+		{
+			"Region Name": "Region 8",
+			"States in Region": "Montana, Wyoming, Utah, Colorado, South Dakota, North Dakota",
+			"Insured Rate": "16",
+			"Coverage Status": "Medicaid"
+		},
+		{
+			"Region Name": "Region 9",
+			"States in Region": "Nevada, California, Arizona, Hawaii",
+			"Insured Rate": "88",
+			"Coverage Status": "Insured"
+		},
+		{
+			"Region Name": "Region 10",
+			"States in Region": "Alaska, Washington, Oregon",
+			"Insured Rate": "30",
+			"Coverage Status": "Medicaid"
 		}
 	],
 	"filters": []

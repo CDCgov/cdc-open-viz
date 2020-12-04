@@ -92,6 +92,9 @@ header + .map-container.full-border {
   > path.darkGray, &.darkGray {
     stroke: rgba(0,0,0,.2) !important;
   }
+  > path.sameAsBackground, &.sameAsBackground {
+    stroke: rgba(255,255,255,.7) !important;
+  }
 }
 
 // Cities and Territories

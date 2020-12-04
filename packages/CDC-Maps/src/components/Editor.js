@@ -213,18 +213,6 @@ const Editor = (props) => {
           })
 
       break;
-      case 'backgroundColor':
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      backgroundColor: value
-                  }
-              }
-          })
-
-          break;
       case 'geoBorderColor':
           setState( (prevState) => {
 
@@ -1431,17 +1419,10 @@ const Editor = (props) => {
                     <span className="edit-label">Add border around map</span>
                   </label>)}
                   <label>
-                    <span className="edit-label">Background Color</span>
-                    <select value={state.general.backgroundColor || false } onChange={(event) => { handleEditorChanges("backgroundColor", event.target.value) }}>
-                      <option value="#FFF">White (Default)</option>
-                      <option value="#f5f5f5">Gray</option>
-                    </select>
-                  </label>
-                  <label>
                     <span className="edit-label">Geo Border Color</span>
                     <select value={state.general.geoBorderColor || false } onChange={(event) => { handleEditorChanges("geoBorderColor", event.target.value) }}>
                       <option value="darkGray">Dark Gray (Default)</option>
-                      <option value="sameAsBackground">Same as Background</option>
+                      <option value="sameAsBackground">White</option>
                     </select>
                   </label>
                   <label>

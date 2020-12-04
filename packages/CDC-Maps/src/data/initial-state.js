@@ -1,6 +1,5 @@
 export default {
   general: {
-    backgroundColor: '#FFF',
     geoBorderColor: 'darkGray',
     headerColor: 'theme-blue',
     showTitle: true,

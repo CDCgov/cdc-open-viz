@@ -10,8 +10,7 @@
 		"showSidebar": true,
 		"showTitle": true,
 		"showDownloadButton": true,
-		"expandDataTable": true,
-		"backgroundColor": "#FFF"
+		"expandDataTable": true
 	},
 	"color": "pinkpurple",
 	"columns": {

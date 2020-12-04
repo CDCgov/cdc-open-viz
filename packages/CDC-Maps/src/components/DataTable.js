@@ -114,16 +114,34 @@ const DataTable = (props) => {
     return markup;
   };
 
-  const DownloadButton = memo(({ data }) => (
-    <a
-      download={`${mapTitle}.csv`}
-      href={`data:text/csv;base64,${btoa(Papa.unparse(data))}`}
-      aria-label="Download this data in a CSV file format."
-      className={`${headerColor} btn btn-download no-border`}
-    >
-      Download Data (CSV)
-    </a>
-  ));
+  var blob = new Blob(["Sample String\r\n,For Checking, msSaveBlob"], {
+    type:'text/csv;charset=utf-8;'
+  });
+
+  const DownloadButton = memo(({ data }) => {
+    const fileName = `${mapTitle}.csv`;
+
+    const csvData = Papa.unparse(data);
+
+    const saveBlob = () => {
+      if (navigator.msSaveBlob) {
+        const dataBlob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
+        navigator.msSaveBlob(dataBlob, fileName);
+      }
+    }
+
+    return (
+      <a
+        download={fileName}
+        onClick={saveBlob}
+        href={`data:text/csv;base64,${btoa(csvData)}`}
+        aria-label="Download this data in a CSV file format."
+        className={`${headerColor} btn btn-download no-border`}
+      >
+        Download Data (CSV)
+      </a>
+    )
+  }, [data]);
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {

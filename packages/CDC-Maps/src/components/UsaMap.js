@@ -63,7 +63,7 @@ const UsaMap = (props) => {
   const territories = [];
 
   territoriesData.forEach((territory) => {
-    const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : state.general.backgroundColor || 'transparent';
+    const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : '#fff';
 
     const territoryData = processedData[territory];
 
