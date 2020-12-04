@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/CDC-Maps",
   "main": "dist/cdcmap",
