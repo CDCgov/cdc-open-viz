@@ -121,7 +121,9 @@ export default function App({ configUrl, element }) {
 
       if (pageContext.config && !resizeInit) {
         window.addEventListener('resize', onResize);
-        onResize();
+        setTimeout(() => {
+          onResize();
+        }, 250);
 
         setResizeInit(true);
       }
@@ -191,104 +193,104 @@ export default function App({ configUrl, element }) {
   };
 
   return (
-    <div style={{ width: pageContext.dimensions ? pageContext.dimensions.width : '100%' }}>
-      <h1 className="chart-title">
-        {pageContext.config ? pageContext.config.title : ''}
-      </h1>
+    <div className="cdc-visualization-container">
+      { pageContext.config && pageContext.data && pageContext.colorScale && pageContext.dimensions.width !== 0 ? (
+        <div style={{ width: pageContext.dimensions ? pageContext.dimensions.width : '100%' }}>
+          <h1 className="chart-title">
+            {pageContext.config ? pageContext.config.title : ''}
+          </h1>
 
-      <div className="chart-container" style={{ width: pageContext.dimensions.chartWidth }}>
-        <Context.Provider value={{ pageContext, setPageContext }}>
-          {
-            (() => {
-              if (error) {
-                return <p>There was an error loading the visualization</p>;
-              }
+          <div className="chart-container" style={{ width: pageContext.dimensions.chartWidth }}>
+            <Context.Provider value={{ pageContext, setPageContext }}>
+              {
+                (() => {
+                  if (error) {
+                    return <p>There was an error loading the visualization</p>;
+                  }
 
-              if (pageContext.config && pageContext.data) {
-                switch (pageContext.config.visualizationType) {
-                  case 'Bar':
-                    return <BarChart />;
-                  case 'Line':
-                    return <LineChart />;
-                  default:
-                    return <p>Error rendering visualization configuration</p>;
-                }
-              }
-
-              return <p>Loading...</p>;
-            })()
-          }
-        </Context.Provider>
-      </div>
-
-      { pageContext.config && pageContext.data && pageContext.colorScale ? (
-        <div className="legend-container" hidden={pageContext.config.legend.hide} style={{ width: pageContext.dimensions.legendWidth }}>
-          <h2>{pageContext.config.legend.label}</h2>
-          <LegendOrdinal
-            scale={pageContext.colorScale}
-            itemDirection="row"
-            labelMargin="0 20px 0 0"
-            shapeMargin="0 10px 0"
-          >{labels => (
-            <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > viewportCutoff ? 'column-reverse' : 'row' }}>
-              {labels.map((label, i) => (
-                <LegendItem
-                  tabIndex={0}
-                  key={`legend-quantile-${i}`}
-                  margin="0 5px"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      highlight(label);
+                  if (pageContext.config && pageContext.data) {
+                    switch (pageContext.config.visualizationType) {
+                      case 'Bar':
+                        return <BarChart />;
+                      case 'Line':
+                        return <LineChart />;
+                      default:
+                        return <p>Error rendering visualization configuration</p>;
                     }
-                  }}
-                  onClick={() => {
-                    highlight(label);
-                  }}
-                >
-                  <svg width={legendGlyphSize} height={legendGlyphSize}>
-                    <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
-                  </svg>
-                  <LegendLabel align="left" margin="0 0 0 4px">
-                    {label.text}
-                  </LegendLabel>
-                </LegendItem>
-              ))}
-            </div>
-          )}
-          </LegendOrdinal>
-        </div>
-      ) : ''}
+                  }
 
-      { pageContext.config && pageContext.data ? (
-        <div className="table-container">
-          <table>
-            <caption tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') changeTableExpanded(); }} onClick={changeTableExpanded}>
-              {pageContext.config.table.label}
-              <span className="table-indicator">{isTableExpanded() ? '-' : '+'}</span>
-            </caption>
-            <thead hidden={!isTableExpanded()}>
-              <tr>
-                <td>&nbsp;</td>
-                {pageContext.config.seriesKeys.map((key, index) => (
-                  <th key={`table-header-item-${index}`} tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
-                    <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
-                      ^
-                    </span>
-                  </th>
+                  return <p>Loading...</p>;
+                })()
+              }
+            </Context.Provider>
+          </div>
+
+          <div className="legend-container" hidden={pageContext.config.legend.hide} style={{ width: pageContext.dimensions.legendWidth }}>
+            <h2>{pageContext.config.legend.label}</h2>
+            <LegendOrdinal
+              scale={pageContext.colorScale}
+              itemDirection="row"
+              labelMargin="0 20px 0 0"
+              shapeMargin="0 10px 0"
+            >{labels => (
+              <div style={{ display: 'flex', flexDirection: pageContext.dimensions.width > viewportCutoff ? 'column-reverse' : 'row' }}>
+                {labels.map((label, i) => (
+                  <LegendItem
+                    tabIndex={0}
+                    key={`legend-quantile-${i}`}
+                    margin="0 5px"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        highlight(label);
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(label);
+                    }}
+                  >
+                    <svg width={legendGlyphSize} height={legendGlyphSize}>
+                      <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+                    </svg>
+                    <LegendLabel align="left" margin="0 0 0 4px">
+                      {label.text}
+                    </LegendLabel>
+                  </LegendItem>
                 ))}
-              </tr>
-            </thead>
-            <tbody hidden={!isTableExpanded()}>
-              {[...pageContext.data].sort(tableSort).map((d, rowIndex) => (
-                <tr key={`table-row-${rowIndex}`}>
-                  <th>{d[pageContext.config.xAxis.dataKey]}</th>
-                  {pageContext.config.seriesKeys.map((key, colIndex) => <td key={`table-item-${rowIndex}-${colIndex}`}>{d[key]}</td>)}
+              </div>
+            )}
+            </LegendOrdinal>
+          </div>
+
+          <div className="table-container">
+            <table>
+              <caption tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') changeTableExpanded(); }} onClick={changeTableExpanded}>
+                {pageContext.config.table.label}
+                <span className="table-indicator">{isTableExpanded() ? '-' : '+'}</span>
+              </caption>
+              <thead hidden={!isTableExpanded()}>
+                <tr>
+                  <td>&nbsp;</td>
+                  {pageContext.config.seriesKeys.map((key, index) => (
+                    <th key={`table-header-item-${index}`} tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{key}
+                      <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
+                        ^
+                      </span>
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody hidden={!isTableExpanded()}>
+                {[...pageContext.data].sort(tableSort).map((d, rowIndex) => (
+                  <tr key={`table-row-${rowIndex}`}>
+                    <th>{d[pageContext.config.xAxis.dataKey]}</th>
+                    {pageContext.config.seriesKeys.map((key, colIndex) => <td key={`table-item-${rowIndex}-${colIndex}`}>{d[key]}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      ) : ''}
+      ) : <div className="loader"></div>}
     </div>
   );
 }

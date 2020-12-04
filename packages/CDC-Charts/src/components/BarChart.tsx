@@ -249,5 +249,5 @@ export default function BarChart() {
         </>
       ) : ''}
     </div>
-  ) : <div></div>;
+  ) : <div className="loader"></div>;
 }

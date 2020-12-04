@@ -113,7 +113,7 @@ export default function LineChart() {
     [showTooltip, containerBounds, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
   );
 
-  return (
+  return pageContext.config && pageContext.data && pageContext.colorScale ? (
     <div className="line-chart-container">
       <svg width={width} height={height}>
         <MarkerCircle id="marker-circle" fill="#333" size={2} refX={2} />
@@ -196,5 +196,5 @@ export default function LineChart() {
         </>
       ) : ''}
     </div>
-  );
+  ) : <div className="loader"></div>;
 }
