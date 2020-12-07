@@ -9,6 +9,7 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import BarChart from './components/BarChart.tsx';
 import LineChart from './components/LineChart.tsx';
+import PieChart from './components/PieChart.tsx';
 import Context from './context.tsx';
 
 import './styles.scss';
@@ -214,6 +215,8 @@ export default function App({ configUrl, element }) {
                         return <BarChart />;
                       case 'Line':
                         return <LineChart />;
+                      case 'Pie':
+                        return <PieChart />;
                       default:
                         return <p>Error rendering visualization configuration</p>;
                     }

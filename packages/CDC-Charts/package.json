@@ -36,6 +36,7 @@
   "dependencies": {
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
+    "@visx/gradient": "^1.0.0",
     "@visx/group": "^1.0.0",
     "@visx/legend": "^1.1.0",
     "@visx/marker": "^1.1.0",
@@ -49,7 +50,8 @@
     "html-react-parser": "^0.14.0",
     "react": "^16.11.0",
     "react-app-polyfill": "^1.0.4",
-    "react-dom": "^16.11.0"
+    "react-dom": "^16.11.0",
+    "react-spring": "^8.0.27"
   },
   "husky": {
     "hooks": {
