@@ -1,9 +1,27 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback, useRef } from 'react';
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import { scaleOrdinal } from '@visx/scale';
 import { Group } from '@visx/group';
+import {
+  useTooltip,
+  useTooltipInPortal,
+  defaultStyles,
+} from '@visx/tooltip';
 import { animated, useTransition, interpolate } from 'react-spring';
 import Context from '../context.tsx';
+
+type TooltipData = {
+  __html: string
+};
+const tooltipStyles = {
+  ...defaultStyles,
+  backgroundColor: 'white',
+  color: 'black',
+  border: '1px solid black',
+  width: 152,
+  height: 72,
+  padding: 12,
+};
 
 // react-spring transition definitions
 type PieStyles = { startAngle: number; endAngle: number; opacity: number };
@@ -94,16 +112,34 @@ function AnimatedPie<Datum>({
 export default function PieChart() {
   const { pageContext } = useContext<any>(Context);
 
+  const svgRef = useRef<HTMLDivElement>();
+
+  const { containerBounds, TooltipInPortal } = useTooltipInPortal({
+    scroll: true,
+    detectBounds: true,
+  });
+
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipOpen,
+    tooltipData,
+    tooltipLeft = 0,
+    tooltipTop = 0,
+  } = useTooltip<TooltipData>({
+    tooltipLeft: tooltipStyles.width / 3,
+    tooltipTop: tooltipStyles.height / 3,
+    tooltipData: { __html: '' },
+  });
+
   const getColor = scaleOrdinal({
     domain: pageContext.data.map(d => d[pageContext.config.xAxis.dataKey]),
     range: ['rgba(93,30,91,1)', 'rgba(93,30,91,0.8)', 'rgba(93,30,91,0.6)', 'rgba(93,30,91,0.4)'],
   });
 
   const width = pageContext.dimensions.chartWidth;
-  const height = Math.max(500, pageContext.dimensions.height);
+  const height = width;
   const margin = pageContext.config.padding;
-
-  if (width < 10) return null;
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -112,25 +148,68 @@ export default function PieChart() {
   const centerX = innerWidth / 2;
   const donutThickness = 50;
 
+  let currentPieSegment = useRef<any>();
+
+  const handleClick = useCallback(
+    (pieSegment: PieArcDatum<any>) => {
+      if (!currentPieSegment.current || currentPieSegment.current.data.name !== pieSegment.data.name) {
+        currentPieSegment.current = pieSegment;
+        const avgAngle = (pieSegment.startAngle + pieSegment.endAngle) / 2 - (Math.PI / 2);
+        const containerX = ((width / 2) - containerBounds.left) + (((radius - donutThickness) / 2) * Math.cos(avgAngle));
+        const containerY = ((height / 2) - containerBounds.top + svgRef.current.getBoundingClientRect().top) + (((radius - donutThickness) / 2) * Math.sin(avgAngle));
+
+        showTooltip({
+          tooltipLeft: containerX,
+          tooltipTop: containerY,
+          tooltipData: {
+            __html: `<div>
+              ${pageContext.config.xAxis.label}: ${pieSegment.data.name} <br/>
+              ${pageContext.config.yAxis.label}: ${pieSegment.data[pageContext.config.yAxis.dataKey]}
+            </div>
+          `,
+          },
+        });
+      } else {
+        hideTooltip();
+      }
+    },
+    [showTooltip, hideTooltip, width, height, radius, containerBounds, pageContext.config.yAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
+  );
+
   return (
-    <svg width={width} height={height}>
-      <Group top={centerY + margin.top} left={centerX + margin.left}>
-        <Pie
-          data={pageContext.data}
-          pieValue={d => d[pageContext.config.yAxis.dataKey]}
-          pieSortValues={() => -1}
-          outerRadius={radius - donutThickness * 1.3}
-        >
-          {pie => (
-            <AnimatedPie<any>
-              {...pie}
-              getKey={d => d.data[pageContext.config.xAxis.dataKey]}
-              getColor={d => getColor(d.data[pageContext.config.yAxis.dataKey])}
-              onClickDatum={() => {}}
-            />
-          )}
-        </Pie>
-      </Group>
-    </svg>
+    <div ref={svgRef}>
+      <svg width={width} height={height}>
+        <Group top={centerY + margin.top} left={centerX + margin.left}>
+          <Pie
+            data={pageContext.data}
+            pieValue={d => d[pageContext.config.yAxis.dataKey]}
+            pieSortValues={() => -1}
+            outerRadius={radius - donutThickness * 1.3}
+          >
+            {pie => (
+              <AnimatedPie<any>
+                {...pie}
+                getKey={d => d.data[pageContext.config.xAxis.dataKey]}
+                getColor={d => getColor(d.data[pageContext.config.yAxis.dataKey])}
+                onClickDatum={(pieSegment) => { handleClick(pieSegment); }}
+              />
+            )}
+          </Pie>
+        </Group>
+      </svg>
+
+      {tooltipOpen ? (
+        <>
+          <TooltipInPortal
+            key={Math.random()} // needed for bounds to update correctly
+            left={tooltipLeft}
+            top={tooltipTop}
+            style={tooltipStyles}
+          >
+            <div dangerouslySetInnerHTML={tooltipData}></div>
+          </TooltipInPortal>
+        </>
+      ) : ''}
+    </div>
   );
 }
