@@ -8,9 +8,7 @@ const domContainers = document.querySelectorAll('.react-container');
 domContainers.forEach((domContainer) => {
   ReactDOM.render(
     <React.StrictMode>
-      <CdcChart configUrl="/assets/planet-example-config.json" />
-      <CdcChart configUrl="/assets/temp-example-config.json" />
-      <CdcChart configUrl="/assets/planet-pie-example-config.json" />
+      <CdcChart configUrl={domContainer.attributes['data-config'].value} />
     </React.StrictMode>,
     domContainer,
   );
