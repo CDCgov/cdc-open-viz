@@ -14,7 +14,7 @@ import { MarkerCircle } from '@visx/marker';
 import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
 
-import './LineChart.scss';
+import '../scss/LineChart.scss';
 
 export type TooltipProps = {
   width: number;
@@ -37,7 +37,7 @@ const tooltipStyles = {
 const font = '#000000';
 
 export default function LineChart() {
-  const { pageContext } = useContext<any>(Context);
+  let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
@@ -58,25 +58,23 @@ export default function LineChart() {
     tooltipData: { __html: '' },
   });
 
-  const width = pageContext.dimensions.chartWidth;
-  const height = 600;
+  const [ width, height ] = dimensions;
 
-  const xMax = width - pageContext.config.padding.left - pageContext.config.padding.right;
-  const yMax = height - pageContext.config.padding.top - pageContext.config.padding.bottom;
+  const xMax = width - config.padding.left - config.padding.right;
+  const yMax = height - config.padding.top - config.padding.bottom;
 
-  const getXAxisData = (d: any) => d[pageContext.config.xAxis.dataKey];
+  const getXAxisData = (d: any) => d[config.xAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
-  const parseDate = timeParse(pageContext.config.xAxis.dateFormat);
+  const parseDate = timeParse(config.xAxis.dateFormat);
   const format = timeFormat('%b %d');
   const formatDate = (date: string) => format(parseDate(date) as Date);
 
-  let data;
   let xScale;
   let yScale;
 
-  if (pageContext.data) {
-    data = pageContext.data.slice(0, 8);
+  if (data) {
+    data = data.slice(0, 8);
 
     // scales
     xScale = scaleBand<string>({
@@ -85,7 +83,7 @@ export default function LineChart() {
     });
 
     yScale = scaleLinear<number>({
-      domain: [Math.min(...data.map((d) => Math.min(...pageContext.config.seriesKeys.map((key) => Number(d[key]))))), Math.max(...data.map((d) => Math.max(...pageContext.config.seriesKeys.map((key) => Number(d[key])))))],
+      domain: [Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key]))))), Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))))],
     });
 
     xScale.rangeRound([0, xMax]);
@@ -102,28 +100,27 @@ export default function LineChart() {
         tooltipTop: containerY,
         tooltipData: {
           __html: `<div>
-            ${pageContext.config.xAxis.label}: ${point[pageContext.config.xAxis.dataKey]} <br/>
-            ${pageContext.config.yAxis.label}: ${point[seriesKey]} <br/>
-            ${pageContext.config.seriesLabel ? `${pageContext.config.seriesLabel}: ${seriesKey}` : ''}
+            ${config.xAxis.label}: ${point[config.xAxis.dataKey]} <br/>
+            ${config.yAxis.label}: ${point[seriesKey]} <br/>
+            ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
           </div>
         `,
         },
       });
     },
-    [showTooltip, containerBounds, pageContext.config.seriesLabel, pageContext.config.xAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
+    [showTooltip, containerBounds, config.seriesLabel, config.xAxis.dataKey, config.xAxis.label, config.yAxis.label],
   );
 
-  return pageContext.config && pageContext.data && pageContext.colorScale ? (
+  return config && data && colorScale ? (
     <div className="line-chart-container">
-      <svg width={width} height={height}>
+      <svg viewBox={`0 0 ${width} ${height}`}>
         <MarkerCircle id="marker-circle" fill="#333" size={2} refX={2} />
-        <rect width={width} height={height} fill="#efefef" rx={14} ry={14} />
-        { pageContext.config.seriesKeys.map((seriesKey) => (
+        { config.seriesKeys.map((seriesKey) => (
           <Group
             key={`series-${seriesKey}`}
-            top={pageContext.config.padding.top}
-            left={pageContext.config.padding.left}
-            display={pageContext.seriesHighlight.length === 0 || pageContext.seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+            top={config.padding.top}
+            left={config.padding.left}
+            display={seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
           >
             { data.map((d, dataIndex) => (
               <circle
@@ -133,7 +130,7 @@ export default function LineChart() {
                 cy={yScale(getYAxisData(d, seriesKey))}
                 strokeWidth="25px"
                 stroke="transparent"
-                fill="pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'"
+                fill="colorScale ? colorScale(seriesKey) : '#000'"
                 onPointerEnter={(e) => { handlePointerEnter(e, d, seriesKey); }}
                 onPointerLeave={hideTooltip}
               />
@@ -143,7 +140,7 @@ export default function LineChart() {
               data={data}
               x={(d) => xScale(getXAxisData(d))}
               y={(d) => yScale(getYAxisData(d, seriesKey))}
-              stroke={pageContext.colorScale ? pageContext.colorScale(seriesKey) : '#000'}
+              stroke={colorScale ? colorScale(seriesKey) : '#000'}
               strokeWidth={2}
               strokeOpacity={1}
               shapeRendering="geometricPrecision"
@@ -154,8 +151,8 @@ export default function LineChart() {
         }
         <AxisLeft
           scale={yScale}
-          left={pageContext.config.padding.left}
-          label={pageContext.config.yAxis.label}
+          left={config.padding.left}
+          label={config.yAxis.label}
           labelProps={{
             fontSize: 18,
             fontWeight: 'bold',
@@ -164,10 +161,10 @@ export default function LineChart() {
           stroke={font}
         />
         <AxisBottom
-          top={yMax + pageContext.config.padding.top}
-          left={pageContext.config.padding.left}
-          label={pageContext.config.xAxis.label}
-          tickFormat={pageContext.config.xAxis.type === 'date' ? formatDate : (tick) => tick}
+          top={yMax + config.padding.top}
+          left={config.padding.left}
+          label={config.xAxis.label}
+          tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
           scale={xScale}
           stroke={font}
           tickStroke={font}

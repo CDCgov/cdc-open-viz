@@ -110,7 +110,7 @@ function AnimatedPie<Datum>({
 }
 
 export default function PieChart() {
-  const { pageContext } = useContext<any>(Context);
+  const { data, config, dimensions } = useContext<any>(Context);
 
   const svgRef = useRef<HTMLDivElement>();
 
@@ -133,13 +133,12 @@ export default function PieChart() {
   });
 
   const getColor = scaleOrdinal({
-    domain: pageContext.data.map(d => d[pageContext.config.xAxis.dataKey]),
+    domain: data.map(d => d[config.xAxis.dataKey]),
     range: ['rgba(93,30,91,1)', 'rgba(93,30,91,0.8)', 'rgba(93,30,91,0.6)', 'rgba(93,30,91,0.4)'],
   });
 
-  const width = pageContext.dimensions.chartWidth;
-  const height = width;
-  const margin = pageContext.config.padding;
+  const [width, height] = dimensions;
+  const margin = config.padding;
 
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
@@ -163,8 +162,8 @@ export default function PieChart() {
           tooltipTop: containerY,
           tooltipData: {
             __html: `<div>
-              ${pageContext.config.xAxis.label}: ${pieSegment.data.name} <br/>
-              ${pageContext.config.yAxis.label}: ${pieSegment.data[pageContext.config.yAxis.dataKey]}
+              ${config.xAxis.label}: ${pieSegment.data.name} <br/>
+              ${config.yAxis.label}: ${pieSegment.data[config.yAxis.dataKey]}
             </div>
           `,
           },
@@ -173,24 +172,24 @@ export default function PieChart() {
         hideTooltip();
       }
     },
-    [showTooltip, hideTooltip, width, height, radius, containerBounds, pageContext.config.yAxis.dataKey, pageContext.config.xAxis.label, pageContext.config.yAxis.label],
+    [showTooltip, hideTooltip, width, height, radius, containerBounds, config.yAxis.dataKey, config.xAxis.label, config.yAxis.label],
   );
 
   return (
     <div ref={svgRef}>
-      <svg width={width} height={height}>
+      <svg viewBox={`0 0 ${width} ${height}`}>
         <Group top={centerY + margin.top} left={centerX + margin.left}>
           <Pie
-            data={pageContext.data}
-            pieValue={d => d[pageContext.config.yAxis.dataKey]}
+            data={data}
+            pieValue={d => d[config.yAxis.dataKey]}
             pieSortValues={() => -1}
             outerRadius={radius - donutThickness * 1.3}
           >
             {pie => (
               <AnimatedPie<any>
                 {...pie}
-                getKey={d => d.data[pageContext.config.xAxis.dataKey]}
-                getColor={d => getColor(d.data[pageContext.config.yAxis.dataKey])}
+                getKey={d => d.data[config.xAxis.dataKey]}
+                getColor={d => getColor(d.data[config.yAxis.dataKey])}
                 onClickDatum={(pieSegment) => { handleClick(pieSegment); }}
               />
             )}

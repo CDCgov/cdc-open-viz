@@ -23,6 +23,11 @@
   }
 }
 
+// For presentation purposes
+body {
+  max-width: 75vw; margin: 0 auto;
+}
+
 .loader {
   width: 100%;
   text-align: center;
@@ -37,10 +42,6 @@
 .chart-title {
     text-align: center;
     margin-bottom: 40px;
-}
-
-.chart-container, .legend-container {
-    display: inline-block;
 }
 
 .legend-container {
