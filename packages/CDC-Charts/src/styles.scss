@@ -44,7 +44,14 @@ body {
     margin-bottom: 40px;
 }
 
+.chart-container {
+  display: inline-block;
+  width: 75%;
+}
+
 .legend-container {
+  display: inline-block;
+  width: 25%;
   padding: 15px;
   vertical-align: top;
   text-align: center;
@@ -97,5 +104,11 @@ table {
     &.down {
       transform: rotate(180deg);
     }
+  }
+}
+
+@media (max-width: 900px) {
+  .chart-container, .legend-container {
+    width: 100%;
   }
 }
