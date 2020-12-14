@@ -56,9 +56,9 @@ For more information, read the [CDC's official guidance](https://www.cdc.gov/wcm
 ## Contributing
 
 To get started working on this repository, follow these steps:
-1. Clone the repo and do an `npm install & npm link @cdc/map`. This installs your dependencies and links the namespace `@cdc/map` to your local folder (see step 4 for more.)
-2. Simply run `npm start` and it will open the project in development mode.
-3. To create an actual built version of the library for testing, run `npm run build`
+1. Clone the monorepo and do an `lerna bootstrap`. This installs all dependencies. Then you can navigate to `/packages/cdc-maps/` and do `npm link` to link the namespace `@cdc/map` to your local project (see step 4 for more.)
+2. Simply run `lerna run --scope @cdc/map start` and it will open the project in development mode.
+3. To create an actual built version of the library for testing, run `lerna run --scope @cdc/map build`
 4. To test the package out locally inside a different project, after building you need to go into that folder and run `npm link @cdc/map`. It should begin using your local version so you can make changes and view them.
 
 **Submitting a Pull Request**
