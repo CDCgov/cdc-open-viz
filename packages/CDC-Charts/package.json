@@ -1,8 +1,26 @@
 {
-  "private": true,
+  "name": "@cdc/chart",
+  "version": "1.0.0",
+  "description": "React component for visualizing your data in a chart based off work done for the CDC",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz/cdc-charts",
+  "main": "dist/cdcchart",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/cdc-charts"
+  },
+  "author": "Matthew Pallansch <mpallansch@adittech.com>",
+  "bugs": {
+    "url": "https://github.com/CDCgov/CDC-Charts/issues"
+  },
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "react": "^16.11.0 || 17.x",
+    "react-dom": "^16.11.0 || 17.x"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
