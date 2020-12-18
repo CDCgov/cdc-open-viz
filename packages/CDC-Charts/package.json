@@ -1,61 +1,65 @@
 {
-  "name": "@cdc/map",
-  "version": "2.1.1",
-  "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
-  "homepage": "https://github.com/CDCgov/cdc-open-viz/cdc-maps",
-  "main": "dist/cdcmap",
+  "private": true,
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "npx webpack --mode production",
-    "prepare": "npx webpack --mode production"
+    "build": "npx webpack"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/cdc-maps"
-  },
-  "author": "Daniel Immke <npm@daniel.do>",
-  "bugs": {
-    "url": "https://github.com/CDCgov/CDC-Maps/issues"
-  },
-  "license": "Apache-2.0",
-  "peerDependencies": {
-    "react": "^16.11.0 || 17.x",
-    "react-dom": "^16.11.0 || 17.x"
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "@types/react": "^16.9.55",
+    "@types/react-dom": "^16.9.9",
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
+    "babel-loader": "^8.0.6",
+    "core-js": "^3.4.1",
+    "css-loader": "^4.3.0",
+    "eslint": "^7.12.1",
+    "eslint-config-airbnb-typescript": "12.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.21.4",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "file-loader": "^6.1.0",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.4.0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^10.0.2",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^8.0.9",
+    "typescript": "^4.0.5",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "@emotion/core": "^10.0.28",
-    "array-flat-polyfill": "^1.0.1",
-    "chroma": "0.0.1",
-    "chroma-js": "^2.1.0",
-    "classlist-polyfill": "^1.2.0",
-    "core-js": "^3.6.5",
-    "d3-interpolate-path": "^2.2.1",
-    "js-base64": "^2.5.2",
-    "mdn-polyfills": "^5.19.0",
-    "papaparse": "^5.2.0",
-    "react-accessible-accordion": "^3.0.1",
+    "@visx/axis": "^1.0.0",
+    "@visx/curve": "^1.0.0",
+    "@visx/gradient": "^1.0.0",
+    "@visx/group": "^1.0.0",
+    "@visx/legend": "^1.1.0",
+    "@visx/marker": "^1.1.0",
+    "@visx/mock-data": "^1.0.0",
+    "@visx/scale": "^1.0.0",
+    "@visx/shape": "^1.0.0",
+    "@visx/tooltip": "^1.1.0",
+    "bootstrap": "^4.3.1",
+    "d3-array": "^2.8.0",
+    "d3-time-format": "^3.0.0",
+    "html-react-parser": "^0.14.0",
+    "react": "^16.11.0",
     "react-app-polyfill": "^1.0.4",
-    "react-beautiful-dnd": "^13.0.0",
-    "react-html-parser": "^2.0.2",
-    "react-select": "^3.0.8",
-    "react-simple-maps": "^2.1.2",
-    "react-table": "^7.5.0",
-    "react-tag-autocomplete": "^6.0.0",
-    "react-tooltip": "^3.11.1",
-    "url-polyfill": "^1.1.7",
-    "us-atlas": "^3.0.0",
-    "world-atlas": "^2.0.2"
+    "react-dom": "^16.11.0",
+    "react-spring": "^8.0.27"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint ./src/**/*.js"
-    ]
-  },
-  "gitHead": "436c1c9ded3b2a2b25a4b19120ae0d2e70bd35d9"
+    "src/**/**.{js,jsx,ts,tsx}": "eslint src/**/*.{js,jsx,ts,tsx}"
+  }
 }
