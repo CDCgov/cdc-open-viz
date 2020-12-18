@@ -34,6 +34,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@cdc/map": "file:packages/cdc-maps"
+    "@cdc/map": "file:packages/cdc-maps",
+    "@cdc/chart": "file:packages/cdc-charts"
   }
 }
