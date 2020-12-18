@@ -1,4 +1,4 @@
-# @cdc/map
+# @cdc/chart
 
 `<CdcChart />` is a React component for visualizing your data in a chart. This was built for the Centers for Disease Control and Prevention's internal use and has been open sourced. There is support for line, bar, and pie charts as well as other configurations.
 
