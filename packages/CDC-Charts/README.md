@@ -14,7 +14,7 @@
 1. Install the package in your React project `npm install @cdc/chart`
 2. Import the component and begin using in your code.
 ```JSX
-import CdcMap from '@cdc/chart'
+import CdcChart from '@cdc/chart'
 
 function App() {
 
@@ -28,7 +28,7 @@ function App() {
 export default App;
 ```
 
-Note: If no properties are passed, the map will load a default configuration file.
+Note: If no properties are passed, the chart will load a default configuration file.
 
 ### Properties
 
