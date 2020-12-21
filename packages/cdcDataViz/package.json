@@ -38,10 +38,12 @@
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "d3": "^6.2.0",
     "html-react-parser": "^0.14.0",
     "react": "^16.11.0",
     "react-app-polyfill": "^1.0.4",
-    "react-dom": "^16.11.0"
+    "react-dom": "^16.11.0",
+    "react-table": "^7.6.2"
   },
   "husky": {
     "hooks": {
