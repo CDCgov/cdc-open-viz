@@ -43,7 +43,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint ./src/**/*.js"
+      "eslint ./packages/**/*.js"
     ]
   }
 }
