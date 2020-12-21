@@ -36,7 +36,8 @@ type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
   animate?: boolean;
   getKey: (d: PieArcDatum<Datum>) => string;
   getColor: (d: PieArcDatum<Datum>) => string;
-  onClickDatum: (d: PieArcDatum<Datum>) => void;
+  handlePointerMove: (event: React.PointerEvent<SVGPathElement>, d: PieArcDatum<Datum>) => void;
+  handlePointerLeave: () => void;
   delay?: number;
 };
 
@@ -45,7 +46,8 @@ function AnimatedPie<Datum>({
   path,
   getKey,
   getColor,
-  onClickDatum,
+  handlePointerMove,
+  handlePointerLeave,
 }: AnimatedPieProps<Datum>) {
   const transitions = useTransition<PieArcDatum<Datum>, PieStyles>(
     arcs,
@@ -83,8 +85,8 @@ function AnimatedPie<Datum>({
                   endAngle,
                 }))}
                 fill={getColor(arc)}
-                onClick={() => onClickDatum(arc)}
-                onTouchStart={() => onClickDatum(arc)}
+                onPointerMove={(e) => handlePointerMove(e, arc)}
+                onPointerLeave={handlePointerLeave}
               />
               {hasSpaceForLabel && (
                 <animated.g style={{ opacity: props.opacity }}>
@@ -147,30 +149,22 @@ export default function PieChart({numberFormatter}) {
   const centerX = innerWidth / 2;
   const donutThickness = 50;
 
-  let currentPieSegment = useRef<any>();
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<SVGPathElement>, pieSegment: PieArcDatum<any>) => {
+      const containerX = ('clientX' in event ? event.clientX : 0) - containerBounds.left;
+      const containerY = ('clientY' in event ? event.clientY : 0) - containerBounds.top;
 
-  const handleClick = useCallback(
-    (pieSegment: PieArcDatum<any>) => {
-      if (!currentPieSegment.current || currentPieSegment.current.data.name !== pieSegment.data.name) {
-        currentPieSegment.current = pieSegment;
-        const avgAngle = (pieSegment.startAngle + pieSegment.endAngle) / 2 - (Math.PI / 2);
-        const containerX = ((width / 2) - containerBounds.left) + (((radius - donutThickness) / 2) * Math.cos(avgAngle));
-        const containerY = ((height / 2) - containerBounds.top + svgRef.current.getBoundingClientRect().top) + (((radius - donutThickness) / 2) * Math.sin(avgAngle));
-
-        showTooltip({
-          tooltipLeft: containerX,
-          tooltipTop: containerY,
-          tooltipData: {
-            __html: `<div>
-              ${config.xAxis.label}: ${pieSegment.data.name} <br/>
-              ${config.yAxis.label}: ${numberFormatter(pieSegment.data[config.yAxis.dataKey])}
-            </div>
-          `,
-          },
-        });
-      } else {
-        hideTooltip();
-      }
+      showTooltip({
+        tooltipLeft: containerX,
+        tooltipTop: containerY,
+        tooltipData: {
+          __html: `<div>
+            ${config.xAxis.label}: ${pieSegment.data.name} <br/>
+            ${config.yAxis.label}: ${numberFormatter(pieSegment.data[config.yAxis.dataKey])}
+          </div>
+        `,
+        },
+      });
     },
     [showTooltip, hideTooltip, width, height, radius, containerBounds, config.yAxis.dataKey, config.xAxis.label, config.yAxis.label],
   );
@@ -190,7 +184,8 @@ export default function PieChart({numberFormatter}) {
                 {...pie}
                 getKey={d => d.data[config.xAxis.dataKey]}
                 getColor={d => getColor(d.data[config.yAxis.dataKey])}
-                onClickDatum={(pieSegment) => { handleClick(pieSegment); }}
+                handlePointerMove={(event, pieSegment) => { handlePointerMove(event, pieSegment); }}
+                handlePointerLeave={() => {}}
               />
             )}
           </Pie>
