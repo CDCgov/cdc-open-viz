@@ -40,7 +40,7 @@ const tooltipStyles = {
 };
 const font = '#000000';
 
-export default function BarChart() {
+export default function BarChart({numberFormatter}) {
   const { data, config, seriesHighlight, colorScale, dimensions } = useContext<any>(Context);
   const [scales, setScales] = useState<any>({ xScale: undefined, yScale: undefined, seriesScale: undefined });
 
@@ -126,7 +126,7 @@ export default function BarChart() {
         tooltipData: {
           __html: `<div>
             ${config.xAxis.label}: ${data[group.index][config.xAxis.dataKey]} <br/>
-            ${config.yAxis.label}: ${bar.bar ? bar.bar.data[bar.key] : bar.value} <br/>
+            ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : bar.value)} <br/>
             ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
           </div>
         `,

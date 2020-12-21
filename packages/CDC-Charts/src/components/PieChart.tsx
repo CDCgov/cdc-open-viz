@@ -109,7 +109,7 @@ function AnimatedPie<Datum>({
   );
 }
 
-export default function PieChart() {
+export default function PieChart({numberFormatter}) {
   const { data, config, dimensions } = useContext<any>(Context);
 
   const svgRef = useRef<HTMLDivElement>();
@@ -163,7 +163,7 @@ export default function PieChart() {
           tooltipData: {
             __html: `<div>
               ${config.xAxis.label}: ${pieSegment.data.name} <br/>
-              ${config.yAxis.label}: ${pieSegment.data[config.yAxis.dataKey]}
+              ${config.yAxis.label}: ${numberFormatter(pieSegment.data[config.yAxis.dataKey])}
             </div>
           `,
           },

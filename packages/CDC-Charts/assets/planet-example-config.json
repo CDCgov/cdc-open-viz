@@ -3,6 +3,12 @@
     "dataUrl":  "/assets/planet-example-data.json",
     "visualizationType": "Bar",
     "seriesKeys": ["Radius"],
+    "dataFormat": {
+        "roundTo": 1,
+        "commas": false,
+        "prefix": "",
+        "suffix": "km"
+    },
     "padding": {
         "top": 0,
         "left": 80,

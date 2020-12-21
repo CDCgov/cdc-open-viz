@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, useRef, useState } from 'react';
 import Context from '../context';
 
-export default function DataTable() {
+export default function DataTable({numberFormatter}) {
 
   const { data, config } = useContext<any>(Context);
 
@@ -53,7 +53,7 @@ export default function DataTable() {
           {[...data].sort(tableSort).map((d, rowIndex) => (
             <tr key={`table-row-${rowIndex}`}>
               <th>{d[config.xAxis.dataKey]}</th>
-              {config.seriesKeys.map((key, colIndex) => <td key={`table-item-${rowIndex}-${colIndex}`}>{d[key]}</td>)}
+              {config.seriesKeys.map((key, colIndex) => <td key={`table-item-${rowIndex}-${colIndex}`}>{numberFormatter(d[key])}</td>)}
             </tr>
           ))}
         </tbody>

@@ -62,8 +62,6 @@ export default function CdcChart({ configUrl }) {
     loadConfig();
   }, []);
 
-  useEffect(() => console.log(colorScale), [colorScale])
-
   useEffect(() => {
     const newColorScale = () => scaleOrdinal({
       domain: config.seriesKeys,
@@ -88,14 +86,22 @@ export default function CdcChart({ configUrl }) {
     setSeriesHighlight(newSeriesHighlight);
   };
 
+  const formatNumber = (num) => {
+    if (!config.dataFormat) return num;
+    if (typeof num !== 'number') num = parseFloat(num);
+    if (config.dataFormat.roundTo !== -1) num = num.toFixed(config.dataFormat.roundTo);
+    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    return config.dataFormat.prefix + num + config.dataFormat.suffix;
+  };
+
   // Destructure items from config for more readable JSX
   const { legend, title, visualizationType } = config;
 
   // Select appropriate chart type
   const chartComponents = {
-    'Bar' : <BarChart />,
-    'Line' : <LineChart />,
-    'Pie' : <PieChart />
+    'Bar' : <BarChart numberFormatter={formatNumber} />,
+    'Line' : <LineChart numberFormatter={formatNumber} />,
+    'Pie' : <PieChart numberFormatter={formatNumber} />
   }
 
   if(true === loading) {
@@ -149,7 +155,7 @@ export default function CdcChart({ configUrl }) {
         </div>
       </div>
       {/* Data Table */}
-      <DataTable />
+      <DataTable numberFormatter={formatNumber} />
     </Context.Provider>
   );
 }

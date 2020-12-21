@@ -36,7 +36,7 @@ const tooltipStyles = {
 };
 const font = '#000000';
 
-export default function LineChart() {
+export default function LineChart({numberFormatter}) {
   let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
 
   const { containerBounds, TooltipInPortal } = useTooltipInPortal({
@@ -101,7 +101,7 @@ export default function LineChart() {
         tooltipData: {
           __html: `<div>
             ${config.xAxis.label}: ${point[config.xAxis.dataKey]} <br/>
-            ${config.yAxis.label}: ${point[seriesKey]} <br/>
+            ${config.yAxis.label}: ${numberFormatter(point[seriesKey])} <br/>
             ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
           </div>
         `,
