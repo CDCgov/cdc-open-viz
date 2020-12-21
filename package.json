@@ -35,5 +35,15 @@
   },
   "dependencies": {
     "@cdc/map": "file:packages/cdc-maps"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint ./src/**/*.js"
+    ]
   }
 }
