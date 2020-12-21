@@ -1,0 +1,16 @@
+.data-import-preview {
+    border: solid 1px blue;
+
+    th {
+        border-bottom: solid 3px red;
+        background: aliceblue;
+        color: black;
+        font-weight: bold;
+    }
+
+    td {
+        padding: 10px;
+        border: solid 1px gray;
+        background: papayawhip;
+    }
+}
