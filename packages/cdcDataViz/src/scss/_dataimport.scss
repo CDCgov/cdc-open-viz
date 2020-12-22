@@ -1,16 +1,64 @@
+@import './variables';
+
+.data-loader {
+    padding-top: $gbl-padding;
+    padding-bottom: $gbl-padding;
+}
+
 .data-import-preview {
-    border: solid 1px blue;
+    padding-top: $gbl-padding;
+    padding-bottom: $gbl-padding;
+    background-color: $lightest-gray;
 
-    th {
-        border-bottom: solid 3px red;
-        background: aliceblue;
-        color: black;
-        font-weight: bold;
+    table {
+        border: solid 1px $light-gray;
+    
+        th {
+            padding: $table-padding;
+            border: solid 1px $light-gray;
+            background: $lighter-gray;
+            color: black;
+            font-weight: bold;
+        }
+    
+        td {
+            padding: $table-padding;
+            border: solid 1px $light-gray;
+            background: $white;
+        }
+    }
+}
+
+.close {
+    float: none;
+}
+
+// .fileupload-exists .fileupload-new, .fileupload-new .fileupload-exists {
+//     display: none;
+// }
+
+.loaded {
+    .upload-file-btn {
+        display: none;
+    }
+}
+
+.not-loaded {
+    .loader-ui {
+        display: none;
+    }
+}
+
+.custom-file {
+    height: calc(1.5em + 0.75rem + 6px) !important;
+
+    label {
+        height: 42px;
+        line-height: 1.75;
+
+        &:after {
+            opacity: 0;
+        }
     }
 
-    td {
-        padding: 10px;
-        border: solid 1px gray;
-        background: papayawhip;
-    }
 }

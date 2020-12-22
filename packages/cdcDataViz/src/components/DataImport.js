@@ -13,8 +13,21 @@ export default function DataImport() {
   const { pageTitle } = useContext(Context);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
+  const [uploadFile, setUploadFile] = useState(false);
+
+  const dataTypes = ['.csv', '.json'];
 
   const reader = new FileReader();
+
+  const toggleUpload = (currState) => {
+    setUploadFile(!currState);
+
+    if (!currState) {
+      document.getElementById('file-uploader').click();
+    } else {
+      // remove old table data ....
+    }
+  };
 
   const {
     getTableProps,
@@ -59,6 +72,9 @@ export default function DataImport() {
     // let renderData;
 
     const userData = document.querySelector('input[type=file]').files[0];
+    // update the label with the document name
+    let fileUpload = document.getElementById('file-uploader').value;
+    document.getElementById('data-upload-label').innerHTML = fileUpload;
 
     if (userData) {
       const fileType = userData.type;
@@ -88,7 +104,9 @@ export default function DataImport() {
 
   useEffect(() => {
     // console.log('data: ', columns);
-    // console.log('data: ', data);
+    console.log('data: ', data);
+    console.log('uploadFile: ', uploadFile);
+    // debugger;
     // document.title = `You clicked ${count} times`;
     // console.log(csv);
     // let dataTable = '';
@@ -104,41 +122,74 @@ export default function DataImport() {
   });
 
   return (
-    <section className="container mt-5">
+    <section className="container-fluid mt-5">
       <h2 className="mb-3">{ pageTitle }</h2>
-      <input type="file" />
-      <button type="button" onClick={() => loadData()}>Load</button>
-      <table {...getTableProps()} className="data-import-preview">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps()}
-                >
-                  {column.render('Header')}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td
-                    {...cell.getCellProps()}
-                  >
-                    {cell.render('Cell')}
-                  </td>
+      <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
+        <div className="row">
+          <div className="col col data-loader">
+            <div className="mb-2">
+              <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
+              {/* <input id="file-uploader" type="file" accept=".csv" onChange={() => loadData()} /> */}
+              {/* <button className="clear-button" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button> */}
+
+              <form className="input-group loader-ui">
+                <div className="custom-file">
+                  <input type="file" className="custom-file-input" id="file-uploader" accept=".csv" onChange={() => loadData()} />
+                  <label id="data-upload-label" className="custom-file-label" for="file-uploader">Choose file</label>
+                </div>
+                <div className="input-group-append">
+                  <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+                </div>
+              </form>
+              {/* <div className="fileinputs">
+	<input type="file" className="file" />
+	<div className="fakefile">
+		<input />
+    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+
+	</div>
+</div> */}
+            </div>
+            <p>Upload a data file to use ({dataTypes.join(', ')})</p>
+            <p className="pb-3">Data Format Help</p>
+            <ul>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
+              <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
+              <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+            </ul>
+          </div>
+          <div className="col col-sm-8 data-import-preview">
+            { data.length < 0 ? 'render table action buttons' : '' }
+            <table {...getTableProps()}>
+              <thead>
+                {headerGroups.map((headerGroup) => (
+                  <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <th {...column.getHeaderProps()}>
+                        {column.render('Header')}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              </thead>
+              <tbody {...getTableBodyProps()}>
+                {rows.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()}>
+                      {row.cells.map((cell) => (
+                        <td {...cell.getCellProps()}>
+                          {cell.render('Cell')}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
