@@ -45,24 +45,32 @@ export default function DataImport() {
     // Format table data
     const newHeaders = [];
     const newRows = [];
+    let x = 0;
 
     // format table header data
     fileData.columns.forEach((cell) => {
+      const cellVal = (cell === ''
+        ? `X.${x += 1}`
+        : cell); // fill in empty cells
       const th = {};
-      th.Header = cell;
-      th.accessor = cell.replace(/[^A-Z0-9]/ig, '_');
+      th.Header = cellVal;
+      th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
       newHeaders.push(th);
     });
     setColumns(newHeaders);
-
+    x = 0;
     // format table data rows
     fileData.forEach((row) => {
       const rowArr = Object.entries(row);
       const td = {};
       rowArr.forEach((cell) => {
+        const cellVal = (cell[0] === ''
+          ? `X_${x += 1}`
+          : cell[0].replace(/[^A-Z0-9]/ig, '_')); // fill in empty cells
         // eslint-disable-next-line prefer-destructuring
-        td[cell[0].replace(/[^A-Z0-9]/ig, '_')] = cell[1];
+        td[cellVal] = cell[1];
       });
+      x = 0; // reset column counter
       newRows.push(td);
     });
     setData(newRows);
@@ -73,7 +81,7 @@ export default function DataImport() {
 
     const userData = document.querySelector('input[type=file]').files[0];
     // update the label with the document name
-    let fileUpload = document.getElementById('file-uploader').value;
+    const fileUpload = document.getElementById('file-uploader').value.replace(/^.*[\\/]/, '');
     document.getElementById('data-upload-label').innerHTML = fileUpload;
 
     if (userData) {
@@ -135,7 +143,7 @@ export default function DataImport() {
               <form className="input-group loader-ui">
                 <div className="custom-file">
                   <input type="file" className="custom-file-input" id="file-uploader" accept=".csv" onChange={() => loadData()} />
-                  <label id="data-upload-label" className="custom-file-label" for="file-uploader">Choose file</label>
+                  <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
                 </div>
                 <div className="input-group-append">
                   <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
@@ -160,7 +168,7 @@ export default function DataImport() {
           </div>
           <div className="col col-sm-8 data-import-preview">
             { data.length < 0 ? 'render table action buttons' : '' }
-            <table {...getTableProps()}>
+            <table className="table-responsive" {...getTableProps()}>
               <thead>
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
