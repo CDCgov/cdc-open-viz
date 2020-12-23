@@ -37,6 +37,10 @@ export default function DataImport() {
     prepareRow,
   } = useTable({ columns, data });
 
+  /**
+   * CSV Parsing: collect the data and format it
+   * to be handled by React-Table
+   */
   function parseCsvFile() {
     const fileData = d3.csvParse(reader.result, (d) => d);
 
@@ -49,31 +53,50 @@ export default function DataImport() {
 
     // format table header data
     fileData.columns.forEach((cell) => {
-      const cellVal = (cell === ''
-        ? `X.${x += 1}`
-        : cell); // fill in empty cells
+      // fill in empty cells with X.{x} this placeholder
+      // is also used to map table data to columns
+      const cellVal = (
+        cell === ''
+          ? `X.${x += 1}`
+          : cell);
       const th = {};
       th.Header = cellVal;
       th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
       newHeaders.push(th);
     });
     setColumns(newHeaders);
-    x = 0;
+    x = 0; // reset column counter for columns
+
     // format table data rows
     fileData.forEach((row) => {
       const rowArr = Object.entries(row);
       const td = {};
       rowArr.forEach((cell) => {
-        const cellVal = (cell[0] === ''
-          ? `X_${x += 1}`
-          : cell[0].replace(/[^A-Z0-9]/ig, '_')); // fill in empty cells
+        // fill in empty cells
+        const cellVal = (
+          cell[0] === ''
+            ? `X_${x += 1}`
+            : cell[0].replace(/[^A-Z0-9]/ig, '_'));
         // eslint-disable-next-line prefer-destructuring
         td[cellVal] = cell[1];
       });
-      x = 0; // reset column counter
+      x = 0; // reset column counter for rows
       newRows.push(td);
     });
     setData(newRows);
+  }
+
+  /**
+   * JSON Parsing: collect the data and format it
+   * to be handled by React-Table
+   */
+  function parseJsonFile() {
+    console.log('parsing json');
+    let jsonData = JSON.parse(reader.result);
+
+    return jsonData;
+
+    // format jsonData
   }
 
   function loadData() {
@@ -92,8 +115,8 @@ export default function DataImport() {
         case 'text/csv':
           reader.addEventListener('load', parseCsvFile);
           break;
-        case 'text/json':
-          // code block
+        case 'application/json':
+          reader.addEventListener('load', parseJsonFile);
           break;
         default:
           // unsupported file type
@@ -137,26 +160,15 @@ export default function DataImport() {
           <div className="col col data-loader">
             <div className="mb-2">
               <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-              {/* <input id="file-uploader" type="file" accept=".csv" onChange={() => loadData()} /> */}
-              {/* <button className="clear-button" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button> */}
-
               <form className="input-group loader-ui">
                 <div className="custom-file">
-                  <input type="file" className="custom-file-input" id="file-uploader" accept=".csv" onChange={() => loadData()} />
+                  <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData()} />
                   <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
                 </div>
                 <div className="input-group-append">
                   <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
                 </div>
               </form>
-              {/* <div className="fileinputs">
-	<input type="file" className="file" />
-	<div className="fakefile">
-		<input />
-    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-
-	</div>
-</div> */}
             </div>
             <p>Upload a data file to use ({dataTypes.join(', ')})</p>
             <p className="pb-3">Data Format Help</p>
