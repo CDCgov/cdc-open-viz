@@ -91,8 +91,8 @@ export default function DataImport() {
    * to be handled by React-Table
    */
   function parseJsonFile() {
-    console.log('parsing json');
-    let jsonData = JSON.parse(reader.result);
+    // console.log('parsing json');
+    const jsonData = JSON.parse(reader.result);
 
     return jsonData;
 
