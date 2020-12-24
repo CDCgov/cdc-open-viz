@@ -46,7 +46,7 @@ const NavigationMenu = ({
     setDropdownItems(sortedOptions);
 
     setActiveGeo(Object.keys(sortedOptions)[0]);
-  }, [processedData]);
+  }, [processedData, displayGeoName]);
 
   return (
     <section className="navigation-menu">
