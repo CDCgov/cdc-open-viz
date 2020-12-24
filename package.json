@@ -44,8 +44,8 @@
     }
   },
   "lint-staged": {
-    "packages/**/*.{js,jsx,ts,tsx}": [
-      "eslint ./packages/*/src --ext .js --ext .ts --ext .jsx --ext .tsx"
+    "packages/*/src/*.{js,jsx,ts,tsx}": [
+      "eslint ./packages/cdc-maps/src -c .eslintrc.js --ext .js --ext .ts --ext .jsx --ext .tsx"
     ]
   }
 }
