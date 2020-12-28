@@ -40,10 +40,6 @@
     "ts-loader": "^8.0.9",
     "typescript": "^4.0.5"
   },
-  "dependencies": {
-    "@cdc/map": "file:packages/cdc-maps",
-    "@cdc/chart": "file:packages/cdc-charts"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

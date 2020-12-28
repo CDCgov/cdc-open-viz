@@ -47,5 +47,8 @@
     "us-atlas": "^3.0.0",
     "world-atlas": "^2.0.2"
   },
-  "gitHead": "436c1c9ded3b2a2b25a4b19120ae0d2e70bd35d9"
+  "gitHead": "436c1c9ded3b2a2b25a4b19120ae0d2e70bd35d9",
+  "devDependencies": {
+    "webpack-cli": "^4.3.0"
+  }
 }
