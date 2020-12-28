@@ -7,7 +7,7 @@ import 'mdn-polyfills/Element.prototype.classList';
 import 'array-flat-polyfill';
 
 // External
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 
 // Third party
 import ReactTooltip from 'react-tooltip';
@@ -956,7 +956,11 @@ class CdcMap extends Component {
 
     async loadConfig (configObj) {
         // Set loading flag
-        this.setState(() => {loading: true})
+        const loadingObj = {
+            loading: true
+        }
+
+        this.setState(() => loadingObj)
 
         // Create new config object the same way each time no matter when this method is called.
         let newState = {

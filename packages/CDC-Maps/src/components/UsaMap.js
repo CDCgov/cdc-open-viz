@@ -1,11 +1,9 @@
-/** @jsx jsx */
 import React, { useState, useEffect } from 'react';
 import {
   ComposableMap,
   Geographies,
   Geography
 } from 'react-simple-maps';
-import { jsx } from '@emotion/core';
 import topoJsonStates from 'us-atlas/states-10m.json';
 import chroma from 'chroma-js';
 import Territory from './Territory';

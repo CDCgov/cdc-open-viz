@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useState, useMemo, memo
+  useEffect, useState, useMemo, memo, useCallback
 } from 'react';
 import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
@@ -9,7 +9,7 @@ import externalIcon from '../images/external-link.svg';
 
 const DataTable = (props) => {
   const {
-    tableTitle, mapTitle, data, showDownloadButton, processedData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToValue, displayGeoName, navigationHandler, processedLegend
+    tableTitle, mapTitle, data, showDownloadButton, processedData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToValue, displayGeoName, navigationHandler
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -18,7 +18,7 @@ const DataTable = (props) => {
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
-  const customSort = (a, b) => {
+  const customSort = useCallback((a, b) => {
     const digitRegex = /\d+/;
 
     const hasNumber = (value) => digitRegex.test(value);
@@ -87,10 +87,10 @@ const DataTable = (props) => {
     // returning 0, undefined or any falsey value will use subsequent sorts or
     // the index as a tiebreaker
     return 0;
-  };
+  }, [displayGeoName]);
 
   // Optionally wrap cell with anchor if config defines a navigation url
-  const getCellAnchor = (markup, row) => {
+  const getCellAnchor = useCallback((markup, row) => {
     if (columns.navigate && row[columns.navigate.name]) {
       markup = (
         <span
@@ -112,11 +112,7 @@ const DataTable = (props) => {
     }
 
     return markup;
-  };
-
-  var blob = new Blob(["Sample String\r\n,For Checking, msSaveBlob"], {
-    type:'text/csv;charset=utf-8;'
-  });
+  }, [columns.navigate, navigationHandler]);
 
   const DownloadButton = memo(({ data }) => {
     const fileName = `${mapTitle}.csv`;
@@ -195,11 +191,11 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [columns]);
+  }, [columns, applyLegendToValue, customSort, displayDataAsText, displayGeoName, getCellAnchor, processedData]);
 
   const tableData = useMemo(
     () => Object.keys(processedData).filter((key) => applyLegendToValue(processedData[key])).sort((a, b) => customSort(a, b)),
-    [processedData, processedLegend]
+    [processedData, applyLegendToValue, customSort]
   );
 
   // Change accessibility label depending on expanded status
@@ -215,7 +211,7 @@ const DataTable = (props) => {
       setAccessibilityLabel(collapsedLabel);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded]);
+  }, [expanded, applyLegendToValue, customSort]);
 
   const defaultColumn = useMemo(
     () => ({
