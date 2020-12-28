@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import closeIcon from '../images/close.svg';
 
 const Modal = (props) => {

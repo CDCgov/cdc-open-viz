@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import React, { useState, useEffect } from 'react';
 import {
   ComposableMap,
@@ -6,7 +5,6 @@ import {
   ZoomableGroup,
   Geography,
 } from 'react-simple-maps';
-import { jsx } from '@emotion/core';
 import topoJsonWorld from 'world-atlas/countries-50m.json';
 import { interpolatePath } from 'd3-interpolate-path';
 import CityList from './CityList';

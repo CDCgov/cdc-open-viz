@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback, memo } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 
 import {
   Accordion,
@@ -11,14 +11,14 @@ import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import arrayMove from 'array-move'
 import Papa from 'papaparse';
-const ReactTags = require('react-tag-autocomplete');
 
 import Waiting from './Waiting';
 import mapIcon from '../images/map-folded.svg';
 import UsaGraphic from '../images/united-states-editor.svg';
 import WorldGraphic from '../images/globe-editor.svg';
 import colorPalettes from '../data/color-palettes';
-import worldDefaultConfig from '../examples/default-world.json'; // Future: Lazy
+import worldDefaultConfig from '../examples/default-world.json';
+const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
 const Editor = (props) => {
 
@@ -341,7 +341,6 @@ const Editor = (props) => {
               }
           })
       break;
-      break;
       case 'editorDataUrl':
           setState({dataUrl: value})
       break;
@@ -618,7 +617,7 @@ const Editor = (props) => {
     }
 
     setRequiredColumns(columnList)
-  }, [state.columns])
+  }, [state.columns, state.general.hasRegions, state.general.type])
 
   const editColumn = async (columnName, editTarget, value) => {
     switch (editTarget) {
@@ -1281,7 +1280,7 @@ const Editor = (props) => {
                         <textarea value={legend.descriptions[String(activeFilterValueForDescription)] || ""} onChange={(event) => { handleEditorChanges("changeLegendDescription", [String(activeFilterValueForDescription), event.target.value]) }} />
                       </label>
                       <label>
-                        <select value={String(activeFilterValueForDescription)} onChange={(event) => { "changeActiveFilterValue", event.target.value }}>
+                        <select value={String(activeFilterValueForDescription)} onChange={(event) => { handleEditorChanges("changeActiveFilterValue", event.target.value) }}>
                           {filterValueOptionList.map( (arr, i) => {
                             return (<option value={arr} key={i}>{displayFilterLegendValue(arr)}</option>)
                           })}

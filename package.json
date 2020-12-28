@@ -7,15 +7,20 @@
     "@babel/plugin-transform-arrow-functions": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.1",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
     "array-move": "^3.0.1",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "css-loader": "^5.0.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.16.0",
     "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.4",
-    "eslint-plugin-react-hooks": "^4.0.0",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "file-loader": "^6.1.0",
     "html-webpack-plugin": "^4.5.0",
     "husky": "^4.3.0",
@@ -38,5 +43,15 @@
   "dependencies": {
     "@cdc/map": "file:packages/cdc-maps",
     "@cdc/chart": "file:packages/cdc-charts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "packages/*/src/*.{js,jsx,ts,tsx}": [
+      "eslint ./packages/cdc-maps/src -c .eslintrc.js --ext .js --ext .ts --ext .jsx --ext .tsx"
+    ]
   }
 }
