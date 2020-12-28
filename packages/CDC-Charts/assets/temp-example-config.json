@@ -1,0 +1,36 @@
+{
+    "title": "Average Temperature By City",
+    "dataUrl":  "/assets/temp-example-data.json",
+    "visualizationType": "Line",
+    "visualizationSubType": "stacked",
+    "seriesKeys": ["New York", "San Francisco", "Austin"],
+    "seriesLabel": "City",
+    "dataFormat": {
+        "roundTo": -1,
+        "commas": false,
+        "prefix": "",
+        "suffix": "°"
+    },
+    "padding": {
+        "top": 0,
+        "left": 80,
+        "right": 0,
+        "bottom": 80
+    },
+    "yAxis": {
+        "label": "Temperature"
+    },
+    "xAxis": {
+        "label": "Date",
+        "dataKey": "date",
+        "type": "date",
+        "dateFormat": "%Y-%m-%d"
+    },
+    "legend": {
+        "label": "Legend"
+    },
+    "table": {
+        "label": "Table",
+        "expanded": false
+    }
+}
