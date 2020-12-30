@@ -10,7 +10,8 @@
     padding-bottom: $gbl-padding;
     background-color: $lightest-gray;
 
-    table {    
+    table {
+        // display: table;   
         th {
             padding: $table-padding;
             border: solid 1px $light-gray;
@@ -23,6 +24,13 @@
             padding: $table-padding;
             border: solid 1px $light-gray;
             background: $white;
+        }
+
+        .index-col,
+        tbody th {
+            width: 60px;
+            font-size: size(14);
+            text-align: center;
         }
     }
 }

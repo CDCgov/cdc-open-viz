@@ -38,21 +38,25 @@ export default function DataImport() {
   } = useTable({ columns, data });
 
   /**
-   * CSV Parsing: collect the data and format it
-   * to be handled by React-Table
+   * populateColumns:
+   * build columns for the table display
    */
-  function parseCsvFile() {
-    const fileData = d3.csvParse(reader.result, (d) => d);
-
-    // Validate Data
-
+  function populateColumns(jsonData) {
     // Format table data
     const newHeaders = [];
-    const newRows = [];
     let x = 0;
 
+    if (!jsonData.columns) {
+      // create columns if they don't exist
+      // eslint-disable-next-line no-param-reassign
+      jsonData.columns = [];
+      const jsonRow = Object.entries(jsonData[0]);
+      jsonRow.forEach((item) => {
+        jsonData.columns.push(item[0]);
+      });
+    }
     // format table header data
-    fileData.columns.forEach((cell) => {
+    jsonData.columns.forEach((cell) => {
       // fill in empty cells with X.{x} this placeholder
       // is also used to map table data to columns
       const cellVal = (
@@ -66,9 +70,18 @@ export default function DataImport() {
     });
     setColumns(newHeaders);
     x = 0; // reset column counter for columns
+  }
 
+  /**
+   * populateRows:
+   * build rows for the table display
+   */
+  function populateRows(jsonData) {
+    // Format table data
+    const newRows = [];
+    let x = 0;
     // format table data rows
-    fileData.forEach((row) => {
+    jsonData.forEach((row) => {
       const rowArr = Object.entries(row);
       const td = {};
       rowArr.forEach((cell) => {
@@ -87,16 +100,29 @@ export default function DataImport() {
   }
 
   /**
+   * CSV Parsing: collect the data and format it
+   * to be handled by React-Table
+   */
+  function parseCsvFile() {
+    const fileData = d3.csvParse(reader.result, (d) => d);
+
+    // ToDo Validate Data
+
+    populateColumns(fileData);
+    populateRows(fileData);
+  }
+
+  /**
    * JSON Parsing: collect the data and format it
    * to be handled by React-Table
    */
   function parseJsonFile() {
-    // console.log('parsing json');
     const jsonData = JSON.parse(reader.result);
 
-    return jsonData;
+    // ToDo Validate Data
 
-    // format jsonData
+    populateColumns(jsonData);
+    populateRows(jsonData);
   }
 
   function loadData() {
@@ -184,6 +210,7 @@ export default function DataImport() {
               <thead>
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
+                    {/* <th className="index-col">...</th> */}
                     {headerGroup.headers.map((column) => (
                       <th {...column.getHeaderProps()}>
                         {column.render('Header')}
@@ -197,6 +224,7 @@ export default function DataImport() {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()}>
+                      {/* <th>{row.index + 1}</th> */}
                       {row.cells.map((cell) => (
                         <td {...cell.getCellProps()}>
                           {cell.render('Cell')}
