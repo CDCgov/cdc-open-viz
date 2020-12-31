@@ -14,6 +14,8 @@ export default function DataImport() {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [uploadFile, setUploadFile] = useState(false);
+  const [error, setError] = useState();
+  let errorPresent = false;
 
   const dataTypes = ['.csv', '.json'];
 
@@ -38,34 +40,56 @@ export default function DataImport() {
   } = useTable({ columns, data });
 
   /**
+   * validateData:
+   * Check data for common issues
+   */
+  function validateData(userData, dataType) {
+    setError(null);
+    // debugger;
+    if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
+      // is the json a bunch of arrays instead of objects?
+      errorPresent = true;
+      setError('Please check the formatting of your data. JSON files need be formatted in an array of objects [ {"name":"data1".... ');
+    } else if (userData.columns && userData.columns.includes('')) {
+      // are any of the column headers empty?
+      setError('It looks like your column headers are missing some data. Please make sure all of your columns have titles.');
+    }
+  }
+
+  /**
    * populateColumns:
    * build columns for the table display
    */
-  function populateColumns(jsonData) {
+  function populateColumns(colData) {
     // Format table data
     const newHeaders = [];
     let x = 0;
 
-    if (!jsonData.columns) {
+    if (!colData.columns) {
       // create columns if they don't exist
       // eslint-disable-next-line no-param-reassign
-      jsonData.columns = [];
-      const jsonRow = Object.entries(jsonData[0]);
-      jsonRow.forEach((item) => {
-        jsonData.columns.push(item[0]);
+      colData.columns = [];
+      const tblRow = Object.entries(colData[0]);
+      tblRow.forEach((item) => {
+        colData.columns.push(item[0]);
       });
     }
     // format table header data
-    jsonData.columns.forEach((cell) => {
-      // fill in empty cells with X.{x} this placeholder
-      // is also used to map table data to columns
+    colData.columns.forEach((cell) => {
+      // create a placeholder to map data to
+      // let placeholder = `X.${x += 1}`;
       const cellVal = (
         cell === ''
           ? `X.${x += 1}`
           : cell);
       const th = {};
-      th.Header = cellVal;
+      // if we generated the cell value write nothing to the th
+      th.Header = (
+        cellVal === `X.${x}`
+          ? ''
+          : cellVal);
       th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
+      debugger;
       newHeaders.push(th);
     });
     setColumns(newHeaders);
@@ -76,12 +100,12 @@ export default function DataImport() {
    * populateRows:
    * build rows for the table display
    */
-  function populateRows(jsonData) {
+  function populateRows(rowData) {
     // Format table data
     const newRows = [];
     let x = 0;
     // format table data rows
-    jsonData.forEach((row) => {
+    rowData.forEach((row) => {
       const rowArr = Object.entries(row);
       const td = {};
       rowArr.forEach((cell) => {
@@ -105,11 +129,12 @@ export default function DataImport() {
    */
   function parseCsvFile() {
     const fileData = d3.csvParse(reader.result, (d) => d);
-
-    // ToDo Validate Data
-
-    populateColumns(fileData);
-    populateRows(fileData);
+    // debugger;
+    validateData(fileData, 'csv');
+    if (!errorPresent) {
+      populateColumns(fileData);
+      populateRows(fileData);
+    }
   }
 
   /**
@@ -117,17 +142,24 @@ export default function DataImport() {
    * to be handled by React-Table
    */
   function parseJsonFile() {
-    const jsonData = JSON.parse(reader.result);
+    let jsonData;
+    try {
+      jsonData = JSON.parse(reader.result);
+      validateData(jsonData, 'json');
+    } catch (err) {
+      errorPresent = true;
+      setError(`There was an issue parsing your json file: ${err.toString()}`);
+    }
 
-    // ToDo Validate Data
-
-    populateColumns(jsonData);
-    populateRows(jsonData);
+    if (!errorPresent) {
+      populateColumns(jsonData);
+      populateRows(jsonData);
+    }
   }
 
   function loadData() {
     // let renderData;
-
+    errorPresent = false;
     const userData = document.querySelector('input[type=file]').files[0];
     // update the label with the document name
     const fileUpload = document.getElementById('file-uploader').value.replace(/^.*[\\/]/, '');
@@ -181,9 +213,25 @@ export default function DataImport() {
   return (
     <section className="container-fluid mt-5">
       <h2 className="mb-3">{ pageTitle }</h2>
+      <ul className="nav nav-tabs" id="myTab" role="tablist">
+        <li className="nav-item" role="presentation">
+          <a className="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+        </li>
+        <li className="nav-item" role="presentation">
+          <a className="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+        </li>
+        <li className="nav-item" role="presentation">
+          <a className="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+        </li>
+      </ul>
+      <div className="tab-content" id="myTabContent">
+        <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">home</div>
+        <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+        <div className="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+      </div>
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
-          <div className="col col data-loader">
+          <div className="col data-loader">
             <div className="mb-2">
               <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
               <form className="input-group loader-ui">
@@ -196,7 +244,11 @@ export default function DataImport() {
                 </div>
               </form>
             </div>
-            <p>Upload a data file to use ({dataTypes.join(', ')})</p>
+
+            { error
+              ? <p className="data-error alert alert-warning">{error}</p>
+              : <p>Upload a data file to use ({dataTypes.join(', ')})</p> }
+
             <p className="pb-3">Data Format Help</p>
             <ul>
               <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
