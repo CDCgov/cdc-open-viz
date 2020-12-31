@@ -1,5 +1,9 @@
 @import './variables';
 
+$black: #000;
+$light-yellow: #fde0b5;
+$dark-yellow: #f59a23;
+
 .data-loader {
     padding-top: $gbl-padding;
     padding-bottom: $gbl-padding;
@@ -18,6 +22,12 @@
             background: $lighter-gray;
             color: black;
             font-weight: bold;
+
+            &:empty {
+                background: $light-yellow;
+                border-color: $dark-yellow;
+                border-width: medium;
+            }
         }
     
         td {
@@ -67,4 +77,9 @@
         }
     }
 
+}
+
+.data-error.alert-warning{
+    background: $light-yellow;
+    color: $black;
 }
