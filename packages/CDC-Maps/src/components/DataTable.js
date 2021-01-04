@@ -6,6 +6,7 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import externalIcon from '../images/external-link.svg';
+import { Base64 } from 'js-base64';
 
 const DataTable = (props) => {
   const {
@@ -130,7 +131,7 @@ const DataTable = (props) => {
       <a
         download={fileName}
         onClick={saveBlob}
-        href={`data:text/csv;base64,${btoa(csvData)}`}
+        href={`data:text/csv;base64,${Base64.encode(csvData)}`}
         aria-label="Download this data in a CSV file format."
         className={`${headerColor} btn btn-download no-border`}
       >
