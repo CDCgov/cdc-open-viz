@@ -22,6 +22,7 @@ composer.lock
 
 # Project Specific
 /node_modules
+/**/**/node_modules
 *.log
 /lib
 tmp
@@ -29,3 +30,6 @@ tmp
 coverage/
 .nyc_output/
 .eslintcache
+
+# Ignore Built Files
+/packages/**/dist
