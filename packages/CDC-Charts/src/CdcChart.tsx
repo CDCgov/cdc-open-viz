@@ -7,9 +7,8 @@ import React, {
 } from 'react';
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
-import BarChart from './components/BarChart.tsx';
-import LineChart from './components/LineChart.tsx';
 import PieChart from './components/PieChart.tsx';
+import ComboChart from './components/ComboChart.tsx';
 import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
@@ -99,9 +98,10 @@ export default function CdcChart({ configUrl }) {
 
   // Select appropriate chart type
   const chartComponents = {
-    'Bar' : <BarChart numberFormatter={formatNumber} />,
-    'Line' : <LineChart numberFormatter={formatNumber} />,
-    'Pie' : <PieChart numberFormatter={formatNumber} />
+    'Bar' : <ComboChart numberFormatter={formatNumber} />,
+    'Line' : <ComboChart numberFormatter={formatNumber} />,
+    'Combo': <ComboChart numberFormatter={formatNumber} />,
+    'Pie' : <PieChart numberFormatter={formatNumber} />,
   }
 
   if(true === loading) {
