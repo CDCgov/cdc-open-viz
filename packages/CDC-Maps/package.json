@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "homepage": "https://github.com/CDCgov/cdc-open-viz/cdc-maps",
   "main": "dist/cdcmap",
@@ -19,13 +19,15 @@
     "url": "https://github.com/CDCgov/CDC-Maps/issues"
   },
   "license": "Apache-2.0",
-  "peerDependencies": {
-    "react": "^16.11.0 || 17.x",
-    "react-dom": "^16.11.0 || 17.x"
-  },
   "dependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-arrow-functions": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
     "@emotion/core": "^10.0.28",
     "array-flat-polyfill": "^1.0.1",
+    "array-move": "^3.0.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "classlist-polyfill": "^1.2.0",
@@ -45,10 +47,31 @@
     "react-tooltip": "^3.11.1",
     "url-polyfill": "^1.1.7",
     "us-atlas": "^3.0.0",
-    "world-atlas": "^2.0.2"
+    "world-atlas": "^2.0.2",
+    "mini-svg-data-uri": "^1.2.3",
+    "react": "^16.11.0 || 17.x",
+    "react-dom": "^16.11.0 || 17.x"
   },
   "gitHead": "436c1c9ded3b2a2b25a4b19120ae0d2e70bd35d9",
   "devDependencies": {
-    "webpack-cli": "^4.3.0"
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-arrow-functions": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
+    "array-move": "^3.0.1",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^5.0.0",
+    "file-loader": "^6.1.0",
+    "html-webpack-plugin": "^4.5.0",
+    "mini-svg-data-uri": "^1.2.3",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^10.0.2",
+    "style-loader": "^1.0.0",
+    "url-loader": "^4.1.1",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-node-externals": "^2.5.2"
   }
 }
