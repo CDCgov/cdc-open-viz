@@ -9,6 +9,7 @@ import {
   useTooltip,
   useTooltipInPortal,
   defaultStyles,
+  TooltipWithBounds,
 } from '@visx/tooltip';
 import { BarGroup, BarStack } from '@visx/shape';
 import { MarkerCircle } from '@visx/marker';
@@ -32,7 +33,6 @@ const tooltipStyles = {
   color: 'black',
   border: '1px solid black',
   width: 152,
-  height: 72,
   padding: 12,
 };
 const font = '#000000';
@@ -55,7 +55,6 @@ export default function ComboChart({numberFormatter}) {
   } = useTooltip<TooltipData>({
     tooltipOpen: false,
     tooltipLeft: tooltipStyles.width / 3,
-    tooltipTop: tooltipStyles.height / 3,
     tooltipData: { __html: '' },
   });
 
@@ -281,10 +280,15 @@ export default function ComboChart({numberFormatter}) {
           left={config.padding.left}
           label={config.yAxis.label}
           labelProps={{
-            fontSize: 18,
+            fontSize: config.yAxis.labelFontSize || 18,
             fontWeight: 'bold',
             textAnchor: 'middle',
+            transform: 'translate(-20, 0) rotate(-90)'
           }}
+          tickLabelProps={() => ({
+            fontSize: config.yAxis.tickFontSize,
+            transform: 'translate(-40, 0)'
+          })}
           stroke={font}
         />
         <AxisBottom
@@ -296,27 +300,27 @@ export default function ComboChart({numberFormatter}) {
           stroke={font}
           tickStroke={font}
           labelProps={{
-            fontSize: 18,
+            fontSize: config.xAxis.labelFontSize || 18,
             fontWeight: 'bold',
           }}
           tickLabelProps={() => ({
             fill: font,
-            fontSize: 11,
-            textAnchor: 'middle',
+            fontSize: config.xAxis.tickFontSize || 11,
+            textAnchor: 'middle'
           })}
         />
       </svg>
 
       {tooltipOpen ? (
         <>
-          <TooltipInPortal
+          <TooltipWithBounds
             key={Math.random()} // needed for bounds to update correctly
             left={tooltipLeft}
             top={tooltipTop}
             style={tooltipStyles}
           >
             <div dangerouslySetInnerHTML={tooltipData}></div>
-          </TooltipInPortal>
+          </TooltipWithBounds>
         </>
       ) : ''}
     </div>
