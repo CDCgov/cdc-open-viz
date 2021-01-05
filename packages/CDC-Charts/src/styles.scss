@@ -47,6 +47,10 @@ body {
 .chart-container {
   display: inline-block;
   width: 75%;
+
+  &.legend-hidden {
+    width: 100%;
+  }
 }
 
 .legend-container {
