@@ -13,6 +13,12 @@ $dark-yellow: #f59a23;
     padding-top: $gbl-padding;
     padding-bottom: $gbl-padding;
     background-color: $lightest-gray;
+    
+    // overflow: auto;
+
+    .table-responsive {
+        max-height: 70vh;
+    }
 
     table {
         // display: table;   
@@ -38,7 +44,7 @@ $dark-yellow: #f59a23;
 
         .index-col,
         tbody th {
-            width: 60px;
+            // width: 60px;
             font-size: size(14);
             text-align: center;
         }
@@ -82,4 +88,23 @@ $dark-yellow: #f59a23;
 .data-error.alert-warning{
     background: $light-yellow;
     color: $black;
+}
+
+// this style may need to move to tab component
+// if others will follow the same look
+.tab-content {
+    padding-top: $gbl-padding;
+    border-top: 1px solid $black;
+}
+.nav-item {
+    list-style: none;
+    height: 55px;
+    line-height: 55px;
+    margin: 0 !important;
+    cursor: pointer;
+
+    &.active {
+        color: $white;
+        background: $black;
+    }
 }

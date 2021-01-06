@@ -3,8 +3,9 @@ import 'react-app-polyfill/ie11';
 import React, { useState, useContext, useEffect } from 'react';
 import { useTable } from 'react-table';
 import '../scss/_dataimport.scss';
-
 import * as d3 from 'd3';
+import TabPane from './TabPane';
+import Tabs from './Tab';
 import Context from '../context';
 // import BarChart from './BarChart';
 // import csv from '../assets/data.csv';
@@ -49,10 +50,10 @@ export default function DataImport() {
     if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
       // is the json a bunch of arrays instead of objects?
       errorPresent = true;
-      setError('Please check the formatting of your data. JSON files need be formatted in an array of objects [ {"name":"data1".... ');
+      setError('Please check the formatting of your data. JSON files need be formatted in an array of objects [ {"name":"data1", .... },{...},{...}]');
     } else if (userData.columns && userData.columns.includes('')) {
       // are any of the column headers empty?
-      setError('It looks like your column headers are missing some data. Please make sure all of your columns have titles.');
+      setError('It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.');
     }
   }
 
@@ -77,7 +78,6 @@ export default function DataImport() {
     // format table header data
     colData.columns.forEach((cell) => {
       // create a placeholder to map data to
-      // let placeholder = `X.${x += 1}`;
       const cellVal = (
         cell === ''
           ? `X.${x += 1}`
@@ -89,7 +89,7 @@ export default function DataImport() {
           ? ''
           : cellVal);
       th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
-      debugger;
+      // debugger;
       newHeaders.push(th);
     });
     setColumns(newHeaders);
@@ -213,37 +213,27 @@ export default function DataImport() {
   return (
     <section className="container-fluid mt-5">
       <h2 className="mb-3">{ pageTitle }</h2>
-      <ul className="nav nav-tabs" id="myTab" role="tablist">
-        <li className="nav-item" role="presentation">
-          <a className="nav-link active" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
-        </li>
-        <li className="nav-item" role="presentation">
-          <a className="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
-        </li>
-        <li className="nav-item" role="presentation">
-          <a className="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
-        </li>
-      </ul>
-      <div className="tab-content" id="myTabContent">
-        <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">home</div>
-        <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-        <div className="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
-      </div>
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
           <div className="col data-loader">
-            <div className="mb-2">
-              <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-              <form className="input-group loader-ui">
-                <div className="custom-file">
-                  <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData()} />
-                  <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
-                </div>
-                <div className="input-group-append">
-                  <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-                </div>
-              </form>
-            </div>
+
+            <Tabs className="tab-content mb-2" key="upload-tabs">
+              <TabPane id="fileUpload" className="tab-pane fade" name="Upload File" key="2">
+                <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
+                <form className="input-group loader-ui">
+                  <div className="custom-file">
+                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData()} />
+                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
+                  </div>
+                  <div className="input-group-append">
+                    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+                  </div>
+                </form>
+              </TabPane>
+              <TabPane id="urlUpload" className="tab-pane fade" name="Link from URL" key="1">
+                File Uploader
+              </TabPane>
+            </Tabs>
 
             { error
               ? <p className="data-error alert alert-warning">{error}</p>
@@ -258,13 +248,13 @@ export default function DataImport() {
           </div>
           <div className="col col-sm-8 data-import-preview">
             { data.length < 0 ? 'render table action buttons' : '' }
-            <table className="table-responsive" {...getTableProps()}>
+            <table className="table-responsive table-bordered table-hover" {...getTableProps()}>
               <thead>
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {/* <th className="index-col">...</th> */}
                     {headerGroup.headers.map((column) => (
-                      <th {...column.getHeaderProps()}>
+                      <th scope="col" {...column.getHeaderProps()}>
                         {column.render('Header')}
                       </th>
                     ))}
