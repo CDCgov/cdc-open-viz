@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "name": "@cdc/editor",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack"
