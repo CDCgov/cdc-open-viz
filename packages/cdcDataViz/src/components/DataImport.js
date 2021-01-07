@@ -7,13 +7,14 @@ import * as d3 from 'd3';
 import TabPane from './TabPane';
 import Tabs from './Tab';
 import Context from '../context';
+
 // import BarChart from './BarChart';
 // import csv from '../assets/data.csv';
 
 export default function DataImport() {
   const { pageTitle } = useContext(Context);
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [data, setData] = useState(null);
+  const [columns, setColumns] = useState(null);
   const [uploadFile, setUploadFile] = useState(false);
   const [error, setError] = useState();
   let errorPresent = false;
@@ -24,21 +25,14 @@ export default function DataImport() {
 
   const toggleUpload = (currState) => {
     setUploadFile(!currState);
+    setError(false); // reset errors
 
     if (!currState) {
       document.getElementById('file-uploader').click();
     } else {
-      // remove old table data ....
+      setData(null);
     }
   };
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data });
 
   /**
    * validateData:
@@ -157,37 +151,58 @@ export default function DataImport() {
     }
   }
 
-  function loadData() {
+  function loadData(dataType) {
     // let renderData;
-    errorPresent = false;
-    const userData = document.querySelector('input[type=file]').files[0];
-    // update the label with the document name
-    const fileUpload = document.getElementById('file-uploader').value.replace(/^.*[\\/]/, '');
-    document.getElementById('data-upload-label').innerHTML = fileUpload;
 
-    if (userData) {
-      const fileType = userData.type;
-      reader.readAsText(userData);
+    errorPresent = null;
 
-      switch (fileType) {
-        case 'text/csv':
-          reader.addEventListener('load', parseCsvFile);
-          break;
-        case 'application/json':
-          reader.addEventListener('load', parseJsonFile);
-          break;
-        default:
-          // unsupported file type
+    switch (dataType) {
+      case 'file': {
+        const userData = document.querySelector('input[type=file]').files[0];
+        // update the label with the document name
+        // todo make the document call a refs - https://reactjs.org/docs/refs-and-the-dom.html
+        const fileUpload = document.getElementById('file-uploader').value.replace(/^.*[\\/]/, '');
+        document.getElementById('data-upload-label').innerHTML = fileUpload;
+
+        if (userData) {
+          const fileType = userData.type;
+          reader.readAsText(userData);
+
+          switch (fileType) {
+            case 'text/csv':
+              reader.addEventListener('load', parseCsvFile);
+              break;
+            case 'application/json':
+              reader.addEventListener('load', parseJsonFile);
+              break;
+            default:
+              setError('The file type that you are trying to upload is not supported.');
+          }
+        }
+        break;
       }
-    } else {
-      // this may be where we handle saved chart data?
-      // for now it is wired to a file
+      case 'external': {
+        // const externalInput = document.getElementById('external-data').value;
+        // // todo check above to be a valid URL
+        // // create a URL to make error checking easier
+        // const dataUrl = new URL(externalInput);
+        // // debugger;
+        // if (dataUrl && dataUrl.hostname) {
+        //   // debugger;
+        //   console.log(dataUrl);
+        // } else {
+        //   setError('Please make sure to use a valid URL.');
+        // }
+        // break;
+      }
+      // case 'freeform': {
+      // todo build textbox to build these
+      // }
+      // break;
 
-      // renderData = d3.csv(csv).then((csvData) => {
-      //   csvData.forEach((item) => {
-      //     console.log(item);
-      //   });
-      // });
+      default: {
+        setError('Your datatype is not supported.');
+      }
     }
   }
 
@@ -210,19 +225,87 @@ export default function DataImport() {
     // document.getElementById('dataTable').insertAdjacentHTML('beforeend', dataTable);
   });
 
+  const DataTable = () => {
+    const {
+      getTableProps,
+      getTableBodyProps,
+      headerGroups,
+      rows,
+      prepareRow,
+    } = useTable({ columns, data });
+
+    return (
+      <table className="table-responsive table-bordered table-hover" {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {/* <th className="index-col">...</th> */}
+              {headerGroup.headers.map((column) => (
+                <th scope="col" {...column.getHeaderProps()}>
+                  {column.render('Header')}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {/* <th>{row.index + 1}</th> */}
+                {row.cells.map((cell) => (
+                  <td {...cell.getCellProps()}>
+                    {cell.render('Cell')}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  };
+
+  const DataPlaceholder = () => (
+    <div>
+      <div className="overlay-empty">Add Data to Get Started</div>
+      <table className="table-bordered table-empty">
+        <thead>
+          <tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <section className="container-fluid mt-5">
       <h2 className="mb-3">{ pageTitle }</h2>
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
           <div className="col data-loader">
-
             <Tabs className="tab-content mb-2" key="upload-tabs">
-              <TabPane id="fileUpload" className="tab-pane fade" name="Upload File" key="2">
+              <TabPane id="urlUpload" className="tab-pane fade" name="Link from URL" key="1" dataicon="icon-url">
+                <div className="input-group mb-3">
+                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" />
+                  <div className="input-group-append">
+                    <button className="input-group-text btn btn-primary" type="button" id="load-data" onClick={() => loadData('external')}>Load</button>
+                  </div>
+                </div>
+              </TabPane>
+              <TabPane id="fileUpload" className="tab-pane fade" name="Upload File" key="2" dataicon="icon-upload">
                 <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
                 <form className="input-group loader-ui">
                   <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData()} />
+                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file')} />
                     <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
                   </div>
                   <div className="input-group-append">
@@ -230,13 +313,10 @@ export default function DataImport() {
                   </div>
                 </form>
               </TabPane>
-              <TabPane id="urlUpload" className="tab-pane fade" name="Link from URL" key="1">
-                File Uploader
-              </TabPane>
             </Tabs>
 
             { error
-              ? <p className="data-error alert alert-warning">{error}</p>
+              ? <p className="data-error alert alert-warning">{error} - {errorPresent}</p>
               : <p>Upload a data file to use ({dataTypes.join(', ')})</p> }
 
             <p className="pb-3">Data Format Help</p>
@@ -247,36 +327,7 @@ export default function DataImport() {
             </ul>
           </div>
           <div className="col col-sm-8 data-import-preview">
-            { data.length < 0 ? 'render table action buttons' : '' }
-            <table className="table-responsive table-bordered table-hover" {...getTableProps()}>
-              <thead>
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {/* <th className="index-col">...</th> */}
-                    {headerGroup.headers.map((column) => (
-                      <th scope="col" {...column.getHeaderProps()}>
-                        {column.render('Header')}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {/* <th>{row.index + 1}</th> */}
-                      {row.cells.map((cell) => (
-                        <td {...cell.getCellProps()}>
-                          {cell.render('Cell')}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            {data ? <DataTable /> : <DataPlaceholder />}
           </div>
         </div>
       </div>
