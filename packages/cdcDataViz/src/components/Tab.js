@@ -40,6 +40,17 @@ const Tabs = (props) => {
           </li>
         ))}
       </ul>
+      {/* <ul className="nav nav-pills nav-fill">
+        {tabHeader.map((item) => (
+          <li
+            onClick={() => changeTab(item.name)}
+            key={item.name}
+            className={item === active ? `nav-item active ${item.dataicon}` : `nav-item ${item.dataicon}`}
+          >
+            {item.name}
+          </li>
+        ))}
+      </ul> */}
       <div className="tab-content">
         {Object.keys(childContent).map((key) => {
           if (key === active) {
