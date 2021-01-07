@@ -1,16 +1,11 @@
 import 'react-app-polyfill/ie11';
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
+import ReactTooltip from 'react-tooltip';
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
 import { LinePath } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
-import {
-  useTooltip,
-  useTooltipInPortal,
-  defaultStyles,
-  TooltipWithBounds,
-} from '@visx/tooltip';
 import { BarGroup, BarStack } from '@visx/shape';
 import { MarkerCircle } from '@visx/marker';
 import { timeParse, timeFormat } from 'd3-time-format';
@@ -18,45 +13,10 @@ import Context from '../context.tsx';
 
 import '../scss/ComboChart.scss';
 
-export type TooltipProps = {
-  width: number;
-  height: number;
-  showControls?: boolean;
-};
-
-type TooltipData = {
-  __html: string
-};
-const tooltipStyles = {
-  ...defaultStyles,
-  backgroundColor: 'white',
-  color: 'black',
-  border: '1px solid black',
-  width: 152,
-  padding: 12,
-};
 const font = '#000000';
 
 export default function ComboChart({numberFormatter}) {
   let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
-
-  const { containerBounds, TooltipInPortal } = useTooltipInPortal({
-    scroll: true,
-    detectBounds: true,
-  });
-
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipOpen,
-    tooltipData,
-    tooltipLeft = 0,
-    tooltipTop = 0,
-  } = useTooltip<TooltipData>({
-    tooltipOpen: false,
-    tooltipLeft: tooltipStyles.width / 3,
-    tooltipData: { __html: '' },
-  });
 
   const [ width, height ] = dimensions;
 
@@ -74,6 +34,7 @@ export default function ComboChart({numberFormatter}) {
   let xScaleBar;
   let seriesScaleBar;
   let yScale;
+  let tooltipContent;
 
   if (data) {
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
@@ -123,48 +84,6 @@ export default function ComboChart({numberFormatter}) {
     }
   }
 
-  const handlePointerEnterLine = useCallback(
-    (event: React.PointerEvent<SVGCircleElement>, point, seriesKey) => {
-      const containerX = ('clientX' in event ? event.clientX : 0) - containerBounds.left;
-      const containerY = ('clientY' in event ? event.clientY : 0) - containerBounds.top;
-
-      showTooltip({
-        tooltipLeft: containerX,
-        tooltipTop: containerY,
-        tooltipData: {
-          __html: `<div>
-            ${config.xAxis.label}: ${point[config.xAxis.dataKey]} <br/>
-            ${config.yAxis.label}: ${numberFormatter(point[seriesKey])} <br/>
-            ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
-          </div>
-        `,
-        },
-      });
-    },
-    [showTooltip, containerBounds, config.seriesLabel, config.xAxis.dataKey, config.xAxis.label, config.yAxis.label],
-  );
-
-  const handlePointerMoveBar = useCallback(
-    (event: React.PointerEvent<SVGRectElement>, bar, group) => {
-      const containerX = ('clientX' in event ? event.clientX : 0) - containerBounds.left;
-      const containerY = ('clientY' in event ? event.clientY : 0) - containerBounds.top;
-
-      showTooltip({
-        tooltipLeft: containerX,
-        tooltipTop: containerY,
-        tooltipData: {
-          __html: `<div>
-            ${config.xAxis.label}: ${data[group.index][config.xAxis.dataKey]} <br/>
-            ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : bar.value)} <br/>
-            ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-          </div>
-        `,
-        },
-      });
-    },
-    [showTooltip, containerBounds, data, config.seriesLabel, config.xAxis.dataKey, config.xAxis.label, config.yAxis.label],
-  );
-
   return config && data && colorScale ? (
     <div className="line-chart-container">
       <svg viewBox={`0 0 ${width} ${height}`}>
@@ -188,8 +107,12 @@ export default function ComboChart({numberFormatter}) {
                   width={bar.width}
                   fill={bar.color}
                   display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                  onPointerMove={(e) => { handlePointerMoveBar(e, bar, barStack); }}
-                  onPointerLeave={hideTooltip}
+                  data-tip={`<div>
+                        ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
+                        ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
+                        ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
+                      </div>`}
+                      data-html="true"
                 />
               )))
               }
@@ -218,8 +141,12 @@ export default function ComboChart({numberFormatter}) {
                       style={{fill: bar.color}}
                       rx={4}
                       display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                      onPointerMove={(e) => { handlePointerMoveBar(e, bar, barGroup); }}
-                      onPointerLeave={hideTooltip}
+                      data-tip={`<div>
+                        ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
+                        ${config.yAxis.label}: ${numberFormatter(bar.value)} <br/>
+                        ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
+                      </div>`}
+                      data-html="true"
                     />
                   ))}
                 </Group>
@@ -249,11 +176,15 @@ export default function ComboChart({numberFormatter}) {
                     r={3}
                     cx={xScaleLine(getXAxisData(d))}
                     cy={yScale(getYAxisData(d, seriesKey))}
-                    strokeWidth="25px"
+                    strokeWidth="10px"
                     stroke="transparent"
                     fill="colorScale ? colorScale(seriesKey) : '#000'"
-                    onPointerEnter={(e) => { handlePointerEnterLine(e, d, seriesKey); }}
-                    onPointerLeave={hideTooltip}
+                    data-tip={`<div>
+                      ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
+                      ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
+                      ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+                    </div>`}
+                    data-html="true"
                   />
                 ))}
                 <LinePath
@@ -311,18 +242,7 @@ export default function ComboChart({numberFormatter}) {
         />
       </svg>
 
-      {tooltipOpen ? (
-        <>
-          <TooltipWithBounds
-            key={Math.random()} // needed for bounds to update correctly
-            left={tooltipLeft}
-            top={tooltipTop}
-            style={tooltipStyles}
-          >
-            <div dangerouslySetInnerHTML={tooltipData}></div>
-          </TooltipWithBounds>
-        </>
-      ) : ''}
+      <ReactTooltip />
     </div>
   ) : <div className="loader"></div>;
 }
