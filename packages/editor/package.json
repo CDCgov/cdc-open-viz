@@ -15,15 +15,8 @@
     "babel-loader": "^8.0.6",
     "core-js": "^3.4.1",
     "css-loader": "^4.3.0",
-    "eslint": "^7.12.1",
-    "eslint-config-airbnb-typescript": "^12.0.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.4",
-    "eslint-plugin-react-hooks": "^4.0.0",
     "file-loader": "^6.1.0",
     "html-webpack-plugin": "^4.5.0",
-    "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
     "mini-svg-data-uri": "^1.2.3",
     "node-sass": "^4.13.0",
@@ -44,13 +37,5 @@
     "react-app-polyfill": "^1.0.4",
     "react-dom": "^16.11.0",
     "react-table": "^7.6.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/**.{js,jsx,ts,tsx}": "eslint src/**/*.{js,jsx,ts,tsx}"
   }
 }
