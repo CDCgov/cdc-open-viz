@@ -18,7 +18,8 @@
     "bootstrap": "^4.3.1",
     "d3": "^6.2.0",
     "html-react-parser": "^0.14.0",
-    "react-table": "^7.6.2"
+    "react-table": "^7.6.2",
+    "mini-svg-data-uri": "^1.2.3"
   },
   "peerDependencies": {
     "react": ">=16",
