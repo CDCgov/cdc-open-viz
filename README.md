@@ -6,7 +6,7 @@ This project is still under heavy initial development with the roadmap extending
 
 | Package | Description |
 | --- | ----------- |
-| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/master/packages/CDC-Maps) | React component for visualizing tabular data on a map of the United States or the world. |
+| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | React component for visualizing tabular data on a map of the United States or the world. |
 
 ### Setup
 
@@ -36,8 +36,8 @@ These shared elements are stored in the root of this repository. This ensures th
 
   * Build/Development process (Webpack)
   * `devDependencies`
-   * Your package should not have its own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
-   * You should not have custom build scripts/processes specifically for your package unless it's been discussed.
+    * Your package should not have its own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
+    * You should not have custom build scripts/processes specifically for your package unless it's been discussed.
 
 
 #### Creating a new package
