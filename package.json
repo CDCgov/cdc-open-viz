@@ -34,6 +34,7 @@
     "style-loader": "^1.0.0",
     "ts-loader": "^8.0.9",
     "url-loader": "^4.1.1",
+    "mini-svg-data-uri": "^1.2.3",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
@@ -44,7 +45,7 @@
     }
   },
   "lint-staged": {
-    "packages/*/src/*.{js,jsx,ts,tsx}": [
+    "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "eslint --config .eslintrc.js --ext .js --ext .ts --ext .jsx --ext .tsx ./packages/*/src"
     ]
   }

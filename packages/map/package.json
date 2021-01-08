@@ -5,7 +5,7 @@
   "main": "dist/cdcmap",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "npx webpack --mode production --no-install",
+    "build": "npx webpack --mode production --no-install --env.packageName=CdcMap --env.folderName=map",
     "prepublishOnly": "npx webpack --mode production"
   },
   "repository": {
@@ -36,12 +36,14 @@
     "react-tag-autocomplete": "^6.0.0",
     "react-tooltip": "^3.11.1",
     "us-atlas": "^3.0.0",
-    "world-atlas": "^2.0.2",
-    "mini-svg-data-uri": "^1.2.3"
+    "world-atlas": "^2.0.2"
   },
   "gitHead": "436c1c9ded3b2a2b25a4b19120ae0d2e70bd35d9",
   "peerDependencies": {
     "react": ">=16",
     "react-dom": ">=16"
-  }
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ]
 }

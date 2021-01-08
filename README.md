@@ -15,9 +15,8 @@ These packages are managed with [Lerna](https://github.com/lerna/lerna#readme) a
 
 ### Setup
 
-1. Start by cloning this repo and running `npm install` at the root.
+1. Start by cloning this repo and running `npm install` at the root. Also run `npm i -g lerna` so you will have global access to lerna commands.
 2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
- * Lerna should have been installed at the package level, but if it tells you command is not found try installing Lerna globally with `npm i -g lerna`.
 3. Run `lerna run --scope @cdc/package_name start`, replacing the package_name with the package's namespace (ex: `@cdc/map`).
  * This tells Lerna to run the `start` script that is defined for that package and should open a window in your browser displaying the module.
 
@@ -25,8 +24,8 @@ These packages are managed with [Lerna](https://github.com/lerna/lerna#readme) a
 
 These are important concepts to understand while working on this codebase:
 
-* To keep each codebase focused only on its direct responsibilities, each package should assume it will be consumed as an package by another application from the NPM registry.
-  * This is a key concept of the target architecture. We have our own wrapper application that imports these packages for use on cdc.gov.
+* To keep each codebase focused only on its direct responsibilities, each package should assume it will be imported from the NPM registry by a React application.
+  * As an example, we have our own wrapper application that imports these packages for use on cdc.gov.
   * This means we don't include polyfills at the package level, that should be handled by the application that imports these modules. We also don't have `react` or `react-dom` as direct dependencies in any package, since every project that would import these will have them. They are defined as `peerDependencies`.
 * Tooling/Configuration is shared as much as possible among packages.
   * Things that are shared: Code Linting (ESLint), Build/Development process (Webpack), NPM scripts (Shell level scripts that run at key points.)
