@@ -51,8 +51,9 @@ These shared elements are stored in the root of this repository. This ensures th
 Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
 
 <details>
-  <summary>** Legal Notices **</summary>
-  #### License
+  <summary>**Legal Notices**</summary>
+
+#### License
 
 The repository utilizes code licensed under the terms of the Apache Software License and therefore is licensed under ASL v2 or later.
 
