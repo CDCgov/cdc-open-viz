@@ -154,6 +154,8 @@ export default function CdcChart({ configUrl }) {
             </LegendOrdinal>
         </div>
       </div>
+      {/* Description */}
+      <div className="chart-description" dangerouslySetInnerHTML={{__html: config.description}}></div>              
       {/* Data Table */}
       <DataTable numberFormatter={formatNumber} />
     </Context.Provider>
