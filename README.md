@@ -8,7 +8,7 @@ This project is still under heavy initial development with the roadmap extending
 | --- | ----------- |
 | [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/master/packages/CDC-Maps) | React component for visualizing tabular data on a map of the United States or the world. |
 
-#### Setup
+### Setup
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [npm](https://www.npmjs.com/) for package management (as opposed to Yarn.) To work on individual packages, you must setup the entire monorepo.
 
@@ -22,14 +22,14 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 These are important things to know before you begin working on this project. Reviewing will help you contribute effectively and keep this project in good shape.
 
-* #### Each package is designed to be imported as a module by another project.
+#### Each package is designed to be imported as a module by another project.
   * This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
   * This means we don't include polyfills, since we can't know what the "parent" project's browser support requirements are. The parent project is responsible for adding appropriate polyfills.
   * We also don't include things `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
   * We do not include any CDC specific logos or functionality (ex. metrics calls) in these packages, that should go in our wrapper codebase.
   * We implement this internally at CDC. We have a wrapper codebase that imports these packages and the bundle generated from that wrapper is what is actually served on pages. Inside that wrapper is a custom function that connects to metrics, contains the CDC logo, etc...
 
-* #### Tooling/Configuration is shared as much as possible among packages.
+#### Tooling/Configuration is shared as much as possible among packages.
 These shared elements are stored in the root of this repository. This ensures that if something breaks in our tooling, we only need to fix it in one spot. It also helps ensure consistency across packages. **Please do not break this guideline.** It is critical to allowing a small team to maintain this project effectively.
 
   * Code Linting configuration (ESLint/Lint Staged)
@@ -40,14 +40,19 @@ These shared elements are stored in the root of this repository. This ensures th
    * You should not have custom build scripts/processes specifically for your package unless it's been discussed.
 
 
-* #### Creating a new package
+#### Creating a new package
   * When creating a new package, use lowercase and don't use any kind of prefix. The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
   * Don't just create the folder inside `/packages/`, if you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
   * Respect the guidelines above and ask someone if you're unsure of something.
+  * New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
 
-## Notices
+#### Each package maintains its own version number
 
-#### License
+Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
+
+<details>
+  <summary>** Legal Notices **</summary>
+  #### License
 
 The repository utilizes code licensed under the terms of the Apache Software License and therefore is licensed under ASL v2 or later.
 
@@ -68,3 +73,4 @@ This repository is not a source of government records, but is a copy to increase
 #### Privacy
 
 This repository contains only non-sensitive, publicly available data and information. All material and community participation is covered by the [Disclaimer](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md) and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md). For more information about CDC's privacy policy, please visit http://www.cdc.gov/other/privacy.html.
+</details>
