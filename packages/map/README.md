@@ -55,11 +55,7 @@ For more information, read the [CDC's official guidance](https://www.cdc.gov/wcm
 
 ## Contributing
 
-To get started working on this repository, follow these steps:
-1. Clone the monorepo and do an `lerna bootstrap`. This installs all dependencies. Then you can navigate to `/packages/cdc-maps/` and do `npm link` to link the namespace `@cdc/map` to your local project (see step 4 for more.)
-2. Simply run `lerna run --scope @cdc/map start` and it will open the project in development mode.
-3. To create an actual built version of the library for testing, run `lerna run --scope @cdc/map build`
-4. To test the package out locally inside a different project, after building you need to go into that folder and run `npm link @cdc/map`. It should begin using your local version so you can make changes and view them.
+To get started working on maps, you must first set up the [larger monorepo](https://github.com/CDCgov/cdc-open-viz). Then you can run the command `lerna run --scope @cdc/map start` to open the a standalone map editor.
 
 **Submitting a Pull Request**
 Contributions from users are welcome. If you are not an approved contributor, you will have to [fork this repository](https://help.github.com/articles/fork-a-repo) and submit a pull request that way.

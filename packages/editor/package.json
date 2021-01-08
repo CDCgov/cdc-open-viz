@@ -1,41 +1,27 @@
 {
   "name": "@cdc/editor",
+  "version": "1.0.0",
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/editor"
+  },
+  "license": "Apache-2.0",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "npx webpack"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/preset-react": "^7.6.3",
-    "@types/react": "^16.9.55",
-    "@types/react-dom": "^16.9.9",
-    "@typescript-eslint/eslint-plugin": "^4.6.1",
-    "@typescript-eslint/parser": "^4.6.1",
-    "babel-loader": "^8.0.6",
-    "core-js": "^3.4.1",
-    "css-loader": "^4.3.0",
-    "file-loader": "^6.1.0",
-    "html-webpack-plugin": "^4.5.0",
-    "lint-staged": "^10.4.0",
-    "mini-svg-data-uri": "^1.2.3",
-    "node-sass": "^4.13.0",
-    "sass-loader": "^10.0.2",
-    "style-loader": "^1.0.0",
-    "ts-loader": "^8.0.9",
-    "typescript": "^4.0.5",
-    "url-loader": "^4.1.1",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
     "d3": "^6.2.0",
     "html-react-parser": "^0.14.0",
-    "react": "^16.11.0",
-    "react-app-polyfill": "^1.0.4",
-    "react-dom": "^16.11.0",
     "react-table": "^7.6.2"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
   }
 }

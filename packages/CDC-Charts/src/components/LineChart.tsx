@@ -1,4 +1,3 @@
-import 'react-app-polyfill/ie11';
 import React, { useCallback, useContext } from 'react';
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
