@@ -1,5 +1,6 @@
 {
     "title": "Average Temperature By City (Line Example)",
+    "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
