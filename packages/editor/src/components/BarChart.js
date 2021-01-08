@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-import 'react-app-polyfill/ie11';
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 
