@@ -51,7 +51,7 @@ These shared elements are stored in the root of this repository. This ensures th
 Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
 
 <details>
-  <summary>**Legal Notices**</summary>
+  <summary><strong>Legal Notices</strong></summary>
 
 #### License
 
