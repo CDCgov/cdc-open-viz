@@ -1,4 +1,3 @@
-import 'react-app-polyfill/ie11';
 import React, { useState, useContext } from 'react';
 import Context from '../context';
 import testImage from '../assets/test-image.png';

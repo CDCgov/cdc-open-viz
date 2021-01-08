@@ -1,4 +1,3 @@
-import 'react-app-polyfill/ie11';
 import React, { useState } from 'react';
 import Context from './context';
 import DataImport from './components/DataImport';

@@ -1,11 +1,3 @@
-// Polyfills
-import 'react-app-polyfill/ie11';
-import 'react-app-polyfill/stable';
-import 'mdn-polyfills/String.prototype.repeat';
-import 'mdn-polyfills/CustomEvent';
-import 'mdn-polyfills/Element.prototype.classList';
-import 'array-flat-polyfill';
-
 // External
 import React, { Component } from 'react';
 
@@ -25,6 +17,9 @@ import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './App.scss';
+
+// Open Viz
+import '@cdc/core';
 
 // Components
 import Sidebar from './components/Sidebar';
