@@ -33,3 +33,6 @@ coverage/
 
 # Ignore Built Files
 /packages/**/dist
+
+# Lerna
+lerna-debug.log

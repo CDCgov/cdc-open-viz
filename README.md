@@ -9,10 +9,34 @@ This project is still under heavy initial development with the roadmap extending
 ### [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/master/packages/CDC-Maps)
 
 React component for visualizing tabular data on a map of the United States or the world.
-
 ## Contributing
 
-To contribute to individual packages, navigate to the specific package and view contribution instructions there.
+These packages are managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [NPM]() for package management (as opposed to Yarn.) To work on any of them, you will have to setup the 
+
+### Setup
+
+1. Start by cloning this repo and running `npm install` at the root.
+2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
+ * Lerna should have been installed at the package level, but if it tells you command is not found try installing Lerna globally with `npm i -g lerna`.
+3. Run `lerna run --scope @cdc/package_name start`, replacing the package_name with the package's namespace (ex: `@cdc/map`).
+ * This tells Lerna to run the `start` script that is defined for that package and should open a window in your browser displaying the module.
+
+ ### Development Guidelines
+
+These are important concepts to understand while working on this codebase:
+
+* To keep each codebase focused only on its direct responsibilities, each package should assume it will be consumed as an package by another application from the NPM registry.
+  * This is a key concept of the target architecture. We have our own wrapper application that imports these packages for use on cdc.gov.
+  * This means we don't include polyfills at the package level, that should be handled by the application that imports these modules. We also don't have `react` or `react-dom` as direct dependencies in any package, since every project that would import these will have them. They are defined as `peerDependencies`.
+* Tooling/Configuration is shared as much as possible among packages.
+  * Things that are shared: Code Linting (ESLint), Build/Development process (Webpack), NPM scripts (Shell level scripts that run at key points.)
+  * This ensures that if something breaks in the build process, we only need to fix it once and it will apply for all packages. It also helps ensure that most packages perform the same way.
+  * Your package should not have it's own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. You should not have custom build scripts/processes specifically for your package unless it's been discussed.
+  * **Please do not break this paradigm.** It's very important to keeping this project maintainable long term.
+* Creating a new package
+  * When creating a new package, use lowercase and don't use any kind of prefix. The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
+  * Don't just create the folder inside `/packages/`, if you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
+  * Please respect the guidelines above and ask someone if you're unsure of something.
 
 ## Notices
 

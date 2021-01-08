@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import 'react-app-polyfill/ie11';
 import React, { useState, useContext, useEffect } from 'react';
 import { useTable } from 'react-table';
 import '../scss/_dataimport.scss';
