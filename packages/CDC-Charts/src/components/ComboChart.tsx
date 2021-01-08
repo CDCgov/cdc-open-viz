@@ -162,7 +162,6 @@ export default function ComboChart({numberFormatter}) {
         
         { config.visualizationType !== 'Bar' ? (
           <Group>
-            <MarkerCircle id="marker-circle" fill="#333" size={2} refX={2} />
             { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey) => (
               <Group
                 key={`series-${seriesKey}`}
@@ -176,9 +175,9 @@ export default function ComboChart({numberFormatter}) {
                     r={3}
                     cx={xScaleLine(getXAxisData(d))}
                     cy={yScale(getYAxisData(d, seriesKey))}
-                    strokeWidth="10px"
-                    stroke="transparent"
-                    fill="colorScale ? colorScale(seriesKey) : '#000'"
+                    strokeWidth="100px"
+                    fill={colorScale ? colorScale(seriesKey) : '#000'}
+                    style={{fill: colorScale ? colorScale(seriesKey) : '#000'}}
                     data-tip={`<div>
                       ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
                       ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
@@ -196,7 +195,6 @@ export default function ComboChart({numberFormatter}) {
                   strokeWidth={2}
                   strokeOpacity={1}
                   shapeRendering="geometricPrecision"
-                  markerMid="url(#marker-circle)"
                 />
               </Group>
             ))

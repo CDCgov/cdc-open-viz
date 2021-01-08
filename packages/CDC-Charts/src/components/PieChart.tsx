@@ -16,12 +16,11 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart({numberFormatter}) {
-  const { data, config, dimensions } = useContext<any>(Context);
+  const { data, config, dimensions, colorScale } = useContext<any>(Context);
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
     getKey: (d: PieArcDatum<Datum>) => string;
-    getColor: (d: PieArcDatum<Datum>) => string;
     delay?: number;
   };
   
@@ -29,7 +28,6 @@ export default function PieChart({numberFormatter}) {
     arcs,
     path,
     getKey,
-    getColor,
   }: AnimatedPieProps<Datum>) {
     const transitions = useTransition<PieArcDatum<Datum>, PieStyles>(
       arcs,
@@ -56,7 +54,7 @@ export default function PieChart({numberFormatter}) {
           }) => {
             const [centroidX, centroidY] = path.centroid(arc);
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
-  
+
             return (
               <g key={key}>
                 <animated.path
@@ -66,7 +64,7 @@ export default function PieChart({numberFormatter}) {
                     startAngle,
                     endAngle,
                   }))}
-                  fill={getColor(arc)}
+                  fill={colorScale((arc.data as any).name)}
                   data-tip={`<div>
                     ${config.xAxis.label}: ${(arc.data as any).name} <br/>
                     ${config.yAxis.label}: ${numberFormatter(arc.data[config.yAxis.dataKey])}
@@ -98,11 +96,6 @@ export default function PieChart({numberFormatter}) {
 
   const svgRef = useRef<HTMLDivElement>();
 
-  const getColor = scaleOrdinal({
-    domain: data.map(d => d[config.xAxis.dataKey]),
-    range: ['rgba(93,30,91,1)', 'rgba(93,30,91,0.8)', 'rgba(93,30,91,0.6)', 'rgba(93,30,91,0.4)'],
-  });
-
   const [width, height] = dimensions;
   const margin = config.padding;
 
@@ -127,7 +120,6 @@ export default function PieChart({numberFormatter}) {
               <AnimatedPie<any>
                 {...pie}
                 getKey={d => d.data[config.xAxis.dataKey]}
-                getColor={d => getColor(d.data[config.yAxis.dataKey])}
               />
             )}
           </Pie>

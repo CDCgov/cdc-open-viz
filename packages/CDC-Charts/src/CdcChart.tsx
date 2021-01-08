@@ -61,14 +61,33 @@ export default function CdcChart({ configUrl }) {
     loadConfig();
   }, []);
 
+  // Generates color palette to pass to child chart component
   useEffect(() => {
-    const newColorScale = () => scaleOrdinal({
-      domain: config.seriesKeys,
-      range: ['#222299', '#229922', '#992229'],
-    });
-  
-    setColorScale(newColorScale);
-  }, [config])
+    if(config.xAxis) {
+      const colorPalettes = {
+        'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
+        'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
+        'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
+        'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
+      };
+
+      let palette = colorPalettes[config.palette] || colorPalettes['qualitative-bold'];
+      let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
+
+      while(numberOfKeys > palette.length) {
+        palette = palette.concat(palette);
+      }
+
+      palette = palette.slice(0, numberOfKeys);
+      
+      const newColorScale = () => scaleOrdinal({
+        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : config.seriesKeys,
+        range: palette,
+      });
+
+      setColorScale(newColorScale);
+    }
+  }, [config, data])
 
   const highlight = (label) => {
     const newSeriesHighlight = [];
