@@ -2,13 +2,14 @@
 
 React component for visualizing tabular data on a map of the United States or the world. Includes support for filtering, toggling, numeric and categorical mapping as well as many other configuration options like color schemes.
 
-## Installation
-`npm install @cdc/map`
-**Demos**
+**Examples**
 * [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
 * [World Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-world-data-map.html)
 * [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
 * [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
+
+## Installation
+`npm install @cdc/map`
 
 ## Usage
 
