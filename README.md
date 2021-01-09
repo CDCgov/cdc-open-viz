@@ -8,7 +8,7 @@ This project is still under heavy initial development with the roadmap extending
 | --- | ----------- |
 | [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | React component for visualizing tabular data on a map of the United States or the world. |
 
-### Setup
+## Setup
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [npm](https://www.npmjs.com/) for package management (as opposed to Yarn.) To work on individual packages, you must setup the entire monorepo.
 
@@ -16,39 +16,37 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 2. Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
 3. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
 4. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
- * This tells Lerna to run the `start` script that is defined for that package and should open a window in your browser displaying the module.
 
-### Development Guidelines - Please Read!
+## Development Guidelines
 
-These are important things to know before you begin working on this project. Reviewing will help you contribute effectively and keep this project in good shape.
+**Please read!** These are important to know before you begin working on this project.
 
-#### Each package is designed to be imported as a module by another project.
+### — Each package is designed to be imported as a module by another project.
   * This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
-  * This means we don't include polyfills, since we can't know what the "parent" project's browser support requirements are. The parent project is responsible for adding appropriate polyfills.
-  * We also don't include things `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
-  * We do not include any CDC specific logos or functionality (ex. metrics calls) in these packages, that should go in our wrapper codebase.
-  * We implement this internally at CDC. We have a wrapper codebase that imports these packages and the bundle generated from that wrapper is what is actually served on pages. Inside that wrapper is a custom function that connects to metrics, contains the CDC logo, etc...
+  * The package structure means we don't include polyfills, since we can't know what the "parent" project's browser support requirements are. The parent project is responsible for adding appropriate polyfills.
+  * We also don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
+  * We avoid adding any CDC specific functionality (ex. metrics calls) or logos in these packages, that should go in our wrapper codebase.
 
-#### Tooling/Configuration is shared as much as possible among packages.
+This pattern of packages being imported by another project is implemented internally at CDC. We have a wrapper codebase that imports these packages. The bundle generated from that wrapper is then served on pages.
+
+### — Tooling/Configuration is shared as much as possible among packages.
 These shared elements are stored in the root of this repository. This ensures that if something breaks in our tooling, we only need to fix it in one spot. It also helps ensure consistency across packages. **Please do not break this guideline.** It is critical to allowing a small team to maintain this project effectively.
 
   * Code Linting configuration (ESLint/Lint Staged)
+  * Build process (Webpack)
+  * devDependencies
+    * Individual packages should not have their own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
 
-  * Build/Development process (Webpack)
-  * `devDependencies`
-    * Your package should not have its own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
-    * You should not have custom build scripts/processes specifically for your package unless it's been discussed.
-
-
-#### Creating a new package
-  * When creating a new package, use lowercase and don't use any kind of prefix. The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
-  * Don't just create the folder inside `/packages/`, if you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
-  * Respect the guidelines above and ask someone if you're unsure of something.
-  * New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
-
-#### Each package maintains its own version number
+### — Each package has its own version number.
 
 Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
+
+### — Tips for creating a new package.
+  * When creating a new package, use lowercase for the folder name and don't use any kind of prefix.
+  * The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
+  * Lerna has specific commands to add packages - you can't just create the folder inside `/packages/`. If you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
+  * New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
+  * Respect the guidelines above and ask someone if you're unsure of something.
 
 <details>
   <summary><strong>Legal Notices</strong></summary>
