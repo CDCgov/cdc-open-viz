@@ -13,7 +13,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "npx webpack --mode production --no-install --env.packageName=CdcEditor --env.folderName=editor"
+    "build": "npx webpack --mode production --no-install --env.packageName=CdcEditor --env.folderName=editor",
+    "prepublishOnly": "npx webpack --mode production"
   },
   "dependencies": {
     "@cdc/core": "^1.0.0",
