@@ -1,4 +1,3 @@
-import 'react-app-polyfill/ie11';
 import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 import * as allCurves from '@visx/curve';

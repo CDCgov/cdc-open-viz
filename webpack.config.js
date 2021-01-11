@@ -12,7 +12,7 @@ module.exports = (env = {}, { mode }) => {
   const folderName = env.folderName || '';
 
   const entry = {
-    index: mode === 'development' ? './src/index' : `./src/${packageName}.js`,
+    index: mode === 'development' ? './src/index' : `./src/${packageName}`,
   }
 
   const configObj = {
@@ -37,6 +37,9 @@ module.exports = (env = {}, { mode }) => {
           warnings: false,
           errors: true
         }
+    },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
     },
     module: {
       rules: [
@@ -92,6 +95,11 @@ module.exports = (env = {}, { mode }) => {
               },
             },
           ],
+        },
+        {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
         }
       ]
     }
