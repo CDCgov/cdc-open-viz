@@ -4,7 +4,7 @@ import DataImport from './components/DataImport';
 
 import './styles.scss';
 
-export default function App() {
+export default function CdcEditor() {
   const [pageTitle, setPageTitle] = useState('Data Import');
 
   return (

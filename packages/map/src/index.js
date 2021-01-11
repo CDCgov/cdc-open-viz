@@ -10,5 +10,5 @@ ReactDOM.render(
   <React.StrictMode>
     <CdcMap isEditor={isEditor} />
   </React.StrictMode>,
-  document.querySelector('#root')
+  document.querySelector('#react-container')
 );

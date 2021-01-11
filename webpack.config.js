@@ -27,7 +27,7 @@ module.exports = (env = {}, { mode }) => {
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
         path: path.resolve(__dirname, `packages/${folderName}/dist`),
-        filename: () => `${packageName}.js`,
+        filename: () => `${packageName.toLowerCase()}.js`,
         libraryTarget: 'umd',
     },
     devServer: {
