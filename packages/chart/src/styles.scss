@@ -1,4 +1,5 @@
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
+@import '@cdc/core/styles/base';
 @import 'scss/reset';
 @import 'scss/variables';
 @import 'scss/mixins';
@@ -44,9 +45,17 @@ body {
     margin-bottom: 40px;
 }
 
+.chart-description {
+  margin-bottom: 20px;
+}
+
 .chart-container {
   display: inline-block;
   width: 75%;
+
+  &.legend-hidden {
+    width: 100%;
+  }
 }
 
 .legend-container {
