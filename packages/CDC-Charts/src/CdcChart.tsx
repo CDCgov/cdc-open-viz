@@ -25,19 +25,19 @@ export default function CdcChart({ configUrl }) {
   const [config, setConfig] = useState<keyable>({
     seriesKeys: [],
     legend: [],
-    title: null
+    title: null,
+    description: null
   });
 
   const [data, setData] = useState<Array<Object>>([]);
 
   // TODO: Discuss as a group. We should use aspect ratios instead of trying to manually determine this.
-  const [dimensions, setDimensions] = useState<Array<number>>([960,540]);
+  const [dimensions] = useState<Array<number>>([960,540]);
 
   const [loading, setLoading] = useState<Boolean>(true);
 
   const [seriesHighlight, setSeriesHighlight] = useState<Array<Number>>([]);
 
-  const legendPercent = 0.2;
   const legendGlyphSize = 15;
 
   const loadConfig = async () => {
@@ -113,7 +113,7 @@ export default function CdcChart({ configUrl }) {
   };
 
   // Destructure items from config for more readable JSX
-  const { legend, title, visualizationType } = config;
+  const { legend, title, description, visualizationType } = config;
 
   // Select appropriate chart type
   const chartComponents = {
@@ -132,7 +132,7 @@ export default function CdcChart({ configUrl }) {
       <div className="cdc-visualization-container mt-4">
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
-          {title && <h1 className="chart-title">{title}</h1>}
+          {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize || 28}}>{title.text}</h1>}
           {chartComponents[visualizationType]}
         </div>
         {/* Legend */}
@@ -174,7 +174,7 @@ export default function CdcChart({ configUrl }) {
         </div>
       </div>
       {/* Description */}
-      <div className="chart-description" dangerouslySetInnerHTML={{__html: config.description}}></div>              
+      <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}} dangerouslySetInnerHTML={{__html: description && description.html}}></div>              
       {/* Data Table */}
       <DataTable numberFormatter={formatNumber} />
     </Context.Provider>

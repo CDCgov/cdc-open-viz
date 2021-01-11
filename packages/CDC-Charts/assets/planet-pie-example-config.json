@@ -1,5 +1,7 @@
 {
-    "title": "Planet Radius (Pie Example)",
+    "title": {
+        "text": "Planet Radius (Pie Example)"
+    },
     "dataUrl":  "/assets/planet-example-data.json",
     "visualizationType": "Pie",
     "palette": "qualitative-soft",
