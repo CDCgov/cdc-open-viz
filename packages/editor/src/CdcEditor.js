@@ -1,0 +1,15 @@
+import React, { useState } from 'react';
+import Context from './context';
+import DataImport from './components/DataImport';
+
+import './styles.scss';
+
+export default function CdcEditor() {
+  const [pageTitle, setPageTitle] = useState('Data Import');
+
+  return (
+    <Context.Provider value={{ pageTitle, setPageTitle }}>
+      <DataImport backgroundColor="#F5F5F5" />
+    </Context.Provider>
+  );
+}

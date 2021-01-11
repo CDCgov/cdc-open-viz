@@ -1,0 +1,33 @@
+{
+  "name": "@cdc/editor",
+  "version": "1.0.0",
+  "main": "dist/CdcEditor",
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/editor"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "webpack-dev-server --mode development",
+    "build": "npx webpack --mode production --no-install --env.packageName=CdcEditor --env.folderName=editor"
+  },
+  "dependencies": {
+    "@cdc/core": "^1.0.0",
+    "bootstrap": "^4.3.1",
+    "d3": "^6.2.0",
+    "html-react-parser": "^0.14.0",
+    "react-table": "^7.6.2",
+    "mini-svg-data-uri": "^1.2.3"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ]
+}

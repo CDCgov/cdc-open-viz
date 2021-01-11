@@ -1,0 +1,27 @@
+{
+  "name": "@cdc/core",
+  "version": "1.0.0",
+  "description": "Core elements of the CDC Open Visualization project",
+  "author": "Daniel Immke <npm@daniel.do>",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
+  "license": "ISC",
+  "main": "lib/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "devDependencies": {}
+}

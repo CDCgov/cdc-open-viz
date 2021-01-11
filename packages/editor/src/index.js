@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import CdcMap from './App';
+import CdcEditor from './CdcEditor';
 
 ReactDOM.render(
   <React.StrictMode>
-    <CdcMap />
+    <CdcEditor />
   </React.StrictMode>,
-  document.querySelector('#root')
+  document.querySelector('#react-container')
 );
