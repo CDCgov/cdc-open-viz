@@ -1,5 +1,7 @@
 {
-    "title": "Planet Radius (Bar Example)",
+    "title": {
+        "text": "Planet Radius (Bar Example)"
+    },
     "dataUrl":  "/assets/planet-example-data.json",
     "visualizationType": "Bar",
     "seriesKeys": ["Radius", "Diameter"],
