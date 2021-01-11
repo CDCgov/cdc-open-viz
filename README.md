@@ -21,7 +21,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 **Please read!** These are important to know before you begin working on this project.
 
-### - Each package is designed to be imported as a module by another project.
+### Each package is designed to be imported as a module by another project.
   * This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
   * The package structure means we don't include polyfills, since we can't know what the "parent" project's browser support requirements are. The parent project is responsible for adding appropriate polyfills.
   * We also don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
@@ -29,7 +29,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 This pattern of packages being imported by another project is implemented internally at CDC. We have a wrapper codebase that imports these packages. The bundle generated from that wrapper is then served on pages.
 
-### - Tooling/Configuration is shared as much as possible among packages.
+### Tooling/Configuration is shared as much as possible among packages.
 These shared elements are stored in the root of this repository. This ensures that if something breaks in our tooling, we only need to fix it in one spot. It also helps ensure consistency across packages. **Please do not break this guideline.** It is critical to allowing a small team to maintain this project effectively.
 
   * Code Linting configuration (ESLint/Lint Staged)
@@ -37,11 +37,11 @@ These shared elements are stored in the root of this repository. This ensures th
   * devDependencies
     * Individual packages should not have their own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
 
-### - Each package has its own version number.
+### Each package has its own version number.
 
 Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
 
-### - Tips for creating a new package.
+### Tips for creating a new package.
   * When creating a new package, use lowercase for the folder name and don't use any kind of prefix.
   * The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
   * Lerna has specific commands to add packages - you can't just create the folder inside `/packages/`. If you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
