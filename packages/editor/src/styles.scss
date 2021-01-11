@@ -1,0 +1,58 @@
+@import "~bootstrap/scss/bootstrap";
+@import 'scss/reset';
+@import 'scss/variables';
+@import 'scss/mixins';
+
+// Your custom SASS here
+.container,
+.row,
+.col {
+    p { padding-bottom: $gbl-padding; }
+    
+    ul { 
+        list-style: disc;
+        
+        li {
+            margin-left: $gbl-padding;
+            padding-bottom: $gbl-padding/2;
+        }
+    }
+}
+
+.btn {
+    position: relative;
+    border: 3px solid;
+    overflow: hidden;
+    transition: background-color( .2s easeinout );
+}
+
+.btn-primary {
+    background-color: $primary !important;
+    border-color: $primary;
+    color: $white;
+    
+    &:after {
+        position: absolute;
+        transition: .3s;
+        content: '';
+        display: block;
+        height: 100%;
+        width: 100%;
+        left: -100%;
+        bottom: 0;
+        background-color: $white;
+        mix-blend-mode: exclusion;
+      }
+  
+      &:hover,
+      &:focus {
+        &:after{
+          left: 0;
+          z-index: 10;
+        }
+      }
+
+    &:hover {
+        border-color: $primary;
+    }
+}

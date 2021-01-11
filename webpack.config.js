@@ -2,15 +2,17 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 
-module.exports = (env, { mode }) => {
-
+module.exports = (env = {}, { mode }) => {
   const prodExternals = {
     'react': true,
     'react-dom': true
   };
 
+  const packageName = env.packageName || '';
+  const folderName = env.folderName || '';
+
   const entry = {
-    index: mode === 'development' ? './src/index.js' : './src/App.js',
+    index: mode === 'development' ? './src/index' : `./src/${packageName}.js`,
   }
 
   const configObj = {
@@ -24,8 +26,8 @@ module.exports = (env, { mode }) => {
     },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: (pathData) => pathData.chunk.name === 'index' ? `cdcmap.js` : '[name].js',
+        path: path.resolve(__dirname, `packages/${folderName}/dist`),
+        filename: () => `${packageName.toLowerCase()}.js`,
         libraryTarget: 'umd',
     },
     devServer: {
@@ -101,7 +103,7 @@ module.exports = (env, { mode }) => {
     configObj.output = {
       ...configObj.output,
       libraryTarget: 'umd',
-      library: 'CdcMap',
+      library: packageName,
     }
   }
 
