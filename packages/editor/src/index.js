@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './App';
+import CdcEditor from './CdcEditor';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <CdcEditor />
   </React.StrictMode>,
   document.querySelector('#react-container')
 );
