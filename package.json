@@ -46,7 +46,7 @@
   },
   "lint-staged": {
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --config .eslintrc.js --ext .js --ext .ts --ext .jsx --ext .tsx ./packages/*/src"
+      "eslint --config .eslintrc.js"
     ]
   }
 }
