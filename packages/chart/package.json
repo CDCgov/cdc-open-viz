@@ -5,12 +5,12 @@
   "main": "dist/cdcchart",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "npx webpack"
+    "build": "npx webpack --mode production --no-install --env.packageName=CdcChart --env.folderName=chart"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/charts"
+    "directory": "packages/chart"
   },
   "author": "Matthew Pallansch <mpallansch@adittech.com>",
   "bugs": {
@@ -33,7 +33,8 @@
     "d3-array": "^2.8.0",
     "d3-time-format": "^3.0.0",
     "html-react-parser": "^0.14.0",
-    "react-spring": "^8.0.27"
+    "react-spring": "^8.0.27",
+    "react-tooltip": "^4.2.11"
   },
   "peerDependencies": {
     "react": ">=16",
