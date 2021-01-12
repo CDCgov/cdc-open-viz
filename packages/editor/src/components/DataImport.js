@@ -1,24 +1,27 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
-import '../scss/_dataimport.scss';
+import '../scss/data-import.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
-import Tabs from './Tab';
-import FileUploader from './FileUploader';
+import Tabs from './Tabs';
 import Context from '../context';
 
-// import BarChart from './BarChart';
-// import csv from '../assets/data.csv';
+import UploadIcon from '../assets/icons/upload-solid.svg';
+import LinkIcon from '../assets/icons/link.svg';
 
 export default function DataImport() {
-  const { pageTitle } = useContext(Context);
   const [data, setData] = useState(null);
+
   const [columns, setColumns] = useState(null);
+
   const [uploadFile, setUploadFile] = useState(false);
+
   const [error, setError] = useState();
+
   let fileInput = useRef(null);
+
   let urlInput = useRef(null);
+
   let dataUploadLabel = useRef(null);
 
   let errorPresent = false;
@@ -30,6 +33,7 @@ export default function DataImport() {
   const toggleUpload = (currState) => {
     setUploadFile(!currState);
     setError(false); // reset errors
+
     dataUploadLabel.current.innerHTML = 'Choose File';
 
     if (!currState) {
@@ -45,7 +49,7 @@ export default function DataImport() {
    */
   function validateData(userData, dataType) {
     setError(null);
-    // debugger;
+
     if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
       // is the json a bunch of arrays instead of objects?
       errorPresent = true;
@@ -88,7 +92,7 @@ export default function DataImport() {
           ? ''
           : cellVal);
       th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
-      // debugger;
+
       newHeaders.push(th);
     });
     setColumns(newHeaders);
@@ -128,8 +132,9 @@ export default function DataImport() {
    */
   function parseCsvFile() {
     const fileData = d3.csvParse(reader.result, (d) => d);
-    // debugger;
+
     validateData(fileData, 'csv');
+
     if (!errorPresent) {
       populateColumns(fileData);
       populateRows(fileData);
@@ -217,9 +222,11 @@ debugger;
   useEffect(() => {
     let { current } = urlInput;
   });
+
   useEffect(() => {
     let { current } = dataUploadLabel;
   });
+  
   useEffect(() => {
     let { current } = fileInput;
   });
@@ -286,13 +293,12 @@ debugger;
   );
 
   return (
-    <section className="container-fluid mt-5">
-      <h2 className="mb-3">{ pageTitle }</h2>
+    <section className="container-fluid">
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
           <div className="col data-loader">
-            <Tabs className="tab-content mb-2" key="upload-tabs">
-            <TabPane id="urlUpload" className="tab-pane fade" name="Link from URL" key="1" dataicon="icon-url">
+            <Tabs>
+              <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
                 <div className="input-group mb-3">
                   <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
                   <div className="input-group-append">
@@ -300,7 +306,7 @@ debugger;
                   </div>
                 </div>
               </TabPane>
-              <TabPane id="fileUpload" className="tab-pane fade" name="Upload File" key="2" dataicon="icon-upload">
+              <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
                 <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
                 <form className="input-group loader-ui">
                   <div className="custom-file">
@@ -312,7 +318,6 @@ debugger;
                   </div>
                 </form>
               </TabPane>
-              
             </Tabs>
 
             { error

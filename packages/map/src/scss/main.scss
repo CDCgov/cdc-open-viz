@@ -1,3 +1,29 @@
+@import "~@cdc/core/styles/base";
+@import "loading";
+@import "variables";
+@import "heading_colors";
+@import "editor";
+
+@mixin legendDot() {
+  margin-right: 5px;
+  border-radius: 300px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: rgba(0,0,0,.3) 1px solid;
+}
+
+.cdc-map-outer-container {
+  position: relative;
+  font-family: $fontStack;
+  display: flex; // Needed for the main content
+  font-size: 14px;
+  @include breakpoint(lg) {
+    font-size: 16px;
+  }
+}
+
 .sr-only,
 .sr-only-focusable:not(:focus) {
   position: absolute !important;
