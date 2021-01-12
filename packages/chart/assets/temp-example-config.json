@@ -1,8 +1,14 @@
 {
-    "title": "Average Temperature By City",
+    "title": {
+        "text": "Average Temperature By City (Line Example)",
+        "fontSize": 28
+    },
+    "description": {
+        "html": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
+        "fontSize": 26
+    },
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Line",
-    "visualizationSubType": "stacked",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
     "seriesLabel": "City",
     "dataFormat": {
