@@ -8,7 +8,7 @@ const domContainers = document.querySelectorAll('.react-container');
 domContainers.forEach((domContainer) => {	
   ReactDOM.render(	
     <React.StrictMode>	
-      <CdcChart configUrl={domContainer.attributes['data-config'].value} />	
+      <CdcChart configUrl={domContainer.attributes['data-config'].value} element={domContainer}/>	
     </React.StrictMode>,	
     domContainer,	
   );	
