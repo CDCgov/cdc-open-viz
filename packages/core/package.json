@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
-  "devDependencies": {}
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
+  }
 }

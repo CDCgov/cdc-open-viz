@@ -1,15 +1,16 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const svgToMiniDataURI = require('mini-svg-data-uri');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const svgToMiniDataURI = require('mini-svg-data-uri')
 
 module.exports = (env = {}, { mode }) => {
   const prodExternals = {
     'react': true,
     'react-dom': true
-  };
+  }
 
-  const packageName = env.packageName || '';
-  const folderName = env.folderName || '';
+  const packageName = env.packageName || ''
+  const folderName = env.folderName || ''
+  const packagePath = path.resolve(__dirname, `packages/${folderName}/`)
 
   const entry = {
     index: mode === 'development' ? './src/index' : `./src/${packageName}`,
@@ -26,7 +27,7 @@ module.exports = (env = {}, { mode }) => {
     },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
-        path: path.resolve(__dirname, `packages/${folderName}/dist`),
+        path: packagePath + `dist`,
         filename: () => `${packageName.toLowerCase()}.js`,
         libraryTarget: 'umd',
     },
@@ -44,7 +45,8 @@ module.exports = (env = {}, { mode }) => {
     module: {
       rules: [
         {
-          test: /\.m?js$/,
+          // JS, JSX - Transpiles JSX
+          test: /\.jsx?$/,
           exclude: /node_modules\/(?!array-move\/).*/,
           use: {
             loader: 'babel-loader',
@@ -60,6 +62,13 @@ module.exports = (env = {}, { mode }) => {
           }
         },
         {
+          // TS, TSX - Transpiles TypeScript and JSX. The ts-loader package handles both and specific configuration is set in tsconfig.json at root.
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+        {
+          // SASS
           test: /\.s[ac]ss$/i,
           use: [
             // Creates `style` nodes from JS strings
@@ -67,14 +76,13 @@ module.exports = (env = {}, { mode }) => {
             // Translates CSS into CommonJS
             'css-loader',
             // Compiles Sass to CSS
-            'sass-loader',
-          ],
+            'sass-loader'
+          ]
         },
-        // Inline and Base64 small jpg, png and gifs but larger ones will be generated as regular images.
-        // For output that gets imported as a library, there's currently no good solution for larger images that don't involve the user of the library manually importing them.
-        // We shouldn't be using anything aside from PNGs anyways, but just putting this here for posterity.
-        // https://github.com/webpack/webpack/issues/7353
         {
+          // JPG, PNG, GIF - Small images will be inlined and encoded but larger ones will be imported normally.
+          // For output that gets imported as a library, there's currently no good solution for larger images that don't involve the user of the library manually importing them.
+          // https://github.com/webpack/webpack/issues/7353
           test: /\.(jpe?g|png|gif)$/i,
           use: [
             {
@@ -86,28 +94,33 @@ module.exports = (env = {}, { mode }) => {
           ],
         },
         {
+          // SVG
           test: /\.svg$/i,
-          use: [
+          oneOf: [
+            // When referenced in CSS, they are inlined and encoded with the url-loader package.
             {
-              loader: 'url-loader',
-              options: {
-                generator: (content) => svgToMiniDataURI(content.toString()),
-              },
+              use: 'url-loader',
+              issuer: {
+                include: /\.s[ac]ss$/
+              }
             },
-          ],
+            {
+              resourceQuery: /inline/,
+              use: 'url-loader'
+            },
+            // When imported into a JS/TS file, they are imported as React Components exposing the full markup of the SVG.
+            {
+              use: 'react-svg-loader'
+            }
+          ]
         },
-        {
-          test: /\.tsx?$/,
-          use: 'ts-loader',
-          exclude: /node_modules/,
-        }
       ]
     }
   }
 
   // Only export as a library when building for production.
   if(mode !== 'development') {
-    configObj.externals = prodExternals;
+    configObj.externals = prodExternals
     configObj.output = {
       ...configObj.output,
       libraryTarget: 'umd',
@@ -121,7 +134,7 @@ module.exports = (env = {}, { mode }) => {
       new HtmlWebpackPlugin({
         template: './src/index.html'
       })
-    ];
+    ]
   }
 
   return configObj

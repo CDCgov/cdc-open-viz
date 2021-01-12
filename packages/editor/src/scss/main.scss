@@ -1,24 +1,6 @@
 @import "~bootstrap/scss/bootstrap";
 @import "@cdc/core/styles/base";
-@import 'scss/reset';
-@import 'scss/variables';
-@import 'scss/mixins';
-
-// Your custom SASS here
-.container,
-.row,
-.col {
-    p { padding-bottom: $gbl-padding; }
-    
-    ul { 
-        list-style: disc;
-        
-        li {
-            margin-left: $gbl-padding;
-            padding-bottom: $gbl-padding/2;
-        }
-    }
-}
+@import 'variables';
 
 .btn {
     position: relative;
@@ -57,3 +39,4 @@
         border-color: $primary;
     }
 }
+
