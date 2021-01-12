@@ -44,12 +44,15 @@
 .geo-buttons {
   list-style: none;
   display: flex;
-  img {
+  svg {
     display: block;
     max-width: 80px;
     max-height: 40px;
     margin: .5em auto;
     box-sizing: border-box;
+    path {
+      fill: currentColor
+    }
   }
   li {
     border-radius: .4em;
@@ -164,6 +167,14 @@
     position: relative;
     overflow: hidden;
     transition: .2s all;
+    svg {
+      width: 70px;
+      color: $blue;
+      margin-right: 1rem;
+      path {
+        fill: currentColor;
+      }
+    }
     &:hover {
       background: $lightGray;
       transition: .2s all;
@@ -171,7 +182,7 @@
     &:before {
       content: " ";
       width: 5px;
-      background: #005eaa;
+      background: $blue;
       left: 0;
       top: 0;
       bottom: 0;
@@ -468,7 +479,7 @@
       }
       &:after {
         content: " ";
-        background: url(./images/inactive-checkmark.svg) no-repeat;
+        background: url('../images/inactive-checkmark.svg') no-repeat;
         width: 14px;
         height: 14px;
         background-size: 14px;
@@ -513,7 +524,7 @@
         }
         &:after {
           content: " ";
-          background-image: url(./images/active-checkmark.svg);
+          background-image: url(../images/active-checkmark.svg);
           opacity: 1;
           transition: .2s opacity;
         }
