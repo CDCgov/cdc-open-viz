@@ -13,9 +13,9 @@ import arrayMove from 'array-move'
 import Papa from 'papaparse';
 
 import Waiting from './Waiting';
-import mapIcon from '../images/map-folded.svg';
-import UsaGraphic from '../images/united-states-editor.svg';
-import WorldGraphic from '../images/globe-editor.svg';
+import MapIcon from '../images/map-folded.svg';
+import UsaGraphic from '../images/usa-graphic.svg';
+import WorldGraphic from '../images/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
@@ -1037,11 +1037,11 @@ const Editor = (props) => {
                     <span className="edit-label column-heading">Geography</span>
                     <ul className="geo-buttons">
                       <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
-                        <img src={UsaGraphic} alt="Continental United States" />
+                        <UsaGraphic />
                         <span>United States</span>
                       </li>
                       <li className={state.general.geoType === 'world' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "world")}>
-                        <img src={WorldGraphic} alt="Globe" />
+                        <WorldGraphic />
                         <span>World</span>
                       </li>
                     </ul>
@@ -1482,7 +1482,7 @@ const Editor = (props) => {
             </Accordion>
           </form>
           <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
-            <img src={mapIcon} alt="Map Icon" />
+            <MapIcon />
             <div>
               <h3>Get Maps Help</h3>
               <p>Examples and documentation</p>

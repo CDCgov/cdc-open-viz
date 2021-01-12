@@ -22,3 +22,18 @@
 
 // Imports
 @import "reset";
+@import "variables";
+
+.cdc-open-viz-module {
+  color: $baseColor;
+}
+
+.inline-icon {
+  width: 1em;
+  height: auto;
+  font-size: 1rem;
+  color: inherit;
+  path {
+    fill: currentColor;
+  }
+}

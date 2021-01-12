@@ -1,21 +1,29 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
-import '../scss/_dataimport.scss';
+import '../scss/data-import.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
-import Tabs from './Tab';
+import Tabs from './Tabs';
 import Context from '../context';
 
-// import BarChart from './BarChart';
-// import csv from '../assets/data.csv';
+import UploadIcon from '../assets/icons/upload-solid.svg';
+import LinkIcon from '../assets/icons/link.svg';
 
 export default function DataImport() {
-  const { pageTitle } = useContext(Context);
   const [data, setData] = useState(null);
+
   const [columns, setColumns] = useState(null);
+
   const [uploadFile, setUploadFile] = useState(false);
+
   const [error, setError] = useState();
+
+  let fileInput = useRef(null);
+
+  let urlInput = useRef(null);
+
+  let dataUploadLabel = useRef(null);
+
   let errorPresent = false;
 
   const dataTypes = ['.csv', '.json'];
@@ -25,6 +33,8 @@ export default function DataImport() {
   const toggleUpload = (currState) => {
     setUploadFile(!currState);
     setError(false); // reset errors
+
+    dataUploadLabel.current.innerHTML = 'Choose File';
 
     if (!currState) {
       document.getElementById('file-uploader').click();
@@ -39,7 +49,7 @@ export default function DataImport() {
    */
   function validateData(userData, dataType) {
     setError(null);
-    // debugger;
+
     if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
       // is the json a bunch of arrays instead of objects?
       errorPresent = true;
@@ -82,7 +92,7 @@ export default function DataImport() {
           ? ''
           : cellVal);
       th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
-      // debugger;
+
       newHeaders.push(th);
     });
     setColumns(newHeaders);
@@ -122,8 +132,9 @@ export default function DataImport() {
    */
   function parseCsvFile() {
     const fileData = d3.csvParse(reader.result, (d) => d);
-    // debugger;
+
     validateData(fileData, 'csv');
+
     if (!errorPresent) {
       populateColumns(fileData);
       populateRows(fileData);
@@ -152,16 +163,16 @@ export default function DataImport() {
 
   function loadData(dataType) {
     // let renderData;
-
     errorPresent = null;
-
+debugger;
     switch (dataType) {
       case 'file': {
-        const userData = document.querySelector('input[type=file]').files[0];
+        const userData = fileInput.current.files[0];
         // update the label with the document name
-        // todo make the document call a refs - https://reactjs.org/docs/refs-and-the-dom.html
-        const fileUpload = document.getElementById('file-uploader').value.replace(/^.*[\\/]/, '');
-        document.getElementById('data-upload-label').innerHTML = fileUpload;
+        const fileUpload = fileInput.current.value.replace(/^.*[\\/]/, '');
+        // document.getElementById('data-upload-label').innerHTML = fileUpload;
+
+        dataUploadLabel.current.innerHTML = fileUpload;
 
         if (userData) {
           const fileType = userData.type;
@@ -181,23 +192,26 @@ export default function DataImport() {
         break;
       }
       case 'external': {
-        // const externalInput = document.getElementById('external-data').value;
-        // // todo check above to be a valid URL
-        // // create a URL to make error checking easier
-        // const dataUrl = new URL(externalInput);
-        // // debugger;
-        // if (dataUrl && dataUrl.hostname) {
-        //   // debugger;
-        //   console.log(dataUrl);
-        // } else {
-        //   setError('Please make sure to use a valid URL.');
-        // }
-        // break;
+        const externalInput = urlInput.current.value;
+        const urlRegEx =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+
+        // create a URL to make error checking easier
+        if ( urlRegEx.test(externalInput) ) {
+          const dataUrl = new URL(externalInput);
+          // debugger;
+          if (dataUrl && dataUrl.hostname) {
+            // debugger;
+            console.log(dataUrl);
+          }
+        } else {
+          setError('Please make sure to use a valid URL.');
+        }
+        break;
       }
-      // case 'freeform': {
+      case 'freeform': {
       // todo build textbox to build these
-      // }
-      // break;
+      }
+      break;
 
       default: {
         setError('Your datatype is not supported.');
@@ -206,22 +220,15 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    // console.log('data: ', columns);
-    console.log('data: ', data);
-    console.log('uploadFile: ', uploadFile);
-    // debugger;
-    // document.title = `You clicked ${count} times`;
-    // console.log(csv);
-    // let dataTable = '';
-    // d3.csv(csv).then(data => {
-    //   data.forEach(item => {
-    //     console.log(item);
-    //   });
-    // });
-    // let test = d3.csv(csv);
-    // console.log(loadData());
-    // dataTable += '<table><tr><th>Hello</th><th>World</th></tr></table>';
-    // document.getElementById('dataTable').insertAdjacentHTML('beforeend', dataTable);
+    let { current } = urlInput;
+  });
+
+  useEffect(() => {
+    let { current } = dataUploadLabel;
+  });
+  
+  useEffect(() => {
+    let { current } = fileInput;
   });
 
   const DataTable = () => {
@@ -286,26 +293,25 @@ export default function DataImport() {
   );
 
   return (
-    <section className="container-fluid mt-5">
-      <h2 className="mb-3">{ pageTitle }</h2>
+    <section className="container-fluid">
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
           <div className="col data-loader">
-            <Tabs className="tab-content mb-2" key="upload-tabs">
-              <TabPane id="urlUpload" className="tab-pane fade" name="Link from URL" key="1" dataicon="icon-url">
+            <Tabs>
+              <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
                 <div className="input-group mb-3">
-                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" />
+                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
                   <div className="input-group-append">
                     <button className="input-group-text btn btn-primary" type="button" id="load-data" onClick={() => loadData('external')}>Load</button>
                   </div>
                 </div>
               </TabPane>
-              <TabPane id="fileUpload" className="tab-pane fade" name="Upload File" key="2" dataicon="icon-upload">
+              <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
                 <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
                 <form className="input-group loader-ui">
                   <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file')} />
-                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader">Choose file</label>
+                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file')} ref={fileInput}  />
+                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
                   </div>
                   <div className="input-group-append">
                     <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
@@ -333,3 +339,4 @@ export default function DataImport() {
     </section>
   );
 }
+
