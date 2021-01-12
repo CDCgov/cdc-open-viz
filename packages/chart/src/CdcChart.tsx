@@ -6,9 +6,8 @@ import React, {
 } from 'react';
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
-import BarChart from './components/BarChart.tsx';
-import LineChart from './components/LineChart.tsx';
 import PieChart from './components/PieChart.tsx';
+import ComboChart from './components/ComboChart.tsx';
 import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
@@ -25,19 +24,19 @@ export default function CdcChart({ configUrl }) {
   const [config, setConfig] = useState<keyable>({
     seriesKeys: [],
     legend: [],
-    title: null
+    title: null,
+    description: null
   });
 
   const [data, setData] = useState<Array<Object>>([]);
 
   // TODO: Discuss as a group. We should use aspect ratios instead of trying to manually determine this.
-  const [dimensions, setDimensions] = useState<Array<number>>([960,540]);
+  const [dimensions] = useState<Array<number>>([960,540]);
 
   const [loading, setLoading] = useState<Boolean>(true);
 
   const [seriesHighlight, setSeriesHighlight] = useState<Array<Number>>([]);
 
-  const legendPercent = 0.2;
   const legendGlyphSize = 15;
 
   const loadConfig = async () => {
@@ -61,14 +60,33 @@ export default function CdcChart({ configUrl }) {
     loadConfig();
   }, []);
 
+  // Generates color palette to pass to child chart component
   useEffect(() => {
-    const newColorScale = () => scaleOrdinal({
-      domain: config.seriesKeys,
-      range: ['#222299', '#229922', '#992229'],
-    });
-  
-    setColorScale(newColorScale);
-  }, [config])
+    if(config.xAxis) {
+      const colorPalettes = {
+        'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
+        'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
+        'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
+        'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
+      };
+
+      let palette = colorPalettes[config.palette] || colorPalettes['qualitative-bold'];
+      let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
+
+      while(numberOfKeys > palette.length) {
+        palette = palette.concat(palette);
+      }
+
+      palette = palette.slice(0, numberOfKeys);
+      
+      const newColorScale = () => scaleOrdinal({
+        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : config.seriesKeys,
+        range: palette,
+      });
+
+      setColorScale(newColorScale);
+    }
+  }, [config, data])
 
   const highlight = (label) => {
     const newSeriesHighlight = [];
@@ -94,13 +112,14 @@ export default function CdcChart({ configUrl }) {
   };
 
   // Destructure items from config for more readable JSX
-  const { legend, title, visualizationType } = config;
+  const { legend, title, description, visualizationType } = config;
 
   // Select appropriate chart type
   const chartComponents = {
-    'Bar' : <BarChart numberFormatter={formatNumber} />,
-    'Line' : <LineChart numberFormatter={formatNumber} />,
-    'Pie' : <PieChart numberFormatter={formatNumber} />
+    'Bar' : <ComboChart numberFormatter={formatNumber} />,
+    'Line' : <ComboChart numberFormatter={formatNumber} />,
+    'Combo': <ComboChart numberFormatter={formatNumber} />,
+    'Pie' : <PieChart numberFormatter={formatNumber} />,
   }
 
   if(true === loading) {
@@ -111,8 +130,8 @@ export default function CdcChart({ configUrl }) {
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
       <div className="cdc-visualization-container mt-4">
         {/* Title & Visualization */}
-        <div className="chart-container">
-          {title && <h1 className="chart-title">{title}</h1>}
+        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
+          {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize || 28}}>{title.text}</h1>}
           {chartComponents[visualizationType]}
         </div>
         {/* Legend */}
@@ -153,6 +172,8 @@ export default function CdcChart({ configUrl }) {
             </LegendOrdinal>
         </div>
       </div>
+      {/* Description */}
+      <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}} dangerouslySetInnerHTML={{__html: description && description.html}}></div>              
       {/* Data Table */}
       <DataTable numberFormatter={formatNumber} />
     </Context.Provider>
