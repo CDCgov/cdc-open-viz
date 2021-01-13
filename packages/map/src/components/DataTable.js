@@ -5,7 +5,7 @@ import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
 } from 'react-table';
 import Papa from 'papaparse';
-import externalIcon from '../images/external-link.svg';
+import ExternalIcon from '../images/external-link.svg';
 import { Base64 } from 'js-base64';
 
 const DataTable = (props) => {
@@ -107,7 +107,7 @@ const DataTable = (props) => {
           }}
         >
           {markup}
-          <img aria-hidden="true" alt="External Link" src={externalIcon} />
+          <ExternalIcon className="inline-icon" />
         </span>
       );
     }
