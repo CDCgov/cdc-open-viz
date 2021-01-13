@@ -30,5 +30,8 @@
   },
   "browserslist": [
     "last 1 Chrome version"
-  ]
+  ],
+  "devDependencies": {
+    "@svgr/webpack": "^5.5.0"
+  }
 }

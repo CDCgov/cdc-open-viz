@@ -9,14 +9,14 @@ import { Base64 } from 'js-base64';
 import ReactHtmlParser from 'react-html-parser';
 
 // Data
-import externalIcon from './images/external-link.svg';
+import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
-import './App.scss';
+import './scss/main.scss';
 
 // Open Viz
 import '@cdc/core';
@@ -447,7 +447,7 @@ class CdcMap extends Component {
             toolTipText = [(<div key="modal-content">{ReactHtmlParser(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<img src={externalIcon} alt="" /></span>) )
+                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel} <ExternalIcon className="inline-icon" /></span>) )
             }
         }
 
@@ -1188,7 +1188,7 @@ class CdcMap extends Component {
         }
 
         return (
-            <div className={this.props.className ? `cdc-map-outer-container ${this.props.className}` : 'cdc-map-outer-container' } ref={this.outerContainerRef}>
+            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className}` : 'cdc-open-viz-module cdc-map-outer-container' } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
                 {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
                 <section className="cdc-map-inner-container" aria-label={'Map: ' + this.state.general.title}>
