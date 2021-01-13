@@ -1,11 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
 import '../scss/_dataimport.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
 import Tabs from './Tab';
-import FileUploader from './FileUploader';
+// import FileUploader from './FileUploader';
 import Context from '../context';
 
 // import BarChart from './BarChart';
@@ -67,7 +66,6 @@ export default function DataImport() {
 
     if (!colData.columns) {
       // create columns if they don't exist
-      // eslint-disable-next-line no-param-reassign
       colData.columns = [];
       const tblRow = Object.entries(colData[0]);
       tblRow.forEach((item) => {
@@ -113,7 +111,6 @@ export default function DataImport() {
           cell[0] === ''
             ? `X_${x += 1}`
             : cell[0].replace(/[^A-Z0-9]/ig, '_'));
-        // eslint-disable-next-line prefer-destructuring
         td[cellVal] = cell[1];
       });
       x = 0; // reset column counter for rows
@@ -156,10 +153,9 @@ export default function DataImport() {
     }
   }
 
-  function loadData(dataType) {
+  function loadData(dataType, dataTypes) {
     // let renderData;
     errorPresent = null;
-debugger;
     switch (dataType) {
       case 'file': {
         const userData = fileInput.current.files[0];
@@ -192,11 +188,15 @@ debugger;
 
         // create a URL to make error checking easier
         if ( urlRegEx.test(externalInput) ) {
-          const dataUrl = new URL(externalInput);
-          // debugger;
-          if (dataUrl && dataUrl.hostname) {
-            // debugger;
-            console.log(dataUrl);
+          const dataUrl  = new URL(externalInput);
+          const fileName = dataUrl.pathname.split('/').pop();
+          const fileExt  = fileName.slice( ( fileName.lastIndexOf(".") - 1 ) + 1 );
+          
+          // does the URL contain an acceptable filetype?
+          if ( dataTypes.includes( fileExt ) ) {
+            
+          } else {
+            setError( fileExt + ' is not an acceptible document type. Please upload your document in ' + dataTypes.join(', ') );
           }
         } else {
           setError('Please make sure to use a valid URL.');
@@ -296,7 +296,7 @@ debugger;
                 <div className="input-group mb-3">
                   <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
                   <div className="input-group-append">
-                    <button className="input-group-text btn btn-primary" type="button" id="load-data" onClick={() => loadData('external')}>Load</button>
+                    <button className="input-group-text btn btn-primary" type="button" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
                   </div>
                 </div>
               </TabPane>
@@ -304,7 +304,7 @@ debugger;
                 <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
                 <form className="input-group loader-ui">
                   <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file')} ref={fileInput}  />
+                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
                     <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
                   </div>
                   <div className="input-group-append">
