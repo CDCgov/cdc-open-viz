@@ -54,9 +54,14 @@ export default function DataImport() {
       // is the json a bunch of arrays instead of objects?
       errorPresent = true;
       setError('Please check the formatting of your data. JSON files need be formatted in an array of objects [ {"name":"data1", .... },{...},{...}]');
+
     } else if (userData.columns && userData.columns.includes('')) {
       // are any of the column headers empty?
       setError('It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.');
+
+    } else if ( userData === null || userData === 'undefined' ) {
+      errorPresent = true;
+      setError('Your data is empty.')
     }
   }
 
@@ -128,8 +133,11 @@ export default function DataImport() {
    * CSV Parsing: collect the data and format it
    * to be handled by React-Table
    */
-  function parseCsvFile() {
-    const fileData = d3.csvParse(reader.result, (d) => d);
+
+  // todo clean this up so it is more consistent
+  function parseCsvFile( extData = null ) {
+    // check for external data
+    const fileData = extData.length ? extData : d3.csvParse(reader.result, (d) => d);
 
     validateData(fileData, 'csv');
 
@@ -143,14 +151,22 @@ export default function DataImport() {
    * JSON Parsing: collect the data and format it
    * to be handled by React-Table
    */
-  function parseJsonFile() {
+
+   // todo clean this up so it is more consistent
+  function parseJsonFile( extData = null ) {
     let jsonData;
-    try {
-      jsonData = JSON.parse(reader.result);
+    // check for external data
+    if ( extData.length ) {
+      jsonData = extData;
       validateData(jsonData, 'json');
-    } catch (err) {
-      errorPresent = true;
-      setError(`There was an issue parsing your json file: ${err.toString()}`);
+    } else {
+      try {
+        jsonData = JSON.parse(reader.result);
+        validateData(jsonData, 'json');
+      } catch (err) {
+        errorPresent = true;
+        setError(`There was an issue parsing your json file: ${err.toString()}`);
+      }
     }
 
     if (!errorPresent) {
@@ -190,17 +206,46 @@ export default function DataImport() {
       }
       case 'external': {
         const externalInput = urlInput.current.value;
-        const urlRegEx =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+        const urlRegEx = new RegExp('^(https?:\\/\\/)'+ // protocol
+                                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                                    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                                    // '/(localhost).'+ // OR localhost:xxxx
+                                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                                    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                                    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
         // create a URL to make error checking easier
-        if ( urlRegEx.test(externalInput) ) {
+        if ( urlRegEx.test( externalInput )  ) {
           const dataUrl  = new URL(externalInput);
           const fileName = dataUrl.pathname.split('/').pop();
           const fileExt  = fileName.slice( ( fileName.lastIndexOf(".") - 1 ) + 1 );
 
           // does the URL contain an acceptable filetype?
           if ( dataTypes.includes( fileExt ) ) {
-
+            switch (fileExt) {
+              case '.csv':
+                d3.csv(dataUrl)
+                  .then(function(csvData) {
+                    parseCsvFile(csvData);
+                  })
+                  .catch(err => { 
+                    errorPresent = true;
+                    setError( 'Check to make sure the URL is correct: ' + err.toString() )
+                  });
+                break;
+              case '.json':
+                d3.json(dataUrl)
+                  .then(function(jsonData) {
+                    parseJsonFile(jsonData);
+                  })
+                  .catch(err => { 
+                    errorPresent = true;
+                    setError( 'Check to make sure the URL is correct: ' + err.toString() )
+                  });
+                break;
+              default:
+                setError('The file type that you are trying to upload is not supported.');
+          }
           } else {
             setError( fileExt + ' is not an acceptible document type. Please upload your document in ' + dataTypes.join(', ') );
           }
@@ -320,7 +365,6 @@ export default function DataImport() {
                 </form>
               </TabPane>
             </Tabs>
-
             { error
               ? <p className="data-error alert alert-warning">{error} - {errorPresent}</p>
               : <p>Upload a data file to use ({dataTypes.join(', ')})</p> }
