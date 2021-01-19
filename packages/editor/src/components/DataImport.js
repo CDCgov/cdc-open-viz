@@ -1,13 +1,9 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
 import '../scss/data-import.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
-// import {ErrorList} from './ErrorList';
-import Context from '../context';
-
-
 
 import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
@@ -25,7 +21,6 @@ export default function DataImport() {
         "urlInvalid": "Please make sure to use a valid URL."
       };
 
-  
   const [data, setData] = useState(null);
 
   const [columns, setColumns] = useState(null);
@@ -338,7 +333,7 @@ export default function DataImport() {
       </table>
     </div>
   );
-  
+  // todo figure out how to get these component to work with other helper code or move both back into the render method
   /**
    * ExternalUrlLoader component
    */
@@ -356,6 +351,52 @@ export default function DataImport() {
       </form>
     )
   }
+
+  /**
+   * FileLoader component
+   */
+  // const FileLoader = () => {
+  //   let fileInput = useRef(null);
+
+  //   let urlInput = useRef(null);
+  
+  //   let dataUploadLabel = useRef(null);
+
+  //   const toggleUpload = (currState) => {
+  //     setUploadFile(!currState);
+  //     setError(false); // reset errors
+  
+  //     dataUploadLabel.current.innerHTML = 'Choose File';
+  
+  //     if (!currState) {
+  //       document.getElementById('file-uploader').click();
+  //     } else {
+  //       setData(null);
+  //     }
+  //   };
+    
+  //   useEffect(() => {
+  //     let { current } = dataUploadLabel;
+  //   });
+
+  //   useEffect(() => {
+  //     let { current } = fileInput;
+  //   });
+  //   return (
+  //     <div>
+  //       <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
+  //       <form className="input-group loader-ui">
+  //         <div className="custom-file">
+  //           <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
+  //           <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
+  //         </div>
+  //         <div className="input-group-append">
+  //           <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+  //         </div>
+  //       </form>
+  //     </div>
+  //   )
+  // }
 
   useEffect(() => {
     let { current } = urlInput;
