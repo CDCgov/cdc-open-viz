@@ -173,8 +173,12 @@ export default function DataImport() {
     }
   }
 
+  /**
+   * Handle loading data from user
+   * submitted files and external URLs
+   */
+
   function loadData(dataType, dataTypes) {
-    // let renderData;
     errorPresent = null;
     switch (dataType) {
       case 'file': {
@@ -204,16 +208,6 @@ export default function DataImport() {
       }
       case 'external': {
         const externalInput = urlInput.current.value;
-        // const urlRegEx = new RegExp('^(https?:\\/\\/)'+ // protocol
-        //                             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        //                             '((\\d{1,3}\\.){3}\\d{1,3}))|'+ // OR ip (v4) address
-        //                             '/(localhost).'+ // OR localhost:xxxx
-        //                             '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        //                             '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        //                             '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-
-                                    // ^(https?:\\/\\/)((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))|/(localhost).(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$','i'
-
         const urlRegEx = new RegExp(/^https?:\/\/\w+(\.\w+)*(:[0-9]+)?(\/.*)?$/);
         // create a URL to make error checking easier
         if ( urlRegEx.test( externalInput )  ) {
@@ -266,18 +260,9 @@ export default function DataImport() {
     }
   }
 
-  useEffect(() => {
-    let { current } = urlInput;
-  });
-
-  useEffect(() => {
-    let { current } = dataUploadLabel;
-  });
-
-  useEffect(() => {
-    let { current } = fileInput;
-  });
-
+  /**
+   * DataTable component
+   */
   const DataTable = () => {
     const {
       getTableProps,
@@ -338,6 +323,36 @@ export default function DataImport() {
       </table>
     </div>
   );
+  
+  /**
+   * ExternalUrlLoader component
+   */
+  const ExternalUrlLoader = () => {
+    function onEnter(e) {
+      e.preventDefault(); //prevent from default on enter
+    }
+
+    return (
+      <form className="input-group" onSubmit={onEnter}>
+        <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
+        <div className="input-group-append">
+          <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
+        </div>
+      </form>
+    )
+  }
+
+  useEffect(() => {
+    let { current } = urlInput;
+  });
+
+  useEffect(() => {
+    let { current } = dataUploadLabel;
+  });
+
+  useEffect(() => {
+    let { current } = fileInput;
+  });
 
   return (
     <section className="container-fluid">
@@ -346,12 +361,7 @@ export default function DataImport() {
           <div className="col data-loader">
             <Tabs>
               <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
-                <div className="input-group mb-3">
-                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
-                  <div className="input-group-append">
-                    <button className="input-group-text btn btn-primary" type="button" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
-                  </div>
-                </div>
+                <ExternalUrlLoader className="mb-3" />
               </TabPane>
               <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
                 <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
