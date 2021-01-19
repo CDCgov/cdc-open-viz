@@ -134,7 +134,6 @@ export default function DataImport() {
    * to be handled by React-Table
    */
 
-  // todo clean this up so it is more consistent
   function parseCsvFile( extData = null ) {
     // check for external data
     const fileData = extData.length ? extData : d3.csvParse(reader.result, (d) => d);
@@ -152,7 +151,6 @@ export default function DataImport() {
    * to be handled by React-Table
    */
 
-   // todo clean this up so it is more consistent
   function parseJsonFile( extData = null ) {
     let jsonData;
     // check for external data
@@ -206,14 +204,17 @@ export default function DataImport() {
       }
       case 'external': {
         const externalInput = urlInput.current.value;
-        const urlRegEx = new RegExp('^(https?:\\/\\/)'+ // protocol
-                                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-                                    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-                                    // '/(localhost).'+ // OR localhost:xxxx
-                                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-                                    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-                                    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        // const urlRegEx = new RegExp('^(https?:\\/\\/)'+ // protocol
+        //                             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        //                             '((\\d{1,3}\\.){3}\\d{1,3}))|'+ // OR ip (v4) address
+        //                             '/(localhost).'+ // OR localhost:xxxx
+        //                             '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        //                             '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        //                             '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
+                                    // ^(https?:\\/\\/)((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))|/(localhost).(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$','i'
+
+        const urlRegEx = new RegExp(/^https?:\/\/\w+(\.\w+)*(:[0-9]+)?(\/.*)?$/);
         // create a URL to make error checking easier
         if ( urlRegEx.test( externalInput )  ) {
           const dataUrl  = new URL(externalInput);
