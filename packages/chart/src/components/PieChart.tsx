@@ -96,7 +96,7 @@ export default function PieChart({numberFormatter}) {
 
   const svgRef = useRef<HTMLDivElement>();
 
-  const [width, height] = dimensions;
+  const {width, height} = dimensions;
   const margin = config.padding;
 
   const innerWidth = width - margin.left - margin.right;
@@ -106,7 +106,7 @@ export default function PieChart({numberFormatter}) {
   const centerX = innerWidth / 2;
   const donutThickness = 50;
 
-  return (
+  return width && height ? (
     <div ref={svgRef}>
       <svg viewBox={`0 0 ${width} ${height}`}>
         <Group top={centerY + margin.top} left={centerX + margin.left}>
@@ -128,5 +128,5 @@ export default function PieChart({numberFormatter}) {
 
       <ReactTooltip />
     </div>
-  );
+  ) : <div className="loader"></div>;
 }
