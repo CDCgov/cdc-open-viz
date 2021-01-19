@@ -1,14 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
 import '../scss/data-import.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
+// import {ErrorList} from './ErrorList';
+import Context from '../context';
+
+
 
 import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
 
 export default function DataImport() {
+  const errorList =
+      {
+        "emptyCols": "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",
+        "emptyData": "Your data is empty.",
+        "dataType": "Your datatype is not supported.",
+        "fileType": "The file type that you are trying to upload is not supported.",
+        "formatting": "Please check the formatting of your data. JSON files need be formatted in an array of objects [ {\"name\":\"data1\", .... },{...},{...}]",
+        "parseError": "There was an issue parsing your json file:",
+        "url404": "Check to make sure the URL is correct:",
+        "urlInvalid": "Please make sure to use a valid URL."
+      };
+
+  
   const [data, setData] = useState(null);
 
   const [columns, setColumns] = useState(null);
@@ -46,21 +63,23 @@ export default function DataImport() {
    * validateData:
    * Check data for common issues
    */
-  function validateData(userData, dataType) {
+  function validateData(userData, dataType, errors = errorList) {
     setError(null);
-
+    debugger;
+    // debugger;
     if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
       // is the json a bunch of arrays instead of objects?
       errorPresent = true;
-      setError('Please check the formatting of your data. JSON files need be formatted in an array of objects [ {"name":"data1", .... },{...},{...}]');
+      debugger;
+      setError(errors.formatting);
 
     } else if (userData.columns && userData.columns.includes('')) {
       // are any of the column headers empty?
-      setError('It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.');
+      setError(errors.emptyCols);
 
     } else if ( userData === null || userData === 'undefined' ) {
       errorPresent = true;
-      setError('Your data is empty.')
+      setError(errors.emptyData);
     }
   }
 
@@ -148,7 +167,7 @@ export default function DataImport() {
    * JSON Parsing: collect the data and format it
    * to be handled by React-Table
    */
-  function parseJsonFile( extData = null ) {
+  function parseJsonFile( extData = null, errors = errorList ) {
     let jsonData;
     // check for external data
     if ( extData.length ) {
@@ -160,7 +179,7 @@ export default function DataImport() {
         validateData(jsonData, 'json');
       } catch (err) {
         errorPresent = true;
-        setError(`There was an issue parsing your json file: ${err.toString()}`);
+        setError(`${errors.parseError} ${err.toString()}`);
       }
     }
 
@@ -174,7 +193,7 @@ export default function DataImport() {
    * Handle loading data from user
    * submitted files and external URLs
    */
-  function loadData(dataType, dataTypes) {
+  function loadData(dataType, dataTypes, errors = errorList) {
     errorPresent = null;
     switch (dataType) {
       case 'file': {
@@ -197,7 +216,7 @@ export default function DataImport() {
               reader.addEventListener('load', parseJsonFile);
               break;
             default:
-              setError('The file type that you are trying to upload is not supported.');
+              setError(errors.fileType);
           }
         }
         break;
@@ -221,7 +240,7 @@ export default function DataImport() {
                   })
                   .catch(err => { 
                     errorPresent = true;
-                    setError( 'Check to make sure the URL is correct: ' + err.toString() )
+                    setError( errors.url404 + ": " + err.toString() )
                   });
                 break;
               case '.json':
@@ -231,17 +250,17 @@ export default function DataImport() {
                   })
                   .catch(err => { 
                     errorPresent = true;
-                    setError( 'Check to make sure the URL is correct: ' + err.toString() )
+                    setError( errors.url404 + err.toString() )
                   });
                 break;
               default:
-                setError('The file type that you are trying to upload is not supported.');
+                setError(errors.fileType);
           }
           } else {
             setError( fileExt + ' is not an acceptible document type. Please upload your document in ' + dataTypes.join(', ') );
           }
         } else {
-          setError('Please make sure to use a valid URL.');
+          setError(errors.urlInvalid);
         }
         break;
       }
@@ -251,7 +270,7 @@ export default function DataImport() {
       // break;
 
       default: {
-        setError('Your datatype is not supported.');
+        setError(errors.dataType);
       }
     }
   }
@@ -338,26 +357,6 @@ export default function DataImport() {
     )
   }
 
-  /**
-   * FileLoader component
-   */
-  const FileLoader = () => {
-    return (
-      <div>
-        <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-        <form className="input-group loader-ui">
-          <div className="custom-file">
-            <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-            <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-          </div>
-          <div className="input-group-append">
-            <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-          </div>
-        </form>
-      </div>
-    )
-  }
-
   useEffect(() => {
     let { current } = urlInput;
   });
@@ -380,7 +379,17 @@ export default function DataImport() {
                 <ExternalUrlLoader className="mb-3" />
               </TabPane>
               <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
-                <FileLoader />
+                {/* <FileLoader /> */}
+                <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
+                <form className="input-group loader-ui">
+                  <div className="custom-file">
+                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
+                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
+                  </div>
+                  <div className="input-group-append">
+                    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+                  </div>
+                </form>
               </TabPane>
             </Tabs>
             { error
