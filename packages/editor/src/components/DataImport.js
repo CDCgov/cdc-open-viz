@@ -342,6 +342,23 @@ export default function DataImport() {
     )
   }
 
+  const FileLoader = () => {
+    return (
+      <div>
+        <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
+        <form className="input-group loader-ui">
+          <div className="custom-file">
+            <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
+            <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
+          </div>
+          <div className="input-group-append">
+            <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
+          </div>
+        </form>
+      </div>
+    )
+  }
+
   useEffect(() => {
     let { current } = urlInput;
   });
@@ -364,16 +381,7 @@ export default function DataImport() {
                 <ExternalUrlLoader className="mb-3" />
               </TabPane>
               <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
-                <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-                <form className="input-group loader-ui">
-                  <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-                  </div>
-                  <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-                  </div>
-                </form>
+                <FileLoader />
               </TabPane>
             </Tabs>
             { error
