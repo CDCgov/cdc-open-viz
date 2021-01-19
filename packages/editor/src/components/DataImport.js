@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTable } from 'react-table';
 import '../scss/data-import.scss';
 import * as d3 from 'd3';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
-import Context from '../context';
 
 import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
@@ -133,7 +132,6 @@ export default function DataImport() {
    * CSV Parsing: collect the data and format it
    * to be handled by React-Table
    */
-
   function parseCsvFile( extData = null ) {
     // check for external data
     const fileData = extData.length ? extData : d3.csvParse(reader.result, (d) => d);
@@ -150,7 +148,6 @@ export default function DataImport() {
    * JSON Parsing: collect the data and format it
    * to be handled by React-Table
    */
-
   function parseJsonFile( extData = null ) {
     let jsonData;
     // check for external data
@@ -177,7 +174,6 @@ export default function DataImport() {
    * Handle loading data from user
    * submitted files and external URLs
    */
-
   function loadData(dataType, dataTypes) {
     errorPresent = null;
     switch (dataType) {
@@ -249,10 +245,10 @@ export default function DataImport() {
         }
         break;
       }
-      case 'freeform': {
-      // todo build textbox to build these
-      }
-      break;
+      // case 'freeform': {
+      // // todo build textbox to build these
+      // }
+      // break;
 
       default: {
         setError('Your datatype is not supported.');
@@ -342,6 +338,9 @@ export default function DataImport() {
     )
   }
 
+  /**
+   * FileLoader component
+   */
   const FileLoader = () => {
     return (
       <div>
@@ -403,4 +402,3 @@ export default function DataImport() {
     </section>
   );
 }
-
