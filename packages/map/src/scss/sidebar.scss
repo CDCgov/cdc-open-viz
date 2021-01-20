@@ -103,6 +103,7 @@ aside {
           flex-direction: column;
           padding-right: 3em;
           li {
+            width: 100%;
             &:nth-last-of-type(-n+2) {
               padding-bottom: 1em;
             }
