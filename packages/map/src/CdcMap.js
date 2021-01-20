@@ -34,6 +34,7 @@ import WorldMap from './components/WorldMap'; // Future: Lazy
 class CdcMap extends Component {
 
     constructor (props) {
+        alert('test')
         super(props)
 
         // Initial state property

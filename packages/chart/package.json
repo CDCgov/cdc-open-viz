@@ -4,9 +4,9 @@
   "description": "React component for visualizing your data in a chart based off work done for the CDC",
   "main": "dist/cdcchart",
   "scripts": {
-    "start": "webpack-dev-server --mode development",
-    "build": "npx webpack --mode production --no-install --env.packageName=CdcChart --env.folderName=chart",
-    "prepublishOnly": "npx webpack --mode production"
+    "start": "webpack serve --mode development",
+    "build": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart",
+    "prepublishOnly": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart"
   },
   "repository": {
     "type": "git",
