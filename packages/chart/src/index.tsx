@@ -1,14 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';	
+import ReactDOM from 'react-dom';	
 
-import CdcChart from './CdcChart';
+import CdcChart from './CdcChart.tsx';	
 
-ReactDOM.render(
-  <React.StrictMode>
-    <CdcChart configUrl="/assets/temp-example-config.json" />
-    <CdcChart configUrl="/assets/planet-example-config.json" />
-    <CdcChart configUrl="/assets/planet-combo-example-config.json" />
-    <CdcChart configUrl="/assets/planet-pie-example-config.json" />
-  </React.StrictMode>,
-  document.querySelector('#react-container')
-);
+const domContainers = document.querySelectorAll('.react-container');	
+
+domContainers.forEach((domContainer) => {	
+  ReactDOM.render(	
+    <React.StrictMode>	
+      <CdcChart configUrl={domContainer.attributes['data-config'].value} element={domContainer}/>	
+    </React.StrictMode>,	
+    domContainer,	
+  );	
+});
