@@ -21,8 +21,8 @@
 }
 
 // Imports
-@import "reset";
-@import "variables";
+@import "_reset";
+@import "_variables";
 
 .cdc-open-viz-module {
   color: $baseColor;

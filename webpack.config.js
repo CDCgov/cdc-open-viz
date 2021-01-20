@@ -40,14 +40,14 @@ module.exports = (env = {}, { mode }) => {
         }
     },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
+      extensions: ['.tsx', '.ts', '.js', '.d.ts'],
     },
     module: {
       rules: [
         {
           // JS, JSX - Transpiles JSX
-          test: /\.jsx?$/,
-          exclude: /node_modules\/(?!array-move\/).*/,
+          test: /\.m?jsx?$/,
+          exclude: /node_modules/(?!array-move\/).*/,
           use: {
             loader: 'babel-loader',
             options: {
@@ -55,7 +55,11 @@ module.exports = (env = {}, { mode }) => {
                 '@babel/preset-env',
                 '@babel/preset-react',
                 {
-                  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import','@babel/plugin-transform-arrow-functions']
+                  plugins: [
+                    '@babel/plugin-proposal-class-properties',
+                    '@babel/plugin-syntax-dynamic-import',
+                    '@babel/plugin-transform-arrow-functions'
+                  ]
                 }
               ]
             },
@@ -104,6 +108,8 @@ module.exports = (env = {}, { mode }) => {
                 include: /\.s[ac]ss$/
               }
             },
+            // If you want to import into a JS/TS file as an encoded string for use inside of a <img /> element, append ?inline to the import.
+            // Example: import icon from './icon.svg?inline'
             {
               resourceQuery: /inline/,
               use: 'url-loader'
@@ -123,8 +129,10 @@ module.exports = (env = {}, { mode }) => {
     configObj.externals = prodExternals
     configObj.output = {
       ...configObj.output,
-      libraryTarget: 'umd',
-      library: packageName,
+      library: {
+        type: 'umd',
+        name: packageName
+      }
     }
   }
 
