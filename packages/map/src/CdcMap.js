@@ -1261,7 +1261,7 @@ class CdcMap extends Component {
                     }
                     {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
                 </section>
-                <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
+                <div aria-live="assertive" className="cdcdataviz-sr-only">{ this.state.accessibleStatus }</div>
             </div>
         )
     }

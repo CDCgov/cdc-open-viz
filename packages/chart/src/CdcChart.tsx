@@ -13,7 +13,7 @@ import DataTable from './components/DataTable.tsx';
 
 import './styles.scss';
 
-export default function CdcChart({ configUrl }) {
+export default function CdcChart({ configUrl, element }) {
 
   const [colorScale, setColorScale] = useState<any>(null);
 
@@ -31,11 +31,13 @@ export default function CdcChart({ configUrl }) {
   const [data, setData] = useState<Array<Object>>([]);
 
   // TODO: Discuss as a group. We should use aspect ratios instead of trying to manually determine this.
-  const [dimensions] = useState<Array<number>>([960,540]);
+  const [dimensions, setDimensions] = useState<any>({});
 
   const [loading, setLoading] = useState<Boolean>(true);
 
   const [seriesHighlight, setSeriesHighlight] = useState<Array<Number>>([]);
+
+  const [resizeInit, setResizeInit] = useState<boolean>(false);
 
   const legendGlyphSize = 15;
 
@@ -55,9 +57,36 @@ export default function CdcChart({ configUrl }) {
     setLoading(false);
   }
 
+  const debounce = useRef(null);
+
+  const onResize = useCallback(() => {
+    if (dimensions.width !== element.offsetWidth) {	
+      if (debounce) {
+        clearTimeout(debounce.current);	
+      }	
+
+      debounce.current = setTimeout(() => {
+        setDimensions({	
+            width: element.offsetWidth,	
+            height: 500
+        });	
+      }, 250);	
+    }	
+  }, [element.offsetWidth, dimensions.width]);
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
+  }, []);
+
+  // Adds resize handler
+  useEffect(() => {
+    if(!resizeInit) {
+      window.addEventListener('resize', onResize);
+      onResize();
+      
+      setResizeInit(true);
+    }
   }, []);
 
   // Generates color palette to pass to child chart component
