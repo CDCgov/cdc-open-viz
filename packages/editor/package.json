@@ -11,7 +11,6 @@
     "directory": "packages/editor"
   },
   "license": "Apache-2.0",
-
   "scripts": {
     "start": "webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js",
@@ -22,8 +21,8 @@
     "bootstrap": "^4.3.1",
     "d3": "^6.2.0",
     "html-react-parser": "^0.14.0",
-    "react-table": "^7.6.2",
-    "mini-svg-data-uri": "^1.2.3"
+    "mini-svg-data-uri": "^1.2.3",
+    "react-table": "^7.6.2"
   },
   "peerDependencies": {
     "react": ">=16",
