@@ -31,31 +31,27 @@ module.exports = (env = {}, { mode }) => {
         filename: () => `${packageName.toLowerCase()}.js`,
         libraryTarget: 'umd',
     },
-    devServer: {
-        open: true,
-        compress: true,
-        overlay: {
-          warnings: false,
-          errors: true
-        }
-    },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
+      extensions: ['*', '.tsx', '.ts', '.js'],
     },
     module: {
       rules: [
         {
           // JS, JSX - Transpiles JSX
-          test: /\.jsx?$/,
-          exclude: /node_modules\/(?!array-move\/).*/,
+          test: /\.m?jsx?$/,
+          exclude: /node_modules\/(?!array-move).*/,
           use: {
             loader: 'babel-loader',
             options: {
               presets: [
                 '@babel/preset-env',
-                '@babel/preset-react',
+                '@babel/preset-react', // Future: Enable automatic runtime support
                 {
-                  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-dynamic-import','@babel/plugin-transform-arrow-functions']
+                  plugins: [
+                    '@babel/plugin-proposal-class-properties',
+                    '@babel/plugin-syntax-dynamic-import',
+                    '@babel/plugin-transform-arrow-functions'
+                  ]
                 }
               ]
             },
@@ -99,14 +95,28 @@ module.exports = (env = {}, { mode }) => {
           oneOf: [
             // When referenced in CSS, they are inlined and encoded with the url-loader package.
             {
-              use: 'url-loader',
-              issuer: {
-                include: /\.s[ac]ss$/
-              }
+              issuer: /\.s[ac]ss$/,
+              use: [
+                {
+                  loader: 'url-loader',
+                  options: {
+                    generator: (content) => svgToMiniDataURI(content.toString()),
+                  },
+                },
+              ]
             },
+            // If you want to import into a JS/TS file as an encoded string for use inside of a <img /> element, append ?inline to the import.
+            // Example: import icon from './icon.svg?inline'
             {
               resourceQuery: /inline/,
-              use: 'url-loader'
+              use: [
+                {
+                  loader: 'url-loader',
+                  options: {
+                    generator: (content) => svgToMiniDataURI(content.toString()),
+                  },
+                },
+              ]
             },
             // When imported into a JS/TS file, they are imported as React Components exposing the full markup of the SVG.
             {
@@ -123,13 +133,24 @@ module.exports = (env = {}, { mode }) => {
     configObj.externals = prodExternals
     configObj.output = {
       ...configObj.output,
-      libraryTarget: 'umd',
-      library: packageName,
+      library: {
+        type: 'umd',
+        name: packageName
+      }
     }
   }
 
   // We only need to generate an index.html file during development for testing purposes.
   if(mode === 'development') {
+    configObj.devServer = {
+      open: true,
+      compress: true,
+      overlay: {
+        warnings: false,
+        errors: true
+      }
+    };
+    configObj.target = 'web'
     configObj.plugins = [
       new HtmlWebpackPlugin({
         template: './src/index.html'

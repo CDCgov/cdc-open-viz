@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactHtmlParser from 'react-html-parser';
+import parse from 'html-react-parser';
 
 const Sidebar = (props) => {
   const {
@@ -142,9 +142,9 @@ const Sidebar = (props) => {
           >Clear
           </button>
           )}
-        {legend.title && <h2>{ ReactHtmlParser(legend.title) }</h2>}
+        {legend.title && <h2>{ parse(legend.title) }</h2>}
         {legend.dynamicDescription === false && legend.description
-          && <p>{ ReactHtmlParser(legend.description) }</p>}
+          && <p>{ parse(legend.description) }</p>}
         {legend.dynamicDescription === true && filters.map((filter, index) => {
           const lookupStr = `${index},${filter.values.indexOf(String(filter.active))}`;
 
