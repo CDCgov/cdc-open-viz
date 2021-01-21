@@ -51,7 +51,7 @@
     ]
   },
   "scripts": {
-    "test": "echo test"
-  },
-  "dependencies": {}
+    "publish": "npx lerna publish",
+    "test": "lerna publish --force-publish=* --skip-git"
+  }
 }
