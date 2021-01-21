@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 
 import CdcMap from './CdcMap';
@@ -7,8 +7,8 @@ import CdcMap from './CdcMap';
 let isEditor = window.location.href.includes('editor=true');
 
 ReactDOM.render(
-  <React.StrictMode>
+  <StrictMode>
     <CdcMap isEditor={isEditor} />
-  </React.StrictMode>,
+  </StrictMode>,
   document.querySelector('#react-container')
 );

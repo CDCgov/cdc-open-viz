@@ -4,9 +4,9 @@
   "description": "React component for visualizing your data on a map of the United States based off work done for the CDC",
   "main": "dist/cdcmap",
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map",
-    "prepublishOnly": "npx webpack --mode production --env packageName=CdcMap --env folderName=map"
+    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
+    "prepublishOnly": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js"
   },
   "repository": {
     "type": "git",
@@ -19,17 +19,17 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@cdc/core": "1.0.0",
     "@emotion/core": "^10.0.28",
     "array-move": "^3.0.1",
-    "@cdc/core": "1.0.0",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "d3-interpolate-path": "^2.2.1",
+    "html-react-parser": "^1.2.1",
     "js-base64": "^2.5.2",
     "papaparse": "^5.2.0",
     "react-accessible-accordion": "^3.0.1",
     "react-beautiful-dnd": "^13.0.0",
-    "react-html-parser": "^2.0.2",
     "react-select": "^3.0.8",
     "react-simple-maps": "^2.1.2",
     "react-table": "^7.5.0",
