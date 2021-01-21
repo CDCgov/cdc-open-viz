@@ -1,7 +1,7 @@
 {
   "name": "@cdc/chart",
   "version": "1.0.0-alpha.0",
-  "description": "React component for visualizing your data in a chart based off work done for the CDC",
+  "description": "React component for visualizing tabular data in various types of charts",
   "main": "dist/cdcchart",
   "scripts": {
     "start": "webpack serve --mode development -c ../../webpack.config.js",
@@ -19,7 +19,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "1.0.0",
+    "@cdc/core": "^1.0.0-alpha.0",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
@@ -43,5 +43,10 @@
   },
   "browserslist": [
     "last 1 Chrome version"
-  ]
+  ],
+  "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81",
+  "devDependencies": {
+    "webpack": "^5.16.0",
+    "webpack-cli": "^4.4.0"
+  }
 }
