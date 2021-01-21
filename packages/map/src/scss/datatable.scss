@@ -83,6 +83,9 @@
         text-align: left;
         cursor: pointer;
         border-right: 1px solid $mediumGray !important;
+        svg {
+          margin-left: 1rem;
+        }
       }
       
       th.sort-asc,
@@ -161,8 +164,7 @@
       text-decoration: underline;
       cursor: pointer;
       color: #075290;
-      img {
-        display: inline-block;
+      svg {
         max-width: 13px;
         vertical-align: baseline;
         margin-left: 5px;

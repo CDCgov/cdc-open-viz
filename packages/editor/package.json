@@ -11,10 +11,11 @@
     "directory": "packages/editor"
   },
   "license": "Apache-2.0",
+
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor",
-    "prepublishOnly": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor"
+    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js",
+    "prepublishOnly": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js"
   },
   "dependencies": {
     "@cdc/core": "^1.0.0",

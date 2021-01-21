@@ -6,7 +6,8 @@
     "jsx": "react",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "webpack"]
 } 
