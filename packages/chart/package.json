@@ -1,6 +1,6 @@
 {
   "name": "@cdc/chart",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "React component for visualizing your data in a chart based off work done for the CDC",
   "main": "dist/cdcchart",
 
