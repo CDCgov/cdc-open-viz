@@ -51,7 +51,6 @@
     ]
   },
   "scripts": {
-    "publish": "npx lerna publish",
-    "test": "lerna publish --force-publish=* --skip-git"
+    "publish": "npx lerna publish"
   }
 }
