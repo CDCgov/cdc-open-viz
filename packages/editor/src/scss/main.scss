@@ -1,41 +1,23 @@
 @import "~bootstrap/scss/bootstrap";
 @import "@cdc/core/styles/base";
 @import 'variables';
+@import "bootstrap";
 
-.btn {
-    position: relative;
-    border: 3px solid;
-    overflow: hidden;
-    transition: background-color( .2s easeinout );
-}
-
-.btn-primary {
-    background-color: $primary !important;
-    border-color: $primary;
-    color: $white;
+.cdc-editor {
+  .dropdown {
+    display: block;
+    width: 100%;
     
-    &:after {
-        position: absolute;
-        transition: .3s;
-        content: '';
-        display: block;
-        height: 100%;
-        width: 100%;
-        left: -100%;
-        bottom: 0;
-        background-color: $white;
-        mix-blend-mode: exclusion;
-      }
-  
-      &:hover,
-      &:focus {
-        &:after{
-          left: 0;
-          z-index: 10;
-        }
-      }
+    nav {
+      display: none;
 
-    &:hover {
-        border-color: $primary;
+      button {
+        display:block;
+      }
     }
+
+    &:focus-within nav {
+      display: block
+    }
+  }
 }
