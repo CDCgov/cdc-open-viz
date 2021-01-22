@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Context from './context';
 import DataImport from './components/DataImport';
-import ChooseVis from './components/ChooseVisualization';
+import ChooseVisTab from './components/ChooseVisTab';
 import ConfigVis from './components/ConfigureVisualization';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
@@ -21,7 +21,7 @@ useEffect(() => {
             <DataImport />
           </TabPane>
           <TabPane title="2. Choose Visualization">
-            <ChooseVis />
+            <ChooseVisTab />
           </TabPane>
           <TabPane title="3. Configure">
             <ConfigVis />
