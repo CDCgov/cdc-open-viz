@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Context from './context';
 import DataImport from './components/DataImport';
+import ChooseVis from './components/ChooseVisualization';
+import ConfigVis from './components/ConfigureVisualization';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
 export default function CdcEditor() {
+
+useEffect(() => {
+  
+});
   return (
     <Context.Provider>
       <div className="cdc-open-viz-module cdc-editor">
@@ -15,10 +21,10 @@ export default function CdcEditor() {
             <DataImport />
           </TabPane>
           <TabPane title="2. Choose Visualization">
-            <DataImport />
+            <ChooseVis />
           </TabPane>
           <TabPane title="3. Configure">
-            <DataImport />
+            <ConfigVis />
           </TabPane>
         </Tabs>
       </div>
