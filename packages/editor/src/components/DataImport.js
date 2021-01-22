@@ -224,7 +224,6 @@ export default function DataImport() {
           const dataUrl  = new URL(externalInput);
           const fileName = dataUrl.pathname.split('/').pop();
           const fileExt  = fileName.slice( ( fileName.lastIndexOf(".") - 1 ) + 1 );
-
           // does the URL contain an acceptable filetype?
           if ( dataTypes.includes( fileExt ) ) {
             switch (fileExt) {
@@ -333,6 +332,10 @@ export default function DataImport() {
       </table>
     </div>
   );
+
+  function onEnter(e) {
+    e.preventDefault(); //prevent from default on enter
+  }
   // todo figure out how to get these component to work with other helper code or move both back into the render method
   /**
    * ExternalUrlLoader component
@@ -417,7 +420,13 @@ export default function DataImport() {
           <div className="col data-loader">
             <Tabs>
               <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
-                <ExternalUrlLoader className="mb-3" />
+                {/* <ExternalUrlLoader className="mb-3" /> */}
+                <form className="input-group" onSubmit={onEnter}>
+                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
+                  <div className="input-group-append">
+                    <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
+                  </div>
+                </form>
               </TabPane>
               <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
                 {/* <FileLoader /> */}
