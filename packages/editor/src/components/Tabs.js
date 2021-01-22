@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 
-const Tabs = ({ children }) => {
-  const [active, setActive] = useState(0);
+const Tabs = ({ children, startingTab = 0, className }) => {
+  const [active, setActive] = useState(startingTab);
+
+  let containerClassName = 'tabs';
+
+  if(className) {
+    containerClassName = `tabs ${className}`;
+  }
 
   return (
-    <div className="tabs">
-      <nav>
-        <ul className="nav nav-pills nav-fill">
+    <>
+      <nav className={containerClassName}>
+        <ul className="nav nav-fill">
           {children.map(({props}, i) => (
             <li
               onClick={() => setActive(i)}
@@ -20,7 +26,7 @@ const Tabs = ({ children }) => {
         </ul>
       </nav>
       {children[active]}
-    </div>
+    </>
   );
 };
 
