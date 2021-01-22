@@ -3,17 +3,6 @@
 $light-yellow: #fde0b5;
 $dark-yellow: #f59a23;
 
-// top level editor tabs
-.cdc-editor>.tabs>nav li {
-    padding-bottom: .75rem;
-    border-bottom: 4px solid $white;
-
-    &.active {
-        font-weight: bold;
-        border-color: $primary;
-      }
-  }
-
 .cdc-editor .data-designer {
     .data-loader {
         padding-top: $gbl-padding;

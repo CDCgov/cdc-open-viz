@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import GlobalState from '../context';
 import { useTable } from 'react-table';
 import '../scss/data-import.scss';
 import * as d3 from 'd3';
@@ -9,6 +10,8 @@ import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
 
 export default function DataImport() {
+  const {data, setData} = useContext(GlobalState);
+
   const errorList =
       {
         "emptyCols": "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",
@@ -21,13 +24,11 @@ export default function DataImport() {
         "urlInvalid": "Please make sure to use a valid URL."
       };
 
-  const [data, setData] = useState(null);
-
   const [columns, setColumns] = useState(null);
 
   const [uploadFile, setUploadFile] = useState(false);
 
-  const [error, setError] = useState();
+  const [error, setError] = useState(null);
 
   let fileInput = useRef(null);
 
@@ -43,7 +44,7 @@ export default function DataImport() {
 
   const toggleUpload = (currState) => {
     setUploadFile(!currState);
-    setError(false); // reset errors
+    setError(null); // reset errors
 
     dataUploadLabel.current.innerHTML = 'Choose File';
 
@@ -139,6 +140,7 @@ export default function DataImport() {
       x = 0; // reset column counter for rows
       newRows.push(td);
     });
+
     setData(newRows);
   }
 
@@ -418,7 +420,7 @@ export default function DataImport() {
       <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
         <div className="row">
           <div className="col data-loader">
-            <Tabs>
+            <Tabs className="mb-4">
               <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
                 {/* <ExternalUrlLoader className="mb-3" /> */}
                 <form className="input-group" onSubmit={onEnter}>
