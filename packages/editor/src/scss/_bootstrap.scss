@@ -35,5 +35,15 @@
         &:hover {
             border-color: $primary;
         }
+
+        &.invert {
+            background-color: $white !important;
+            border-color: $white;
+            color: $primary;
+
+            &:hover {
+                border-color: $white;
+            }
+        }
     }
 }
