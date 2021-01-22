@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import Context from './context';
+import GlobalState from './context';
 import DataImport from './components/DataImport';
 import ChooseVis from './components/ChooseVisualization';
-import ConfigVis from './components/ConfigureVisualization';
+import ConfigTab from './components/ConfigTab';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor() {
+export default function CdcEditor({ startingTab }) {
+  const [data, setData] = useState(null);
+  const [type, setType] = useState('map'); // Default to map, temporarily
 
-useEffect(() => {
-  
-});
+  const state = {
+    data,
+    setData,
+    type,
+    setType
+  }
+
   return (
-    <Context.Provider>
+    <GlobalState.Provider value={state}>
       <div className="cdc-open-viz-module cdc-editor">
-        <Tabs className="tab-content editor-container mb-2">
+        <Tabs className="top-level" startingTab={startingTab}>
           <TabPane title="1. Design Data" className="data-designer">
             <DataImport />
           </TabPane>
@@ -24,10 +30,10 @@ useEffect(() => {
             <ChooseVis />
           </TabPane>
           <TabPane title="3. Configure">
-            <ConfigVis />
+            <ConfigTab />
           </TabPane>
         </Tabs>
       </div>
-    </Context.Provider>
+    </GlobalState.Provider>
   );
 }
