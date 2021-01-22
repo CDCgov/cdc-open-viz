@@ -241,7 +241,7 @@ const DataTable = (props) => {
       >
         {tableTitle}
       </div>
-      <table className={expanded ? '' : 'sr-only'} {...getTableProps()}>
+      <table className={expanded ? '' : 'cdcdataviz-sr-only'} {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, isValidElement } from 'react';
+import React, { useState } from 'react';
 
 const Tabs = ({ children }) => {
   const [active, setActive] = useState(0);

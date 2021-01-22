@@ -2,11 +2,10 @@ import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
-import { LinePath } from '@visx/shape';
+import { LinePath, Line } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import { BarGroup, BarStack } from '@visx/shape';
-import { MarkerCircle } from '@visx/marker';
 import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
 
@@ -17,7 +16,7 @@ const font = '#000000';
 export default function ComboChart({numberFormatter}) {
   let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
 
-  const [ width, height ] = dimensions;
+  const { width, height } = dimensions;
 
   const xMax = width - config.padding.left - config.padding.right;
   const yMax = height - config.padding.top - config.padding.bottom;
@@ -33,7 +32,6 @@ export default function ComboChart({numberFormatter}) {
   let xScaleBar;
   let seriesScaleBar;
   let yScale;
-  let tooltipContent;
 
   if (data) {
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
@@ -83,9 +81,9 @@ export default function ComboChart({numberFormatter}) {
     }
   }
 
-  return config && data && colorScale ? (
+  return config && data && colorScale && width && height ? (
     <div className="line-chart-container">
-      <svg viewBox={`0 0 ${width} ${height}`}>
+      <svg width={width} height={height}>
         { config.visualizationType !== 'Line' ? (
           <Group top={config.padding.top} left={config.padding.left}>
           { config.visualizationSubType === 'stacked' ? (
@@ -227,16 +225,52 @@ export default function ComboChart({numberFormatter}) {
           scale={(xScaleLine || xScaleBar)}
           stroke={font}
           tickStroke={font}
-          labelProps={{
-            fontSize: config.xAxis.labelFontSize || 18,
-            fontWeight: 'bold',
+        >
+          {props => {
+            const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
+            return (
+              <g className="my-custom-bottom-axis">
+                {props.ticks.map((tick, i) => {
+                  const tickX = tick.to.x;
+                  const tickY = tick.to.y + (config.xAxis.tickFontSize || 11) + props.tickLength;
+                  return (
+                    <Group
+                      key={`vx-tick-${tick.value}-${i}`}
+                      className={'vx-axis-tick'}
+                    >
+                      <Line
+                        from={tick.from}
+                        to={tick.to}
+                        stroke="black"
+                      />
+                      <text
+                        transform={`translate(${tickX}, ${tickY + (tick.formattedValue.length * 4.5)}) rotate(-90)`}
+                        fontSize={config.xAxis.tickFontSize || 11}
+                        textAnchor="middle"
+                        width={width / props.tickLength}
+                      >
+                        {tick.formattedValue}
+                      </text>
+                    </Group>
+                  );
+                })}
+                <Line 
+                  from={props.axisFromPoint}
+                  to={props.axisToPoint}
+                  stroke="black"
+                />
+                <text
+                  textAnchor="middle"
+                  transform={`translate(${axisCenter}, 50)`}
+                  fontSize={config.xAxis.labelFontSize || 18}
+                  fontWeight="bold"
+                >
+                  {props.label}
+                </text>
+              </g>
+            );
           }}
-          tickLabelProps={() => ({
-            fill: font,
-            fontSize: config.xAxis.tickFontSize || 11,
-            textAnchor: 'middle'
-          })}
-        />
+        </AxisBottom>
       </svg>
 
       <ReactTooltip />
