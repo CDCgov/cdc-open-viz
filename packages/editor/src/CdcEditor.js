@@ -23,7 +23,7 @@ export default function CdcEditor({ startingTab }) {
     <GlobalState.Provider value={state}>
       <div className="cdc-open-viz-module cdc-editor">
         <Tabs className="top-level" startingTab={startingTab}>
-          <TabPane title="1. Design Data" className="data-designer">
+          <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
           <TabPane title="2. Choose Visualization">

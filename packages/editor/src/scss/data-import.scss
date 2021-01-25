@@ -1,34 +1,39 @@
 @import "_variables";
 
-$light-yellow: #fde0b5;
-$dark-yellow: #f59a23;
-
 .cdc-editor .data-designer {
-    .data-loader {
+    display: flex;
+    .left-col {
         padding-top: $gbl-padding;
         padding-bottom: $gbl-padding;
-
-        .form-control {
-            height: 2.65em;
-        }
-
-        .btn {
-            padding-left: $gbl-padding;
-            padding-right: $gbl-padding;
-        }
+        width: 33.333%;
+        border-right: $lightGray 1px solid;
+        position: fixed;
+        bottom: 0;
+        top: 3rem;
         .tabs {
+            > ul.nav {
+                display: flex;
+            }
             .nav-item {
                 display: flex;
                 justify-content: center;
                 list-style: none;
                 cursor: pointer;
                 padding: .6rem 0;
+                flex-grow: 1;
+                border-bottom: $lightGray 1px solid;
+                color: $mediumGray;
+                align-items: center;
                 svg {
                     margin-right: .3em;
                 }
+                &:hover {
+                    border-bottom-color: $mediumGray;
+                }
                 &.active {
-                    color: $white;
-                    background: $baseColor;
+                    border-bottom-width: 5px;
+                    border-bottom-color: $mediumGray;
+                    color: $darkGray;
                 }
             }
         
@@ -37,12 +42,55 @@ $dark-yellow: #f59a23;
                 border-top: 1px solid $baseColor;
             }
         }
+        .cdcdataviz-file-selector {
+            padding: 1rem 3rem;
+            text-align: center;
+            border: $lightGray 2px dashed;
+            border-radius: .2rem;
+            cursor: pointer;
+            font-size: 1em;
+            color: $mediumGray;
+            transition: .1s all;
+            svg {
+                max-width: 40px;
+                margin: 0 auto .5em;
+                color: $mediumGray;
+                transition: .1s all;
+                path {
+                    fill: currentColor
+                }
+            }
+            &.drag-active {
+                background-color: $lightest-gray;
+                svg {
+                    transform: scale(.8);
+                    transition: .1s all;
+                }
+            }
+            span {
+                white-space: pre;
+                color: $blue;
+                text-decoration: underline;
+            }
+        }
+        .footnote {
+            font-size: .8rem;
+            font-style: italic;
+            color: $mediumGray;
+        }
     }
-
-    .data-import-preview {
-        padding-top: $gbl-padding;
-        padding-bottom: $gbl-padding;
+    &::before {
+        content: " ";
+        flex-shrink: 0;
+        width: 33.33%; // Space pseudo element
+    }
+    .right-col {
+        position: relative;
         background-color: $lightest-gray;
+        padding: $gbl-padding;
+        flex-grow: 1;
+    }
+    .data-import-preview {
         .table-responsive {
             max-height: 70vh;
         }
@@ -68,7 +116,7 @@ $dark-yellow: #f59a23;
                 border: solid 1px $light-gray;
                 background: $white;
             }
-    
+
             .index-col,
             tbody th {
                 // width: 60px;
@@ -95,34 +143,5 @@ $dark-yellow: #f59a23;
             padding-top: 20%;
             
         }
-    }
-
-    .loaded {
-        .upload-file-btn {
-            display: none;
-        }
-    }
-
-    .not-loaded {
-        .loader-ui {
-            display: none;
-        }
-    }
-
-    .custom-file {
-        height: calc(1.5em + 0.75rem + 6px) !important;
-    
-        label {
-            height: 42px;
-            line-height: 1.75;
-    
-            &:after {
-                opacity: 0;
-            }
-        }
-    }
-
-    .data-error.alert-warning{
-        background: $light-yellow;
     }
 }
