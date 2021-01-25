@@ -13,11 +13,8 @@ import UsaIcon from '../assets/icons/globe-asia-solid.svg';
 /**
  * IconButton component
  */
-const IconButton = ({icon, label}) => {
-    return (
-        <button className="btn btn-primary invert" aria-label={label}>{icon}</button>
-    )
-}
+const IconButton = ({icon, label}) => 
+    <button className="btn btn-primary invert" aria-label={label}>{icon}</button>;
 
 export default function ChooseVisTab() { 
     return (
