@@ -49,12 +49,6 @@ const Editor = (props) => {
   
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
 
-  const [ keepUrl, setKeepUrl ] = useState(false)
-
-  const [ dataSource, setDataSource ] = useState('local')
-
-  const [ localData, setLocalData ] = useState(null)
-
   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState(null)
 
   const [ editorCatOrder, setEditorCatOrder ] = useState([])
@@ -551,46 +545,6 @@ const Editor = (props) => {
     }
   }
 
-  const loadData = async (e) => {
-    e.preventDefault()
-
-    // If this started out using default data we are not anymore
-    if(true === loadedDefault) {
-      setLoadedDefault(false)
-    }
-
-    setState(() => { return {loading: true} })
-
-    // Reset a lot of state when loading new data
-    let resetObj = {
-        columns: resetColumnsObj,
-        filters: [],
-        legend: {
-            ...legend,
-            data: [],
-            descriptions: {},
-            specialClasses: [],
-        },
-        processedData: {}
-    }
-
-    let data = {}
-
-    switch(dataSource) {
-        case 'local':
-            data = localData
-        break;
-        case 'url':
-            data = await fetchRemoteData(state.dataUrl)
-        break;
-        default:
-            console.warn(`Editor Load Data type not set`)
-        break;
-    }
-
-    setState({...resetObj, data, loading: false})
-  }
-
   const columnsRequiredChecker = useCallback(() => {
     const columnList = []
 
@@ -972,60 +926,10 @@ const Editor = (props) => {
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
-        <h2>Configuration </h2>
+        <h2>Configure Map</h2>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* Data */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Import Data
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <ul className="data-toggle">
-                    <li className={ dataSource === "local" ? "active" : ""} onClick={ () => { setDataSource('local') } }>
-                      <label>
-                        <span className="edit-label column-heading">Local File</span>
-                        <input type="file"
-                              ref={fileInput}
-                              id="file" name="file"
-                              onChange={() => {
-
-                                const file = fileInput.current.files[0];
-
-                                const extension = file.name.split('.').pop().toLowerCase()
-
-                                if(false === ['csv','json'].includes(extension)) {
-                                  alert("Wrong file type! File must be a .csv or .json file.");
-                                }
-
-                                const reader = new FileReader();
-
-                                reader.readAsText(file, "UTF-8");
-
-                                reader.onload = (evt) => {
-                                  handleEditorChanges("loadFileData", [evt.target.result, extension])
-                                }
-
-                              }}
-                              />
-                      </label>
-                    </li>
-                    <li className={ dataSource === "url" ? "active" : ""} onClick={ () => { setDataSource('url') } }>
-                      <label>
-                        <span className="edit-label column-heading">URL</span>
-                        <input type="text" placeholder="http://" value={state.dataUrl || ''} onChange={(event) => { handleEditorChanges("editorDataUrl", event.target.value) }} />
-                      </label>
-                      <label className="checkbox">
-                        <input type="checkbox" checked={ keepUrl || false } onChange={(event) => { setKeepUrl(event.target.checked) }} />
-                        <span className="edit-label">Always fetch from url</span>
-                      </label>
-                    </li>
-                  </ul>
-                  <button className="btn full-width" onClick={(e) => loadData(e)}>Load Data</button>
-                </AccordionItemPanel>
-              </AccordionItem>
               <AccordionItem> {/* General */}
                 <AccordionItemHeading>
                   <AccordionItemButton>

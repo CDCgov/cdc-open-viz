@@ -23,7 +23,9 @@ export default function DataImport() {
 
   const [data, setData] = useState(null);
 
-  const [columns, setColumns] = useState(null);
+  const [tableColumns, setTableColumns] = useState(null);
+
+  const [tableRows, setTableRows] = useState(null);
 
   const [uploadFile, setUploadFile] = useState(false);
 
@@ -112,7 +114,7 @@ export default function DataImport() {
 
       newHeaders.push(th);
     });
-    setColumns(newHeaders);
+    setTableColumns(newHeaders);
     x = 0; // reset column counter for columns
   }
 
@@ -139,7 +141,9 @@ export default function DataImport() {
       x = 0; // reset column counter for rows
       newRows.push(td);
     });
-    setData(newRows);
+    // debugger;
+    setTableRows(newRows)
+    setData(rowData);
   }
 
   /**
@@ -279,7 +283,7 @@ export default function DataImport() {
       headerGroups,
       rows,
       prepareRow,
-    } = useTable({ columns, data });
+    } = useTable({ columns: tableColumns, data: tableRows });
 
     return (
       <table className="table-responsive table-bordered table-hover" {...getTableProps()}>
@@ -454,7 +458,7 @@ export default function DataImport() {
             </ul>
           </div>
           <div className="col col-sm-8 data-import-preview">
-            {data ? <DataTable /> : <DataPlaceholder />}
+            {tableRows ? <DataTable /> : <DataPlaceholder />}
           </div>
         </div>
       </div>
