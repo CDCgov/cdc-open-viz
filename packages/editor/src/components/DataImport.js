@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import GlobalState from '../context';
+import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import {useDropzone} from 'react-dropzone'
 import { useTable } from 'react-table';
-import '../scss/data-import.scss';
 import * as d3 from 'd3';
+
+import GlobalState from '../context';
+import '../scss/data-import.scss';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
 
-import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
+import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
+import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
   const {data, setData} = useContext(GlobalState);
@@ -22,15 +25,13 @@ export default function DataImport() {
         "parseError": "There was an issue parsing your json file:",
         "url404": "Check to make sure the URL is correct:",
         "urlInvalid": "Please make sure to use a valid URL."
-      };
+  };
+
+  const reader = new FileReader();
 
   const [columns, setColumns] = useState(null);
 
-  const [uploadFile, setUploadFile] = useState(false);
-
   const [error, setError] = useState(null);
-
-  let fileInput = useRef(null);
 
   let urlInput = useRef(null);
 
@@ -40,20 +41,23 @@ export default function DataImport() {
 
   const dataTypes = ['.csv', '.json'];
 
-  const reader = new FileReader();
+  const onDrop = useCallback(acceptedFiles => {
+    const uploadedFile = acceptedFiles[0]
+    const { type: fileType } = uploadedFile;
 
-  const toggleUpload = (currState) => {
-    setUploadFile(!currState);
-    setError(null); // reset errors
+    reader.readAsText(uploadedFile);
 
-    dataUploadLabel.current.innerHTML = 'Choose File';
-
-    if (!currState) {
-      document.getElementById('file-uploader').click();
-    } else {
-      setData(null);
+    switch (fileType) {
+      case 'text/csv':
+        reader.addEventListener('load', parseCsvFile);
+        break;
+      case 'application/json':
+        reader.addEventListener('load', parseJsonFile);
+        break;
+      default:
+        setError(errorList.fileType);
     }
-  };
+  }, [])
 
   /**
    * validateData:
@@ -192,32 +196,8 @@ export default function DataImport() {
    */
   function loadData(dataType, dataTypes, errors = errorList) {
     errorPresent = null;
+
     switch (dataType) {
-      case 'file': {
-        const userData = fileInput.current.files[0];
-        // update the label with the document name
-        const fileUpload = fileInput.current.value.replace(/^.*[\\/]/, '');
-        // document.getElementById('data-upload-label').innerHTML = fileUpload;
-
-        dataUploadLabel.current.innerHTML = fileUpload;
-
-        if (userData) {
-          const fileType = userData.type;
-          reader.readAsText(userData);
-
-          switch (fileType) {
-            case 'text/csv':
-              reader.addEventListener('load', parseCsvFile);
-              break;
-            case 'application/json':
-              reader.addEventListener('load', parseJsonFile);
-              break;
-            default:
-              setError(errors.fileType);
-          }
-        }
-        break;
-      }
       case 'external': {
         const externalInput = urlInput.current.value;
         const urlRegEx = new RegExp(/^https?:\/\/\w+(\.\w+)*(:[0-9]+)?(\/.*)?$/);
@@ -260,11 +240,6 @@ export default function DataImport() {
         }
         break;
       }
-      // case 'freeform': {
-      // // todo build textbox to build these
-      // }
-      // break;
-
       default: {
         setError(errors.dataType);
       }
@@ -317,7 +292,7 @@ export default function DataImport() {
   };
 
   const DataPlaceholder = () => (
-    <div>
+    <div className="data-import-preview">
       <div className="overlay-empty">Add Data to Get Started</div>
       <table className="table-bordered table-empty">
         <thead>
@@ -338,128 +313,49 @@ export default function DataImport() {
   function onEnter(e) {
     e.preventDefault(); //prevent from default on enter
   }
-  // todo figure out how to get these component to work with other helper code or move both back into the render method
-  /**
-   * ExternalUrlLoader component
-   */
-  const ExternalUrlLoader = () => {
-    function onEnter(e) {
-      e.preventDefault(); //prevent from default on enter
-    }
-
-    return (
-      <form className="input-group" onSubmit={onEnter}>
-        <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
-        <div className="input-group-append">
-          <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
-        </div>
-      </form>
-    )
-  }
-
-  /**
-   * FileLoader component
-   */
-  // const FileLoader = () => {
-  //   let fileInput = useRef(null);
-
-  //   let urlInput = useRef(null);
-  
-  //   let dataUploadLabel = useRef(null);
-
-  //   const toggleUpload = (currState) => {
-  //     setUploadFile(!currState);
-  //     setError(false); // reset errors
-  
-  //     dataUploadLabel.current.innerHTML = 'Choose File';
-  
-  //     if (!currState) {
-  //       document.getElementById('file-uploader').click();
-  //     } else {
-  //       setData(null);
-  //     }
-  //   };
-    
-  //   useEffect(() => {
-  //     let { current } = dataUploadLabel;
-  //   });
-
-  //   useEffect(() => {
-  //     let { current } = fileInput;
-  //   });
-  //   return (
-  //     <div>
-  //       <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-  //       <form className="input-group loader-ui">
-  //         <div className="custom-file">
-  //           <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-  //           <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-  //         </div>
-  //         <div className="input-group-append">
-  //           <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-  //         </div>
-  //       </form>
-  //     </div>
-  //   )
-  // }
 
   useEffect(() => {
     let { current } = urlInput;
   });
 
-  useEffect(() => {
-    let { current } = dataUploadLabel;
-  });
-
-  useEffect(() => {
-    let { current } = fileInput;
-  });
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
   return (
-    <section className="container-fluid">
-      <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
-        <div className="row">
-          <div className="col data-loader">
-            <Tabs className="mb-4">
-              <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
-                {/* <ExternalUrlLoader className="mb-3" /> */}
-                <form className="input-group" onSubmit={onEnter}>
-                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
-                  <div className="input-group-append">
-                    <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
-                  </div>
-                </form>
-              </TabPane>
-              <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
-                {/* <FileLoader /> */}
-                <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-                <form className="input-group loader-ui">
-                  <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-                  </div>
-                  <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-                  </div>
-                </form>
-              </TabPane>
-            </Tabs>
-            { error
-              ? <p className="data-error alert alert-warning">{error} - {errorPresent}</p>
-              : <p>Upload a data file to use ({dataTypes.join(', ')})</p> }
-
-            <p className="pb-3">Data Format Help</p>
-            <ul>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
-              <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
-              <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
-            </ul>
-          </div>
-          <div className="col col-sm-8 data-import-preview">
-            {data ? <DataTable /> : <DataPlaceholder />}
-          </div>
-        </div>
+    <>
+      <div className="left-col px-4">
+        <Tabs className="mb-4">
+          <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
+            <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+              <FileUploadIcon />
+              <input {...getInputProps()} />
+              {
+                isDragActive ?
+                <p>Drop file here</p> :
+                <p>Drag file to this area, or <span>select a file</span>.</p>
+              }
+            </div>
+          </TabPane>
+          <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
+            <form className="input-group d-flex" onSubmit={onEnter}>
+              <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
+              <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
+            </form>
+          </TabPane>
+        </Tabs>
+        {error && <div className="error-box mt-2"><span>{error}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setError(null)} /></div>}
+        <p className="footnote mt-2 mb-4">Supported file types: {dataTypes.join(', ')}</p>
+        <section className="cdcdataviz-guidance info-box">
+          <h4>Data Format Help</h4>
+          <ul>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
+            <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
+            <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+          </ul>
+        </section>
       </div>
-    </section>
+      <div className="right-col">
+        {data ? <DataTable /> : <DataPlaceholder />}
+      </div>
+    </>
   );
 }

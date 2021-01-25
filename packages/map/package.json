@@ -40,7 +40,7 @@
   },
   "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81",
   "peerDependencies": {
-    "react": ">=16",
+    "react": ">=16.8",
     "react-dom": ">=16"
   },
   "browserslist": [

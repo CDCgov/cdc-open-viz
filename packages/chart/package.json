@@ -38,7 +38,7 @@
     "react-tooltip": "^4.2.11"
   },
   "peerDependencies": {
-    "react": ">=16",
+    "react": ">=16.8",
     "react-dom": ">=16"
   },
   "browserslist": [
