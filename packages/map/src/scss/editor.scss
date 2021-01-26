@@ -534,6 +534,7 @@
       color: rgba(0,0,0,.5);
       text-transform: none;
       font-weight: normal;
+<<<<<<< HEAD
     }
   
     .btn {
@@ -608,6 +609,108 @@
       margin-left: 8px;
     }
   
+=======
+    }
+  
+    .btn {
+      background: #005eaa;
+      color: #fff;
+      border: 0;
+      padding: .4em 0;
+      font-size: 1em;
+      display: block;
+      border-radius: 5px;
+      margin-top: 1em;
+      transition: .1s all;
+      cursor: pointer;
+      &.full-width {
+        width: 100%;
+      }
+      &.secondary {
+        font-size: .8em;
+        padding: .3em 1em;
+        background: rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        margin-bottom: 1em;
+        &:hover {
+          background: rgba(0,0,0,.5);
+        }
+      }
+      &:hover {
+        transition: .1s all;
+        background: lighten(#005eaa, 5%);
+      }
+    }
+    
+    .sort-list li {
+      display: block;
+      box-sizing: border-box;
+      border: 1px solid #D1D1D1;
+      border-radius: 2px;
+      background: #F1F1F1;
+      padding: .4em .6em;
+      font-size: .8em;
+      margin-right: .3em;
+      margin-bottom: .3em;
+      cursor: move;
+      z-index: 999;
+    }
+    
+    .info {
+      font-size: .8em;
+      line-height: 1.4em;
+      font-style: italic;
+      padding-top: 10px;
+    }
+  
+    .react-tags__search {
+      width: 100%;
+    }
+  
+    .react-tags {
+      position: relative;
+      input {
+        border: rgba(0, 0, 0, 0.3) 1px solid;
+      }
+  
+      /* shared font styles */
+      font-size: 1em;
+      line-height: 1;
+  
+      /* clicking anywhere will focus the input */
+      cursor: text;
+      span {
+        display: inline
+      }
+    }
+  
+    .react-tags.is-focused {
+      border-color: rgba(0, 0, 0, 0.7);
+    }
+  
+    .react-tags__selected {
+      display: inline;
+    }
+  
+    .react-tags__selected-tag {
+      display: inline-block;
+      box-sizing: border-box;
+      border: 1px solid #D1D1D1;
+      border-radius: 2px;
+      background: #F1F1F1;
+      padding: .4em .6em;
+      font-size: .8em;
+      margin-right: .3em;
+      margin-bottom: .3em;
+    }
+  
+    .react-tags__selected-tag:after {
+      content: '\2715';
+      color: #AAA;
+      margin-left: 8px;
+    }
+  
+>>>>>>> editor/data-loader
     .react-tags__selected-tag:hover,
     .react-tags__selected-tag:focus {
       border-color: #B1B1B1;
