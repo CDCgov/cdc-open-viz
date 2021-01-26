@@ -1,273 +1,137 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import GlobalState from '../context';
+import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import {useDropzone} from 'react-dropzone'
 import { useTable } from 'react-table';
-import '../scss/data-import.scss';
 import * as d3 from 'd3';
+
+import GlobalState from '../context';
+import '../scss/data-import.scss';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
 
-import UploadIcon from '../assets/icons/upload-solid.svg';
 import LinkIcon from '../assets/icons/link.svg';
+import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
+import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
   const {data, setData} = useContext(GlobalState);
 
-  const errorList =
+  const [externalURL, setExternalURL] = useState('')
+
+  const errorMessages =
       {
         "emptyCols": "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",
         "emptyData": "Your data is empty.",
         "dataType": "Your datatype is not supported.",
         "fileType": "The file type that you are trying to upload is not supported.",
         "formatting": "Please check the formatting of your data. JSON files need be formatted in an array of objects [ {\"name\":\"data1\", .... },{...},{...}]",
-        "parseError": "There was an issue parsing your json file:",
-        "url404": "Check to make sure the URL is correct:",
+        "parseError": "There was an issue parsing your json file: ",
+        "url404": "Error fetching or parsing data: ",
         "urlInvalid": "Please make sure to use a valid URL."
-      };
+  };
 
-  const [columns, setColumns] = useState(null);
-
-  const [uploadFile, setUploadFile] = useState(false);
-
-  const [error, setError] = useState(null);
-
-  let fileInput = useRef(null);
-
-  let urlInput = useRef(null);
-
-  let dataUploadLabel = useRef(null);
-
-  let errorPresent = false;
+  const [errors, setErrors] = useState([]);
 
   const dataTypes = ['.csv', '.json'];
-
-  const reader = new FileReader();
-
-  const toggleUpload = (currState) => {
-    setUploadFile(!currState);
-    setError(null); // reset errors
-
-    dataUploadLabel.current.innerHTML = 'Choose File';
-
-    if (!currState) {
-      document.getElementById('file-uploader').click();
-    } else {
-      setData(null);
-    }
-  };
 
   /**
    * validateData:
    * Check data for common issues
    */
-  function validateData(userData, dataType, errors = errorList) {
-    setError(null);
-    debugger;
-    // debugger;
-    if (userData[1] && typeof userData[1][0] !== 'undefined' && dataType === 'json') {
+  const validateData = async (rawData, mimeType) => {
+    const errorsFound = []
+
+    if ( rawData === null || rawData === 'undefined' ) {
+      errorsFound.push(errorMessages.emptyData)
+    }
+
+    if (rawData[1] && typeof rawData[1][0] !== 'undefined' && mimeType === 'application/json') {
       // is the json a bunch of arrays instead of objects?
-      errorPresent = true;
-      debugger;
-      setError(errors.formatting);
-
-    } else if (userData.columns && userData.columns.includes('')) {
+      errorsFound.push(errorMessages.formatting);
+    }
+    
+    if (rawData.columns && rawData.columns.includes('')) {
       // are any of the column headers empty?
-      setError(errors.emptyCols);
-
-    } else if ( userData === null || userData === 'undefined' ) {
-      errorPresent = true;
-      setError(errors.emptyData);
+      errorsFound.push(errorMessages.emptyCols)
     }
+
+    if(errorsFound.length > 0) {
+      throw errorsFound;
+    }
+
+    return rawData;
   }
 
-  /**
-   * populateColumns:
-   * build columns for the table display
-   */
-  function populateColumns(colData) {
-    // Format table data
-    const newHeaders = [];
-    let x = 0;
+  const loadExternal = async () => {
+    let dataURL = '';
 
-    if (!colData.columns) {
-      // create columns if they don't exist
-      colData.columns = [];
-      const tblRow = Object.entries(colData[0]);
-      tblRow.forEach((item) => {
-        colData.columns.push(item[0]);
+    // Is URL valid?
+    try {
+      dataURL = new URL(externalURL);
+    } catch {
+      setErrors([errorMessages.urlInvalid]);
+      return false;
+    }
+
+    let responseBlob = null;
+
+    try {
+      const response = await fetch(dataURL);
+      const responseText = await response.text();
+
+      const typeDictionary = {
+        '.csv': 'text/csv',
+        '.json': 'application/json'
+      }
+
+      const fileExtension = Object.keys(typeDictionary).find(extension => dataURL.pathname.endsWith(extension))
+
+      // Manually construct blob instead of calling response.blob() to get around inconsistent mimeType inference
+      responseBlob = new Blob([responseText], {
+        type: typeDictionary[fileExtension]
       });
+    } catch (err) {
+      setErrors([errorMessages.url404 + err.toString()]);
     }
-    // format table header data
-    colData.columns.forEach((cell) => {
-      // create a placeholder to map data to
-      const cellVal = (
-        cell === ''
-          ? `X.${x += 1}`
-          : cell);
-      const th = {};
-      // if we generated the cell value write nothing to the th
-      th.Header = (
-        cellVal === `X.${x}`
-          ? ''
-          : cellVal);
-      th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
-
-      newHeaders.push(th);
-    });
-    setColumns(newHeaders);
-    x = 0; // reset column counter for columns
+    
+    return responseBlob;
   }
 
-  /**
-   * populateRows:
-   * build rows for the table display
-   */
-  function populateRows(rowData) {
-    // Format table data
-    const newRows = [];
-    let x = 0;
-    // format table data rows
-    rowData.forEach((row) => {
-      const rowArr = Object.entries(row);
-      const td = {};
-      rowArr.forEach((cell) => {
-        // fill in empty cells
-        const cellVal = (
-          cell[0] === ''
-            ? `X_${x += 1}`
-            : cell[0].replace(/[^A-Z0-9]/ig, '_'));
-        td[cellVal] = cell[1];
-      });
-      x = 0; // reset column counter for rows
-      newRows.push(td);
-    });
-
-    setData(newRows);
-  }
+  const onDrop = useCallback(([uploadedFile]) => loadData(uploadedFile), [])
 
   /**
-   * CSV Parsing: collect the data and format it
-   * to be handled by React-Table
+   * Handle loading data
    */
-  function parseCsvFile( extData = null ) {
-    // check for external data
-    const fileData = extData.length ? extData : d3.csvParse(reader.result, (d) => d);
+  const loadData = async (fileBlob = null) => {
+    let fileData = fileBlob;
 
-    validateData(fileData, 'csv');
-
-    if (!errorPresent) {
-      populateColumns(fileData);
-      populateRows(fileData);
-    }
-  }
-
-  /**
-   * JSON Parsing: collect the data and format it
-   * to be handled by React-Table
-   */
-  function parseJsonFile( extData = null, errors = errorList ) {
-    let jsonData;
-    // check for external data
-    if ( extData.length ) {
-      jsonData = extData;
-      validateData(jsonData, 'json');
-    } else {
-      try {
-        jsonData = JSON.parse(reader.result);
-        validateData(jsonData, 'json');
-      } catch (err) {
-        errorPresent = true;
-        setError(`${errors.parseError} ${err.toString()}`);
-      }
+    // Get the raw data as text from the file
+    if(null === fileData) {
+      fileData = await loadExternal();
     }
 
-    if (!errorPresent) {
-      populateColumns(jsonData);
-      populateRows(jsonData);
-    }
-  }
+    // Pull out mime type of file
+    const { type: mimeType } = fileData;
 
-  /**
-   * Handle loading data from user
-   * submitted files and external URLs
-   */
-  function loadData(dataType, dataTypes, errors = errorList) {
-    errorPresent = null;
-    switch (dataType) {
-      case 'file': {
-        const userData = fileInput.current.files[0];
-        // update the label with the document name
-        const fileUpload = fileInput.current.value.replace(/^.*[\\/]/, '');
-        // document.getElementById('data-upload-label').innerHTML = fileUpload;
+    // Convert from blob into raw text
+    fileData = await fileData.text();
 
-        dataUploadLabel.current.innerHTML = fileUpload;
-
-        if (userData) {
-          const fileType = userData.type;
-          reader.readAsText(userData);
-
-          switch (fileType) {
-            case 'text/csv':
-              reader.addEventListener('load', parseCsvFile);
-              break;
-            case 'application/json':
-              reader.addEventListener('load', parseJsonFile);
-              break;
-            default:
-              setError(errors.fileType);
-          }
-        }
+    switch (mimeType) {
+      case 'text/csv':
+        fileData = d3.csvParse(fileData);
         break;
-      }
-      case 'external': {
-        const externalInput = urlInput.current.value;
-        const urlRegEx = new RegExp(/^https?:\/\/\w+(\.\w+)*(:[0-9]+)?(\/.*)?$/);
-        // create a URL to make error checking easier
-        if ( urlRegEx.test( externalInput )  ) {
-          const dataUrl  = new URL(externalInput);
-          const fileName = dataUrl.pathname.split('/').pop();
-          const fileExt  = fileName.slice( ( fileName.lastIndexOf(".") - 1 ) + 1 );
-          // does the URL contain an acceptable filetype?
-          if ( dataTypes.includes( fileExt ) ) {
-            switch (fileExt) {
-              case '.csv':
-                d3.csv(dataUrl)
-                  .then(function(csvData) {
-                    parseCsvFile(csvData);
-                  })
-                  .catch(err => { 
-                    errorPresent = true;
-                    setError( errors.url404 + ": " + err.toString() )
-                  });
-                break;
-              case '.json':
-                d3.json(dataUrl)
-                  .then(function(jsonData) {
-                    parseJsonFile(jsonData);
-                  })
-                  .catch(err => { 
-                    errorPresent = true;
-                    setError( errors.url404 + err.toString() )
-                  });
-                break;
-              default:
-                setError(errors.fileType);
-          }
-          } else {
-            setError( fileExt + ' is not an acceptible document type. Please upload your document in ' + dataTypes.join(', ') );
-          }
-        } else {
-          setError(errors.urlInvalid);
-        }
+      case 'application/json':
+        fileData = JSON.parse(fileData);
         break;
-      }
-      // case 'freeform': {
-      // // todo build textbox to build these
-      // }
-      // break;
+      default:
+        setErrors([errorMessages.fileType]);
+    }
 
-      default: {
-        setError(errors.dataType);
-      }
+    // Validate parsed data and set it
+    try {
+      fileData = await validateData(fileData, mimeType);
+      setData(fileData);
+    } catch (errors) {
+      setErrors(errors);
     }
   }
 
@@ -275,13 +139,87 @@ export default function DataImport() {
    * DataTable component
    */
   const DataTable = () => {
+    const [tableColumns, setTableColumns] = useState(null);
+
+    const [tableRows, setTableRows] = useState(null);
+
+    /**
+     * populateColumns:
+     * build columns for the table display
+     */
+    const populateColumns = (colData) => {
+      // Format table data
+      const newHeaders = [];
+      let x = 0;
+
+      if (!colData.columns) {
+        // create columns if they don't exist
+        colData.columns = [];
+        const tblRow = Object.entries(colData[0]);
+        tblRow.forEach((item) => {
+          colData.columns.push(item[0]);
+        });
+      }
+      // format table header data
+      colData.columns.forEach((cell) => {
+        // create a placeholder to map data to
+        const cellVal = (
+          cell === ''
+            ? `X.${x += 1}`
+            : cell);
+        const th = {};
+        // if we generated the cell value write nothing to the th
+        th.Header = (
+          cellVal === `X.${x}`
+            ? ''
+            : cellVal);
+        th.accessor = cellVal.replace(/[^A-Z0-9]/ig, '_');
+
+        newHeaders.push(th);
+      });
+      setTableColumns(newHeaders);
+      x = 0; // reset column counter for columns
+    }
+
+    /**
+     * populateRows:
+     * build rows for the table display
+     */
+    const populateRows = (rowData) => {
+      // Format table data
+      const newRows = [];
+      let x = 0;
+      // format table data rows
+      rowData.forEach((row) => {
+        const rowArr = Object.entries(row);
+        const td = {};
+        rowArr.forEach((cell) => {
+          // fill in empty cells
+          const cellVal = (
+            cell[0] === ''
+              ? `X_${x += 1}`
+              : cell[0].replace(/[^A-Z0-9]/ig, '_'));
+          td[cellVal] = cell[1];
+        });
+        x = 0; // reset column counter for rows
+        newRows.push(td);
+      });
+      // debugger;
+      setTableRows(newRows)
+    }
+
+    useEffect(() => {
+      populateColumns(data);
+      populateRows(data);
+    }, [])
+
     const {
       getTableProps,
       getTableBodyProps,
       headerGroups,
       rows,
       prepareRow,
-    } = useTable({ columns, data });
+    } = useTable({ columns: tableColumns, data: tableRows });
 
     return (
       <table className="table-responsive table-bordered table-hover" {...getTableProps()}>
@@ -317,7 +255,7 @@ export default function DataImport() {
   };
 
   const DataPlaceholder = () => (
-    <div>
+    <div className="data-import-preview">
       <div className="overlay-empty">Add Data to Get Started</div>
       <table className="table-bordered table-empty">
         <thead>
@@ -335,131 +273,44 @@ export default function DataImport() {
     </div>
   );
 
-  function onEnter(e) {
-    e.preventDefault(); //prevent from default on enter
-  }
-  // todo figure out how to get these component to work with other helper code or move both back into the render method
-  /**
-   * ExternalUrlLoader component
-   */
-  const ExternalUrlLoader = () => {
-    function onEnter(e) {
-      e.preventDefault(); //prevent from default on enter
-    }
-
-    return (
-      <form className="input-group" onSubmit={onEnter}>
-        <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
-        <div className="input-group-append">
-          <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
-        </div>
-      </form>
-    )
-  }
-
-  /**
-   * FileLoader component
-   */
-  // const FileLoader = () => {
-  //   let fileInput = useRef(null);
-
-  //   let urlInput = useRef(null);
-  
-  //   let dataUploadLabel = useRef(null);
-
-  //   const toggleUpload = (currState) => {
-  //     setUploadFile(!currState);
-  //     setError(false); // reset errors
-  
-  //     dataUploadLabel.current.innerHTML = 'Choose File';
-  
-  //     if (!currState) {
-  //       document.getElementById('file-uploader').click();
-  //     } else {
-  //       setData(null);
-  //     }
-  //   };
-    
-  //   useEffect(() => {
-  //     let { current } = dataUploadLabel;
-  //   });
-
-  //   useEffect(() => {
-  //     let { current } = fileInput;
-  //   });
-  //   return (
-  //     <div>
-  //       <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-  //       <form className="input-group loader-ui">
-  //         <div className="custom-file">
-  //           <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-  //           <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-  //         </div>
-  //         <div className="input-group-append">
-  //           <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-  //         </div>
-  //       </form>
-  //     </div>
-  //   )
-  // }
-
-  useEffect(() => {
-    let { current } = urlInput;
-  });
-
-  useEffect(() => {
-    let { current } = dataUploadLabel;
-  });
-
-  useEffect(() => {
-    let { current } = fileInput;
-  });
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
   return (
-    <section className="container-fluid">
-      <div className={(uploadFile) ? 'loaded' : 'not-loaded'}>
-        <div className="row">
-          <div className="col data-loader">
-            <Tabs className="mb-4">
-              <TabPane title="Link from URL" icon={<LinkIcon className="inline-icon" />}>
-                {/* <ExternalUrlLoader className="mb-3" /> */}
-                <form className="input-group" onSubmit={onEnter}>
-                  <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" ref={urlInput} />
-                  <div className="input-group-append">
-                    <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData('external', dataTypes)}>Load</button>
-                  </div>
-                </form>
-              </TabPane>
-              <TabPane title="Upload File" icon={<UploadIcon className="inline-icon" />}>
-                {/* <FileLoader /> */}
-                <button className="btn btn-primary btn-block upload-file-btn" type="button" htmlFor="file-uploader" onClick={() => toggleUpload(uploadFile)}>Upload File</button>
-                <form className="input-group loader-ui">
-                  <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="file-uploader" accept={dataTypes.join(',')} onChange={() => loadData('file', dataTypes)} ref={fileInput}  />
-                    <label id="data-upload-label" className="custom-file-label" htmlFor="file-uploader" ref={dataUploadLabel}>Choose file</label>
-                  </div>
-                  <div className="input-group-append">
-                    <button className="btn btn-primary" type="button" onClick={() => toggleUpload(uploadFile)}>Clear</button>
-                  </div>
-                </form>
-              </TabPane>
-            </Tabs>
-            { error
-              ? <p className="data-error alert alert-warning">{error} - {errorPresent}</p>
-              : <p>Upload a data file to use ({dataTypes.join(', ')})</p> }
-
-            <p className="pb-3">Data Format Help</p>
-            <ul>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
-              <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
-              <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
-            </ul>
-          </div>
-          <div className="col col-sm-8 data-import-preview">
-            {data ? <DataTable /> : <DataPlaceholder />}
-          </div>
-        </div>
+    <>
+      <div className="left-col px-4">
+        <Tabs className="mb-4">
+          <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
+            <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+              <FileUploadIcon />
+              <input {...getInputProps()} />
+              {
+                isDragActive ?
+                <p>Drop file here</p> :
+                <p>Drag file to this area, or <span>select a file</span>.</p>
+              }
+            </div>
+          </TabPane>
+          <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
+            <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
+              <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} required />
+              <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
+            </form>
+          </TabPane>
+        </Tabs>
+        {errors.map((message, index) => (<div className="error-box mt-2" key={`error-${index}`}><span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((i) => i !== index) )} /></div>))}
+        <p className="footnote mt-2 mb-4">Supported file types: {dataTypes.join(', ')}</p>
+        <section className="cdcdataviz-guidance info-box">
+          <h4>Data Format Help</h4>
+          <ul>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
+            <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
+            <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+          </ul>
+        </section>
       </div>
-    </section>
+      <div className="right-col">
+        {/* {data ? <DataTable /> : <DataPlaceholder />} */}
+      </div>
+    </>
   );
 }
