@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GlobalState from './context';
 import DataImport from './components/DataImport';
-import ChooseVis from './components/ChooseVisualization';
+import ChooseVisTab from './components/ChooseVisTab';
 import ConfigTab from './components/ConfigTab';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
@@ -23,11 +23,11 @@ export default function CdcEditor({ startingTab }) {
     <GlobalState.Provider value={state}>
       <div className="cdc-open-viz-module cdc-editor">
         <Tabs className="top-level" startingTab={startingTab}>
-          <TabPane title="1. Design Data" className="data-designer">
+          <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
           <TabPane title="2. Choose Visualization">
-            <ChooseVis />
+            <ChooseVisTab />
           </TabPane>
           <TabPane title="3. Configure">
             <ConfigTab />

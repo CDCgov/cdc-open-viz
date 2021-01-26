@@ -1,7 +1,3 @@
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
-@import "~bootstrap/scss/grid";
 @import "@cdc/core/styles/base";
 @import 'variables';
 @import "bootstrap";
@@ -9,6 +5,11 @@
 $tempLightGray: #C7C7C7;
 
 .cdc-editor {
+  @import "~bootstrap/scss/functions";
+  @import "~bootstrap/scss/variables";
+  @import "~bootstrap/scss/mixins";
+  @import "~bootstrap/scss/utilities";
+  @import "~bootstrap/scss/grid";
   min-height: inherit;
   display: flex;
   flex-direction: column;
@@ -37,6 +38,8 @@ $tempLightGray: #C7C7C7;
         border-bottom: 1px solid $tempLightGray;
         color: #333;
         flex-grow: 1;
+        flex-shrink: 0;
+        width: 33.33%;
         cursor: pointer;
         border-right: 1px solid $tempLightGray;
         text-align: center;
@@ -69,6 +72,31 @@ $tempLightGray: #C7C7C7;
 
     &:focus-within nav {
       display: block
+    }
+  }
+
+  .info-box {
+    border: $lightGray 1px solid;
+    padding: 1rem;
+    font-size: .9rem;
+    h4 {
+      font-weight: 600;
+      font-size: 1.2em;
+    }
+    ul {
+      padding: inherit;
+    }
+  }
+
+  .error-box {
+    background: #FFC2C2;
+    display: flex;
+    justify-content: space-between;
+    padding: .3rem 1rem;
+    font-size: .9rem;
+    .dismiss-error {
+      font-size: .8rem;
+      cursor: pointer;
     }
   }
 }
