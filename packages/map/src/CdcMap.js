@@ -738,7 +738,7 @@ class CdcMap extends Component {
     }
 
     // Checks if the string is a number and returns it as a number if it is
-    numberFromString = (value) => {
+    numberFromString (value) {
         // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
         let nonNumeric = /[^\d.]/g
 

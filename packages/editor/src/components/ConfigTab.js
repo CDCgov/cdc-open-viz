@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import CdcMap from '@cdc/map'; // TODO: Lazy
+// import CdcMap from '@cdc/map'; // TODO: Lazy load this
 import GlobalState from '../context';
 
 
@@ -8,7 +8,8 @@ export default function ConfigTab() {
 
     switch (type) {
         case 'map':
-            return <CdcMap isEditor={true} config={{data: data}} />
+            return <span>map</span>
+            // return <CdcMap isEditor={true} config={{data: data}} />
         default:
             return <p>No visualization type selected.</p>
     }

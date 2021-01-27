@@ -16,6 +16,38 @@ module.exports = (env = {}, { mode }) => {
     index: mode === 'development' ? './src/index' : `./src/${packageName}`,
   }
 
+  const babelLoader = {
+    loader: 'babel-loader',
+    options: {
+      presets: [
+        ['@babel/preset-env', {
+          useBuiltIns: 'entry',
+          corejs: '3.8.3',
+          targets: {
+            browsers: [
+                'IE 11',
+            ],
+          }
+        }],
+        '@babel/preset-react', // TODO: Enable automatic runtime support
+        {
+          plugins: [
+            '@babel/plugin-syntax-dynamic-import',
+            [
+              '@babel/plugin-transform-runtime',
+              {
+                "helpers": false,
+                "regenerator": true,
+                useModules: false,
+                "version": "7.12.5"
+              }
+            ],
+          ]
+        }
+      ]
+    },
+  }
+
   const configObj = {
     mode,
     entry,
@@ -34,28 +66,13 @@ module.exports = (env = {}, { mode }) => {
     resolve: {
       extensions: ['*', '.tsx', '.ts', '.js'],
     },
+    target: ['es5', 'web'],
     module: {
       rules: [
         {
           // JS, JSX - Transpiles JSX
           test: /\.m?jsx?$/,
-          exclude: /node_modules\/(?!array-move).*/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                '@babel/preset-env',
-                '@babel/preset-react', // Future: Enable automatic runtime support
-                {
-                  plugins: [
-                    '@babel/plugin-proposal-class-properties',
-                    '@babel/plugin-syntax-dynamic-import',
-                    '@babel/plugin-transform-arrow-functions'
-                  ]
-                }
-              ]
-            },
-          }
+          use: babelLoader
         },
         {
           // TS, TSX - Transpiles TypeScript and JSX. The ts-loader package handles both and specific configuration is set in tsconfig.json at root.
@@ -120,7 +137,12 @@ module.exports = (env = {}, { mode }) => {
             },
             // When imported into a JS/TS file, they are imported as React Components exposing the full markup of the SVG.
             {
-              use: 'react-svg-loader'
+              use: [
+                babelLoader,
+                {
+                  loader: 'react-svg-loader'
+                }
+              ]
             }
           ]
         },
@@ -150,7 +172,6 @@ module.exports = (env = {}, { mode }) => {
         errors: true
       }
     };
-    configObj.target = 'web'
     configObj.plugins = [
       new HtmlWebpackPlugin({
         template: './src/index.html'

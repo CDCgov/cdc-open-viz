@@ -9,8 +9,6 @@ import {
 } from 'react-accessible-accordion';
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import arrayMove from 'array-move'
-import Papa from 'papaparse';
 
 import Waiting from './Waiting';
 import MapIcon from '../images/map-folded.svg';
@@ -18,6 +16,7 @@ import UsaGraphic from '../images/usa-graphic.svg';
 import WorldGraphic from '../images/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
+const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
 const Editor = (props) => {
@@ -337,23 +336,6 @@ const Editor = (props) => {
       break;
       case 'editorDataUrl':
           setState({dataUrl: value})
-      break;
-      case 'loadFileData':
-
-          if("csv" === value[1]) {
-              const parsedCsv = Papa.parse(value[0], {
-                  header: true,
-                  dynamicTyping: true
-              })
-
-              const uploadedCsvData = cleanCsvData(parsedCsv.data)
-
-              setLocalData(uploadedCsvData)
-          } else if("json" === value[1]) {
-              const uploadedJsonData = JSON.parse(value[0])
-
-              setLocalData(uploadedJsonData)
-          }
       break;
       case 'toggleDownloadButton':
               setState( (prevState) => {
