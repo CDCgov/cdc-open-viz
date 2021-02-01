@@ -24,7 +24,7 @@ $tempLightGray: #C7C7C7;
     top: calc(3rem + 11px);
   }
   .editor-panel {
-    top: 3rem;
+    margin-top: 3rem;
   }
   // Top level tabs
   .top-level {
@@ -41,8 +41,8 @@ $tempLightGray: #C7C7C7;
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
-        width: 33.33%;
         cursor: pointer;
+        width: 33%;
         border-right: 1px solid $tempLightGray;
         text-align: center;
         &:last-child {
@@ -52,12 +52,15 @@ $tempLightGray: #C7C7C7;
             background-color: #565656;
             color: #fff;
         }
+        &.disabled {
+          cursor: not-allowed;
+        }
       }
     }
   }
   > .tab-content {
     flex-grow: 1;
-    top: 3rem;
+    margin-top: 3rem;
     position: relative;
   }
   .dropdown {

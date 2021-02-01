@@ -9,14 +9,29 @@ export default {
     modalOpen: false,
     modalContent: null,
     language: 'en',
+    geoType: 'us',
     parentUrl: false,
     hasRegions: false,
     expandDataTable: true,
-    fullBorder: false
+    fullBorder: false,
+    type: 'data'
   },
+  color: 'pinkpurple',
   columns: {
-    primary: {},
-    geo: {},
+    geo: {
+      name: '',
+      label: 'Location',
+			tooltip: false,
+      dataTable: true,
+    },
+    primary: {
+      dataTable: true,
+      tooltip: true,
+      prefix: '',
+      suffix: '',
+      name: '',
+      label: ''
+    },
     geosInRegion: {
       name: ''
     }
@@ -26,7 +41,11 @@ export default {
     specialClasses: [],
     unified: false,
     singleColumn: false,
-    dynamicDescription: false
+    dynamicDescription: false,
+    type: "equalnumber",
+    numberOfItems: 3,
+    position: "side",
+    title: "Legend",
   },
   data: [
     {},

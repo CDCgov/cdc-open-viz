@@ -66,7 +66,7 @@ module.exports = (env = {}, { mode }) => {
     resolve: {
       extensions: ['*', '.tsx', '.ts', '.js'],
     },
-    target: ['es5', 'web'],
+    target: 'web',
     module: {
       rules: [
         {

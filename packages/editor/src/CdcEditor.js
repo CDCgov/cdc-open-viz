@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import GlobalState from './context';
 import DataImport from './components/DataImport';
-import ChooseVisTab from './components/ChooseVisTab';
 import ConfigTab from './components/ConfigTab';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
@@ -26,10 +25,7 @@ export default function CdcEditor({ startingTab }) {
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
-          <TabPane title="2. Choose Visualization">
-            <ChooseVisTab />
-          </TabPane>
-          <TabPane title="3. Configure">
+          <TabPane title="2. Configure" disableRule={null === data}>
             <ConfigTab />
           </TabPane>
         </Tabs>
