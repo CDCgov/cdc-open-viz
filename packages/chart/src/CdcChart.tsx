@@ -40,6 +40,7 @@ export default function CdcChart({ configUrl, element }) {
   const [resizeInit, setResizeInit] = useState<boolean>(false);
 
   const legendGlyphSize = 15;
+  const viewportCutoff = 900;
 
   const loadConfig = async () => {
     const response = await fetch(configUrl);
@@ -67,7 +68,7 @@ export default function CdcChart({ configUrl, element }) {
 
       debounce.current = setTimeout(() => {
         setDimensions({	
-            width: element.offsetWidth,	
+            width: element.offsetWidth > viewportCutoff ? (element.offsetWidth * .75) : element.offsetWidth,	
             height: 500
         });	
       }, 250);	
