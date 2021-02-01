@@ -24,8 +24,8 @@ export default function ComboChart({numberFormatter}) {
   const getXAxisData = (d: any) => d[config.xAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
-  const parseDate = timeParse(config.xAxis.dateFormat);
-  const format = timeFormat('%b %d');
+  const parseDate = timeParse(config.xAxis.dateParseFormat);
+  const format = timeFormat(config.xAxis.dateDisplayFormat);
   const formatDate = (date: string) => format(parseDate(date) as Date);
 
   let xScaleLine;
