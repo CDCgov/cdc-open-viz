@@ -99,7 +99,7 @@ export default function PieChart({numberFormatter}) {
   const {width, height} = dimensions;
   const margin = config.padding;
 
-  const innerWidth = width - margin.left - margin.right;
+  const innerWidth = width;
   const innerHeight = height - margin.top - margin.bottom;
   const radius = Math.min(innerWidth, innerHeight) / 2;
   const centerY = innerHeight / 2;
@@ -109,7 +109,7 @@ export default function PieChart({numberFormatter}) {
   return width && height ? (
     <div ref={svgRef}>
       <svg viewBox={`0 0 ${width} ${height}`}>
-        <Group top={centerY + margin.top} left={centerX + margin.left}>
+        <Group top={centerY + margin.top}  left={centerX}>
           <Pie
             data={data}
             pieValue={d => d[config.yAxis.dataKey]}
