@@ -96,6 +96,26 @@ export default function DataImport() {
 
   const onDrop = useCallback(([uploadedFile]) => loadData(uploadedFile), [])
 
+  // This adds a columns property just like the D3 function for JSON parsing.
+  const addColumns = (data) => {
+    let columns = []
+
+    data.forEach( (rowObj) => {
+      Object.keys(rowObj).forEach( (columnHeading) => {
+        if(false === columns.includes(columnHeading)) {
+          columns.push(columnHeading)
+        }
+      })
+    })
+
+    // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
+    const newData = [...data];
+
+    newData.columns = columns;
+
+    return newData;
+  }
+
   /**
    * Handle loading data
    */
@@ -130,6 +150,7 @@ export default function DataImport() {
         break;
       case 'application/json':
         fileData = JSON.parse(fileData);
+        fileData = addColumns(fileData);
         break;
       default:
         setErrors([errorMessages.fileType]);
@@ -200,7 +221,7 @@ export default function DataImport() {
         </section>
       </div>
       <div className="right-col">
-        {data ? <PreviewDataTable data={data} /> : <DataPlaceholder />}
+        <PreviewDataTable data={data} />
       </div>
     </>
   );

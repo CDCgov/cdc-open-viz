@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
-
+import React, { useState, useEffect, useCallback } from 'react'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import {
   Accordion,
   AccordionItem,
@@ -19,7 +19,7 @@ import worldDefaultConfig from '../examples/default-world.json';
 const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
-const Editor = (props) => {
+const EditorPanel = (props) => {
 
   const {
     state,
@@ -35,8 +35,6 @@ const Editor = (props) => {
   } = props
 
   const { legend, processedData, processedLegend } = state
-
-  const fileInput = useRef(null);
 
   const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
 
@@ -904,7 +902,7 @@ const Editor = (props) => {
   
 
   return (
-    <>
+    <ErrorBoundary component="Editor">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
@@ -1387,8 +1385,8 @@ const Editor = (props) => {
           </div>
         </section>
       </section>
-    </>
+    </ErrorBoundary>
   )
 }
 
-export default Editor;
+export default EditorPanel;

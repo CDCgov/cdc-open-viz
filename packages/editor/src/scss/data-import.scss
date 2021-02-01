@@ -3,13 +3,16 @@
 .cdc-editor .data-designer {
     display: flex;
     .left-col {
+        background: #fff;
         padding-top: $gbl-padding;
         padding-bottom: $gbl-padding;
         width: 33.333%;
         border-right: $lightGray 1px solid;
         position: fixed;
         bottom: 0;
-        top: 3rem;
+        top: 0;
+        margin-top: 3rem;
+        z-index: 1;
         .tabs {
             > ul.nav {
                 display: flex;
@@ -89,59 +92,6 @@
         background-color: $lightest-gray;
         padding: $gbl-padding;
         flex-grow: 1;
-    }
-    .data-import-preview {
-        .table-responsive {
-            max-height: 70vh;
-        }
-
-        table {
-            width: 100%;
-            th {
-                padding: $table-padding;
-                border: solid 1px $light-gray;
-                background: $lighter-gray;
-                color: black;
-                font-weight: bold;
-    
-                &:empty {
-                    background: $light-yellow;
-                    border-color: $dark-yellow;
-                    border-width: medium;
-                }
-            }
-        
-            td {
-                padding: $table-padding;
-                border: solid 1px $light-gray;
-                background: $white;
-            }
-
-            .index-col,
-            tbody th {
-                // width: 60px;
-                font-size: size(14);
-                text-align: center;
-            }
-    
-            &.table-empty {
-                filter: blur(2px);
-            }
-        }
-
-        .overlay-empty {
-            position: absolute;
-            z-index: 2;
-            text-shadow: 0 0 5px rgba(0,0,0,0.1);
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            font-size: 1.5em;
-            background: rgba($lightest-gray, 0.75);
-            text-align: center;
-            padding-top: 20%;
-            
-        }
+        max-width: 66.667%;
     }
 }
