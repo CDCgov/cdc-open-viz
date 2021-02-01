@@ -30,7 +30,8 @@
         "label": "Date",
         "dataKey": "date",
         "type": "date",
-        "dateFormat": "%Y-%m-%d"
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d"
     },
     "legend": {
         "label": "Legend"
