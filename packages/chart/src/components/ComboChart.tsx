@@ -96,14 +96,20 @@ export default function ComboChart({numberFormatter}) {
               yScale={yScale}
               color={colorScale}
             >
-              {barStacks => barStacks.map(barStack => barStack.bars.map(bar => (
+              {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
+                let barThickness = xMax / barStack.bars.length;
+                let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
+                let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
+                return (
                 <rect
                   key={`bar-stack-${barStack.index}-${bar.index}`}
-                  x={bar.x}
+                  x={barThickness * bar.index + offset}
                   y={bar.y}
                   height={bar.height}
-                  width={bar.width}
+                  width={barThicknessAdjusted}
                   fill={bar.color}
+                  stroke="black"
+                  strokeWidth={config.barBorderThickness || 1}
                   display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                   data-tip={`<div>
                         ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
@@ -112,7 +118,8 @@ export default function ComboChart({numberFormatter}) {
                       </div>`}
                       data-html="true"
                 />
-              )))
+              )}
+              ))
               }
             </BarStack>
           ) : (
@@ -125,21 +132,25 @@ export default function ComboChart({numberFormatter}) {
               x1Scale={seriesScaleBar}
               yScale={yScale}
               color={colorScale}
+              widths={500}
             >
               {(barGroups) => barGroups.map((barGroup) => (
-                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={barGroup.x0}>
-                  {barGroup.bars.map((bar) => (
+                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={xMax / barGroups.length * barGroup.index}>
+                  {barGroup.bars.map((bar) => {
+                    let barGroupWidth = xMax / barGroups.length * (config.barThickness || 0.8);
+                    let offset = xMax / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                    let barWidth = barGroupWidth / barGroup.bars.length;
+                    return (
                     <rect
                       key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                      x={bar.x}
+                      x={barWidth * (barGroup.bars.length - bar.index - 1) + offset}
                       y={bar.y}
-                      width={bar.width}
+                      width={barWidth}
                       height={bar.height}
                       fill={bar.color}
                       stroke="black"
                       strokeWidth={config.barBorderThickness || 1}
                       style={{fill: bar.color}}
-                      rx={4}
                       display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                       data-tip={`<div>
                         ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
@@ -148,7 +159,8 @@ export default function ComboChart({numberFormatter}) {
                       </div>`}
                       data-html="true"
                     />
-                  ))}
+                  )}
+                  )}
                 </Group>
               ))}
             </BarGroup>
