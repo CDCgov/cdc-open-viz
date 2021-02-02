@@ -4,6 +4,7 @@
     },
     "dataUrl":  "/assets/planet-example-data.json",
     "visualizationType": "Bar",
+    "visualizationSubType": "stacked",
     "seriesKeys": ["Radius", "Diameter"],
     "dataFormat": {
         "roundTo": 1,
