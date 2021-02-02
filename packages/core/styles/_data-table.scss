@@ -41,7 +41,7 @@ table.data-table {
     }
     th,
     td {
-      padding: .5em .7em;
+      padding: .5em 1.3em .5em .7em;
       line-height: normal;
       position: relative;
       text-align: left;
@@ -55,7 +55,7 @@ table.data-table {
     th.sort {
       background-color: darken($mediumGray, 10%);
       background-repeat: no-repeat;
-      background-position: right .7em center;
+      background-position: right .5em center;
       background-size: 10px 5px;
     }
 
@@ -134,6 +134,78 @@ table.data-table {
       max-width: 13px;
       vertical-align: baseline;
       margin-left: 5px;
+    }
+  }
+}
+
+.no-data {
+  position: relative;
+  .no-data-message {
+    @include emptyState;
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: .3rem;
+    }
+  }
+  tr:hover {
+    background: #fff;
+  }
+  th, td {
+    width: 50%;
+    &::before {
+      content: "\00a0";
+    }
+  }
+}
+
+.data-table-pagination {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  ul {
+    list-style: none;
+    margin: 0 1rem 0 0;
+    display: flex;
+    li + li {
+      margin-left: .3rem;
+    }
+    button {
+      background: $mediumGray;
+      padding: .6rem .8rem;
+      &:hover {
+        background: lighten($mediumGray, 5%);
+      }
+    }
+    button.btn-next {
+      &::before {
+        content: " ";
+        background-image: url(~@cdc/core/assets/asc.svg);
+        background-size: 10px 5px;
+        width: 10px;
+        height: 5px;
+        display: block;
+        transform: rotate(90deg);
+      }
+    }
+    button.btn-prev {
+      &::before {
+        content: " ";
+        background-image: url(~@cdc/core/assets/asc.svg);
+        background-size: 10px 5px;
+        width: 10px;
+        height: 5px;
+        display: block;
+        transform: rotate(-90deg);
+      }
+    }
+    button[disabled] {
+      background: $mediumGray;
+      opacity: .3;
+      cursor: default;
+      &:hover {
+        background: $mediumGray;
+      }
     }
   }
 }

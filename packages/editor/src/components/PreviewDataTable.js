@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo, memo, useCallback} from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   useTable,
   useBlockLayout,
   useGlobalFilter,
   useAsyncDebounce,
-  useSortBy
+  useSortBy,
+  useResizeColumns,
+  usePagination
 } from 'react-table/src';
 
 const TableFilter = ({globalFilter, setGlobalFilter, disabled = false}) => {
@@ -49,48 +51,160 @@ export default function PreviewDataTable({ data }) {
     getTableBodyProps,
     headerGroups,
     rows,
-    state,
+    state: { pageIndex, pageSize, globalFilter },
     prepareRow,
-    setGlobalFilter
-  } = useTable({ columns: tableColumns, data }, useBlockLayout, useGlobalFilter, useSortBy);
+    setGlobalFilter,
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+  } = useTable({ columns: tableColumns, data, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination);
 
-  const TablePlaceholder = () => {
-    return (<span>Import sort data to preview it here</span>)
+  const Header = () => (
+    <header className="data-table-header mb-4">
+      <h2>Data Preview</h2>
+      <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
+    </header>
+  )
+
+  const NoData = () => (
+    <section className="no-data-message">
+      <section>
+        <h3>No Data</h3>
+        <p>Import data to preview</p>
+      </section>
+    </section>
+  )
+
+  const PlaceholderTable = () => {
+    return (
+      <section className="no-data">
+        <NoData />
+        <table className="data-table table-responsive table-bordered table-hover" role="table">
+          <thead>
+              <tr role="row">
+                  <th scope="col" colSpan="1" role="columnheader">
+                  </th>
+                  <th scope="col" colSpan="1" role="columnheader">
+                  </th>
+                  <th scope="col" colSpan="1" role="columnheader">
+                  </th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+            <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+                    <tr role="row">
+                <td role="cell"></td>
+                <td role="cell"></td>
+                <td role="cell"></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    )
   }
 
-  return (
+  if(!data) {
+    return [<Header />, <PlaceholderTable />]
+  }
+
+  const Table = () => (
     <>
-      <header className="data-table-header mb-4">
-        <h2>Data Preview</h2>
-        <TableFilter globalFilter={state.globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
-      </header>
-      {data && <table className="data-table table-responsive table-bordered table-hover" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''}>
-                  {column.render('Header')}
-                </th>
+      <table className="data-table table-responsive table-bordered table-hover" {...getTableProps()} aria-hidden="true">
+      <thead>
+        {headerGroups.map((headerGroup) => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => (
+              <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''} title={column.Header}>
+                {column.render('Header')}
+                <div {...column.getResizerProps()} className="resizer" />
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {page.map((row) => {
+          prepareRow(row);
+          return (
+            <tr {...row.getRowProps()}>
+              {row.cells.map((cell) => (
+                <td {...cell.getCellProps()} title={cell.value}>
+                  {cell.render('Cell')}
+                </td>
               ))}
             </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()}>
-                    {cell.render('Cell')}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>}
+          );
+        })}
+      </tbody>
+    </table>
+    <footer className="data-table-pagination">
+      <ul>
+        <li>
+          <button onClick={() => previousPage()} className="btn btn-prev" disabled={!canPreviousPage} title="Previous Page"></button>
+        </li>
+        <li>
+          <button onClick={() => nextPage()} className="btn btn-next" disabled={!canNextPage} title="Next Page"></button>
+        </li>
+      </ul>
+      <span>
+        Page{' '}
+        <strong>
+          {pageIndex + 1} of {pageOptions.length}
+        </strong>
+      </span>
+    </footer>
     </>
-  );
+  )
+
+  return [<Header />, <Table />]
 };

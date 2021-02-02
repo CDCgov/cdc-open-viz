@@ -23,67 +23,23 @@
 // Imports
 @import "reset";
 @import "variables";
-@import "data-table";
+
+@mixin emptyState {
+  background: rgba(255, 255, 255, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 7;
+}
 
 .cdc-open-viz-module {
   color: $baseColor;
-}
-
-.inline-icon {
-  width: 1em;
-  height: auto;
-  font-size: 1rem;
-  color: inherit;
-  path {
-    fill: currentColor;
-  }
-}
-
-// Editor Styles
-.btn {
-  background: #005eaa;
-  color: #fff;
-  border: 0;
-  padding: .4em .8em;
-  font-size: 1em;
-  display: block;
-  border-radius: 5px;
-  transition: .1s all;
-  cursor: pointer;
-  &.full-width {
-    width: 100%;
-  }
-  &.secondary {
-    font-size: .8em;
-    padding: .3em 1em;
-    background: rgba(0, 0, 0, 0.3);
-    display: inline-block;
-    margin-bottom: 1em;
-    &:hover {
-      background: rgba(0,0,0,.5);
-    }
-  }
-  &:hover {
-    transition: .1s all;
-    background: lighten(#005eaa, 5%);
-  }
-}
-
-input[type="text"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
-  padding: .5em .5em;
-  font-size: 1em;
-  font-family: sans-serif;
-  border: rgba(0,0,0,.3) 1px solid;
-  &:focus {
-    border: rgba(0,0,0,.7) 1px solid;
-    outline: 0;
-  }
-}
-textarea {
-  min-height: 140px;
-}
-select {
-  width: 100%;
-  font-size: 1.4em;
-  text-transform: none;
+  @import "data-table";
+  @import "global";
 }

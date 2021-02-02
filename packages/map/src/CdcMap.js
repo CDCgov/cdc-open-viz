@@ -1226,7 +1226,7 @@ class CdcMap extends Component {
                                 navigationHandler={(val) => this.navigationHandler(val)}
                             />
                         }
-                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
+                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading  && Object.keys(this.state.processedData).length > 0 &&
                             <Sidebar
                                 legend={this.state.legend}
                                 filters={this.state.filters}
