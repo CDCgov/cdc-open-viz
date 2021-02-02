@@ -10,6 +10,7 @@ import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
 
 import '../scss/ComboChart.scss';
+import { bottomTickLabelProps } from '@visx/axis/lib/axis/AxisBottom';
 
 const font = '#000000';
 
@@ -207,18 +208,58 @@ export default function ComboChart({numberFormatter}) {
           scale={yScale}
           left={config.padding.left}
           label={config.yAxis.label}
-          labelProps={{
-            fontSize: config.yAxis.labelFontSize || 18,
-            fontWeight: 'bold',
-            textAnchor: 'middle',
-            transform: 'translate(-20, 0) rotate(-90)'
-          }}
-          tickLabelProps={() => ({
-            fontSize: config.yAxis.tickFontSize,
-            transform: 'translate(-40, 0)'
-          })}
           stroke={font}
-        />
+        >
+          {props => {
+            const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+            return (
+              <g className="my-custom-left-axis">
+                {props.ticks.map((tick, i) => {
+                  return (
+                    <Group
+                      key={`vx-tick-${tick.value}-${i}`}
+                      className={'vx-axis-tick'}
+                    >
+                      <Line
+                        from={tick.from}
+                        to={tick.to}
+                        stroke="black"
+                      />
+                      { config.yAxis.gridLines ? (
+                        <Line
+                          from={{x: tick.from.x + width - config.padding.left - config.padding.right, y: tick.from.y}}
+                          to={tick.from}
+                          stroke="rgba(0,0,0,0.3)"
+                        />
+                        ) : ''
+                      }
+                      <text
+                        transform={`translate(${tick.to.x - 30}, ${tick.to.y})`}
+                        fontSize={config.yAxis.tickFontSize || 16}
+                        textAnchor="middle"
+                      >
+                        {tick.formattedValue}
+                      </text>
+                    </Group>
+                  );
+                })}
+                <Line 
+                  from={props.axisFromPoint}
+                  to={props.axisToPoint}
+                  stroke="black"
+                />
+                <text
+                  textAnchor="middle"
+                  transform={`translate(-75, ${axisCenter}) rotate(-90)`}
+                  fontSize={config.yAxis.labelFontSize || 18}
+                  fontWeight="bold"
+                >
+                  {props.label}
+                </text>
+              </g>
+            );
+          }}
+        </AxisLeft>
         <AxisBottom
           top={yMax + config.padding.top}
           left={config.padding.left}
@@ -247,7 +288,7 @@ export default function ComboChart({numberFormatter}) {
                       />
                       <text
                         transform={`translate(${tickX}, ${tickY + (tick.formattedValue.length * 4.5)}) rotate(-90)`}
-                        fontSize={config.xAxis.tickFontSize || 11}
+                        fontSize={config.xAxis.tickFontSize || 16}
                         textAnchor="middle"
                         width={width / props.tickLength}
                       >

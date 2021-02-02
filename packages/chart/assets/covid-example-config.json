@@ -21,8 +21,9 @@
     "yAxis": {
         "label": "Rate per 100,000 population",
         "dataKey": "Age-adjusted rate",
-        "labelFontSize": 30,
-        "tickFontSize": 24
+        "labelFontSize": 24,
+        "tickFontSize": 18,
+        "gridLines": true
     },
     "xAxis": {
         "label": "Race",
