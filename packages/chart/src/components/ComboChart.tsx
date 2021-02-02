@@ -135,6 +135,8 @@ export default function ComboChart({numberFormatter}) {
                       width={bar.width}
                       height={bar.height}
                       fill={bar.color}
+                      stroke="black"
+                      strokeWidth={config.barBorderThickness || 1}
                       style={{fill: bar.color}}
                       rx={4}
                       display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
