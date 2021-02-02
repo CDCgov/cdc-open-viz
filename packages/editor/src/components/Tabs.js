@@ -9,20 +9,43 @@ const Tabs = ({ children, startingTab = 0, className }) => {
     containerClassName = `tabs ${className}`;
   }
 
+  const setActiveTab = (disabled, index) => {
+    if(false === disabled) {
+      setActive(index)
+    }
+  }
+
+  const tabs = children.map(({props}, i) => {
+    
+    let classes = 'nav-item'
+
+    let disabled = props.disableRule || false
+
+    if(disabled) {
+      classes += ' disabled';
+    }
+
+    if(i === active) {
+      classes += ' active';
+    }
+
+    return (
+    <li
+      onClick={() => setActiveTab(disabled, i)}
+      key={props.title}
+      className={classes}
+    >
+      {props.icon}
+      {props.title}
+    </li>
+    )
+  })
+
   return (
     <>
       <nav className={containerClassName}>
         <ul className="nav nav-fill">
-          {children.map(({props}, i) => (
-            <li
-              onClick={() => setActive(i)}
-              key={props.title}
-              className={i === active ? 'nav-item active' : 'nav-item'}
-            >
-              {props.icon}
-              {props.title}
-            </li>
-          ))}
+          {tabs}
         </ul>
       </nav>
       {children[active]}

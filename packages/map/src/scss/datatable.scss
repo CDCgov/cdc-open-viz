@@ -1,4 +1,4 @@
-.data-table {
+.data-table-container {
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -34,101 +34,7 @@
     }
   }
 
-  table {
-    background: #fff;
-    position: relative;
-    display: flex;
-    overflow-x: auto;
-    flex-direction: column;
-    border: 1px solid $mediumGray;
-    align-items: stretch;
-    border-collapse: collapse;
-    overflow: auto;
-    appearance: none;
-    * {
-      box-sizing: border-box
-    }
-
-    thead {
-      user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-      text-transform: capitalize;
-      tr {
-        background: none;
-      }
-    }
-    
-    thead {
-      color: #fff;
-      display: flex;
-      background-color: rgba(0,0,0,.73);
-      .resizer {
-        cursor: e-resize;
-        width: 10px;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        touch-action:none;
-      }
-      tr {
-        text-align: left;
-      }
-      th,
-      td {
-        padding: .5em .7em;
-        line-height: normal;
-        position: relative;
-        text-align: left;
-        cursor: pointer;
-        border-right: 1px solid $mediumGray !important;
-        svg {
-          margin-left: 1rem;
-        }
-      }
-      
-      th.sort-asc,
-      td.sort-asc {
-        background: rgba(0,0,0,.4) url(../images/asc.svg) no-repeat right .7em center;
-      }
-      
-      th.sort-desc,
-      td.sort-desc {
-        background: rgba(0,0,0,.4) url(../images/desc.svg) no-repeat right .7em center;
-      }
-      
-      th:last-child,
-      td:last-child {
-        border-right: 0
-      }
-    }
-    
-    tbody {
-      display: flex;
-      flex-direction: column;
-      tr {
-        width: 100%;
-        &:hover {
-          background: rgba(0, 0, 0, 0.05)
-        }
-      }
-    }
-
-    tr {
-      display: flex;
-      width: 100% !important;
-      border-bottom: solid 1px #E5E5E5;
-      &:last-child {
-        border-bottom: 0
-      }
-    }
-    
-    td {
-      padding: .3em .7em;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
+  table {    
     th,
     td {
       white-space: nowrap;

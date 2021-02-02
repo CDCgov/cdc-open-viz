@@ -15,24 +15,14 @@
     &.collapsed {
       padding: 2em;
     }
-    text-align: center;
-    position: absolute;
-    z-index: 5;
-    background: rgba(255,255,255,.8);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include emptyState;
     .container {
       max-width: 400px;
     }
     h3 {
-      display: block;
-      margin-bottom: .5em;
-      font-size: 2em;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: .3rem;
     }
     p {
       font-size: 1em;
@@ -143,7 +133,6 @@
     overflow-x: hidden;
     position: fixed;
     z-index: 7;
-    font-family: $fontStack;
     display: flex;
     flex-direction: column;
     left: 0;
@@ -157,21 +146,8 @@
       flex-grow: 1;
     }
     .guidance-link {
-      font-family: $fontStack;
-      margin: 2em 1em 1em;
-      border-radius: .4em;
+      margin: 2em 1em 0;
       padding: .75em 1em;
-      display: flex;
-      text-decoration: none;
-      color: #444;
-      border: $mediumGray 1px solid;
-      position: relative;
-      overflow: hidden;
-      transition: .2s all;
-      font-size: 1em;
-      > div {
-        font-size: .9em;
-      }
       svg {
         width: 60px;
         color: $blue;
@@ -179,10 +155,6 @@
         path {
           fill: currentColor;
         }
-      }
-      &:hover {
-        background: $lightGray;
-        transition: .2s all;
       }
       &:before {
         content: " ";
@@ -196,10 +168,6 @@
       img {
         max-width: 40px;
         margin-right: 1em;
-      }
-      h3 {
-        font-weight: 600;
-        font-size: 1.1em;
       }
     }
     .warning {
@@ -257,6 +225,9 @@
     .advanced {
       padding: 0 1em 1em;
       text-align: left;
+      p {
+        font-size: .8rem;
+      }
       .advanced-toggle-link {
         padding-top: 1em;
         display: block;
@@ -273,12 +244,6 @@
         &:hover {
           color: rgba(0,0,0,.7);
         }
-      }
-      p, .warning {
-        font-size: .8em;
-      }
-      p {
-        margin-bottom: 1em;
       }
       textarea {
         height: 400px;
@@ -315,7 +280,7 @@
       font-size: .8em;
       font-weight: 600;
       &:not(:first-child) {
-        margin-top: 1.5em;
+        margin-top: 1em;
       }
       span.edit-label {
         margin-bottom: .3em;
@@ -325,6 +290,7 @@
         font-size: 1em;
       }
       &.checkbox {
+        margin-top: .5rem;
         display: flex;
         span {
           display: inline;
@@ -346,9 +312,6 @@
       width: 100%;
       font-size: 1.4em;
       text-transform: none;
-    }
-    h5 {
-      font-size: .8em;
     }
     .header .color-palette li {
       width: 21px;
@@ -534,7 +497,6 @@
       color: rgba(0,0,0,.5);
       text-transform: none;
       font-weight: normal;
-<<<<<<< HEAD
     }
   
     .btn {
@@ -571,11 +533,6 @@
       input {
         border: rgba(0, 0, 0, 0.3) 1px solid;
       }
-  
-      /* shared font styles */
-      font-size: 1em;
-      line-height: 1;
-  
       /* clicking anywhere will focus the input */
       cursor: text;
       span {
@@ -609,108 +566,6 @@
       margin-left: 8px;
     }
   
-=======
-    }
-  
-    .btn {
-      background: #005eaa;
-      color: #fff;
-      border: 0;
-      padding: .4em 0;
-      font-size: 1em;
-      display: block;
-      border-radius: 5px;
-      margin-top: 1em;
-      transition: .1s all;
-      cursor: pointer;
-      &.full-width {
-        width: 100%;
-      }
-      &.secondary {
-        font-size: .8em;
-        padding: .3em 1em;
-        background: rgba(0, 0, 0, 0.3);
-        display: inline-block;
-        margin-bottom: 1em;
-        &:hover {
-          background: rgba(0,0,0,.5);
-        }
-      }
-      &:hover {
-        transition: .1s all;
-        background: lighten(#005eaa, 5%);
-      }
-    }
-    
-    .sort-list li {
-      display: block;
-      box-sizing: border-box;
-      border: 1px solid #D1D1D1;
-      border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-right: .3em;
-      margin-bottom: .3em;
-      cursor: move;
-      z-index: 999;
-    }
-    
-    .info {
-      font-size: .8em;
-      line-height: 1.4em;
-      font-style: italic;
-      padding-top: 10px;
-    }
-  
-    .react-tags__search {
-      width: 100%;
-    }
-  
-    .react-tags {
-      position: relative;
-      input {
-        border: rgba(0, 0, 0, 0.3) 1px solid;
-      }
-  
-      /* shared font styles */
-      font-size: 1em;
-      line-height: 1;
-  
-      /* clicking anywhere will focus the input */
-      cursor: text;
-      span {
-        display: inline
-      }
-    }
-  
-    .react-tags.is-focused {
-      border-color: rgba(0, 0, 0, 0.7);
-    }
-  
-    .react-tags__selected {
-      display: inline;
-    }
-  
-    .react-tags__selected-tag {
-      display: inline-block;
-      box-sizing: border-box;
-      border: 1px solid #D1D1D1;
-      border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-right: .3em;
-      margin-bottom: .3em;
-    }
-  
-    .react-tags__selected-tag:after {
-      content: '\2715';
-      color: #AAA;
-      margin-left: 8px;
-    }
-  
->>>>>>> editor/data-loader
     .react-tags__selected-tag:hover,
     .react-tags__selected-tag:focus {
       border-color: #B1B1B1;

@@ -3,10 +3,11 @@ import React, {
 } from 'react';
 import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
-} from 'react-table';
+} from 'react-table/src';
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
 import { Base64 } from 'js-base64';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 const DataTable = (props) => {
   const {
@@ -145,13 +146,13 @@ const DataTable = (props) => {
     const newTableColumns = [];
 
     Object.keys(columns).forEach((column) => {
-      if (columns[column].dataTable === true && columns[column].name !== '') {
+      if (columns[column].dataTable === true && '' !== columns[column].name) {
         const newCol = {
           Header: columns[column].label || columns[column].name,
           id: column,
           accessor: (row) => {
             if (processedData) {
-              return processedData[row][columns[column].name];
+              return processedData[row][columns[column].name] || null;
             }
 
             return null;
@@ -232,7 +233,8 @@ const DataTable = (props) => {
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
   return (
-    <section className="data-table" aria-label={accessibilityLabel}>
+    <ErrorBoundary component="DataTable">
+      <section className="data-table-container" aria-label={accessibilityLabel}>
       <div
         className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
         onClick={() => { setExpanded(!expanded); }}
@@ -241,12 +243,12 @@ const DataTable = (props) => {
       >
         {tableTitle}
       </div>
-      <table className={expanded ? '' : 'cdcdataviz-sr-only'} {...getTableProps()}>
+      <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? ' sort-desc' : ' sort-asc' : ''}>
+                <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}>
                   {column.render('Header')}
                   <div {...column.getResizerProps()} className="resizer" />
                 </th>
@@ -271,6 +273,7 @@ const DataTable = (props) => {
       </table>
       {showDownloadButton === true && <DownloadButton data={data} />}
     </section>
+    </ErrorBoundary>
   );
 };
 
