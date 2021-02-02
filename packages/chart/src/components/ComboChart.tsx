@@ -209,6 +209,7 @@ export default function ComboChart({numberFormatter}) {
           left={config.padding.left}
           label={config.yAxis.label}
           stroke={font}
+          numTicks={config.yAxis.numTicks}
         >
           {props => {
             const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
