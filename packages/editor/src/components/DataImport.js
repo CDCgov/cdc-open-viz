@@ -209,16 +209,14 @@ export default function DataImport() {
             </form>
           </TabPane>
         </Tabs>
-        {errors.map((message, index) => (<div className="error-box mt-2" key={`error-${index}`}><span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} /></div>))}
+        {errors.map((message, index) => (<div className="error-box slim mt-2" key={`error-${index}`}><span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} /></div>))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
-        <section className="cdcdataviz-guidance info-box">
-          <h4>Data Format Help</h4>
-          <ul>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.</li>
-            <li>Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.Proin sodales pulvinar tempor.</li>
-            <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
-          </ul>
-        </section>
+          <a href="#" target="_blank" rel="noopener noreferrer" className="guidance-link">
+            <div>
+              <h3>Get Help</h3>
+              <p>Documentation and examples on formatting data and configuring visualizations.</p>
+            </div>
+          </a>
       </div>
       <div className="right-col">
         <PreviewDataTable data={data} />
