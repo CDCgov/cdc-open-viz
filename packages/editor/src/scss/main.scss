@@ -1,6 +1,5 @@
-@import "@cdc/core/styles/base";
 @import 'variables';
-@import "bootstrap";
+@import "@cdc/core/styles/base";
 
 $tempLightGray: #C7C7C7;
 
@@ -10,6 +9,7 @@ $tempLightGray: #C7C7C7;
   @import "~bootstrap/scss/mixins";
   @import "~bootstrap/scss/utilities";
   @import "~bootstrap/scss/grid";
+  @import "data-table";
   min-height: inherit;
   display: flex;
   flex-direction: column;
@@ -17,12 +17,62 @@ $tempLightGray: #C7C7C7;
     nav {
       display: flex;
     }
+    .nav-item {
+      user-select: none;
+      cursor: pointer;
+      &.disabled {
+        cursor: not-allowed;
+      }
+      &.active {
+        cursor: default;
+      }
+    }
   }
   .editor-toggle {
     top: calc(3rem + 11px);
   }
   .editor-panel {
-    top: 3rem;
+    margin-top: 3rem;
+  }
+  .guidance-link {
+    margin: 2em 0 1em;
+    padding: .75em 1em;
+    display: flex;
+    text-decoration: none;
+    color: #444;
+    border: $lightGray 1px solid;
+    position: relative;
+    overflow: hidden;
+    transition: .2s all;
+    font-size: 1em;
+    &:before {
+      content: " ";
+      width: 5px;
+      background: $blue;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+    }
+    &:hover {
+      background: $lightestGray;
+      transition: .2s all;
+    }
+    > div {
+      font-size: .9em;
+    }
+    svg {
+      width: 60px;
+      color: $blue;
+      margin-right: 1rem;
+      path {
+        fill: currentColor;
+      }
+    }
+    h3 {
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
   }
   // Top level tabs
   .top-level {
@@ -39,8 +89,7 @@ $tempLightGray: #C7C7C7;
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
-        width: 33.33%;
-        cursor: pointer;
+        width: 33%;
         border-right: 1px solid $tempLightGray;
         text-align: center;
         &:last-child {
@@ -55,7 +104,7 @@ $tempLightGray: #C7C7C7;
   }
   > .tab-content {
     flex-grow: 1;
-    top: 3rem;
+    margin-top: 3rem;
     position: relative;
   }
   .dropdown {
@@ -85,18 +134,6 @@ $tempLightGray: #C7C7C7;
     }
     ul {
       padding: inherit;
-    }
-  }
-
-  .error-box {
-    background: #FFC2C2;
-    display: flex;
-    justify-content: space-between;
-    padding: .3rem 1rem;
-    font-size: .9rem;
-    .dismiss-error {
-      font-size: .8rem;
-      cursor: pointer;
     }
   }
 }

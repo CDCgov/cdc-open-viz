@@ -23,8 +23,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 ### Each package is designed to be imported as a module by another project.
   * This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
-  * The package structure means we don't include polyfills, since we can't know what the "parent" project's browser support requirements are. The parent project is responsible for adding appropriate polyfills.
-  * We also don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
+  * We don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
   * We avoid adding any CDC specific functionality (ex. metrics calls) or logos in these packages, that should go in our wrapper codebase.
 
 This pattern of packages being imported by another project is implemented internally at CDC. We have a wrapper codebase that imports these packages. The bundle generated from that wrapper is then served on pages.

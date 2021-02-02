@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import {
   ComposableMap,
   Geographies,
@@ -308,7 +309,7 @@ const UsaMap = (props) => {
   };
 
   return (
-    <>
+    <ErrorBoundary component="UsaMap">
       <div style={styles.container}>
         <div style={styles.innerContainer}>
           <ComposableMap
@@ -340,7 +341,7 @@ const UsaMap = (props) => {
                   </ul>
                 </section>
                 )}
-    </>
+    </ErrorBoundary>
   );
 };
 

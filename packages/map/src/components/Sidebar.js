@@ -1,6 +1,8 @@
 import React from 'react';
 import parse from 'html-react-parser';
 
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
 const Sidebar = (props) => {
   const {
     legend,
@@ -128,7 +130,8 @@ const Sidebar = (props) => {
   });
 
   return (
-    <aside className={legend.position}>
+    <ErrorBoundary component="Sidebar">
+      <aside className={legend.position}>
       <section className="legend-section" aria-label="Map Legend">
         {processedLegend.disabledAmt > 0
           && (
@@ -172,6 +175,7 @@ const Sidebar = (props) => {
         </section>
         )}
     </aside>
+    </ErrorBoundary>
   );
 };
 

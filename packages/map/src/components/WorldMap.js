@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import {
   ComposableMap,
   Geographies,
@@ -295,7 +296,7 @@ const WorldMap = (props) => {
   };
 
   return (
-    <>
+    <ErrorBoundary component="WorldMap">
       {state.general.type === 'data' && ZoomControls}
       <div style={styles.container}>
         <div style={styles.innerContainer}>
@@ -326,7 +327,7 @@ const WorldMap = (props) => {
           </ComposableMap>
         </div>
       </div>
-    </>
+    </ErrorBoundary>
   );
 };
 
