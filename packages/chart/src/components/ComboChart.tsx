@@ -269,6 +269,7 @@ export default function ComboChart({numberFormatter}) {
           scale={(xScaleLine || xScaleBar)}
           stroke={font}
           tickStroke={font}
+          numTicks={config.xAxis.numTicks}
         >
           {props => {
             const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
