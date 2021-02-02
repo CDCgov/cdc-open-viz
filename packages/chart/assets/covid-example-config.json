@@ -23,7 +23,8 @@
         "dataKey": "Age-adjusted rate",
         "labelFontSize": 24,
         "tickFontSize": 18,
-        "gridLines": true
+        "gridLines": true,
+        "numTicks": 3
     },
     "xAxis": {
         "label": "Race",
