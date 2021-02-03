@@ -23,6 +23,7 @@
     "@cdc/core": "^1.0.0-alpha.0",
     "@emotion/core": "^10.0.28",
     "array-move": "^3.0.1",
+    "bootstrap": "^4.3.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "d3-interpolate-path": "^2.2.1",
@@ -38,6 +39,7 @@
     "react-tooltip": "^3.11.1",
     "stream": "0.0.2",
     "us-atlas": "^3.0.0",
+    "use-debounce": "^5.2.0",
     "world-atlas": "^2.0.2"
   },
   "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81",
