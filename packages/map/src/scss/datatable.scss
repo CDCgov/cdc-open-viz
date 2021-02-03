@@ -13,7 +13,7 @@
   div.data-table-heading {
     background: rgba(0, 0, 0, 0.05);
     padding: .5em .7em;
-    border: $mediumGray 1px solid;
+    border: $lightGray 1px solid;
     border-bottom: 0;
     font-size: 1.1em;
     cursor: pointer;
@@ -30,7 +30,7 @@
       background-size: 15px;
       background-position: right .7em center;
       background-repeat: no-repeat;
-      border-bottom: $mediumGray 1px solid;
+      border-bottom: $lightGray 1px solid;
     }
   }
 
