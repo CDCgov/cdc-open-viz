@@ -17,8 +17,8 @@
 }
 
 .inline-icon {
-  width: 1em;
-  height: auto;
+  width: 1em !important;
+  height: auto !important;
   font-size: 1rem;
   color: inherit;
   path {
@@ -70,11 +70,51 @@ textarea {
 }
 select {
   width: 100%;
-  font-size: 1.4em;
+  font-size: 1.1rem;
   text-transform: none;
 }
 
 .input-group-text {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+
+.guidance-link {
+  margin: 2em 0 1em;
+  padding: .75em 1em;
+  display: flex;
+  text-decoration: none;
+  color: #444;
+  border: $lightGray 1px solid;
+  position: relative;
+  transition: .2s all;
+  font-size: 1em;
+  &:before {
+    content: " ";
+    width: 5px;
+    background: $blue;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    position: absolute;
+  }
+  &:hover {
+    background: $lightestGray;
+    transition: .2s all;
+  }
+  > div {
+    font-size: .9em;
+  }
+  svg {
+    width: 60px;
+    color: $blue;
+    margin-right: 1rem;
+    path {
+      fill: currentColor;
+    }
+  }
+  h3 {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
 }

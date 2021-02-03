@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import {
   Accordion,
@@ -9,6 +9,7 @@ import {
 } from 'react-accessible-accordion';
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useDebounce } from 'use-debounce';
 
 import Waiting from './Waiting';
 import MapIcon from '../images/map-folded.svg';
@@ -16,25 +17,57 @@ import UsaGraphic from '../images/usa-graphic.svg';
 import WorldGraphic from '../images/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
+import usaDefaultConfig from '../examples/default-usa.json';
+
 const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
-const EditorPanel = (props) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
+  const [ value, setValue ] = useState(stateValue);
 
+  const [ debouncedValue ] = useDebounce(value, 500);
+
+  useEffect(() => {
+    if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
+      updateField(section, subsection, fieldName, debouncedValue)
+    }
+  }, [debouncedValue])
+
+  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
+
+  const onChange = (e) => setValue(e.target.value);
+
+  let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value} />
+
+  if('textarea' === type) {
+    formElement = (
+      <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
+    )
+  }
+  
+  if('number' === type) {
+    formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
+  }
+
+  return (
+    <label>
+      <span className="edit-label column-heading">{label}</span>
+      {formElement}
+    </label>
+  )
+})
+
+const EditorPanel = memo((props) => {
   const {
     state,
     loadConfig,
     setState,
     generateValuesForFilter,
     processData,
-    processLegend,
-    cleanCsvData,
-    fetchRemoteData,
-    loading,
-    usaDefaultConfig
+    processLegend
   } = props
 
-  const { legend, processedData, processedLegend } = state
+  const { general, color, columns, legend, data, filters, dataTable, tooltips, processedData, processedLegend, loading } = state
 
   const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
 
@@ -79,103 +112,57 @@ const EditorPanel = (props) => {
 
   const handleEditorChanges = async (property, value) => {
     switch (property) {
-      case 'title':
-
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      title: value
-                  }
-              }
-          })
-
-      break;
-      case 'subtext':
-
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      subtext: value
-                  }
-              }
-          })
-
-      break;
-      case 'territoriesLabel':
-
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      territoriesLabel: value
-                  }
-              }
-          })
-
-          break;
       case 'showTitle':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      showTitle: value
-                  }
-              }
-          })
-
+            return {
+                general: {
+                    ...prevState.general,
+                    showTitle: value
+                }
+            }
+        })
       break;
       case 'showSidebar':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      showSidebar: value
-                  }
-              }
-          })
-
+            return {
+                general: {
+                    ...prevState.general,
+                    showSidebar: value
+                }
+            }
+        })
       break;
       case 'fullBorder':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      fullBorder: value
-                  }
-              }
-          })
-
+            return {
+                general: {
+                    ...prevState.general,
+                    fullBorder: value
+                }
+            }
+        })
       break;
       case 'expandDataTable':
-          setState( (prevState) => {
+        setState( (prevState) => {
 
-              return {
-                  general: {
-                      ...prevState.general,
-                      expandDataTable: value
-                  }
-              }
-          })
+            return {
+                general: {
+                    ...prevState.general,
+                    expandDataTable: value
+                }
+            }
+        })
       break;
       case 'color':
-          setState( (prevState) => {
+        setState( (prevState) => {
 
-              return {
-                  color: value
-              }
-          })
-
+            return {
+                color: value
+            }
+        })
       break;
       case 'hasRegions':
         setState( (prevState) => {
@@ -189,49 +176,42 @@ const EditorPanel = (props) => {
                   processedData: {}
               }
         })
-
       break;
       case 'sidebarPosition':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  legend: {
-                      ...prevState.legend,
-                      position: value
-                  }
-              }
-          })
-
+            return {
+                legend: {
+                    ...prevState.legend,
+                    position: value
+                }
+            }
+        })
       break;
       case 'geoBorderColor':
-          setState( (prevState) => {
+        setState( (prevState) => {
 
-              return {
-                  general: {
-                      ...prevState.general,
-                      geoBorderColor: value
-                  }
-              }
-          })
-
-          break;
+            return {
+                general: {
+                    ...prevState.general,
+                    geoBorderColor: value
+                }
+            }
+        })
+      break;
       case 'headerColor':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      headerColor: value
-                  }
-              }
-          })
-
+            return {
+                general: {
+                    ...prevState.general,
+                    headerColor: value
+                }
+            }
+        })
       break;
       case 'geoColumn':
-
-          setState( (prevState) => {
+        setState( (prevState) => {
 
               return {
                   columns: {
@@ -242,272 +222,235 @@ const EditorPanel = (props) => {
                       }
                   }
               }
-          })
-
+        })
       break;
       case 'navigateColumn':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  columns: {
-                      ...prevState.columns,
-                      navigate: {
-                          ...prevState.columns.navigate,
-                          name: value
-                      }
-                  }
-              }
-          })
-
-      break;
-      case 'legendTitle':
-
-          setState( (prevState) => {
-
-              return {
-                  legend: {
-                      ...prevState.legend,
-                      title: value
-                  }
-              }
-          })
-
-      break;
-      case 'dataTableTitle':
-
-          setState( (prevState) => {
-
-              return {
-                  dataTable: {
-                      ...prevState.dataTable,
-                      title: value
-                  }
-              }
-          })
-
+            return {
+                columns: {
+                    ...prevState.columns,
+                    navigate: {
+                        ...prevState.columns.navigate,
+                        name: value
+                    }
+                }
+            }
+        })
       break;
       case 'legendDescription':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  legend: {
-                      ...prevState.legend,
-                      description: value
-                  }
-              }
-          })
-
+            return {
+                legend: {
+                    ...prevState.legend,
+                    description: value
+                }
+            }
+        })
       break;
       case 'legendType':
-          setState( (prevState) => { return {legend: {...legend, type: value} } } )
+        setState( (prevState) => { return {legend: {...legend, type: value} } } )
       break;
       case 'legendNumber':
-          setState( (prevState) => {
+        setState( (prevState) => {
               return {
                   legend: {
                     ...prevState.legend,
                     numberOfItems: parseInt(value)
                   }
               }
-          })
+        })
       break;
       case 'changeActiveFilterValue':
-          const arrVal = value.split(',')
+        const arrVal = value.split(',')
 
-          setActiveFilterValueForDescription(arrVal)
+        setActiveFilterValueForDescription(arrVal)
       break;
       case 'unifiedLegend':
-          setState( () => {
-              return {
-                  legend: {...legend, unified: value}
-              }
-          })
+        setState( () => {
+            return {
+                legend: {...legend, unified: value}
+            }
+        })
       break;
       case 'separateZero':
-          setState( () => {
-              return {
-                  legend: {...legend, separateZero: value}
-              }
-          })
+        setState( () => {
+            return {
+                legend: {...legend, separateZero: value}
+            }
+        })
       break;
       case 'editorDataUrl':
-          setState({dataUrl: value})
+        setState({dataUrl: value})
       break;
       case 'toggleDownloadButton':
-              setState( (prevState) => {
-                  return {
-                      general: {
-                          ...prevState.general,
-                          showDownloadButton: !prevState.general.showDownloadButton
-                      }
-                  }
-              })
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        showDownloadButton: !prevState.general.showDownloadButton
+                    }
+                }
+            })
       break;
       case 'editorMapType':
-          switch(value) {
-              case 'data':
-                  setState( (prevState) => {
-                      return {
-                          general: {
-                              ...prevState.general,
-                              showSidebar: true,
-                              type: "data"
-                          },
-                      }
-                  })
-                  break;
-              case 'navigation':
-                  setState( (prevState) => {
-                      return {
-                          general: {
+        switch(value) {
+            case 'data':
+                setState( (prevState) => {
+                    return {
+                        general: {
                             ...prevState.general,
-                            showSidebar: false,
-                            type: "navigation",
-                          },
-                          tooltips: {
-                              ...prevState.tooltips,
-                              appearanceType: "hover"
-                          }
-                      }
-                  })
-                  break;
-              default:
-                  console.warn("Map type not set")
-              break;
-          }
+                            showSidebar: true,
+                            type: "data"
+                        },
+                    }
+                })
+                break;
+            case 'navigation':
+                setState( (prevState) => {
+                    return {
+                        general: {
+                          ...prevState.general,
+                          showSidebar: false,
+                          type: "navigation",
+                        },
+                        tooltips: {
+                            ...prevState.tooltips,
+                            appearanceType: "hover"
+                        }
+                    }
+                })
+                break;
+            default:
+                console.warn("Map type not set")
+            break;
+        }
 
-          setState(() => {
-              return {
-                  processedData: processData()
-              }
-          })
+        setState(() => {
+            return {
+                processedData: processData()
+            }
+        })
       break;
       case 'geoType':
-          // If we're still working with default data, switch to the world default to show it as an example
-          if(true === loadedDefault && 'world' === value) {
-            loadConfig(worldDefaultConfig)
-            ReactTooltip.rebuild()
-            break;
-          }
-
-          if(true === loadedDefault && 'us' === value) {
-            loadConfig(usaDefaultConfig)
-            ReactTooltip.rebuild()
-            break;
-          }
-
-          switch(value) {
-              case 'us':
-                  setState( (prevState) => {
-                      return {
-                          general: {
-                              ...prevState.general,
-                              geoType: "us"
-                          }
-                      }
-                  })
-                  break;
-              case 'world':
-                  setState( (prevState) => {
-                      return {
-                          general: {
-                              ...prevState.general,
-                              geoType: "world",
-                          }
-                      }
-                  })
-                  break;
-              default:
-                  console.warn("Map type not set.")
-              break;
-          }
-
+        // If we're still working with default data, switch to the world default to show it as an example
+        if(true === loadedDefault && 'world' === value) {
+          loadConfig(worldDefaultConfig)
           ReactTooltip.rebuild()
+          break;
+        }
+
+        if(true === loadedDefault && 'us' === value) {
+          loadConfig(usaDefaultConfig)
+          ReactTooltip.rebuild()
+          break;
+        }
+
+        switch(value) {
+            case 'us':
+                setState( (prevState) => {
+                    return {
+                        general: {
+                            ...prevState.general,
+                            geoType: "us"
+                        }
+                    }
+                })
+                break;
+            case 'world':
+                setState( (prevState) => {
+                    return {
+                        general: {
+                            ...prevState.general,
+                            geoType: "world",
+                        }
+                    }
+                })
+                break;
+            default:
+                console.warn("Map type not set.")
+            break;
+        }
+
+        ReactTooltip.rebuild()
       break;
       case 'categoryOrder':
-          const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
+        const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
 
-          setState( (prevState) => {
-              return {
-                legend: {
-                  ...prevState.legend,
-                  categoryValuesOrder
-                }
+        setState( (prevState) => {
+            return {
+              legend: {
+                ...prevState.legend,
+                categoryValuesOrder
               }
-          })
+            }
+        })
       break;
       case 'singleColumnLegend':
-          setState( (prevState) => {
-              return {
-                  legend: {
-                      ...prevState.legend,
-                      singleColumn: !prevState.legend.singleColumn
-                  }
-              }
-          })
+        setState( (prevState) => {
+            return {
+                legend: {
+                    ...prevState.legend,
+                    singleColumn: !prevState.legend.singleColumn
+                }
+            }
+        })
       break;
       case 'dynamicDescription':
-          setState( (prevState) => {
-              return {
-                  editor: {
-                      ...prevState.editor,
-                      activeFilterValueForDescription: value
-                  },
-                  legend: {
-                      ...prevState.legend,
-                      dynamicDescription: !prevState.legend.dynamicDescription
-                  }
-              }
-          })
+        setState( (prevState) => {
+            return {
+                editor: {
+                    ...prevState.editor,
+                    activeFilterValueForDescription: value
+                },
+                legend: {
+                    ...prevState.legend,
+                    dynamicDescription: !prevState.legend.dynamicDescription
+                }
+            }
+        })
       break;
       case 'changeLegendDescription':
+        const filterValKey = value[0]
 
-          const filterValKey = value[0]
+        const filterValDesc = value[1]
 
-          const filterValDesc = value[1]
-
-          setState( (prevState) => {
-              return {
-                  legend: {
-                      ...prevState.legend,
-                      descriptions: {
-                          ...prevState.legend.descriptions,
-                          [filterValKey]: [filterValDesc]
-                      }
-                  }
-              }
-          })
+        setState( (prevState) => {
+            return {
+                legend: {
+                    ...prevState.legend,
+                    descriptions: {
+                        ...prevState.legend.descriptions,
+                        [filterValKey]: [filterValDesc]
+                    }
+                }
+            }
+        })
       break;
       case 'appearanceType':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  tooltips: {
-                      ...prevState.tooltips,
-                      appearanceType: value
-                  }
-              }
-          })
-
+            return {
+                tooltips: {
+                    ...prevState.tooltips,
+                    appearanceType: value
+                }
+            }
+        })
       break;
       case 'linkLabel':
+        setState( (prevState) => {
 
-          setState( (prevState) => {
-
-              return {
-                  tooltips: {
-                      ...prevState.tooltips,
-                      linkLabel: value
-                  }
-              }
-          })
-
+            return {
+                tooltips: {
+                    ...prevState.tooltips,
+                    linkLabel: value
+                }
+            }
+        })
       break;
       case 'capitalizeLabels':
-
           setState( (prevState) => {
 
               return {
@@ -517,7 +460,6 @@ const EditorPanel = (props) => {
                   }
               }
           })
-
       break;
       default:
           console.warn(`Did not recognize editor property.`)
@@ -615,7 +557,7 @@ const EditorPanel = (props) => {
   }
 
   const changeFilter = async (filterIndex, target, value) => {
-      let newFilters = Array.from(state.filters)
+      let newFilters = Array.from(filters)
 
       switch (target) {
           case 'addNew':
@@ -686,9 +628,9 @@ const EditorPanel = (props) => {
 
   const displayFilterLegendValue = (arr) => {
 
-    const filterName = state.filters[ arr[0] ].label || `Unlabeled Legend`
+    const filterName = filters[ arr[0] ].label || `Unlabeled Legend`
 
-    const filterValue = state.filters[ arr[0] ].values[ arr[1] ]
+    const filterValue = filters[ arr[0] ].values[ arr[1] ]
 
     return filterName + ' - ' + filterValue
 
@@ -757,7 +699,7 @@ const EditorPanel = (props) => {
 
   useEffect(() => setLoadedDefault(state.defaultData), [state.defaultData])
 
-  useEffect(() => columnsRequiredChecker(), [columnsRequiredChecker, state.columns, state.general])
+  useEffect(() => columnsRequiredChecker(), [state.columns, state.general])
 
   useEffect(() => {
     if(0 === requiredColumns.length && false === loading) {
@@ -790,7 +732,6 @@ const EditorPanel = (props) => {
     return (<option value={name} key={name}>{name}</option>)
   })
 
-
   const specialClasses = []
 
   if("" !== legend.specialClasses[0]) {
@@ -813,7 +754,28 @@ const EditorPanel = (props) => {
     return true
   })
 
-  const filters = state.filters.map( (filter, index) => {
+  const updateField = (section, subsection, fieldName, newValue) => {
+    const isArray = Array.isArray(state[section]);
+    let sectionValue = isArray ? [...state[section], newValue] : {...state[section], [fieldName]: newValue};
+
+    if(null !== subsection) {
+      if(isArray) {
+        sectionValue = [...state[section]]
+        sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
+        debugger;
+      } else {
+        sectionValue = {...state[section], [subsection]: { ...state[section][subsection], [fieldName]: newValue}}
+      }
+    }
+
+    let updatedState = {
+      [section]: sectionValue
+    }
+
+    setState(() => updatedState)
+  }
+
+  const filtersJSX = filters.map( (filter, index) => {
     return (
         <fieldset className="edit-block">
           <button className="remove-column" onClick={(event) => { event.preventDefault(); changeFilter(index, "remove")}}>Remove</button>
@@ -823,28 +785,22 @@ const EditorPanel = (props) => {
               {columnsOptions}
             </select>
           </label>
-          <label>
-            <span className="edit-label">Label</span>
-            <input type="text" value={filter.label} onChange={(event) => { changeFilter(index, "label", event.target.value) }} />
-          </label>
+          <TextField value={filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
         </fieldset>
   )
   })
 
   const filterValueOptionList = []
 
-  if(state.filters.length > 0) {
-
-    state.filters.forEach( (filter, index) => {
-
-      state.filters[index].values.forEach( (value, valueNum) => {
+  if(filters.length > 0) {
+    filters.forEach( (filter, index) => {
+      filters[index].values.forEach( (value, valueNum) => {
 
         filterValueOptionList.push([index, valueNum])
 
       })
 
     })
-
   }
 
   useEffect(() => {
@@ -899,10 +855,13 @@ const EditorPanel = (props) => {
       </Draggable>
     ))
   }
-  
+
+  if(loading) {
+    return null
+  }
 
   return (
-    <ErrorBoundary component="Editor">
+    <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
@@ -937,20 +896,12 @@ const EditorPanel = (props) => {
                       <option value="navigation">Navigation</option>
                     </select>
                   </label>
-                  <label>
-                    <span className="edit-label column-heading">Title</span>
-                    <input type="text" value={state.general.title || ""} onChange={(event) => { handleEditorChanges("title", event.target.value) }} />                
-                  </label>
-                  <p className="info">For accessibility purposes, you must enter an accurate title even if you are not planning on displaying this title.</p>
-                  <label>
-                    <span className="edit-label column-heading">Subtext</span>
-                    <textarea value={state.general.subtext || ""} onChange={(event) => { handleEditorChanges("subtext", event.target.value) }} />
-                  </label>
+                  <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
+                  <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
+                  <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
                   {'us' === state.general.geoType &&
-                  <label>
-                    <span className="edit-label column-heading">Territories Label</span>
-                    <input type="text" value={state.general.territoriesLabel || "Territories"} onChange={(event) => { handleEditorChanges("territoriesLabel", event.target.value) }}/>
-                  </label>}
+                    <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem> {/* Columns */}
@@ -960,87 +911,75 @@ const EditorPanel = (props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {'us' === state.general.geoType && 
-                  <label className="checkbox">
-                    <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
-                    <span className="edit-label">This map uses regions</span>
-                  </label>
-                  }
                   <label className="edit-block geo">
                     <span className="edit-label column-heading">{state.general.hasRegions ? `Region` : `Geography`}</span>
                     <select value={state.columns.geo ? state.columns.geo.name : columnsOptions[0] } onChange={(event) => { editColumn("geo", "name", event.target.value) }}>
                       {columnsOptions}
                     </select>
                   </label>
-                {state.general.hasRegions &&
-                  <label className="edit-block geo">
-                    <span className="edit-label column-heading">Geos In Region</span>
-                    <select value={state.columns.geo ? state.columns.geosInRegion.name : columnsOptions[0] } onChange={(event) => { editColumn("geosInRegion", "name", event.target.value) }}>
-                      {columnsOptions}
-                    </select>
+                  {'us' === state.general.geoType && 
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
+                    <span className="edit-label">This map uses regions</span>
                   </label>
-                }
-                {"navigation" !== state.general.type &&
-                <fieldset className="primary-fieldset edit-block">
-                  <label>
-                    <span className="edit-label column-heading">Primary</span>
-                    <select value={state.columns.primary ? state.columns.primary.name : columnsOptions[0] } onChange={(event) => { editColumn("primary", "name", event.target.value) }}>
-                      {columnsOptions}
-                    </select>
-                  </label>
-                  <label>
-                    <span className="edit-label">Label</span>
-                    <input type="text" value={state.columns.primary.label || ""} onChange={(event) => { editColumn("primary", "label", event.target.value) }} />
-                  </label>
-                  <ul className="column-edit">
-                    <li className="three-col">
-                      <label className="prefix">
-                        <span className="edit-label">Prefix</span>
-                        <input type="text" value={state.columns.primary.prefix || ""} onChange={(event) => { editColumn("primary", "prefix", event.target.value) }} />
-                      </label>
-                      <label className="suffix">
-                        <span className="edit-label">Suffix</span>
-                        <input type="text" value={state.columns.primary.suffix || ""} onChange={(event) => { editColumn("primary", "suffix", event.target.value) }} />
-                      </label>
-                      <label className="round">
-                        <span className="edit-label">Round</span>
-                        <input type="number" min="0" value={state.columns.primary.hasOwnProperty('roundToPlace') ? state.columns.primary.roundToPlace : "" } onChange={(event) => { editColumn("primary", "roundToPlace", event.target.value.length === 0 ? "None" : parseFloat( event.target.value ) ) }} />
-                      </label>
-                    </li>
-                    <li>
-                      <label className="checkbox">
-                        <input type="checkbox" checked={ state.columns.primary.useCommas } onChange={(event) => { editColumn("primary", "useCommas", event.target.checked) }} />
-                        <span className="edit-label">Add Commas to Numbers</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label className="checkbox">
-                        <input type="checkbox" checked={ state.columns.primary.dataTable || false} onChange={(event) => { editColumn("primary", "dataTable", event.target.checked) }} />
-                        <span className="edit-label">Display in Data Table</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label className="checkbox">
-                        <input type="checkbox" checked={ state.columns.primary.tooltip || false} onChange={(event) => { editColumn("primary", "tooltip", event.target.checked) }} />
-                        <span className="edit-label">Display in Tooltips</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label>
-                        <span className="edit-label">Special Classes</span>
-                      </label>
-                        <ReactTags
-                            placeholder="Separate by comma"
-                            delimiters={[' ',',','Enter']}
-                            allowNew={true}
-                            minQueryLength={1}
-                            tags={specialClasses}
-                            onDelete={(event) => { editColumn("primary", "specialClassDelete", event) }}
-                            onAddition={(value) => { editColumn("primary", "specialClassAdd", value) }}
-                        />
-                    </li>
-                  </ul>
-                </fieldset>}
+                  }
+                  {state.general.hasRegions &&
+                    <label className="edit-block geo">
+                      <span className="edit-label column-heading">Geos In Region</span>
+                      <select value={state.columns.geo ? state.columns.geosInRegion.name : columnsOptions[0] } onChange={(event) => { editColumn("geosInRegion", "name", event.target.value) }}>
+                        {columnsOptions}
+                      </select>
+                    </label>
+                  }
+                  {"navigation" !== state.general.type &&
+                  <fieldset className="primary-fieldset edit-block">
+                    <label>
+                      <span className="edit-label column-heading">Primary</span>
+                      <select value={state.columns.primary ? state.columns.primary.name : columnsOptions[0] } onChange={(event) => { editColumn("primary", "name", event.target.value) }}>
+                        {columnsOptions}
+                      </select>
+                    </label>
+                    <TextField value={columns.primary.label} section="columns" subsection="primary" fieldName="label" label="Label" updateField={updateField} />
+                    <ul className="column-edit">
+                      <li className="three-col">
+                        <TextField value={columns.primary.prefix} section="columns" subsection="primary" fieldName="prefix" label="Prefix" updateField={updateField} />
+                        <TextField value={columns.primary.suffix} section="columns" subsection="primary" fieldName="suffix" label="Suffix" updateField={updateField} />
+                        <TextField type="number" value={columns.primary.roundToPlace} section="columns" subsection="primary" fieldName="roundToPlace" label="Round" updateField={updateField} />
+                      </li>
+                      <li>
+                        <label className="checkbox">
+                          <input type="checkbox" checked={ state.columns.primary.useCommas } onChange={(event) => { editColumn("primary", "useCommas", event.target.checked) }} />
+                          <span className="edit-label">Add Commas to Numbers</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label className="checkbox">
+                          <input type="checkbox" checked={ state.columns.primary.dataTable || false} onChange={(event) => { editColumn("primary", "dataTable", event.target.checked) }} />
+                          <span className="edit-label">Display in Data Table</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label className="checkbox">
+                          <input type="checkbox" checked={ state.columns.primary.tooltip || false} onChange={(event) => { editColumn("primary", "tooltip", event.target.checked) }} />
+                          <span className="edit-label">Display in Tooltips</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label>
+                          <span className="edit-label">Special Classes</span>
+                        </label>
+                          <ReactTags
+                              placeholder="Separate by comma"
+                              delimiters={[' ',',','Enter']}
+                              allowNew={true}
+                              minQueryLength={1}
+                              tags={specialClasses}
+                              onDelete={(event) => { editColumn("primary", "specialClassDelete", event) }}
+                              onAddition={(value) => { editColumn("primary", "specialClassAdd", value) }}
+                          />
+                      </li>
+                    </ul>
+                  </fieldset>}
                   <label className="edit-block navigate column-heading">
                     <span className="edit-label column-heading">Navigation</span>
                     <select value={state.columns.navigate ? state.columns.navigate.name : columnsOptions[0] } onChange={(event) => { editColumn("navigate", "name", event.target.value) }}>
@@ -1056,24 +995,12 @@ const EditorPanel = (props) => {
                             {columnsOptions}
                           </select>
                         </label>
-                        <label>
-                          <span className="edit-label">Label</span>
-                          <input type="text" value={state.columns[val].label} onChange={(event) => { editColumn(val, "label", event.target.value) }} />
-                        </label>
+                        <TextField value={columns[val].label} section="columns" subsection={val} fieldName="label" label="Label" updateField={updateField} />
                         <ul className="column-edit">
                           <li className="three-col">
-                            <label className="prefix">
-                              <span className="edit-label">Prefix</span>
-                              <input type="text" value={state.columns[val].prefix} onChange={(event) => { editColumn(val, "prefix", event.target.value) }} />
-                            </label>
-                            <label className="suffix">
-                              <span className="edit-label">Suffix</span>
-                              <input type="text" value={state.columns[val].suffix} onChange={(event) => { editColumn(val, "suffix", event.target.value) }} />
-                            </label>
-                            <label className="round">
-                              <span className="edit-label">Round</span>
-                              <input type="number" min="0" value={state.columns[val].hasOwnProperty('roundToPlace') ? state.columns[val].roundToPlace : "" } onChange={(event) => { editColumn(val, "roundToPlace", event.target.value.length === 0 ? "None" : parseFloat( event.target.value ) ) }} />
-                            </label>
+                            <TextField value={columns[val].prefix} section="columns" subsection={val} fieldName="prefix" label="Prefix" updateField={updateField} />
+                            <TextField value={columns[val].suffix} section="columns" subsection={val} fieldName="suffix" label="Suffix" updateField={updateField} />
+                            <TextField type="number" value={columns[val].roundToPlace} section="columns" subsection={val} fieldName="roundToPlace" label="Round" updateField={updateField} />
                           </li>
                           <li>
                             <label className="checkbox">
@@ -1144,18 +1071,13 @@ const EditorPanel = (props) => {
                           )}
                         </Droppable>
                       </DragDropContext>
-                      {editorCatOrder.length === 9 && <section className="error-box my-2"><div><h5 className="py-2">Warning</h5><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</p></div></section>}
+                      {editorCatOrder.length === 9 && <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</p></div></section>}
                     </React.Fragment>
                   }
-                  <label>
-                    <span>Legend Title</span>
-                    <input type="text" value={legend.title || ""} onChange={(event) => { handleEditorChanges("legendTitle", event.target.value) }} />
-                  </label>
+                  <TextField value={legend.title} updateField={updateField} section="legend" fieldName="title" label="Legend Title" placeholder="Legend Title" />
                   {false === legend.dynamicDescription && (
-                    <label>
-                      <span>Legend Description</span>
-                      <textarea value={legend.description || ""} onChange={(event) => { handleEditorChanges("legendDescription", event.target.value) }} />
-                    </label>)}
+                    <TextField type="textarea" value={legend.description} updateField={updateField} section="legend" fieldName="description" label="Legend Description" />
+                  )}
                   {true === legend.dynamicDescription && (
                     <React.Fragment>
                       <label>
@@ -1179,12 +1101,12 @@ const EditorPanel = (props) => {
                       />
                       <span className="edit-label">Separate Zero</span>
                     </label>)}
-                  {filters.length > 0 && (
+                  {filtersJSX.length > 0 && (
                       <label className="checkbox">
                         <input type="checkbox" checked={ legend.dynamicDescription} onChange={() => { handleEditorChanges("dynamicDescription", filterValueOptionList[0]) }} />
                         <span className="edit-label">Dynamic Legend Description</span>
                       </label>)}
-                  {filters.length > 0 &&
+                  {filtersJSX.length > 0 &&
                     <label className="checkbox">
                       <input type="checkbox"
                             checked={legend.unified}
@@ -1202,7 +1124,7 @@ const EditorPanel = (props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {filters.length > 0 ? filters : (<p style={{textAlign: "center"}}>There are currently no filters.</p>) }
+                  {filtersJSX.length > 0 ? filtersJSX : (<p style={{textAlign: "center"}}>There are currently no filters.</p>) }
                   <button className={"btn full-width"} onClick={(event) => {event.preventDefault(); changeFilter(null, "addNew")}}>Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>}
@@ -1214,10 +1136,7 @@ const EditorPanel = (props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <label>
-                    <span>Data Table Title</span>
-                    <input type="text" value={state.dataTable.title || ""} onChange={(event) => { handleEditorChanges("dataTableTitle", event.target.value) }} />
-                  </label>
+                  <TextField value={dataTable.title} updateField={updateField} section="dataTable" fieldName="title" label="Data Table Title" placeholder="Data Table" />
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />
                     <span className="edit-label">Map loads with data table expanded</span>
@@ -1244,10 +1163,7 @@ const EditorPanel = (props) => {
                   </label>
                   <p className="info">On mobile, information always appears in a popover modal when a user taps on an item.</p>
                   {'click' === state.tooltips.appearanceType &&
-                  <label>
-                    <span>Tooltips Link Label</span>
-                    <input type="text" value={state.tooltips.linkLabel} onChange={(event) => { handleEditorChanges("linkLabel", event.target.value) }} />
-                  </label>
+                    <TextField value={tooltips.linkLabel} section="tooltips" fieldName="linkLabel" label="Tooltips Link Label" updateField={updateField} />
                   }
                   <label className="checkbox">
                     <input type="checkbox" checked={state.tooltips.capitalizeLabels} onChange={(event) => { handleEditorChanges("capitalizeLabels", event.target.checked) }} />
@@ -1373,10 +1289,10 @@ const EditorPanel = (props) => {
             </div>
           </a>
           <div className="advanced">
-                  <span className="advanced-toggle-link" onClick={() => setAdvancedToggle(!advancedToggle)}><span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options</span>
+            <span className="advanced-toggle-link" onClick={() => setAdvancedToggle(!advancedToggle)}><span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options</span>
             {advancedToggle && (
               <React.Fragment>
-                <section className="error-box my-2"><div><h5 className="py-2">Warning</h5><p>This can cause serious errors in your map.</p></div></section>
+                <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>This can cause serious errors in your map.</p></div></section>
                 <p className="pb-2">This tool displays the actual map configuration <acronym title="JavaScript Object Notation">JSON</acronym> that is generated by this editor and allows you to edit properties directly and apply them.</p>
                 <textarea value={ configData } onChange={(event) => setConfigData(event.target.value)} />
                 <button className="btn full-width" onClick={() => loadConfig(JSON.parse(configData))}>Apply</button>
@@ -1387,6 +1303,6 @@ const EditorPanel = (props) => {
       </section>
     </ErrorBoundary>
   )
-}
+})
 
 export default EditorPanel;

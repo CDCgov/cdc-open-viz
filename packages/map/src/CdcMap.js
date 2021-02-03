@@ -448,7 +448,7 @@ class CdcMap extends Component {
             toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel} <ExternalIcon className="inline-icon" /></span>) )
+                toolTipText.push( (<span className="navigation-link d-flex" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon mr-1" /></span>) )
             }
         }
 
@@ -1193,7 +1193,7 @@ class CdcMap extends Component {
         return (
             <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className}` : 'cdc-open-viz-module cdc-map-outer-container' } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
-                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
+                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} />}
                 <section className="cdc-map-inner-container" aria-label={'Map: ' + title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip

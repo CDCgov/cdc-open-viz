@@ -1,5 +1,5 @@
 import React from 'react';
-import closeIcon from '../images/close.svg';
+import closeIcon from '../images/close.svg?inline';
 
 const Modal = (props) => {
   const {
