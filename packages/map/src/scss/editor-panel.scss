@@ -1,3 +1,8 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/utilities";
+
 @include breakpoint(md) {
   .editor-panel:not(.hidden) + .cdc-map-inner-container {
     padding-left: $editorWidth;
@@ -35,6 +40,7 @@
   .geo-buttons {
     list-style: none;
     display: flex;
+    color: $mediumGray;
     svg {
       display: block;
       max-width: 80px;
@@ -46,10 +52,9 @@
       }
     }
     li {
-      border-radius: .4em;
       padding: .3em .75em;
       display: flex;
-      border: $mediumGray 1px solid;
+      border: $lightGray 1px solid;
       width: 40%;
       align-items: center;
       margin-right: 1em;
@@ -104,7 +109,7 @@
     cursor: pointer;
     width: 25px;
     height: 25px;
-    left: 305px;
+    left: 307px;
     top: 10px;
     box-shadow: rgba(0,0,0,.5) 0 1px 2px;
     &:before {
@@ -139,10 +144,10 @@
     top: 0;
     bottom: 0;
     .accordion__heading {
-      background: $lightGray;
+      background: $lightestGray;
     }
     .form-container {
-      border-right: $mediumGray 1px solid;
+      border-right: $lightGray 1px solid;
       flex-grow: 1;
     }
     .guidance-link {
@@ -155,19 +160,6 @@
         path {
           fill: currentColor;
         }
-      }
-      &:before {
-        content: " ";
-        width: 5px;
-        background: $blue;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        position: absolute;
-      }
-      img {
-        max-width: 40px;
-        margin-right: 1em;
       }
     }
     .warning {
@@ -220,6 +212,9 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       padding: 1em 1.25em 2em;
       animation: fadein 0.2s ease-in;
+      h5 {
+        font-size: .8em;
+      }
     }
   
     .advanced {
@@ -269,7 +264,7 @@
       background: #565656;
       color: #fff;
       font-size: 1.1em;
-      padding: .6em .8em;
+      padding: .6em 1em;
       position: relative;
       z-index: 3;
     }
@@ -296,6 +291,7 @@
           display: inline;
         }
         input {
+          margin-left: 0;
           width: inherit;
           display: inline;
         }
@@ -307,11 +303,6 @@
     }
     textarea {
       min-height: 140px;
-    }
-    select {
-      width: 100%;
-      font-size: 1.4em;
-      text-transform: none;
     }
     .header .color-palette li {
       width: 21px;
@@ -530,8 +521,8 @@
   
     .react-tags {
       position: relative;
-      input {
-        border: rgba(0, 0, 0, 0.3) 1px solid;
+      input.react-tags__search-input {
+        font-size: .8rem;
       }
       /* clicking anywhere will focus the input */
       cursor: text;
