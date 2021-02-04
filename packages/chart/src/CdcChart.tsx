@@ -12,6 +12,7 @@ import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
 import './styles.scss';
+import { IgnorePlugin } from 'webpack';
 
 export default function CdcChart({ configUrl, element }) {
 
@@ -44,7 +45,29 @@ export default function CdcChart({ configUrl, element }) {
 
   const loadConfig = async () => {
     const response = await fetch(configUrl);
-    const responseObj = await response.json();
+    let responseObj = await response.json();
+
+    // Sets default values for config
+    responseObj.initialized = true;
+    responseObj.title = responseObj.title || {};
+    responseObj.title.fontSize = responseObj.title.fontSize || 28;
+
+    responseObj.minHeight = responseObj.minHeight || 400;
+
+    responseObj.padding = responseObj.padding || {};
+    responseObj.padding.left = responseObj.padding.left|| 0;
+    responseObj.padding.right = responseObj.padding.right || 0;
+
+    responseObj.yAxis = responseObj.yAxis || {};
+    responseObj.yAxis.width = responseObj.yAxis.width || 50;
+    responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
+    responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
+
+    responseObj.xAxis = responseObj.xAxis || {};
+    responseObj.xAxis.height = responseObj.xAxis.height !== undefined ? responseObj.xAxis.height : 75;
+    responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
+    responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
+    responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
 
     // If data is included through a URL, fetch that and store
     if(responseObj.dataUrl) {
@@ -66,14 +89,16 @@ export default function CdcChart({ configUrl, element }) {
         clearTimeout(debounce.current);	
       }	
 
+      const adjustedWidth = config.padding ? element.offsetWidth - config.padding.left - config.padding.right : element.offsetWidth;
+
       debounce.current = setTimeout(() => {
         setDimensions({	
-            width: element.offsetWidth > viewportCutoff ? (element.offsetWidth * .75) : element.offsetWidth,	
-            height: 500
+            width: ((element.offsetWidth > viewportCutoff) && !config.legend.hide) ? (adjustedWidth * .75) : adjustedWidth,	
+            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.height
         });	
       }, 250);	
     }	
-  }, [element.offsetWidth, dimensions.width]);
+  }, [element.offsetWidth, dimensions.width, config.legend]);
 
   // Load data when component first mounts
   useEffect(() => {
@@ -82,13 +107,13 @@ export default function CdcChart({ configUrl, element }) {
 
   // Adds resize handler
   useEffect(() => {
-    if(!resizeInit) {
+    if(config.initialized && !resizeInit) {
       window.addEventListener('resize', onResize);
       onResize();
-      
+
       setResizeInit(true);
     }
-  }, []);
+  });
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -162,8 +187,10 @@ export default function CdcChart({ configUrl, element }) {
       <div className="cdc-visualization-container mt-4">
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
-          {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize || 28}}>{title.text}</h1>}
-          {chartComponents[visualizationType]}
+          {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
+          <div style={{paddingLeft: config.padding.left}}>
+            {chartComponents[visualizationType]}
+          </div>
         </div>
         {/* Legend */}
         <div className="legend-container" hidden={legend.hide}>

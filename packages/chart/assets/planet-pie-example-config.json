@@ -6,17 +6,12 @@
     "visualizationType": "Pie",
     "palette": "qualitative-soft",
     "seriesKeys": ["Radius"],
+    "minHeight": 200,
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
         "prefix": "",
         "suffix": "km"
-    },
-    "padding": {
-        "top": 0,
-        "left": 80,
-        "right": 0,
-        "bottom": 80
     },
     "yAxis": {
         "label": "Radius",
@@ -24,7 +19,8 @@
     },
     "xAxis": {
         "label": "Planet",
-        "dataKey": "name"
+        "dataKey": "name",
+        "height": 0
     },
     "legend": {
         "hide": true

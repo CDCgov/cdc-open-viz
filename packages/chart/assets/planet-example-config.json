@@ -13,17 +13,17 @@
         "suffix": "km"
     },
     "padding": {
-        "top": 0,
-        "left": 80,
-        "right": 0,
-        "bottom": 80
+        "left": 5,
+        "right": 5
     },
     "yAxis": {
         "label": "Measurement (1000km)"
     },
     "xAxis": {
         "label": "Planet",
-        "dataKey": "name"
+        "dataKey": "name",
+        "tickRotation": 30,
+        "height": 90
     },
     "legend": {
         "hide": false

@@ -97,24 +97,22 @@ export default function PieChart({numberFormatter}) {
   const svgRef = useRef<HTMLDivElement>();
 
   const {width, height} = dimensions;
-  const margin = config.padding;
 
-  const innerWidth = width;
-  const innerHeight = height - margin.top - margin.bottom;
-  const radius = Math.min(innerWidth, innerHeight) / 2;
-  const centerY = innerHeight / 2;
-  const centerX = innerWidth / 2;
-  const donutThickness = 50;
+  const radius = Math.min(width, height) / 2;
+  const centerY = height / 2;
+  const centerX = width / 2;
+  const donutThickness = radius;
 
   return width && height ? (
     <div ref={svgRef}>
-      <svg viewBox={`0 0 ${width} ${height}`}>
-        <Group top={centerY + margin.top}  left={centerX}>
+      <svg width={width} height={height}>
+        <Group top={centerY}  left={centerX}>
           <Pie
             data={data}
             pieValue={d => d[config.yAxis.dataKey]}
             pieSortValues={() => -1}
-            outerRadius={radius - donutThickness * 1.3}
+            innerRadius={radius - donutThickness}
+            outerRadius={radius}
           >
             {pie => (
               <AnimatedPie<any>

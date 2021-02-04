@@ -6,6 +6,7 @@
     "dataUrl":  "/assets/covid-example-data.json",
     "visualizationType": "Bar",
     "seriesKeys": ["Age-adjusted rate"],
+    "minHeight": 300,
     "dataFormat": {
         "roundTo": -1,
         "commas": false,
@@ -13,10 +14,8 @@
         "suffix": ""
     },
     "padding": {
-        "top": 0,
-        "left": 100,
-        "right": 0,
-        "bottom": 80
+        "left": 10,
+        "right": 10
     },
     "yAxis": {
         "label": "Rate per 100,000 population",
@@ -24,13 +23,16 @@
         "labelFontSize": 24,
         "tickFontSize": 18,
         "gridLines": true,
-        "numTicks": 3
+        "numTicks": 3,
+        "width": 75
     },
     "xAxis": {
         "label": "Race",
         "dataKey": "Race",
         "labelFontSize": 22,
-        "tickFontSize": 22
+        "tickFontSize": 22,
+        "tickRotation": 72,
+        "height": 450
     },
     "legend": {
         "hide": true
