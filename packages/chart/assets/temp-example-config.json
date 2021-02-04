@@ -18,10 +18,8 @@
         "suffix": "°"
     },
     "padding": {
-        "top": 0,
-        "left": 80,
-        "right": 0,
-        "bottom": 80
+        "left": 15,
+        "right": 15
     },
     "yAxis": {
         "label": "Temperature"
@@ -31,7 +29,10 @@
         "dataKey": "date",
         "type": "date",
         "dateParseFormat": "%Y-%m-%d",
-        "dateDisplayFormat": "%b %d"
+        "dateDisplayFormat": "%b %d",
+        "numTicks": 8,
+        "tickRotation": 50,
+        "height": 100
     },
     "legend": {
         "label": "Legend"
