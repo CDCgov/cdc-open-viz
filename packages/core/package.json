@@ -1,6 +1,6 @@
 {
   "name": "@cdc/core",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Core elements of the CDC Open Visualization project",
   "author": "Daniel Immke <npm@daniel.do>",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
@@ -23,5 +23,5 @@
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
-  "devDependencies": {}
+  "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81"
 }

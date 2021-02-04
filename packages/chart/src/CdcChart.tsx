@@ -184,7 +184,7 @@ export default function CdcChart({ configUrl, element }) {
 
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
-      <div className="cdc-visualization-container mt-4">
+      <div className="cdc-open-viz-module cdc-visualization-container mt-4">
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
           {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}

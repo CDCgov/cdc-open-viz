@@ -6,26 +6,27 @@ import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
-import ReactHtmlParser from 'react-html-parser';
+import parse from 'html-react-parser';
 
 // Data
-import externalIcon from './images/external-link.svg';
+import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
-import './App.scss';
+import './scss/main.scss';
 
 // Open Viz
 import '@cdc/core';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 // Components
 import Sidebar from './components/Sidebar';
 import Loading from './components/Loading';
 import Modal from './components/Modal';
-import Editor from './components/Editor'; // Future: Lazy
+import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
@@ -444,10 +445,10 @@ class CdcMap extends Component {
 
         // We convert the markup into JSX and add a navigation link if it's going into a modal.
         if('jsx' === returnType) {
-            toolTipText = [(<div key="modal-content">{ReactHtmlParser(toolTipText)}</div>)]
+            toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<img src={externalIcon} alt="" /></span>) )
+                toolTipText.push( (<span className="navigation-link d-flex" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon mr-1" /></span>) )
             }
         }
 
@@ -738,7 +739,7 @@ class CdcMap extends Component {
     }
 
     // Checks if the string is a number and returns it as a number if it is
-    numberFromString = (value) => {
+    numberFromString (value) {
         // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
         let nonNumeric = /[^\d.]/g
 
@@ -1187,11 +1188,13 @@ class CdcMap extends Component {
             displayGeoName : this.displayGeoName
         }
 
+        const { title = '', subtext = ''} = this.state.general
+
         return (
-            <div className={this.props.className ? `cdc-map-outer-container ${this.props.className}` : 'cdc-map-outer-container' } ref={this.outerContainerRef}>
+            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className}` : 'cdc-open-viz-module cdc-map-outer-container' } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
-                {true === this.props.isEditor && <Editor state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} cleanCsvData={this.cleanCsvData} loading={this.state.loading} fetchRemoteData={this.fetchRemoteData} usaDefaultConfig={usaDefaultConfig} />}
-                <section className="cdc-map-inner-container" aria-label={'Map: ' + this.state.general.title}>
+                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} />}
+                <section className="cdc-map-inner-container" aria-label={'Map: ' + title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip
                             id="tooltip"
@@ -1203,15 +1206,16 @@ class CdcMap extends Component {
                     }
                     <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
                         <h1 className={'map-title ' + this.state.general.headerColor}>
-                            { ReactHtmlParser(this.state.general.title) }
+                            { parse(title) }
                         </h1>
                     </header>
                     <section className={mapContainerClasses.join(' ')} onClick={(e) => this.closeModal(e)}>
                         <section className="geography-container" aria-hidden="true">
                             {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                            {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
-                            {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
-                            {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
+                                {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
+                                {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
+                                
                         </section>
                         {"navigation" === this.state.general.type &&
                             <NavigationMenu
@@ -1222,7 +1226,7 @@ class CdcMap extends Component {
                                 navigationHandler={(val) => this.navigationHandler(val)}
                             />
                         }
-                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading &&
+                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading  && Object.keys(this.state.processedData).length > 0 &&
                             <Sidebar
                                 legend={this.state.legend}
                                 filters={this.state.filters}
@@ -1239,7 +1243,7 @@ class CdcMap extends Component {
                             />
                         }
                     </section>
-                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
+                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&     
                         <DataTable
                             state={this.state}
                             navigationHandler={this.navigationHandler}
@@ -1258,9 +1262,9 @@ class CdcMap extends Component {
                             mapTitle={this.state.general.title}
                         />
                     }
-                    {this.state.general.subtext && <p className="subtext">{ ReactHtmlParser(this.state.general.subtext) }</p>}
+                    {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
                 </section>
-                <div aria-live="assertive" className="sr-only">{ this.state.accessibleStatus }</div>
+                <div aria-live="assertive" className="cdcdataviz-sr-only">{ this.state.accessibleStatus }</div>
             </div>
         )
     }

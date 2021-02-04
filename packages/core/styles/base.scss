@@ -22,3 +22,24 @@
 
 // Imports
 @import "reset";
+@import "variables";
+
+@mixin emptyState {
+  background: rgba(255, 255, 255, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 7;
+}
+
+.cdc-open-viz-module {
+  color: $baseColor;
+  @import "data-table";
+  @import "global";
+}

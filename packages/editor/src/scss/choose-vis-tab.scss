@@ -1,0 +1,17 @@
+@import 'variables';
+
+#visualizationList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $gbl-padding;
+    padding: $gbl-padding 0;
+
+    @media only screen and ( min-width: $sm ) {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    button {
+        border: solid 1px rgba( $lightGray, .5 );
+        padding: $gbl-padding;
+    }
+}
