@@ -3,41 +3,44 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@types/react": "17.x",
+    "@types/react-dom": "17.x",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
+    "core-js": "^3.8.3",
+    "css-loader": "^4.3.0",
     "eslint": "^7.16.0",
+    "eslint-config-airbnb-typescript": "12.0.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.1",
     "husky": "^4.3.0",
-    "html-webpack-plugin": "^4.5.0",
     "lerna": "^3.22.1",
     "lint-staged": "^10.4.0",
-    "typescript": "^4.0.5",
+    "mini-svg-data-uri": "^1.2.3",
+    "node-sass": "^4.13.0",
     "react": "17.x",
     "react-dom": "17.x",
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/preset-react": "^7.6.3",
-    "@types/react": "^16.9.55",
-    "@types/react-dom": "^16.9.9",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^4.3.0",
-    "eslint-config-airbnb-typescript": "12.0.0",
-    "file-loader": "^6.1.0",
-    "node-sass": "^4.13.0",
+    "react-svg-loader": "^3.0.3",
     "sass-loader": "^10.0.2",
     "style-loader": "^1.0.0",
     "ts-loader": "^8.0.9",
+    "typescript": "^4.0.5",
     "url-loader": "^4.1.1",
-    "mini-svg-data-uri": "^1.2.3",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+    "webpack": "^5.16.0",
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "husky": {
     "hooks": {
@@ -48,5 +51,8 @@
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "eslint --config .eslintrc.js"
     ]
+  },
+  "scripts": {
+    "publish": "npx lerna publish"
   }
 }

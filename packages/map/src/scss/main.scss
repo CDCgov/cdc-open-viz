@@ -1,5 +1,30 @@
-.sr-only,
-.sr-only-focusable:not(:focus) {
+@import "~@cdc/core/styles/base";
+@import "loading";
+@import "variables";
+@import "heading-colors";
+@import "editor-panel";
+
+@mixin legendDot() {
+  margin-right: 5px;
+  border-radius: 300px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: rgba(0,0,0,.3) 1px solid;
+}
+
+.cdc-map-outer-container {
+  position: relative;
+  display: flex; // Needed for the main content
+  font-size: 14px;
+  @include breakpoint(lg) {
+    font-size: 16px;
+  }
+}
+
+.cdcdataviz-sr-only,
+.cdcdataviz-sr-only-focusable:not(:focus) {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;
@@ -92,7 +117,7 @@
         box-shadow: rgba(0, 0, 0, 0.2) 3px 3px 7px;
         opacity: 1;
         line-height: 1.4em;
-        font-size: 1em;
+        font-size: 1rem;
         border-radius: 4px;
         min-width: 250px;
         padding: 16px 40px 16px 20px;
@@ -113,7 +138,7 @@
           transform: translate(-50%, -120%);
         }
         @include breakpoint(lg) {
-          font-size: 1.3em;
+          font-size: .9em;
           min-width: 300px;
           .legend-color {
             height: 1.3em;
@@ -129,16 +154,15 @@
           right: 20px;
           top: 18px;
           cursor: pointer;
+          width: 1em;
         }
         span.navigation-link {
           text-decoration: underline;
           cursor: pointer;
           color: #075290;
-          img {
+          svg {
             display: inline-block;
             max-width: 13px;
-            vertical-align: baseline;
-            margin-left: 5px;
           }
         }
         &.capitalize p {

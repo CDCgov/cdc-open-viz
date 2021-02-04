@@ -1,0 +1,120 @@
+.error-box {
+  background: #FFC2C2;
+  display: flex;
+  justify-content: space-between;
+  padding: .3rem 1rem;
+  font-size: .9rem;
+  h5 {
+    font-weight: 600;
+  }
+  p {
+    margin: 0;
+  }
+  .dismiss-error {
+    font-size: .8rem;
+    cursor: pointer;
+  }
+}
+
+.inline-icon {
+  width: 1em !important;
+  height: auto !important;
+  font-size: 1rem;
+  color: inherit;
+  path {
+    fill: currentColor;
+  }
+}
+
+.btn {
+  background: #005eaa;
+  color: #fff;
+  border: 0;
+  padding: .4em .8em;
+  font-size: 1em;
+  display: block;
+  border-radius: 5px;
+  transition: .1s all;
+  cursor: pointer;
+  &.full-width {
+    width: 100%;
+  }
+  &.secondary {
+    font-size: .8em;
+    padding: .3em 1em;
+    background: rgba(0, 0, 0, 0.3);
+    display: inline-block;
+    margin-bottom: 1em;
+    &:hover {
+      background: rgba(0,0,0,.5);
+    }
+  }
+  &:hover {
+    transition: .1s all;
+    background: lighten(#005eaa, 5%);
+  }
+}
+
+input[type="text"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
+  padding: .5em .5em;
+  font-size: 1em;
+  font-family: sans-serif;
+  border: rgba(0,0,0,.3) 1px solid;
+  &:focus {
+    border: rgba(0,0,0,.7) 1px solid;
+    outline: 0;
+  }
+}
+textarea {
+  min-height: 140px;
+}
+select {
+  width: 100%;
+  font-size: 1.1rem;
+  text-transform: none;
+}
+
+.input-group-text {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.guidance-link {
+  margin: 2em 0 1em;
+  padding: .75em 1em;
+  display: flex;
+  text-decoration: none;
+  color: #444;
+  border: $lightGray 1px solid;
+  position: relative;
+  transition: .2s all;
+  font-size: 1em;
+  &:before {
+    content: " ";
+    width: 5px;
+    background: $blue;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    position: absolute;
+  }
+  &:hover {
+    background: $lightestGray;
+    transition: .2s all;
+  }
+  > div {
+    font-size: .9em;
+  }
+  svg {
+    width: 60px;
+    color: $blue;
+    margin-right: 1rem;
+    path {
+      fill: currentColor;
+    }
+  }
+  h3 {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+}

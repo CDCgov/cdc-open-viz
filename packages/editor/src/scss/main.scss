@@ -1,0 +1,99 @@
+@import 'variables';
+@import "@cdc/core/styles/base";
+
+$tempLightGray: #C7C7C7;
+
+.cdc-editor {
+  @import "~bootstrap/scss/functions";
+  @import "~bootstrap/scss/variables";
+  @import "~bootstrap/scss/mixins";
+  @import "~bootstrap/scss/utilities";
+  @import "~bootstrap/scss/grid";
+  @import "data-table";
+  min-height: inherit;
+  display: flex;
+  flex-direction: column;
+  .tabs {
+    nav {
+      display: flex;
+    }
+    .nav-item {
+      user-select: none;
+      cursor: pointer;
+      &.disabled {
+        cursor: not-allowed;
+      }
+      &.active {
+        cursor: default;
+      }
+    }
+  }
+  .editor-toggle {
+    top: calc(3rem + 11px);
+  }
+  .editor-panel {
+    margin-top: 3rem;
+  }
+  // Top level tabs
+  .top-level {
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    ul {
+      display: flex;
+      list-style: none;
+      li {
+        background: #F2F2F2;
+        line-height: 3rem;
+        border-bottom: 1px solid $tempLightGray;
+        color: #333;
+        flex-grow: 1;
+        flex-shrink: 0;
+        width: 33%;
+        border-right: 1px solid $tempLightGray;
+        text-align: center;
+        &:last-child {
+          border-right: none;
+        }
+        &.active {
+            background-color: #565656;
+            color: #fff;
+        }
+      }
+    }
+  }
+  > .tab-content {
+    flex-grow: 1;
+    margin-top: 3rem;
+    position: relative;
+  }
+  .dropdown {
+    display: block;
+    width: 100%;
+    
+    nav {
+      display: none;
+
+      button {
+        display:block;
+      }
+    }
+
+    &:focus-within nav {
+      display: block
+    }
+  }
+
+  .info-box {
+    border: $lightGray 1px solid;
+    padding: 1rem;
+    font-size: .9rem;
+    h4 {
+      font-weight: 600;
+      font-size: 1.2em;
+    }
+    ul {
+      padding: inherit;
+    }
+  }
+}

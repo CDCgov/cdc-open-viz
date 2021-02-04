@@ -1,5 +1,7 @@
 import React from 'react';
-import ReactHtmlParser from 'react-html-parser';
+import parse from 'html-react-parser';
+
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 const Sidebar = (props) => {
   const {
@@ -128,7 +130,8 @@ const Sidebar = (props) => {
   });
 
   return (
-    <aside className={legend.position}>
+    <ErrorBoundary component="Sidebar">
+      <aside className={legend.position}>
       <section className="legend-section" aria-label="Map Legend">
         {processedLegend.disabledAmt > 0
           && (
@@ -142,9 +145,9 @@ const Sidebar = (props) => {
           >Clear
           </button>
           )}
-        {legend.title && <h2>{ ReactHtmlParser(legend.title) }</h2>}
+        {legend.title && <h2>{ parse(legend.title) }</h2>}
         {legend.dynamicDescription === false && legend.description
-          && <p>{ ReactHtmlParser(legend.description) }</p>}
+          && <p>{ parse(legend.description) }</p>}
         {legend.dynamicDescription === true && filters.map((filter, index) => {
           const lookupStr = `${index},${filter.values.indexOf(String(filter.active))}`;
 
@@ -172,6 +175,7 @@ const Sidebar = (props) => {
         </section>
         )}
     </aside>
+    </ErrorBoundary>
   );
 };
 

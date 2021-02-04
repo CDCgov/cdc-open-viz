@@ -1,0 +1,14 @@
+.data-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  h2 {
+    font-weight: 600;
+    font-size: 1.3em;
+  }
+  .filter {
+    align-self: flex-end;
+    font-size: 1em;
+    width: 30%;
+  }
+}

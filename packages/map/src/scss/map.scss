@@ -64,7 +64,7 @@ header + .map-container.full-border {
     z-index: 3;
     width: 75px;
   }
-  svg {
+  svg[class^="rsm-"] {
     padding: 0;
     width: 100%;
     height: auto;
@@ -109,6 +109,7 @@ header + .map-container.full-border {
     padding-top: 3em;
   }
   ul {
+    display: flex;
     @include breakpoint(lg) {
       max-width: none;
     }
@@ -117,7 +118,9 @@ header + .map-container.full-border {
       min-width: 30px;
       display: inline-block;
       margin-right: .5em;
-      margin-bottom: .5em;
+      @include breakpoint(lg) {
+        margin-bottom: .5em;
+      }
       transition: .3s all;
       &.label {
         max-width: 30%;

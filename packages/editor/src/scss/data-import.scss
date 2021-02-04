@@ -1,0 +1,96 @@
+@import "_variables";
+
+.cdc-editor .data-designer {
+    display: flex;
+    .left-col {
+        background: #fff;
+        padding-top: $gbl-padding;
+        padding-bottom: $gbl-padding;
+        width: 33.333%;
+        border-right: $lightGray 1px solid;
+        position: fixed;
+        bottom: 0;
+        top: 0;
+        margin-top: 3rem;
+        z-index: 1;
+        .tabs {
+            > ul.nav {
+                display: flex;
+            }
+            .nav-item {
+                display: flex;
+                justify-content: center;
+                list-style: none;
+                padding: .6rem 0;
+                flex-grow: 1;
+                border-bottom: $lightGray 1px solid;
+                color: $mediumGray;
+                align-items: center;
+                svg {
+                    margin-right: .3em;
+                }
+                &:hover {
+                    border-bottom-color: $mediumGray;
+                }
+                &.active {
+                    border-bottom-width: 5px;
+                    border-bottom-color: $mediumGray;
+                    color: $darkGray;
+                }
+            }
+        
+            .tab-content {
+                padding-top: $gbl-padding;
+                border-top: 1px solid $baseColor;
+            }
+        }
+        .cdcdataviz-file-selector {
+            padding: 1rem 3rem;
+            text-align: center;
+            border: $lightGray 2px dashed;
+            border-radius: .2rem;
+            cursor: pointer;
+            font-size: 1em;
+            color: $mediumGray;
+            transition: .1s all;
+            svg {
+                max-width: 35px;
+                margin: 0 auto .5em;
+                color: $mediumGray;
+                transition: .1s all;
+                path {
+                    fill: currentColor
+                }
+            }
+            &.drag-active {
+                background-color: $lightest-gray;
+                svg {
+                    transform: scale(.8);
+                    transition: .1s all;
+                }
+            }
+            span {
+                white-space: pre;
+                color: $blue;
+                text-decoration: underline;
+            }
+        }
+        .footnote {
+            font-size: .8rem;
+            font-style: italic;
+            color: $mediumGray;
+        }
+    }
+    &::before {
+        content: " ";
+        flex-shrink: 0;
+        width: 33.33%; // Space pseudo element
+    }
+    .right-col {
+        position: relative;
+        background-color: $lightest-gray;
+        padding: $gbl-padding;
+        flex-grow: 1;
+        max-width: 66.667%;
+    }
+}
