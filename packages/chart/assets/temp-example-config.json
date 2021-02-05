@@ -22,7 +22,8 @@
         "right": 15
     },
     "yAxis": {
-        "label": "Temperature"
+        "label": "Temperature",
+        "paddingPercent": 0.15
     },
     "xAxis": {
         "label": "Date",

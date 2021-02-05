@@ -17,7 +17,7 @@ export default function ComboChart({numberFormatter}) {
   let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
 
   const { width, height } = dimensions;
-  console.log(width, config.yAxis.width);
+
   const xMax = width - config.yAxis.width;
   const yMax = height - config.xAxis.height;
 
@@ -33,6 +33,10 @@ export default function ComboChart({numberFormatter}) {
   let yScale;
 
   if (data) {
+    let min = config.visualizationType === 'Bar' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
+    let max = Number.MIN_VALUE;
+
+    //If stacked bar, add together y values to get max, otherwise map data to find max
     if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.seriesKeys.reduce((yTotal, k) => {
@@ -40,6 +44,9 @@ export default function ComboChart({numberFormatter}) {
           return yTotal;
         }, 0);
         allTotals.push(totalYValues);
+        if(totalYValues > max){
+          max = totalYValues;
+        }
         return allTotals;
       }, [] as number[]);
 
@@ -47,12 +54,20 @@ export default function ComboChart({numberFormatter}) {
         domain: [0, Math.max(...yTotals)],
       });
     } else {
-      yScale = scaleLinear<number>({
-        domain: [(config.visualizationType !== 'Line' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))))), Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))))],
-      });
+      max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
     }
 
-    yScale.range([yMax, 0]);
+    //Adds Y Axis data padding if applicable
+    if(config.yAxis.paddingPercent) { 
+      let paddingValue = (max - min) * config.yAxis.paddingPercent;
+      min -= paddingValue;
+      max += paddingValue;
+    }
+    
+    yScale = scaleLinear<number>({
+      domain: [min, max],
+      range: [yMax, 0]
+    });
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
 
