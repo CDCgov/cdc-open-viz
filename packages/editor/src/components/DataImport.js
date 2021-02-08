@@ -125,7 +125,7 @@ export default function DataImport() {
    */
   const loadData = async (fileBlob = null) => {
     let fileData = fileBlob;
-debugger;
+
     // Get the raw data as text from the file
     if(null === fileData) {
       try {
