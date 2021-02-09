@@ -33,28 +33,29 @@ export default function ComboChart({numberFormatter}) {
   let yScale;
 
   if (data) {
-    let min = config.visualizationType === 'Bar' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
-    let max = Number.MIN_VALUE;
+    let min = config.yAxis.min !== undefined ? config.yAxis.min : (config.visualizationType === 'Bar' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key]))))));
+    let max = config.yAxis.max !== undefined ? config.yAxis.max : Number.MIN_VALUE;
 
-    //If stacked bar, add together y values to get max, otherwise map data to find max
-    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
-      const yTotals = data.reduce((allTotals, xValue) => {
-        const totalYValues = config.seriesKeys.reduce((yTotal, k) => {
-          yTotal += Number(xValue[k]);
-          return yTotal;
-        }, 0);
-        allTotals.push(totalYValues);
-        if(totalYValues > max){
-          max = totalYValues;
-        }
-        return allTotals;
-      }, [] as number[]);
+    //If data value max wasn't provided, calculate it
+    if(max === Number.MIN_VALUE){
+      //If stacked bar, add together y values to get max, otherwise map data to find max
+      if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
+        const yTotals = data.reduce((allTotals, xValue) => {
+          const totalYValues = config.seriesKeys.reduce((yTotal, k) => {
+            yTotal += Number(xValue[k]);
+            return yTotal;
+          }, 0);
+          allTotals.push(totalYValues);
+          if(totalYValues > max){
+            max = totalYValues;
+          }
+          return allTotals;
+        }, [] as number[]);
 
-      yScale = scaleLinear<number>({
-        domain: [0, Math.max(...yTotals)],
-      });
-    } else {
-      max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
+        max = Math.max(...yTotals);
+      } else {
+        max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
+      }
     }
 
     //Adds Y Axis data padding if applicable
