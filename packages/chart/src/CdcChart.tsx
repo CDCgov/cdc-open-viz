@@ -134,9 +134,9 @@ export default function CdcChart({ configUrl, element }) {
       }
 
       palette = palette.slice(0, numberOfKeys);
-      
+
       const newColorScale = () => scaleOrdinal({
-        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : config.seriesKeys,
+        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesKeysLabels || config.seriesKeys),
         range: palette,
       });
 
@@ -150,10 +150,15 @@ export default function CdcChart({ configUrl, element }) {
       newSeriesHighlight.push(value);
     });
 
-    if (newSeriesHighlight.indexOf(label.datum) !== -1) {
-      newSeriesHighlight.splice(newSeriesHighlight.indexOf(label.datum), 1);
+    let newHighlight = label.datum;
+    if(config.seriesKeysLabels){
+      newHighlight = config.seriesKeys[config.seriesKeysLabels.indexOf(label.datum)];
+    }
+
+    if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
+      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1);
     } else {
-      newSeriesHighlight.push(label.datum);
+      newSeriesHighlight.push(newHighlight);
     }
 
     setSeriesHighlight(newSeriesHighlight);
