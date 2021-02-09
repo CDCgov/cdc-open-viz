@@ -82,6 +82,10 @@ export default function DataImport() {
 
       const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
 
+      const typeDictionary = {
+        '.csv': 'text/csv',
+        '.json': 'application/json'
+      }
       // Manually construct blob instead of calling response.blob() to get around inconsistent mimeType inference
       responseBlob = new Blob([responseText], {
         type: typeDictionary[fileExtension]
