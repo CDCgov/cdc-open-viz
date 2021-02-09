@@ -1,39 +1,53 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import {
   useTable,
   useBlockLayout,
   useGlobalFilter,
-  useAsyncDebounce,
   useSortBy,
   useResizeColumns,
   usePagination
 } from 'react-table/src';
+import { useDebounce } from 'use-debounce';
 
-const TableFilter = ({globalFilter, setGlobalFilter, disabled = false}) => {
+const TableFilter = memo(({globalFilter, setGlobalFilter, disabled = false}) => {
   const [filterValue, setFilterValue] = useState(globalFilter);
 
-  const filterTable = useAsyncDebounce(value => {
-    setGlobalFilter(value || undefined)
-  }, 200);
+  const [ debouncedValue ] = useDebounce(filterValue, 200);
+
+  useEffect(() => {
+    if('string' === typeof debouncedValue && debouncedValue !== globalFilter ) {
+      setGlobalFilter(debouncedValue ?? '')
+    }
+  }, [debouncedValue])
+
+  const onChange = (e) => {
+    setFilterValue(e.target.value);
+  }
 
   return (
     <input
     className="filter"
     value={filterValue}
-    onChange={(e) => {
-      setFilterValue(e.target.value);
-      filterTable(e.target.value);
-    }}
+    onChange={onChange}
     type="search"
     placeholder='Filter...'
     disabled={disabled}
     />
   )
-};
+});
 
-export default function PreviewDataTable({ data }) {
+const Header = memo(({ globalFilter, data, setGlobalFilter}) => (
+  <header className="data-table-header mb-4">
+    <h2>Data Preview</h2>
+    <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
+  </header>
+))
+
+const PreviewDataTable = ({ data }) => {
+  const [tableData, setTableData] = useState(data ?? [])
+
   const tableColumns = useMemo(() => {
-    const columns = data ? data.columns : [];
+    const columns = tableData.columns ?? [];
 
     return columns.map((columnName) => {
         const columnConfig = {
@@ -44,33 +58,56 @@ export default function PreviewDataTable({ data }) {
 
         return columnConfig
     });
-  }, [data]);
+  }, [tableData]);
+
+  // This adds a columns property just like the D3 function for JSON parsing.
+  const generateColumns = useCallback((data) => {
+    let columns = []
+
+    data.forEach( (rowObj) => {
+      Object.keys(rowObj).forEach( (columnHeading) => {
+        if(false === columns.includes(columnHeading)) {
+          columns.push(columnHeading)
+        }
+      })
+    })
+
+    // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
+    const newData = [...data];
+
+    if(Array.isArray(newData)) {
+      newData.columns = columns;
+      return newData;
+    }
+
+  }, [])
+
+  useEffect(() => {
+    if(!data) {
+      return;
+    }
+
+    let newData = [...data];
+
+    newData = generateColumns(newData);
+
+    setTableData(newData)
+  }, [data, generateColumns])
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
-    state: { pageIndex, pageSize, globalFilter },
+    state: { pageIndex, globalFilter },
     prepareRow,
     setGlobalFilter,
     page,
     canPreviousPage,
     canNextPage,
     pageOptions,
-    pageCount,
-    gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
-  } = useTable({ columns: tableColumns, data, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination);
-
-  const Header = () => (
-    <header className="data-table-header mb-4">
-      <h2>Data Preview</h2>
-      <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
-    </header>
-  )
+  } = useTable({ columns: tableColumns, data: tableData, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination);
 
   const NoData = () => (
     <section className="no-data-message">
@@ -206,5 +243,7 @@ export default function PreviewDataTable({ data }) {
     </>
   )
 
-  return [<Header />, <Table />]
+  return [<Header data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table />]
 };
+
+export default PreviewDataTable;

@@ -448,7 +448,7 @@ class CdcMap extends Component {
             toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
             
             if(data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link d-flex" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon mr-1" /></span>) )
+                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1" /></span>) )
             }
         }
 
