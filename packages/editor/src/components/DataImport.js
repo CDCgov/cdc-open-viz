@@ -47,11 +47,6 @@ export default function DataImport() {
     if ( 0 === parsedData.length ) {
       errorsFound.push(errorMessages.emptyData)
     }
-    
-    // Empty columns headings?
-    if (parsedData.columns.includes('')) {
-      errorsFound.push(errorMessages.emptyCols)
-    }
 
     // Does it have the correct data structure?
     if (parsedData.filter(row =>  row.constructor !== Object).length > 0) {
@@ -96,26 +91,6 @@ export default function DataImport() {
 
   const onDrop = useCallback(([uploadedFile]) => loadData(uploadedFile), [])
 
-  // This adds a columns property just like the D3 function for JSON parsing.
-  const addColumns = (data) => {
-    let columns = []
-
-    data.forEach( (rowObj) => {
-      Object.keys(rowObj).forEach( (columnHeading) => {
-        if(false === columns.includes(columnHeading)) {
-          columns.push(columnHeading)
-        }
-      })
-    })
-
-    // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
-    const newData = [...data];
-
-    newData.columns = columns;
-
-    return newData;
-  }
-
   /**
    * Handle loading data
    */
@@ -150,7 +125,6 @@ export default function DataImport() {
         break;
       case 'application/json':
         fileData = JSON.parse(fileData);
-        fileData = addColumns(fileData);
         break;
       default:
         setErrors([errorMessages.fileType]);
@@ -209,7 +183,11 @@ export default function DataImport() {
             </form>
           </TabPane>
         </Tabs>
-        {errors.map((message, index) => (<div className="error-box slim mt-2" key={`error-${index}`}><span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} /></div>))}
+        {errors.map((message, index) => (
+          <div className="error-box slim mt-2" key={`error-${message}`}>
+            <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
+          </div>
+        ))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
           <a href="#" target="_blank" rel="noopener noreferrer" className="guidance-link">
             <div>

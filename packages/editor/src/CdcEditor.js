@@ -7,15 +7,28 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ startingTab }) {
+export default function CdcEditor({ startingTab = null, config: configObj = null }) {
+  const [config, setConfig] = useState(configObj)
   const [data, setData] = useState(null);
   const [type, setType] = useState('map'); // Default to map, temporarily
+
+  useEffect(() => {
+    if(config && config.hasOwnProperty('data')) {
+      setData(config.data)
+    }
+  }, [config])
 
   const state = {
     data,
     setData,
     type,
-    setType
+    setType,
+    config,
+    setConfig
+  }
+
+  if(null === startingTab) {
+    startingTab = config ? 1 : 0;
   }
 
   return (
