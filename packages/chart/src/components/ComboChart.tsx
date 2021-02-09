@@ -174,7 +174,7 @@ export default function ComboChart({numberFormatter}) {
         
         { config.visualizationType !== 'Bar' ? (
           <Group left={config.yAxis.width}>
-            { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey) => (
+            { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
               <Group
                 key={`series-${seriesKey}`}
                 display={seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
@@ -186,8 +186,8 @@ export default function ComboChart({numberFormatter}) {
                     cx={xScale(getXAxisData(d))}
                     cy={yScale(getYAxisData(d, seriesKey))}
                     strokeWidth="100px"
-                    fill={colorScale ? colorScale(seriesKey) : '#000'}
-                    style={{fill: colorScale ? colorScale(seriesKey) : '#000'}}
+                    fill={colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}
+                    style={{fill: colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}}
                     data-tip={`<div>
                       ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
                       ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
@@ -201,7 +201,7 @@ export default function ComboChart({numberFormatter}) {
                   data={data}
                   x={(d) => xScale(getXAxisData(d))}
                   y={(d) => yScale(getYAxisData(d, seriesKey))}
-                  stroke={colorScale ? colorScale(seriesKey) : '#000'}
+                  stroke={colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}
                   strokeWidth={2}
                   strokeOpacity={1}
                   shapeRendering="geometricPrecision"
