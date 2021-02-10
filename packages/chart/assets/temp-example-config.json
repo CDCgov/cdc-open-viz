@@ -10,6 +10,7 @@
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
+    "seriesKeysLabels": ["NY", "SF", "AU"],
     "seriesLabel": "City",
     "dataFormat": {
         "roundTo": -1,
@@ -18,19 +19,22 @@
         "suffix": "°"
     },
     "padding": {
-        "top": 0,
-        "left": 80,
-        "right": 0,
-        "bottom": 80
+        "left": 15,
+        "right": 15
     },
     "yAxis": {
-        "label": "Temperature"
+        "label": "Temperature",
+        "paddingPercent": 0.15
     },
     "xAxis": {
         "label": "Date",
         "dataKey": "date",
         "type": "date",
-        "dateFormat": "%Y-%m-%d"
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d",
+        "numTicks": 8,
+        "tickRotation": 50,
+        "height": 100
     },
     "legend": {
         "label": "Legend"
