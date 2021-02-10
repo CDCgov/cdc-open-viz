@@ -44,6 +44,9 @@ module.exports = (env = {}, { mode }) => {
             ],
           ]
         }
+      ],
+      plugins: [
+        '@babel/plugin-transform-arrow-functions'
       ]
     },
   }

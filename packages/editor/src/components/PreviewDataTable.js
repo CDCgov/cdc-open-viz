@@ -122,7 +122,7 @@ const PreviewDataTable = ({ data }) => {
     return (
       <section className="no-data">
         <NoData />
-        <table className="data-table table-responsive table-bordered table-hover" role="table">
+        <table className="data-table table-responsive" role="table">
           <thead>
               <tr role="row">
                   <th scope="col" colSpan="1" role="columnheader">
@@ -196,7 +196,7 @@ const PreviewDataTable = ({ data }) => {
 
   const Table = () => (
     <>
-      <table className="data-table table-responsive table-bordered table-hover" {...getTableProps()} aria-hidden="true">
+      <table className="data-table table-responsive" {...getTableProps()} aria-hidden="true">
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
