@@ -16,6 +16,7 @@ export default {
     fullBorder: false,
     type: 'data'
   },
+  type: "map",
   color: 'pinkpurple',
   columns: {
     geo: {

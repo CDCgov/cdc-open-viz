@@ -6,11 +6,10 @@ import GlobalState from '../context';
 
 
 export default function ConfigTab() {
-    const { data, type } = useContext(GlobalState);
+    const { data, type, config } = useContext(GlobalState);
 
-    const configObj = {
-        data
-    }
+    // If there's no preexisting config (this is a new visualizaiton) we just pass in an object created with only the data.
+    let configObj = config ?? {data}
 
     switch (type) {
         case 'map':
