@@ -70,7 +70,7 @@ textarea {
 }
 select {
   width: 100%;
-  font-size: 1.1rem;
+  font-size: 1.1em;
   text-transform: none;
 }
 
@@ -101,6 +101,7 @@ select {
   &:hover {
     background: $lightestGray;
     transition: .2s all;
+    color: #444;
   }
   > div {
     font-size: .9em;

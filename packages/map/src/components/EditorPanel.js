@@ -762,7 +762,6 @@ const EditorPanel = memo((props) => {
       if(isArray) {
         sectionValue = [...state[section]]
         sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
-        debugger;
       } else {
         sectionValue = {...state[section], [subsection]: { ...state[section][subsection], [fieldName]: newValue}}
       }
