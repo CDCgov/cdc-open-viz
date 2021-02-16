@@ -122,9 +122,10 @@ export default function DataImport() {
     
     // Convert from blob into raw text
     fileData = await fileData.text();
-
+console.log( mimeType );
     switch (mimeType) {
       case 'text/csv':
+      case 'application/csv':
         fileData = csvParse(fileData);
         break;
       case 'application/json':
