@@ -125,6 +125,7 @@ export default function DataImport() {
 
     switch (mimeType) {
       case 'text/csv':
+      case 'application/csv':
         fileData = csvParse(fileData);
         break;
       case 'application/json':
