@@ -1,0 +1,8 @@
+[[]
+  {"name":"data1", "date":"01/01/2016", "data": 100},
+  {"name":"data1", "date":"01/02/2016", "data": 200},
+  {"name":"data1", "date":"01/03/2016", "data": 300},
+  {"name":"data2", "date":"01/01/2016", "data": 400},
+  {"name":"data2", "date":"01/02/2016", "data": 500},
+  {"name":"data2", "date":"01/03/2016", "data": 600}
+]
