@@ -183,6 +183,44 @@ export default function CdcChart({ configUrl, element }) {
     'Pie' : <PieChart numberFormatter={formatNumber} />,
   }
 
+  const legendElements = <div className={`legend-container ${config.legend.left ? 'left': ''}`} hidden={legend.hide}>
+  <h2>{legend.label}</h2>
+  <LegendOrdinal
+    scale={colorScale}
+    itemDirection="row"
+    labelMargin="0 20px 0 0"
+    shapeMargin="0 10px 0"
+    className="legend-item-container"
+    >
+      {labels => (
+        <div>
+          {labels.map((label, i) => (
+            <LegendItem
+              tabIndex={0}
+              key={`legend-quantile-${i}`}
+              margin="0 5px"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  highlight(label);
+                }
+              }}
+              onClick={() => {
+                highlight(label);
+              }}
+            >
+              <svg width={legendGlyphSize} height={legendGlyphSize}>
+                <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+              </svg>
+              <LegendLabel align="left" margin="0 0 0 4px">
+                {label.text}
+              </LegendLabel>
+            </LegendItem>
+          ))}
+        </div>
+      )}
+    </LegendOrdinal>
+</div>;
+
   if(true === loading) {
     return <div className="loader"></div>;
   }
@@ -190,6 +228,7 @@ export default function CdcChart({ configUrl, element }) {
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
       <div className="cdc-open-viz-module cdc-visualization-container mt-4">
+        {config.legend.above ? legendElements : ''}
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
           {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
@@ -197,43 +236,7 @@ export default function CdcChart({ configUrl, element }) {
             {chartComponents[visualizationType]}
           </div>
         </div>
-        {/* Legend */}
-        <div className="legend-container" hidden={legend.hide}>
-          <h2>{legend.label}</h2>
-          <LegendOrdinal
-            scale={colorScale}
-            itemDirection="row"
-            labelMargin="0 20px 0 0"
-            shapeMargin="0 10px 0"
-            >
-              {labels => (
-                <div>
-                  {labels.map((label, i) => (
-                    <LegendItem
-                      tabIndex={0}
-                      key={`legend-quantile-${i}`}
-                      margin="0 5px"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          highlight(label);
-                        }
-                      }}
-                      onClick={() => {
-                        highlight(label);
-                      }}
-                    >
-                      <svg width={legendGlyphSize} height={legendGlyphSize}>
-                        <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
-                      </svg>
-                      <LegendLabel align="left" margin="0 0 0 4px">
-                        {label.text}
-                      </LegendLabel>
-                    </LegendItem>
-                  ))}
-                </div>
-              )}
-            </LegendOrdinal>
-        </div>
+        {!config.legend.above ? legendElements : ''}
       </div>
       {/* Description */}
       <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}} dangerouslySetInnerHTML={{__html: description && description.html}}></div>              

@@ -37,7 +37,9 @@
         "height": 100
     },
     "legend": {
-        "label": "Legend"
+        "label": "Legend",
+        "above": true,
+        "left": true
     },
     "table": {
         "label": "Table",
