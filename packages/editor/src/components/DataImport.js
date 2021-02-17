@@ -76,7 +76,7 @@ export default function DataImport() {
       const responseText = await response.text();
 
       const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
-
+debugger;
       const typeDictionary = {
         '.csv': 'text/csv',
         '.json': 'application/json'
@@ -99,6 +99,7 @@ export default function DataImport() {
    * Handle loading data
    */
   const loadData = async (fileBlob = null) => {
+    debugger;
     let fileData = fileBlob;
 
     // Get the raw data as text from the file
