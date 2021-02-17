@@ -112,7 +112,8 @@ export default function ComboChart({numberFormatter}) {
                   fill={bar.color}
                   stroke="black"
                   strokeWidth={config.barBorderThickness || 1}
-                  display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                  opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                  display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                   data-tip={`<div>
                         ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
@@ -152,7 +153,8 @@ export default function ComboChart({numberFormatter}) {
                       stroke="black"
                       strokeWidth={config.barBorderThickness || 1}
                       style={{fill: bar.color}}
-                      display={seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                      opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                      display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                       data-tip={`<div>
                         ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${numberFormatter(bar.value)} <br/>
@@ -178,7 +180,8 @@ export default function ComboChart({numberFormatter}) {
             { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
               <Group
                 key={`series-${seriesKey}`}
-                display={seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+                opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+                display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
               >
                 { data.map((d, dataIndex) => (
                   <circle
