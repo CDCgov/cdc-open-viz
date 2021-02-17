@@ -14,6 +14,7 @@ import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
   const {data, setData} = useContext(GlobalState);
+  const {errors, setErrors } = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -34,7 +35,7 @@ export default function DataImport() {
     fileTooLarge: `File is too large. Maximum file size is ${maxFileSize}MB.`
   };
 
-  const [errors, setErrors] = useState([]);
+  // const [errors, setErrors] = useState([]);
 
   /**
    * validateData:
@@ -76,7 +77,7 @@ export default function DataImport() {
       const responseText = await response.text();
 
       const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
-debugger;
+
       const typeDictionary = {
         '.csv': 'text/csv',
         '.json': 'application/json'
@@ -99,7 +100,7 @@ debugger;
    * Handle loading data
    */
   const loadData = async (fileBlob = null) => {
-    debugger;
+
     let fileData = fileBlob;
 
     // Get the raw data as text from the file
@@ -120,7 +121,7 @@ debugger;
       setErrors([errorMessages.fileTooLarge]);
       return;
     }
-    
+
     // Convert from blob into raw text
     fileData = await fileData.text();
 
@@ -136,13 +137,18 @@ debugger;
         fileData = csvParse(fileData);
         break;
       case 'application/json':
-        fileData = JSON.parse(fileData);
+        try {
+          fileData = JSON.parse(fileData);
+        } catch (errors) { 
+          setErrors([errorMessages.formatting]);
+          return;
+        }
         break;
       default:
         setErrors([errorMessages.fileType]);
         return;
     }
-
+debugger;
     // Validate parsed data and set if no issues.
     try {
       fileData = await validateData(fileData);
