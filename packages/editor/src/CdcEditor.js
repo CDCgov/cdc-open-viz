@@ -11,6 +11,7 @@ export default function CdcEditor({ startingTab = null, config: configObj = null
   const [config, setConfig] = useState(configObj)
   const [data, setData] = useState(null);
   const [type, setType] = useState('map'); // Default to map, temporarily
+  const [errors, setErrors] = useState([]);
 
   useEffect(() => {
     if(config && config.hasOwnProperty('data')) {
@@ -24,7 +25,9 @@ export default function CdcEditor({ startingTab = null, config: configObj = null
     type,
     setType,
     config,
-    setConfig
+    setConfig,
+    errors,
+    setErrors
   }
 
   if(null === startingTab) {
