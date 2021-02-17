@@ -123,10 +123,16 @@ debugger;
     
     // Convert from blob into raw text
     fileData = await fileData.text();
-console.log( mimeType );
+
+    console.log('Uploaded file mimeType: ' . mimeType);
+
     switch (mimeType) {
       case 'text/csv':
       case 'application/csv':
+      case 'application/vnd.ms-excel':
+      case 'application/x-csv':
+      case 'text/x-comma-separated-values':
+      case 'text/comma-separated-values':
         fileData = csvParse(fileData);
         break;
       case 'application/json':
