@@ -69,6 +69,11 @@ i {
   text-align: center;
   border: 1px solid black;
   margin-bottom: 20px;
+  float: right;
+
+  &.left {
+    float: left;
+  }
 }
 
 svg {
@@ -122,5 +127,9 @@ table {
 @media (max-width: 900px) {
   .chart-container, .legend-container {
     width: 100%;
+  }
+
+  .legend-container > div {
+    display: flex;
   }
 }
