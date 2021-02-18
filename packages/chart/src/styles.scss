@@ -32,6 +32,11 @@ i {
   font-style: italic;
 }
 
+.visually-hidden {
+  position: fixed;
+  left: -10000px;
+}
+
 .loader {
   width: 100%;
   text-align: center;
@@ -110,6 +115,7 @@ table {
     padding: 5px;
     user-select: none;
     cursor: pointer;
+    background-color: #e5e5e5;
   }
 
   .table-sort-indicator {
@@ -122,6 +128,10 @@ table {
       transform: rotate(180deg);
     }
   }
+}
+
+.region-table {
+  margin-top: 15px;
 }
 
 @media (max-width: 900px) {

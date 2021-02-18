@@ -1,4 +1,5 @@
 import React, { useContext, useCallback, useRef, useState } from 'react';
+import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context';
 
 export default function DataTable({numberFormatter}) {
@@ -7,6 +8,8 @@ export default function DataTable({numberFormatter}) {
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(false);
   const [tableSortConfig, setTableSortConfig] = useState<any>({ sortKey: '', sortReverse: false });
+
+  const formatDate = (date) => timeFormat(config.xAxis.dateDisplayFormat)(new Date(date));
 
   const tableSort = (a, b) => {
     if (tableSortConfig.sortKey) {
@@ -39,7 +42,7 @@ export default function DataTable({numberFormatter}) {
         </caption>
         <thead hidden={!tableExpanded}>
           <tr>
-            <td>&nbsp;</td>
+            <th>&nbsp;</th>
             {config.seriesKeys.map((key, index) => (
               <th key={`table-header-item-${index}`} tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: key, sortReverse: !tableSortConfig.sortReverse }); }}>{(config.seriesKeysLabels ? config.seriesKeysLabels[index] : key)}
                 <span hidden={tableSortConfig.sortKey !== key} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
@@ -58,6 +61,28 @@ export default function DataTable({numberFormatter}) {
           ))}
         </tbody>
       </table>
+      {config.regions ? (
+        <table className="region-table">
+          <caption className="visually-hidden">Table of the highlighted regions in the visualization</caption>
+          <thead>
+            <tr>
+              <th>Region Name</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {config.regions.map((region) => (
+              <tr>
+                <td>{region.label}</td>
+                <td>{formatDate(region.from)}</td>
+                <td>{formatDate(region.to)}</td>
+              </tr>
+            ))}
+            
+          </tbody>
+        </table>
+      ) : ''}
     </div>
   );
 
