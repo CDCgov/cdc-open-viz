@@ -251,6 +251,37 @@ export default function ComboChart({numberFormatter}) {
           <Group>
           </Group>
         ) }
+        { config.regions ? config.regions.map((region) => {
+          const from = xScale((parseDate(region.from) as Date).getTime());
+          const to = xScale((parseDate(region.to) as Date).getTime());
+          const width = to - from;
+
+          return (
+            <Group className="regions" left={config.yAxis.width}>
+              <path stroke="black" d={`M${from} -5
+                        L${from} 5
+                        M${from} 0
+                        L${to} 0
+                        M${to} -5
+                        L${to} 5`} />
+              <rect 
+                x={from} 
+                y={0} 
+                width={width} 
+                height={yMax} 
+                fill={region.background} 
+                opacity={0.3} />
+              <text 
+                x={from + (width / 2)} 
+                y={region.fontSize || 14} 
+                fill={region.color} 
+                fontSize={region.fontSize || 14}
+                textAnchor="middle">
+                  {region.label}
+              </text>
+            </Group>
+          )
+        }) : '' }
         <AxisLeft
           scale={yScale}
           left={config.yAxis.width}
