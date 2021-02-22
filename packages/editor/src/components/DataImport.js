@@ -13,25 +13,13 @@ import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
-  const {data, setData, errors, setErrors} = useContext(GlobalState);
+  const {data, setData, errors, setErrors, errorMessages, maxFileSize} = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
-  const maxFileSize = 5; // Represents number of MB. Maybe move this to a prop eventually but static for now.
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
-  };
-
-  const errorMessages = {
-    emptyCols: "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",
-    emptyData: "Your data is empty.",
-    dataType: "Your datatype is not supported.",
-    fileType: "The file type that you are trying to upload is not supported.",
-    formatting: "Please check the formatting of your data.",
-    failedFetch: "Error fetching or parsing data: ",
-    urlInvalid: "Please make sure to use a valid URL.",
-    fileTooLarge: `File is too large. Maximum file size is ${maxFileSize}MB.`
   };
 
   /**
@@ -64,13 +52,18 @@ export default function DataImport() {
     try {
       dataURL = new URL(externalURL);
     } catch {
-      throw errorMessages.urlInvalid;
+      throw errorMessages.urlInvalid
     }
 
     let responseBlob = null;
 
     try {
       const response = await fetch(dataURL);
+
+      if(response.status !== 200) {
+        throw errorMessages.cannotReach
+      }
+
       const responseText = await response.text();
 
       const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
@@ -84,8 +77,15 @@ export default function DataImport() {
         type: typeDictionary[fileExtension]
       });
     } catch (err) {
-      const errorMsg = errorMessages.failedFetch + err.toString();
-      throw errorMsg;
+      console.error(err)
+
+      const error = err.toString();
+
+      if( Object.values(errorMessages).includes(err) ) {
+        throw error
+      }
+
+      throw errorMessages.failedFetch
     }
     
     return responseBlob;
@@ -122,8 +122,6 @@ export default function DataImport() {
     // Convert from blob into raw text
     fileData = await fileData.text();
 
-    console.log('Uploaded file mimeType: ' . mimeType);
-
     switch (mimeType) {
       case 'text/csv':
       case 'application/csv':
@@ -150,8 +148,8 @@ export default function DataImport() {
     try {
       fileData = await validateData(fileData);
       setData(fileData);
-    } catch (errors) {
-      setErrors(errors);
+    } catch (err) {
+        setErrors(err);
     }
   }
 
@@ -196,6 +194,9 @@ export default function DataImport() {
               <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
               <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
             </form>
+            {/* <label htmlFor="keep-url">
+              <input type="checkbox" id="keep-url" /> Always load from URL (normally will only pull once)
+            </label> */}
           </TabPane>
         </Tabs>
         {errors.map((message, index) => (
@@ -204,7 +205,7 @@ export default function DataImport() {
           </div>
         ))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
-          <a href="#" target="_blank" rel="noopener noreferrer" className="guidance-link">
+          <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
             <div>
               <h3>Get Help</h3>
               <p>Documentation and examples on formatting data and configuring visualizations.</p>

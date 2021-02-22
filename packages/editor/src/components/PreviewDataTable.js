@@ -46,14 +46,14 @@ const Header = memo(({ globalFilter, data, setGlobalFilter}) => (
 
 const PreviewDataTable = ({ data }) => {
   const [tableData, setTableData] = useState(data ?? []);
-  const {errors, setErrors } = useContext(GlobalState);
+  const {setErrors, errorMessages} = useContext(GlobalState);
 
   const tableColumns = useMemo(() => {
     const columns = tableData.columns ?? [];
     if ( columns.length > 0 && columns.includes("") ) {
       // todo find a way to call the errors. Currently they are in DataImport.js
       // maybe these can be moved to a file? but then we need a way to add settings like size...
-      setErrors(['It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.']);
+      setErrors([errorMessages.emptyCols]);
     }
     
     return columns.map((columnName) => {
