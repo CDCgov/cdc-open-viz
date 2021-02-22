@@ -13,8 +13,7 @@ import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
-  const {data, setData} = useContext(GlobalState);
-  const {errors, setErrors } = useContext(GlobalState);
+  const {data, setData, errors, setErrors} = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -34,8 +33,6 @@ export default function DataImport() {
     urlInvalid: "Please make sure to use a valid URL.",
     fileTooLarge: `File is too large. Maximum file size is ${maxFileSize}MB.`
   };
-
-  // const [errors, setErrors] = useState([]);
 
   /**
    * validateData:
@@ -148,7 +145,7 @@ export default function DataImport() {
         setErrors([errorMessages.fileType]);
         return;
     }
-debugger;
+
     // Validate parsed data and set if no issues.
     try {
       fileData = await validateData(fileData);
