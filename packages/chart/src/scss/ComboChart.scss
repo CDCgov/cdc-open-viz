@@ -1,0 +1,13 @@
+.combo-chart-container {
+
+    .bottom-axis-tick-container {
+        overflow: visible;
+
+        .bottom-axis-tick {
+            margin-left: -50%;
+            width: 100%;
+            text-align: center;
+            word-break: break-word;
+        }
+    }
+}
