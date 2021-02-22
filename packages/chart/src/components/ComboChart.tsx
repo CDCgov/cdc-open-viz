@@ -85,7 +85,7 @@ export default function ComboChart({numberFormatter}) {
   }
 
   return config && data && colorScale && width && height ? (
-    <div className="line-chart-container">
+    <div className="combo-chart-container">
       <svg width={width} height={height}>
         { config.visualizationType !== 'Line' ? (
           <Group left={config.yAxis.width}>
@@ -355,7 +355,7 @@ export default function ComboChart({numberFormatter}) {
               <g className="my-custom-bottom-axis">
                 {props.ticks.map((tick, i) => {
                   const tickX = tick.to.x;
-                  const tickY = tick.to.y + config.xAxis.tickFontSize;
+                  const tickY = tick.to.y + (!config.xAxis.wrap ? config.xAxis.tickFontSize : 0);
 
                   return (
                     <Group
@@ -367,14 +367,21 @@ export default function ComboChart({numberFormatter}) {
                         to={tick.to}
                         stroke="black"
                       />
-                      <text
-                        transform={`translate(${tickX}, ${tickY}) rotate(${config.xAxis.tickRotation})`}
-                        fontSize={config.xAxis.tickFontSize}
-                        textAnchor={config.xAxis.tickRotation !== 0 ? 'end': 'middle'}
-                        className="bottom-axis-tick"
-                      >
-                        {tick.formattedValue}
-                      </text>
+                      { !config.xAxis.wrap ? ( 
+                        <text
+                          transform={`translate(${tickX}, ${tickY}) rotate(${config.xAxis.tickRotation})`}
+                          fontSize={config.xAxis.tickFontSize}
+                          textAnchor={config.xAxis.tickRotation !== 0 ? 'end': 'middle'}
+                          className="bottom-axis-tick"
+                        >
+                          {tick.formattedValue}
+                        </text> 
+                      ) : (
+                        <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.height}>
+                          <p className="bottom-axis-tick">{tick.formattedValue}</p>
+                        </foreignObject> 
+                      )
+                      }
                     </Group>
                   );
                 })}

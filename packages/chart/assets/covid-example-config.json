@@ -32,7 +32,8 @@
         "labelFontSize": 22,
         "tickFontSize": 22,
         "tickRotation": 72,
-        "height": 450
+        "height": 200,
+        "wrap": true
     },
     "legend": {
         "hide": true
