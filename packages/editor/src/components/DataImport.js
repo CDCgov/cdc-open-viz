@@ -1,6 +1,7 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback, useEffect } from 'react';
 import {useDropzone} from 'react-dropzone'
 import {csvParse} from 'd3';
+import { useDebounce } from 'use-debounce';
 
 import GlobalState from '../context';
 import '../scss/data-import.scss';
@@ -13,14 +14,22 @@ import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
 export default function DataImport() {
-  const {data, setData, errors, setErrors, errorMessages, maxFileSize} = useContext(GlobalState);
+  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL} = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
+
+  const [ debouncedExternalURL ] = useDebounce(externalURL, 200);
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
   };
+
+  useEffect(() => {
+    if(true === keepURL) {
+      setDataURL(debouncedExternalURL)
+    }
+  }, [debouncedExternalURL, keepURL])
 
   /**
    * validateData:
@@ -153,25 +162,6 @@ export default function DataImport() {
     }
   }
 
-  const DataPlaceholder = () => (
-    <div className="data-import-preview">
-      <div className="overlay-empty">Add Data to Get Started</div>
-      <table className="table-bordered table-empty">
-        <thead>
-          <tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-          <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-        </tbody>
-      </table>
-    </div>
-  );
-
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
   return (
@@ -194,9 +184,9 @@ export default function DataImport() {
               <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
               <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
             </form>
-            {/* <label htmlFor="keep-url">
-              <input type="checkbox" id="keep-url" /> Always load from URL (normally will only pull once)
-            </label> */}
+            <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
+              <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
+            </label>
           </TabPane>
         </Tabs>
         {errors.map((message, index) => (
