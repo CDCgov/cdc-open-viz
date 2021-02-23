@@ -9,7 +9,9 @@ import './scss/main.scss';
 
 export default function CdcEditor({ startingTab = null, config: configObj = null }) {
   const [config, setConfig] = useState(configObj)
+  const [dataURL, setDataURL] = useState(null);
   const [data, setData] = useState(null);
+  const [keepURL, setKeepURL] = useState(false)
   const [type, setType] = useState('map'); // Default to map, temporarily
   const [errors, setErrors] = useState([]);
 
@@ -43,7 +45,11 @@ export default function CdcEditor({ startingTab = null, config: configObj = null
     errors,
     setErrors,
     errorMessages,
-    maxFileSize
+    maxFileSize,
+    dataURL,
+    setDataURL,
+    keepURL,
+    setKeepURL
   }
 
   if(null === startingTab) {

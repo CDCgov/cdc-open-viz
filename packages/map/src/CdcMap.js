@@ -964,7 +964,7 @@ class CdcMap extends Component {
             ...configObj
         }
 
-        // If there is no raw data stored, we grab and store the rawdata from the URL provided in the config file
+        // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {        
             newState.data = await this.fetchRemoteData(newState.dataUrl)
         }

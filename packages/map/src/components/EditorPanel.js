@@ -686,14 +686,6 @@ const EditorPanel = memo((props) => {
 
     strippedState.general = strippedGeneral
 
-    if(state.dataUrl && true === keepUrl) {
-        delete strippedState.data // If the data is pulled dynamically from a URL, don't store the data locally
-    }
-
-    if(state.dataUrl && false === keepUrl) {
-        delete strippedState.dataUrl
-    }
-
     return JSON.stringify( strippedState )
   }
 
