@@ -12,3 +12,22 @@
     width: 30%;
   }
 }
+
+.data-table {
+  tr {
+    border-bottom: none !important;
+    border-right: none !important;
+
+    th {
+      background: #565656;
+    }
+  
+    th, 
+    td {
+      width: inherit !important;
+      min-width: 100px !important;
+      border-bottom: solid 1px #E5E5E5;
+      border-right: solid 1px #E5E5E5
+    }
+  }
+}
