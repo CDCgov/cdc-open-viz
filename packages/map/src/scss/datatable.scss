@@ -43,6 +43,8 @@
       &:first-child {
         max-width: none !important;
         width: auto !important;
+        min-width: 150px;
+        flex-shrink: 0;
         flex-grow: 1 !important;
       }
       &:last-child {
