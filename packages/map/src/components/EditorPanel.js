@@ -79,7 +79,7 @@ const EditorPanel = memo((props) => {
   
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
 
-  const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState(null)
+  const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
 
   const [ editorCatOrder, setEditorCatOrder ] = useState([])
 
@@ -412,9 +412,7 @@ const EditorPanel = memo((props) => {
         })
       break;
       case 'changeLegendDescription':
-        const filterValKey = value[0]
-
-        const filterValDesc = value[1]
+        const [filterValKey, filterValDesc] = value
 
         setState( (prevState) => {
             return {

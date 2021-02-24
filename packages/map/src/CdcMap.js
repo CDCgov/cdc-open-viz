@@ -968,7 +968,7 @@ class CdcMap extends Component {
         if (newState.dataUrl) {        
             newState.data = await this.fetchRemoteData(newState.dataUrl)
         }
-        
+
         // Process all the data and trim whitespace/returns/etc...
         newState.data = this.cleanCsvData(newState.data)
 

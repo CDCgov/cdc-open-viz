@@ -35,7 +35,7 @@ export default function DataImport() {
    * validateData:
    * Check data for common issues
    */
-  const validateData = async (parsedData) => {
+  const validateData = (parsedData) => {
     const errorsFound = []
 
     // Empty data
@@ -155,7 +155,7 @@ export default function DataImport() {
 
     // Validate parsed data and set if no issues.
     try {
-      fileData = await validateData(fileData);
+      fileData = validateData(fileData);
       setData(fileData);
     } catch (err) {
         setErrors(err);
