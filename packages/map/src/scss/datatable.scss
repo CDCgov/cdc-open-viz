@@ -43,7 +43,7 @@
       &:first-child {
         max-width: none !important;
         width: auto !important;
-        min-width: 150px;
+        min-width: 150px !important;
         flex-shrink: 0;
         flex-grow: 1 !important;
       }

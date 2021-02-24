@@ -13,6 +13,8 @@ import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
+import validMapData from '../../sampledata/valid-data-map.csv';
+
 export default function DataImport() {
   const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL} = useContext(GlobalState);
 
@@ -195,12 +197,17 @@ export default function DataImport() {
           </div>
         ))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
-          <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
-            <div>
-              <h3>Get Help</h3>
-              <p>Documentation and examples on formatting data and configuring visualizations.</p>
-            </div>
-          </a>
+        {/* TODO: Add more sample data in, but this will do for now. */}
+        <h3>Load Sample Data:</h3>
+        <ul className="sample-data-list">
+          <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
+        </ul>
+        <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
+          <div>
+            <h3>Get Help</h3>
+            <p>Documentation and examples on formatting data and configuring visualizations.</p>
+          </div>
+        </a>
       </div>
       <div className="right-col">
         <PreviewDataTable data={data} />
