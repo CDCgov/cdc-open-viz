@@ -110,6 +110,11 @@ module.exports = (env = {}, { mode }) => {
           ],
         },
         {
+         // CSV
+         test: /\.(csv)$/i,
+         type: 'asset/source'
+        },
+        {
           // SVG
           test: /\.svg$/i,
           oneOf: [

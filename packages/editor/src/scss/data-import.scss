@@ -98,4 +98,15 @@
         font-size:.8rem;
         color: $mediumGray
     }
+
+    .sample-data-list {
+        margin-left: 1rem;
+        font-size: .8rem;
+        li {
+            margin-top: .3rem;
+            color: $blue;
+            text-decoration: underline;
+            cursor: pointer
+        }
+    }
 }
