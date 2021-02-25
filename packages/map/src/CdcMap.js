@@ -296,7 +296,13 @@ class CdcMap extends Component {
         let value = rowObj[this.state.columns.primary.name]
       
         // First, check if it's a special class
-        if (this.state.legend.specialClasses !== false &&
+        let hasSpecialClasses = false
+        
+        if(Array.isArray( this.state.legend.specialClasses ) && this.state.legend.specialClasses.length > 0) {
+            hasSpecialClasses = true
+        }
+
+        if (hasSpecialClasses &&
             this.state.legend.specialClasses.includes(value)) {
             for (let i = 0; i < this.state.processedLegend.data.length; i++) {
       
@@ -404,7 +410,7 @@ class CdcMap extends Component {
                 console.warn(`Error: Do not recognize type of legend. Should either be equalnumber, equalinterval or category.`)
             break;
         }
-      
+
         // If at the end we aren't able to assign a color, give it black to signify a fail state. If a geo is black, this function isn't able to assign a legend to the value.
         if(0 === color.length) {
             if(true === this.state.loading) {
