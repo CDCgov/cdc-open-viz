@@ -492,8 +492,14 @@
     .btn {
       margin-top: 1em;
     }
-    
-    .sort-list li {
+    .sort-list {
+      list-style: none;
+      > li {
+        margin-right: .3em;
+        margin-bottom: .3em;  
+      }
+    }
+    .sort-list li > div {
       display: block;
       box-sizing: border-box;
       border: 1px solid #D1D1D1;
@@ -501,8 +507,7 @@
       background: #F1F1F1;
       padding: .4em .6em;
       font-size: .8em;
-      margin-right: .3em;
-      margin-bottom: .3em;
+      margin-bottom: .3em; 
       cursor: move;
       z-index: 999;
     }
