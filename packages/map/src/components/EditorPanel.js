@@ -831,15 +831,20 @@ const EditorPanel = memo((props) => {
       <Draggable key={value} draggableId={`${value}`} index={index}>
         {(provided, snapshot) => (
           <li
-            style={getItemStyle(
-              snapshot.isDragging,
-              provided.draggableProps.style,
-              sortableItemStyles
-            )}
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >{value}</li>
+            style={{position: 'relative'}}
+          >
+            <div
+              className={snapshot.isDragging ? 'currently-dragging': ''}
+              style={getItemStyle(
+                snapshot.isDragging,
+                provided.draggableProps.style,
+                sortableItemStyles
+              )}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >{value}</div>
+          </li>
         )}
       </Draggable>
     ))
