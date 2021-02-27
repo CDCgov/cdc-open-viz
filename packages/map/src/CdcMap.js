@@ -452,8 +452,8 @@ class CdcMap extends Component {
         // We convert the markup into JSX and add a navigation link if it's going into a modal.
         if('jsx' === returnType) {
             toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
-            
-            if(data[this.state.columns.navigate.name]) {
+
+            if(this.state.columns.hasOwnProperty('navigate') && data[this.state.columns.navigate.name]) {
                 toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1" /></span>) )
             }
         }
