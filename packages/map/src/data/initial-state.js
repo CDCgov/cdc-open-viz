@@ -33,6 +33,9 @@ export default {
       name: '',
       label: ''
     },
+    navigate: {
+      name: ''
+    },
     geosInRegion: {
       name: ''
     }
