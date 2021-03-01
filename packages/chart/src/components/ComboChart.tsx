@@ -53,6 +53,8 @@ export default function ComboChart({numberFormatter}) {
         }, [] as number[]);
 
         max = Math.max(...yTotals);
+      } else if(config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && config.confidenceKeys) {
+        max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
       } else {
         max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
       }
@@ -137,58 +139,77 @@ export default function ComboChart({numberFormatter}) {
               }
             </BarStack>
           ) : (
-            <BarGroup
-              data={data}
-              keys={(config.barSeriesKeys || config.seriesKeys)}
-              height={yMax}
-              x0={(d: any) => d[config.xAxis.dataKey]}
-              x0Scale={xScale}
-              x1Scale={seriesScale}
-              yScale={yScale}
-              color={colorScale}
-            >
-              {(barGroups) => barGroups.map((barGroup) => (
-                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={xMax / barGroups.length * barGroup.index}>
-                  {barGroup.bars.map((bar) => {
-                    let barGroupWidth = xMax / barGroups.length * (config.barThickness || 0.8);
-                    let offset = xMax / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
-                    let barWidth = barGroupWidth / barGroup.bars.length;
-                    return (
-                    <Group>
-                      <text 
-                        display={config.labels && config.labels.display ? 'block': 'none'}
-                        x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
-                        y={bar.y - 5}
-                        fill={bar.color}
-                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                        textAnchor="middle">
-                          {numberFormatter(bar.value)}
-                      </text>
-                      <rect
-                        key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                        x={barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                        y={bar.y}
-                        width={barWidth}
-                        height={bar.height}
-                        fill={bar.color}
-                        stroke="black"
-                        strokeWidth={config.barBorderThickness || 1}
-                        style={{fill: bar.color}}
-                        opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                        display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                        data-tip={`<div>
-                          ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${numberFormatter(bar.value)} <br/>
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                        </div>`}
-                        data-html="true"
-                      />
-                    </Group>
-                  )}
-                  )}
-                </Group>
-              ))}
-            </BarGroup>
+            <g>
+              <BarGroup
+                data={data}
+                keys={(config.barSeriesKeys || config.seriesKeys)}
+                height={yMax}
+                x0={(d: any) => d[config.xAxis.dataKey]}
+                x0Scale={xScale}
+                x1Scale={seriesScale}
+                yScale={yScale}
+                color={colorScale}
+              >
+                {(barGroups) => barGroups.map((barGroup) => (
+                  <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={xMax / barGroups.length * barGroup.index}>
+                    {barGroup.bars.map((bar) => {
+                      let barGroupWidth = xMax / barGroups.length * (config.barThickness || 0.8);
+                      let offset = xMax / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                      let barWidth = barGroupWidth / barGroup.bars.length;
+                      return (
+                      <Group>
+                        <text 
+                          display={config.labels && config.labels.display ? 'block': 'none'}
+                          x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
+                          y={bar.y - 5}
+                          fill={bar.color}
+                          fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
+                          textAnchor="middle">
+                            {numberFormatter(bar.value)}
+                        </text>
+                        <rect
+                          key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
+                          x={barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                          y={bar.y}
+                          width={barWidth}
+                          height={bar.height}
+                          fill={bar.color}
+                          stroke="black"
+                          strokeWidth={config.barBorderThickness || 1}
+                          style={{fill: bar.color}}
+                          opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                          display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                          data-tip={`<div>
+                            ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
+                            ${config.yAxis.label}: ${numberFormatter(bar.value)} <br/>
+                            ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
+                          </div>`}
+                          data-html="true"
+                        />
+                      </Group>
+                    )}
+                    )}
+                  </Group>
+                ))}
+              </BarGroup>
+              {config.confidenceKeys ? data.map((d) => {
+                let offset = xMax / data.length / 2;
+                let xPos = xScale(getXAxisData(d)) + offset;
+                let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
+                let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
+                let tickWidth = 5;
+
+                return (
+                  <path stroke="black" strokeWidth="2px" d={`
+                    M${xPos - tickWidth} ${upperPos}
+                    L${xPos + tickWidth} ${upperPos}
+                    M${xPos} ${upperPos}
+                    L${xPos} ${lowerPos}
+                    M${xPos - tickWidth} ${lowerPos}
+                    L${xPos + tickWidth} ${lowerPos}`}/>
+                );
+              }) : ''}
+            </g>
           )
           }
         </Group>
@@ -211,7 +232,7 @@ export default function ComboChart({numberFormatter}) {
                       display={config.labels && config.labels.display ? 'block': 'none'}
                       x={xScale(getXAxisData(d))}
                       y={yScale(getYAxisData(d, seriesKey))}
-                      fill={colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}
+                      fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
                       fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                       textAnchor="middle">
                         {numberFormatter(d[seriesKey])}
@@ -222,8 +243,8 @@ export default function ComboChart({numberFormatter}) {
                       cx={xScale(getXAxisData(d))}
                       cy={yScale(getYAxisData(d, seriesKey))}
                       strokeWidth="100px"
-                      fill={colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}
-                      style={{fill: colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}}
+                      fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                      style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
                       data-tip={`<div>
                         ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
@@ -238,7 +259,7 @@ export default function ComboChart({numberFormatter}) {
                   data={data}
                   x={(d) => xScale(getXAxisData(d))}
                   y={(d) => yScale(getYAxisData(d, seriesKey))}
-                  stroke={colorScale ? colorScale(config.seriesKeysLabels ? config.seriesKeysLabels[index] : seriesKey) : '#000'}
+                  stroke={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
                   strokeWidth={2}
                   strokeOpacity={1}
                   shapeRendering="geometricPrecision"

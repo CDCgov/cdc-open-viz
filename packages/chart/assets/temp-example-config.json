@@ -10,7 +10,7 @@
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
-    "seriesKeysLabels": ["NY", "SF", "AU"],
+    "seriesLabels": {"New York": "NY", "San Francisco": "SF", "Austin": "AU"},
     "seriesLabel": "City",
     "dataFormat": {
         "roundTo": -1,
