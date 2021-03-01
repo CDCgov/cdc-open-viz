@@ -11,6 +11,10 @@ export default function ConfigTab() {
     // If there's no preexisting config (this is a new visualizaiton) we just pass in an object created with only the data.
     let configObj = config ?? {data}
 
+    if(data) {
+        configObj = {...configObj, data}
+    }
+
     if(keepURL && dataURL) {
         configObj = {...configObj, dataUrl: dataURL}
     }
