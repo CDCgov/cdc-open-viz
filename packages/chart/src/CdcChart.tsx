@@ -69,6 +69,11 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
     responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
 
+    if(responseObj.seriesLabels){
+      responseObj.seriesLabelsAll = [];
+      Object.keys(responseObj.seriesLabels).forEach(seriesKey => responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey]));
+    }
+
     // If data is included through a URL, fetch that and store
     if(responseObj.dataUrl) {
       const data = await fetch(responseObj.dataUrl);
@@ -136,7 +141,7 @@ export default function CdcChart({ configUrl, element }) {
       palette = palette.slice(0, numberOfKeys);
 
       const newColorScale = () => scaleOrdinal({
-        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesKeysLabels || config.seriesKeys),
+        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesLabelsAll || config.seriesKeys),
         range: palette,
       });
 
@@ -151,8 +156,13 @@ export default function CdcChart({ configUrl, element }) {
     });
 
     let newHighlight = label.datum;
-    if(config.seriesKeysLabels){
-      newHighlight = config.seriesKeys[config.seriesKeysLabels.indexOf(label.datum)];
+    if(config.seriesLabels){
+      for(let i = 0; i < config.seriesKeys.length; i++) {
+        if(config.seriesLabels[config.seriesKeys[i]] === label.datum){
+          newHighlight = config.seriesKeys[i];
+          break;
+        }
+      }
     }
 
     if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
