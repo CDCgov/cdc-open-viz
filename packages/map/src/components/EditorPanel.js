@@ -486,7 +486,7 @@ const EditorPanel = memo((props) => {
     }
 
     // Navigate is required for navigation maps
-    if('navigation' === state.general.type && '' === state.columns.navigate.name) {
+    if('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate) ) {
       columnList.push('Navigation')
     }
 
@@ -678,6 +678,7 @@ const EditorPanel = memo((props) => {
     delete strippedGeneral.modalOpen;
     delete strippedGeneral.modalContent;
     delete strippedGeneral.parentUrl;
+    delete strippedGeneral.logoImage;
 
     // Strip out computed items
     delete strippedGeneral.viewportSize;
