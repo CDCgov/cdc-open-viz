@@ -20,6 +20,9 @@
 .inline-icon {
   width: 1em !important;
   height: auto !important;
+  @media all and (-ms-high-contrast:none) {
+    height: 30px !important;
+  }
   font-size: 1rem;
   color: inherit;
   path {

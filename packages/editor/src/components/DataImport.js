@@ -2,6 +2,7 @@ import React, { useState, useContext, useCallback, useEffect } from 'react';
 import {useDropzone} from 'react-dropzone'
 import {csvParse} from 'd3';
 import { useDebounce } from 'use-debounce';
+import { get } from 'axios';
 
 import GlobalState from '../context';
 import '../scss/data-import.scss';
@@ -69,13 +70,13 @@ export default function DataImport() {
     let responseBlob = null;
 
     try {
-      const response = await fetch(dataURL);
+      const response = await get(dataURL);
 
       if(response.status !== 200) {
         throw errorMessages.cannotReach
       }
 
-      const responseText = await response.text();
+      const responseText = response.data;
 
       const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
 
@@ -83,6 +84,7 @@ export default function DataImport() {
         '.csv': 'text/csv',
         '.json': 'application/json'
       }
+
       // Manually construct blob instead of calling response.blob() to get around inconsistent mimeType inference
       responseBlob = new Blob([responseText], {
         type: typeDictionary[fileExtension]
@@ -131,37 +133,47 @@ export default function DataImport() {
     }
 
     // Convert from blob into raw text
-    fileData = await fileData.text();
+    // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
+    // fileData = await fileData.text();
+    let filereader = new FileReader();
 
-    switch (mimeType) {
-      case 'text/csv':
-      case 'application/csv':
-      case 'application/vnd.ms-excel':
-      case 'application/x-csv':
-      case 'text/x-comma-separated-values':
-      case 'text/comma-separated-values':
-        fileData = csvParse(fileData);
-        break;
-      case 'application/json':
-        try {
-          fileData = JSON.parse(fileData);
-        } catch (errors) { 
-          setErrors([errorMessages.formatting]);
+    filereader.onload = function() {
+      let text = this.result
+      // debugger;
+
+      switch (mimeType) {
+        case 'text/csv':
+        case 'application/csv':
+        case 'application/vnd.ms-excel':
+        case 'application/x-csv':
+        case 'text/x-comma-separated-values':
+        case 'text/comma-separated-values':
+          text = csvParse(text);
+          break;
+        case 'application/json':
+          try {
+            text = JSON.parse(text);
+          } catch (errors) { 
+            setErrors([errorMessages.formatting]);
+            return;
+          }
+          break;
+        default:
+          setErrors([errorMessages.fileType]);
           return;
-        }
-        break;
-      default:
-        setErrors([errorMessages.fileType]);
-        return;
+      }
+  
+      // Validate parsed data and set if no issues.
+      try {
+        text = validateData(text);
+        setData(text);
+      } catch (err) {
+          setErrors(err);
+      }
+
     }
 
-    // Validate parsed data and set if no issues.
-    try {
-      fileData = validateData(fileData);
-      setData(fileData);
-    } catch (err) {
-        setErrors(err);
-    }
+    filereader.readAsText(fileData)
   }
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
