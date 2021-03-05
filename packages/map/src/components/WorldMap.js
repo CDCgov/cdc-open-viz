@@ -6,7 +6,7 @@ import {
   ZoomableGroup,
   Geography,
 } from 'react-simple-maps';
-import topoJsonWorld from 'world-atlas/countries-50m.json';
+import topoJsonWorld from '../data/world-topo.json';
 import { interpolatePath } from 'd3-interpolate-path';
 import CityList from './CityList';
 
