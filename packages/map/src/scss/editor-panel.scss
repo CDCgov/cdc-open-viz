@@ -20,7 +20,7 @@
       padding: 2em;
     }
     @include emptyState;
-    .container {
+    .waiting-container {
       max-width: 400px;
     }
     h3 {
@@ -156,6 +156,7 @@
         width: 60px;
         color: $blue;
         margin-right: 1rem;
+        height: 60px; // IE11
         path {
           fill: currentColor;
         }
