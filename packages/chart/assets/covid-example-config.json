@@ -24,7 +24,7 @@
         "tickFontSize": 18,
         "gridLines": true,
         "numTicks": 3,
-        "width": 75
+        "size": 75
     },
     "xAxis": {
         "label": "Race",
@@ -32,7 +32,7 @@
         "labelFontSize": 22,
         "tickFontSize": 22,
         "tickRotation": 72,
-        "height": 200,
+        "size": 200,
         "wrap": true
     },
     "legend": {

@@ -34,7 +34,7 @@
         "dateDisplayFormat": "%b %d",
         "numTicks": 8,
         "tickRotation": 50,
-        "height": 100
+        "size": 100
     },
     "legend": {
         "label": "Legend",

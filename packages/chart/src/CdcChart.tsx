@@ -59,12 +59,12 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.padding.right = responseObj.padding.right || 0;
 
     responseObj.yAxis = responseObj.yAxis || {};
-    responseObj.yAxis.width = responseObj.yAxis.width || 50;
+    responseObj.yAxis.size = responseObj.yAxis.size || 50;
     responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
     responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
 
     responseObj.xAxis = responseObj.xAxis || {};
-    responseObj.xAxis.height = responseObj.xAxis.height !== undefined ? responseObj.xAxis.height : 75;
+    responseObj.xAxis.size = responseObj.xAxis.size !== undefined ? responseObj.xAxis.size : 75;
     responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
     responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
     responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
@@ -99,7 +99,7 @@ export default function CdcChart({ configUrl, element }) {
       debounce.current = setTimeout(() => {
         setDimensions({	
             width: ((element.offsetWidth > viewportCutoff) && !config.legend.hide) ? (adjustedWidth * .75) : adjustedWidth,	
-            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.height
+            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.size
         });	
       }, 250);	
     }	
