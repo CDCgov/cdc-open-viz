@@ -18,8 +18,8 @@ export default function ComboChart({numberFormatter}) {
 
   const { width, height } = dimensions;
 
-  const xMax = width - config.yAxis.width;
-  const yMax = height - config.xAxis.height;
+  const xMax = width - config.yAxis.size;
+  const yMax = height - config.xAxis.size;
 
   const parseDate = timeParse(config.xAxis.dateParseFormat);
   const format = timeFormat(config.xAxis.dateDisplayFormat);
@@ -90,7 +90,7 @@ export default function ComboChart({numberFormatter}) {
     <div className="combo-chart-container">
       <svg width={width} height={height}>
         { config.visualizationType !== 'Line' ? (
-          <Group left={config.yAxis.width}>
+          <Group left={config.yAxis.size}>
           { config.visualizationSubType === 'stacked' ? (
             <BarStack
               data={data}
@@ -219,7 +219,7 @@ export default function ComboChart({numberFormatter}) {
         ) }
         
         { config.visualizationType !== 'Bar' ? (
-          <Group left={config.yAxis.width}>
+          <Group left={config.yAxis.size}>
             { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
               <Group
                 key={`series-${seriesKey}`}
@@ -278,7 +278,7 @@ export default function ComboChart({numberFormatter}) {
           const width = to - from;
 
           return (
-            <Group className="regions" left={config.yAxis.width}>
+            <Group className="regions" left={config.yAxis.size}>
               <path stroke="black" d={`M${from} -5
                         L${from} 5
                         M${from} 0
@@ -305,7 +305,7 @@ export default function ComboChart({numberFormatter}) {
         }) : '' }
         <AxisLeft
           scale={yScale}
-          left={config.yAxis.width}
+          left={config.yAxis.size}
           label={config.yAxis.label}
           stroke={font}
           numTicks={config.yAxis.numTicks}
@@ -350,7 +350,7 @@ export default function ComboChart({numberFormatter}) {
                 />
                 <text
                   textAnchor="middle"
-                  transform={`translate(${-1 * (config.yAxis.width - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
+                  transform={`translate(${-1 * (config.yAxis.size - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
                   fontSize={config.yAxis.labelFontSize || 18}
                   fontWeight="bold"
                 >
@@ -362,7 +362,7 @@ export default function ComboChart({numberFormatter}) {
         </AxisLeft>
         <AxisBottom
           top={yMax}
-          left={config.yAxis.width}
+          left={config.yAxis.size}
           label={config.xAxis.label}
           tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
           scale={xScale}
@@ -398,7 +398,7 @@ export default function ComboChart({numberFormatter}) {
                           {tick.formattedValue}
                         </text> 
                       ) : (
-                        <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.height}>
+                        <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.size}>
                           <p className="bottom-axis-tick">{tick.formattedValue}</p>
                         </foreignObject> 
                       )
@@ -413,7 +413,7 @@ export default function ComboChart({numberFormatter}) {
                 />
                 <text
                   textAnchor="middle"
-                  transform={`translate(${axisCenter}, ${config.xAxis.height - config.xAxis.labelFontSize})`}
+                  transform={`translate(${axisCenter}, ${config.xAxis.size - config.xAxis.labelFontSize})`}
                   fontSize={config.xAxis.labelFontSize}
                   fontWeight="bold"
                 >
