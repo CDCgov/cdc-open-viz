@@ -66,7 +66,6 @@ export default function DataImport() {
     } catch {
       throw errorMessages.urlInvalid
     }
-    let responseText = null;
     let responseBlob = null;
 
     const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
@@ -81,8 +80,13 @@ export default function DataImport() {
           responseType: 'blob'
         })
         .then((response) => {
-          debugger;
           responseBlob = response.data;
+
+          if ( fileExtension === ".csv" && responseBlob.type === "text/plain" ) {
+            responseBlob = responseBlob.slice(0, responseBlob.size, "text/csv")
+          } else if ( fileExtension === ".json" && responseBlob.type === "text/plain" ) {
+            responseBlob = responseBlob.slice(0, responseBlob.size, "application/json")
+          }
         });
     } catch (err) {
       console.error(err)
