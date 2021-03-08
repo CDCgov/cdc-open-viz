@@ -5,6 +5,7 @@
     },
     "dataUrl":  "/assets/covid-example-data-confidence.json",
     "visualizationType": "Bar",
+    "visualizationSubType": "horizontal",
     "seriesKeys": ["Age-adjusted rate"],
     "seriesLabels": {"Age-adjusted rate": "Rate", "Lower": "Low Bound", "Upper": "High Bound"},
     "confidenceKeys": {
@@ -37,7 +38,7 @@
         "labelFontSize": 22,
         "tickFontSize": 22,
         "tickRotation": 72,
-        "size": 200,
+        "size": 500,
         "wrap": true
     },
     "legend": {
