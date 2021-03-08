@@ -17,6 +17,10 @@ export default function ComboChart({numberFormatter}) {
   let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
 
   const { width, height } = dimensions;
+  
+  const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
+
+  const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
 
   const xMax = width - config.yAxis.size;
   const yMax = height - config.xAxis.size;
@@ -25,7 +29,7 @@ export default function ComboChart({numberFormatter}) {
   const format = timeFormat(config.xAxis.dateDisplayFormat);
   const formatDate = (date) => format(new Date(date));
 
-  const getXAxisData = (d: any) => config.xAxis.type === 'date' ? (parseDate(d[config.xAxis.dataKey]) as Date).getTime() : d[config.xAxis.dataKey];
+  const getXAxisData = (d: any) => config.xAxis.type === 'date' ? (parseDate(d[mappedXAxis.dataKey]) as Date).getTime() : d[mappedXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
   let xScale;
@@ -66,24 +70,42 @@ export default function ComboChart({numberFormatter}) {
       min -= paddingValue;
       max += paddingValue;
     }
-    
-    yScale = scaleLinear<number>({
-      domain: [min, max],
-      range: [yMax, 0]
-    });
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
+    
+    if(horizontal){
+      xScale = scaleLinear<number>({
+        domain: [min, max],
+        range: [0, xMax]
+      });
 
-    xScale = config.xAxis.type === 'date' ? 
-      scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
-      scaleBand<string>({domain: xAxisDataMapped});
+      yScale = config.xAxis.type === 'date' ? 
+        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
+        scaleBand<string>({domain: xAxisDataMapped});
 
-    seriesScale = scaleBand<string>({
-      domain: (config.barSeriesKeys || config.seriesKeys)
-    });
+      seriesScale = scaleBand<string>({
+        domain: (config.barSeriesKeys || config.seriesKeys)
+      });
 
-    xScale.rangeRound([0, xMax]);
-    seriesScale.rangeRound([0, xMax]);
+      yScale.rangeRound([yMax, 0]);
+      seriesScale.rangeRound([0, yMax]);
+    } else {
+      yScale = scaleLinear<number>({
+        domain: [min, max],
+        range: [yMax, 0]
+      });
+
+      xScale = config.xAxis.type === 'date' ? 
+        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
+        scaleBand<string>({domain: xAxisDataMapped});
+
+      seriesScale = scaleBand<string>({
+        domain: (config.barSeriesKeys || config.seriesKeys)
+      });
+
+      xScale.rangeRound([0, xMax]);
+      seriesScale.rangeRound([0, xMax]);
+    }
   }
 
   return config && data && colorScale && width && height ? (
@@ -144,17 +166,17 @@ export default function ComboChart({numberFormatter}) {
                 data={data}
                 keys={(config.barSeriesKeys || config.seriesKeys)}
                 height={yMax}
-                x0={(d: any) => d[config.xAxis.dataKey]}
-                x0Scale={xScale}
+                x0={(d: any) => d[mappedXAxis.dataKey]}
+                x0Scale={yScale}
                 x1Scale={seriesScale}
-                yScale={yScale}
+                yScale={xScale}
                 color={colorScale}
               >
                 {(barGroups) => barGroups.map((barGroup) => (
-                  <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} left={xMax / barGroups.length * barGroup.index}>
+                  <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                     {barGroup.bars.map((bar) => {
-                      let barGroupWidth = xMax / barGroups.length * (config.barThickness || 0.8);
-                      let offset = xMax / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                      let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
+                      let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                       let barWidth = barGroupWidth / barGroup.bars.length;
                       return (
                       <Group>
@@ -169,10 +191,10 @@ export default function ComboChart({numberFormatter}) {
                         </text>
                         <rect
                           key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                          y={bar.y}
-                          width={barWidth}
-                          height={bar.height}
+                          x={horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                          y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : bar.y}
+                          width={horizontal ?  bar.y : barWidth}
+                          height={horizontal ? barWidth : bar.height}
                           fill={bar.color}
                           stroke="black"
                           strokeWidth={config.barBorderThickness || 1}

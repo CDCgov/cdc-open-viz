@@ -58,6 +58,12 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.padding.left = responseObj.padding.left|| 0;
     responseObj.padding.right = responseObj.padding.right || 0;
 
+    if(responseObj.visualizationType === 'Bar' && responseObj.visualizationSubType === 'horizontal'){
+      let tempAxis = responseObj.yAxis;
+      responseObj.yAxis = responseObj.xAxis;
+      responseObj.xAxis = tempAxis;
+    }
+
     responseObj.yAxis = responseObj.yAxis || {};
     responseObj.yAxis.size = responseObj.yAxis.size || 50;
     responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
