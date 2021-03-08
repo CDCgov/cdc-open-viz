@@ -2,7 +2,7 @@ import React, { useState, useContext, useCallback, useEffect } from 'react';
 import {useDropzone} from 'react-dropzone'
 import {csvParse} from 'd3';
 import { useDebounce } from 'use-debounce';
-import { get, request } from 'axios';
+import { get } from 'axios';
 
 import GlobalState from '../context';
 import '../scss/data-import.scss';
@@ -82,6 +82,7 @@ export default function DataImport() {
         .then((response) => {
           responseBlob = response.data;
 
+          // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
           if ( fileExtension === ".csv" && responseBlob.type === "text/plain" ) {
             responseBlob = responseBlob.slice(0, responseBlob.size, "text/csv")
           } else if ( fileExtension === ".json" && responseBlob.type === "text/plain" ) {
@@ -116,7 +117,6 @@ export default function DataImport() {
     if(null === fileData) {
       try {
         fileData = await loadExternal();
-        debugger;
       } catch (error) {
         setErrors([error]);
         return;
@@ -148,7 +148,6 @@ export default function DataImport() {
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
-    // fileData = await fileData.text();
     let filereader = new FileReader();
     // Set encoding for CSV files - needed to render special characters properly
     let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
@@ -157,7 +156,6 @@ export default function DataImport() {
 
       switch (mimeType) {
         case 'text/csv': 
-        debugger;
           text = csvParse(text);
           break;
         case 'text/plain':
@@ -183,8 +181,6 @@ export default function DataImport() {
       }
 
     }
-      debugger;
-      // filereader.readAsText(fileData)
       filereader.readAsText(fileData, encoding)    
   }
 
