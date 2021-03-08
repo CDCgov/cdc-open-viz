@@ -44,6 +44,9 @@
         max-width: none !important;
         width: auto !important;
         min-width: 150px !important;
+        @include breakpoint(md) {
+          min-width: 200px !important;
+        }
         flex-shrink: 0;
         flex-grow: 1 !important;
       }
