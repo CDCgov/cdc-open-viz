@@ -52,9 +52,6 @@ export default function PieChart({numberFormatter}) {
             props: PieStyles;
             key: string;
           }) => {
-            const [centroidX, centroidY] = path.centroid(arc);
-            const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
-
             return (
               <g key={key}>
                 <animated.path
@@ -71,22 +68,40 @@ export default function PieChart({numberFormatter}) {
                   </div>`}
                   data-html="true"
                 />
+              </g>
+            );
+          },
+        )}
+        {transitions.map(
+          ({
+            item: arc,
+            props,
+            key,
+          }: {
+            item: PieArcDatum<Datum>;
+            props: PieStyles;
+            key: string;
+          }) => {
+            const [centroidX, centroidY] = path.centroid(arc);
+            const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
+
+            return (
+              <animated.g style={{ opacity: props.opacity }}>
                 {hasSpaceForLabel && (
-                  <animated.g style={{ opacity: props.opacity }}>
+                  
                     <text
                       fill="white"
                       x={centroidX}
                       y={centroidY}
                       dy=".33em"
-                      fontSize={9}
+                      fontSize={config.labels && config.labels.fontSize ? config.labels.fontSize : 14}
                       textAnchor="middle"
                       pointerEvents="none"
                     >
                       {Math.round((arc.endAngle - arc.startAngle) * 180 / Math.PI / 360 * 100) + '%'}
                     </text>
-                  </animated.g>
                 )}
-              </g>
+              </animated.g>
             );
           },
         )}
