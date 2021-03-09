@@ -82,7 +82,7 @@ export default function PieChart({numberFormatter}) {
                       textAnchor="middle"
                       pointerEvents="none"
                     >
-                      {getKey(arc)}
+                      {Math.round((arc.endAngle - arc.startAngle) * 180 / Math.PI / 360 * 100) + '%'}
                     </text>
                   </animated.g>
                 )}
