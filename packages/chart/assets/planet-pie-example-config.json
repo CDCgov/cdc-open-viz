@@ -23,7 +23,7 @@
         "size": 0
     },
     "legend": {
-        "hide": true
+        "hide": false
     },
     "table": {
         "label": "Table",
