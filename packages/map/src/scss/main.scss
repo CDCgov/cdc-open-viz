@@ -17,9 +17,22 @@
 .cdc-map-outer-container {
   position: relative;
   display: flex; // Needed for the main content
-  font-size: 14px;
-  @include breakpoint(lg) {
-    font-size: 16px;
+  font-size: 14px !important;
+  line-height: 1.4;
+  @include breakpointClass(xs) {
+    div#tooltip {
+      display: none !important;
+    }
+  }
+  @include breakpointClass(md) {
+    .map-container.modal-background::before {
+      border-bottom: $lightGray 1px solid;
+      margin-bottom: -1px;
+      bottom: 1px;
+    }
+  }
+  @include breakpointClass(md) {
+    font-size: 16px !important;
   }
 }
 
@@ -42,7 +55,6 @@
   @import "./sidebar";
   @import "./datatable";
   @import "./animations";
-
   flex-grow: 1;
   text-rendering: geometricPrecision;
   color: #202020;
@@ -88,7 +100,7 @@
     flex-direction: column;
     &.modal-background {
       position: relative;
-      &:before {
+      &::before {
         content: " ";
         position: absolute;
         top: 0;
@@ -97,11 +109,6 @@
         bottom: 0;
         background: rgba(0,0,0,.05);
         z-index: 7;
-        @include breakpoint(md) {
-          border-bottom: $mediumGray 1px solid;
-          margin-bottom: -1px;
-          bottom: 1px;
-        }
       }
       .modal-content {
         background: #fff;
@@ -131,13 +138,13 @@
           margin-top: 3px;
           flex-shrink: 0;
         }
-        @include breakpoint(sm) {
+        @include breakpointClass(sm) {
           transform: translate(-50%, -100%);
         }
-        @include breakpoint(md) {
+        @include breakpointClass(md) {
           transform: translate(-50%, -120%);
         }
-        @include breakpoint(lg) {
+        @include breakpointClass(lg) {
           font-size: .9em;
           min-width: 300px;
           .legend-color {
@@ -174,6 +181,7 @@
   }
 
   p.subtext {
+    font-size: .9em;
     padding: 0 .8em .8em;
     em {
       font-style: italic;
@@ -200,7 +208,7 @@
     padding: 1em;
     z-index: 6;
     width: 100%;
-    border-top: $mediumGray 1px solid;
+    border-top: $lightGray 1px solid;
     label {
       flex-grow: 1;
       > h5 {

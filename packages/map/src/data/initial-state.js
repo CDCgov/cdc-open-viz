@@ -69,5 +69,6 @@ export default {
     data: [],
     categoryValuesOrder: []
   },
-  loading: true
+  loading: true,
+  viewport: "lg"
 };

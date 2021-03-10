@@ -20,6 +20,36 @@
   }
 }
 
+@mixin breakpointClass($class) {
+  @if $class == xs {
+    &.xs {
+      @content;
+    }
+  }
+
+  @else if $class == sm {
+    &.sm, &.md, &.lg {
+      @content;
+    }
+  }
+
+  @else if $class == md {
+    &.md, &.lg {
+      @content;
+    }
+  }
+
+  @else if $class == lg {
+    &.lg {
+      @content;
+    }
+  }
+
+  @else {
+    @warn "Breakpoint Class mixin supports: xs, sm, md, lg";
+  }
+}
+
 // Imports
 @import "reset";
 @import "variables";
