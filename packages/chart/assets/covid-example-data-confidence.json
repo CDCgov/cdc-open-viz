@@ -6,12 +6,6 @@
         "Upper": "650.2"
     },
     {
-        "Race": "Non-Hispanic American Indian or Alaska Native",
-        "Age-adjusted rate": "636.1",
-        "Lower": "630.2",
-        "Upper": "740.2"
-    },
-    {
         "Race": "Non-Hispanic Black",
         "Age-adjusted rate": "563.7",
         "Lower": "560.2",
@@ -22,6 +16,12 @@
         "Age-adjusted rate": "202.5",
         "Lower": "200.2",
         "Upper": "210.2"
+    },
+    {
+        "Race": "Non-Hispanic American Indian or Alaska Native",
+        "Age-adjusted rate": "636.1",
+        "Lower": "630.2",
+        "Upper": "740.2"
     },
     {
         "Race": "Non-Hispanic White",

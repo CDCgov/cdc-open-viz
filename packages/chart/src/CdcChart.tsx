@@ -68,7 +68,6 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.yAxis.size = responseObj.yAxis.size || 50;
     responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
     responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
-
     responseObj.xAxis = responseObj.xAxis || {};
     responseObj.xAxis.size = responseObj.xAxis.size !== undefined ? responseObj.xAxis.size : 75;
     responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
@@ -93,6 +92,22 @@ export default function CdcChart({ configUrl, element }) {
   }
 
   const debounce = useRef(null);
+
+  const sortData = (a, b) => {
+    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey;
+    let aData = parseFloat(a[sortKey]);
+    let bData = parseFloat(b[sortKey]);
+
+    console.log(a, aData);
+    console.log(b, bData);
+    if(aData < bData){
+      return config.sortData === 'ascending' ? 1 : -1;
+    } else if (aData > bData){
+      return config.sortData === 'ascending' ? -1 : 1;
+    } else {
+      return 0;
+    }
+  }
 
   const onResize = useCallback(() => {
     if (dimensions.width !== element.offsetWidth) {	
@@ -152,6 +167,12 @@ export default function CdcChart({ configUrl, element }) {
       });
 
       setColorScale(newColorScale);
+    }
+
+    if(config && data && config.sortData){
+      console.log(data);
+      data.sort(sortData);
+      console.log(data);
     }
   }, [config, data])
 

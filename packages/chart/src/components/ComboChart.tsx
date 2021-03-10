@@ -19,7 +19,6 @@ export default function ComboChart({numberFormatter}) {
   const { width, height } = dimensions;
   
   const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
-
   const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
 
   const xMax = width - config.yAxis.size;
@@ -167,9 +166,9 @@ export default function ComboChart({numberFormatter}) {
                 keys={(config.barSeriesKeys || config.seriesKeys)}
                 height={yMax}
                 x0={(d: any) => d[mappedXAxis.dataKey]}
-                x0Scale={yScale}
+                x0Scale={horizontal ? yScale : xScale}
                 x1Scale={seriesScale}
-                yScale={xScale}
+                yScale={horizontal ? xScale : yScale}
                 color={colorScale}
               >
                 {(barGroups) => barGroups.map((barGroup) => (
