@@ -252,7 +252,6 @@ const DataTable = (props) => {
                   tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} 
                   className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
                   onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
-                  
                 >
                   {column.render('Header')}
                   <div {...column.getResizerProps()} className="resizer" />
