@@ -684,6 +684,9 @@ const EditorPanel = memo((props) => {
     // Remove loading status
     delete strippedState.loading
 
+    // Remove viewport
+    delete strippedState.viewport
+
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
     

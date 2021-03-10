@@ -7,6 +7,7 @@ import chroma from 'chroma-js';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
+import ResizeObserver from 'resize-observer-polyfill';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
@@ -33,7 +34,6 @@ import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
 class CdcMap extends Component {
-
     constructor (props) {
         super(props)
 
@@ -52,6 +52,14 @@ class CdcMap extends Component {
         this.countryValues = Object.values(supportedCountries).flat()
         this.countryKeys = Object.keys(supportedCountries)
         this.cityNames = Object.keys(supportedCities)
+    
+        this.viewports = {
+            "lg": 1200,
+            "md": 992,
+            "sm": 768,
+            "xs": 576,
+            "xxs": 350
+        }
 
         // Binding context
         this.processData = this.processData.bind(this)
@@ -71,6 +79,8 @@ class CdcMap extends Component {
         this.loadConfig = this.loadConfig.bind(this)
         this.setState = this.setState.bind(this)
         this.processUnifiedData = this.processUnifiedData.bind(this)
+        this.getViewport = this.getViewport.bind(this)
+
     }
 
     closeModal({target}) {
@@ -407,7 +417,7 @@ class CdcMap extends Component {
                 }
                 break
             default:
-                console.warn(`Error: Do not recognize type of legend. Should either be equalnumber, equalinterval or category.`)
+                console.warn(`Error: Legend type not recognized. Should either be equalnumber, equalinterval or category.`)
             break;
         }
 
@@ -1048,6 +1058,19 @@ class CdcMap extends Component {
         }
     }
 
+    getViewport(size) {
+        let result = this.state.viewport
+        let viewports = Object.keys( this.viewports )
+
+        for(let viewport of viewports) {
+            if(size <= this.viewports[viewport]) {
+                result = viewport
+            }
+        }
+
+        return result
+    }
+
     async componentDidMount () {
         let configData
 
@@ -1070,6 +1093,21 @@ class CdcMap extends Component {
         if('object' === typeof configData) {
             await this.loadConfig(configData)
         }
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                let newViewport = this.getViewport(entry.contentRect.width)
+                
+                if( newViewport !== this.state.viewport ) {
+                    this.setState({
+                        ...this.state,
+                        viewport: newViewport
+                    })
+                }
+            }
+        });
+        
+        resizeObserver.observe(this.outerContainerRef.current);
     }
 
     generateValuesForFilter(columnName, data = this.state.data) {
@@ -1113,9 +1151,7 @@ class CdcMap extends Component {
     }
 
     hashRow (rowObj) {
-
         return Base64.encode( JSON.stringify( rowObj ) )
-
     }
 
     announceChange (value) {
@@ -1127,25 +1163,9 @@ class CdcMap extends Component {
         })
     }
 
-    getViewport(width = this.outerContainerRef.current.offsetWidth) {
-        if(width >= 1300) {
-            return'lg';
-        }
-
-        if(width >= 960) {
-            return'md';
-        }
-        if(width >= 768) {
-            return'sm';
-        }
-        if(width < 768) {
-            return'xs';
-        }
-    }
-
     geoClickHandler (key, value) {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === this.getViewport() || 'click' === this.state.tooltips.appearanceType) {
+        if ('xs' === this.state.viewport || 'click' === this.state.tooltips.appearanceType) {
             this.setState( (prevState) => {
                 return {
                     ...prevState,
@@ -1200,11 +1220,13 @@ class CdcMap extends Component {
 
         const { title = '', subtext = ''} = this.state.general
 
+        const headerColor = this.state.general.headerColor || 'theme-blue'
+
         return (
-            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className}` : 'cdc-open-viz-module cdc-map-outer-container' } ref={this.outerContainerRef}>
+            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className} ${this.state.viewport}` : `cdc-open-viz-module cdc-map-outer-container ${this.state.viewport}` } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
                 {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} />}
-                <section className="cdc-map-inner-container" aria-label={'Map: ' + title}>
+                <section className={`cdc-map-inner-container ${this.state.viewport}`} aria-label={'Map: ' + title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip
                             id="tooltip"
@@ -1215,7 +1237,7 @@ class CdcMap extends Component {
                         />
                     }
                     <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                        <h1 className={'map-title ' + this.state.general.headerColor}>
+                        <h1 className={'map-title ' + headerColor}>
                             { parse(title) }
                         </h1>
                     </header>
@@ -1238,6 +1260,7 @@ class CdcMap extends Component {
                         }
                         {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading  && Object.keys(this.state.processedData).length > 0 &&
                             <Sidebar
+                                viewport={this.state.viewport}
                                 legend={this.state.legend}
                                 filters={this.state.filters}
                                 columns={this.state.columns}
@@ -1270,6 +1293,7 @@ class CdcMap extends Component {
                             geoNames={this.geoNames}
                             tableTitle={this.state.dataTable.title}
                             mapTitle={this.state.general.title}
+                            viewport={this.state.viewport}
                         />
                     }
                     {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
