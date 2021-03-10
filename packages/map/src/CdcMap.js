@@ -972,6 +972,10 @@ class CdcMap extends Component {
 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {        
+            if(newState.dataUrl[0] === '/') {
+                newState.dataUrl = `https://${this.props.hostname}${newState.dataUrl}`
+            }
+
             newState.data = await this.fetchRemoteData(newState.dataUrl)
         }
 
