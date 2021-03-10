@@ -5,7 +5,6 @@
     },
     "dataUrl":  "/assets/covid-example-data-confidence.json",
     "visualizationType": "Bar",
-    "visualizationSubType": "horizontal",
     "seriesKeys": ["Age-adjusted rate"],
     "seriesLabels": {"Age-adjusted rate": "Rate", "Lower": "Low Bound", "Upper": "High Bound"},
     "confidenceKeys": {
@@ -38,11 +37,11 @@
         "labelFontSize": 22,
         "tickFontSize": 22,
         "tickRotation": 72,
-        "size": 500,
+        "size": 200,
         "wrap": true
     },
     "legend": {
-        "hide": true
+        "hide": false
     },
     "table": {
         "label": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity",

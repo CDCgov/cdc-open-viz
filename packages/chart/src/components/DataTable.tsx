@@ -6,6 +6,9 @@ export default function DataTable({numberFormatter}) {
 
   const { data, config } = useContext<any>(Context);
 
+  const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
+  const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
+
   const [tableExpanded, setTableExpanded] = useState<boolean>(false);
   const [tableSortConfig, setTableSortConfig] = useState<any>({ sortKey: undefined, sortReverse: false });
 
@@ -53,7 +56,7 @@ export default function DataTable({numberFormatter}) {
               <th>&nbsp;</th>
               {data.map((d, index) => (
                 <th key={`table-header-item-${index}`} tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') { setTableSortConfig({ sortKey: index, sortReverse: !tableSortConfig.sortReverse }); } }} onClick={() => { setTableSortConfig({ sortKey: index, sortReverse: !tableSortConfig.sortReverse }); }}>
-                  {config.xAxis.type === 'date' ? formatDate(d[config.xAxis.dataKey]) : d[config.xAxis.dataKey]}
+                  {config.xAxis.type === 'date' ? formatDate(d[mappedXAxis.dataKey]) : d[mappedXAxis.dataKey]}
                   <span hidden={tableSortConfig.sortKey !== index} className={'table-sort-indicator ' + (tableSortConfig.sortReverse ? 'up' : 'down')}>
                     ^
                   </span>
