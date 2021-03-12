@@ -10,7 +10,6 @@ export default {
     modalContent: null,
     language: 'en',
     geoType: 'us',
-    parentUrl: false,
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
