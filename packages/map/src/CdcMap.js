@@ -986,11 +986,17 @@ class CdcMap extends Component {
                 newState.dataUrl = `https://${this.props.hostname}${newState.dataUrl}`
             }
 
-            newState.data = await this.fetchRemoteData(newState.dataUrl)
+            let newData = await this.fetchRemoteData(newState.dataUrl)
+
+            if(newData) {
+                newState.data = newData
+            }
         }
 
-        // Process all the data and trim whitespace/returns/etc...
-        newState.data = this.cleanCsvData(newState.data)
+        if( Array.isArray(newState.data) ) {
+            // Process all the data and trim whitespace/returns/etc...
+            newState.data = this.cleanCsvData(newState.data)
+        }
 
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
         // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
@@ -1030,7 +1036,7 @@ class CdcMap extends Component {
             })
 
         }
-
+        debugger;
         // Set properties that can be passed directly and require no additional computation
         this.setState(() => newState)
 
@@ -1165,7 +1171,7 @@ class CdcMap extends Component {
 
     geoClickHandler (key, value) {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === this.state.viewport || 'click' === this.state.tooltips.appearanceType) {
+        if ('xs' === this.state.viewport || 'xxs' === this.state.viewport || 'click' === this.state.tooltips.appearanceType) {
             this.setState( (prevState) => {
                 return {
                     ...prevState,
