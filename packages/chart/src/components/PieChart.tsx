@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import ReactTooltip from 'react-tooltip';
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import { scaleOrdinal } from '@visx/scale';
@@ -16,7 +16,9 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart({numberFormatter}) {
-  const { data, config, dimensions, colorScale } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale } = useContext<any>(Context);
+
+  const [filteredData, setFilteredData] = useState<any>(undefined);
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
@@ -118,12 +120,28 @@ export default function PieChart({numberFormatter}) {
   const centerX = width / 2;
   const donutThickness = radius;
 
+  useEffect(() => {
+    if(seriesHighlight.length > 0){
+      let newFilteredData = [];
+
+      data.forEach((d) => {
+        if(seriesHighlight.indexOf(d[config.xAxis.dataKey]) !== -1) {
+          newFilteredData.push(d);
+        }
+      });
+
+      setFilteredData(newFilteredData);
+    } else {
+      setFilteredData(undefined);
+    }
+  }, [seriesHighlight]);
+
   return width && height ? (
     <div ref={svgRef}>
       <svg width={width} height={height}>
         <Group top={centerY}  left={centerX}>
           <Pie
-            data={data}
+            data={filteredData || data}
             pieValue={d => d[config.yAxis.dataKey]}
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
