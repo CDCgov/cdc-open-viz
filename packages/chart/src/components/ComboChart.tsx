@@ -32,8 +32,8 @@ export default function ComboChart({numberFormatter}) {
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
   let xScale;
-  let seriesScale;
   let yScale;
+  let seriesScale;
 
   if (data) {
     let min = config.yAxis.min !== undefined ? config.yAxis.min : (config.visualizationType === 'Bar' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key]))))));
@@ -333,6 +333,7 @@ export default function ComboChart({numberFormatter}) {
         >
           {props => {
             const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+            const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
             return (
               <g className="my-custom-left-axis">
                 {props.ticks.map((tick, i) => {
@@ -345,6 +346,7 @@ export default function ComboChart({numberFormatter}) {
                         from={tick.from}
                         to={tick.to}
                         stroke="black"
+                        display={horizontal ? 'none' : 'block'}
                       />
                       { config.yAxis.gridLines ? (
                         <Line
@@ -355,9 +357,9 @@ export default function ComboChart({numberFormatter}) {
                         ) : ''
                       }
                       <text
-                        transform={`translate(${tick.to.x}, ${tick.to.y + (config.yAxis.tickFontSize / 2)})`}
+                        transform={`translate(${horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
                         fontSize={config.yAxis.tickFontSize}
-                        textAnchor="end"
+                        textAnchor={horizontal ? 'start' : 'end'}
                       >
                         {tick.formattedValue}
                       </text>
