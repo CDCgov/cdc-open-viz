@@ -44,6 +44,9 @@ module.exports = (env = {}, { mode }) => {
             ],
           ]
         }
+      ],
+      plugins: [
+        '@babel/plugin-transform-arrow-functions'
       ]
     },
   }
@@ -105,6 +108,11 @@ module.exports = (env = {}, { mode }) => {
               }
             },
           ],
+        },
+        {
+         // CSV
+         test: /\.(csv)$/i,
+         type: 'asset/source'
         },
         {
           // SVG

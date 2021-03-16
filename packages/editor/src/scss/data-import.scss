@@ -1,6 +1,7 @@
 @import "_variables";
 
 .cdc-editor .data-designer {
+    @import "data-table";
     display: flex;
     .left-col {
         background: #fff;
@@ -10,6 +11,7 @@
         border-right: $lightGray 1px solid;
         position: fixed;
         bottom: 0;
+        left: 0;
         top: 0;
         margin-top: 3rem;
         z-index: 1;
@@ -92,5 +94,21 @@
         padding: $gbl-padding;
         flex-grow: 1;
         max-width: 66.667%;
+    }
+
+    .keep-url {
+        font-size:.8rem;
+        color: $mediumGray
+    }
+
+    .sample-data-list {
+        margin-left: 1rem;
+        font-size: .8rem;
+        li {
+            margin-top: .3rem;
+            color: $blue;
+            text-decoration: underline;
+            cursor: pointer
+        }
     }
 }

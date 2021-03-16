@@ -22,6 +22,21 @@ import usaDefaultConfig from '../examples/default-usa.json';
 const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
+// IE11 Custom Event polyfill
+(function () {
+
+  if ( typeof window.CustomEvent === "function" ) return false;
+
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: null };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+   }
+
+  window.CustomEvent = CustomEvent;
+})();
+
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
@@ -79,7 +94,7 @@ const EditorPanel = memo((props) => {
   
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
 
-  const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState(null)
+  const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
 
   const [ editorCatOrder, setEditorCatOrder ] = useState([])
 
@@ -412,9 +427,7 @@ const EditorPanel = memo((props) => {
         })
       break;
       case 'changeLegendDescription':
-        const filterValKey = value[0]
-
-        const filterValDesc = value[1]
+        const [filterValKey, filterValDesc] = value
 
         setState( (prevState) => {
             return {
@@ -488,7 +501,7 @@ const EditorPanel = memo((props) => {
     }
 
     // Navigate is required for navigation maps
-    if('navigation' === state.general.type && '' === state.columns.navigate.name) {
+    if('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate) ) {
       columnList.push('Navigation')
     }
 
@@ -671,6 +684,9 @@ const EditorPanel = memo((props) => {
     // Remove loading status
     delete strippedState.loading
 
+    // Remove viewport
+    delete strippedState.viewport
+
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
     
@@ -680,19 +696,12 @@ const EditorPanel = memo((props) => {
     delete strippedGeneral.modalOpen;
     delete strippedGeneral.modalContent;
     delete strippedGeneral.parentUrl;
+    delete strippedGeneral.logoImage;
 
     // Strip out computed items
     delete strippedGeneral.viewportSize;
 
     strippedState.general = strippedGeneral
-
-    if(state.dataUrl && true === keepUrl) {
-        delete strippedState.data // If the data is pulled dynamically from a URL, don't store the data locally
-    }
-
-    if(state.dataUrl && false === keepUrl) {
-        delete strippedState.dataUrl
-    }
 
     return JSON.stringify( strippedState )
   }
@@ -762,7 +771,6 @@ const EditorPanel = memo((props) => {
       if(isArray) {
         sectionValue = [...state[section]]
         sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
-        debugger;
       } else {
         sectionValue = {...state[section], [subsection]: { ...state[section][subsection], [fieldName]: newValue}}
       }
@@ -842,15 +850,20 @@ const EditorPanel = memo((props) => {
       <Draggable key={value} draggableId={`${value}`} index={index}>
         {(provided, snapshot) => (
           <li
-            style={getItemStyle(
-              snapshot.isDragging,
-              provided.draggableProps.style,
-              sortableItemStyles
-            )}
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >{value}</li>
+            style={{position: 'relative'}}
+          >
+            <div
+              className={snapshot.isDragging ? 'currently-dragging': ''}
+              style={getItemStyle(
+                snapshot.isDragging,
+                provided.draggableProps.style,
+                sortableItemStyles
+              )}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >{value}</div>
+          </li>
         )}
       </Draggable>
     ))
