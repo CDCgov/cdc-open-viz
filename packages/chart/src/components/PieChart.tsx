@@ -88,7 +88,7 @@ export default function PieChart({numberFormatter}) {
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
 
             return (
-              <animated.g style={{ opacity: props.opacity }}>
+              <animated.g key={key} style={{ opacity: props.opacity }}>
                 {hasSpaceForLabel && (
                   
                     <text
