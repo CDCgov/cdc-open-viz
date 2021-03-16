@@ -1,27 +1,14 @@
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
-@import "~bootstrap/scss/utilities";
-
-@include breakpoint(md) {
-  .editor-panel:not(.hidden) + .cdc-map-inner-container {
-    padding-left: $editorWidth;
-  }
-  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-    padding-left: 3em;
-  } 
-}
-
 .cdc-open-viz-module {
+  @import "~bootstrap/scss/functions";
+  @import "~bootstrap/scss/variables";
+  @import "~bootstrap/scss/mixins";
+  @import "~bootstrap/scss/utilities";
   .waiting {
-    @include breakpoint(md) {
-      padding-left: 350px;    
-    }
     &.collapsed {
       padding: 2em;
     }
     @include emptyState;
-    .container {
+    .waiting-container {
       max-width: 400px;
     }
     h3 {
@@ -157,6 +144,7 @@
         width: 60px;
         color: $blue;
         margin-right: 1rem;
+        height: 60px; // IE11
         path {
           fill: currentColor;
         }
@@ -266,6 +254,7 @@
       font-size: 1.1em;
       padding: .6em 1em;
       position: relative;
+      border-bottom:#565656 3px solid;
       z-index: 3;
     }
   
@@ -493,8 +482,14 @@
     .btn {
       margin-top: 1em;
     }
-    
-    .sort-list li {
+    .sort-list {
+      list-style: none;
+      > li {
+        margin-right: .3em;
+        margin-bottom: .3em;  
+      }
+    }
+    .sort-list li > div {
       display: block;
       box-sizing: border-box;
       border: 1px solid #D1D1D1;
@@ -502,8 +497,7 @@
       background: #F1F1F1;
       padding: .4em .6em;
       font-size: .8em;
-      margin-right: .3em;
-      margin-bottom: .3em;
+      margin-bottom: .3em; 
       cursor: move;
       z-index: 999;
     }
@@ -647,4 +641,15 @@
     }
   
   }  
+  @include breakpointClass(md) {
+    .editor-panel:not(.hidden) + .cdc-map-inner-container {
+      padding-left: $editorWidth;
+    }
+    .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
+      padding-left: 3em;
+    }
+    .waiting {
+      padding-left: 350px;
+    }
+  }
 }

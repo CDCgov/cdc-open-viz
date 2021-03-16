@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+/** @jsx jsx */
+import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import {
   ComposableMap,

@@ -11,7 +11,19 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 const DataTable = (props) => {
   const {
-    tableTitle, mapTitle, data, showDownloadButton, processedData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToValue, displayGeoName, navigationHandler
+    tableTitle,
+    mapTitle,
+    data,
+    showDownloadButton,
+    processedData,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToValue,
+    displayGeoName,
+    navigationHandler,
+    viewport
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -234,7 +246,7 @@ const DataTable = (props) => {
 
   return (
     <ErrorBoundary component="DataTable">
-      <section className="data-table-container" aria-label={accessibilityLabel}>
+      <section className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
       <div
         className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
         onClick={() => { setExpanded(!expanded); }}
