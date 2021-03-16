@@ -126,7 +126,7 @@ export default function ComboChart({numberFormatter}) {
                 let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
                 let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
                 return (
-                <Group>
+                <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
                 <text 
                   display={config.labels && config.labels.display ? 'block': 'none'}
                   x={barThickness * (bar.index + 0.5) + offset}
@@ -178,7 +178,7 @@ export default function ComboChart({numberFormatter}) {
                       let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                       let barWidth = barGroupWidth / barGroup.bars.length;
                       return (
-                      <Group>
+                      <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
                         <text 
                           display={config.labels && config.labels.display ? 'block': 'none'}
                           x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
@@ -221,7 +221,7 @@ export default function ComboChart({numberFormatter}) {
                 let tickWidth = 5;
 
                 return (
-                  <path stroke="black" strokeWidth="2px" d={`
+                  <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="black" strokeWidth="2px" d={`
                     M${xPos - tickWidth} ${upperPos}
                     L${xPos + tickWidth} ${upperPos}
                     M${xPos} ${upperPos}
@@ -248,7 +248,7 @@ export default function ComboChart({numberFormatter}) {
                 display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
               >
                 { data.map((d, dataIndex) => (
-                  <Group>
+                  <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                   <text 
                       display={config.labels && config.labels.display ? 'block': 'none'}
                       x={xScale(getXAxisData(d))}
