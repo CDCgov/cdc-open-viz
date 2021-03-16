@@ -15,7 +15,8 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 1. Start by cloning this repo and running `npm install` at the root. 
 2. Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
 3. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-4. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
+4. NOTE: To run the **editor** you will also need to build the packages that it consumes. `lerna run --scope @cdc/map build` and soon `lerna run --scope @cdc/chart build`.
+5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
 
 ## Development Guidelines
 
