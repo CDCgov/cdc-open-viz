@@ -152,7 +152,7 @@ export default function ComboChart({numberFormatter}) {
                           ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                           ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                         </div>`}
-                        data-html="true"
+                    data-for="global"
                   />
                 </Group>
               )}
@@ -202,10 +202,10 @@ export default function ComboChart({numberFormatter}) {
                           display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                           data-tip={`<div>
                             ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                            ${config.yAxis.label}: ${numberFormatter(bar.value)} <br/>
+                            ${config.yAxis.label}: ${horizontal ? data[barGroup.index][mappedXAxis.dataKey] : numberFormatter(bar.value)} <br/>
                             ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                           </div>`}
-                          data-html="true"
+                          data-for="global"
                         />
                       </Group>
                     )}
@@ -271,7 +271,7 @@ export default function ComboChart({numberFormatter}) {
                         ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
                         ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
                       </div>`}
-                      data-html="true"
+                      data-for="global"
                     />
                   </Group>
                 ))}
@@ -448,7 +448,7 @@ export default function ComboChart({numberFormatter}) {
         </AxisBottom>
       </svg>
 
-      <ReactTooltip />
+      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </div>
   ) : ( <div className="loader"></div> );
 }

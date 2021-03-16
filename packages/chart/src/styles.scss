@@ -122,8 +122,6 @@ svg {
       }
     }
 
-
-
     tbody {
       width: auto;
     }
@@ -150,6 +148,15 @@ svg {
       }
     }
   }
+}
+
+.tooltip {
+  border: rgba(0,0,0,0.3) 1px solid !important;
+  box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+  line-height: 1.4em;
+  font-size: 1em !important;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
 }
 
 .region-table {
