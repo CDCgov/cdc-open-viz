@@ -7,7 +7,7 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ startingTab = null, config: configObj = null }) {
+export default function CdcEditor({ startingTab = null, config: configObj = null, hostname }) {
   const [config, setConfig] = useState(configObj)
   const [dataURL, setDataURL] = useState(null);
   const [data, setData] = useState(null);
@@ -49,7 +49,8 @@ export default function CdcEditor({ startingTab = null, config: configObj = null
     dataURL,
     setDataURL,
     keepURL,
-    setKeepURL
+    setKeepURL,
+    hostname
   }
 
   if(null === startingTab) {

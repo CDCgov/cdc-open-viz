@@ -28,9 +28,3 @@
     font-weight: 600;
   }
 }
-
-@include breakpoint(xs) {
-  div#tooltip {
-    display: none !important;
-  }
-}

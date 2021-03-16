@@ -15,7 +15,8 @@ const Sidebar = (props) => {
     setState,
     processedLegend,
     prefix,
-    suffix
+    suffix,
+    viewport
   } = props;
 
   const addCommas = (value) => {
@@ -131,7 +132,7 @@ const Sidebar = (props) => {
 
   return (
     <ErrorBoundary component="Sidebar">
-      <aside className={legend.position}>
+      <aside className={`${legend.position} ${viewport}`}>
       <section className="legend-section" aria-label="Map Legend">
         {processedLegend.disabledAmt > 0
           && (

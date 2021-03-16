@@ -11,7 +11,19 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 const DataTable = (props) => {
   const {
-    tableTitle, mapTitle, data, showDownloadButton, processedData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToValue, displayGeoName, navigationHandler
+    tableTitle,
+    mapTitle,
+    data,
+    showDownloadButton,
+    processedData,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToValue,
+    displayGeoName,
+    navigationHandler,
+    viewport
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -234,7 +246,7 @@ const DataTable = (props) => {
 
   return (
     <ErrorBoundary component="DataTable">
-      <section className="data-table-container" aria-label={accessibilityLabel}>
+      <section className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
       <div
         className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
         onClick={() => { setExpanded(!expanded); }}
@@ -243,12 +255,16 @@ const DataTable = (props) => {
       >
         {tableTitle}
       </div>
-      <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()}>
+      <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-live="assertive" >
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}>
+                <th 
+                  tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} 
+                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                  onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                >
                   {column.render('Header')}
                   <div {...column.getResizerProps()} className="resizer" />
                 </th>

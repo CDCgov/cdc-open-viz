@@ -32,6 +32,11 @@ i {
   font-style: italic;
 }
 
+.visually-hidden {
+  position: fixed;
+  left: -10000px;
+}
+
 .loader {
   width: 100%;
   text-align: center;
@@ -69,58 +74,81 @@ i {
   text-align: center;
   border: 1px solid black;
   margin-bottom: 20px;
+  float: right;
+
+  &.left {
+    float: left;
+  }
 }
 
 svg {
   overflow: visible;
 }
 
-table {
-  border-collapse: collapse;
+.table-header {
+  font-size: x-large;
+  font-weight: bold;
+  line-height: 2em;
+  padding-left: 10px;
+  border: 1px solid black;
+  color: black;
+  cursor: pointer;
+  padding: 0.25em 1em;
 
-  caption {
-    caption-side: top;
-    font-size: x-large;
-    font-weight: bold;
-    line-height: 2em;
-    padding-left: 10px;
-    border: 1px solid black;
-    color: black;
-    cursor: pointer;
-    padding: 0.25em 1em;
-
-    .table-indicator {
-      float: right;
-      font-size: xx-large;
-      font-weight: bold;
-    }
-  }
-
-  th, td {
-    border: 1px solid black;
-  }
-
-  th {
-    line-height: 1.5em;
-    padding: 5px;
-    user-select: none;
-    cursor: pointer;
-  }
-
-  .table-sort-indicator {
+  .table-indicator {
     float: right;
-    display: inline-block;
+    font-size: xx-large;
     font-weight: bold;
-    font-size: x-large;
+  }
+}
 
-    &.down {
-      transform: rotate(180deg);
+.table-container {
+  overflow-x: auto;
+
+  table {
+    width: auto;
+    min-width: 100%;
+    border-collapse: collapse;
+
+    tbody {
+      width: auto;
+    }
+
+    th, td {
+      border: 1px solid black;
+    }
+
+    th {
+      line-height: 1.5em;
+      padding: 5px;
+      user-select: none;
+      cursor: pointer;
+      background-color: #e5e5e5;
+    }
+
+    .table-sort-indicator {
+      float: right;
+      display: inline-block;
+      font-weight: bold;
+      font-size: x-large;
+
+      &.down {
+        transform: rotate(180deg);
+      }
     }
   }
+}
+
+.region-table {
+  margin-top: 15px;
 }
 
 @media (max-width: 900px) {
   .chart-container, .legend-container {
     width: 100%;
+  }
+
+  .legend-container > div {
+    display: flex;
   }
 }

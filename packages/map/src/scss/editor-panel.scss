@@ -1,21 +1,9 @@
-@include breakpoint(md) {
-  .editor-panel:not(.hidden) + .cdc-map-inner-container {
-    padding-left: $editorWidth;
-  }
-  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-    padding-left: 3em;
-  } 
-}
-
 .cdc-open-viz-module {
   @import "~bootstrap/scss/functions";
   @import "~bootstrap/scss/variables";
   @import "~bootstrap/scss/mixins";
   @import "~bootstrap/scss/utilities";
   .waiting {
-    @include breakpoint(md) {
-      padding-left: 350px;    
-    }
     &.collapsed {
       padding: 2em;
     }
@@ -266,6 +254,7 @@
       font-size: 1.1em;
       padding: .6em 1em;
       position: relative;
+      border-bottom:#565656 3px solid;
       z-index: 3;
     }
   
@@ -652,4 +641,15 @@
     }
   
   }  
+  @include breakpointClass(md) {
+    .editor-panel:not(.hidden) + .cdc-map-inner-container {
+      padding-left: $editorWidth;
+    }
+    .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
+      padding-left: 3em;
+    }
+    .waiting {
+      padding-left: 350px;
+    }
+  }
 }

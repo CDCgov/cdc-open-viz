@@ -20,10 +20,10 @@
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
-        "height": 0
+        "size": 0
     },
     "legend": {
-        "hide": true
+        "hide": false
     },
     "table": {
         "label": "Table",

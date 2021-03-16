@@ -1,6 +1,7 @@
 @import "_variables";
 
 .cdc-editor .data-designer {
+    @import "data-table";
     display: flex;
     .left-col {
         background: #fff;
