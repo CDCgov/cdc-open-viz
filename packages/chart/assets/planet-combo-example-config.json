@@ -24,7 +24,7 @@
         "label": "Planet",
         "dataKey": "name",
         "tickRotation": 30,
-        "height": 90
+        "size": 90
     },
     "legend": {
         "hide": false

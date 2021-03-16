@@ -10,7 +10,7 @@
     "dataUrl":  "/assets/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
-    "seriesKeysLabels": ["NY", "SF", "AU"],
+    "seriesLabels": {"New York": "NY", "San Francisco": "SF", "Austin": "AU"},
     "seriesLabel": "City",
     "dataFormat": {
         "roundTo": -1,
@@ -34,10 +34,12 @@
         "dateDisplayFormat": "%b %d",
         "numTicks": 8,
         "tickRotation": 50,
-        "height": 100
+        "size": 100
     },
     "legend": {
-        "label": "Legend"
+        "label": "Legend",
+        "above": true,
+        "left": true
     },
     "table": {
         "label": "Table",

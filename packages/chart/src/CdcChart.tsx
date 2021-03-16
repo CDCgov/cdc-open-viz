@@ -12,7 +12,6 @@ import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
 import './styles.scss';
-import { IgnorePlugin } from 'webpack';
 
 export default function CdcChart({ configUrl, element }) {
 
@@ -58,16 +57,26 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.padding.left = responseObj.padding.left|| 0;
     responseObj.padding.right = responseObj.padding.right || 0;
 
+    if(responseObj.visualizationType === 'Bar' && responseObj.visualizationSubType === 'horizontal'){
+      let tempAxis = responseObj.yAxis;
+      responseObj.yAxis = responseObj.xAxis;
+      responseObj.xAxis = tempAxis;
+    }
+
     responseObj.yAxis = responseObj.yAxis || {};
-    responseObj.yAxis.width = responseObj.yAxis.width || 50;
+    responseObj.yAxis.size = responseObj.yAxis.size || 50;
     responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
     responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
-
     responseObj.xAxis = responseObj.xAxis || {};
-    responseObj.xAxis.height = responseObj.xAxis.height !== undefined ? responseObj.xAxis.height : 75;
+    responseObj.xAxis.size = responseObj.xAxis.size !== undefined ? responseObj.xAxis.size : 75;
     responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
     responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
     responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
+
+    if(responseObj.seriesLabels){
+      responseObj.seriesLabelsAll = [];
+      Object.keys(responseObj.seriesLabels).forEach(seriesKey => responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey]));
+    }
 
     // If data is included through a URL, fetch that and store
     if(responseObj.dataUrl) {
@@ -83,6 +92,22 @@ export default function CdcChart({ configUrl, element }) {
 
   const debounce = useRef(null);
 
+  const sortData = (a, b) => {
+    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey;
+    let aData = parseFloat(a[sortKey]);
+    let bData = parseFloat(b[sortKey]);
+
+    console.log(a, aData);
+    console.log(b, bData);
+    if(aData < bData){
+      return config.sortData === 'ascending' ? 1 : -1;
+    } else if (aData > bData){
+      return config.sortData === 'ascending' ? -1 : 1;
+    } else {
+      return 0;
+    }
+  }
+
   const onResize = useCallback(() => {
     if (dimensions.width !== element.offsetWidth) {	
       if (debounce) {
@@ -94,7 +119,7 @@ export default function CdcChart({ configUrl, element }) {
       debounce.current = setTimeout(() => {
         setDimensions({	
             width: ((element.offsetWidth > viewportCutoff) && !config.legend.hide) ? (adjustedWidth * .75) : adjustedWidth,	
-            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.height
+            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.size
         });	
       }, 250);	
     }	
@@ -136,11 +161,17 @@ export default function CdcChart({ configUrl, element }) {
       palette = palette.slice(0, numberOfKeys);
 
       const newColorScale = () => scaleOrdinal({
-        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesKeysLabels || config.seriesKeys),
+        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesLabelsAll || config.seriesKeys),
         range: palette,
       });
 
       setColorScale(newColorScale);
+    }
+
+    if(config && data && config.sortData){
+      console.log(data);
+      data.sort(sortData);
+      console.log(data);
     }
   }, [config, data])
 
@@ -151,8 +182,13 @@ export default function CdcChart({ configUrl, element }) {
     });
 
     let newHighlight = label.datum;
-    if(config.seriesKeysLabels){
-      newHighlight = config.seriesKeys[config.seriesKeysLabels.indexOf(label.datum)];
+    if(config.seriesLabels){
+      for(let i = 0; i < config.seriesKeys.length; i++) {
+        if(config.seriesLabels[config.seriesKeys[i]] === label.datum){
+          newHighlight = config.seriesKeys[i];
+          break;
+        }
+      }
     }
 
     if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
@@ -183,6 +219,44 @@ export default function CdcChart({ configUrl, element }) {
     'Pie' : <PieChart numberFormatter={formatNumber} />,
   }
 
+  const legendElements = <div className={`legend-container ${config.legend.left ? 'left': ''}`} hidden={legend.hide}>
+  <h2>{legend.label}</h2>
+  <LegendOrdinal
+    scale={colorScale}
+    itemDirection="row"
+    labelMargin="0 20px 0 0"
+    shapeMargin="0 10px 0"
+    className="legend-item-container"
+    >
+      {labels => (
+        <div>
+          {labels.map((label, i) => (
+            <LegendItem
+              tabIndex={0}
+              key={`legend-quantile-${i}`}
+              margin="0 5px"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  highlight(label);
+                }
+              }}
+              onClick={() => {
+                highlight(label);
+              }}
+            >
+              <svg width={legendGlyphSize} height={legendGlyphSize}>
+                <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+              </svg>
+              <LegendLabel align="left" margin="0 0 0 4px">
+                {label.text}
+              </LegendLabel>
+            </LegendItem>
+          ))}
+        </div>
+      )}
+    </LegendOrdinal>
+</div>;
+
   if(true === loading) {
     return <div className="loader"></div>;
   }
@@ -190,50 +264,15 @@ export default function CdcChart({ configUrl, element }) {
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
       <div className="cdc-open-viz-module cdc-visualization-container mt-4">
+       {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
+        {config.legend.above ? legendElements : ''}
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
-          {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
           <div style={{paddingLeft: config.padding.left}}>
             {chartComponents[visualizationType]}
           </div>
         </div>
-        {/* Legend */}
-        <div className="legend-container" hidden={legend.hide}>
-          <h2>{legend.label}</h2>
-          <LegendOrdinal
-            scale={colorScale}
-            itemDirection="row"
-            labelMargin="0 20px 0 0"
-            shapeMargin="0 10px 0"
-            >
-              {labels => (
-                <div>
-                  {labels.map((label, i) => (
-                    <LegendItem
-                      tabIndex={0}
-                      key={`legend-quantile-${i}`}
-                      margin="0 5px"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          highlight(label);
-                        }
-                      }}
-                      onClick={() => {
-                        highlight(label);
-                      }}
-                    >
-                      <svg width={legendGlyphSize} height={legendGlyphSize}>
-                        <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
-                      </svg>
-                      <LegendLabel align="left" margin="0 0 0 4px">
-                        {label.text}
-                      </LegendLabel>
-                    </LegendItem>
-                  ))}
-                </div>
-              )}
-            </LegendOrdinal>
-        </div>
+        {!config.legend.above ? legendElements : ''}
       </div>
       {/* Description */}
       <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}} dangerouslySetInnerHTML={{__html: description && description.html}}></div>              
