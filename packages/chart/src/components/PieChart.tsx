@@ -68,7 +68,7 @@ export default function PieChart({numberFormatter}) {
                     ${config.xAxis.label}: ${(arc.data as any).name} <br/>
                     ${config.yAxis.label}: ${numberFormatter(arc.data[config.yAxis.dataKey])}
                   </div>`}
-                  data-html="true"
+                  data-for="global"
                 />
               </g>
             );
@@ -157,7 +157,7 @@ export default function PieChart({numberFormatter}) {
         </Group>
       </svg>
 
-      <ReactTooltip />
+      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </div>
   ) : <div className="loader"></div>;
 }
