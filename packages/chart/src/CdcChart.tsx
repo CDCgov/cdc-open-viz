@@ -12,7 +12,6 @@ import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
 import './styles.scss';
-import { IgnorePlugin } from 'webpack';
 
 export default function CdcChart({ configUrl, element }) {
 
