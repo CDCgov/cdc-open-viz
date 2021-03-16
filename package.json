@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.12.10",
+    "@babel/plugin-transform-arrow-functions": "^7.12.13",
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
@@ -24,6 +25,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
     "file-loader": "^6.2.0",
+    "html-react-parser": "^1.2.1",
     "html-webpack-plugin": "^4.5.1",
     "husky": "^4.3.0",
     "lerna": "^3.22.1",
@@ -33,6 +35,7 @@
     "react": "17.x",
     "react-dom": "17.x",
     "react-svg-loader": "^3.0.3",
+    "resize-observer-polyfill": "^1.5.1",
     "sass-loader": "^10.0.2",
     "style-loader": "^1.0.0",
     "ts-loader": "^8.0.9",
@@ -54,5 +57,8 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
+  },
+  "dependencies": {
+    "npm-package-arg": "^8.1.1"
   }
 }

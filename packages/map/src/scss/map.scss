@@ -9,12 +9,7 @@ header + .map-container.full-border {
 // World Specific Styles
 .map-container.world {
   &.data .geography-container {
-    border-bottom: $mediumGray 1px solid;
-  }
-  @include breakpoint(md) {
-    aside.bottom {
-      margin-top: 1em;
-    }
+    border-bottom: $lightGray 1px solid;
   }
   .geography-container {
     cursor: move;
@@ -31,8 +26,8 @@ header + .map-container.full-border {
 }
 
 // Data Specific Styles
-.map-container.data {
-  @include breakpoint(md) {
+@include breakpointClass(md) {
+  .map-container.data {
     &.side {
       flex-direction: row;
     }
@@ -102,30 +97,18 @@ header + .map-container.full-border {
   padding: 1em 100px 0 1em;
   margin-bottom: 2em;
   font-size: .8em;
-  @include breakpoint(md) {
-  }
-  @include breakpoint(lg) {
-    font-size: 1em;
-    padding-top: 3em;
-  }
   ul {
     display: flex;
-    @include breakpoint(lg) {
-      max-width: none;
-    }
     li {
       text-align: center;
       min-width: 30px;
       display: inline-block;
       margin-right: .5em;
-      @include breakpoint(lg) {
-        margin-bottom: .5em;
-      }
       transition: .3s all;
       &.label {
         max-width: 30%;
-        vertical-align: middle;
-        display: inline-block;
+        display: flex;
+        align-items: center;
         text-align: left;
         font-size: 1em !important;
         margin-bottom: 0;
@@ -138,9 +121,6 @@ header + .map-container.full-border {
         line-height: 15px;
         border-width: 1px !important;
         border-style: solid !important;
-        @include breakpoint(lg) {
-          padding: .3em;
-        }
       }
       &.darkGray {
         border: rgba(0,0,0,.2) 1px solid !important;
@@ -161,8 +141,8 @@ header + .map-container.full-border {
   z-index: 4;
   > button {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     padding: .2em;
     height: 1.75em;
     width: 1.75em;
@@ -171,10 +151,6 @@ header + .map-container.full-border {
     color: #fff;
     border-radius: 100%;
     border: 0;
-    @include breakpoint(sm) {
-      height: 2.5em;
-      width: 2.5em;
-    }
     &:hover {
       background: rgba(0,0,0,.8);
       transition: .2s all;
@@ -185,5 +161,29 @@ header + .map-container.full-border {
   }
   > button:first-child {
     margin-right: 0.25em;
+  }
+}
+
+
+@include breakpointClass(sm) {
+  .zoom-controls > button {
+    height: 2.5em;
+    width: 2.5em;
+  }
+}
+
+@include breakpointClass(md) {
+  .territories {
+    font-size: 1em;
+    padding-top: 3em;
+    ul {
+      max-width: none;
+      li {
+        margin-bottom: .5em;
+        &:not(:first-child) {
+          padding: .3em;
+        }
+      }
+    }
   }
 }

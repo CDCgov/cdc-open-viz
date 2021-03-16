@@ -10,12 +10,12 @@ export default {
     modalContent: null,
     language: 'en',
     geoType: 'us',
-    parentUrl: false,
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
     type: 'data'
   },
+  type: "map",
   color: 'pinkpurple',
   columns: {
     geo: {
@@ -31,6 +31,9 @@ export default {
       suffix: '',
       name: '',
       label: ''
+    },
+    navigate: {
+      name: ''
     },
     geosInRegion: {
       name: ''
@@ -65,5 +68,6 @@ export default {
     data: [],
     categoryValuesOrder: []
   },
-  loading: true
+  loading: true,
+  viewport: "lg"
 };

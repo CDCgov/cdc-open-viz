@@ -11,7 +11,7 @@ const Modal = (props) => {
   const legendColors = applyLegendToValue(content.geoData);
 
   return (
-    <section className={capitalize ? 'modal-content tooltip capitalize' : 'modal-content tooltip'} aria-hidden="true">
+    <section className={capitalize ? 'modal-content tooltip capitalize ' + state.viewport : 'modal-content tooltip ' + state.viewport} aria-hidden="true">
       <img src={closeIcon} className="modal-close" alt="Close Modal" />
       {state.general.type === 'data' && <span className="legend-color" style={{ backgroundColor: legendColors[0] }} />}
       <div className="content">

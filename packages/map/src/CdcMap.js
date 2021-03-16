@@ -7,6 +7,7 @@ import chroma from 'chroma-js';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
+import ResizeObserver from 'resize-observer-polyfill';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
@@ -33,7 +34,6 @@ import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
 class CdcMap extends Component {
-
     constructor (props) {
         super(props)
 
@@ -52,6 +52,14 @@ class CdcMap extends Component {
         this.countryValues = Object.values(supportedCountries).flat()
         this.countryKeys = Object.keys(supportedCountries)
         this.cityNames = Object.keys(supportedCities)
+    
+        this.viewports = {
+            "lg": 1200,
+            "md": 992,
+            "sm": 768,
+            "xs": 576,
+            "xxs": 350
+        }
 
         // Binding context
         this.processData = this.processData.bind(this)
@@ -71,6 +79,8 @@ class CdcMap extends Component {
         this.loadConfig = this.loadConfig.bind(this)
         this.setState = this.setState.bind(this)
         this.processUnifiedData = this.processUnifiedData.bind(this)
+        this.getViewport = this.getViewport.bind(this)
+
     }
 
     closeModal({target}) {
@@ -296,7 +306,13 @@ class CdcMap extends Component {
         let value = rowObj[this.state.columns.primary.name]
       
         // First, check if it's a special class
-        if (this.state.legend.specialClasses !== false &&
+        let hasSpecialClasses = false
+        
+        if(Array.isArray( this.state.legend.specialClasses ) && this.state.legend.specialClasses.length > 0) {
+            hasSpecialClasses = true
+        }
+
+        if (hasSpecialClasses &&
             this.state.legend.specialClasses.includes(value)) {
             for (let i = 0; i < this.state.processedLegend.data.length; i++) {
       
@@ -401,10 +417,10 @@ class CdcMap extends Component {
                 }
                 break
             default:
-                console.warn(`Error: Do not recognize type of legend. Should either be equalnumber, equalinterval or category.`)
+                console.warn(`Error: Legend type not recognized. Should either be equalnumber, equalinterval or category.`)
             break;
         }
-      
+
         // If at the end we aren't able to assign a color, give it black to signify a fail state. If a geo is black, this function isn't able to assign a legend to the value.
         if(0 === color.length) {
             if(true === this.state.loading) {
@@ -446,9 +462,9 @@ class CdcMap extends Component {
         // We convert the markup into JSX and add a navigation link if it's going into a modal.
         if('jsx' === returnType) {
             toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
-            
-            if(data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link d-flex" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon mr-1" /></span>) )
+
+            if(this.state.columns.hasOwnProperty('navigate') && data[this.state.columns.navigate.name]) {
+                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1" /></span>) )
             }
         }
 
@@ -964,13 +980,23 @@ class CdcMap extends Component {
             ...configObj
         }
 
-        // If there is no raw data stored, we grab and store the rawdata from the URL provided in the config file
+        // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {        
-            newState.data = await this.fetchRemoteData(newState.dataUrl)
+            if(newState.dataUrl[0] === '/') {
+                newState.dataUrl = `https://${this.props.hostname}${newState.dataUrl}`
+            }
+
+            let newData = await this.fetchRemoteData(newState.dataUrl)
+
+            if(newData) {
+                newState.data = newData
+            }
         }
-        
-        // Process all the data and trim whitespace/returns/etc...
-        newState.data = this.cleanCsvData(newState.data)
+
+        if( Array.isArray(newState.data) ) {
+            // Process all the data and trim whitespace/returns/etc...
+            newState.data = this.cleanCsvData(newState.data)
+        }
 
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
         // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
@@ -1010,7 +1036,7 @@ class CdcMap extends Component {
             })
 
         }
-
+        debugger;
         // Set properties that can be passed directly and require no additional computation
         this.setState(() => newState)
 
@@ -1038,6 +1064,19 @@ class CdcMap extends Component {
         }
     }
 
+    getViewport(size) {
+        let result = this.state.viewport
+        let viewports = Object.keys( this.viewports )
+
+        for(let viewport of viewports) {
+            if(size <= this.viewports[viewport]) {
+                result = viewport
+            }
+        }
+
+        return result
+    }
+
     async componentDidMount () {
         let configData
 
@@ -1060,6 +1099,21 @@ class CdcMap extends Component {
         if('object' === typeof configData) {
             await this.loadConfig(configData)
         }
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                let newViewport = this.getViewport(entry.contentRect.width)
+                
+                if( newViewport !== this.state.viewport ) {
+                    this.setState({
+                        ...this.state,
+                        viewport: newViewport
+                    })
+                }
+            }
+        });
+        
+        resizeObserver.observe(this.outerContainerRef.current);
     }
 
     generateValuesForFilter(columnName, data = this.state.data) {
@@ -1103,9 +1157,7 @@ class CdcMap extends Component {
     }
 
     hashRow (rowObj) {
-
         return Base64.encode( JSON.stringify( rowObj ) )
-
     }
 
     announceChange (value) {
@@ -1117,25 +1169,9 @@ class CdcMap extends Component {
         })
     }
 
-    getViewport(width = this.outerContainerRef.current.offsetWidth) {
-        if(width >= 1300) {
-            return'lg';
-        }
-
-        if(width >= 960) {
-            return'md';
-        }
-        if(width >= 768) {
-            return'sm';
-        }
-        if(width < 768) {
-            return'xs';
-        }
-    }
-
     geoClickHandler (key, value) {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === this.getViewport() || 'click' === this.state.tooltips.appearanceType) {
+        if ('xs' === this.state.viewport || 'xxs' === this.state.viewport || 'click' === this.state.tooltips.appearanceType) {
             this.setState( (prevState) => {
                 return {
                     ...prevState,
@@ -1190,11 +1226,13 @@ class CdcMap extends Component {
 
         const { title = '', subtext = ''} = this.state.general
 
+        const headerColor = this.state.general.headerColor || 'theme-blue'
+
         return (
-            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className}` : 'cdc-open-viz-module cdc-map-outer-container' } ref={this.outerContainerRef}>
+            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className} ${this.state.viewport}` : `cdc-open-viz-module cdc-map-outer-container ${this.state.viewport}` } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
                 {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} />}
-                <section className="cdc-map-inner-container" aria-label={'Map: ' + title}>
+                <section className={`cdc-map-inner-container ${this.state.viewport}`} aria-label={'Map: ' + title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip
                             id="tooltip"
@@ -1205,7 +1243,7 @@ class CdcMap extends Component {
                         />
                     }
                     <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                        <h1 className={'map-title ' + this.state.general.headerColor}>
+                        <h1 className={'map-title ' + headerColor}>
                             { parse(title) }
                         </h1>
                     </header>
@@ -1228,6 +1266,7 @@ class CdcMap extends Component {
                         }
                         {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading  && Object.keys(this.state.processedData).length > 0 &&
                             <Sidebar
+                                viewport={this.state.viewport}
                                 legend={this.state.legend}
                                 filters={this.state.filters}
                                 columns={this.state.columns}
@@ -1260,6 +1299,7 @@ class CdcMap extends Component {
                             geoNames={this.geoNames}
                             tableTitle={this.state.dataTable.title}
                             mapTitle={this.state.general.title}
+                            viewport={this.state.viewport}
                         />
                     }
                     {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}

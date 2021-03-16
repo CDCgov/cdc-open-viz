@@ -1,5 +1,9 @@
-@include breakpoint(md) {
-  .map-container.world .geography-container + aside.side {
+.map-container.world aside.side {
+  border-top: 0;
+}
+@include breakpointClass(md) {
+  .map-container.world aside.side {
+    border-top: $lightGray 1px solid;
     position: absolute;
   }
 }
@@ -7,12 +11,14 @@
 aside {
   background-color: #fff;
   z-index: 6;
-  border-top: $mediumGray 1px solid;
-  @include breakpoint(md) {
-    border: $mediumGray 1px solid;
+  border-top: $lightGray 1px solid;
+  @include breakpointClass(md) {
+    &.bottom {
+      margin: 0 1em;
+      border: #c2c2c2 1px solid;
+    }
     &.side {
       z-index: 1;
-      width: 37%;
       box-sizing: content-box;
       max-width: 450px;
       margin-right: 1em;
@@ -21,32 +27,27 @@ aside {
       align-self: flex-start;
       z-index: 4;
       right: 1em;
-      top: 2em;
-      border: rgba(0,0,0,.2) 1px solid;
+      border: $lightGray 1px solid;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
-    }
-    &.bottom {
-      margin: 0 1em;
-      border: #c2c2c2 1px solid;
+      width: 50%;
+      margin-right: 1rem;
+      top: 2em;
+      right: 1em;
     }
   }
-  @include breakpoint(lg) {
-    &.side {
-      margin-right: 2em;
-      right: 2em;
-    }
+  @include breakpointClass(lg) {
   }
 
   .legend-section {
     padding: 1em;
     position: relative;
     h2 {
-      font-size: 1.5em;
+      font-size: 1.3em;
       padding-bottom: 0;
       display: inline-block;
     }
     h2 + p, h2 + ul, p + ul, p + p {
-      padding-top: 1.5em;
+      padding-top: 1em;
     }
     .clear {
       font-size: .8em;
@@ -90,26 +91,30 @@ aside {
           opacity: .4;
         }
       }
-      @include breakpoint(sm) {
-        align-items: flex-start;
-        li {
-          width: 48%;
-          padding-right: .5em;
-          &:nth-last-of-type(-n+2) {
-            padding-bottom: 0
-          }
+    }
+  }
+
+  @include breakpointClass(sm) {
+    .legend-section ul {
+      align-items: flex-start;
+      justify-content: space-between;
+      li {
+        width: 48%;
+        padding-right: .5em;
+        &:nth-last-of-type(-n+2) {
+          padding-bottom: 0
         }
-        &.single-column {
-          flex-direction: column;
-          padding-right: 3em;
-          li {
-            width: 100%;
-            &:nth-last-of-type(-n+2) {
-              padding-bottom: 1em;
-            }
-            &:last-child {
-              padding-bottom: 0;
-            }
+      }
+      &.single-column {
+        flex-direction: column;
+        padding-right: 3em;
+        li {
+          width: 100%;
+          &:nth-last-of-type(-n+2) {
+            padding-bottom: 1em;
+          }
+          &:last-child {
+            padding-bottom: 0;
           }
         }
       }
@@ -134,83 +139,6 @@ aside {
     select {
       font-size: 1em;
       margin-right: 1em;
-    }
-  }
-
-
-  .share-section {
-    padding: .75em 1em;
-    label {
-      display: flex;
-      justify-content: space-between;
-      align-content: center;
-      a {
-        color: rgba(0,0,0,.7);
-        font-size: .75em;
-      }
-    }
-    .input-social-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    h3 {
-      text-transform: uppercase;
-      font-size: .9em;
-      margin: 0 0 .3em 0;
-      padding: 0;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    input {
-      margin-top: 1em;
-      padding: .5em .5em;
-      font-size: .8em;
-      color: #666;
-      width: 100%;
-      margin: 0 .5em 0 0;
-      border: rgba(0,0,0,.3) 1px solid;
-      &:focus {
-        outline: 0;
-        border: #000 1px solid;
-      }
-    }
-    ul {
-      display: flex;
-      list-style: none;
-      li {
-        margin-right: .5em;
-        &:last-child {
-          margin: 0;
-        }
-        a {
-          display: block;
-          width: 20px;
-          height: 20px;
-          border-radius: 100px;
-          text-indent: -200em;
-          overflow: hidden;
-          img {
-            max-width: 100%;
-            display: block;
-          }
-        }
-      }
-    }
-    @include breakpoint(lg) {
-      h3 {
-        font-size: .9em;
-      }
-      input {
-        margin-right: 1em;
-      }
-      ul li {
-        margin-right: .3em;
-      }
-      ul li a {
-        width: 30px;
-        height: 30px;
-      }
     }
   }
 }
