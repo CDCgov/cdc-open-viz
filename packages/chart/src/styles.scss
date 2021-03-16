@@ -79,6 +79,10 @@ i {
   &.left {
     float: left;
   }
+
+  .visx-legend-item {
+    cursor: pointer;
+  }
 }
 
 svg {
@@ -110,6 +114,16 @@ svg {
     min-width: 100%;
     border-collapse: collapse;
 
+    thead th {
+      cursor: pointer;
+
+      &:first-child {
+        cursor: default;
+      }
+    }
+
+
+
     tbody {
       width: auto;
     }
@@ -122,7 +136,6 @@ svg {
       line-height: 1.5em;
       padding: 5px;
       user-select: none;
-      cursor: pointer;
       background-color: #e5e5e5;
     }
 
