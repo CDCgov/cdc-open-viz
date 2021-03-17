@@ -43,6 +43,7 @@
     },
     "table": {
         "label": "Table",
-        "expanded": false
+        "expanded": false,
+        "download": true
     }
 }

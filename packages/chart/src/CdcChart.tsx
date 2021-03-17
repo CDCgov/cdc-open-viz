@@ -244,7 +244,7 @@ export default function CdcChart({ configUrl, element }) {
                 highlight(label);
               }}
             >
-              <svg width={legendGlyphSize} height={legendGlyphSize}>
+              <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
                 <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
               </svg>
               <LegendLabel align="left" margin="0 0 0 4px">
