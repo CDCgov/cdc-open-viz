@@ -11,7 +11,7 @@ import ComboChart from './components/ComboChart.tsx';
 import Context from './context';
 import DataTable from './components/DataTable.tsx';
 
-import './styles.scss';
+import './scss/main.scss';
 
 export default function CdcChart({ configUrl, element }) {
 

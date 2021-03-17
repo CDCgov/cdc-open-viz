@@ -4,6 +4,8 @@ import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
+import '../scss/DataTable.scss';
+
 export default function DataTable({numberFormatter}) {
 
   const { data, config } = useContext<any>(Context);
