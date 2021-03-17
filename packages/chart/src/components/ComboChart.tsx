@@ -9,6 +9,8 @@ import { BarGroup, BarStack } from '@visx/shape';
 import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
 
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+
 import '../scss/ComboChart.scss';
 
 const font = '#000000';
@@ -108,347 +110,349 @@ export default function ComboChart({numberFormatter}) {
   }
 
   return config && data && colorScale && width && height ? (
-    <div className="combo-chart-container">
-      <svg width={width} height={height}>
-        { config.visualizationType !== 'Line' ? (
-          <Group left={config.yAxis.size}>
-          { config.visualizationSubType === 'stacked' ? (
-            <BarStack
-              data={data}
-              keys={(config.barSeriesKeys || config.seriesKeys)}
-              x={(d: any) => d[config.xAxis.dataKey]}
-              xScale={xScale}
-              yScale={yScale}
-              color={colorScale}
-            >
-              {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
-                let barThickness = xMax / barStack.bars.length;
-                let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
-                let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
-                return (
-                <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-                <text 
-                  display={config.labels && config.labels.display ? 'block': 'none'}
-                  x={barThickness * (bar.index + 0.5) + offset}
-                  y={bar.y - 5}
-                  fill={bar.color}
-                  fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                  textAnchor="middle">
-                    {numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)}
-                </text>
-                  <rect
-                    key={`bar-stack-${barStack.index}-${bar.index}`}
-                    x={barThickness * bar.index + offset}
-                    y={bar.y}
-                    height={bar.height}
-                    width={barThicknessAdjusted}
-                    fill={bar.color}
-                    stroke="black"
-                    strokeWidth={config.barBorderThickness || 1}
-                    opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                    display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                    data-tip={`<div>
-                          ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                        </div>`}
-                    data-for="global"
-                  />
-                </Group>
-              )}
-              ))
-              }
-            </BarStack>
-          ) : (
-            <g>
-              <BarGroup
+    <ErrorBoundary component="ComboChart">
+      <div className="combo-chart-container">
+        <svg width={width} height={height}>
+          { config.visualizationType !== 'Line' ? (
+            <Group left={config.yAxis.size}>
+            { config.visualizationSubType === 'stacked' ? (
+              <BarStack
                 data={data}
                 keys={(config.barSeriesKeys || config.seriesKeys)}
-                height={yMax}
-                x0={(d: any) => d[mappedXAxis.dataKey]}
-                x0Scale={horizontal ? yScale : xScale}
-                x1Scale={seriesScale}
-                yScale={horizontal ? xScale : yScale}
+                x={(d: any) => d[config.xAxis.dataKey]}
+                xScale={xScale}
+                yScale={yScale}
                 color={colorScale}
               >
-                {(barGroups) => barGroups.map((barGroup) => (
-                  <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
-                    {barGroup.bars.map((bar) => {
-                      let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
-                      let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
-                      let barWidth = barGroupWidth / barGroup.bars.length;
-                      return (
-                      <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
-                        <text 
-                          display={config.labels && config.labels.display ? 'block': 'none'}
-                          x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
-                          y={bar.y - 5}
-                          fill={bar.color}
-                          fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                          textAnchor="middle">
-                            {numberFormatter(bar.value)}
-                        </text>
-                        <rect
-                          key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                          x={horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                          y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : bar.y}
-                          width={horizontal ?  bar.y : barWidth}
-                          height={horizontal ? barWidth : bar.height}
-                          fill={bar.color}
-                          stroke="black"
-                          strokeWidth={config.barBorderThickness || 1}
-                          style={{fill: bar.color}}
-                          opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                          display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                          data-tip={`<div>
-                            ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                            ${config.yAxis.label}: ${horizontal ? data[barGroup.index][mappedXAxis.dataKey] : numberFormatter(bar.value)} <br/>
+                {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
+                  let barThickness = xMax / barStack.bars.length;
+                  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
+                  let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
+                  return (
+                  <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
+                  <text 
+                    display={config.labels && config.labels.display ? 'block': 'none'}
+                    x={barThickness * (bar.index + 0.5) + offset}
+                    y={bar.y - 5}
+                    fill={bar.color}
+                    fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
+                    textAnchor="middle">
+                      {numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)}
+                  </text>
+                    <rect
+                      key={`bar-stack-${barStack.index}-${bar.index}`}
+                      x={barThickness * bar.index + offset}
+                      y={bar.y}
+                      height={bar.height}
+                      width={barThicknessAdjusted}
+                      fill={bar.color}
+                      stroke="black"
+                      strokeWidth={config.barBorderThickness || 1}
+                      opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                      display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                      data-tip={`<div>
+                            ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
+                            ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                             ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                           </div>`}
-                          data-for="global"
-                        />
-                      </Group>
-                    )}
-                    )}
-                  </Group>
-                ))}
-              </BarGroup>
-              {config.confidenceKeys ? data.map((d) => {
-                let offset = xMax / data.length / 2;
-                let xPos = xScale(getXAxisData(d)) + offset;
-                let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
-                let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
-                let tickWidth = 5;
-
-                return (
-                  <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="black" strokeWidth="2px" d={`
-                    M${xPos - tickWidth} ${upperPos}
-                    L${xPos + tickWidth} ${upperPos}
-                    M${xPos} ${upperPos}
-                    L${xPos} ${lowerPos}
-                    M${xPos - tickWidth} ${lowerPos}
-                    L${xPos + tickWidth} ${lowerPos}`}/>
-                );
-              }) : ''}
-            </g>
-          )
-          }
-        </Group>
-        ) : (
-          <Group>
-          </Group>
-        ) }
-        
-        { config.visualizationType !== 'Bar' ? (
-          <Group left={config.yAxis.size}>
-            { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
-              <Group
-                key={`series-${seriesKey}`}
-                opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-                display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
-              >
-                { data.map((d, dataIndex) => (
-                  <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-                  <text 
-                      display={config.labels && config.labels.display ? 'block': 'none'}
-                      x={xScale(getXAxisData(d))}
-                      y={yScale(getYAxisData(d, seriesKey))}
-                      fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                      fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                      textAnchor="middle">
-                        {numberFormatter(d[seriesKey])}
-                    </text>
-                    <circle
-                      key={`${seriesKey}-${dataIndex}`}
-                      r={3}
-                      cx={xScale(getXAxisData(d))}
-                      cy={yScale(getYAxisData(d, seriesKey))}
-                      strokeWidth="100px"
-                      fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                      style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
-                      data-tip={`<div>
-                        ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
-                        ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
-                        ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
-                      </div>`}
                       data-for="global"
                     />
                   </Group>
-                ))}
-                <LinePath
-                  curve={allCurves.curveLinear}
+                )}
+                ))
+                }
+              </BarStack>
+            ) : (
+              <g>
+                <BarGroup
                   data={data}
-                  x={(d) => xScale(getXAxisData(d))}
-                  y={(d) => yScale(getYAxisData(d, seriesKey))}
-                  stroke={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                  strokeWidth={2}
-                  strokeOpacity={1}
-                  shapeRendering="geometricPrecision"
-                />
-              </Group>
-            ))
+                  keys={(config.barSeriesKeys || config.seriesKeys)}
+                  height={yMax}
+                  x0={(d: any) => d[mappedXAxis.dataKey]}
+                  x0Scale={horizontal ? yScale : xScale}
+                  x1Scale={seriesScale}
+                  yScale={horizontal ? xScale : yScale}
+                  color={colorScale}
+                >
+                  {(barGroups) => barGroups.map((barGroup) => (
+                    <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
+                      {barGroup.bars.map((bar) => {
+                        let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
+                        let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                        let barWidth = barGroupWidth / barGroup.bars.length;
+                        return (
+                        <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
+                          <text 
+                            display={config.labels && config.labels.display ? 'block': 'none'}
+                            x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
+                            y={bar.y - 5}
+                            fill={bar.color}
+                            fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
+                            textAnchor="middle">
+                              {numberFormatter(bar.value)}
+                          </text>
+                          <rect
+                            key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
+                            x={horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                            y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : bar.y}
+                            width={horizontal ?  bar.y : barWidth}
+                            height={horizontal ? barWidth : bar.height}
+                            fill={bar.color}
+                            stroke="black"
+                            strokeWidth={config.barBorderThickness || 1}
+                            style={{fill: bar.color}}
+                            opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                            display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                            data-tip={`<div>
+                              ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
+                              ${config.yAxis.label}: ${horizontal ? data[barGroup.index][mappedXAxis.dataKey] : numberFormatter(bar.value)} <br/>
+                              ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
+                            </div>`}
+                            data-for="global"
+                          />
+                        </Group>
+                      )}
+                      )}
+                    </Group>
+                  ))}
+                </BarGroup>
+                {config.confidenceKeys ? data.map((d) => {
+                  let offset = xMax / data.length / 2;
+                  let xPos = xScale(getXAxisData(d)) + offset;
+                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
+                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
+                  let tickWidth = 5;
+
+                  return (
+                    <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="black" strokeWidth="2px" d={`
+                      M${xPos - tickWidth} ${upperPos}
+                      L${xPos + tickWidth} ${upperPos}
+                      M${xPos} ${upperPos}
+                      L${xPos} ${lowerPos}
+                      M${xPos - tickWidth} ${lowerPos}
+                      L${xPos + tickWidth} ${lowerPos}`}/>
+                  );
+                }) : ''}
+              </g>
+            )
             }
           </Group>
-        ) : (
-          <Group>
-          </Group>
-        ) }
-        { config.regions ? config.regions.map((region) => {
-          const from = xScale((parseDate(region.from) as Date).getTime());
-          const to = xScale((parseDate(region.to) as Date).getTime());
-          const width = to - from;
-
-          return (
-            <Group className="regions" left={config.yAxis.size}>
-              <path stroke="black" d={`M${from} -5
-                        L${from} 5
-                        M${from} 0
-                        L${to} 0
-                        M${to} -5
-                        L${to} 5`} />
-              <rect 
-                x={from} 
-                y={0} 
-                width={width} 
-                height={yMax} 
-                fill={region.background} 
-                opacity={0.3} />
-              <text 
-                x={from + (width / 2)} 
-                y={region.fontSize || 14} 
-                fill={region.color} 
-                fontSize={region.fontSize || 14}
-                textAnchor="middle">
-                  {region.label}
-              </text>
+          ) : (
+            <Group>
             </Group>
-          )
-        }) : '' }
-        <AxisLeft
-          scale={yScale}
-          left={config.yAxis.size}
-          label={config.yAxis.label}
-          stroke={font}
-          numTicks={config.yAxis.numTicks}
-        >
-          {props => {
-            const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
-            const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
-            return (
-              <g className="my-custom-left-axis">
-                {props.ticks.map((tick, i) => {
-                  return (
-                    <Group
-                      key={`vx-tick-${tick.value}-${i}`}
-                      className={'vx-axis-tick'}
-                    >
-                      <Line
-                        from={tick.from}
-                        to={tick.to}
-                        stroke="black"
-                        display={horizontal ? 'none' : 'block'}
-                      />
-                      { config.yAxis.gridLines ? (
-                        <Line
-                          from={{x: tick.from.x + xMax, y: tick.from.y}}
-                          to={tick.from}
-                          stroke="rgba(0,0,0,0.3)"
-                        />
-                        ) : ''
-                      }
-                      <text
-                        transform={`translate(${horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
-                        fontSize={config.yAxis.tickFontSize}
-                        textAnchor={horizontal ? 'start' : 'end'}
-                      >
-                        {tick.formattedValue}
-                      </text>
-                    </Group>
-                  );
-                })}
-                <Line 
-                  from={props.axisFromPoint}
-                  to={props.axisToPoint}
-                  stroke="black"
-                />
-                <text
-                  textAnchor="middle"
-                  transform={`translate(${-1 * (config.yAxis.size - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
-                  fontSize={config.yAxis.labelFontSize || 18}
-                  fontWeight="bold"
+          ) }
+          
+          { config.visualizationType !== 'Bar' ? (
+            <Group left={config.yAxis.size}>
+              { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
+                <Group
+                  key={`series-${seriesKey}`}
+                  opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+                  display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
                 >
-                  {props.label}
-                </text>
-              </g>
-            );
-          }}
-        </AxisLeft>
-        <AxisBottom
-          top={yMax}
-          left={config.yAxis.size}
-          label={config.xAxis.label}
-          tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
-          scale={xScale}
-          stroke={font}
-          tickStroke={font}
-          numTicks={config.xAxis.numTicks}
-        >
-          {props => {
-            const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
-            return (
-              <g className="my-custom-bottom-axis">
-                {props.ticks.map((tick, i) => {
-                  const tickX = tick.to.x;
-                  const tickY = tick.to.y + (!config.xAxis.wrap ? config.xAxis.tickFontSize : 0);
-
-                  return (
-                    <Group
-                      key={`vx-tick-${tick.value}-${i}`}
-                      className={'vx-axis-tick'}
-                    >
-                      <Line
-                        from={tick.from}
-                        to={tick.to}
-                        stroke="black"
+                  { data.map((d, dataIndex) => (
+                    <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                    <text 
+                        display={config.labels && config.labels.display ? 'block': 'none'}
+                        x={xScale(getXAxisData(d))}
+                        y={yScale(getYAxisData(d, seriesKey))}
+                        fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
+                        textAnchor="middle">
+                          {numberFormatter(d[seriesKey])}
+                      </text>
+                      <circle
+                        key={`${seriesKey}-${dataIndex}`}
+                        r={3}
+                        cx={xScale(getXAxisData(d))}
+                        cy={yScale(getYAxisData(d, seriesKey))}
+                        strokeWidth="100px"
+                        fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                        style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
+                        data-tip={`<div>
+                          ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
+                          ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
+                          ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+                        </div>`}
+                        data-for="global"
                       />
-                      { !config.xAxis.wrap ? ( 
+                    </Group>
+                  ))}
+                  <LinePath
+                    curve={allCurves.curveLinear}
+                    data={data}
+                    x={(d) => xScale(getXAxisData(d))}
+                    y={(d) => yScale(getYAxisData(d, seriesKey))}
+                    stroke={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    strokeWidth={2}
+                    strokeOpacity={1}
+                    shapeRendering="geometricPrecision"
+                  />
+                </Group>
+              ))
+              }
+            </Group>
+          ) : (
+            <Group>
+            </Group>
+          ) }
+          { config.regions ? config.regions.map((region) => {
+            const from = xScale((parseDate(region.from) as Date).getTime());
+            const to = xScale((parseDate(region.to) as Date).getTime());
+            const width = to - from;
+
+            return (
+              <Group className="regions" left={config.yAxis.size}>
+                <path stroke="black" d={`M${from} -5
+                          L${from} 5
+                          M${from} 0
+                          L${to} 0
+                          M${to} -5
+                          L${to} 5`} />
+                <rect 
+                  x={from} 
+                  y={0} 
+                  width={width} 
+                  height={yMax} 
+                  fill={region.background} 
+                  opacity={0.3} />
+                <text 
+                  x={from + (width / 2)} 
+                  y={region.fontSize || 14} 
+                  fill={region.color} 
+                  fontSize={region.fontSize || 14}
+                  textAnchor="middle">
+                    {region.label}
+                </text>
+              </Group>
+            )
+          }) : '' }
+          <AxisLeft
+            scale={yScale}
+            left={config.yAxis.size}
+            label={config.yAxis.label}
+            stroke={font}
+            numTicks={config.yAxis.numTicks}
+          >
+            {props => {
+              const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+              const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
+              return (
+                <g className="my-custom-left-axis">
+                  {props.ticks.map((tick, i) => {
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className={'vx-axis-tick'}
+                      >
+                        <Line
+                          from={tick.from}
+                          to={tick.to}
+                          stroke="black"
+                          display={horizontal ? 'none' : 'block'}
+                        />
+                        { config.yAxis.gridLines ? (
+                          <Line
+                            from={{x: tick.from.x + xMax, y: tick.from.y}}
+                            to={tick.from}
+                            stroke="rgba(0,0,0,0.3)"
+                          />
+                          ) : ''
+                        }
                         <text
-                          transform={`translate(${tickX}, ${tickY}) rotate(${config.xAxis.tickRotation})`}
-                          fontSize={config.xAxis.tickFontSize}
-                          textAnchor={config.xAxis.tickRotation !== 0 ? 'end': 'middle'}
-                          className="bottom-axis-tick"
+                          transform={`translate(${horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
+                          fontSize={config.yAxis.tickFontSize}
+                          textAnchor={horizontal ? 'start' : 'end'}
                         >
                           {tick.formattedValue}
-                        </text> 
-                      ) : (
-                        <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.size}>
-                          <p className="bottom-axis-tick">{tick.formattedValue}</p>
-                        </foreignObject> 
-                      )
-                      }
-                    </Group>
-                  );
-                })}
-                <Line 
-                  from={props.axisFromPoint}
-                  to={props.axisToPoint}
-                  stroke="black"
-                />
-                <text
-                  textAnchor="middle"
-                  transform={`translate(${axisCenter}, ${config.xAxis.size - config.xAxis.labelFontSize})`}
-                  fontSize={config.xAxis.labelFontSize}
-                  fontWeight="bold"
-                >
-                  {props.label}
-                </text>
-              </g>
-            );
-          }}
-        </AxisBottom>
-      </svg>
+                        </text>
+                      </Group>
+                    );
+                  })}
+                  <Line 
+                    from={props.axisFromPoint}
+                    to={props.axisToPoint}
+                    stroke="black"
+                  />
+                  <text
+                    textAnchor="middle"
+                    transform={`translate(${-1 * (config.yAxis.size - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
+                    fontSize={config.yAxis.labelFontSize || 18}
+                    fontWeight="bold"
+                  >
+                    {props.label}
+                  </text>
+                </g>
+              );
+            }}
+          </AxisLeft>
+          <AxisBottom
+            top={yMax}
+            left={config.yAxis.size}
+            label={config.xAxis.label}
+            tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
+            scale={xScale}
+            stroke={font}
+            tickStroke={font}
+            numTicks={config.xAxis.numTicks}
+          >
+            {props => {
+              const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
+              return (
+                <g className="my-custom-bottom-axis">
+                  {props.ticks.map((tick, i) => {
+                    const tickX = tick.to.x;
+                    const tickY = tick.to.y + (!config.xAxis.wrap ? config.xAxis.tickFontSize : 0);
 
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
-    </div>
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className={'vx-axis-tick'}
+                      >
+                        <Line
+                          from={tick.from}
+                          to={tick.to}
+                          stroke="black"
+                        />
+                        { !config.xAxis.wrap ? ( 
+                          <text
+                            transform={`translate(${tickX}, ${tickY}) rotate(${config.xAxis.tickRotation})`}
+                            fontSize={config.xAxis.tickFontSize}
+                            textAnchor={config.xAxis.tickRotation !== 0 ? 'end': 'middle'}
+                            className="bottom-axis-tick"
+                          >
+                            {tick.formattedValue}
+                          </text> 
+                        ) : (
+                          <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.size}>
+                            <p className="bottom-axis-tick">{tick.formattedValue}</p>
+                          </foreignObject> 
+                        )
+                        }
+                      </Group>
+                    );
+                  })}
+                  <Line 
+                    from={props.axisFromPoint}
+                    to={props.axisToPoint}
+                    stroke="black"
+                  />
+                  <text
+                    textAnchor="middle"
+                    transform={`translate(${axisCenter}, ${config.xAxis.size - config.xAxis.labelFontSize})`}
+                    fontSize={config.xAxis.labelFontSize}
+                    fontWeight="bold"
+                  >
+                    {props.label}
+                  </text>
+                </g>
+              );
+            }}
+          </AxisBottom>
+        </svg>
+
+        <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      </div>
+    </ErrorBoundary>
   ) : ( <div className="loader"></div> );
 }

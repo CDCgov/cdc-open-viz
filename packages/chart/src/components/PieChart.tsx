@@ -6,6 +6,8 @@ import { Group } from '@visx/group';
 import { animated, useTransition, interpolate } from 'react-spring';
 import Context from '../context.tsx';
 
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+
 // react-spring transition definitions
 type PieStyles = { startAngle: number; endAngle: number; opacity: number };
 
@@ -137,27 +139,29 @@ export default function PieChart({numberFormatter}) {
   }, [seriesHighlight]);
 
   return width && height ? (
-    <div ref={svgRef}>
-      <svg width={width} height={height}>
-        <Group top={centerY}  left={centerX}>
-          <Pie
-            data={filteredData || data}
-            pieValue={d => d[config.yAxis.dataKey]}
-            pieSortValues={() => -1}
-            innerRadius={radius - donutThickness}
-            outerRadius={radius}
-          >
-            {pie => (
-              <AnimatedPie<any>
-                {...pie}
-                getKey={d => d.data[config.xAxis.dataKey]}
-              />
-            )}
-          </Pie>
-        </Group>
-      </svg>
+    <ErrorBoundary component="PieChart">
+      <div ref={svgRef}>
+        <svg width={width} height={height}>
+          <Group top={centerY}  left={centerX}>
+            <Pie
+              data={filteredData || data}
+              pieValue={d => d[config.yAxis.dataKey]}
+              pieSortValues={() => -1}
+              innerRadius={radius - donutThickness}
+              outerRadius={radius}
+            >
+              {pie => (
+                <AnimatedPie<any>
+                  {...pie}
+                  getKey={d => d.data[config.xAxis.dataKey]}
+                />
+              )}
+            </Pie>
+          </Group>
+        </svg>
 
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
-    </div>
+        <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      </div>
+    </ErrorBoundary>
   ) : <div className="loader"></div>;
 }
