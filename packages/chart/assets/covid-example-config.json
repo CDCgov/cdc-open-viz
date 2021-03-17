@@ -42,6 +42,7 @@
     },
     "table": {
         "label": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity",
-        "expanded": true
+        "expanded": true,
+        "download": true
     }
 }
