@@ -8,14 +8,11 @@
   }
 
   .table-header {
-    font-size: x-large;
-    font-weight: bold;
+    background: rgba(0,0,0,0.05);
+    padding: .5em .7em;
+    border: #C7C7C7 1px solid;
     line-height: 2em;
-    padding-left: 10px;
-    border: 1px solid black;
-    color: black;
     cursor: pointer;
-    padding: 0.25em 1em;
   
     .table-indicator {
       float: right;
@@ -32,20 +29,26 @@
       min-width: 100%;
       border-collapse: collapse;
   
-      thead th {
-        cursor: pointer;
-  
-        &:first-child {
-          cursor: default;
+      thead {
+        border: 1px solid rgb(32,32,32);
+
+        th {
+          cursor: pointer;
+    
+          &:first-child {
+            cursor: default;
+          }
         }
       }
   
-      tbody {
+      tbody {    
+        border: 1px solid rgb(32,32,32);
         width: auto;
       }
   
-      th, td {
-        border: 1px solid black;
+      td {
+        border-right: 1px solid rgba(0,0,0,0.1);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
       }
   
       th {

@@ -1,5 +1,6 @@
 @import '~bootstrap/scss/bootstrap';
 @import '~@cdc/core/styles/base';
+@import "~@cdc/core/styles/heading-colors";
 @import 'reset';
 @import 'variables';
 @import 'mixins';
@@ -60,9 +61,13 @@ i {
   cursor: pointer;
 }
 
-.chart-title {
+h1.chart-title {
     text-align: center;
+    color: white;
+    padding: .6em .8em;
     margin-bottom: 40px;
+    border-bottom-width: 3px;
+    border-bottom-style: solid;
 }
 
 .chart-description {
