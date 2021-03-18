@@ -77,7 +77,9 @@ export default function CdcChart({ configUrl, element }) {
 
     if(responseObj.seriesLabels){
       responseObj.seriesLabelsAll = [];
-      Object.keys(responseObj.seriesLabels).forEach(seriesKey => responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey]));
+      responseObj.seriesKeys.forEach((seriesKey) => {
+        responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey])
+      });
     }
 
     // If data is included through a URL, fetch that and store

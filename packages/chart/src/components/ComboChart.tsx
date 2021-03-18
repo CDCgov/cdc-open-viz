@@ -172,7 +172,7 @@ export default function ComboChart({numberFormatter}) {
                   x0Scale={horizontal ? yScale : xScale}
                   x1Scale={seriesScale}
                   yScale={horizontal ? xScale : yScale}
-                  color={colorScale}
+                  color={() => {return '';}}
                 >
                   {(barGroups) => barGroups.map((barGroup) => (
                     <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
@@ -180,13 +180,14 @@ export default function ComboChart({numberFormatter}) {
                         let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                         let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                         let barWidth = barGroupWidth / barGroup.bars.length;
+                        let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
                         return (
                         <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
                           <text 
                             display={config.labels && config.labels.display ? 'block': 'none'}
                             x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
                             y={bar.y - 5}
-                            fill={bar.color}
+                            fill={barColor}
                             fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                             textAnchor="middle">
                               {numberFormatter(bar.value)}
@@ -197,10 +198,10 @@ export default function ComboChart({numberFormatter}) {
                             y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : bar.y}
                             width={horizontal ?  bar.y : barWidth}
                             height={horizontal ? barWidth : bar.height}
-                            fill={bar.color}
+                            fill={barColor}
                             stroke="black"
                             strokeWidth={config.barBorderThickness || 1}
-                            style={{fill: bar.color}}
+                            style={{fill: barColor}}
                             opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
                             display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                             data-tip={`<div>
