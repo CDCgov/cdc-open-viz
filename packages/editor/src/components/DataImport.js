@@ -125,6 +125,13 @@ export default function DataImport() {
 
     // Pull out mime type of file
     let { type: mimeType } = fileData;
+
+    // Catch empty types - sometimes these are blank on Windows machines...
+    if ( mimeType === "" ) {
+      const fileExtension = Object.keys(supportedDataTypes).find(extension => fileBlob.name.endsWith(extension));
+      mimeType = ( fileExtension === ".csv" ) ? 'text/csv' : 'application/json';
+    }
+    
     // Consolidate CSV types since we need to know this before choosing encoding
     switch (mimeType) {
       case 'text/csv':
