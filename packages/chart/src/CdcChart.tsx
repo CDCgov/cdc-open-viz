@@ -40,6 +40,7 @@ export default function CdcChart({ configUrl, element }) {
   const [resizeInit, setResizeInit] = useState<boolean>(false);
 
   const legendGlyphSize = 15;
+  const legendGlyphSizeHalf = legendGlyphSize / 2;
   const viewportCutoff = 900;
 
   const loadConfig = async () => {
@@ -50,6 +51,7 @@ export default function CdcChart({ configUrl, element }) {
     responseObj.initialized = true;
     responseObj.title = responseObj.title || {};
     responseObj.title.fontSize = responseObj.title.fontSize || 28;
+    responseObj.theme = responseObj.theme || 'theme-blue';
 
     responseObj.minHeight = responseObj.minHeight || 400;
 
@@ -245,7 +247,7 @@ export default function CdcChart({ configUrl, element }) {
               }}
             >
               <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
-                <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
+                <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={label.value} stroke="rgba(0,0,0,0.3)" />
               </svg>
               <LegendLabel align="left" margin="0 0 0 4px">
                 {label.text}
@@ -264,7 +266,7 @@ export default function CdcChart({ configUrl, element }) {
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
       <div className="cdc-open-viz-module cdc-visualization-container mt-4">
-       {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
+       {title.text && <h1 className={`chart-title ${config.theme}`} style={{fontSize: title.fontSize}}>{title.text}</h1>}
         {config.legend.above ? legendElements : ''}
         {/* Title & Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>

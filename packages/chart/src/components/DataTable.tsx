@@ -25,6 +25,7 @@ export default function DataTable({numberFormatter}) {
   const { data, config, colorScale } = useContext<any>(Context);
 
   const legendGlyphSize = 15;
+  const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
   const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
@@ -52,7 +53,7 @@ export default function DataTable({numberFormatter}) {
         onClick={saveBlob}
         href={`data:text/csv;base64,${Base64.encode(csvData)}`}
         aria-label="Download this data in a CSV file format."
-        className={`${config.headerColor || 'theme-blue'} btn btn-download no-border`}
+        className={`${config.theme} btn btn-download no-border`}
       >
         Download Data (CSV)
       </a>
@@ -67,9 +68,11 @@ export default function DataTable({numberFormatter}) {
         const seriesLabel = config.seriesLabels ? config.seriesLabels[row.original] : row.original;
         return (
           <>
-            <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
-              <rect fill={colorScale(seriesLabel)} width={legendGlyphSize} height={legendGlyphSize} />
-            </svg>
+            {config.visualizationType !== 'Pie' ? (
+              <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
+                <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={colorScale(seriesLabel)} stroke="rgba(0,0,0,0.3)" />
+              </svg>
+            ) : ''}
             {seriesLabel}
           </>
         )

@@ -3,6 +3,7 @@
         "text": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
         "fontSize": 32
     },
+    "theme": "theme-brown",
     "dataUrl":  "/assets/covid-example-data.json",
     "visualizationType": "Bar",
     "visualizationSubType": "horizontal",
