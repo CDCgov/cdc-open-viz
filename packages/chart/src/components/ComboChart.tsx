@@ -2,10 +2,9 @@ import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
-import { LinePath, Line } from '@visx/shape';
+import { LinePath, Line, BarGroup, BarStack } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
-import { BarGroup, BarStack } from '@visx/shape';
 import { timeParse, timeFormat } from 'd3-time-format';
 import Context from '../context.tsx';
 
@@ -38,8 +37,12 @@ export default function ComboChart({numberFormatter}) {
   let seriesScale;
 
   if (data) {
-    let min = config.yAxis.min !== undefined ? config.yAxis.min : (config.visualizationType === 'Bar' ? 0 : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key]))))));
+    let min = config.yAxis.min !== undefined ? config.yAxis.min : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
     let max = config.yAxis.max !== undefined ? config.yAxis.max : Number.MIN_VALUE;
+
+    if(config.visualizationType === 'Bar' && min > 0) {
+      min = 0;
+    }
 
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
@@ -177,6 +180,8 @@ export default function ComboChart({numberFormatter}) {
                   {(barGroups) => barGroups.map((barGroup) => (
                     <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                       {barGroup.bars.map((bar) => {
+                        let barHeight = Math.abs(yScale(bar.value) - yScale(0));
+                        let barY = bar.value >= 0 ? bar.y : yScale(0);
                         let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                         let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                         let barWidth = barGroupWidth / barGroup.bars.length;
@@ -186,7 +191,7 @@ export default function ComboChart({numberFormatter}) {
                           <text 
                             display={config.labels && config.labels.display ? 'block': 'none'}
                             x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
-                            y={bar.y - 5}
+                            y={barY - 5}
                             fill={barColor}
                             fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                             textAnchor="middle">
@@ -195,9 +200,9 @@ export default function ComboChart({numberFormatter}) {
                           <rect
                             key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                             x={horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                            y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : bar.y}
+                            y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY}
                             width={horizontal ?  bar.y : barWidth}
-                            height={horizontal ? barWidth : bar.height}
+                            height={horizontal ? barWidth : barHeight}
                             fill={barColor}
                             stroke="black"
                             strokeWidth={config.barBorderThickness || 1}
@@ -375,6 +380,13 @@ export default function ComboChart({numberFormatter}) {
                     to={props.axisToPoint}
                     stroke="black"
                   />
+                  { yScale.domain()[0] < 0 && (
+                    <Line
+                      from={{x: props.axisFromPoint.x, y: yScale(0)}}
+                      to={{x: xMax, y: yScale(0)}}
+                      stroke="black"
+                    />
+                  )}
                   <text
                     textAnchor="middle"
                     transform={`translate(${-1 * (config.yAxis.size - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
