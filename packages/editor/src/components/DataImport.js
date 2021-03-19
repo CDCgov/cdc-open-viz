@@ -66,29 +66,29 @@ export default function DataImport() {
     } catch {
       throw errorMessages.urlInvalid
     }
-
     let responseBlob = null;
 
+    const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
+
+    const typeDictionary = {
+      '.csv': 'text/csv',
+      '.json': 'application/json'
+    }
     try {
-      const response = await get(dataURL);
+      const response = await get( dataURL,
+        {
+          responseType: 'blob'
+        })
+        .then((response) => {
+          responseBlob = response.data;
 
-      if(response.status !== 200) {
-        throw errorMessages.cannotReach
-      }
-
-      const responseText = response.data;
-
-      const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
-
-      const typeDictionary = {
-        '.csv': 'text/csv',
-        '.json': 'application/json'
-      }
-
-      // Manually construct blob instead of calling response.blob() to get around inconsistent mimeType inference
-      responseBlob = new Blob([responseText], {
-        type: typeDictionary[fileExtension]
-      });
+          // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
+          if ( fileExtension === ".csv" && responseBlob.type === "text/plain" ) {
+            responseBlob = responseBlob.slice(0, responseBlob.size, "text/csv")
+          } else if ( fileExtension === ".json" && responseBlob.type === "text/plain" ) {
+            responseBlob = responseBlob.slice(0, responseBlob.size, "application/json")
+          }
+        });
     } catch (err) {
       console.error(err)
 
@@ -124,7 +124,28 @@ export default function DataImport() {
     }
 
     // Pull out mime type of file
-    const { type: mimeType } = fileData;
+    let { type: mimeType } = fileData;
+
+    // Catch empty types - sometimes these are blank on Windows machines...
+    if ( mimeType === "" ) {
+      const fileExtension = Object.keys(supportedDataTypes).find(extension => fileBlob.name.endsWith(extension));
+      mimeType = ( fileExtension === ".csv" ) ? 'text/csv' : 'application/json';
+    }
+    
+    // Consolidate CSV types since we need to know this before choosing encoding
+    switch (mimeType) {
+      case 'text/csv':
+      case 'application/csv':
+      case 'application/vnd.ms-excel':
+      case 'application/x-csv':
+      case 'text/x-comma-separated-values':
+      case 'text/comma-separated-values':
+        mimeType = 'text/csv';
+        break;
+      default: 
+        mimeType = mimeType;
+        break;
+    }
 
     // Check if file is too big
     if(fileData.size > (maxFileSize * 1048576) ) {
@@ -134,22 +155,17 @@ export default function DataImport() {
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
-    // fileData = await fileData.text();
     let filereader = new FileReader();
-
+    // Set encoding for CSV files - needed to render special characters properly
+    let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
     filereader.onload = function() {
-      let text = this.result
-      // debugger;
+      let text = this.result;
 
       switch (mimeType) {
-        case 'text/csv':
-        case 'application/csv':
-        case 'application/vnd.ms-excel':
-        case 'application/x-csv':
-        case 'text/x-comma-separated-values':
-        case 'text/comma-separated-values':
+        case 'text/csv': 
           text = csvParse(text);
           break;
+        case 'text/plain':
         case 'application/json':
           try {
             text = JSON.parse(text);
@@ -172,8 +188,7 @@ export default function DataImport() {
       }
 
     }
-
-    filereader.readAsText(fileData)
+      filereader.readAsText(fileData, encoding)    
   }
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
