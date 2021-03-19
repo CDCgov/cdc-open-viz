@@ -18,6 +18,8 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 4. NOTE: To run the **editor** you will also need to build the packages that it consumes. `lerna run --scope @cdc/map build` and soon `lerna run --scope @cdc/chart build`.
 5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
 
+
+**Note:** Right now, Node v15x is not supported. Make sure you're using Node 14 when working on this project.
 ## Development Guidelines
 
 **Please read!** These are important to know before you begin working on this project.
