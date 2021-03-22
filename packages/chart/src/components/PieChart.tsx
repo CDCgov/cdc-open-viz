@@ -10,12 +10,11 @@ import Context from '../context.tsx';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 // react-spring transition definitions
-type PieStyles = { startAngle: number; endAngle: number; opacity: number };
+type PieStyles = { startAngle: number; endAngle: number };
 
 const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
   startAngle,
   endAngle,
-  opacity: 1,
 });
 
 export default function PieChart() {
@@ -58,7 +57,7 @@ export default function PieChart() {
             key: string;
           }) => {
             return (
-              <g key={key}>
+              <Group key={key} style={{ opacity: (config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
                 <animated.path
                   // compute interpolated path d attribute from intermediate angle values
                   d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) => path({
@@ -73,14 +72,13 @@ export default function PieChart() {
                   </div>`}
                   data-for="global"
                 />
-              </g>
+              </Group>
             );
           },
         )}
         {transitions.map(
           ({
             item: arc,
-            props,
             key,
           }: {
             item: PieArcDatum<Datum>;
@@ -91,7 +89,7 @@ export default function PieChart() {
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
 
             return (
-              <animated.g key={key} style={{ opacity: props.opacity }}>
+              <animated.g key={key}>
                 {hasSpaceForLabel && (
                   
                     <text
@@ -124,7 +122,7 @@ export default function PieChart() {
   const donutThickness = radius;
 
   useEffect(() => {
-    if(seriesHighlight.length > 0){
+    if(seriesHighlight.length > 0 && !config.legend.highlight){
       let newFilteredData = [];
 
       data.forEach((d) => {
