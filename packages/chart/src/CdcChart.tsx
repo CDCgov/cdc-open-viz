@@ -200,6 +200,11 @@ export default function CdcChart({ configUrl, element }) {
     setSeriesHighlight(newSeriesHighlight);
   };
 
+  // Called on reset button click, unhighlights all data series
+  const highlightReset = () => {
+    setSeriesHighlight([]);
+  }
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
     if (!config.dataFormat) return num;
@@ -254,6 +259,7 @@ export default function CdcChart({ configUrl, element }) {
               </LegendLabel>
             </LegendItem>
           ))}
+          <button className={`legend-reset btn ${config.theme}`} onClick={highlightReset}>Reset</button>
         </div>
       )}
     </LegendOrdinal>
