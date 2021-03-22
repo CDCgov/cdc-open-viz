@@ -1,26 +1,26 @@
 import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
+
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
 import { LinePath, Line, BarGroup, BarStack } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
+
 import { timeParse, timeFormat } from 'd3-time-format';
+
 import Context from '../context.tsx';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import '../scss/ComboChart.scss';
+import '../scss/LinearChart.scss';
 
-const font = '#000000';
-
-export default function ComboChart({numberFormatter}) {
-  let { data, dimensions, colorScale, seriesHighlight, config } = useContext<any>(Context);
+export default function LinearChart() {
+  let { data, dimensions, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
   const { width, height } = dimensions;
   
-  const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
-  const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
+  const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
 
   const xMax = width - config.yAxis.size;
   const yMax = height - config.xAxis.size;
@@ -77,7 +77,7 @@ export default function ComboChart({numberFormatter}) {
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
     
-    if(horizontal){
+    if(config.horizontal){
       xScale = scaleLinear<number>({
         domain: [min, max],
         range: [0, xMax]
@@ -113,8 +113,8 @@ export default function ComboChart({numberFormatter}) {
   }
 
   return config && data && colorScale && width && height ? (
-    <ErrorBoundary component="ComboChart">
-      <div className="combo-chart-container">
+    <ErrorBoundary component="LinearChart">
+      <div className="linear-chart-container">
         <svg width={width} height={height}>
           { config.visualizationType !== 'Line' ? (
             <Group left={config.yAxis.size}>
@@ -140,7 +140,7 @@ export default function ComboChart({numberFormatter}) {
                     fill={bar.color}
                     fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                     textAnchor="middle">
-                      {numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)}
+                      {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
                   </text>
                     <rect
                       key={`bar-stack-${barStack.index}-${bar.index}`}
@@ -155,7 +155,7 @@ export default function ComboChart({numberFormatter}) {
                       display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                       data-tip={`<div>
                             ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
-                            ${config.yAxis.label}: ${numberFormatter(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
+                            ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                             ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                           </div>`}
                       data-for="global"
@@ -166,24 +166,24 @@ export default function ComboChart({numberFormatter}) {
                 }
               </BarStack>
             ) : (
-              <g>
+              <Group>
                 <BarGroup
                   data={data}
                   keys={(config.barSeriesKeys || config.seriesKeys)}
                   height={yMax}
                   x0={(d: any) => d[mappedXAxis.dataKey]}
-                  x0Scale={horizontal ? yScale : xScale}
+                  x0Scale={config.horizontal ? yScale : xScale}
                   x1Scale={seriesScale}
-                  yScale={horizontal ? xScale : yScale}
+                  yScale={config.horizontal ? xScale : yScale}
                   color={() => {return '';}}
                 >
                   {(barGroups) => barGroups.map((barGroup) => (
-                    <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={horizontal ? yMax / barGroups.length * barGroup.index : 0} left={horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
+                    <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                       {barGroup.bars.map((bar) => {
                         let barHeight = Math.abs(yScale(bar.value) - yScale(0));
                         let barY = bar.value >= 0 ? bar.y : yScale(0);
-                        let barGroupWidth = (horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
-                        let offset = (horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                        let barGroupWidth = (config.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
+                        let offset = (config.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                         let barWidth = barGroupWidth / barGroup.bars.length;
                         let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
                         return (
@@ -195,14 +195,14 @@ export default function ComboChart({numberFormatter}) {
                             fill={barColor}
                             fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                             textAnchor="middle">
-                              {numberFormatter(bar.value)}
+                              {formatNumber(bar.value)}
                           </text>
                           <rect
                             key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                            x={horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                            y={horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY}
-                            width={horizontal ?  bar.y : barWidth}
-                            height={horizontal ? barWidth : barHeight}
+                            x={config.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                            y={config.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY}
+                            width={config.horizontal ?  bar.y : barWidth}
+                            height={config.horizontal ? barWidth : barHeight}
                             fill={barColor}
                             stroke="black"
                             strokeWidth={config.barBorderThickness || 1}
@@ -211,7 +211,7 @@ export default function ComboChart({numberFormatter}) {
                             display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                             data-tip={`<div>
                               ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                              ${config.yAxis.label}: ${horizontal ? data[barGroup.index][mappedXAxis.dataKey] : numberFormatter(bar.value)} <br/>
+                              ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
                               ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                             </div>`}
                             data-for="global"
@@ -239,7 +239,7 @@ export default function ComboChart({numberFormatter}) {
                       L${xPos + tickWidth} ${lowerPos}`}/>
                   );
                 }) : ''}
-              </g>
+              </Group>
             )
             }
           </Group>
@@ -265,7 +265,7 @@ export default function ComboChart({numberFormatter}) {
                         fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                         textAnchor="middle">
-                          {numberFormatter(d[seriesKey])}
+                          {formatNumber(d[seriesKey])}
                       </text>
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
@@ -277,7 +277,7 @@ export default function ComboChart({numberFormatter}) {
                         style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
                         data-tip={`<div>
                           ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${numberFormatter(d[seriesKey])} <br/>
+                          ${config.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
                           ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
                         </div>`}
                         data-for="global"
@@ -337,14 +337,14 @@ export default function ComboChart({numberFormatter}) {
             scale={yScale}
             left={config.yAxis.size}
             label={config.yAxis.label}
-            stroke={font}
+            stroke="black"
             numTicks={config.yAxis.numTicks}
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
               return (
-                <g className="my-custom-left-axis">
+                <Group className="my-custom-left-axis">
                   {props.ticks.map((tick, i) => {
                     return (
                       <Group
@@ -355,7 +355,7 @@ export default function ComboChart({numberFormatter}) {
                           from={tick.from}
                           to={tick.to}
                           stroke="black"
-                          display={horizontal ? 'none' : 'block'}
+                          display={config.horizontal ? 'none' : 'block'}
                         />
                         { config.yAxis.gridLines ? (
                           <Line
@@ -366,9 +366,9 @@ export default function ComboChart({numberFormatter}) {
                           ) : ''
                         }
                         <text
-                          transform={`translate(${horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
+                          transform={`translate(${config.horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (config.horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
                           fontSize={config.yAxis.tickFontSize}
-                          textAnchor={horizontal ? 'start' : 'end'}
+                          textAnchor={config.horizontal ? 'start' : 'end'}
                         >
                           {tick.formattedValue}
                         </text>
@@ -395,7 +395,7 @@ export default function ComboChart({numberFormatter}) {
                   >
                     {props.label}
                   </text>
-                </g>
+                </Group>
               );
             }}
           </AxisLeft>
@@ -405,14 +405,14 @@ export default function ComboChart({numberFormatter}) {
             label={config.xAxis.label}
             tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
             scale={xScale}
-            stroke={font}
-            tickStroke={font}
+            stroke="black"
+            tickStroke="black"
             numTicks={config.xAxis.numTicks}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
-                <g className="my-custom-bottom-axis">
+                <Group className="my-custom-bottom-axis">
                   {props.ticks.map((tick, i) => {
                     const tickX = tick.to.x;
                     const tickY = tick.to.y + (!config.xAxis.wrap ? config.xAxis.tickFontSize : 0);
@@ -458,7 +458,7 @@ export default function ComboChart({numberFormatter}) {
                   >
                     {props.label}
                   </text>
-                </g>
+                </Group>
               );
             }}
           </AxisBottom>

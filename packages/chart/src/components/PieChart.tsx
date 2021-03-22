@@ -1,9 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import ReactTooltip from 'react-tooltip';
-import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
-import { scaleOrdinal } from '@visx/scale';
-import { Group } from '@visx/group';
 import { animated, useTransition, interpolate } from 'react-spring';
+import ReactTooltip from 'react-tooltip';
+
+import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
+import { Group } from '@visx/group';
+
 import Context from '../context.tsx';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -17,8 +18,8 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
   opacity: 1,
 });
 
-export default function PieChart({numberFormatter}) {
-  const { data, config, dimensions, seriesHighlight, colorScale } = useContext<any>(Context);
+export default function PieChart() {
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -68,7 +69,7 @@ export default function PieChart({numberFormatter}) {
                   fill={colorScale((arc.data as any).name)}
                   data-tip={`<div>
                     ${config.xAxis.label}: ${(arc.data as any).name} <br/>
-                    ${config.yAxis.label}: ${numberFormatter(arc.data[config.yAxis.dataKey])}
+                    ${config.yAxis.label}: ${formatNumber(arc.data[config.yAxis.dataKey])}
                   </div>`}
                   data-for="global"
                 />
