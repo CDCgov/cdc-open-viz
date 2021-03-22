@@ -1,15 +1,12 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+
 import PieChart from './components/PieChart.tsx';
-import ComboChart from './components/ComboChart.tsx';
-import Context from './context';
+import LinearChart from './components/LinearChart.tsx';
 import DataTable from './components/DataTable.tsx';
+import Context from './context';
 
 import './scss/main.scss';
 
@@ -30,7 +27,6 @@ export default function CdcChart({ configUrl, element }) {
 
   const [data, setData] = useState<Array<Object>>([]);
 
-  // TODO: Discuss as a group. We should use aspect ratios instead of trying to manually determine this.
   const [dimensions, setDimensions] = useState<any>({});
 
   const [loading, setLoading] = useState<Boolean>(true);
@@ -42,6 +38,8 @@ export default function CdcChart({ configUrl, element }) {
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
   const viewportCutoff = 900;
+
+  const debounce = useRef(null);
 
   const loadConfig = async () => {
     const response = await fetch(configUrl);
@@ -63,6 +61,7 @@ export default function CdcChart({ configUrl, element }) {
       let tempAxis = responseObj.yAxis;
       responseObj.yAxis = responseObj.xAxis;
       responseObj.xAxis = tempAxis;
+      responseObj.horizontal = true;
     }
 
     responseObj.yAxis = responseObj.yAxis || {};
@@ -94,15 +93,12 @@ export default function CdcChart({ configUrl, element }) {
     setLoading(false);
   }
 
-  const debounce = useRef(null);
-
+  // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
     let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey;
     let aData = parseFloat(a[sortKey]);
     let bData = parseFloat(b[sortKey]);
 
-    console.log(a, aData);
-    console.log(b, bData);
     if(aData < bData){
       return config.sortData === 'ascending' ? 1 : -1;
     } else if (aData > bData){
@@ -112,6 +108,7 @@ export default function CdcChart({ configUrl, element }) {
     }
   }
 
+  // Handles resize event, sets width and height to pass to child components
   const onResize = useCallback(() => {
     if (dimensions.width !== element.offsetWidth) {	
       if (debounce) {
@@ -173,12 +170,11 @@ export default function CdcChart({ configUrl, element }) {
     }
 
     if(config && data && config.sortData){
-      console.log(data);
       data.sort(sortData);
-      console.log(data);
     }
   }, [config, data])
 
+  // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
     const newSeriesHighlight = [];
     seriesHighlight.forEach((value) => {
@@ -204,6 +200,7 @@ export default function CdcChart({ configUrl, element }) {
     setSeriesHighlight(newSeriesHighlight);
   };
 
+  // Format numeric data based on settings in config
   const formatNumber = (num) => {
     if (!config.dataFormat) return num;
     if (typeof num !== 'number') num = parseFloat(num);
@@ -217,12 +214,13 @@ export default function CdcChart({ configUrl, element }) {
 
   // Select appropriate chart type
   const chartComponents = {
-    'Bar' : <ComboChart numberFormatter={formatNumber} />,
-    'Line' : <ComboChart numberFormatter={formatNumber} />,
-    'Combo': <ComboChart numberFormatter={formatNumber} />,
-    'Pie' : <PieChart numberFormatter={formatNumber} />,
+    'Bar' : <LinearChart />,
+    'Line' : <LinearChart />,
+    'Combo': <LinearChart />,
+    'Pie' : <PieChart />,
   }
 
+  // JSX for Legend
   const legendElements = <div className={`legend-container ${config.legend.left ? 'left': ''}`} hidden={legend.hide}>
   <h2>{legend.label}</h2>
   <LegendOrdinal
@@ -259,23 +257,27 @@ export default function CdcChart({ configUrl, element }) {
         </div>
       )}
     </LegendOrdinal>
-</div>;
+  </div>;
 
+  // Prevent render if loading
   if(true === loading) {
     return <div className="loader"></div>;
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, formatNumber }}>
       <div className="cdc-open-viz-module cdc-visualization-container mt-4">
-       {title.text && <h1 className={`chart-title ${config.theme}`} style={{fontSize: title.fontSize}}>{title.text}</h1>}
+        {/* Title */}
+        {title.text && <h1 className={`chart-title ${config.theme}`} style={{fontSize: title.fontSize}}>{title.text}</h1>}
+        {/* Legend, if set above */}
         {config.legend.above ? legendElements : ''}
-        {/* Title & Visualization */}
+        {/* Visualization */}
         <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
           <div style={{paddingLeft: config.padding.left}}>
             {chartComponents[visualizationType]}
           </div>
         </div>
+        {/* Legend, if set below */}
         {!config.legend.above ? legendElements : ''}
       </div>
       {/* Description */}
