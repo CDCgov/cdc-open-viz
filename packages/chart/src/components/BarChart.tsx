@@ -51,7 +51,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
                   display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                   data-tip={`<div>
-                        ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
+                        ${config.xAxis.label}: ${data[bar.index][config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                         ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                       </div>`}
