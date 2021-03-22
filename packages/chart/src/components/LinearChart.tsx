@@ -17,7 +17,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { data, dimensions, colorScale, config } = useContext<any>(Context);
 
   const { width, height } = dimensions;
   
@@ -41,7 +41,7 @@ export default function LinearChart() {
     let min = config.yAxis.min !== undefined ? config.yAxis.min : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
     let max = config.yAxis.max !== undefined ? config.yAxis.max : Number.MIN_VALUE;
 
-    if(config.visualizationType === 'Bar' && min > 0) {
+    if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
     }
 
