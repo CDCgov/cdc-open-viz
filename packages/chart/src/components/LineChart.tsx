@@ -36,7 +36,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
                   r={3}
                   cx={xScale(getXAxisData(d))}
                   cy={yScale(getYAxisData(d, seriesKey))}
-                  strokeWidth="100px"
                   fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
                   style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
                   data-tip={`<div>
