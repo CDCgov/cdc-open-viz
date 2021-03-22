@@ -1,14 +1,15 @@
 import React, { useContext } from 'react';
 import ReactTooltip from 'react-tooltip';
 
-import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
-import { LinePath, Line, BarGroup, BarStack } from '@visx/shape';
+import { Line } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 
 import { timeParse, timeFormat } from 'd3-time-format';
 
+import BarChart from './BarChart';
+import LineChart from './LineChart';
 import Context from '../context.tsx';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -16,7 +17,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  let { data, dimensions, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { data, dimensions, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
   const { width, height } = dimensions;
   
@@ -116,192 +117,17 @@ export default function LinearChart() {
     <ErrorBoundary component="LinearChart">
       <div className="linear-chart-container">
         <svg width={width} height={height}>
-          { config.visualizationType !== 'Line' ? (
-            <Group left={config.yAxis.size}>
-            { config.visualizationSubType === 'stacked' ? (
-              <BarStack
-                data={data}
-                keys={(config.barSeriesKeys || config.seriesKeys)}
-                x={(d: any) => d[config.xAxis.dataKey]}
-                xScale={xScale}
-                yScale={yScale}
-                color={colorScale}
-              >
-                {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
-                  let barThickness = xMax / barStack.bars.length;
-                  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
-                  let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
-                  return (
-                  <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-                  <text 
-                    display={config.labels && config.labels.display ? 'block': 'none'}
-                    x={barThickness * (bar.index + 0.5) + offset}
-                    y={bar.y - 5}
-                    fill={bar.color}
-                    fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                    textAnchor="middle">
-                      {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
-                  </text>
-                    <rect
-                      key={`bar-stack-${barStack.index}-${bar.index}`}
-                      x={barThickness * bar.index + offset}
-                      y={bar.y}
-                      height={bar.height}
-                      width={barThicknessAdjusted}
-                      fill={bar.color}
-                      stroke="black"
-                      strokeWidth={config.barBorderThickness || 1}
-                      opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                      display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                      data-tip={`<div>
-                            ${config.xAxis.label}: ${data[barStack.index][config.xAxis.dataKey]} <br/>
-                            ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
-                            ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                          </div>`}
-                      data-for="global"
-                    />
-                  </Group>
-                )}
-                ))
-                }
-              </BarStack>
-            ) : (
-              <Group>
-                <BarGroup
-                  data={data}
-                  keys={(config.barSeriesKeys || config.seriesKeys)}
-                  height={yMax}
-                  x0={(d: any) => d[mappedXAxis.dataKey]}
-                  x0Scale={config.horizontal ? yScale : xScale}
-                  x1Scale={seriesScale}
-                  yScale={config.horizontal ? xScale : yScale}
-                  color={() => {return '';}}
-                >
-                  {(barGroups) => barGroups.map((barGroup) => (
-                    <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
-                      {barGroup.bars.map((bar) => {
-                        let barHeight = Math.abs(yScale(bar.value) - yScale(0));
-                        let barY = bar.value >= 0 ? bar.y : yScale(0);
-                        let barGroupWidth = (config.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
-                        let offset = (config.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
-                        let barWidth = barGroupWidth / barGroup.bars.length;
-                        let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
-                        return (
-                        <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
-                          <text 
-                            display={config.labels && config.labels.display ? 'block': 'none'}
-                            x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
-                            y={barY - 5}
-                            fill={barColor}
-                            fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                            textAnchor="middle">
-                              {formatNumber(bar.value)}
-                          </text>
-                          <rect
-                            key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                            x={config.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                            y={config.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY}
-                            width={config.horizontal ?  bar.y : barWidth}
-                            height={config.horizontal ? barWidth : barHeight}
-                            fill={barColor}
-                            stroke="black"
-                            strokeWidth={config.barBorderThickness || 1}
-                            style={{fill: barColor}}
-                            opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                            display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                            data-tip={`<div>
-                              ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                              ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
-                              ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                            </div>`}
-                            data-for="global"
-                          />
-                        </Group>
-                      )}
-                      )}
-                    </Group>
-                  ))}
-                </BarGroup>
-                {config.confidenceKeys ? data.map((d) => {
-                  let offset = xMax / data.length / 2;
-                  let xPos = xScale(getXAxisData(d)) + offset;
-                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
-                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
-                  let tickWidth = 5;
-
-                  return (
-                    <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="black" strokeWidth="2px" d={`
-                      M${xPos - tickWidth} ${upperPos}
-                      L${xPos + tickWidth} ${upperPos}
-                      M${xPos} ${upperPos}
-                      L${xPos} ${lowerPos}
-                      M${xPos - tickWidth} ${lowerPos}
-                      L${xPos + tickWidth} ${lowerPos}`}/>
-                  );
-                }) : ''}
-              </Group>
-            )
-            }
-          </Group>
-          ) : (
-            <Group>
-            </Group>
-          ) }
+          {/* Line chart */}
+          { config.visualizationType !== 'Line' && (
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
           
-          { config.visualizationType !== 'Bar' ? (
-            <Group left={config.yAxis.size}>
-              { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
-                <Group
-                  key={`series-${seriesKey}`}
-                  opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-                  display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
-                >
-                  { data.map((d, dataIndex) => (
-                    <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-                    <text 
-                        display={config.labels && config.labels.display ? 'block': 'none'}
-                        x={xScale(getXAxisData(d))}
-                        y={yScale(getYAxisData(d, seriesKey))}
-                        fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
-                        textAnchor="middle">
-                          {formatNumber(d[seriesKey])}
-                      </text>
-                      <circle
-                        key={`${seriesKey}-${dataIndex}`}
-                        r={3}
-                        cx={xScale(getXAxisData(d))}
-                        cy={yScale(getYAxisData(d, seriesKey))}
-                        strokeWidth="100px"
-                        fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                        style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
-                        data-tip={`<div>
-                          ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
-                        </div>`}
-                        data-for="global"
-                      />
-                    </Group>
-                  ))}
-                  <LinePath
-                    curve={allCurves.curveLinear}
-                    data={data}
-                    x={(d) => xScale(getXAxisData(d))}
-                    y={(d) => yScale(getYAxisData(d, seriesKey))}
-                    stroke={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                    strokeWidth={2}
-                    strokeOpacity={1}
-                    shapeRendering="geometricPrecision"
-                  />
-                </Group>
-              ))
-              }
-            </Group>
-          ) : (
-            <Group>
-            </Group>
-          ) }
+          {/* Bar chart */}
+          { config.visualizationType !== 'Bar' && (
+            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
+
+          {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             const from = xScale((parseDate(region.from) as Date).getTime());
             const to = xScale((parseDate(region.to) as Date).getTime());
@@ -333,6 +159,8 @@ export default function LinearChart() {
               </Group>
             )
           }) : '' }
+
+          {/* Y axis */}
           <AxisLeft
             scale={yScale}
             left={config.yAxis.size}
@@ -399,6 +227,8 @@ export default function LinearChart() {
               );
             }}
           </AxisLeft>
+
+          {/* X axis */}
           <AxisBottom
             top={yMax}
             left={config.yAxis.size}
@@ -462,8 +292,10 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
+
         </svg>
 
+        {/* Tooltip */}
         <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
       </div>
     </ErrorBoundary>
