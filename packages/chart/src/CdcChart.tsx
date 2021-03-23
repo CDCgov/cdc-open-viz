@@ -10,7 +10,10 @@ import Context from './context';
 
 import './scss/main.scss';
 
-export default function CdcChart({ configUrl, element }) {
+export default function CdcChart(
+  { configUrl, configObj, dataUrl, dataObj, element } : 
+  { configUrl?: string, configObj?: any, dataUrl?: string, dataObj?: any, element: any }
+) {
 
   const [colorScale, setColorScale] = useState<any>(null);
 
@@ -42,55 +45,54 @@ export default function CdcChart({ configUrl, element }) {
   const debounce = useRef(null);
 
   const loadConfig = async () => {
-    const response = await fetch(configUrl);
-    let responseObj = await response.json();
+    let response = configObj || await (await fetch(configUrl)).json();
 
     // Sets default values for config
-    responseObj.initialized = true;
-    responseObj.title = responseObj.title || {};
-    responseObj.title.fontSize = responseObj.title.fontSize || 28;
-    responseObj.theme = responseObj.theme || 'theme-blue';
+    response.initialized = true;
+    response.title = response.title || {};
+    response.title.fontSize = response.title.fontSize || 28;
+    response.theme = response.theme || 'theme-blue';
 
-    responseObj.minHeight = responseObj.minHeight || 400;
+    response.minHeight = response.minHeight || 400;
 
-    responseObj.padding = responseObj.padding || {};
-    responseObj.padding.left = responseObj.padding.left|| 0;
-    responseObj.padding.right = responseObj.padding.right || 0;
+    response.padding = response.padding || {};
+    response.padding.left = response.padding.left|| 0;
+    response.padding.right = response.padding.right || 0;
 
-    if(responseObj.visualizationType === 'Bar' && responseObj.visualizationSubType === 'horizontal'){
-      let tempAxis = responseObj.yAxis;
-      responseObj.yAxis = responseObj.xAxis;
-      responseObj.xAxis = tempAxis;
-      responseObj.horizontal = true;
+    if(response.visualizationType === 'Bar' && response.visualizationSubType === 'horizontal'){
+      let tempAxis = response.yAxis;
+      response.yAxis = response.xAxis;
+      response.xAxis = tempAxis;
+      response.horizontal = true;
     }
 
-    responseObj.yAxis = responseObj.yAxis || {};
-    responseObj.yAxis.size = responseObj.yAxis.size || 50;
-    responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
-    responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
-    responseObj.xAxis = responseObj.xAxis || {};
-    responseObj.xAxis.size = responseObj.xAxis.size !== undefined ? responseObj.xAxis.size : 75;
-    responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
-    responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
-    responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
+    response.yAxis = response.yAxis || {};
+    response.yAxis.size = response.yAxis.size || 50;
+    response.yAxis.labelFontSize = response.yAxis.labelFontSize || 18;
+    response.yAxis.tickFontSize = response.yAxis.tickFontSize || 16;
+    response.xAxis = response.xAxis || {};
+    response.xAxis.size = response.xAxis.size !== undefined ? response.xAxis.size : 75;
+    response.xAxis.labelFontSize = response.xAxis.labelFontSize || 18;
+    response.xAxis.tickFontSize = response.xAxis.tickFontSize || 16;
+    response.xAxis.tickRotation = response.xAxis.tickRotation ? response.xAxis.tickRotation * -1 : 0;
 
-    if(responseObj.seriesLabels){
-      responseObj.seriesLabelsAll = [];
-      responseObj.seriesKeys.forEach((seriesKey) => {
-        responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey])
+    if(response.seriesLabels){
+      response.seriesLabelsAll = [];
+      response.seriesKeys.forEach((seriesKey) => {
+        response.seriesLabelsAll.push(response.seriesLabels[seriesKey])
       });
     }
 
     // If data is included through a URL, fetch that and store
-    if(responseObj.dataUrl) {
-      const data = await fetch(responseObj.dataUrl);
-      const dataObj = await data.json();
+    if(dataUrl || response.dataUrl) {
+      const dataString = await fetch(dataUrl || response.dataUrl);
 
-      setData(dataObj);
+      setData(await dataString.json());
+    } else {
+      setData(dataObj || response.data);
     }
 
-    setConfig(responseObj);
-    setLoading(false);
+    setConfig(response);
   }
 
   // Sorts data series for horizontal bar charts
@@ -143,7 +145,7 @@ export default function CdcChart({ configUrl, element }) {
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(config.xAxis) {
+    if(data && config.xAxis) {
       const colorPalettes = {
         'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
         'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -167,6 +169,7 @@ export default function CdcChart({ configUrl, element }) {
       });
 
       setColorScale(newColorScale);
+      setLoading(false);
     }
 
     if(config && data && config.sortData){
