@@ -120,8 +120,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               ))}
             </BarGroup>
             {config.confidenceKeys ? data.map((d) => {
-              let offset = xMax / data.length / 2;
-              let xPos = xScale(getXAxisData(d)) + offset;
+              let xPos = xScale(getXAxisData(d));
               let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
               let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
               let tickWidth = 5;
