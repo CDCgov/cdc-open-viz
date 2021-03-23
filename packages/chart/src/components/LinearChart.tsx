@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
-import { scaleLinear, scaleBand } from '@visx/scale';
+import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 
 import { timeParse, timeFormat } from 'd3-time-format';
@@ -86,14 +86,14 @@ export default function LinearChart() {
 
       yScale = config.xAxis.type === 'date' ? 
         scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
-        scaleBand<string>({domain: xAxisDataMapped});
+        scalePoint<string>({domain: xAxisDataMapped});
 
-      seriesScale = scaleBand<string>({
-        domain: (config.barSeriesKeys || config.seriesKeys)
+      seriesScale = scalePoint<string>({
+        domain: (config.barSeriesKeys || config.seriesKeys),
+        range: [0, yMax]
       });
 
       yScale.rangeRound([yMax, 0]);
-      seriesScale.rangeRound([0, yMax]);
     } else {
       yScale = scaleLinear<number>({
         domain: [min, max],
@@ -101,15 +101,14 @@ export default function LinearChart() {
       });
 
       xScale = config.xAxis.type === 'date' ? 
-        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
-        scaleBand<string>({domain: xAxisDataMapped});
+        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)], range: [0, xMax]}) : 
+        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax],
+          padding: 0.5});
 
-      seriesScale = scaleBand<string>({
-        domain: (config.barSeriesKeys || config.seriesKeys)
+      seriesScale = scalePoint<string>({
+        domain: (config.barSeriesKeys || config.seriesKeys),
+        range: [0, xMax]
       });
-
-      xScale.rangeRound([0, xMax]);
-      seriesScale.rangeRound([0, xMax]);
     }
   }
 
