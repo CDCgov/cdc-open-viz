@@ -134,6 +134,8 @@ svg {
   }
 
   .legend-container > div {
-    display: flex;
+    display: inline-flex;
+    flex-wrap: wrap;
+    line-height: 56px;
   }
 }
