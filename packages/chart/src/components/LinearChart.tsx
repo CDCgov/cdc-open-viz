@@ -86,7 +86,7 @@ export default function LinearChart() {
 
       yScale = config.xAxis.type === 'date' ? 
         scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
-        scalePoint<string>({domain: xAxisDataMapped});
+        scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
 
       seriesScale = scalePoint<string>({
         domain: (config.barSeriesKeys || config.seriesKeys),
@@ -102,8 +102,7 @@ export default function LinearChart() {
 
       xScale = config.xAxis.type === 'date' ? 
         scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)], range: [0, xMax]}) : 
-        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax],
-          padding: 0.5});
+        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
 
       seriesScale = scalePoint<string>({
         domain: (config.barSeriesKeys || config.seriesKeys),
