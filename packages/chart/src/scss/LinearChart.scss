@@ -4,10 +4,30 @@
         overflow: visible;
 
         .bottom-axis-tick {
-            margin-left: -50%;
             width: 100%;
             text-align: center;
             word-break: break-word;
+            transform-origin: top right;
+        }
+    }
+
+    .left-axis-tick {
+        margin-right: 5px;
+    }
+
+    .bottom-axis-label {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .left-axis-label-container {
+        overflow: visible;
+
+        .left-axis-label {
+            width: 100%;
+            font-weight: bold;
+            text-align: center;
+            margin-left: -50%;
         }
     }
 }
