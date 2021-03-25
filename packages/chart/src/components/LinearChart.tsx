@@ -168,7 +168,7 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
-              const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
+              const horizontalTickOffset = yMax / props.ticks.length / 4 - 5;
               return (
                 <Group className="my-custom-left-axis">
                   {props.ticks.map((tick, i) => {
@@ -191,13 +191,18 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        <text
-                          transform={`translate(${config.horizontal ? tick.from.x + 5 : tick.to.x}, ${tick.to.y + (config.horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2))})`}
-                          fontSize={config.yAxis.tickFontSize}
-                          textAnchor={config.horizontal ? 'start' : 'end'}
-                        >
-                          {tick.formattedValue}
-                        </text>
+                        <foreignObject className="left-axis-tick-container" 
+                          x={(config.horizontal ? tick.from.x + 5 : (tick.to.x - config.yAxis.size))} 
+                          y={tick.to.y  + (config.horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2 * -1))} 
+                          width={config.horizontal ? xMax : config.yAxis.size} 
+                          height={config.yAxis.tickFontSize}>
+
+                          <p className="left-axis-tick" style={{
+                            fontSize: config.yAxis.tickFontSize, 
+                            lineHeight: config.yAxis.tickFontSize + 'px',
+                            textAlign: config.horizontal ? 'left' : 'right',
+                          }}>{tick.formattedValue}</p>
+                        </foreignObject> 
                       </Group>
                     );
                   })}
@@ -213,14 +218,9 @@ export default function LinearChart() {
                       stroke="black"
                     />
                   )}
-                  <text
-                    textAnchor="middle"
-                    transform={`translate(${-1 * (config.yAxis.size - config.yAxis.labelFontSize)}, ${axisCenter}) rotate(-90)`}
-                    fontSize={config.yAxis.labelFontSize || 18}
-                    fontWeight="bold"
-                  >
-                    {props.label}
-                  </text>
+                  <foreignObject className="left-axis-label-container" transform="rotate(-90)" transform-origin={`${-1 * config.yAxis.size}px ${axisCenter}px`} x={-1 * config.yAxis.size} y={axisCenter} width={yMax} height={config.yAxis.labelFontSize}>
+                    <p className="left-axis-label" style={{fontSize: config.xAxis.labelFontSize, lineHeight: config.xAxis.labelFontSize + 'px'}}>{props.label}</p>
+                  </foreignObject>
                 </Group>
               );
             }}
@@ -242,8 +242,7 @@ export default function LinearChart() {
               return (
                 <Group className="my-custom-bottom-axis">
                   {props.ticks.map((tick, i) => {
-                    const tickX = tick.to.x;
-                    const tickY = tick.to.y + (!config.xAxis.wrap ? config.xAxis.tickFontSize : 0);
+                    const tickWidth = xMax / props.ticks.length;
 
                     return (
                       <Group
@@ -255,21 +254,15 @@ export default function LinearChart() {
                           to={tick.to}
                           stroke="black"
                         />
-                        { !config.xAxis.wrap ? ( 
-                          <text
-                            transform={`translate(${tickX}, ${tickY}) rotate(${config.xAxis.tickRotation})`}
-                            fontSize={config.xAxis.tickFontSize}
-                            textAnchor={config.xAxis.tickRotation !== 0 ? 'end': 'middle'}
-                            className="bottom-axis-tick"
-                          >
-                            {tick.formattedValue}
-                          </text> 
-                        ) : (
-                          <foreignObject className="bottom-axis-tick-container" x={tickX} y={tickY} width={xMax / props.ticks.length - 4} height={config.xAxis.size}>
-                            <p className="bottom-axis-tick">{tick.formattedValue}</p>
-                          </foreignObject> 
-                        )
-                        }
+                        <foreignObject className="bottom-axis-tick-container" x={tick.to.x - tickWidth} y={tick.to.y} width={tickWidth} height={config.xAxis.size}>
+                          <p className="bottom-axis-tick" style={{
+                            fontSize: config.xAxis.tickFontSize, 
+                            textAlign: config.xAxis.wrap ? 'center' : 'right',
+                            transform: `rotate(${config.xAxis.wrap ? 0 : config.xAxis.tickRotation}deg)`,
+                            whiteSpace: config.xAxis.wrap ? 'normal' : 'nowrap',
+                            marginLeft: config.xAxis.wrap ? '50%' : '0'
+                          }}>{tick.formattedValue}</p>
+                        </foreignObject> 
                       </Group>
                     );
                   })}
@@ -278,14 +271,9 @@ export default function LinearChart() {
                     to={props.axisToPoint}
                     stroke="black"
                   />
-                  <text
-                    textAnchor="middle"
-                    transform={`translate(${axisCenter}, ${config.xAxis.size - config.xAxis.labelFontSize})`}
-                    fontSize={config.xAxis.labelFontSize}
-                    fontWeight="bold"
-                  >
-                    {props.label}
-                  </text>
+                  <foreignObject className="bottom-axis-label-container" x={0} y={config.xAxis.size - config.xAxis.labelFontSize} width={xMax} height={config.xAxis.labelFontSize}>
+                    <p className="bottom-axis-label" style={{fontSize: config.xAxis.labelFontSize, lineHeight: config.xAxis.labelFontSize + 'px'}}>{props.label}</p>
+                  </foreignObject>
                 </Group>
               );
             }}
