@@ -4,3 +4,13 @@
     @content;
   }
 }
+
+@mixin legendDot() {
+  margin-right: 5px;
+  border-radius: 300px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  border: rgba(0,0,0,.3) 1px solid;
+}

@@ -2,10 +2,11 @@ import React, { useContext } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
+import ReactTooltip from 'react-tooltip';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import Context from '../context.tsx';
+import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
@@ -137,7 +138,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             }) : ''}
           </Group>
         )}
-      </Group>  
+      </Group>
+            {/* Tooltip */}
+            <ReactTooltip html={true} type="light" className="tooltip"/>
     </ErrorBoundary>
   );
 }

@@ -88,7 +88,6 @@ table.data-table {
 
   tr {
     display: flex;
-    width: 100% !important;
     border-bottom: solid 1px #E5E5E5;
     &:last-child {
       border-bottom: 0
@@ -207,5 +206,11 @@ table.data-table {
         background: $mediumGray;
       }
     }
+  }
+}
+
+table.editor.data-table {
+  tr {
+    width: 100% !important;
   }
 }
