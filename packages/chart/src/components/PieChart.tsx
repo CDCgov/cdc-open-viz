@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip';
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import { Group } from '@visx/group';
 
-import Context from '../context.tsx';
+import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -159,7 +159,7 @@ export default function PieChart() {
           </Group>
         </svg>
 
-        <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+        <ReactTooltip html={true} type="light" className="tooltip"/>
       </div>
     </ErrorBoundary>
   ) : <div className="loader"></div>;

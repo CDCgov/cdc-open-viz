@@ -139,7 +139,6 @@ export default function DataImport() {
 
     filereader.onload = function() {
       let text = this.result
-      // debugger;
 
       switch (mimeType) {
         case 'text/csv':

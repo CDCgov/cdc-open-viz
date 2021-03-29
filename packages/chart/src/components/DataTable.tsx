@@ -17,8 +17,6 @@ import { timeFormat } from 'd3-time-format';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
-import '../scss/DataTable.scss';
-
 
 export default function DataTable({numberFormatter}) {
 
@@ -53,7 +51,7 @@ export default function DataTable({numberFormatter}) {
         onClick={saveBlob}
         href={`data:text/csv;base64,${Base64.encode(csvData)}`}
         aria-label="Download this data in a CSV file format."
-        className={`${config.theme} btn btn-download no-border`}
+        className={`btn btn-download no-border`}
       >
         Download Data (CSV)
       </a>
@@ -139,19 +137,23 @@ export default function DataTable({numberFormatter}) {
 
   return (
     <ErrorBoundary component="DataTable">
-      <section className={`table-wrapper`} aria-label={accessibilityLabel}>
-          <div className="table-header" tabIndex={0} onKeyPress={(e) => { if (e.key === 'Enter') setTableExpanded(!tableExpanded); }} onClick={() => setTableExpanded(!tableExpanded)}>
+      <section className={`data-table-container`} aria-label={accessibilityLabel}>
+          <div
+            className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+            onClick={() => { setTableExpanded(!tableExpanded); }}
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.keyCode === 13) { setTableExpanded(!tableExpanded); } }}
+          >
             {config.table.label}
-            <span className="table-indicator">{tableExpanded ? '-' : '+'}</span>
           </div>
           <div className="table-container">
-            <table hidden={!tableExpanded} {...getTableProps()}>
+            <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
-                      <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}>
+                      <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
                         {column.render('Header')}
                         <div {...column.getResizerProps()} className="resizer" />
                       </th>

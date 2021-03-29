@@ -1036,7 +1036,7 @@ class CdcMap extends Component {
             })
 
         }
-        debugger;
+
         // Set properties that can be passed directly and require no additional computation
         this.setState(() => newState)
 
