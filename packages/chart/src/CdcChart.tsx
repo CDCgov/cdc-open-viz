@@ -34,6 +34,10 @@ export default function CdcChart(
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
+  const [currentViewport, setCurrentViewport] = useState<String>(null);
+
+  const outerContainerRef = useRef(null);
+
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
@@ -56,8 +60,6 @@ export default function CdcChart(
         newConfig[key] = {...newConfig[key], ...defaults[key]}
       }
     })
-
-     console.log({newConfig})
 
     if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
       let tempAxis = newConfig.yAxis;
@@ -96,6 +98,23 @@ export default function CdcChart(
     loadConfig();
   }, []);
 
+  // useEffect(() => {
+  //   const resizeObserver = new ResizeObserver(entries => {
+  //     for (let entry of entries) {
+  //         let newViewport = this.getViewport(entry.contentRect.width)
+          
+  //         if( newViewport !== this.state.viewport ) {
+  //             this.setState({
+  //                 ...this.state,
+  //                 viewport: newViewport
+  //             })
+  //         }
+  //     }
+  //   });
+
+  //   resizeObserver.observe(outerContainerRef.current);
+  // }, [outerContainerRef.current])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if(data && config.xAxis) {
@@ -133,6 +152,13 @@ export default function CdcChart(
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
     const newSeriesHighlight = [];
+
+    // If we're highlighting all the series, reset them
+    if(seriesHighlight.length + 1 === config.seriesKeys.length) {
+      highlightReset()
+      return
+    }
+
     seriesHighlight.forEach((value) => {
       newSeriesHighlight.push(value);
     });
@@ -190,7 +216,7 @@ export default function CdcChart(
     }
 
     return (
-      <div className={containerClasses.join(' ')} hidden={legend.hide}>
+      <div className={containerClasses.join(' ')}>
         <h2>{legend.label}</h2>
         <LegendOrdinal
         scale={colorScale}
@@ -200,30 +226,44 @@ export default function CdcChart(
         >
           {labels => (
             <div>
-              {labels.map((label, i) => (
-                <LegendItem
-                  tabIndex={0}
-                  className={seriesHighlight.length > 0 && false === seriesHighlight.includes(label.text) ? 'inactive legend-item' : 'legend-item'}
-                  key={`legend-quantile-${i}`}
-                  margin="0 5px"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      highlight(label);
-                    }
-                  }}
-                  onClick={() => {
-                    highlight(label);
-                  }}
-                >
-                  <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
-                    <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={label.value} stroke="rgba(0,0,0,0.3)" />
-                  </svg>
-                  <LegendLabel align="left" margin="0 0 0 4px">
-                    {label.text}
-                  </LegendLabel>
-                </LegendItem>
-              ))}
-              <button className={seriesHighlight.length > 0 ? `legend-reset ${config.theme} display` : `legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>
+              {labels.map((label, i) => {
+                let className = 'legend-item'
+
+                let itemName:any = label.datum
+
+                if(config.seriesLabels){
+                  let index = config.seriesLabelsAll.indexOf(itemName)
+                  itemName = config.seriesKeys[index]
+                }
+
+                if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) ) {
+                  className += ' inactive'
+                }
+
+                  return (
+                    <LegendItem
+                      tabIndex={0}
+                      className={className}
+                      key={`legend-quantile-${i}`}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          highlight(label);
+                        }
+                      }}
+                      onClick={() => {
+                        highlight(label);
+                      }}
+                    >
+                      <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
+                        <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={label.value} stroke="rgba(0,0,0,0.3)" />
+                      </svg>
+                      <LegendLabel align="left" margin="0 0 0 4px">
+                        {label.text}
+                      </LegendLabel>
+                    </LegendItem>
+                  )
+              })}
+              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
             </div>
           )}
         </LegendOrdinal>
@@ -237,25 +277,47 @@ export default function CdcChart(
   }
   // TEMPORARY
   let dimensions = {
-    width: 900,
-    height: 700
+    width: 500,
+    height: 250
   }
+
+  const viewports:keyable = {
+    "lg": 1200,
+    "md": 992,
+    "sm": 768,
+    "xs": 576,
+    "xxs": 350
+  }
+
+  const getViewport = (size) => {
+    let result = currentViewport
+    let viewportList = Object.keys( viewports )
+
+    for(let viewport of viewportList) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
+    }
+
+    return result
+}
+
 
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, formatNumber }}>
-      <div className="cdc-open-viz-module type-chart">
+      <div className="cdc-open-viz-module type-chart" ref={outerContainerRef}>
           {/* Title */}
           {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
-          {/* Legend, if set above */}
-          {config.legend.above && <Legend />}
           {/* Visualization */}
           <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+            {/* Legend, if set above */}
+            {!config.legend.hide && !config.legend.below && <Legend />}
             {chartComponents[visualizationType]}
-          </div>
+          </div>            
           {/* Legend, if set below */}
-          {!config.legend.below && <Legend />}
+          {config.legend.below && <Legend />}
           {/* Description */}
-          {description && description.html && <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}}>{parse(description.html)}</div>}
+          {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
           {/* Data Table */}
           <DataTable numberFormatter={formatNumber} />
       </div>

@@ -85,15 +85,6 @@
     margin-bottom: 20px;
   }
 
-  .chart-container {
-    display: inline-block;
-    width: 75%;
-
-    &.legend-hidden {
-      width: 100%;
-    }
-  }
-
   .legend-container {
     background: #fff;
     display: inline-block;
@@ -102,13 +93,14 @@
     vertical-align: top;
     text-align: center;
     border: 1px solid #C7C7C7;
-    margin-bottom: 20px;
-    float: right;
-
-    &.left {
-      float: left;
+    order: 1;
+    h2 {
+      font-size: 1.3em;
     }
-
+    &.left {
+      margin-right: 1em;
+      order: 0;
+    }
     .legend-item {
       cursor: pointer;
     }
@@ -127,12 +119,6 @@
       padding: .375rem .65rem;
       top: 1em;
       border-radius: 5px;
-      opacity: 0;
-      z-index: -1;
-      &.display {
-        opacity: 1;
-        z-index: 1;
-      }
       &:hover {
         background: rgba(0,0,0,.15);
         transition: .3s all;
@@ -147,16 +133,12 @@
     }
     .legend-color {
       display: inline-block;
-      margin: 0 5px;
+      margin: 0 .5rem 0 0;
     }
   }
 
-  svg {
-    overflow: visible;
-    margin: 1rem 0 2rem;
-  }
-
   .tooltip {
+    background-color: #fff;
     border: rgba(0,0,0,0.3) 1px solid !important;
     box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
     line-height: 1.4em;
@@ -168,6 +150,17 @@
 
   .region-table {
     margin-top: 15px;
+  }
+
+  .chart-container {
+    display: flex;
+    align-items: flex-start;
+    > svg {
+      width: 75%;
+    }
+    &.legend-hidden > svg {
+      width :100%;
+    }
   }
 
   @media (max-width: $md) {

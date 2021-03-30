@@ -71,7 +71,7 @@ export default function DataTable({numberFormatter}) {
                 <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={colorScale(seriesLabel)} stroke="rgba(0,0,0,0.3)" />
               </svg>
             ) : ''}
-            {seriesLabel}
+            <span>{seriesLabel}</span>
           </>
         )
       },
