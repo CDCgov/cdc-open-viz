@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
+import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
 import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
-import ReactTooltip from 'react-tooltip';
 
 import { timeParse, timeFormat } from 'd3-time-format';
 
@@ -18,8 +18,6 @@ import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
   const { data, dimensions, config } = useContext<any>(Context);
-  console.log(data)
-  console.log(config)
   const { width, height } = dimensions;
   const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
 
@@ -113,8 +111,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <div className="linear-chart-container">
-        <svg width={width} height={height}>
+      <svg viewBox={`0 0 500 250`} className="linear">
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
@@ -277,10 +274,8 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
-        </svg>
-      </div>
-      {/* Tooltip */}
-      <ReactTooltip html={true} type="light" className="tooltip"/>
+      </svg>
+      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }

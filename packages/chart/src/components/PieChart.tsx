@@ -112,8 +112,6 @@ export default function PieChart() {
     );
   }
 
-  const svgRef = useRef<HTMLDivElement>();
-
   const {width, height} = dimensions;
 
   const radius = Math.min(width, height) / 2;
@@ -139,28 +137,25 @@ export default function PieChart() {
 
   return width && height ? (
     <ErrorBoundary component="PieChart">
-      <div ref={svgRef}>
-        <svg width={width} height={height}>
-          <Group top={centerY}  left={centerX}>
-            <Pie
-              data={filteredData || data}
-              pieValue={d => d[config.yAxis.dataKey]}
-              pieSortValues={() => -1}
-              innerRadius={radius - donutThickness}
-              outerRadius={radius}
-            >
-              {pie => (
-                <AnimatedPie<any>
-                  {...pie}
-                  getKey={d => d.data[config.xAxis.dataKey]}
-                />
-              )}
-            </Pie>
-          </Group>
-        </svg>
-
-        <ReactTooltip html={true} type="light" className="tooltip"/>
-      </div>
+      <svg width={width} height={height}>
+        <Group top={centerY}  left={centerX}>
+          <Pie
+            data={filteredData || data}
+            pieValue={d => d[config.yAxis.dataKey]}
+            pieSortValues={() => -1}
+            innerRadius={radius - donutThickness}
+            outerRadius={radius}
+          >
+            {pie => (
+              <AnimatedPie<any>
+                {...pie}
+                getKey={d => d.data[config.xAxis.dataKey]}
+              />
+            )}
+          </Pie>
+        </Group>
+      </svg>
+      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   ) : <div className="loader"></div>;
 }

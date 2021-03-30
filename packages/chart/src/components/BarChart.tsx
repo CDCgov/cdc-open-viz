@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
-import ReactTooltip from 'react-tooltip';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -139,8 +138,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           </Group>
         )}
       </Group>
-            {/* Tooltip */}
-            <ReactTooltip html={true} type="light" className="tooltip"/>
     </ErrorBoundary>
   );
 }
