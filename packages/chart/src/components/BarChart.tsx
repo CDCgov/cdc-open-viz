@@ -46,7 +46,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   height={bar.height}
                   width={barThicknessAdjusted}
                   fill={bar.color}
-                  stroke="black"
+                  stroke="#333"
                   strokeWidth={config.barBorderThickness || 1}
                   opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
                   display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
@@ -101,7 +101,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         width={config.horizontal ?  bar.y : barWidth}
                         height={config.horizontal ? barWidth : barHeight}
                         fill={barColor}
-                        stroke="black"
+                        stroke="#333"
                         strokeWidth={config.barBorderThickness || 1}
                         style={{fill: barColor}}
                         opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
@@ -126,7 +126,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let tickWidth = 5;
 
               return (
-                <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="black" strokeWidth="2px" d={`
+                <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="#333" strokeWidth="2px" d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}
                   M${xPos} ${upperPos}

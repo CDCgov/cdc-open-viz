@@ -9,16 +9,17 @@ export default {
     minHeight: 400,
     yAxis: {
         size: 50,
-        labelFontSize: 18,
-        tickFontSize: 16
+        labelFontSize: 11,
+        tickFontSize: 9
     },
     xAxis: {
         size: 75,
-        labelFontSize: 18,
-        tickFontSize: 16,
+        labelFontSize: 11,
+        tickFontSize: 9,
         tickRotation: 0
     },
     table: {
         label: 'Data Table'
-    }
+    },
+    legend: {}
 }

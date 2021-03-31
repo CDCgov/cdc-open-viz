@@ -111,7 +111,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg viewBox={`0 0 500 250`} className="linear">
+      <svg viewBox={`0 0 750 375`} className="linear">
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
@@ -130,7 +130,7 @@ export default function LinearChart() {
 
             return (
               <Group className="regions" left={config.yAxis.size}>
-                <path stroke="black" d={`M${from} -5
+                <path stroke="#333" d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
@@ -160,7 +160,7 @@ export default function LinearChart() {
             scale={yScale}
             left={config.yAxis.size}
             label={config.yAxis.label}
-            stroke="black"
+            stroke="#333"
             numTicks={config.yAxis.numTicks}
           >
             {props => {
@@ -177,7 +177,7 @@ export default function LinearChart() {
                         <Line
                           from={tick.from}
                           to={tick.to}
-                          stroke="black"
+                          stroke="#333"
                           display={config.horizontal ? 'none' : 'block'}
                         />
                         { config.yAxis.gridLines ? (
@@ -206,13 +206,13 @@ export default function LinearChart() {
                   <Line 
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
-                    stroke="black"
+                    stroke="#333"
                   />
                   { yScale.domain()[0] < 0 && (
                     <Line
                       from={{x: props.axisFromPoint.x, y: yScale(0)}}
                       to={{x: xMax, y: yScale(0)}}
-                      stroke="black"
+                      stroke="#333"
                     />
                   )}
                   <foreignObject className="left-axis-label-container" transform="rotate(-90)" transform-origin={`${-1 * config.yAxis.size}px ${axisCenter}px`} x={-1 * config.yAxis.size} y={axisCenter} width={yMax} height={config.yAxis.labelFontSize}>
@@ -230,8 +230,8 @@ export default function LinearChart() {
             label={config.xAxis.label}
             tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
             scale={xScale}
-            stroke="black"
-            tickStroke="black"
+            stroke="#333"
+            tickStroke="#333"
             numTicks={config.xAxis.numTicks}
           >
             {props => {
@@ -248,7 +248,7 @@ export default function LinearChart() {
                         <Line
                           from={tick.from}
                           to={tick.to}
-                          stroke="black"
+                          stroke="#333"
                         />
                         <foreignObject className="bottom-axis-tick-container" x={tick.to.x - tickWidth} y={tick.to.y} width={tickWidth} height={config.xAxis.size}>
                           <p className="bottom-axis-tick" style={{
@@ -265,7 +265,7 @@ export default function LinearChart() {
                   <Line 
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
-                    stroke="black"
+                    stroke="#333"
                   />
                   <foreignObject className="bottom-axis-label-container" x={0} y={config.xAxis.size - config.xAxis.labelFontSize} width={xMax} height={config.xAxis.labelFontSize}>
                     <p className="bottom-axis-label" style={{fontSize: config.xAxis.labelFontSize, lineHeight: config.xAxis.labelFontSize + 'px'}}>{props.label}</p>

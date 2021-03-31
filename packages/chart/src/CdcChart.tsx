@@ -4,9 +4,11 @@ import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import parse from 'html-react-parser';
 
-import PieChart from './components/PieChart.tsx';
-import LinearChart from './components/LinearChart.tsx';
-import DataTable from './components/DataTable.tsx';
+import Loading from '@cdc/core/components/Loading';
+
+import PieChart from './components/PieChart';
+import LinearChart from './components/LinearChart';
+import DataTable from './components/DataTable';
 import Context from './context';
 import defaults from './data/initial-state';
 
@@ -34,7 +36,7 @@ export default function CdcChart(
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
-  const [currentViewport, setCurrentViewport] = useState<String>(null);
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
   const outerContainerRef = useRef(null);
 
@@ -93,27 +95,43 @@ export default function CdcChart(
     }
   }
 
+  const viewports:keyable = {
+    "lg": 1200,
+    "md": 992,
+    "sm": 768,
+    "xs": 576,
+    "xxs": 350
+  }
+
+  const getViewport = (size) => {
+    let result = currentViewport
+    let viewportList = Object.keys( viewports )
+
+    for(let viewport of viewportList) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
+    }
+
+    return result
+  }
+
+  // Observes changes to outermost container and changes viewport size in state
+  const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        let newViewport = getViewport(entry.contentRect.width)
+        
+        if( newViewport !== currentViewport ) {
+            setCurrentViewport(newViewport)
+        }
+    }
+  })
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
+    resizeObserver.observe(outerContainerRef.current);
   }, []);
-
-  // useEffect(() => {
-  //   const resizeObserver = new ResizeObserver(entries => {
-  //     for (let entry of entries) {
-  //         let newViewport = this.getViewport(entry.contentRect.width)
-          
-  //         if( newViewport !== this.state.viewport ) {
-  //             this.setState({
-  //                 ...this.state,
-  //                 viewport: newViewport
-  //             })
-  //         }
-  //     }
-  //   });
-
-  //   resizeObserver.observe(outerContainerRef.current);
-  // }, [outerContainerRef.current])
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -217,7 +235,7 @@ export default function CdcChart(
 
     return (
       <div className={containerClasses.join(' ')}>
-        <h2>{legend.label}</h2>
+        {legend.label && <h2>{legend.label}</h2>}
         <LegendOrdinal
         scale={colorScale}
         itemDirection="row"
@@ -272,54 +290,39 @@ export default function CdcChart(
   }
 
   // Prevent render if loading
-  if(true === loading) {
-    return <div className="loader"></div>;
+  let body = (<Loading />)
+
+  if(false === loading) {
+    body = (
+      <>
+        {/* Title */}
+        {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
+        {/* Visualization */}
+        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+          {/* Legend, if set above */}
+          {!config.legend.hide && !config.legend.below && <Legend />}
+          {chartComponents[visualizationType]}
+        </div>            
+        {/* Legend, if set below */}
+        {config.legend.below && <Legend />}
+        {/* Description */}
+        {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
+        {/* Data Table */}
+        <DataTable />
+      </>
+    )
   }
+
   // TEMPORARY
   let dimensions = {
-    width: 500,
-    height: 250
+    width: 750,
+    height: 375
   }
-
-  const viewports:keyable = {
-    "lg": 1200,
-    "md": 992,
-    "sm": 768,
-    "xs": 576,
-    "xxs": 350
-  }
-
-  const getViewport = (size) => {
-    let result = currentViewport
-    let viewportList = Object.keys( viewports )
-
-    for(let viewport of viewportList) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-}
-
 
   return (
     <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, formatNumber }}>
-      <div className="cdc-open-viz-module type-chart" ref={outerContainerRef}>
-          {/* Title */}
-          {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
-          {/* Visualization */}
-          <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
-            {/* Legend, if set above */}
-            {!config.legend.hide && !config.legend.below && <Legend />}
-            {chartComponents[visualizationType]}
-          </div>            
-          {/* Legend, if set below */}
-          {config.legend.below && <Legend />}
-          {/* Description */}
-          {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
-          {/* Data Table */}
-          <DataTable numberFormatter={formatNumber} />
+      <div className={`cdc-open-viz-module type-chart ${currentViewport}`} ref={outerContainerRef}>
+        {body}
       </div>
     </Context.Provider>
   );
