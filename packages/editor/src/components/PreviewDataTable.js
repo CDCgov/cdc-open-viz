@@ -129,7 +129,7 @@ const PreviewDataTable = ({ data }) => {
     return (
       <section className="no-data">
         <NoData />
-        <table className="data-table table-responsive" role="table">
+        <table className="editor data-table table-responsive" role="table">
           <thead>
               <tr role="row">
                   <th scope="col" colSpan="1" role="columnheader">

@@ -1,19 +1,23 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
-import PieChart from './components/PieChart.tsx';
-import ComboChart from './components/ComboChart.tsx';
+import parse from 'html-react-parser';
+
+import Loading from '@cdc/core/components/Loading';
+
+import PieChart from './components/PieChart';
+import LinearChart from './components/LinearChart';
+import DataTable from './components/DataTable';
 import Context from './context';
-import DataTable from './components/DataTable.tsx';
+import defaults from './data/initial-state';
 
-import './styles.scss';
+import './scss/main.scss';
 
-export default function CdcChart({ configUrl, element }) {
+export default function CdcChart(
+  { configUrl, configObj } : 
+  { configUrl?: string, configObj?: any }
+) {
 
   const [colorScale, setColorScale] = useState<any>(null);
 
@@ -21,84 +25,67 @@ export default function CdcChart({ configUrl, element }) {
     [key: string]: any  
   }
 
-  const [config, setConfig] = useState<keyable>({
-    seriesKeys: [],
-    legend: [],
-    title: null,
-    description: null
-  });
+  const [config, setConfig] = useState<keyable>({});
 
   const [data, setData] = useState<Array<Object>>([]);
 
-  // TODO: Discuss as a group. We should use aspect ratios instead of trying to manually determine this.
-  const [dimensions, setDimensions] = useState<any>({});
-
   const [loading, setLoading] = useState<Boolean>(true);
 
-  const [seriesHighlight, setSeriesHighlight] = useState<Array<Number>>([]);
-
-  const [resizeInit, setResizeInit] = useState<boolean>(false);
+  const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
 
   const legendGlyphSize = 15;
-  const viewportCutoff = 900;
+  const legendGlyphSizeHalf = legendGlyphSize / 2;
+
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  const outerContainerRef = useRef(null);
 
   const loadConfig = async () => {
-    const response = await fetch(configUrl);
-    let responseObj = await response.json();
-
-    // Sets default values for config
-    responseObj.initialized = true;
-    responseObj.title = responseObj.title || {};
-    responseObj.title.fontSize = responseObj.title.fontSize || 28;
-
-    responseObj.minHeight = responseObj.minHeight || 400;
-
-    responseObj.padding = responseObj.padding || {};
-    responseObj.padding.left = responseObj.padding.left|| 0;
-    responseObj.padding.right = responseObj.padding.right || 0;
-
-    if(responseObj.visualizationType === 'Bar' && responseObj.visualizationSubType === 'horizontal'){
-      let tempAxis = responseObj.yAxis;
-      responseObj.yAxis = responseObj.xAxis;
-      responseObj.xAxis = tempAxis;
-    }
-
-    responseObj.yAxis = responseObj.yAxis || {};
-    responseObj.yAxis.size = responseObj.yAxis.size || 50;
-    responseObj.yAxis.labelFontSize = responseObj.yAxis.labelFontSize || 18;
-    responseObj.yAxis.tickFontSize = responseObj.yAxis.tickFontSize || 16;
-    responseObj.xAxis = responseObj.xAxis || {};
-    responseObj.xAxis.size = responseObj.xAxis.size !== undefined ? responseObj.xAxis.size : 75;
-    responseObj.xAxis.labelFontSize = responseObj.xAxis.labelFontSize || 18;
-    responseObj.xAxis.tickFontSize = responseObj.xAxis.tickFontSize || 16;
-    responseObj.xAxis.tickRotation = responseObj.xAxis.tickRotation ? responseObj.xAxis.tickRotation * -1 : 0;
-
-    if(responseObj.seriesLabels){
-      responseObj.seriesLabelsAll = [];
-      Object.keys(responseObj.seriesLabels).forEach(seriesKey => responseObj.seriesLabelsAll.push(responseObj.seriesLabels[seriesKey]));
-    }
+    let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
-    if(responseObj.dataUrl) {
-      const data = await fetch(responseObj.dataUrl);
-      const dataObj = await data.json();
+    let data = response.data ?? {}
 
-      setData(dataObj);
+    if(response.dataUrl) {
+      const dataString = await fetch(response.dataUrl);
+
+      data = await dataString.json();
     }
 
-    setConfig(responseObj);
-    setLoading(false);
+    setData(data);
+
+    let newConfig = {...defaults, ...response}
+
+    // Deeper copy
+    Object.keys(defaults).forEach( key => {
+      if(newConfig[key] && 'object' === typeof newConfig[key]) {
+        newConfig[key] = {...newConfig[key], ...defaults[key]}
+      }
+    })
+
+    if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
+      let tempAxis = newConfig.yAxis;
+      newConfig.yAxis = newConfig.xAxis;
+      newConfig.xAxis = tempAxis;
+      newConfig.horizontal = true;
+    }
+
+    if(newConfig.seriesLabels){
+      newConfig.seriesLabelsAll = [];
+      newConfig.seriesKeys.forEach((seriesKey) => {
+        newConfig.seriesLabelsAll.push(newConfig.seriesLabels[seriesKey])
+      });
+    }
+
+    setConfig(newConfig);
   }
 
-  const debounce = useRef(null);
-
+  // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
     let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey;
     let aData = parseFloat(a[sortKey]);
     let bData = parseFloat(b[sortKey]);
 
-    console.log(a, aData);
-    console.log(b, bData);
     if(aData < bData){
       return config.sortData === 'ascending' ? 1 : -1;
     } else if (aData > bData){
@@ -108,41 +95,47 @@ export default function CdcChart({ configUrl, element }) {
     }
   }
 
-  const onResize = useCallback(() => {
-    if (dimensions.width !== element.offsetWidth) {	
-      if (debounce) {
-        clearTimeout(debounce.current);	
-      }	
+  const viewports:keyable = {
+    "lg": 1200,
+    "md": 992,
+    "sm": 768,
+    "xs": 576,
+    "xxs": 350
+  }
 
-      const adjustedWidth = config.padding ? element.offsetWidth - config.padding.left - config.padding.right : element.offsetWidth;
+  const getViewport = (size) => {
+    let result = currentViewport
+    let viewportList = Object.keys( viewports )
 
-      debounce.current = setTimeout(() => {
-        setDimensions({	
-            width: ((element.offsetWidth > viewportCutoff) && !config.legend.hide) ? (adjustedWidth * .75) : adjustedWidth,	
-            height: Math.max(element.offsetWidth / 3, config.minHeight) + config.xAxis.size
-        });	
-      }, 250);	
-    }	
-  }, [element.offsetWidth, dimensions.width, config.legend]);
+    for(let viewport of viewportList) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
+    }
+
+    return result
+  }
+
+  // Observes changes to outermost container and changes viewport size in state
+  const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        let newViewport = getViewport(entry.contentRect.width)
+        
+        if( newViewport !== currentViewport ) {
+            setCurrentViewport(newViewport)
+        }
+    }
+  })
 
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
+    resizeObserver.observe(outerContainerRef.current);
   }, []);
-
-  // Adds resize handler
-  useEffect(() => {
-    if(config.initialized && !resizeInit) {
-      window.addEventListener('resize', onResize);
-      onResize();
-
-      setResizeInit(true);
-    }
-  });
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(config.xAxis) {
+    if(data && config.xAxis) {
       const colorPalettes = {
         'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
         'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -166,17 +159,24 @@ export default function CdcChart({ configUrl, element }) {
       });
 
       setColorScale(newColorScale);
+      setLoading(false);
     }
 
     if(config && data && config.sortData){
-      console.log(data);
       data.sort(sortData);
-      console.log(data);
     }
   }, [config, data])
 
+  // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
     const newSeriesHighlight = [];
+
+    // If we're highlighting all the series, reset them
+    if(seriesHighlight.length + 1 === config.seriesKeys.length) {
+      highlightReset()
+      return
+    }
+
     seriesHighlight.forEach((value) => {
       newSeriesHighlight.push(value);
     });
@@ -200,6 +200,12 @@ export default function CdcChart({ configUrl, element }) {
     setSeriesHighlight(newSeriesHighlight);
   };
 
+  // Called on reset button click, unhighlights all data series
+  const highlightReset = () => {
+    setSeriesHighlight([]);
+  }
+
+  // Format numeric data based on settings in config
   const formatNumber = (num) => {
     if (!config.dataFormat) return num;
     if (typeof num !== 'number') num = parseFloat(num);
@@ -213,71 +219,111 @@ export default function CdcChart({ configUrl, element }) {
 
   // Select appropriate chart type
   const chartComponents = {
-    'Bar' : <ComboChart numberFormatter={formatNumber} />,
-    'Line' : <ComboChart numberFormatter={formatNumber} />,
-    'Combo': <ComboChart numberFormatter={formatNumber} />,
-    'Pie' : <PieChart numberFormatter={formatNumber} />,
+    'Bar' : <LinearChart />,
+    'Line' : <LinearChart />,
+    'Combo': <LinearChart />,
+    'Pie' : <PieChart />,
   }
 
-  const legendElements = <div className={`legend-container ${config.legend.left ? 'left': ''}`} hidden={legend.hide}>
-  <h2>{legend.label}</h2>
-  <LegendOrdinal
-    scale={colorScale}
-    itemDirection="row"
-    labelMargin="0 20px 0 0"
-    shapeMargin="0 10px 0"
-    className="legend-item-container"
-    >
-      {labels => (
-        <div>
-          {labels.map((label, i) => (
-            <LegendItem
-              tabIndex={0}
-              key={`legend-quantile-${i}`}
-              margin="0 5px"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  highlight(label);
-                }
-              }}
-              onClick={() => {
-                highlight(label);
-              }}
-            >
-              <svg width={legendGlyphSize} height={legendGlyphSize}>
-                <rect fill={label.value} width={legendGlyphSize} height={legendGlyphSize} />
-              </svg>
-              <LegendLabel align="left" margin="0 0 0 4px">
-                {label.text}
-              </LegendLabel>
-            </LegendItem>
-          ))}
-        </div>
-      )}
-    </LegendOrdinal>
-</div>;
+  // JSX for Legend
+  const Legend = () => {
+    let containerClasses = ['legend-container']
 
-  if(true === loading) {
-    return <div className="loader"></div>;
+    if(config.legend.left) {
+      containerClasses.push('left')
+    }
+
+    return (
+      <div className={containerClasses.join(' ')}>
+        {legend.label && <h2>{legend.label}</h2>}
+        <LegendOrdinal
+        scale={colorScale}
+        itemDirection="row"
+        labelMargin="0 20px 0 0"
+        shapeMargin="0 10px 0"
+        >
+          {labels => (
+            <div>
+              {labels.map((label, i) => {
+                let className = 'legend-item'
+
+                let itemName:any = label.datum
+
+                if(config.seriesLabels){
+                  let index = config.seriesLabelsAll.indexOf(itemName)
+                  itemName = config.seriesKeys[index]
+                }
+
+                if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) ) {
+                  className += ' inactive'
+                }
+
+                  return (
+                    <LegendItem
+                      tabIndex={0}
+                      className={className}
+                      key={`legend-quantile-${i}`}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          highlight(label);
+                        }
+                      }}
+                      onClick={() => {
+                        highlight(label);
+                      }}
+                    >
+                      <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
+                        <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={label.value} stroke="rgba(0,0,0,0.3)" />
+                      </svg>
+                      <LegendLabel align="left" margin="0 0 0 4px">
+                        {label.text}
+                      </LegendLabel>
+                    </LegendItem>
+                  )
+              })}
+              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+            </div>
+          )}
+        </LegendOrdinal>
+      </div>
+    )
+  }
+
+  // Prevent render if loading
+  let body = (<Loading />)
+
+  if(false === loading) {
+    body = (
+      <>
+        {/* Title */}
+        {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
+        {/* Visualization */}
+        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+          {/* Legend, if set above */}
+          {!config.legend.hide && !config.legend.below && <Legend />}
+          {chartComponents[visualizationType]}
+        </div>            
+        {/* Legend, if set below */}
+        {config.legend.below && <Legend />}
+        {/* Description */}
+        {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
+        {/* Data Table */}
+        <DataTable />
+      </>
+    )
+  }
+
+  // TEMPORARY
+  let dimensions = {
+    width: 750,
+    height: 375
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions}}>
-      <div className="cdc-open-viz-module cdc-visualization-container mt-4">
-       {title.text && <h1 className="chart-title" style={{fontSize: title.fontSize}}>{title.text}</h1>}
-        {config.legend.above ? legendElements : ''}
-        {/* Title & Visualization */}
-        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
-          <div style={{paddingLeft: config.padding.left}}>
-            {chartComponents[visualizationType]}
-          </div>
-        </div>
-        {!config.legend.above ? legendElements : ''}
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, formatNumber }}>
+      <div className={`cdc-open-viz-module type-chart ${currentViewport}`} ref={outerContainerRef}>
+        {body}
       </div>
-      {/* Description */}
-      <div className="chart-description" style={{fontSize: description && (description.fontSize || 22)}} dangerouslySetInnerHTML={{__html: description && description.html}}></div>              
-      {/* Data Table */}
-      <DataTable numberFormatter={formatNumber} />
     </Context.Provider>
   );
 }
