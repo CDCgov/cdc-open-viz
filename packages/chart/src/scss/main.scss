@@ -1,29 +1,7 @@
 @import '~bootstrap/scss/bootstrap';
 @import '~@cdc/core/styles/base';
 @import "~@cdc/core/styles/heading-colors";
-@import 'reset';
-@import 'variables';
 @import 'mixins';
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@-webkit-keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 .cdc-open-viz-module.type-chart {
   @import 'datatable';
@@ -87,53 +65,44 @@
 
   .legend-container {
     background: #fff;
-    display: inline-block;
-    width: 25%;
+    width: 100%;
     padding: 15px;
     vertical-align: top;
     text-align: center;
     border: 1px solid #C7C7C7;
     order: 1;
-    h2 {
-      font-size: 1.3em;
-    }
-    &.left {
-      margin-right: 1em;
-      order: 0;
-    }
-    .legend-item {
-      cursor: pointer;
-    }
-  }
-
-  .legend-container {
     position: relative;
     .legend-reset {
-      font-size: .8em;
+      font-size: .7em;
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
       transition: .3s all;
-      padding: .375rem .65rem;
+      padding: .375rem;
       top: 1em;
-      border-radius: 5px;
+      border-radius: 3px;
       &:hover {
         background: rgba(0,0,0,.15);
         transition: .3s all;
       }
     }
+    .legend-color {
+      display: inline-block;
+      margin: 0 .5rem 0 0;
+    }
+    h2 {
+      font-size: 1.3em;
+      margin-bottom: .3em;
+    }
     .legend-item {
+      cursor: pointer;
       transition: .2s all;
       &.inactive {
         opacity: .5;
         transition: .2s all;
       }
-    }
-    .legend-color {
-      display: inline-block;
-      margin: 0 .5rem 0 0;
     }
   }
 
@@ -151,26 +120,33 @@
   .region-table {
     margin-top: 15px;
   }
-
   .chart-container {
     display: flex;
     align-items: flex-start;
-    > svg {
-      width: 75%;
-    }
+    flex-wrap: wrap;
     &.legend-hidden > svg {
-      width :100%;
+      width: 100% !important;
+    }
+    > svg {
+      font-size: 16px;
     }
   }
-
-  @media (max-width: $md) {
-    .chart-container, .legend-container {
-      width: 100%;
-    }
-
-    .legend-container > div {
-      display: flex;
+  @include breakpointClass(md) {
+    .chart-container {
+      flex-wrap: nowrap;
+      .legend-container {
+        width: 25%;
+        margin-left: 1em;
+        &.left {
+          margin-left: 0;
+          margin-right: 1em;
+          order: 0;
+        }
+      }  
+      > svg {
+        font-size: 14px;
+        width: 75%;
+      }
     }
   }
-
 }

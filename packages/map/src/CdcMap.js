@@ -21,11 +21,10 @@ import './scss/main.scss';
 
 // Open Viz
 import '@cdc/core';
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Loading from '@cdc/core/components/Loading';
 
 // Components
 import Sidebar from './components/Sidebar';
-import Loading from './components/Loading';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy

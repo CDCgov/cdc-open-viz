@@ -59,6 +59,7 @@
     "publish": "npx lerna publish"
   },
   "dependencies": {
+    "@types/resize-observer-browser": "^0.1.5",
     "npm-package-arg": "^8.1.1"
   }
 }

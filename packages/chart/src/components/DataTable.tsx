@@ -18,9 +18,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
 
-export default function DataTable({numberFormatter}) {
+export default function DataTable() {
 
-  const { data, config, colorScale } = useContext<any>(Context);
+  const { data, config, colorScale, formatNumber:numberFormatter } = useContext<any>(Context);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
@@ -67,7 +67,7 @@ export default function DataTable({numberFormatter}) {
         return (
           <>
             {config.visualizationType !== 'Pie' ? (
-              <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
+              <svg className="legend-color">
                 <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={colorScale(seriesLabel)} stroke="rgba(0,0,0,0.3)" />
               </svg>
             ) : ''}
