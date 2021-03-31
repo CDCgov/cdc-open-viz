@@ -1,6 +1,5 @@
 @import "~@cdc/core/styles/base";
 @import "~@cdc/core/styles/heading-colors";
-@import "loading";
 @import "variables";
 @import "editor-panel";
 
@@ -54,7 +53,6 @@
   @import "./map";
   @import "./sidebar";
   @import "./datatable";
-  @import "./animations";
   flex-grow: 1;
   text-rendering: geometricPrecision;
   color: #202020;
