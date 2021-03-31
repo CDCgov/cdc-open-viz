@@ -1,4 +1,4 @@
-@import "_variables";
+@import "variables";
 
 .cdc-editor .data-designer {
     @import "data-table";
@@ -40,7 +40,7 @@
                     color: $darkGray;
                 }
             }
-        
+
             .tab-content {
                 padding-top: $gbl-padding;
                 border-top: 1px solid $baseColor;
