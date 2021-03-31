@@ -4,7 +4,7 @@
         "fontSize": 32
     },
     "theme": "theme-brown",
-    "dataUrl":  "/assets/covid-example-data.json",
+    "dataUrl":  "/examples/covid-example-data.json",
     "visualizationType": "Bar",
     "seriesKeys": ["Age-adjusted rate"],
     "minHeight": 300,

@@ -6,7 +6,7 @@ import { LinePath } from '@visx/shape';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import Context from '../context.tsx';
+import Context from '../context';
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }) {
   const { data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);

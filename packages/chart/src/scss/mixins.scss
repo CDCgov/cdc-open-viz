@@ -1,6 +1,7 @@
-// Responsive mixin.
-@mixin r($size) {
-  @media only screen and (min-width: $size) {
-    @content;
-  }
+@mixin legendDot() {
+  margin-right: 5px;
+  vertical-align: middle;
+  display: inline-block;
+  height: 1em;
+  width: 1em;
 }

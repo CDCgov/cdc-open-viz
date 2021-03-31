@@ -1,5 +1,6 @@
-.linear-chart-container {
-
+svg.linear {
+    overflow: visible;
+    margin: 1rem 0 2rem;
     .bottom-axis-tick-container {
         overflow: visible;
 
@@ -8,6 +9,7 @@
             text-align: center;
             word-break: break-word;
             transform-origin: top right;
+            line-height: 1.4em;
         }
     }
 

@@ -1,92 +1,85 @@
-.table-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  .btn-download {
-    align-self: flex-end;
-    margin: 1em 0;
-  }
-
-  .table-header {
-    background: rgba(0,0,0,0.05);
-    padding: .5em .7em;
-    border: #C7C7C7 1px solid;
-    line-height: 2em;
-    cursor: pointer;
-  
-    .table-indicator {
-      float: right;
-      font-size: xx-large;
-      font-weight: bold;
+.data-table-container {
+    clear: both;
+    margin: 0;
+    display: flex;
+    flex-direction: column;  
+    .legend-color {
+      @include legendDot;
     }
-  }
-    
-  .table-container {
-    overflow-x: auto;
   
-    table {
-      width: auto;
-      min-width: 100%;
-      border-collapse: collapse;
-  
-      thead {
-        border: 1px solid rgb(32,32,32);
-
-        th {
-          cursor: pointer;
-    
-          &:first-child {
-            cursor: default;
-          }
-        }
+    div.data-table-heading {
+      background: rgba(0, 0, 0, 0.05);
+      padding: .5em .7em;
+      border: $lightGray 1px solid;
+      border-bottom: 0;
+      cursor: pointer;
+      background-image: url(../images/minus.svg);
+      background-size: 15px 15px; // Need to define both for IE11
+      background-position: right .7em center;
+      background-repeat: no-repeat;
+      &:focus {
+        z-index: 2;
+        position: relative;
       }
+      &.collapsed {
+        background-image: url(../images/plus.svg);
+        background-size: 15px 15px; // Need to define both for IE11
+        background-position: right .7em center;
+        background-repeat: no-repeat;
+        border-bottom: $lightGray 1px solid;
+      }
+    }
   
-      tbody {    
-        border: 1px solid rgb(32,32,32);
-        width: auto;
+    table {    
+      th,
+      td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        &:last-child {
+          border-right: 0 !important;
+        }
       }
   
       td {
-        border-right: 1px solid rgba(0,0,0,0.1);
-        border-bottom: 1px solid rgba(0,0,0,0.1);
+        display: flex !important;
+        align-items: center;
+        position: relative;
       }
   
-      th {
-        line-height: 1.5em;
-        padding: 5px 25px 5px 5px;
-        user-select: none;
-        background-color: #3d3d3d;
-        color: white;
-        border-right: 1px solid #C7C7C7;
-        font-weight: normal;
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      td a {
+        padding: .3em .7em;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        display: block;
+        color: inherit;
+        text-decoration: none;
       }
-  
-      .sort {
-        .resizer {
-          position: absolute;
-          margin: .5em .5em 0 0;
-          width: 0;
-          height: 0;
-          right: 0;
-          top: 0.5em;
-        }
-
-        &.sort-asc .resizer {
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-bottom: 5px solid white;
-        }
-
-        &.sort-desc .resizer {
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-top: 5px solid white;
+      
+      td span.table-link {
+        text-decoration: underline;
+        cursor: pointer;
+        color: #075290;
+        svg {
+          max-width: 13px;
+          vertical-align: baseline;
+          margin-left: 5px;
         }
       }
     }
+  
+    .btn-download {
+      color: #fff;
+      align-self: flex-end;
+      text-decoration: none;
+      transition: .3s all;
+      margin: 1em 0;
+      font-weight: 600;
+      &:hover {
+        transition: .3s all;
+      }
+    }
   }
-}
