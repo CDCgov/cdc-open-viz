@@ -18,7 +18,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -112,7 +112,12 @@ export default function PieChart() {
     );
   }
 
-  const {width, height} = dimensions;
+  let [ width ] = dimensions;
+  let height = 500
+
+  if(!config.legend.hide && currentViewport === 'lg') {
+    width = width * 0.73
+  }
 
   const radius = Math.min(width, height) / 2;
   const centerY = height / 2;
@@ -135,10 +140,10 @@ export default function PieChart() {
     }
   }, [seriesHighlight]);
 
-  return width && height ? (
+  return (
     <ErrorBoundary component="PieChart">
       <svg width={width} height={height}>
-        <Group top={centerY}  left={centerX}>
+        <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
             pieValue={d => d[config.yAxis.dataKey]}
@@ -157,5 +162,5 @@ export default function PieChart() {
       </svg>
       <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
-  ) : <div className="loader"></div>;
+  )
 }

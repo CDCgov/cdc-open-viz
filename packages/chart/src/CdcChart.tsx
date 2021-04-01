@@ -38,6 +38,8 @@ export default function CdcChart(
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
+  const [dimensions, setDimensions] = useState<Array<Number>>([]);
+
   const outerContainerRef = useRef(null);
 
   const loadConfig = async () => {
@@ -103,7 +105,7 @@ export default function CdcChart(
     "xxs": 350
   }
 
-  const getViewport = (size) => {
+  const getViewport = size => {
     let result = currentViewport
     let viewportList = Object.keys( viewports )
 
@@ -119,11 +121,14 @@ export default function CdcChart(
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-        let newViewport = getViewport(entry.contentRect.width)
+      let { width, height } = entry.contentRect
+        let newViewport = getViewport(width)
         
         if( newViewport !== currentViewport ) {
             setCurrentViewport(newViewport)
         }
+
+        setDimensions([width, height])
     }
   })
 
@@ -313,14 +318,8 @@ export default function CdcChart(
     )
   }
 
-  // TEMPORARY
-  let dimensions = {
-    width: 750,
-    height: 375
-  }
-
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, formatNumber }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport}`} ref={outerContainerRef}>
         {body}
       </div>
