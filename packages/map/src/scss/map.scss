@@ -1,5 +1,32 @@
-.map-container.full-border {
-  border: #C2C2C2 1px solid;
+// Map Download UI
+.map-downloads {
+  position: relative;
+  z-index: 3;
+
+  .map-downloads__ui {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 5px 12px -8px rgba(0, 0, 0, .50);
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+  }
+}
+
+.map-container {
+  &:hover,
+  &:focus {
+    .map-downloads__ui {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+
+  &.full-border {
+    border: #C2C2C2 1px solid;
+  }
 }
 
 header + .map-container.full-border {

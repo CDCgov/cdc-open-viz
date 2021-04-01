@@ -147,6 +147,7 @@ const DataTable = (props) => {
         href={`data:text/csv;base64,${Base64.encode(csvData)}`}
         aria-label="Download this data in a CSV file format."
         className={`${headerColor} btn btn-download no-border`}
+        data-html2canvas-ignore
       >
         Download Data (CSV)
       </a>
@@ -260,9 +261,9 @@ const DataTable = (props) => {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th 
-                  tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} 
-                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                <th
+                  tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())}
+                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}
                   onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
                 >
                   {column.render('Header')}

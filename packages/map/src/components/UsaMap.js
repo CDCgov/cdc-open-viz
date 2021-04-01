@@ -24,7 +24,7 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips
   } = props;
-  
+
   const [territoriesData, setTerritoriesData] = useState([]);
 
   useEffect(() => {
@@ -319,6 +319,7 @@ const UsaMap = (props) => {
             height={500}
             style={styles.map}
             projection="geoAlbersUsa"
+            data-html2canvas-ignore
           >
             <Geographies geography={topoJsonStates}>
               {({ geographies }) => geoList(geographies)}
