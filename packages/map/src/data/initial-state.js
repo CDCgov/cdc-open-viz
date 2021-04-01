@@ -5,6 +5,7 @@ export default {
     showTitle: true,
     showSidebar: true,
     showDownloadButton: true,
+    showDownloadMediaButton: true,
     territoriesLabel: 'Territories',
     modalOpen: false,
     modalContent: null,
