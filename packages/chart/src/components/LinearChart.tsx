@@ -17,8 +17,14 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config } = useContext<any>(Context);
-  const { width, height } = dimensions;
+  const { data, dimensions, config, currentViewport } = useContext<any>(Context);
+  let [ width ] = dimensions;
+  let height = 500
+
+  if(!config.legend.hide && currentViewport === 'lg') {
+    width = width * 0.73
+  }
+
   const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
 
   const xMax = width - config.yAxis.size;
@@ -111,7 +117,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg viewBox={`0 0 750 375`} className="linear">
+      <svg width={width} height={height} className="linear">
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
