@@ -925,6 +925,10 @@ const EditorPanel = memo((props) => {
                   {'us' === state.general.geoType &&
                     <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
                   }
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
+                    <span className="edit-label">Enable Media Download</span>
+                  </label>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem> {/* Columns */}
@@ -1163,10 +1167,6 @@ const EditorPanel = memo((props) => {
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />
                     <span className="edit-label">Map loads with data table expanded</span>
-                  </label>
-                  <label className="checkbox">
-                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
-                    <span className="edit-label">Enable Media Download</span>
                   </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.showDownloadButton } onChange={(event) => { handleEditorChanges("toggleDownloadButton", event.target.checked) }} />

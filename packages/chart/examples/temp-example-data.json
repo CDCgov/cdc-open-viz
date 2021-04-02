@@ -140,13 +140,13 @@
   {
     "date": "2011-10-24",
     "New York": "54.8",
-    "San Francisco": "60.9",
+    "San Francisco": "-60.9",
     "Austin": "72.5"
   },
   {
     "date": "2011-10-25",
     "New York": "57.9",
-    "San Francisco": "56.1",
+    "San Francisco": "-56.1",
     "Austin": "72.7"
   },
   {
@@ -158,7 +158,7 @@
   {
     "date": "2011-10-27",
     "New York": "54.4",
-    "San Francisco": "56.1",
+    "San Francisco": "-56.1",
     "Austin": "70.7"
   },
   {

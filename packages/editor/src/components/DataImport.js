@@ -159,7 +159,8 @@ export default function DataImport() {
     // Set encoding for CSV files - needed to render special characters properly
     let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
     filereader.onload = function() {
-      let text = this.result;
+
+      let text = this.result
 
       switch (mimeType) {
         case 'text/csv': 

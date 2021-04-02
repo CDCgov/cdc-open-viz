@@ -7,7 +7,7 @@
         "html": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
         "fontSize": 26
     },
-    "dataUrl":  "/assets/temp-example-data.json",
+    "dataUrl":  "/examples/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
     "seriesLabels": {"New York": "NY", "San Francisco": "SF", "Austin": "AU"},
@@ -42,7 +42,8 @@
         "left": true
     },
     "table": {
-        "label": "Table",
-        "expanded": false
+        "label": "Data Table",
+        "expanded": false,
+        "download": true
     }
 }
