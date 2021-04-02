@@ -63,6 +63,10 @@ This source code in this repository is distributed in the hope that it will be u
 
 The source code forked from other open source projects will inherit its license.
 
+#### Attribution
+
+Some icons used by this project are from [Font Awesome](https://fontawesome.com/).
+
 #### Public Domain
 
 This repository constitutes a work of the United States Government and is not subject to domestic copyright protection under 17 USC § 105. This repository is in the public domain within the United States, and copyright and related rights in the work worldwide are waived through the [CC0 1.0 Universal public domain dedication](https://creativecommons.org/publicdomain/zero/1.0/). All contributions to this repository will be released under the CC0 dedication. By submitting a pull request you are agreeing to comply with this waiver of copyright interest.
