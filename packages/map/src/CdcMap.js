@@ -27,15 +27,13 @@ import './scss/btn.scss'
 // Images
 import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
-import DownloadCsv from './images/icon-download-csv.svg'
 
 // Open Viz
 import '@cdc/core';
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Loading from '@cdc/core/components/Loading';
 
 // Components
 import Sidebar from './components/Sidebar';
-import Loading from './components/Loading';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
@@ -126,7 +124,7 @@ class CdcMap extends Component {
         const baseSvg = this.mapSvg.current.querySelector('.rsm-svg')
         baseSvg.querySelectorAll('path').forEach(path => {
             path.style.strokeWidth = '1.3px'
-            path.classList.contains('darkGray') ? path.style.stroke = 'rgba(0,0,0,0.2)' : null
+            this.state.general.geoBorderColor === 'darkGray' ? path.style.stroke = 'rgba(0,0,0,0.2)' : this.state.general.geoBorderColor === 'sameAsBackground' ? path.style.stroke = 'rgba(255,255,255,0.7)' : null
         })
         const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
         const calcHeight = ratio * 1440
@@ -1125,7 +1123,7 @@ class CdcMap extends Component {
             })
 
         }
-        debugger;
+
         // Set properties that can be passed directly and require no additional computation
         this.setState(() => newState)
 
@@ -1351,10 +1349,6 @@ class CdcMap extends Component {
                                     <button className="btn" title="Download Map as PDF"
                                             onClick={() => this.generateMedia(this.outerContainerRef.current, 'pdf')}>
                                         <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
-                                    </button>
-                                    <button className="btn" title="Download Data as CSV"
-                                            onClick={() => this.generateMedia(this.outerContainerRef.current, 'pdf')}>
-                                        <DownloadCsv className="btn__icon" title='Download Data as CSV'/>
                                     </button>
                                 </div>
                             </div>
