@@ -62,7 +62,7 @@ const WorldMap = (props) => {
   };
 
   const ZoomControls = (
-    <div className="zoom-controls">
+    <div className="zoom-controls" data-html2canvas-ignore>
       <button onClick={handleZoomIn}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -305,6 +305,7 @@ const WorldMap = (props) => {
             width={880}
             height={500}
             style={styles.map}
+            data-html2canvas-ignore
           >
             <ZoomableGroup
               zoom={position.zoom}

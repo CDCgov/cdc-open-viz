@@ -147,6 +147,7 @@ const DataTable = (props) => {
         href={`data:text/csv;base64,${Base64.encode(csvData)}`}
         aria-label="Download this data in a CSV file format."
         className={`${headerColor} btn btn-download no-border`}
+        data-html2canvas-ignore
       >
         Download Data (CSV)
       </a>
