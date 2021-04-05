@@ -122,10 +122,7 @@ class CdcMap extends Component {
     generateMedia(target, type) {
         // Convert SVG to canvas
         const baseSvg = this.mapSvg.current.querySelector('.rsm-svg')
-        baseSvg.querySelectorAll('path').forEach(path => {
-            path.style.strokeWidth = '1.3px'
-            this.state.general.geoBorderColor === 'darkGray' ? path.style.stroke = 'rgba(0,0,0,0.2)' : this.state.general.geoBorderColor === 'sameAsBackground' ? path.style.stroke = 'rgba(255,255,255,0.7)' : null
-        })
+
         const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
         const calcHeight = ratio * 1440
         const xmlSerializer = new XMLSerializer()
