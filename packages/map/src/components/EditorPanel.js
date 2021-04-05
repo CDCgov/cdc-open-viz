@@ -309,6 +309,16 @@ const EditorPanel = memo((props) => {
                 }
             })
       break;
+      case 'toggleDownloadMediaButton':
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        showDownloadMediaButton: !prevState.general.showDownloadMediaButton
+                    }
+                }
+            })
+      break;
       case 'editorMapType':
         switch(value) {
             case 'data':
@@ -876,8 +886,8 @@ const EditorPanel = memo((props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
+      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>
@@ -915,6 +925,10 @@ const EditorPanel = memo((props) => {
                   {'us' === state.general.geoType &&
                     <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
                   }
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
+                    <span className="edit-label">Enable Media Download</span>
+                  </label>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem> {/* Columns */}
