@@ -1,0 +1,2742 @@
+{
+    "type": "Topology",
+    "objects": {
+        "us_states_geo": {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            0,
+                            1
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Maine",
+                        "bees": 60.5,
+                        "iso3166_2": "ME",
+                        "google_name": "Maine (United States)",
+                        "state": "Maine"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            2,
+                            3,
+                            4,
+                            5
+                        ]
+                    ],
+                    "properties": {
+                        "label": "R.I.",
+                        "bees": 47.8,
+                        "iso3166_2": "RI",
+                        "google_name": "Rhode Island (United States)",
+                        "state": "Rhode Island"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            6,
+                            7,
+                            8,
+                            9
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Vt.",
+                        "bees": 33.9,
+                        "iso3166_2": "VT",
+                        "google_name": "Vermont (United States)",
+                        "state": "Vermont"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Okla.",
+                        "bees": 63.4,
+                        "iso3166_2": "OK",
+                        "google_name": "Oklahoma (United States)",
+                        "state": "Oklahoma"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            16,
+                            17,
+                            18,
+                            19,
+                            20,
+                            21
+                        ]
+                    ],
+                    "properties": {
+                        "label": "S.C.",
+                        "bees": 26.6,
+                        "iso3166_2": "SC",
+                        "google_name": "South Carolina (United States)",
+                        "state": "South Carolina"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            22,
+                            23,
+                            24,
+                            -17,
+                            25,
+                            26
+                        ]
+                    ],
+                    "properties": {
+                        "label": "D.C.",
+                        "bees": null,
+                        "iso3166_2": "DC",
+                        "google_name": "District of Columbia (United States)",
+                        "state": "District of Columbia"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            27,
+                            -26,
+                            -22,
+                            28,
+                            29,
+                            30
+                        ]
+                    ],
+                    "properties": {
+                        "label": "W.Va.",
+                        "bees": 59.5,
+                        "iso3166_2": "WV",
+                        "google_name": "West Virginia (United States)",
+                        "state": "West Virgina"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            31,
+                            32,
+                            33,
+                            34
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Calif.",
+                        "bees": 40.1,
+                        "iso3166_2": "CA",
+                        "google_name": "California (United States)",
+                        "state": "California"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            35,
+                            36,
+                            37,
+                            -11,
+                            38,
+                            39
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Kan.",
+                        "bees": 40.8,
+                        "iso3166_2": "KS",
+                        "google_name": "Kansas (United States)",
+                        "state": "Kansas"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            40,
+                            -30,
+                            41,
+                            42,
+                            43,
+                            44
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ky.",
+                        "bees": 47.7,
+                        "iso3166_2": "KY",
+                        "google_name": "Kentucky (United States)",
+                        "state": "Kentucky"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            45,
+                            46,
+                            47,
+                            48,
+                            -24,
+                            49
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Md.",
+                        "bees": 60.9,
+                        "iso3166_2": "MD",
+                        "google_name": "Maryland (United States)",
+                        "state": "Maryland"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            50,
+                            -44,
+                            51,
+                            -36,
+                            52,
+                            53
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Mo.",
+                        "bees": 34.9,
+                        "iso3166_2": "MO",
+                        "google_name": "Missouri (United States)",
+                        "state": "Missouri"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            54,
+                            -53,
+                            -40,
+                            55,
+                            56,
+                            57
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Neb.",
+                        "bees": 37.3,
+                        "iso3166_2": "NE",
+                        "google_name": "Nebraska (United States)",
+                        "state": "Nebraska"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -56,
+                            -39,
+                            -16,
+                            58,
+                            59,
+                            60
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.M.",
+                        "bees": 46.1,
+                        "iso3166_2": "NM",
+                        "google_name": "New Mexico (United States)",
+                        "state": "New Mexico"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -49,
+                            61,
+                            62,
+                            63,
+                            -18,
+                            -25
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.C.",
+                        "bees": 41.5,
+                        "iso3166_2": "NC",
+                        "google_name": "North Carolina (United States)",
+                        "state": "North Carolina"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -29,
+                            -21,
+                            64,
+                            65,
+                            66,
+                            -42
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Tenn.",
+                        "bees": 36.4,
+                        "iso3166_2": "TN",
+                        "google_name": "Tennessee (United States)",
+                        "state": "Tennessee"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            67,
+                            68,
+                            -54,
+                            -55,
+                            69,
+                            70
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Iowa",
+                        "bees": 61.4,
+                        "iso3166_2": "IA",
+                        "google_name": "Iowa (United States)",
+                        "state": "Iowa"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            71,
+                            72,
+                            73,
+                            -32,
+                            74,
+                            75
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Nev.",
+                        "bees": 26.7,
+                        "iso3166_2": "NV",
+                        "google_name": "Nevada (United States)",
+                        "state": "Nevada"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            76,
+                            77,
+                            78,
+                            -46,
+                            79,
+                            80
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.J.",
+                        "bees": 47.6,
+                        "iso3166_2": "NJ",
+                        "google_name": "New Jersey (United States)",
+                        "state": "New Jersey"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            81,
+                            -70,
+                            -58,
+                            82,
+                            83,
+                            84
+                        ]
+                    ],
+                    "properties": {
+                        "label": "S.D.",
+                        "bees": 36.1,
+                        "iso3166_2": "SD",
+                        "google_name": "South Dakota (United States)",
+                        "state": "South Dakota"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            85,
+                            86,
+                            -27,
+                            -28,
+                            87,
+                            88
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ohio",
+                        "bees": 49.8,
+                        "iso3166_2": "OH",
+                        "google_name": "Ohio (United States)",
+                        "state": "Ohio"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            89,
+                            -84,
+                            90,
+                            -72,
+                            91,
+                            92
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Wyo.",
+                        "bees": 32.5,
+                        "iso3166_2": "WY",
+                        "google_name": "Wyoming (United States)",
+                        "state": "Wyoming"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            93,
+                            94,
+                            -62,
+                            -48
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Va.",
+                        "bees": 45.6,
+                        "iso3166_2": "VA",
+                        "google_name": "Virginia (United States)",
+                        "state": "Virginia"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            95
+                        ]
+                    ],
+                    "properties": {
+                        "label": "D.C.",
+                        "bees": null,
+                        "iso3166_2": "PR",
+                        "google_name": "Puerto Rico (United States)",
+                        "state": "Puerto Rico"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            96
+                        ]
+                    ],
+                    "properties": {
+                        "label": "D.C.",
+                        "bees": null,
+                        "iso3166_2": "VI",
+                        "google_name": "Virgin Islands (United States)",
+                        "state": "Virgin Islands"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            97,
+                            98,
+                            -94,
+                            -47,
+                            -79
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Del.",
+                        "bees": 61,
+                        "iso3166_2": "DE",
+                        "google_name": "Delaware (United States)",
+                        "state": "Delaware"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            99,
+                            100,
+                            101
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Fla.",
+                        "bees": 54.8,
+                        "iso3166_2": "FL",
+                        "google_name": "Florida (United States)",
+                        "state": "Florida"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -1,
+                            102,
+                            -6,
+                            103,
+                            -7,
+                            104
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.H.",
+                        "bees": 39.4,
+                        "iso3166_2": "NH",
+                        "google_name": "New Hampshire (United States)",
+                        "state": "New Hampshire"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            105
+                        ]
+                    ],
+                    "properties": {
+                        "label": "H.I.",
+                        "bees": 13.9,
+                        "iso3166_2": "HI",
+                        "google_name": "Hawaii (United States)",
+                        "state": "Hawaii"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            106,
+                            107,
+                            -13
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Texas",
+                        "bees": 46.3,
+                        "iso3166_2": "TX",
+                        "google_name": "Texas (United States)",
+                        "state": "Texas"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -20,
+                            108,
+                            -102,
+                            109,
+                            110,
+                            -65
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ala.",
+                        "bees": 48.1,
+                        "iso3166_2": "AL",
+                        "google_name": "Alabama (United States)",
+                        "state": "Alabama"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -59,
+                            -15,
+                            111,
+                            112
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ariz.",
+                        "bees": 42.9,
+                        "iso3166_2": "AZ",
+                        "google_name": "Arizona (United States)",
+                        "state": "Arizona"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -64,
+                            113,
+                            -100,
+                            -109,
+                            -19
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ga.",
+                        "bees": 34.9,
+                        "iso3166_2": "GA",
+                        "google_name": "Georgia (United States)",
+                        "state": "Georgia"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            114,
+                            115,
+                            116,
+                            -107,
+                            -12,
+                            -38
+                        ]
+                    ],
+                    "properties": {
+                        "label": "La.",
+                        "bees": 44.3,
+                        "iso3166_2": "LA",
+                        "google_name": "Louisiana (United States)",
+                        "state": "Louisiana"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -66,
+                            -111,
+                            117,
+                            -116,
+                            118
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Miss.",
+                        "bees": 38.7,
+                        "iso3166_2": "MS",
+                        "google_name": "Mississippi (United States)",
+                        "state": "Mississippi"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            119,
+                            -60,
+                            -113,
+                            120,
+                            -33,
+                            -74
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Utah",
+                        "bees": 33.5,
+                        "iso3166_2": "UT",
+                        "google_name": "Utah (United States)",
+                        "state": "Utah"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -83,
+                            -57,
+                            -61,
+                            -120,
+                            -73,
+                            -91
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Colo.",
+                        "bees": 38,
+                        "iso3166_2": "CO",
+                        "google_name": "Colorado (United States)",
+                        "state": "Colorado"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -43,
+                            -67,
+                            -119,
+                            -115,
+                            -37,
+                            -52
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ark.",
+                        "bees": 48.3,
+                        "iso3166_2": "AR",
+                        "google_name": "Arkansas (United States)",
+                        "state": "Arkansas"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            121,
+                            -92,
+                            -76,
+                            122,
+                            123,
+                            124
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Idaho",
+                        "bees": 33.3,
+                        "iso3166_2": "ID",
+                        "google_name": "Idaho (United States)",
+                        "state": "Idaho"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -123,
+                            -75,
+                            -35,
+                            125
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ore.",
+                        "bees": 25.2,
+                        "iso3166_2": "OR",
+                        "google_name": "Oregon (United States)",
+                        "state": "Oregon"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            126,
+                            127,
+                            -45,
+                            -51,
+                            -69,
+                            128
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ill.",
+                        "bees": 62.4,
+                        "iso3166_2": "IL",
+                        "google_name": "Illinois (United States)",
+                        "state": "Illinois"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            129,
+                            -80,
+                            -50,
+                            -23,
+                            -87,
+                            130
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Pa.",
+                        "bees": 60.6,
+                        "iso3166_2": "PA",
+                        "google_name": "Pennsylvania (United States)",
+                        "state": "Pennsylvania"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            131,
+                            -88,
+                            -31,
+                            -41,
+                            -128,
+                            132
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Ind.",
+                        "bees": 49.1,
+                        "iso3166_2": "IN",
+                        "google_name": "Indiana (United States)",
+                        "state": "Indiana"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -9,
+                            133,
+                            -81,
+                            -130,
+                            134
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.Y.",
+                        "bees": 54.1,
+                        "iso3166_2": "NY",
+                        "google_name": "New York (United States)",
+                        "state": "New York"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            135,
+                            -125,
+                            136
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Wash.",
+                        "bees": 39.3,
+                        "iso3166_2": "WA",
+                        "google_name": "Washington (United States)",
+                        "state": "Washington"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -129,
+                            -68,
+                            137,
+                            138
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Wis.",
+                        "bees": 60.2,
+                        "iso3166_2": "WI",
+                        "google_name": "Wisconsin (United States)",
+                        "state": "Wisconsin"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -104,
+                            -5,
+                            139,
+                            -77,
+                            -134,
+                            -8
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Mass.",
+                        "bees": 46.4,
+                        "iso3166_2": "MA",
+                        "google_name": "Massachusetts (United States)",
+                        "state": "Massachusetts"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -89,
+                            -132,
+                            140
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Mich.",
+                        "bees": 27.7,
+                        "iso3166_2": "MI",
+                        "google_name": "Michigan (United States)",
+                        "state": "Michigan"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -138,
+                            -71,
+                            -82,
+                            141,
+                            142
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Minn.",
+                        "bees": 51.2,
+                        "iso3166_2": "MN",
+                        "google_name": "Minnesota (United States)",
+                        "state": "Minnesota"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            143,
+                            -93,
+                            -122,
+                            -136,
+                            144
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Mont.",
+                        "bees": 41.1,
+                        "iso3166_2": "MT",
+                        "google_name": "Montana (United States)",
+                        "state": "Montana"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -142,
+                            -85,
+                            -90,
+                            -144,
+                            145
+                        ]
+                    ],
+                    "properties": {
+                        "label": "N.D.",
+                        "bees": 40.4,
+                        "iso3166_2": "ND",
+                        "google_name": "North Dakota (United States)",
+                        "state": "North Dakota"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            146
+                        ]
+                    ],
+                    "properties": {
+                        "label": "A.K.",
+                        "bees": null,
+                        "iso3166_2": "AK",
+                        "google_name": "Alaska (United States)",
+                        "state": "Alaska"
+                    }
+                },
+                {
+                    "type": "Polygon",
+                    "arcs": [
+                        [
+                            -4,
+                            147,
+                            -98,
+                            -78,
+                            -140
+                        ]
+                    ],
+                    "properties": {
+                        "label": "Conn.",
+                        "bees": 57.5,
+                        "iso3166_2": "CT",
+                        "google_name": "Connecticut (United States)",
+                        "state": "Connecticut"
+                    }
+                }
+            ]
+        }
+    },
+    "arcs": [
+        [
+            [
+                934848,
+                879666
+            ],
+            [
+                -38952,
+                31081
+            ]
+        ],
+        [
+            [
+                895896,
+                910747
+            ],
+            [
+                0,
+                60160
+            ],
+            [
+                38952,
+                29092
+            ],
+            [
+                38952,
+                -29092
+            ],
+            [
+                0,
+                -60160
+            ],
+            [
+                -38952,
+                -31081
+            ]
+        ],
+        [
+            [
+                934848,
+                815473
+            ],
+            [
+                38952,
+                -33121
+            ],
+            [
+                0,
+                -68310
+            ],
+            [
+                -38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                934848,
+                678850
+            ],
+            [
+                -38952,
+                35192
+            ]
+        ],
+        [
+            [
+                895896,
+                714042
+            ],
+            [
+                0,
+                68310
+            ]
+        ],
+        [
+            [
+                895896,
+                782352
+            ],
+            [
+                38952,
+                33121
+            ]
+        ],
+        [
+            [
+                856944,
+                879666
+            ],
+            [
+                0,
+                -64193
+            ]
+        ],
+        [
+            [
+                856944,
+                815473
+            ],
+            [
+                -38952,
+                -33121
+            ]
+        ],
+        [
+            [
+                817992,
+                782352
+            ],
+            [
+                -38952,
+                33121
+            ]
+        ],
+        [
+            [
+                779040,
+                815473
+            ],
+            [
+                0,
+                64193
+            ],
+            [
+                38952,
+                31081
+            ],
+            [
+                38952,
+                -31081
+            ]
+        ],
+        [
+            [
+                389520,
+                372513
+            ],
+            [
+                38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                428472,
+                331187
+            ],
+            [
+                0,
+                -84582
+            ]
+        ],
+        [
+            [
+                428472,
+                246605
+            ],
+            [
+                -38952,
+                -43230
+            ]
+        ],
+        [
+            [
+                389520,
+                203375
+            ],
+            [
+                -38952,
+                43230
+            ]
+        ],
+        [
+            [
+                350568,
+                246605
+            ],
+            [
+                0,
+                84582
+            ]
+        ],
+        [
+            [
+                350568,
+                331187
+            ],
+            [
+                38952,
+                41326
+            ]
+        ],
+        [
+            [
+                662184,
+                492508
+            ],
+            [
+                38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                701136,
+                453182
+            ],
+            [
+                0,
+                -80669
+            ]
+        ],
+        [
+            [
+                701136,
+                372513
+            ],
+            [
+                -38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                662184,
+                331187
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                623232,
+                372513
+            ],
+            [
+                0,
+                80669
+            ]
+        ],
+        [
+            [
+                623232,
+                453182
+            ],
+            [
+                38952,
+                39326
+            ]
+        ],
+        [
+            [
+                701136,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                740088,
+                569114
+            ],
+            [
+                0,
+                -76606
+            ]
+        ],
+        [
+            [
+                740088,
+                492508
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                662184,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                662184,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                623232,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                623232,
+                453182
+            ],
+            [
+                -38952,
+                39326
+            ]
+        ],
+        [
+            [
+                584280,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                584280,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                194760,
+                492508
+            ],
+            [
+                38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                233712,
+                453182
+            ],
+            [
+                0,
+                -80669
+            ]
+        ],
+        [
+            [
+                233712,
+                372513
+            ],
+            [
+                -38952,
+                -41326
+            ],
+            [
+                -38952,
+                41326
+            ],
+            [
+                0,
+                80669
+            ]
+        ],
+        [
+            [
+                155808,
+                453182
+            ],
+            [
+                38952,
+                39326
+            ]
+        ],
+        [
+            [
+                428472,
+                492508
+            ],
+            [
+                38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                467424,
+                453182
+            ],
+            [
+                0,
+                -80669
+            ]
+        ],
+        [
+            [
+                467424,
+                372513
+            ],
+            [
+                -38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                389520,
+                372513
+            ],
+            [
+                0,
+                80669
+            ]
+        ],
+        [
+            [
+                389520,
+                453182
+            ],
+            [
+                38952,
+                39326
+            ]
+        ],
+        [
+            [
+                545328,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                584280,
+                492508
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                545328,
+                453182
+            ],
+            [
+                -38952,
+                39326
+            ]
+        ],
+        [
+            [
+                506376,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                506376,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                779040,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                817992,
+                569114
+            ],
+            [
+                0,
+                -76606
+            ]
+        ],
+        [
+            [
+                817992,
+                492508
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                779040,
+                453182
+            ],
+            [
+                -38952,
+                39326
+            ]
+        ],
+        [
+            [
+                740088,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                467424,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                506376,
+                492508
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                428472,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                428472,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                389520,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                389520,
+                453182
+            ],
+            [
+                -38952,
+                39326
+            ]
+        ],
+        [
+            [
+                350568,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                350568,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                350568,
+                331187
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                311616,
+                372513
+            ],
+            [
+                0,
+                80669
+            ]
+        ],
+        [
+            [
+                311616,
+                453182
+            ],
+            [
+                38952,
+                39326
+            ]
+        ],
+        [
+            [
+                779040,
+                453182
+            ],
+            [
+                0,
+                -80669
+            ]
+        ],
+        [
+            [
+                779040,
+                372513
+            ],
+            [
+                -38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                740088,
+                331187
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                623232,
+                372513
+            ],
+            [
+                -38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                584280,
+                331187
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                545328,
+                372513
+            ],
+            [
+                0,
+                80669
+            ]
+        ],
+        [
+            [
+                428472,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                467424,
+                678850
+            ],
+            [
+                0,
+                -72465
+            ]
+        ],
+        [
+            [
+                389520,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                389520,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                233712,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                272664,
+                569114
+            ],
+            [
+                0,
+                -76606
+            ]
+        ],
+        [
+            [
+                272664,
+                492508
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                194760,
+                492508
+            ],
+            [
+                0,
+                76606
+            ]
+        ],
+        [
+            [
+                194760,
+                569114
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                817992,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                856944,
+                678850
+            ],
+            [
+                0,
+                -72465
+            ]
+        ],
+        [
+            [
+                856944,
+                606385
+            ],
+            [
+                -38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                779040,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                779040,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                350568,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                350568,
+                569114
+            ],
+            [
+                -38952,
+                37271
+            ]
+        ],
+        [
+            [
+                311616,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                311616,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                662184,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                701136,
+                678850
+            ],
+            [
+                0,
+                -72465
+            ]
+        ],
+        [
+            [
+                623232,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                623232,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                272664,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                311616,
+                606385
+            ],
+            [
+                -38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                233712,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                233712,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                817992,
+                492508
+            ],
+            [
+                38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                856944,
+                453182
+            ],
+            [
+                0,
+                -80669
+            ],
+            [
+                -38952,
+                -41326
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                961047,
+                177398
+            ],
+            [
+                38952,
+                -45757
+            ],
+            [
+                0,
+                -80669
+            ],
+            [
+                -38952,
+                -50972
+            ],
+            [
+                -38952,
+                50972
+            ],
+            [
+                0,
+                80669
+            ],
+            [
+                38952,
+                71480
+            ]
+        ],
+        [
+            [
+                882367,
+                177398
+            ],
+            [
+                38952,
+                -45757
+            ],
+            [
+                0,
+                -80669
+            ],
+            [
+                -38952,
+                -50972
+            ],
+            [
+                -38952,
+                50972
+            ],
+            [
+                0,
+                80669
+            ],
+            [
+                38952,
+                71480
+            ]
+        ],
+        [
+            [
+                856944,
+                606385
+            ],
+            [
+                38952,
+                -37271
+            ]
+        ],
+        [
+            [
+                895896,
+                569114
+            ],
+            [
+                0,
+                -76606
+            ],
+            [
+                -38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                662184,
+                246605
+            ],
+            [
+                38952,
+                -43230
+            ]
+        ],
+        [
+            [
+                701136,
+                203375
+            ],
+            [
+                0,
+                -88265
+            ],
+            [
+                -38952,
+                -44999
+            ],
+            [
+                -38952,
+                44999
+            ],
+            [
+                0,
+                88265
+            ]
+        ],
+        [
+            [
+                623232,
+                203375
+            ],
+            [
+                38952,
+                43230
+            ]
+        ],
+        [
+            [
+                934848,
+                879666
+            ],
+            [
+                0,
+                -64193
+            ]
+        ],
+        [
+            [
+                895896,
+                782352
+            ],
+            [
+                -38952,
+                33121
+            ]
+        ],
+        [
+            [
+                856944,
+                879666
+            ],
+            [
+                38952,
+                31081
+            ]
+        ],
+        [
+            [
+                38952,
+                246605
+            ],
+            [
+                38952,
+                -43230
+            ],
+            [
+                0,
+                -88265
+            ],
+            [
+                -38952,
+                -44999
+            ],
+            [
+                -38952,
+                44999
+            ],
+            [
+                0,
+                88265
+            ],
+            [
+                38952,
+                43230
+            ]
+        ],
+        [
+            [
+                428472,
+                246605
+            ],
+            [
+                38952,
+                -43230
+            ]
+        ],
+        [
+            [
+                467424,
+                203375
+            ],
+            [
+                0,
+                -88265
+            ],
+            [
+                -38952,
+                -44999
+            ],
+            [
+                -38952,
+                44999
+            ],
+            [
+                0,
+                88265
+            ]
+        ],
+        [
+            [
+                662184,
+                331187
+            ],
+            [
+                0,
+                -84582
+            ]
+        ],
+        [
+            [
+                623232,
+                203375
+            ],
+            [
+                -38952,
+                43230
+            ]
+        ],
+        [
+            [
+                584280,
+                246605
+            ],
+            [
+                0,
+                84582
+            ]
+        ],
+        [
+            [
+                350568,
+                246605
+            ],
+            [
+                -38952,
+                -43230
+            ],
+            [
+                -38952,
+                43230
+            ],
+            [
+                0,
+                84582
+            ]
+        ],
+        [
+            [
+                272664,
+                331187
+            ],
+            [
+                38952,
+                41326
+            ]
+        ],
+        [
+            [
+                740088,
+                331187
+            ],
+            [
+                0,
+                -84582
+            ],
+            [
+                -38952,
+                -43230
+            ]
+        ],
+        [
+            [
+                467424,
+                372513
+            ],
+            [
+                38952,
+                -41326
+            ]
+        ],
+        [
+            [
+                506376,
+                331187
+            ],
+            [
+                0,
+                -84582
+            ]
+        ],
+        [
+            [
+                506376,
+                246605
+            ],
+            [
+                -38952,
+                -43230
+            ]
+        ],
+        [
+            [
+                584280,
+                246605
+            ],
+            [
+                -38952,
+                -43230
+            ],
+            [
+                -38952,
+                43230
+            ]
+        ],
+        [
+            [
+                506376,
+                331187
+            ],
+            [
+                38952,
+                41326
+            ]
+        ],
+        [
+            [
+                272664,
+                492508
+            ],
+            [
+                38952,
+                -39326
+            ]
+        ],
+        [
+            [
+                272664,
+                331187
+            ],
+            [
+                -38952,
+                41326
+            ]
+        ],
+        [
+            [
+                194760,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                194760,
+                569114
+            ],
+            [
+                -38952,
+                37271
+            ]
+        ],
+        [
+            [
+                155808,
+                606385
+            ],
+            [
+                0,
+                72465
+            ]
+        ],
+        [
+            [
+                155808,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                155808,
+                453182
+            ],
+            [
+                -38952,
+                39326
+            ],
+            [
+                0,
+                76606
+            ],
+            [
+                38952,
+                37271
+            ]
+        ],
+        [
+            [
+                506376,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                545328,
+                678850
+            ],
+            [
+                0,
+                -72465
+            ]
+        ],
+        [
+            [
+                467424,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                740088,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                701136,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                584280,
+                714042
+            ],
+            [
+                38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                545328,
+                678850
+            ],
+            [
+                38952,
+                35192
+            ]
+        ],
+        [
+            [
+                817992,
+                782352
+            ],
+            [
+                0,
+                -68310
+            ]
+        ],
+        [
+            [
+                740088,
+                714042
+            ],
+            [
+                0,
+                68310
+            ],
+            [
+                38952,
+                33121
+            ]
+        ],
+        [
+            [
+                194760,
+                782352
+            ],
+            [
+                0,
+                -68310
+            ]
+        ],
+        [
+            [
+                155808,
+                678850
+            ],
+            [
+                -38952,
+                35192
+            ],
+            [
+                0,
+                68310
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ]
+        ],
+        [
+            [
+                428472,
+                714042
+            ],
+            [
+                0,
+                68310
+            ]
+        ],
+        [
+            [
+                428472,
+                782352
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ],
+            [
+                0,
+                -68310
+            ]
+        ],
+        [
+            [
+                895896,
+                714042
+            ],
+            [
+                -38952,
+                -35192
+            ]
+        ],
+        [
+            [
+                584280,
+                714042
+            ],
+            [
+                0,
+                68310
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ],
+            [
+                0,
+                -68310
+            ]
+        ],
+        [
+            [
+                350568,
+                714042
+            ],
+            [
+                0,
+                68310
+            ]
+        ],
+        [
+            [
+                350568,
+                782352
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ]
+        ],
+        [
+            [
+                272664,
+                782352
+            ],
+            [
+                0,
+                -68310
+            ]
+        ],
+        [
+            [
+                194760,
+                782352
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ]
+        ],
+        [
+            [
+                272664,
+                782352
+            ],
+            [
+                38952,
+                33121
+            ],
+            [
+                38952,
+                -33121
+            ]
+        ],
+        [
+            [
+                77904,
+                999999
+            ],
+            [
+                38952,
+                -29092
+            ],
+            [
+                0,
+                -60160
+            ],
+            [
+                -38952,
+                -31081
+            ],
+            [
+                -38952,
+                31081
+            ],
+            [
+                0,
+                60160
+            ],
+            [
+                38952,
+                29092
+            ]
+        ],
+        [
+            [
+                934848,
+                678850
+            ],
+            [
+                0,
+                -72465
+            ],
+            [
+                -38952,
+                -37271
+            ]
+        ]
+    ],
+    "bbox": [
+        -137.974702,
+        24.212972,
+        -68.071485,
+        55.313204
+    ],
+    "transform": {
+        "scale": [
+            0.00006990328690328692,
+            0.0000311002631002631
+        ],
+        "translate": [
+            -137.974702,
+            24.212972
+        ]
+    }
+}

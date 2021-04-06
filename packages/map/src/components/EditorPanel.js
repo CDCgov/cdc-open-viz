@@ -337,6 +337,17 @@ const EditorPanel = memo((props) => {
                     }
                 })
                 break;
+            case 'hex':
+            setState( (prevState) => {
+                return {
+                    general: {
+                      ...prevState.general,
+                      showSidebar: true,
+                      type: "hex",
+                    }
+                }
+            })
+            break;
             default:
                 console.warn("Map type not set")
             break;
@@ -907,6 +918,7 @@ const EditorPanel = memo((props) => {
                     <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
                       <option value="data">Data</option>
                       <option value="navigation">Navigation</option>
+                      <option value="hex">Hex</option>
                     </select>
                   </label>
                   <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />

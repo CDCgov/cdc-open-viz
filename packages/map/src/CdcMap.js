@@ -29,6 +29,7 @@ import Loading from './components/Loading';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import HexMap from './components/HexMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
@@ -1251,6 +1252,7 @@ class CdcMap extends Component {
                         <section className="geography-container" aria-hidden="true">
                             {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
                                 {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {'hex' === this.state.general.geoType && <HexMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
                                 {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
                                 {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
                                 
