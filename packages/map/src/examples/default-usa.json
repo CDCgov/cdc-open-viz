@@ -6,7 +6,7 @@
 		"subtext": "",
 		"territoriesLabel": "Territories",
 		"type": "data",
-		"geoType": "us",
+		"geoType": "hex",
 		"headerColor": "theme-blue",
 		"showSidebar": true,
 		"showTitle": true,
