@@ -61,7 +61,7 @@ export default function CdcChart(
     // Deeper copy
     Object.keys(defaults).forEach( key => {
       if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...newConfig[key], ...defaults[key]}
+        newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
     })
 
@@ -98,11 +98,11 @@ export default function CdcChart(
   }
 
   const viewports:keyable = {
-    "lg": 1200,
-    "md": 992,
-    "sm": 768,
-    "xs": 576,
-    "xxs": 350
+    'lg': 1200,
+    'md': 992,
+    'sm': 768,
+    'xs': 576,
+    'xxs': 350
   }
 
   const getViewport = size => {

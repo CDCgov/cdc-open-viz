@@ -6,6 +6,7 @@
     "seriesKeys": ["New York", "San Francisco", "Austin"],
     "seriesLabels": {"New York": "NY", "San Francisco": "SF", "Austin": "AU"},
     "seriesLabel": "City",
+    "fontSize": "large",
     "dataFormat": {
         "roundTo": -1,
         "commas": false,
@@ -27,8 +28,7 @@
         "dateParseFormat": "%Y-%m-%d",
         "dateDisplayFormat": "%b %d",
         "numTicks": 8,
-        "tickRotation": 50,
-        "size": 100
+        "tickRotation": 50
     },
     "legend": {
         "label": "Legend",
