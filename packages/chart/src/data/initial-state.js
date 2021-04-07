@@ -1,21 +1,18 @@
 export default {
     type: 'chart',
-    title: {},
+    title: '',
     theme: 'theme-blue',
+    fontSize: 'medium',
     padding: {
         left: 0,
         right: 0
     },
     minHeight: 400,
     yAxis: {
-        size: 50,
-        labelFontSize: 11,
-        tickFontSize: 9
+        size: 50
     },
     xAxis: {
         size: 75,
-        labelFontSize: 11,
-        tickFontSize: 9,
         tickRotation: 0
     },
     table: {

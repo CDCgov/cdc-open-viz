@@ -34,7 +34,7 @@ export default function DataTable() {
   const formatDate = (date) => timeFormat(config.xAxis.dateDisplayFormat)(new Date(date));
 
   const DownloadButton = memo(({ data }: any) => {
-    const fileName = `${config.title.text.substring(0, 50)}.csv`;
+    const fileName = `${config.title.substring(0, 50)}.csv`;
 
     const csvData = Papa.unparse(data);
 
@@ -188,7 +188,7 @@ export default function DataTable() {
                 </thead>
                 <tbody>
                   {config.regions.map((region) => (
-                    <tr>
+                    <tr key={`row-${region.label}`}>
                       <td>{region.label}</td>
                       <td>{formatDate(region.from)}</td>
                       <td>{formatDate(region.to)}</td>

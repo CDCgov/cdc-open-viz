@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import * as allCurves from '@visx/curve';
 import { Group } from '@visx/group';
 import { LinePath } from '@visx/shape';
+import { Text } from '@visx/text';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -22,15 +23,14 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
           >
             { data.map((d, dataIndex) => (
               <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-              <text 
+              <Text 
                   display={config.labels && config.labels.display ? 'block': 'none'}
                   x={xScale(getXAxisData(d))}
                   y={yScale(getYAxisData(d, seriesKey))}
                   fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                  fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                   textAnchor="middle">
                     {formatNumber(d[seriesKey])}
-                </text>
+                </Text>
                 <circle
                   key={`${seriesKey}-${dataIndex}`}
                   r={3}

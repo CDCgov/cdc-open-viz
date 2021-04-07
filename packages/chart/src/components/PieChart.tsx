@@ -4,6 +4,7 @@ import ReactTooltip from 'react-tooltip';
 
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import { Group } from '@visx/group';
+import { Text } from '@visx/text';
 
 import Context from '../context';
 
@@ -92,17 +93,16 @@ export default function PieChart() {
               <animated.g key={key}>
                 {hasSpaceForLabel && (
                   
-                    <text
+                    <Text
                       fill="white"
                       x={centroidX}
                       y={centroidY}
                       dy=".33em"
-                      fontSize={config.labels && config.labels.fontSize ? config.labels.fontSize : 14}
                       textAnchor="middle"
                       pointerEvents="none"
                     >
                       {Math.round((arc.endAngle - arc.startAngle) * 180 / Math.PI / 360 * 100) + '%'}
-                    </text>
+                    </Text>
                 )}
               </animated.g>
             );
