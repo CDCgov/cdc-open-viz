@@ -5,9 +5,8 @@
     "visualizationType": "Bar",
     "visualizationSubType": "horizontal",
     "seriesKeys": ["Age-adjusted rate"],
-    "minHeight": 300,
-    "barThickness": 0.35,
-    "fontSize": "large",
+    "barThickness": 0.3,
+    "height": 300,
     "dataFormat": {
         "roundTo": -1,
         "commas": false,
@@ -22,14 +21,12 @@
         "label": "Rate per 100,000 population",
         "dataKey": "Age-adjusted rate",
         "gridLines": false,
-        "numTicks": 3,
-        "size": 75
+        "numTicks": 3
     },
     "xAxis": {
         "label": "Race",
         "dataKey": "Race",
-        "tickRotation": 72,
-        "size": 140,
+        "size": 20,
         "wrap": true
     },
     "legend": {

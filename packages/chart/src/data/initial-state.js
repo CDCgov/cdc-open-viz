@@ -3,11 +3,11 @@ export default {
     title: '',
     theme: 'theme-blue',
     fontSize: 'medium',
+    height: 500,
     padding: {
-        left: 0,
-        right: 0
+        left: 5,
+        right: 5
     },
-    minHeight: 400,
     yAxis: {
         size: 50
     },

@@ -20,15 +20,16 @@ import '../scss/LinearChart.scss';
 export default function LinearChart() {
   const { data, dimensions, config, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
-  let height = 500;
 
   if(!config.legend.hide && currentViewport === 'lg') {
     width = width * 0.73
   }
 
+  const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
+
   const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
 
-  const xMax = width - config.yAxis.size;
+  const xMax = width - config.yAxis.size - config.padding.left - config.padding.right;
   const yMax = height - config.xAxis.size;
 
   const parseDate = timeParse(config.xAxis.dateParseFormat);
@@ -121,7 +122,7 @@ export default function LinearChart() {
       <svg width={width} height={height} className="linear">
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
           
           {/* Bar chart */}
@@ -152,7 +153,7 @@ export default function LinearChart() {
                   opacity={0.3} />
                 <Text 
                   x={from + (width / 2)} 
-                  y={0} 
+                  y={5} 
                   fill={region.color}
                   verticalAnchor="start"
                   textAnchor="middle">
@@ -198,6 +199,7 @@ export default function LinearChart() {
                         <Text
                           x={config.horizontal ? tick.from.x + 2 : tick.to.x}
                           y={tick.to.y + (config.horizontal ? horizontalTickOffset : 0)}
+                          dy={config.horizontal ? -5 : 0}
                           verticalAnchor="middle"
                           textAnchor={config.horizontal ? 'start' : 'end'}
                         >{tick.formattedValue}</Text>
@@ -257,10 +259,10 @@ export default function LinearChart() {
                           stroke="#333"
                         />
                         <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(${!config.horizontal ? config.xAxis.tickRotation : 0})`}
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
-                          textAnchor="middle"
-                          width={config.xAxis.wrap ? tickWidth : undefined}
+                          textAnchor={config.xAxis.tickRotation ? 'end' : 'middle'}
+                          width={config.xAxis.tickRotation ? undefined : tickWidth}
                         >
                           {tick.formattedValue}
                         </Text>
@@ -273,9 +275,9 @@ export default function LinearChart() {
                     stroke="#333"
                   />
                   <Text
-                    textAnchor="middle"
                     x={axisCenter}
                     y={config.xAxis.size}
+                    textAnchor="middle"
                     verticalAnchor="end"
                     fontWeight="bold"
                   >

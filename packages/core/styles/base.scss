@@ -22,7 +22,7 @@
 
 @mixin breakpointClass($class) {
   @if $class == xs {
-    &.xs {
+    &.xs, &.xxs {
       @content;
     }
   }

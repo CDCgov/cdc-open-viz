@@ -128,6 +128,7 @@
       width: 100% !important;
     }
     > svg {
+      overflow: visible;
       font-size: 14px;
       margin: 1rem 0 2rem;
     }
@@ -188,7 +189,7 @@
       }
     }
   }
-  @include breakpointClass(xxs) {
+  @include breakpointClass(xs) {
     &.font-small {
       font-size: .8em;
 

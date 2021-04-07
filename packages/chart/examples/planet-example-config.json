@@ -21,8 +21,7 @@
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
-        "tickRotation": 30,
-        "size": 90
+        "tickRotation": 30
     },
     "legend": {
         "hide": false

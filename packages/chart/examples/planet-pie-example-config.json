@@ -4,7 +4,7 @@
     "visualizationType": "Pie",
     "palette": "qualitative-soft",
     "seriesKeys": ["Radius"],
-    "minHeight": 200,
+    "aspectRatio": 1,
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -17,8 +17,7 @@
     },
     "xAxis": {
         "label": "Planet",
-        "dataKey": "name",
-        "size": 0
+        "dataKey": "name"
     },
     "legend": {
         "hide": false
