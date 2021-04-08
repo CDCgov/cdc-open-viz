@@ -5,6 +5,7 @@
     "visualizationSubType": "stacked",
     "seriesKeys": ["Radius", "Diameter"],
     "fontSize": "medium",
+    "dataCutoff": "0.5",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,

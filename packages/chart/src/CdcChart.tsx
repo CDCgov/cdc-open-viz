@@ -212,11 +212,20 @@ export default function CdcChart(
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+    let prefix = config.dataFormat.prefix;
     if (!config.dataFormat) return num;
     if (typeof num !== 'number') num = parseFloat(num);
+    if (config.dataCutoff){
+      let cutoff = config.dataCutoff
+      if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
+      if(num < cutoff) {
+        prefix = '< ' + prefix;
+        num = cutoff;  
+      }
+    }
     if (config.dataFormat.roundTo !== -1) num = num.toFixed(config.dataFormat.roundTo);
     if (config.dataFormat.commas) num = num.toLocaleString('en-US');
-    return config.dataFormat.prefix + num + config.dataFormat.suffix;
+    return prefix + num + config.dataFormat.suffix;
   };
 
   // Destructure items from config for more readable JSX
