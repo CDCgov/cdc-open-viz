@@ -1,19 +1,30 @@
 import React, { useState, useEffect, memo } from 'react';
 import GlobalState from './context';
 import DataImport from './components/DataImport';
+import ChooseVisTab from './components/ChooseVisTab';
 import ConfigTab from './components/ConfigTab';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ startingTab = null, config: configObj = null, hostname }) {
+export default function CdcEditor({ config: configObj = null, hostname }) {
   const [config, setConfig] = useState(configObj)
-  const [dataURL, setDataURL] = useState(null);
-  const [data, setData] = useState(null);
+  const [dataURL, setDataURL] = useState(null)
+  const [data, setData] = useState(null)
   const [keepURL, setKeepURL] = useState(false)
-  const [type, setType] = useState('map'); // Default to map, temporarily
-  const [errors, setErrors] = useState([]);
+  const [type, setType] = useState(null)
+  const [errors, setErrors] = useState([])
+
+  let startingTab = config ? 2 : 0;
+
+  const [globalActive, setGlobalActive] = useState(startingTab);
+
+  useEffect(() => {
+    if(globalActive > -1) {
+      setGlobalActive(-1)
+    }
+  }, [globalActive])
 
   useEffect(() => {
     if(config && config.hasOwnProperty('data')) {
@@ -50,21 +61,22 @@ export default function CdcEditor({ startingTab = null, config: configObj = null
     setDataURL,
     keepURL,
     setKeepURL,
-    hostname
-  }
-
-  if(null === startingTab) {
-    startingTab = config ? 1 : 0;
+    hostname,
+    globalActive,
+    setGlobalActive
   }
 
   return (
     <GlobalState.Provider value={state}>
       <div className="cdc-open-viz-module cdc-editor">
-        <Tabs className="top-level" startingTab={startingTab}>
+        <Tabs className="top-level" startingTab={globalActive}>
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
-          <TabPane title="2. Configure" disableRule={null === data}>
+          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={null === data}>
+            <ChooseVisTab />
+          </TabPane>
+          <TabPane title="3. Configure" disableRule={null === data || null === type}>
             <ConfigTab />
           </TabPane>
         </Tabs>

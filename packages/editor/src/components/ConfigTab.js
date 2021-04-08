@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import CdcMap from '@cdc/map'; // TODO: Lazy load this
+import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import GlobalState from '../context';
@@ -8,7 +9,7 @@ import GlobalState from '../context';
 export default function ConfigTab() {
     const { data, type, config, keepURL, dataURL, hostname } = useContext(GlobalState);
 
-    // If there's no preexisting config (this is a new visualizaiton) we just pass in an object created with only the data.
+    // If there's no preexisting config (this is a new visualiztaion) we just pass in an object created with only the data.
     let configObj = config ?? {data}
 
     if(data) {
@@ -24,6 +25,12 @@ export default function ConfigTab() {
             return (
                 <ErrorBoundary component="CdcMap">
                     <CdcMap isEditor={true} config={configObj} hostname={hostname} />
+                </ErrorBoundary>
+            )
+        case 'chart':
+            return (
+                <ErrorBoundary component="CdcChart">
+                    <CdcChart isEditor={true} config={configObj} hostname={hostname} />
                 </ErrorBoundary>
             )
         default:

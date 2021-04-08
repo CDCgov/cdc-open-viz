@@ -15,8 +15,8 @@
     "dataFormat": {
         "roundTo": -1,
         "commas": false,
-        "prefix": "",
-        "suffix": ""
+        "prefix": "Lorem",
+        "suffix": "Suffix"
     },
     "padding": {
         "left": 10,
