@@ -1,6 +1,6 @@
 $btn-radius: 6px;
 
-.btn-group {
+.cdc-open-viz-module .btn-group {
   display: inline-flex;
   flex-flow: row;
   justify-content: flex-start;
@@ -21,6 +21,7 @@ $btn-radius: 6px;
     border-radius: $btn-radius;
     user-select: none;
     align-self: stretch;
+    flex: 1 0 auto;
 
     &::before {
       content: '';
