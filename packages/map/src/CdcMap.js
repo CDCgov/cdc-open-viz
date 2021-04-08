@@ -89,7 +89,7 @@ class CdcMap extends Component {
         this.setState = this.setState.bind(this)
         this.processUnifiedData = this.processUnifiedData.bind(this)
         this.getViewport = this.getViewport.bind(this)
-        this.saveAs = this.saveAs.bind(this)
+        this.saveImageAs = this.saveImageAs.bind(this)
     }
 
     closeModal({target}) {
@@ -105,17 +105,33 @@ class CdcMap extends Component {
         }
     }
 
-    saveAs(uri, filename) {
-        const link = document.createElement('a')
-        if (typeof link.download === 'string') {
-            link.href = uri
-            link.download = filename
+    saveImageAs(uri, filename) {
+        const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
+        const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
+        const ieEdge = navigator.userAgent.match(/Edge/g)
+        const ieVer=(ie ? ie[1] : (ie11 ? 11 : (ieEdge ? 12 : -1)));
 
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
+        if (ie && ieVer<10) {
+            console.log("IE10+ required");
+            return;
+        }
+
+        if (ieVer>-1) {
+            const fileAsBlob = new Blob([uri], {
+                type: 'image/png'
+            });
+            window.navigator.msSaveBlob(fileAsBlob, filename);
         } else {
-            window.open(uri)
+            const link = document.createElement('a')
+            if (typeof link.download === 'string') {
+                link.href = uri
+                link.download = filename
+                link.onclick = (e) => document.body.removeChild(e.target);
+                document.body.appendChild(link)
+                link.click()
+            } else {
+                window.open(uri)
+            }
         }
     }
 
@@ -155,7 +171,7 @@ class CdcMap extends Component {
                     windowWidth: 1440,
                     scale: 1
                 }).then(canvas => {
-                    this.saveAs(canvas.toDataURL(), filename + '.png')
+                    this.saveImageAs(canvas.toDataURL(), filename + '.png')
                 }).then(() => {
                     generatedImage.remove() // Remove generated png
                     baseSvg.style.display = null // Re-display initial svg map
