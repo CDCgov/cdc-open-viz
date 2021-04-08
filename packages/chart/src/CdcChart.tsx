@@ -13,10 +13,11 @@ import Context from './context';
 import defaults from './data/initial-state';
 
 import './scss/main.scss';
+import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, configObj } : 
-  { configUrl?: string, configObj?: any }
+  { configUrl, configObj, isEditor = false} : 
+  { configUrl?: string, configObj?: any, isEditor?: boolean }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
@@ -300,20 +301,23 @@ export default function CdcChart(
   if(false === loading) {
     body = (
       <>
-        {/* Title */}
-        {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
-        {/* Visualization */}
-        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
-          {/* Legend, if set above */}
-          {!config.legend.hide && !config.legend.below && <Legend />}
-          {chartComponents[visualizationType]}
-        </div>            
-        {/* Legend, if set below */}
-        {config.legend.below && <Legend />}
-        {/* Description */}
-        {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
-        {/* Data Table */}
-        <DataTable />
+        {isEditor && <EditorPanel />}
+        <div className="cdc-chart-inner-container">
+          {/* Title */}
+          {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
+          {/* Visualization */}
+          <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+            {/* Legend, if set above */}
+            {!config.legend.hide && !config.legend.below && <Legend />}
+            {chartComponents[visualizationType]}
+          </div>            
+          {/* Legend, if set below */}
+          {config.legend.below && <Legend />}
+          {/* Description */}
+          {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
+          {/* Data Table */}
+          <DataTable />
+        </div>
       </>
     )
   }

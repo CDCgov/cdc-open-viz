@@ -18,41 +18,16 @@ const IconButton = ({icon, label}) =>
 
 export default function ChooseVisTab() { 
     return (
-        <div className="container-fuild">
-            <div className="row">
-                <div className="col choose-vis">
-                    {/* Experimenting with an accessible,
-                    no js alt to a select - IE not supported 
-                    won't be needed until we have more charts
-                    <div className="dropdown " role="navigation">
-                        <button>View All Visualizations</button>
-                        <nav className="">
-                            <button>View Charts</button>
-                            <button>View Maps</button>
-                        </nav>
-                    </div>*/}
+        <div className="choose-vis">
+            <h2>Charts</h2>
+            <IconButton label="Bar Chart" icon={ <BarIcon /> } />
+            <IconButton label="Area Chart" icon={ <AreaIcon /> } />
+            <IconButton label="Pie Chart" icon={ <PieIcon /> } />
+            <IconButton label="Line Chart" icon={ <LineIcon /> } />
 
-                    <div id="visualizationList">
-                        <IconButton label="Bar Chart" icon={ <BarIcon /> } />
-                        <IconButton label="Area Chart" icon={ <AreaIcon /> } />
-                        <IconButton label="Pie Chart" icon={ <PieIcon /> } />
-                        <IconButton label="Line Chart" icon={ <LineIcon /> } />
-                        <IconButton label="World Map" icon={ <GlobeIcon /> } />
-                        <IconButton label="United States Map" icon={ <UsaIcon /> } />
-                    </div>
-                    
-                </div>
-                <div className="col-sm-8 choos-vis-preview">
-                    <Tabs>
-                        <TabPane title="Single Visualization">
-                            Single Visualization Here
-                        </TabPane>
-                        <TabPane title="Dashboard Builder">
-                            Dashboard Here
-                        </TabPane>
-                    </Tabs>
-                </div>
-            </div>
+            <h2>Maps</h2>
+            <IconButton label="World Map" icon={ <GlobeIcon /> } />
+            <IconButton label="United States Map" icon={ <UsaIcon /> } />
         </div>
     )
 }

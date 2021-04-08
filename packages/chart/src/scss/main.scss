@@ -1,10 +1,12 @@
-@import '~bootstrap/scss/bootstrap';
+// @import '~bootstrap/scss/bootstrap';
 @import '~@cdc/core/styles/base';
 @import "~@cdc/core/styles/heading-colors";
 @import 'mixins';
+@import 'variables';
 
 .cdc-open-viz-module.type-chart {
   @import 'datatable';
+  @import 'editor-panel';
   .visually-hidden {
     position: fixed;
     left: -10000px;

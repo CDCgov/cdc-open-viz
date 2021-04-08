@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
-const Tabs = ({ children, startingTab = 0, className }) => {
+import GlobalState from '../context';
+
+const Tabs = ({ children, startingTab = 0, className, changeTab = null }) => {
   const [active, setActive] = useState(startingTab);
 
   let containerClassName = 'tabs';
@@ -14,6 +16,12 @@ const Tabs = ({ children, startingTab = 0, className }) => {
       setActive(index)
     }
   }
+
+  useEffect(() => {
+    if(startingTab > -1) {
+      setActive(startingTab)
+    }
+  }, [startingTab])
 
   const tabs = children.map(({props}, i) => {
     
