@@ -42,7 +42,7 @@
     "react-simple-maps": "^2.1.2",
     "react-table": "^7.5.0",
     "react-tag-autocomplete": "^6.0.0",
-    "react-tooltip": "^3.11.1",
+    "react-tooltip": "^4.2.17",
     "stream": "0.0.2",
     "us-atlas": "^3.0.0",
     "use-debounce": "^5.2.0",
