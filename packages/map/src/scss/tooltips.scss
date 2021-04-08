@@ -1,5 +1,6 @@
 /* Tooltip Styles - overrides some default ones provided by <ReactTooltip /> */
 .tooltip {
+  opacity: 1 !important;
   border: rgba(0,0,0,.3) 1px solid;
   box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
   opacity: 1;
