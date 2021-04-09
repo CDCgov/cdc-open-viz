@@ -6,8 +6,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import GlobalState from '../context';
 
 
-export default function ConfigTab() {
-    const { data, type, config, keepURL, dataURL, hostname } = useContext(GlobalState);
+export default function ConfigureTab() {
+    const { data, type, subType, config, keepURL, dataURL, hostname } = useContext(GlobalState);
 
     // If there's no preexisting config (this is a new visualiztaion) we just pass in an object created with only the data.
     let configObj = config ?? {data}
@@ -16,8 +16,16 @@ export default function ConfigTab() {
         configObj = {...configObj, data}
     }
 
+    // Add US/World switcher for maps
+    if(type === 'map') {
+        let general = configObj.general ?? {}
+
+        general.geoType = subType
+        configObj.general = general
+    }
+
     if(keepURL && dataURL) {
-        configObj = {...configObj, dataUrl: dataURL}
+        configObj.dataUrl = dataURL
     }
 
     switch (type) {

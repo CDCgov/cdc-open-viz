@@ -238,7 +238,7 @@ export default function DataImport() {
         </a>
         {data && (
           <div>
-            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type</span>
+            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
           </div>
         )}
       </div>

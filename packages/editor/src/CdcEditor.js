@@ -1,8 +1,8 @@
 import React, { useState, useEffect, memo } from 'react';
 import GlobalState from './context';
 import DataImport from './components/DataImport';
-import ChooseVisTab from './components/ChooseVisTab';
-import ConfigTab from './components/ConfigTab';
+import ChooseTab from './components/ChooseTab';
+import ConfigureTab from './components/ConfigureTab';
 import TabPane from './components/TabPane';
 import Tabs from './components/Tabs';
 
@@ -14,6 +14,7 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
   const [data, setData] = useState(null)
   const [keepURL, setKeepURL] = useState(false)
   const [type, setType] = useState(null)
+  const [subType, setSubType] = useState(null)
   const [errors, setErrors] = useState([])
 
   let startingTab = config ? 2 : 0;
@@ -51,6 +52,8 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
     setData,
     type,
     setType,
+    subType,
+    setSubType,
     config,
     setConfig,
     errors,
@@ -74,10 +77,10 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
             <DataImport />
           </TabPane>
           <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={null === data}>
-            <ChooseVisTab />
+            <ChooseTab />
           </TabPane>
           <TabPane title="3. Configure" disableRule={null === data || null === type}>
-            <ConfigTab />
+            <ConfigureTab />
           </TabPane>
         </Tabs>
       </div>
