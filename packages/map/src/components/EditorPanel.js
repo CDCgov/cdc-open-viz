@@ -59,7 +59,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -91,7 +91,7 @@ const EditorPanel = memo((props) => {
   const [ loadedDefault, setLoadedDefault ] = useState(false)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
-  
+
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
 
   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
@@ -305,6 +305,16 @@ const EditorPanel = memo((props) => {
                     general: {
                         ...prevState.general,
                         showDownloadButton: !prevState.general.showDownloadButton
+                    }
+                }
+            })
+      break;
+      case 'toggleDownloadMediaButton':
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        showDownloadMediaButton: !prevState.general.showDownloadMediaButton
                     }
                 }
             })
@@ -689,7 +699,7 @@ const EditorPanel = memo((props) => {
 
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
-    
+
     // Remove tooltips if they're active in the editor
     let strippedGeneral = JSON.parse(JSON.stringify(state.general))
 
@@ -756,7 +766,7 @@ const EditorPanel = memo((props) => {
       'primary',
       'geosInRegion'
     ]
-    
+
     if( true === defaultCols.includes(value) ) {
       return false
     }
@@ -822,7 +832,7 @@ const EditorPanel = memo((props) => {
     const event = new CustomEvent('updateMapConfig', { detail: parsedData})
 
     window.dispatchEvent(event)
-      
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
 
@@ -837,7 +847,7 @@ const EditorPanel = memo((props) => {
 
   let numberOfItemsLimit = 8
 
-  const getItemStyle = (isDragging, draggableStyle) => ({  
+  const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
   });
 
@@ -876,8 +886,8 @@ const EditorPanel = memo((props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
+      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>
@@ -915,6 +925,10 @@ const EditorPanel = memo((props) => {
                   {'us' === state.general.geoType &&
                     <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
                   }
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
+                    <span className="edit-label">Enable Media Download</span>
+                  </label>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem> {/* Columns */}
@@ -930,7 +944,7 @@ const EditorPanel = memo((props) => {
                       {columnsOptions}
                     </select>
                   </label>
-                  {'us' === state.general.geoType && 
+                  {'us' === state.general.geoType &&
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
                     <span className="edit-label">This map uses regions</span>
@@ -950,6 +964,14 @@ const EditorPanel = memo((props) => {
                       <span className="edit-label column-heading">Primary</span>
                       <select value={state.columns.primary ? state.columns.primary.name : columnsOptions[0] } onChange={(event) => { editColumn("primary", "name", event.target.value) }}>
                         {columnsOptions}
+                      </select>
+                    </label>
+                    <label>
+                      <span className="edit-label">Data Classification Type</span>
+                      <select value={legend.type} onChange={(event) => { handleEditorChanges("legendType", event.target.value) }}>
+                        <option value="equalnumber">Equal Number</option>
+                        <option value="equalinterval">Equal Interval</option>
+                        <option value="category">Categorical</option>
                       </select>
                     </label>
                     <TextField value={columns.primary.label} section="columns" subsection="primary" fieldName="label" label="Label" updateField={updateField} />
@@ -1046,14 +1068,6 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <label>
-                    <span className="edit-label">Legend Type</span>
-                    <select value={legend.type} onChange={(event) => { handleEditorChanges("legendType", event.target.value) }}>
-                      <option value="equalnumber">Equal Number</option>
-                      <option value="equalinterval">Equal Interval</option>
-                      <option value="category">Categorical</option>
-                    </select>
-                  </label>
                   {"category" !== legend.type &&
                     <label>
                       <span className="edit-label">Number of Items</span>
