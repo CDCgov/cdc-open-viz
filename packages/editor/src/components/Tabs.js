@@ -1,7 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 
-import GlobalState from '../context';
-
 const Tabs = ({ children, startingTab = 0, className, changeTab = null }) => {
   const [active, setActive] = useState(startingTab);
 
