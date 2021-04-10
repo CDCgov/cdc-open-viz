@@ -24,6 +24,11 @@ export default function ConfigureTab() {
         configObj.general = general
     }
 
+    // Add type switcher for charts
+    if(type === 'chart') {
+        configObj.visualizationType = configObj.visualizationType || subType
+    }
+
     if(keepURL && dataURL) {
         configObj.dataUrl = dataURL
     }

@@ -28,7 +28,7 @@ export default function DataTable() {
   const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
   const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
 
-  const [tableExpanded, setTableExpanded] = useState<boolean>(false);
+  const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
   const formatDate = (date) => timeFormat(config.xAxis.dateDisplayFormat)(new Date(date));

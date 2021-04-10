@@ -1,0 +1,26 @@
+.cdc-open-viz-module {
+    @import "mixins";
+    .waiting {
+        &.collapsed {
+            padding: 2em !important;
+        }
+        @include emptyState;
+        align-items: flex-start;
+        padding-top: 250px;
+        .waiting-container {
+            max-width: 400px;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: .3rem;
+        }
+        p {
+            font-size: 1em;
+            strong {
+                font-weight: bold;
+            }
+        }
+    }
+}
+  

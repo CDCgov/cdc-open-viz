@@ -1,6 +1,7 @@
 export default {
     type: 'chart',
     title: {},
+    description: {},
     theme: 'theme-blue',
     padding: {
         left: 0,
@@ -19,7 +20,8 @@ export default {
         tickRotation: 0
     },
     table: {
-        label: 'Data Table'
+        label: 'Data Table',
+        expanded: true
     },
     legend: {}
 }

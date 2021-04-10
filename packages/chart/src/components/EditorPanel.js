@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+
 import {
   Accordion,
   AccordionItem,
@@ -7,8 +7,12 @@ import {
   AccordionItemPanel,
   AccordionItemButton,
 } from 'react-accessible-accordion';
-import ReactTooltip from 'react-tooltip'
 import { useDebounce } from 'use-debounce';
+
+import Context from '../context';
+
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Waiting from '@cdc/core/components/Waiting'
 
 // IE11 Custom Event polyfill
 (function () {
@@ -60,744 +64,65 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const EditorPanel = memo((props) => {
-//   const {
-//     state,
-//     loadConfig,
-//     setState,
-//     generateValuesForFilter,
-//     processData,
-//     processLegend
-//   } = props
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField}) => (
+  <label className="checkbox mt-4">
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} />
+    <span className="edit-label">{label}</span>
+  </label>
+))
 
-//   const { general, color, columns, legend, data, filters, dataTable, tooltips, processedData, processedLegend, loading } = state
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField}) => {
+  let optionsJsx = options.map(optionName => <option value={optionName}>{optionName}</option>)
 
-  const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
+  return (
+    <label>
+      <span className="edit-label">{label}</span>
+      <select name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }}>
+        {optionsJsx}
+      </select>
+    </label>
+  )
+})
 
-//   const [ configData, setConfigData ] = useState({})
+const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
-//   const [ loadedDefault, setLoadedDefault ] = useState(false)
+const EditorPanel = memo(() => {
+  const { config, setConfig, loading, data } = useContext(Context);
+
+  const updateField = (section, subsection, fieldName, newValue) => {
+    const isArray = Array.isArray(config[section]);
+    const isString = typeof config[section] === "string";
+
+    if(isString && null === subsection) {
+      setConfig({...config, [section]: newValue})
+      return
+    } 
+
+    let sectionValue = isArray ? [...config[section], newValue] : {...config[section], [fieldName]: newValue};
+
+    if(null !== subsection) {
+      if(isArray) {
+        sectionValue = [...config[section]]
+        sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
+      } else {
+        sectionValue = {...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue}}
+      }
+    }
+
+    let updatedConfig = {
+      [section]: sectionValue
+    }
+
+    setConfig({...config, ...updatedConfig})
+  }
+
+  const [ requiredColumns, setRequiredColumns ] = useState([])
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
-  
-//   const [ advancedToggle, setAdvancedToggle ] = useState(false)
 
-//   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
-
-//   const [ editorCatOrder, setEditorCatOrder ] = useState([])
-
-//   const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
-
-//   const resetColumnsObj = {
-//     geo: {
-//         dataTable: true,
-//         label: "",
-//         name: "",
-//         tooltip: false
-//     },
-//     primary: {
-//         dataTable: true,
-//         label: "",
-//         name: "",
-//         prefix: "",
-//         suffix: "",
-//         tooltip: true
-//     },
-//     navigate: {
-//         dataTable: false,
-//         name: "",
-//         tooltip: false
-//     },
-//     geosInRegion: {
-//         name: ''
-//     }
-//   }
-
-//   const handleEditorChanges = async (property, value) => {
-//     switch (property) {
-//       case 'showTitle':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     showTitle: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'showSidebar':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     showSidebar: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'fullBorder':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     fullBorder: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'expandDataTable':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     expandDataTable: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'color':
-//         setState( (prevState) => {
-
-//             return {
-//                 color: value
-//             }
-//         })
-//       break;
-//       case 'hasRegions':
-//         setState( (prevState) => {
-
-//               return {
-//                   general: {
-//                       ...prevState.general,
-//                       hasRegions: value
-//                   },
-//                   columns: resetColumnsObj,
-//                   processedData: {}
-//               }
-//         })
-//       break;
-//       case 'sidebarPosition':
-//         setState( (prevState) => {
-
-//             return {
-//                 legend: {
-//                     ...prevState.legend,
-//                     position: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'geoBorderColor':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     geoBorderColor: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'headerColor':
-//         setState( (prevState) => {
-
-//             return {
-//                 general: {
-//                     ...prevState.general,
-//                     headerColor: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'geoColumn':
-//         setState( (prevState) => {
-
-//               return {
-//                   columns: {
-//                       ...prevState.columns,
-//                       geo: {
-//                           ...prevState.columns.geo,
-//                           name: value
-//                       }
-//                   }
-//               }
-//         })
-//       break;
-//       case 'navigateColumn':
-//         setState( (prevState) => {
-
-//             return {
-//                 columns: {
-//                     ...prevState.columns,
-//                     navigate: {
-//                         ...prevState.columns.navigate,
-//                         name: value
-//                     }
-//                 }
-//             }
-//         })
-//       break;
-//       case 'legendDescription':
-//         setState( (prevState) => {
-
-//             return {
-//                 legend: {
-//                     ...prevState.legend,
-//                     description: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'legendType':
-//         setState( (prevState) => { return {legend: {...legend, type: value} } } )
-//       break;
-//       case 'legendNumber':
-//         setState( (prevState) => {
-//               return {
-//                   legend: {
-//                     ...prevState.legend,
-//                     numberOfItems: parseInt(value)
-//                   }
-//               }
-//         })
-//       break;
-//       case 'changeActiveFilterValue':
-//         const arrVal = value.split(',')
-
-//         setActiveFilterValueForDescription(arrVal)
-//       break;
-//       case 'unifiedLegend':
-//         setState( () => {
-//             return {
-//                 legend: {...legend, unified: value}
-//             }
-//         })
-//       break;
-//       case 'separateZero':
-//         setState( () => {
-//             return {
-//                 legend: {...legend, separateZero: value}
-//             }
-//         })
-//       break;
-//       case 'editorDataUrl':
-//         setState({dataUrl: value})
-//       break;
-//       case 'toggleDownloadButton':
-//             setState( (prevState) => {
-//                 return {
-//                     general: {
-//                         ...prevState.general,
-//                         showDownloadButton: !prevState.general.showDownloadButton
-//                     }
-//                 }
-//             })
-//       break;
-//       case 'editorMapType':
-//         switch(value) {
-//             case 'data':
-//                 setState( (prevState) => {
-//                     return {
-//                         general: {
-//                             ...prevState.general,
-//                             showSidebar: true,
-//                             type: "data"
-//                         },
-//                     }
-//                 })
-//                 break;
-//             case 'navigation':
-//                 setState( (prevState) => {
-//                     return {
-//                         general: {
-//                           ...prevState.general,
-//                           showSidebar: false,
-//                           type: "navigation",
-//                         },
-//                         tooltips: {
-//                             ...prevState.tooltips,
-//                             appearanceType: "hover"
-//                         }
-//                     }
-//                 })
-//                 break;
-//             default:
-//                 console.warn("Map type not set")
-//             break;
-//         }
-
-//         setState(() => {
-//             return {
-//                 processedData: processData()
-//             }
-//         })
-//       break;
-//       case 'geoType':
-//         // If we're still working with default data, switch to the world default to show it as an example
-//         if(true === loadedDefault && 'world' === value) {
-//           loadConfig(worldDefaultConfig)
-//           ReactTooltip.rebuild()
-//           break;
-//         }
-
-//         if(true === loadedDefault && 'us' === value) {
-//           loadConfig(usaDefaultConfig)
-//           ReactTooltip.rebuild()
-//           break;
-//         }
-
-//         switch(value) {
-//             case 'us':
-//                 setState( (prevState) => {
-//                     return {
-//                         general: {
-//                             ...prevState.general,
-//                             geoType: "us"
-//                         }
-//                     }
-//                 })
-//                 break;
-//             case 'world':
-//                 setState( (prevState) => {
-//                     return {
-//                         general: {
-//                             ...prevState.general,
-//                             geoType: "world",
-//                         }
-//                     }
-//                 })
-//                 break;
-//             default:
-//                 console.warn("Map type not set.")
-//             break;
-//         }
-
-//         ReactTooltip.rebuild()
-//       break;
-//       case 'categoryOrder':
-//         const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
-
-//         setState( (prevState) => {
-//             return {
-//               legend: {
-//                 ...prevState.legend,
-//                 categoryValuesOrder
-//               }
-//             }
-//         })
-//       break;
-//       case 'singleColumnLegend':
-//         setState( (prevState) => {
-//             return {
-//                 legend: {
-//                     ...prevState.legend,
-//                     singleColumn: !prevState.legend.singleColumn
-//                 }
-//             }
-//         })
-//       break;
-//       case 'dynamicDescription':
-//         setState( (prevState) => {
-//             return {
-//                 editor: {
-//                     ...prevState.editor,
-//                     activeFilterValueForDescription: value
-//                 },
-//                 legend: {
-//                     ...prevState.legend,
-//                     dynamicDescription: !prevState.legend.dynamicDescription
-//                 }
-//             }
-//         })
-//       break;
-//       case 'changeLegendDescription':
-//         const [filterValKey, filterValDesc] = value
-
-//         setState( (prevState) => {
-//             return {
-//                 legend: {
-//                     ...prevState.legend,
-//                     descriptions: {
-//                         ...prevState.legend.descriptions,
-//                         [filterValKey]: [filterValDesc]
-//                     }
-//                 }
-//             }
-//         })
-//       break;
-//       case 'appearanceType':
-//         setState( (prevState) => {
-
-//             return {
-//                 tooltips: {
-//                     ...prevState.tooltips,
-//                     appearanceType: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'linkLabel':
-//         setState( (prevState) => {
-
-//             return {
-//                 tooltips: {
-//                     ...prevState.tooltips,
-//                     linkLabel: value
-//                 }
-//             }
-//         })
-//       break;
-//       case 'capitalizeLabels':
-//           setState( (prevState) => {
-
-//               return {
-//                   tooltips: {
-//                       ...prevState.tooltips,
-//                       capitalizeLabels: value
-//                   }
-//               }
-//           })
-//       break;
-//       default:
-//           console.warn(`Did not recognize editor property.`)
-//       break;
-//     }
-//   }
-
-//   const columnsRequiredChecker = useCallback(() => {
-//     const columnList = []
-
-//     // Geo is always required
-//     if('' === state.columns.geo.name) {
-//       let colName = state.general.hasRegions ? 'Region' : 'Geography'
-
-//       columnList.push(colName)
-//     }
-
-//     // Geos in Region is required for region maps
-//     if(true === state.general.hasRegions && '' === state.columns.geosInRegion.name) {
-//       columnList.push('Geos in Region')
-//     }
-
-//     // Primary is required if we're on a data map
-//     if('data' === state.general.type && '' === state.columns.primary.name) {
-//       columnList.push('Primary')
-//     }
-
-//     // Navigate is required for navigation maps
-//     if('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate) ) {
-//       columnList.push('Navigation')
-//     }
-
-//     setRequiredColumns(columnList)
-//   }, [state.columns, state.general.hasRegions, state.general.type])
-
-  const editColumn = async (columnName, editTarget, value) => {
-    switch (editTarget) {
-        case 'specialClassDelete':
-            const updatedSpecialClasses = Array.from(legend.specialClasses)
-
-            updatedSpecialClasses.splice(value, 1)
-
-            setState( () => {
-                return {
-                    legend: {
-                      ...legend, specialClasses: updatedSpecialClasses}
-                }
-            })
-        break;
-        case 'specialClassAdd':
-            let newSpecialClasses = legend.specialClasses
-
-            newSpecialClasses.push(value.name)
-
-            setState( (prevState) => {
-                return {
-                    ...prevState,
-                    legend: {
-                      ...legend,
-                      specialClasses: newSpecialClasses
-                    }
-                }
-            })
-        break;
-        case 'name':
-          setState( (prevState) => {
-
-            return {
-                columns: {
-                    ...prevState.columns,
-                    [columnName]: {
-                        ...prevState.columns[columnName],
-                        [editTarget]: value
-                    }
-                }
-            }
-          })
-
-          break;
-        default:
-            setState( (prevState) => {
-
-                return {
-                    columns: {
-                        ...prevState.columns,
-                        [columnName]: {
-                            ...prevState.columns[columnName],
-                            [editTarget]: value
-                        }
-                    }
-                }
-            })
-        break;
-    }
+  if(loading) {
+    return null
   }
-
-  const changeFilter = async (filterIndex, target, value) => {
-      let newFilters = Array.from(filters)
-
-      switch (target) {
-          case 'addNew':
-              newFilters.push({
-                  values:[]
-              })
-          break;
-          case 'remove':
-              newFilters = newFilters.filter( (value, index) => index !== filterIndex);
-          break;
-          case 'columnName':
-              newFilters[filterIndex].columnName = value
-
-              // Regenerate legend values set one to active to pass to state
-              let values = generateValuesForFilter(value)
-
-              newFilters[filterIndex].values = values
-
-              newFilters[filterIndex].active = values[0]
-          break;
-          default:
-              newFilters[filterIndex][target] = value
-          break;
-
-      }
-
-      setState(() => { return {filters: newFilters}})
-
-      const processedData = processData()
-
-      setState(() => { return {processedData} })
-  }
-
-  const addAdditionalColumn = (number) => {
-      const columnKey = `additionalColumn${number}`
-
-      setState( (prevState) => {
-          return {
-              columns: {
-                  ...prevState.columns,
-                  [columnKey]: {
-                      label: "New Column",
-                      dataTable: false,
-                      tooltips: false,
-                      prefix: "",
-                      suffix: ""
-                  }
-              }
-          }
-      }
-    )
-
-  }
-
-  const removeAdditionalColumn = (columnName) => {
-
-      const newColumns = state.columns
-
-      delete newColumns[columnName]
-
-      setState( (prevState) => {
-          return {
-              columns: newColumns
-          }
-      })
-
-  }
-
-  const displayFilterLegendValue = (arr) => {
-
-    const filterName = filters[ arr[0] ].label || `Unlabeled Legend`
-
-    const filterValue = filters[ arr[0] ].values[ arr[1] ]
-
-    return filterName + ' - ' + filterValue
-
-  }
-
-  const sortableItemStyles = {
-    display:"block",
-    boxSizing:"border-box",
-    border:"1px solid #D1D1D1",
-    borderRadius:"2px",
-    background:"#F1F1F1",
-    padding:".4em .6em",
-    fontSize:".8em",
-    marginRight:".3em",
-    marginBottom:".3em",
-    cursor:"move",
-    zIndex:"999"
-  }
-
-  const convertStateToConfigFile = () => {
-    let strippedState = JSON.parse(JSON.stringify(state))
-
-    // Strip ref
-    delete strippedState[""]
-
-    // Delete processed data and legend
-    delete strippedState.processedData
-    delete strippedState.processedLegend
-
-    // Remove the legend
-    let strippedLegend = JSON.parse(JSON.stringify(state.legend))
-
-    delete strippedLegend.data
-    delete strippedLegend.disabledAmt
-
-    strippedState.legend = strippedLegend
-
-    // Remove loading status
-    delete strippedState.loading
-
-    // Remove viewport
-    delete strippedState.viewport
-
-    // Remove default data marker if the user started this map from default data
-    delete strippedState.defaultData
-    
-    // Remove tooltips if they're active in the editor
-    let strippedGeneral = JSON.parse(JSON.stringify(state.general))
-
-    delete strippedGeneral.modalOpen;
-    delete strippedGeneral.modalContent;
-    delete strippedGeneral.parentUrl;
-    delete strippedGeneral.logoImage;
-
-    // Strip out computed items
-    delete strippedGeneral.viewportSize;
-
-    strippedState.general = strippedGeneral
-
-    return JSON.stringify( strippedState )
-  }
-
-//   useEffect(() => setLoadedDefault(state.defaultData), [state.defaultData])
-
-//   useEffect(() => columnsRequiredChecker(), [state.columns, state.general])
-
-//   useEffect(() => {
-//     if(0 === requiredColumns.length && false === loading) {
-//       const processedData = processData()
-
-//       setState(() => { return {processedData} })
-//     }
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [requiredColumns])
-
-  // Generate all columns available by looping through the data - add a blank value at the top
-//   const columnsInData = [""]
-
-//   state.data.forEach( (row) => {
-
-//     Object.keys(row).forEach( (columnName) => {
-//       if(false === columnsInData.includes(columnName)) {
-//         columnsInData.push(columnName)
-//       }
-//     })
-
-//   } )
-
-//   const columnsOptions = columnsInData.map( (name) => {
-
-//     if("" === name) {
-//       return (<option value="" key={"Select Option"}>- Select Option -</option>)
-//     }
-
-//     return (<option value={name} key={name}>{name}</option>)
-//   })
-
-//   const specialClasses = []
-
-//   if("" !== legend.specialClasses[0]) {
-//     legend.specialClasses.forEach( (specialClass, index) => {
-//       specialClasses.push({id: index, name: specialClass})
-//     })
-//   }
-
-//   const additionalColumns = Object.keys(state.columns).filter( (value) => {
-//     const defaultCols = [
-//       'geo',
-//       'navigate',
-//       'primary',
-//       'geosInRegion'
-//     ]
-    
-//     if( true === defaultCols.includes(value) ) {
-//       return false
-//     }
-//     return true
-//   })
-
-//   const updateField = (section, subsection, fieldName, newValue) => {
-//     const isArray = Array.isArray(state[section]);
-//     let sectionValue = isArray ? [...state[section], newValue] : {...state[section], [fieldName]: newValue};
-
-//     if(null !== subsection) {
-//       if(isArray) {
-//         sectionValue = [...state[section]]
-//         sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
-//       } else {
-//         sectionValue = {...state[section], [subsection]: { ...state[section][subsection], [fieldName]: newValue}}
-//       }
-//     }
-
-//     let updatedState = {
-//       [section]: sectionValue
-//     }
-
-//     setState(() => updatedState)
-//   }
-
-//   useEffect(() => {
-//     const parsedData = convertStateToConfigFile()
-
-//     const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
-
-//     setConfigData(formattedData)
-
-//     // Emit the data in a regular JS event so it can be consumed by anything.
-//     const event = new CustomEvent('updateMapConfig', { detail: parsedData})
-
-//     window.dispatchEvent(event)
-      
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [state])
-
-//   useEffect(() => {
-//     if('data' === state.general.type) {
-//       const processedLegend = processLegend()
-
-//       setState(() => { return {processedLegend} })
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [legend, processedData])
-
-//   if(loading) {
-//     return null
-//   }
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -815,33 +140,9 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
-                  {/* <label>
-                    <span className="edit-label column-heading">Geography</span>
-                    <ul className="geo-buttons">
-                      <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
-                        <UsaGraphic />
-                        <span>United States</span>
-                      </li>
-                      <li className={state.general.geoType === 'world' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "world")}>
-                        <WorldGraphic />
-                        <span>World</span>
-                      </li>
-                    </ul>
-                  </label>
-                  <label>
-                    <span className="edit-label column-heading">Map Type</span>
-                    <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
-                      <option value="data">Data</option>
-                      <option value="navigation">Navigation</option>
-                    </select>
-                  </label>
-                  <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
-                  <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
-                  <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
-                  {'us' === state.general.geoType &&
-                    <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
-                  } */}
+                  <Select value={config.visualizationType} section="visualizationType" fieldName="chart-vis-type" label="Chart Type" updateField={updateField} options={['Bar', 'Line', 'Area']} />
+                  <TextField value={config.title.text} section="title" fieldName="text" label="Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.description.html || ''} section="description" fieldName="html" label="Description" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -851,7 +152,8 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
+                  <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
+                  <Select value={config.yAxis.dataKey} section="yAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -861,7 +163,8 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
+                  <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
+                  <Select value={config.xAxis.dataKey} section="xAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -871,7 +174,8 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
+                  <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} />
+                  <TextField value={config.legend.label} section="legend" fieldName="label" label="Label" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -881,7 +185,15 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
+                  <label className="header">
+                      <span className="edit-label">Header Theme</span>
+                      <ul className="color-palette">
+                        {headerColors.map( (palette) => (
+                          <li title={ palette } key={ palette } onClick={ () => { setConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette}>
+                          </li>
+                        ))}
+                      </ul>
+                    </label>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -891,7 +203,9 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem Ipsum
+                  <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
+                  <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
+                  <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>

@@ -3,27 +3,7 @@
   @import "~bootstrap/scss/variables";
   @import "~bootstrap/scss/mixins";
   @import "~bootstrap/scss/utilities";
-  .waiting {
-    &.collapsed {
-      padding: 2em !important;
-    }
-    @include emptyState;
-    .waiting-container {
-      max-width: 400px;
-    }
-    h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: .3rem;
-    }
-    p {
-      font-size: 1em;
-      strong {
-        font-weight: bold;
-      }
-    }
-  }
-  
+
   .geo-buttons {
     list-style: none;
     display: flex;

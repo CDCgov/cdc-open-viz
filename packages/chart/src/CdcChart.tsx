@@ -5,6 +5,7 @@ import { scaleOrdinal } from '@visx/scale';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
+import Waiting from '@cdc/core/components/Waiting';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -16,8 +17,8 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, configObj, isEditor = false} : 
-  { configUrl?: string, configObj?: any, isEditor?: boolean }
+  { configUrl, config: configObj, isEditor = false} : 
+  { configUrl?: string, config?: any, isEditor?: boolean }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
@@ -141,7 +142,7 @@ export default function CdcChart(
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(data && config.xAxis) {
+    if(data && config.xAxis && config.seriesKeys) {
       const colorPalettes = {
         'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
         'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -298,7 +299,15 @@ export default function CdcChart(
   // Prevent render if loading
   let body = (<Loading />)
 
-  if(false === loading) {
+  if(undefined === config.seriesKeys) {
+    body = (
+      <>
+        {isEditor && <EditorPanel />}
+        <Waiting requiredColumns={['Series Keys']} className="waiting" />
+      </>)
+  }
+
+  if(false === loading && config.seriesKeys.length > 0) {
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -316,14 +325,14 @@ export default function CdcChart(
           {/* Description */}
           {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
           {/* Data Table */}
-          <DataTable />
+          {config.xAxis.dataKey && <DataTable />}
         </div>
       </>
     )
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber }}>
+    <Context.Provider value={{ config, setConfig, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport}`} ref={outerContainerRef}>
         {body}
       </div>
