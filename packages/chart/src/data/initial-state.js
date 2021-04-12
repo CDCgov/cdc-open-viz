@@ -23,5 +23,9 @@ export default {
         label: 'Data Table',
         expanded: true
     },
-    legend: {}
+    legend: {},
+    palette: "qualitative-bold",
+    labels: {
+        display: true
+    }
 }

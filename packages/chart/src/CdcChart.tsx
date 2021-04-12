@@ -151,7 +151,7 @@ export default function CdcChart(
         'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
       };
 
-      let palette = colorPalettes[config.palette] || colorPalettes['qualitative-bold'];
+      let palette = colorPalettes[config.palette]
       let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
