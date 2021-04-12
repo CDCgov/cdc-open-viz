@@ -5,6 +5,7 @@ import { scaleOrdinal } from '@visx/scale';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
+import Waiting from '@cdc/core/components/Waiting';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -13,10 +14,11 @@ import Context from './context';
 import defaults from './data/initial-state';
 
 import './scss/main.scss';
+import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, configObj } : 
-  { configUrl?: string, configObj?: any }
+  { configUrl, config: configObj, isEditor = false} : 
+  { configUrl?: string, config?: any, isEditor?: boolean }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
@@ -140,7 +142,7 @@ export default function CdcChart(
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(data && config.xAxis) {
+    if(data && config.xAxis && config.seriesKeys) {
       const colorPalettes = {
         'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
         'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -149,7 +151,7 @@ export default function CdcChart(
         'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
       };
 
-      let palette = colorPalettes[config.palette] || colorPalettes['qualitative-bold'];
+      let palette = colorPalettes[config.palette]
       let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
@@ -306,29 +308,40 @@ export default function CdcChart(
   // Prevent render if loading
   let body = (<Loading />)
 
-  if(false === loading) {
+  if(undefined === config.seriesKeys) {
     body = (
       <>
-        {/* Title */}
-        {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
-        {/* Visualization */}
-        <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
-          {/* Legend, if set above */}
-          {!config.legend.hide && !config.legend.below && <Legend />}
-          {chartComponents[visualizationType]}
-        </div>            
-        {/* Legend, if set below */}
-        {config.legend.below && <Legend />}
-        {/* Description */}
-        {description && <div className="chart-description">{parse(description)}</div>}
-        {/* Data Table */}
-        <DataTable />
+        {isEditor && <EditorPanel />}
+        <Waiting requiredColumns={['Series Keys']} className="waiting" />
+      </>)
+  }
+
+  if(false === loading && config.seriesKeys.length > 0) {
+    body = (
+      <>
+        {isEditor && <EditorPanel />}
+        <div className="cdc-chart-inner-container">
+          {/* Title */}
+          {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
+          {/* Visualization */}
+          <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+            {/* Legend, if set above */}
+            {!config.legend.hide && !config.legend.below && <Legend />}
+            {chartComponents[visualizationType]}
+          </div>            
+          {/* Legend, if set below */}
+          {config.legend.below && <Legend />}
+          {/* Description */}
+          {description && <div className="chart-description">{parse(description.html)}</div>}
+          {/* Data Table */}
+          {config.xAxis.dataKey && <DataTable />}
+        </div>
       </>
     )
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

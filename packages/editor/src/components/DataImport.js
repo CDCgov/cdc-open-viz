@@ -17,7 +17,7 @@ import CloseIcon from '../assets/icons/close.svg';
 import validMapData from '../../sampledata/valid-data-map.csv';
 
 export default function DataImport() {
-  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL} = useContext(GlobalState);
+  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL, setGlobalActive} = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -236,6 +236,11 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
+        {data && (
+          <div>
+            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
+          </div>
+        )}
       </div>
       <div className="right-col">
         <PreviewDataTable data={data} />
