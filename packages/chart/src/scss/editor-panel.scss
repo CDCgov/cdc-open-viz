@@ -13,6 +13,11 @@
     .accordion__heading {
       background: $lightestGray;
     }
+    .accordion__item {
+      select {
+        text-transform: capitalize;
+      }
+    }
     .form-container {
       border-right: $lightGray 1px solid;
       flex-grow: 1;
@@ -52,7 +57,7 @@
       position: relative;
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     }
-  
+    .accordion__panel:first-child { margin-top: 0; }
     .accordion__button:before {
       display: inline-block;
       content: '';
@@ -154,7 +159,7 @@
         font-size: 1em;
       }
       &.checkbox {
-        margin-top: .5rem;
+        margin-top: 1rem;
         display: flex;
         span {
           display: inline;
