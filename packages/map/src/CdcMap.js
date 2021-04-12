@@ -1,5 +1,9 @@
 // External
 import React, { Component } from 'react';
+import html2pdf from 'html2pdf.js'
+import html2canvas from 'html2canvas';
+import Canvg from 'canvg';
+import { createCanvas } from 'canvas'
 
 // Third party
 import ReactTooltip from 'react-tooltip';
@@ -18,9 +22,13 @@ import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
+import './scss/btn.scss'
+
+// Images
+import DownloadImg from './images/icon-download-img.svg'
+import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Open Viz
-import '@cdc/core';
 import Loading from '@cdc/core/components/Loading';
 
 // Components
@@ -41,6 +49,7 @@ class CdcMap extends Component {
 
         // Data props
         this.outerContainerRef = React.createRef();
+        this.mapSvg = React.createRef();
         this.supportedStates = supportedStates;
         this.supportedCountries = supportedCountries;
         this.supportedTerritories = supportedTerritories;
@@ -51,7 +60,7 @@ class CdcMap extends Component {
         this.countryValues = Object.values(supportedCountries).flat()
         this.countryKeys = Object.keys(supportedCountries)
         this.cityNames = Object.keys(supportedCities)
-    
+
         this.viewports = {
             "lg": 1200,
             "md": 992,
@@ -79,7 +88,7 @@ class CdcMap extends Component {
         this.setState = this.setState.bind(this)
         this.processUnifiedData = this.processUnifiedData.bind(this)
         this.getViewport = this.getViewport.bind(this)
-
+        this.saveImageAs = this.saveImageAs.bind(this)
     }
 
     closeModal({target}) {
@@ -92,6 +101,97 @@ class CdcMap extends Component {
                     }
                 }
             })
+        }
+    }
+
+    saveImageAs(uri, filename) {
+        const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
+        const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
+        const ieEdge = navigator.userAgent.match(/Edge/g)
+        const ieVer=(ie ? ie[1] : (ie11 ? 11 : (ieEdge ? 12 : -1)));
+
+        if (ie && ieVer<10) {
+            console.log("IE10+ required");
+            return;
+        }
+
+        if (ieVer>-1) {
+            const fileAsBlob = new Blob([uri], {
+                type: 'image/png'
+            });
+            window.navigator.msSaveBlob(fileAsBlob, filename);
+        } else {
+            const link = document.createElement('a')
+            if (typeof link.download === 'string') {
+                link.href = uri
+                link.download = filename
+                link.onclick = (e) => document.body.removeChild(e.target);
+                document.body.appendChild(link)
+                link.click()
+            } else {
+                window.open(uri)
+            }
+        }
+    }
+
+    generateMedia(target, type) {
+        // Convert SVG to canvas
+        const baseSvg = this.mapSvg.current.querySelector('.rsm-svg')
+
+        const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
+        const calcHeight = ratio * 1440
+        const xmlSerializer = new XMLSerializer()
+        const svgStr = xmlSerializer.serializeToString(baseSvg)
+        const options = { log: false, ignoreMouse: true }
+        const canvas = createCanvas(1440, calcHeight)
+        const ctx = canvas.getContext('2d')
+        const canvg = Canvg.fromString(ctx, svgStr, options)
+        canvg.start()
+
+        // Generate DOM <img> from svg data
+        const generatedImage = document.createElement('img')
+        generatedImage.src = canvas.toDataURL('image/png')
+        generatedImage.style.width = '100%'
+        generatedImage.style.height = 'auto'
+
+        baseSvg.style.display = 'none' // Hide default SVG during media generation
+        baseSvg.parentNode.insertBefore(generatedImage, baseSvg.nextSibling) // Insert png generated from canvas of svg
+
+        // Construct filename with timestamp
+        const date = new Date()
+        const filename = this.state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+
+        switch (type) {
+            case 'image':
+                return html2canvas(target, {
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: 1440,
+                    windowWidth: 1440,
+                    scale: 1
+                }).then(canvas => {
+                    this.saveImageAs(canvas.toDataURL(), filename + '.png')
+                }).then(() => {
+                    generatedImage.remove() // Remove generated png
+                    baseSvg.style.display = null // Re-display initial svg map
+                })
+            case 'pdf':
+                let opt = {
+                    margin:       0.2,
+                    filename:     filename + '.pdf',
+                    image:        { type: 'png' },
+                    html2canvas:  { scale: 2 },
+                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(target).save().then(() => {
+                    generatedImage.remove() // Remove generated png
+                    baseSvg.style.display = null // Re-display initial svg map
+                })
+                break
+            default:
+                console.log('generateMedia param 2 type must be \'image\' or \'pdf\'')
+                break
         }
     }
 
@@ -269,8 +369,8 @@ class CdcMap extends Component {
                 8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
                 9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
             }
-    
-    
+
+
             let distributionArray = colorDistributions[ regularLegendItems ]
 
             specificColor = distributionArray[ legendItemIndex ]
@@ -282,7 +382,7 @@ class CdcMap extends Component {
 
     applyLegendToValue (rowObj, type = this.state.legend.type) {
         let color = ''
-      
+
         const generateColorsArray = (color) => {
             return [
                 color,
@@ -290,7 +390,7 @@ class CdcMap extends Component {
                 chroma(color).darken(0.5).hex()
             ]
         }
-        
+
         // If we've got a nav map, simply give them all the same color and be done with it.
         if("navigation" === this.state.general.type) {
           let mapColorPalette = colorPalettes[ this.state.color ]
@@ -298,15 +398,15 @@ class CdcMap extends Component {
           if(!mapColorPalette) {
             mapColorPalette = colorPalettes[ 'bluegreenreverse' ]
           }
-      
+
           return generateColorsArray( mapColorPalette[ 3 ] )
         }
-      
+
         let value = rowObj[this.state.columns.primary.name]
-      
+
         // First, check if it's a special class
         let hasSpecialClasses = false
-        
+
         if(Array.isArray( this.state.legend.specialClasses ) && this.state.legend.specialClasses.length > 0) {
             hasSpecialClasses = true
         }
@@ -314,105 +414,105 @@ class CdcMap extends Component {
         if (hasSpecialClasses &&
             this.state.legend.specialClasses.includes(value)) {
             for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-      
+
                 const legend = this.state.processedLegend.data[i]
                 const legendValue = legend.value || legend.category
-      
+
                 if (true === legend.special && value === legendValue) {
                     color = this.applyColorToLegend(legend)
-      
+
                     if (legend && legend.disabled === true) {
                         return false
                     }
-      
+
                     return [color, color, color]
-      
+
                 }
-      
+
             }
-      
+
         }
 
         // If the value is a string that can become a number, convert it.
         value = this.numberFromString(value)
-      
+
         // Check if it's a zero that needs to be separated
         if ( true === this.state.legend.separateZero && 0 === value && 0 < this.state.processedLegend.data.length ) {
             // Grab the 0 legend item
             let legend = this.state.processedLegend.data.filter((legendItem) => legendItem.max === 0 && legendItem.min === 0)[0]
-      
+
             if (legend) {
                 if (legend.disabled === true) {
                     return false
                 }
 
                 color = this.applyColorToLegend(legend)
-            }            
+            }
         }
-      
+
         switch (type) {
             case 'equalnumber':
                 let hash = this.hashRow(rowObj)
-      
+
                 for (var i = 0; i < this.state.processedLegend.data.length; i++) {
-      
+
                     var legend = this.state.processedLegend.data[i]
-      
+
                     if ( 'geos' in legend && legend.geos.includes(hash) ) {
-      
+
                         if(legend.disabled === true) {
                             return false
                         }
-      
+
                         color = this.applyColorToLegend(legend)
                     }
-      
+
                 }
-      
+
                 break
             case 'equalinterval':
                 // Because equal intervals will have the same "max" for one legend item as the "min" for the next, we must only add if the value is less than (and not equal to) the MAXIMUM of the legend.
                 // The one edge case is if this is the last legend item.
                 for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-      
+
                     const legend = this.state.processedLegend.data[i]
-      
+
                     if (i === this.state.processedLegend.data.length - 1) {
                         if (value >= legend.min && value <= legend.max) {
                             color = this.applyColorToLegend(legend)
-      
+
                             if (legend.disabled === true) {
                                 return false
                             }
-      
+
                         }
                     } else {
                         if (value >= legend.min && value < legend.max) {
                             color = this.applyColorToLegend(legend)
-      
+
                             if (legend.disabled === true) {
                                 return false
                             }
-      
+
                         }
                     }
-      
+
                 }
                 break
             case 'category':
                 for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-      
+
                     const legend = this.state.processedLegend.data[i]
-      
+
                     if (legend.category == value) { // eslint-disable-line
                         color = this.applyColorToLegend(legend)
-      
+
                         if (legend.disabled === true) {
                             return false
                         }
-      
+
                     }
-      
+
                 }
                 break
             default:
@@ -425,10 +525,10 @@ class CdcMap extends Component {
             if(true === this.state.loading) {
                 return false;
             }
-      
+
             color = '#000000'
         }
-      
+
         // Return array with the color, and a lighter and darker version for hover and pressed states
         return generateColorsArray( color )
     }
@@ -454,7 +554,7 @@ class CdcMap extends Component {
 
                 }
             })
-            
+
             toolTipText += `</dl>`
         }
 
@@ -542,14 +642,14 @@ class CdcMap extends Component {
                     legendData.push(newLegendItem)
                 }
             })
-            
+
             // Add our generated legends to the state
             if(categoryValues.length > 0) {
                 processedDataObj.categoryValuesOrder = categoryValues
             }
 
             processedDataObj.data = legendData
-        
+
             return processedDataObj
         }
 
@@ -633,7 +733,7 @@ class CdcMap extends Component {
 
         // Get all indexes of the number.
         fullDataValues = Array.from( intervalAmt[1].values() )
-        fullDataKeys = Array.from( intervalAmt[1].keys() )    
+        fullDataKeys = Array.from( intervalAmt[1].keys() )
 
         if(true === legendObj.separateZero) {
             const zeroInData = getAllIndexes(fullDataValues, 0)
@@ -646,14 +746,14 @@ class CdcMap extends Component {
                     if(fullDataValues.length > 0) {
                         fullDataValues.splice(i, 1)
                         fullDataKeys.splice(i, 1)
-                    }                    
+                    }
                 }
 
                 // Push zero at the beginning of returned legend object
                 let range = {
                     min: 0,
                     max: 0,
-                }                
+                }
 
                 legendData.push(range)
                 realNumber -= 1 // This zero takes up one legend item. Account for that.
@@ -681,14 +781,14 @@ class CdcMap extends Component {
                     remainder = numberOfRows % changingNumber
 
                     chunkAmt = Math.floor(numberOfRows / changingNumber)
-    
+
                     if (remainder > 0) {
                         chunkAmt += 1
                     }
 
                     let selectedGeos = fullDataKeys.splice(0, chunkAmt);
                     let selectedData = fullDataValues.splice(0, chunkAmt);
-                    
+
                     chunked.push( {
                         selectedGeos,
                         selectedData
@@ -706,7 +806,7 @@ class CdcMap extends Component {
                         let hashedString = Base64.encode( JSON.stringify( fullRow ) )
 
                         return hashedString
-    
+
                     })
 
                     let range = {
@@ -749,7 +849,7 @@ class CdcMap extends Component {
         }
 
         processedDataObj.data = legendData
-        
+
         return processedDataObj
     }
 
@@ -956,7 +1056,7 @@ class CdcMap extends Component {
 
         // Abort if value is blank
         if(0 === urlString.length) {
-            throw Error("Blank string passed as URL. Navigation aborted."); 
+            throw Error("Blank string passed as URL. Navigation aborted.");
         }
 
         const urlObj = new URL(urlString);
@@ -980,7 +1080,7 @@ class CdcMap extends Component {
         }
 
         // If a dataUrl property exists, always pull from that.
-        if (newState.dataUrl) {        
+        if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
                 newState.dataUrl = `https://${this.props.hostname}${newState.dataUrl}`
             }
@@ -1102,7 +1202,7 @@ class CdcMap extends Component {
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 let newViewport = this.getViewport(entry.contentRect.width)
-                
+
                 if( newViewport !== this.state.viewport ) {
                     this.setState({
                         ...this.state,
@@ -1111,7 +1211,7 @@ class CdcMap extends Component {
                 }
             }
         });
-        
+
         resizeObserver.observe(this.outerContainerRef.current);
     }
 
@@ -1195,6 +1295,8 @@ class CdcMap extends Component {
     }
 
     render () {
+        let showDownloadMediaButton = this.state.general.showDownloadMediaButton
+
         // Map Container Classes
         let mapContainerClasses = [
             'map-container',
@@ -1246,13 +1348,30 @@ class CdcMap extends Component {
                             { parse(title) }
                         </h1>
                     </header>
+
                     <section className={mapContainerClasses.join(' ')} onClick={(e) => this.closeModal(e)}>
-                        <section className="geography-container" aria-hidden="true">
+
+                        {showDownloadMediaButton === true &&
+                            <div className="map-downloads" data-html2canvas-ignore>
+                                <div className="map-downloads__ui btn-group">
+                                    <button className="btn" title="Download Map as Image"
+                                            onClick={() => this.generateMedia(this.outerContainerRef.current, 'image')}>
+                                        <DownloadImg className="btn__icon" title='Download Map as Image'/>
+                                    </button>
+                                    <button className="btn" title="Download Map as PDF"
+                                            onClick={() => this.generateMedia(this.outerContainerRef.current, 'pdf')}>
+                                        <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+                        <section className="geography-container" aria-hidden="true" ref={this.mapSvg}>
                             {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
                                 {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
                                 {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
                                 {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
-                                
+
                         </section>
                         {"navigation" === this.state.general.type &&
                             <NavigationMenu
@@ -1281,7 +1400,7 @@ class CdcMap extends Component {
                             />
                         }
                     </section>
-                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&     
+                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
                         <DataTable
                             state={this.state}
                             navigationHandler={this.navigationHandler}
