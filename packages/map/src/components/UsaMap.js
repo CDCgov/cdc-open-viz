@@ -24,7 +24,7 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips
   } = props;
-  
+
   const [territoriesData, setTerritoriesData] = useState([]);
 
   useEffect(() => {
@@ -129,6 +129,8 @@ const UsaMap = (props) => {
     ));
   });
 
+  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+
   const geoList = (geographies) => {
     // If there's regions and they are filled out, slot the geos into groups
     if (state.general.hasRegions === true && state.columns.geosInRegion.name.length > 0) {
@@ -162,12 +164,12 @@ const UsaMap = (props) => {
 
           const stylesObj = {
             base: {
-              fill: `${legendColors[0]} !important`,
+              fill: legendColors[0],
               '&:hover': {
-                fill: `${legendColors[1]} !important`
+                fill: `${legendColors[1]}  !important`,
               },
               '&:active': {
-                fill: `${legendColors[2]} !important`
+                fill: `${legendColors[2]}  !important`
               },
             }
           };
@@ -203,8 +205,8 @@ const UsaMap = (props) => {
               data-tip={toolTip}
               data-for="tooltip"
               tabIndex={-1}
-              className={`rsm-geography ${state.general.geoBorderColor} ${state.general.geoBorderColor} region-${regionName}`}
-              style={{ stroke: state.general.backgroundColor }}
+              className={`rsm-geography ${state.general.geoBorderColor} region-${regionName}`}
+              style={{ stroke: geoStrokeColor, strokeWidth: '1.3px', fill: legendColors[0] }}
               key={`region-${regionName}`}
               onClick={() => geoClickHandler(regionName, regionData)}
               d={regionPath}
@@ -218,12 +220,19 @@ const UsaMap = (props) => {
       // Regions are done, render out the remaining
       const unusedGeos = Object.keys(regionGeographies).map((key) => {
         const geo = regionGeographies[key];
+        const unusedStyles = {
+            default: {
+              stroke: geoStrokeColor,
+              strokeWidth: '1.3px',
+              fill: '#E6E6E6'
+            }
+        }
 
         return (
           <Geography
+            style={unusedStyles}
             key={geo.rsmKey}
             className={`rsm-geography ${state.general.geoBorderColor}`}
-            style={{ stroke: state.general.backgroundColor }}
             tabIndex={-1}
             geography={geo}
           />
@@ -259,15 +268,15 @@ const UsaMap = (props) => {
         const stylesObj = {
           default: {
             fill: legendColors[0],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           hover: {
             fill: legendColors[1],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           pressed: {
             fill: legendColors[2],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
         };
 
@@ -300,7 +309,7 @@ const UsaMap = (props) => {
         <Geography
           key={geo.rsmKey}
           className={`rsm-geography ${state.general.geoBorderColor}`}
-          style={{ stroke: state.general.backgroundColor }}
+          style={{ stroke: state.general.geoBorderColor }}
           tabIndex={-1}
           geography={geo}
         />
@@ -319,6 +328,7 @@ const UsaMap = (props) => {
             height={500}
             style={styles.map}
             projection="geoAlbersUsa"
+            data-html2canvas-ignore
           >
             <Geographies geography={topoJsonStates}>
               {({ geographies }) => geoList(geographies)}
