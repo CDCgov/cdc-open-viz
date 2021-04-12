@@ -63,7 +63,7 @@ export default function CdcChart(
     // Deeper copy
     Object.keys(defaults).forEach( key => {
       if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...newConfig[key], ...defaults[key]}
+        newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
     })
 
@@ -100,11 +100,11 @@ export default function CdcChart(
   }
 
   const viewports:keyable = {
-    "lg": 1200,
-    "md": 992,
-    "sm": 768,
-    "xs": 576,
-    "xxs": 350
+    'lg': 1200,
+    'md': 992,
+    'sm': 768,
+    'xs': 576,
+    'xxs': 350
   }
 
   const getViewport = size => {
@@ -214,11 +214,20 @@ export default function CdcChart(
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+    let prefix = config.dataFormat.prefix;
     if (!config.dataFormat) return num;
     if (typeof num !== 'number') num = parseFloat(num);
+    if (config.dataCutoff){
+      let cutoff = config.dataCutoff
+      if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
+      if(num < cutoff) {
+        prefix = '< ' + prefix;
+        num = cutoff;  
+      }
+    }
     if (config.dataFormat.roundTo !== -1) num = num.toFixed(config.dataFormat.roundTo);
     if (config.dataFormat.commas) num = num.toLocaleString('en-US');
-    return config.dataFormat.prefix + num + config.dataFormat.suffix;
+    return prefix + num + config.dataFormat.suffix;
   };
 
   // Destructure items from config for more readable JSX
@@ -332,8 +341,8 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, setConfig, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport}`} ref={outerContainerRef}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber }}>
+      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
     </Context.Provider>

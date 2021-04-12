@@ -28,7 +28,7 @@
     color: #fff !important;
     border: 0;
     padding: .4em .8em;
-    font-size: 1em;
+    font-size: .9em;
     display: block;
     border-radius: 5px;
     transition: .1s all;
@@ -130,8 +130,32 @@
       width: 100% !important;
     }
     > svg {
-      font-size: 16px;
+      overflow: visible;
+      font-size: 14px;
       margin: 1rem 0 2rem;
+    }
+  }
+  @include breakpointClass(lg) {
+    &.font-small {
+      font-size: 1em;
+
+      .chart-container > svg {
+        font-size: 16px;
+      }
+    }
+    &.font-medium {
+      font-size: 1.1em;
+
+      .chart-container > svg {
+        font-size: 18px;
+      }
+    }
+    &.font-large {
+      font-size: 1.2em;
+
+      .chart-container > svg {
+        font-size: 20px;
+      }
     }
   }
   @include breakpointClass(md) {
@@ -147,8 +171,48 @@
         }
       }  
       > svg {
-        font-size: 14px;
+        font-size: 16px;
         width: 75%;
+      }
+    }
+    &.font-small {
+      font-size: .9em;
+
+      .chart-container > svg {
+        font-size: 14px;
+      }
+
+    }
+    &.font-large {
+      font-size: 1.1em;
+
+      .chart-container > svg {
+        font-size: 18px;
+      }
+    }
+  }
+  @include breakpointClass(xs) {
+    &.font-small {
+      font-size: .8em;
+
+      .chart-container > svg {
+        font-size: 12px;
+      }
+
+    }
+    &.font-medium {
+      font-size: .9em;
+
+      .chart-container > svg {
+        font-size: 14px;
+      }
+      
+    }
+    &.font-large {
+      font-size: 1em;
+
+      .chart-container > svg {
+        font-size: 16px;
       }
     }
   }
