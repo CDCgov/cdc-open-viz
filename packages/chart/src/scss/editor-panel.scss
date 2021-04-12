@@ -1,104 +1,4 @@
-.cdc-open-viz-module {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-
-  .geo-buttons {
-    list-style: none;
-    display: flex;
-    color: $mediumGray;
-    svg {
-      display: block;
-      max-width: 80px;
-      max-height: 40px;
-      margin: .5em auto;
-      box-sizing: border-box;
-      path {
-        fill: currentColor
-      }
-    }
-    li {
-      padding: .3em .75em;
-      display: flex;
-      border: $lightGray 1px solid;
-      width: 40%;
-      align-items: center;
-      margin-right: 1em;
-      cursor: pointer;
-      overflow: hidden;
-      flex-direction: column;
-      transition: .2s all; 
-      svg {
-        display: block;
-        height: 25px;
-        margin: .5em auto;
-        max-width: 100%;
-      }
-      span {
-        text-transform: none;
-        font-size: 1em;
-      }
-      &:hover {
-        background: #F2F2F2;
-        transition: .2s all;  
-      }
-      &.active {
-        background: #fff;
-        border-color: #005eaa;
-        color: #005eaa;
-        position: relative;
-        path {
-          fill: #005eaa;
-        }
-        &:before {
-          content: " ";
-          width: 5px;
-          background: #005eaa;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          position: absolute;
-        }
-      }
-    }
-  }
-  
-  .editor-toggle {
-    background: #F2F2F2;
-    border-radius: 60px;
-    color: #000;
-    font-size: 1em;
-    border: 0;
-    position: fixed;
-    z-index: 100;
-    transition: .1s background;
-    cursor: pointer;
-    width: 25px;
-    height: 25px;
-    left: 307px;
-    top: 10px;
-    box-shadow: rgba(0,0,0,.5) 0 1px 2px;
-    &:before {
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      content: "\00ab";
-    }
-    &.collapsed {
-      left: 1em;
-      margin-left: 0;  
-      &:before {
-      content: "\00bb";
-     }
-    }
-    &:hover {
-      background: rgba(255,255,255,1)
-    }
-  }
-  
-  .editor-panel {
+.editor-panel {
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
@@ -620,16 +520,48 @@
       cursor: auto;
     }
   
-  }  
-  @include breakpointClass(md) {
-    .editor-panel:not(.hidden) + .cdc-map-inner-container {
-      padding-left: $editorWidth;
-    }
-    .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-      padding-left: 3em;
-    }
-    .waiting {
-      padding-left: 350px;
-    }
+}  
+.editor-toggle {
+  background: #F2F2F2;
+  border-radius: 60px;
+  color: #000;
+  font-size: 1em;
+  border: 0;
+  position: fixed;
+  z-index: 100;
+  transition: .1s background;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  left: 307px;
+  top: 10px;
+  box-shadow: rgba(0,0,0,.5) 0 1px 2px;
+  &:before {
+    top: 43%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    content: "\00ab";
+  }
+  &.collapsed {
+    left: 1em;
+    margin-left: 0;  
+    &:before {
+    content: "\00bb";
+   }
+  }
+  &:hover {
+    background: rgba(255,255,255,1)
+  }
+}
+@include breakpointClass(md) {
+  .editor-panel:not(.hidden) + .cdc-chart-inner-container {
+    padding-left: $editorWidth;
+  }
+  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
+    padding-left: 3em;
+  }
+  .waiting {
+    padding-left: 350px;
   }
 }

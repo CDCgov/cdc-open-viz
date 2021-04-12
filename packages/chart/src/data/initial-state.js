@@ -16,8 +16,12 @@ export default {
         tickRotation: 0
     },
     table: {
-        label: 'Data Table'
+        label: 'Data Table',
+        expanded: true
     },
     legend: {},
-    labels: false
+    palette: "qualitative-bold",
+    labels: {
+        display: true
+    }
 }
