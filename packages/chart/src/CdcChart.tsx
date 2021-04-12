@@ -332,7 +332,7 @@ export default function CdcChart(
           {/* Legend, if set below */}
           {config.legend.below && <Legend />}
           {/* Description */}
-          {description && <div className="chart-description">{parse(description.html)}</div>}
+          {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
           {config.xAxis.dataKey && <DataTable />}
         </div>
@@ -341,7 +341,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading, setConfig }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

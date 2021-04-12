@@ -21,7 +21,5 @@ export default {
     },
     legend: {},
     palette: "qualitative-bold",
-    labels: {
-        display: true
-    }
+    labels: false
 }
