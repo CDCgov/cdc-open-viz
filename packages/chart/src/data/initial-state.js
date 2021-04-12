@@ -18,5 +18,6 @@ export default {
     table: {
         label: 'Data Table'
     },
-    legend: {}
+    legend: {},
+    labels: false
 }

@@ -32,11 +32,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
               <Text 
-                display={config.labels && config.labels.display ? 'block': 'none'}
+                display={config.labels ? 'block' : 'none'}
                 x={barThickness * (bar.index + 0.5) + offset}
                 y={bar.y - 5}
                 fill={bar.color}
-                fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                 textAnchor="middle">
                   {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
               </Text>
@@ -87,11 +86,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
                       <Text 
-                        display={config.labels && config.labels.display ? 'block': 'none'}
+                        display={config.labels ? 'block' : 'none'}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
                         y={barY - 5}
                         fill={barColor}
-                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                         textAnchor="middle">
                           {formatNumber(bar.value)}
                       </Text>
