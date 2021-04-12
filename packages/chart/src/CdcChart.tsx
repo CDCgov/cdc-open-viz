@@ -44,6 +44,14 @@ export default function CdcChart(
 
   const outerContainerRef = useRef(null);
 
+  const colorPalettes = {
+    'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
+    'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
+    'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
+    'sequential-blue-reverse': ['#084594', '#2171B5', '#4292C6', '#6BAED6', '#9ECAE1', '#C6DBEF'],
+    'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
+  };
+
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
@@ -143,14 +151,6 @@ export default function CdcChart(
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if(data && config.xAxis && config.seriesKeys) {
-      const colorPalettes = {
-        'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
-        'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
-        'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
-        'sequential-blue-reverse': ['#084594', '#2171B5', '#4292C6', '#6BAED6', '#9ECAE1', '#C6DBEF'],
-        'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
-      };
-
       let palette = colorPalettes[config.palette]
       let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
 
@@ -332,7 +332,7 @@ export default function CdcChart(
           {/* Legend, if set below */}
           {config.legend.below && <Legend />}
           {/* Description */}
-          {description && <div className="chart-description">{parse(description.html)}</div>}
+          {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
           {config.xAxis.dataKey && <DataTable />}
         </div>
@@ -341,7 +341,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading, colorPalettes, setConfig }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
