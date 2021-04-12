@@ -24,7 +24,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
             { data.map((d, dataIndex) => (
               <Group key={`series-${seriesKey}-point-${dataIndex}`}>
               <Text 
-                  display={config.labels && config.labels.display ? 'block': 'none'}
+                  display={config.labels ? 'block' : 'none'}
                   x={xScale(getXAxisData(d))}
                   y={yScale(getYAxisData(d, seriesKey))}
                   fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
