@@ -58,7 +58,7 @@ export default function PieChart() {
             key: string;
           }) => {
             return (
-              <Group key={key} style={{ opacity: (config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
+              <Group key={key} style={{ opacity: (config.legend.highlight === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
                 <animated.path
                   // compute interpolated path d attribute from intermediate angle values
                   d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) => path({
@@ -128,7 +128,7 @@ export default function PieChart() {
   const donutThickness = radius;
 
   useEffect(() => {
-    if(seriesHighlight.length > 0 && !config.legend.highlight){
+    if(seriesHighlight.length > 0 && config.legend.behavior !== "highlight"){
       let newFilteredData = [];
 
       data.forEach((d) => {

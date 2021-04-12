@@ -19,7 +19,9 @@ export default {
         label: 'Data Table',
         expanded: true
     },
-    legend: {},
+    legend: {
+        behavior: "isolate"
+    },
     palette: "qualitative-bold",
     labels: false
 }

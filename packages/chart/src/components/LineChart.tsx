@@ -18,8 +18,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
         { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
           <Group
             key={`series-${seriesKey}`}
-            opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
-            display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+            opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+            display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
           >
             { data.map((d, dataIndex) => (
               <Group key={`series-${seriesKey}-point-${dataIndex}`}>

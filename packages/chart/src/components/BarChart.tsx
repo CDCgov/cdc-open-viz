@@ -18,7 +18,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={config.yAxis.size}>
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
-            data={data}
+            data={data.reverse()}
             keys={(config.barSeriesKeys || config.seriesKeys)}
             x={(d: any) => d[config.xAxis.dataKey]}
             xScale={xScale}
@@ -48,8 +48,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   fill={bar.color}
                   stroke="#333"
                   strokeWidth={config.barBorderThickness || 1}
-                  opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                  display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                  opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                  display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                   data-tip={`<div>
                         ${config.xAxis.label}: ${data[bar.index][config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
@@ -103,8 +103,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         stroke="#333"
                         strokeWidth={config.barBorderThickness || 1}
                         style={{fill: barColor}}
-                        opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                        display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                        opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
+                        display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
                         data-tip={`<div>
                           ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
                           ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
