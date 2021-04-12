@@ -322,7 +322,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title.text && <h1 className={`chart-title ${config.theme}`}>{title.text}</h1>}
+          {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
           {/* Visualization */}
           <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
             {/* Legend, if set above */}
@@ -332,7 +332,7 @@ export default function CdcChart(
           {/* Legend, if set below */}
           {config.legend.below && <Legend />}
           {/* Description */}
-          {description && description.html && <div className="chart-description">{parse(description.html)}</div>}
+          {description && <div className="chart-description">{parse(description.html)}</div>}
           {/* Data Table */}
           {config.xAxis.dataKey && <DataTable />}
         </div>
@@ -341,7 +341,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

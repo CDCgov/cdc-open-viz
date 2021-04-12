@@ -141,8 +141,8 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} section="visualizationType" fieldName="chart-vis-type" label="Chart Type" updateField={updateField} options={['Bar', 'Line', 'Area']} />
-                  <TextField value={config.title.text} section="title" fieldName="text" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description.html || ''} section="description" fieldName="html" label="Description" updateField={updateField} />
+                  <TextField value={config.title} section="title" label="Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.description || ''} section="description" label="Description" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
