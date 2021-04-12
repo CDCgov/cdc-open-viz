@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
+import { Text } from '@visx/text';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -30,15 +31,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-              <text 
-                display={config.labels && config.labels.display ? 'block': 'none'}
+              <Text 
+                display={config.labels ? 'block' : 'none'}
                 x={barThickness * (bar.index + 0.5) + offset}
                 y={bar.y - 5}
                 fill={bar.color}
-                fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                 textAnchor="middle">
                   {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
-              </text>
+              </Text>
                 <rect
                   key={`bar-stack-${barStack.index}-${bar.index}`}
                   x={barThickness * bar.index + offset}
@@ -85,15 +85,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
-                      <text 
-                        display={config.labels && config.labels.display ? 'block': 'none'}
+                      <Text 
+                        display={config.labels ? 'block' : 'none'}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
                         y={barY - 5}
                         fill={barColor}
-                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                         textAnchor="middle">
                           {formatNumber(bar.value)}
-                      </text>
+                      </Text>
                       <rect
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={config.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}

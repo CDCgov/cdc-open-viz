@@ -3,6 +3,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
+import { Text } from '@visx/text'; 
 import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 
@@ -19,15 +20,16 @@ import '../scss/LinearChart.scss';
 export default function LinearChart() {
   const { data, dimensions, config, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
-  let height = 500
 
   if(!config.legend.hide && currentViewport === 'lg') {
     width = width * 0.73
   }
 
+  const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
+
   const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
 
-  const xMax = width - config.yAxis.size;
+  const xMax = width - config.yAxis.size - config.padding.left - config.padding.right;
   const yMax = height - config.xAxis.size;
 
   const parseDate = timeParse(config.xAxis.dateParseFormat);
@@ -120,7 +122,7 @@ export default function LinearChart() {
       <svg width={width} height={height} className="linear">
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
           
           {/* Bar chart */}
@@ -135,7 +137,7 @@ export default function LinearChart() {
             const width = to - from;
 
             return (
-              <Group className="regions" left={config.yAxis.size}>
+              <Group className="regions" left={config.yAxis.size} key={region.label}>
                 <path stroke="#333" d={`M${from} -5
                           L${from} 5
                           M${from} 0
@@ -149,14 +151,14 @@ export default function LinearChart() {
                   height={yMax} 
                   fill={region.background} 
                   opacity={0.3} />
-                <text 
+                <Text 
                   x={from + (width / 2)} 
-                  y={region.fontSize || 14} 
-                  fill={region.color} 
-                  fontSize={region.fontSize || 14}
+                  y={5} 
+                  fill={region.color}
+                  verticalAnchor="start"
                   textAnchor="middle">
                     {region.label}
-                </text>
+                </Text>
               </Group>
             )
           }) : '' }
@@ -171,9 +173,9 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
-              const horizontalTickOffset = yMax / props.ticks.length / 4 - 5;
+              const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
               return (
-                <Group className="my-custom-left-axis">
+                <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
                     return (
                       <Group
@@ -194,18 +196,13 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        <foreignObject className="left-axis-tick-container" 
-                          x={(config.horizontal ? tick.from.x + 5 : (tick.to.x - config.yAxis.size))} 
-                          y={tick.to.y  + (config.horizontal ? horizontalTickOffset : (config.yAxis.tickFontSize / 2 * -1))} 
-                          width={config.horizontal ? xMax : config.yAxis.size} 
-                          height={config.yAxis.tickFontSize}>
-
-                          <p className="left-axis-tick" style={{
-                            fontSize: config.yAxis.tickFontSize, 
-                            lineHeight: config.yAxis.tickFontSize + 'px',
-                            textAlign: config.horizontal ? 'left' : 'right',
-                          }}>{tick.formattedValue}</p>
-                        </foreignObject> 
+                        <Text
+                          x={config.horizontal ? tick.from.x + 2 : tick.to.x}
+                          y={tick.to.y + (config.horizontal ? horizontalTickOffset : 0)}
+                          dy={config.horizontal ? -5 : 0}
+                          verticalAnchor="middle"
+                          textAnchor={config.horizontal ? 'start' : 'end'}
+                        >{tick.formattedValue}</Text>
                       </Group>
                     );
                   })}
@@ -221,9 +218,14 @@ export default function LinearChart() {
                       stroke="#333"
                     />
                   )}
-                  <foreignObject className="left-axis-label-container" transform="rotate(-90)" transform-origin={`${-1 * config.yAxis.size}px ${axisCenter}px`} x={-1 * config.yAxis.size} y={axisCenter} width={yMax} height={config.yAxis.labelFontSize}>
-                    <p className="left-axis-label" style={{fontSize: config.xAxis.labelFontSize, lineHeight: config.xAxis.labelFontSize + 'px'}}>{props.label}</p>
-                  </foreignObject>
+                  <Text
+                    textAnchor="middle"
+                    verticalAnchor="start"
+                    transform={`translate(${-1 * config.yAxis.size}, ${axisCenter}) rotate(-90)`}
+                    fontWeight="bold"
+                  >
+                    {props.label}
+                  </Text>
                 </Group>
               );
             }}
@@ -256,15 +258,14 @@ export default function LinearChart() {
                           to={tick.to}
                           stroke="#333"
                         />
-                        <foreignObject className="bottom-axis-tick-container" x={tick.to.x - tickWidth} y={tick.to.y} width={tickWidth} height={config.xAxis.size}>
-                          <p className="bottom-axis-tick" style={{
-                            fontSize: config.xAxis.tickFontSize, 
-                            textAlign: config.xAxis.wrap ? 'center' : 'right',
-                            transform: `rotate(${config.xAxis.wrap ? 0 : config.xAxis.tickRotation}deg)`,
-                            whiteSpace: config.xAxis.wrap ? 'normal' : 'nowrap',
-                            marginLeft: config.xAxis.wrap ? '50%' : '0'
-                          }}>{tick.formattedValue}</p>
-                        </foreignObject> 
+                        <Text
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.xAxis.tickRotation : 0})`}
+                          verticalAnchor="start"
+                          textAnchor={config.xAxis.tickRotation ? 'end' : 'middle'}
+                          width={config.xAxis.tickRotation ? undefined : tickWidth}
+                        >
+                          {tick.formattedValue}
+                        </Text>
                       </Group>
                     );
                   })}
@@ -273,9 +274,15 @@ export default function LinearChart() {
                     to={props.axisToPoint}
                     stroke="#333"
                   />
-                  <foreignObject className="bottom-axis-label-container" x={0} y={config.xAxis.size - config.xAxis.labelFontSize} width={xMax} height={config.xAxis.labelFontSize}>
-                    <p className="bottom-axis-label" style={{fontSize: config.xAxis.labelFontSize, lineHeight: config.xAxis.labelFontSize + 'px'}}>{props.label}</p>
-                  </foreignObject>
+                  <Text
+                    x={axisCenter}
+                    y={config.xAxis.size}
+                    textAnchor="middle"
+                    verticalAnchor="end"
+                    fontWeight="bold"
+                  >
+                    {props.label}
+                  </Text>
                 </Group>
               );
             }}

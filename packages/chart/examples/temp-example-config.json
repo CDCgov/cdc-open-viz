@@ -1,17 +1,12 @@
 {
-    "title": {
-        "text": "Average Temperature By City (Line Example)",
-        "fontSize": 28
-    },
-    "description": {
-        "html": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
-        "fontSize": 26
-    },
+    "title": "Average Temperature By City (Line Example)",
+    "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
     "dataUrl":  "/examples/temp-example-data.json",
     "visualizationType": "Line",
     "seriesKeys": ["New York", "San Francisco", "Austin"],
     "seriesLabels": {"New York": "NY", "San Francisco": "SF", "Austin": "AU"},
     "seriesLabel": "City",
+    "fontSize": "large",
     "dataFormat": {
         "roundTo": -1,
         "commas": false,
@@ -33,8 +28,7 @@
         "dateParseFormat": "%Y-%m-%d",
         "dateDisplayFormat": "%b %d",
         "numTicks": 8,
-        "tickRotation": 50,
-        "size": 100
+        "tickRotation": 50
     },
     "legend": {
         "label": "Legend",
@@ -45,5 +39,14 @@
         "label": "Data Table",
         "expanded": false,
         "download": true
-    }
+    },
+    "regions": [
+        {
+            "label": "Region",
+            "color": "black",
+            "background": "green",
+            "from": "2011-10-02",
+            "to": "2011-12-06"
+        }
+    ]
 }
