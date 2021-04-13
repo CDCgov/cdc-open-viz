@@ -1,10 +1,38 @@
 .editor-panel {
+    + .cdc-chart-inner-container > * {
+      margin: 1em;
+    }
+    .series-list {
+      list-style: none;
+      border: $lightGray 1px solid;
+      &:empty {
+        border: none !important
+      }
+      li {
+        padding: .3em .5em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .9em;
+        &:hover {
+          background-color: $lightestGray;
+        }
+        span {
+          font-size: .8em;
+          color: #f00;
+          cursor: pointer;
+        }
+        + li {
+          border-top: $lightGray 1px solid;
+        }
+      }
+    }
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
     overflow-x: hidden;
     position: fixed;
-    z-index: 7;
+    z-index: 8;
     display: flex;
     flex-direction: column;
     left: 0;
@@ -16,6 +44,10 @@
     .accordion__item {
       select {
         text-transform: capitalize;
+      }
+      .number-narrow {
+        min-width: auto;
+        width: 75px
       }
     }
     .form-container {
@@ -159,7 +191,6 @@
         font-size: 1em;
       }
       &.checkbox {
-        margin-top: 1rem;
         display: flex;
         span {
           display: inline;
@@ -287,76 +318,7 @@
         transition: .2s all;
       }
     }
-  
-    .data-toggle {
-      list-style: none;
-      li {
-        padding-left: 2em;
-        position: relative;
-        &:before {
-          content: " ";
-          position: absolute;
-          left: 20px;
-          top: 0;
-          bottom: 0;
-          border-left: rgba(0, 0, 0, 0.2) 4px solid;
-          transition: .2s all;
-        }
-        &:after {
-          content: " ";
-          background: url('../images/inactive-checkmark.svg') no-repeat;
-          width: 14px;
-          height: 14px;
-          background-size: 14px;
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 40;
-          opacity: .5;
-          transition: .2s opacity;
-        }
-        transition: .2s opacity;
-        cursor: pointer;
-        opacity: .7;
-        &:not(:first-child) {
-          margin-top: 1em;
-        }
-        input[type="text"], input[type="number"] {
-          font-size: 1em;
-        }
-        label {
-          margin-top: 0;
-        }
-        label + label {
-          margin-top: 1em;
-        }
-        &:hover {
-          &:before {
-            border-left: rgba(0, 0, 0, 0.7) 4px solid;
-            transition: .2s all;
-          }
-          &:after{
-            opacity: 1;
-            transition: .2s all;
-          }
-        }
-        &.active {
-          position: relative;
-          opacity: 1;
-          &:before {
-            border-left: rgba(0, 0, 0, 0.7) 4px solid;
-          }
-          &:after {
-            content: " ";
-            background-image: url(../images/active-checkmark.svg);
-            opacity: 1;
-            transition: .2s opacity;
-          }
-        }
-      }
-    }
-  
+
     span.subtext {
       display: block;
       color: rgba(0,0,0,.5);
@@ -384,7 +346,6 @@
       font-size: .8em;
       margin-bottom: .3em; 
       cursor: move;
-      z-index: 999;
     }
     
     .info {

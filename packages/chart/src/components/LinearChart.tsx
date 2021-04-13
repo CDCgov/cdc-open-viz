@@ -169,7 +169,7 @@ export default function LinearChart() {
             left={config.yAxis.size}
             label={config.yAxis.label}
             stroke="#333"
-            numTicks={config.yAxis.numTicks}
+            numTicks={config.yAxis.numTicks || undefined}
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
@@ -240,7 +240,7 @@ export default function LinearChart() {
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
-            numTicks={config.xAxis.numTicks}
+            numTicks={config.xAxis.numTicks || undefined}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;

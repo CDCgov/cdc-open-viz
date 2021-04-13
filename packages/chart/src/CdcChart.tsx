@@ -245,7 +245,7 @@ export default function CdcChart(
   const Legend = () => {
     let containerClasses = ['legend-container']
 
-    if(config.legend.left) {
+    if(config.legend.position === "left") {
       containerClasses.push('left')
     }
 
@@ -316,7 +316,7 @@ export default function CdcChart(
       </>)
   }
 
-  if(false === loading && config.seriesKeys.length > 0) {
+  if(false === loading && config.seriesKeys) {
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -325,12 +325,10 @@ export default function CdcChart(
           {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
           {/* Visualization */}
           <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
-            {/* Legend, if set above */}
-            {!config.legend.hide && !config.legend.below && <Legend />}
             {chartComponents[visualizationType]}
-          </div>            
-          {/* Legend, if set below */}
-          {config.legend.below && <Legend />}
+            {/* Legend */}
+            {false === config.legend.hide && <Legend />}
+          </div>
           {/* Description */}
           {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
