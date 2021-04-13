@@ -9,7 +9,8 @@ export default {
         right: 5
     },
     yAxis: {
-        size: 50
+        size: 50,
+        gridLines: false
     },
     xAxis: {
         size: 75,
@@ -20,7 +21,8 @@ export default {
         expanded: true
     },
     legend: {
-        behavior: "isolate"
+        behavior: "isolate",
+        position: "right"
     },
     palette: "qualitative-bold",
     labels: false

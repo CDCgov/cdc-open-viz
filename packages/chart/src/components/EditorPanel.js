@@ -64,14 +64,14 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField}) => (
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
   <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} />
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
     <span className="edit-label">{label}</span>
   </label>
 ))
 
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initialValue}) => {
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initialValue, ...attributes}) => {
   let optionsJsx = options.map(optionName => <option value={optionName}>{optionName}</option>)
 
   if(initialValue) {
@@ -81,7 +81,7 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
   return (
     <label>
       <span className="edit-label">{label}</span>
-      <select name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }}>
+      <select name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
         {optionsJsx}
       </select>
     </label>
@@ -94,15 +94,13 @@ const EditorPanel = memo(() => {
   const { config, setConfig, loading, colorPalettes, data } = useContext(Context);
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    const isArray = Array.isArray(config[section]);
-    const isString = typeof config[section] === "string";
-    const isBool = typeof config[section] === "boolean"
-
     // Top level
-    if( (isString || isBool || undefined === config.section) && null === subsection) {
-      setConfig({...config, [section]: newValue})
+    if( null === section && null === subsection) {
+      setConfig({...config, [fieldName]: newValue})
       return
     }
+
+    const isArray = Array.isArray(config[section]);
 
     let sectionValue = isArray ? [...config[section], newValue] : {...config[section], [fieldName]: newValue};
 
@@ -125,11 +123,40 @@ const EditorPanel = memo(() => {
   }
 
   const [ requiredColumns, setRequiredColumns ] = useState([])
-
+  const [ addSeries, setAddSeries ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true)
 
   if(loading) {
     return null
+  }
+
+  const removeSeriesKey = (i) => {
+    let seriesKeys = [...config.seriesKeys]
+    seriesKeys.splice(i, 1)
+
+    let newConfig = {...config, seriesKeys}
+
+    if(seriesKeys.length === 0) {
+      delete newConfig.seriesKeys
+    }
+
+    setConfig(newConfig)
+  }
+
+  const addNewSeries = (value) => {
+    let newSeriesKeys = config.seriesKeys ? [...config.seriesKeys] : []
+    newSeriesKeys.push(value)
+    setConfig({...config, seriesKeys: newSeriesKeys})
+  }
+
+  const getColumns = () => {
+    let columns = {}
+
+    data.map(row => {
+      Object.keys(row).forEach(columnName => columns[columnName] = true)
+    })
+
+    return Object.keys(columns)
   }
 
   return (
@@ -148,12 +175,32 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} section="visualizationType" fieldName="chart-vis-type" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
-                  {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} section="visualizationSubType" fieldName="chart-subvis-type" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
-                  <TextField value={config.title} section="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description || ''} section="description" label="Description" updateField={updateField} />
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
+                  {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
+                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
+              {config.visualizationType !== "Pie" && <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Data Series
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {config.seriesKeys && (
+                    <>
+                      <label><span className="edit-label">Displaying</span></label>
+                      <ul className="series-list">
+                        {config.seriesKeys.map((key, i) => (
+                          <li key={key}>{key} <span onClick={(i) => removeSeriesKey(i)}>X</span></li>
+                        ))}
+                      </ul>
+                    </>)}
+                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
+                    <button onClick={(e) => { e.preventDefault(); addNewSeries(addSeries) }} className="btn btn-primary">Add Data Series</button>
+                </AccordionItemPanel>
+              </AccordionItem>}
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -161,8 +208,11 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                   <Select value={config.yAxis.dataKey} section="yAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
+                  <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
+                  <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
+                  <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
+                  <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -174,6 +224,16 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
                   <Select value={config.xAxis.dataKey} section="xAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
+                  <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
+                  {config.xAxis.type === "date" && (
+                    <>
+                      <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
+                      <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
+                      <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                    </>
+                  )}
+                  <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
+                  <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />                  
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -184,8 +244,9 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} />
-                  <Select value={config.legend.behavior} section="legend" subsection="behavior" fieldName="legend-behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={['highlight', 'isolate']} />
-                  <TextField value={config.legend.label} section="legend" fieldName="label" label="Label" updateField={updateField} />
+                  <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={['highlight', 'isolate']} />
+                  <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField} />
+                  <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={['right', 'left']} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -195,7 +256,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.fontSize} section="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <label className="header">
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
@@ -258,7 +319,8 @@ const EditorPanel = memo(() => {
                       )
                     })}
                   </ul>
-                  <CheckBox value={config.labels} section="labels" label="Display label on data" updateField={updateField} />
+                  <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
+                  <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
