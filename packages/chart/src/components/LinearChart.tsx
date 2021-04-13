@@ -116,16 +116,6 @@ export default function LinearChart() {
   return (
     <ErrorBoundary component="LinearChart">
       <svg width={width} height={height} className="linear">
-          {/* Line chart */}
-          { config.visualizationType !== 'Line' && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
-          )}
-          
-          {/* Bar chart */}
-          { config.visualizationType !== 'Bar' && (
-            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
-          )}
-
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             const from = xScale((parseDate(region.from) as Date).getTime());
@@ -283,6 +273,16 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
+
+          {/* Line chart */}
+          { config.visualizationType !== 'Line' && (
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
+          
+          {/* Bar chart */}
+          { config.visualizationType !== 'Bar' && (
+            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
       </svg>
       <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
