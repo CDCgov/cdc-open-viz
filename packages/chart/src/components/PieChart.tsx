@@ -19,7 +19,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -136,6 +136,10 @@ export default function PieChart() {
       setFilteredData(undefined);
     }
   }, [seriesHighlight]);
+
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  });
 
   return (
     <ErrorBoundary component="PieChart">
