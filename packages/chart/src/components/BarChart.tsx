@@ -25,7 +25,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             yScale={yScale}
             color={colorScale}
           >
-            {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
+            {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
               let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
               let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
               let barThickness = xMax / barStack.bars.length;
