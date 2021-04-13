@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
-import { createCanvas } from 'canvas'
 
 // Third party
 import ReactTooltip from 'react-tooltip';
@@ -143,8 +142,10 @@ class CdcMap extends Component {
         const xmlSerializer = new XMLSerializer()
         const svgStr = xmlSerializer.serializeToString(baseSvg)
         const options = { log: false, ignoreMouse: true }
-        const canvas = createCanvas(1440, calcHeight)
+        const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
+        ctx.canvas.width = 1440
+        ctx.canvas.height = calcHeight
         const canvg = Canvg.fromString(ctx, svgStr, options)
         canvg.start()
 
@@ -168,7 +169,8 @@ class CdcMap extends Component {
                     backgroundColor: '#ffffff',
                     width: 1440,
                     windowWidth: 1440,
-                    scale: 1
+                    scale: 1,
+                    logging: false
                 }).then(canvas => {
                     this.saveImageAs(canvas.toDataURL(), filename + '.png')
                 }).then(() => {
@@ -180,7 +182,7 @@ class CdcMap extends Component {
                     margin:       0.2,
                     filename:     filename + '.pdf',
                     image:        { type: 'png' },
-                    html2canvas:  { scale: 2 },
+                    html2canvas:  { scale: 2, logging: false },
                     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
                 };
 
