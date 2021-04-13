@@ -71,7 +71,7 @@ export default function PieChart() {
                     ${config.xAxis.label}: ${(arc.data as any).name} <br/>
                     ${config.yAxis.label}: ${formatNumber(arc.data[config.yAxis.dataKey])}
                   </div>`}
-                  data-for="global"
+                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                 />
               </Group>
             );
@@ -161,7 +161,7 @@ export default function PieChart() {
           </Pie>
         </Group>
       </svg>
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }
