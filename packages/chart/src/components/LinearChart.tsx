@@ -18,12 +18,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config, currentViewport } = useContext<any>(Context);
-  let [ width ] = dimensions;
-
-  if(!config.legend.hide && currentViewport === 'lg') {
-    width = width * 0.73
-  }
+  const { data, dimensions, config } = useContext<any>(Context);
+  const [ width ] = dimensions;
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
@@ -120,16 +116,6 @@ export default function LinearChart() {
   return (
     <ErrorBoundary component="LinearChart">
       <svg width={width} height={height} className="linear">
-          {/* Line chart */}
-          { config.visualizationType !== 'Line' && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
-          )}
-          
-          {/* Bar chart */}
-          { config.visualizationType !== 'Bar' && (
-            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
-          )}
-
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             const from = xScale((parseDate(region.from) as Date).getTime());
@@ -287,8 +273,18 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
+
+          {/* Line chart */}
+          { config.visualizationType !== 'Line' && (
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
+          
+          {/* Bar chart */}
+          { config.visualizationType !== 'Bar' && (
+            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+          )}
       </svg>
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }

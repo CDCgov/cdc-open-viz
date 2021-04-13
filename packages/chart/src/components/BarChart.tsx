@@ -25,14 +25,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             yScale={yScale}
             color={colorScale}
           >
-            {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
+            {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
+              let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
               let barThickness = xMax / barStack.bars.length;
               let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
               <Text 
-                display={config.labels ? 'block' : 'none'}
+                display={config.labels && displayBar ? 'block' : 'none'}
+                opacity={transparentBar ? 0.5 : 1}
                 x={barThickness * (bar.index + 0.5) + offset}
                 y={bar.y - 5}
                 fill={bar.color}
@@ -48,14 +51,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   fill={bar.color}
                   stroke="#333"
                   strokeWidth={config.barBorderThickness || 1}
-                  opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                  display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                  opacity={transparentBar ? 0.5 : 1}
+                  display={displayBar ? 'block' : 'none'}
                   data-tip={`<div>
                         ${config.xAxis.label}: ${data[bar.index][config.xAxis.dataKey]} <br/>
                         ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                         ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                       </div>`}
-                  data-for="global"
+                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                 />
               </Group>
             )}
@@ -77,6 +80,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barGroups) => barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
+                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
+                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = Math.abs(yScale(bar.value) - yScale(0));
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
                     let barGroupWidth = (config.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
@@ -86,7 +91,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
                       <Text 
-                        display={config.labels ? 'block' : 'none'}
+                        display={config.labels && displayBar ? 'block' : 'none'}
+                        opacity={transparentBar ? 0.5 : 1}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
                         y={barY - 5}
                         fill={barColor}
@@ -103,14 +109,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         stroke="#333"
                         strokeWidth={config.barBorderThickness || 1}
                         style={{fill: barColor}}
-                        opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                        display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
+                        opacity={transparentBar ? 0.5 : 1}
+                        display={displayBar ? 'block' : 'none'}
                         data-tip={`<div>
                           ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
                           ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
                           ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                         </div>`}
-                        data-for="global"
+                        data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                       />
                     </Group>
                   )}

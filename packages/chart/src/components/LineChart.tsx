@@ -43,7 +43,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
                     ${config.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
                     ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
                   </div>`}
-                  data-for="global"
+                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                 />
               </Group>
             ))}

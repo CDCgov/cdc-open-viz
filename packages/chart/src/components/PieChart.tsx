@@ -19,7 +19,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -71,7 +71,7 @@ export default function PieChart() {
                     ${config.xAxis.label}: ${(arc.data as any).name} <br/>
                     ${config.yAxis.label}: ${formatNumber(arc.data[config.yAxis.dataKey])}
                   </div>`}
-                  data-for="global"
+                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                 />
               </Group>
             );
@@ -112,14 +112,8 @@ export default function PieChart() {
     );
   }
 
-  let [ width ] = dimensions;
-
-  if(!config.legend.hide && currentViewport === 'lg') {
-    width = width * 0.73
-  }
-
-  width -= (config.padding.left + config.padding.right);
-
+  const [ width ] = dimensions;
+  
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
   const radius = Math.min(width, height) / 2;
@@ -143,6 +137,10 @@ export default function PieChart() {
     }
   }, [seriesHighlight]);
 
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  });
+
   return (
     <ErrorBoundary component="PieChart">
       <svg width={width} height={height}>
@@ -163,7 +161,7 @@ export default function PieChart() {
           </Pie>
         </Group>
       </svg>
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }
