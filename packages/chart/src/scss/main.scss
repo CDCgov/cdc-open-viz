@@ -133,6 +133,9 @@
       overflow: visible;
       font-size: 14px;
       margin: 1rem 0 2rem;
+      .visx-linepath {
+        pointer-events: none;
+      }
     }
   }
   @include breakpointClass(lg) {
