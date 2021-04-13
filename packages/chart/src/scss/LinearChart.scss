@@ -1,0 +1,35 @@
+svg.linear {
+    overflow: visible;
+    margin: 1rem 0 2rem;
+    .bottom-axis-tick-container {
+        overflow: visible;
+
+        .bottom-axis-tick {
+            width: 100%;
+            text-align: center;
+            word-break: break-word;
+            transform-origin: top right;
+            line-height: 1.4em;
+        }
+    }
+
+    .left-axis-tick {
+        margin-right: 5px;
+    }
+
+    .bottom-axis-label {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .left-axis-label-container {
+        overflow: visible;
+
+        .left-axis-label {
+            width: 100%;
+            font-weight: bold;
+            text-align: center;
+            margin-left: -50%;
+        }
+    }
+}

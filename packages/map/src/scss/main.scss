@@ -1,7 +1,6 @@
 @import "~@cdc/core/styles/base";
-@import "loading";
+@import "~@cdc/core/styles/heading-colors";
 @import "variables";
-@import "heading-colors";
 @import "editor-panel";
 
 @mixin legendDot() {
@@ -54,7 +53,6 @@
   @import "./map";
   @import "./sidebar";
   @import "./datatable";
-  @import "./animations";
   flex-grow: 1;
   text-rendering: geometricPrecision;
   color: #202020;

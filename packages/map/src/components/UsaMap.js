@@ -24,7 +24,7 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips
   } = props;
-  
+
   const [territoriesData, setTerritoriesData] = useState([]);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const UsaMap = (props) => {
 
       let textColor = '#FFF';
 
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         // Use white text if the background is dark, and dark grey if it's light
         if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
           textColor = '#202020';
@@ -129,7 +129,16 @@ const UsaMap = (props) => {
     ));
   });
 
+  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+
   const geoList = (geographies) => {
+    const unusedStyles = {
+      default: {
+        stroke: geoStrokeColor,
+        strokeWidth: '1.3px',
+        fill: '#E6E6E6'
+      }
+    }
     // If there's regions and they are filled out, slot the geos into groups
     if (state.general.hasRegions === true && state.columns.geosInRegion.name.length > 0) {
       // Create new geographies list where all the data is keyed to the original data object.
@@ -157,17 +166,17 @@ const UsaMap = (props) => {
         }
 
         // If a legend applies, return it with appropriate information.
-        if (legendColors) {
+        if (legendColors && legendColors[0] !== '#000000') {
           const toolTip = applyTooltipsToGeo(regionName, regionData);
 
           const stylesObj = {
             base: {
-              fill: `${legendColors[0]} !important`,
+              fill: legendColors[0],
               '&:hover': {
-                fill: `${legendColors[1]} !important`
+                fill: `${legendColors[1]}  !important`,
               },
               '&:active': {
-                fill: `${legendColors[2]} !important`
+                fill: `${legendColors[2]}  !important`
               },
             }
           };
@@ -203,8 +212,8 @@ debugger;
               data-tip={toolTip}
               data-for="tooltip"
               tabIndex={-1}
-              className={`rsm-geography ${state.general.geoBorderColor} ${state.general.geoBorderColor} region-${regionName}`}
-              style={{ stroke: state.general.backgroundColor }}
+              className={`rsm-geography ${state.general.geoBorderColor} region-${regionName}`}
+              style={{ stroke: geoStrokeColor, strokeWidth: '1.3px', fill: legendColors[0] }}
               key={`region-${regionName}`}
               onClick={() => geoClickHandler(regionName, regionData)}
               d={regionPath}
@@ -221,9 +230,9 @@ debugger;
 
         return (
           <Geography
+            style={unusedStyles}
             key={geo.rsmKey}
             className={`rsm-geography ${state.general.geoBorderColor}`}
-            style={{ stroke: state.general.backgroundColor }}
             tabIndex={-1}
             geography={geo}
           />
@@ -253,21 +262,21 @@ debugger;
       const geoDisplayName = displayGeoName(geoKey);
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
 
         const stylesObj = {
           default: {
             fill: legendColors[0],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           hover: {
             fill: legendColors[1],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           pressed: {
             fill: legendColors[2],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
         };
 
@@ -300,7 +309,7 @@ debugger;
         <Geography
           key={geo.rsmKey}
           className={`rsm-geography ${state.general.geoBorderColor}`}
-          style={{ stroke: state.general.backgroundColor }}
+          style={ unusedStyles }
           tabIndex={-1}
           geography={geo}
         />
@@ -319,6 +328,7 @@ debugger;
             height={500}
             style={styles.map}
             projection="geoAlbersUsa"
+            data-html2canvas-ignore
           >
             <Geographies geography={topoJsonStates}>
               {({ geographies }) => geoList(geographies)}
