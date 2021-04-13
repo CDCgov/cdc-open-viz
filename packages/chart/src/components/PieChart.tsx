@@ -112,14 +112,8 @@ export default function PieChart() {
     );
   }
 
-  let [ width ] = dimensions;
-
-  if(!config.legend.hide && currentViewport === 'lg') {
-    width = width * 0.73
-  }
-
-  width -= (config.padding.left + config.padding.right);
-
+  const [ width ] = dimensions;
+  
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
   const radius = Math.min(width, height) / 2;
