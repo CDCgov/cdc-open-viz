@@ -267,15 +267,15 @@ const UsaMap = (props) => {
 
         const stylesObj = {
           default: {
-            fill: legendColors[0],
+            fill: legendColors[0] === '#000000' ? '#E6E6E6' : legendColors[0],
             stroke: geoStrokeColor
           },
           hover: {
-            fill: legendColors[1],
+            fill: legendColors[1] === '#280001' ? '#E6E6E6' : legendColors[1],
             stroke: geoStrokeColor
           },
           pressed: {
-            fill: legendColors[2],
+            fill: legendColors[2] === '#000000' ? '#E6E6E6' : legendColors[2],
             stroke: geoStrokeColor
           },
         };
@@ -293,7 +293,7 @@ const UsaMap = (props) => {
             data-tip={toolTip}
             data-for="tooltip"
             tabIndex={-1}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
+            className={`rsm-geography mark1 ${state.general.geoBorderColor}`}
             key={geo.rsmKey}
             geography={geo}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -308,7 +308,7 @@ const UsaMap = (props) => {
       return (
         <Geography
           key={geo.rsmKey}
-          className={`rsm-geography ${state.general.geoBorderColor}`}
+          className={`rsm-geography mark2 ${state.general.geoBorderColor}`}
           style={{ stroke: state.general.geoBorderColor }}
           tabIndex={-1}
           geography={geo}
