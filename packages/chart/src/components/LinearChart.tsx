@@ -284,7 +284,7 @@ export default function LinearChart() {
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
       </svg>
-      <ReactTooltip id="global" html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }

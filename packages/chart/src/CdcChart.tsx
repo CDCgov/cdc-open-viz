@@ -89,9 +89,11 @@ export default function CdcChart(
       });
     }
 
+    //Enforce default values that need to be calculated at runtime
     if(newConfig.visualizationType === 'Pie') {
       newConfig.seriesKeys = data.map(d => d[newConfig.xAxis.dataKey]);
     }
+    newConfig.uniqueId = Date.now();
 
     setConfig(newConfig);
   }

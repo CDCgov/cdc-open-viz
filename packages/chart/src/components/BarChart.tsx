@@ -58,7 +58,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                         ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                       </div>`}
-                  data-for="global"
+                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                 />
               </Group>
             )}
@@ -116,7 +116,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
                           ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                         </div>`}
-                        data-for="global"
+                        data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
                       />
                     </Group>
                   )}
