@@ -89,6 +89,10 @@ export default function CdcChart(
       });
     }
 
+    if(newConfig.visualizationType === 'Pie') {
+      newConfig.seriesKeys = data.map(d => d[newConfig.xAxis.dataKey]);
+    }
+
     setConfig(newConfig);
   }
 
@@ -160,7 +164,7 @@ export default function CdcChart(
   useEffect(() => {
     if(data && config.xAxis && config.seriesKeys) {
       let palette = colorPalettes[config.palette]
-      let numberOfKeys = config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]).length : config.seriesKeys.length
+      let numberOfKeys = config.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
         palette = palette.concat(palette);
@@ -169,7 +173,7 @@ export default function CdcChart(
       palette = palette.slice(0, numberOfKeys);
 
       const newColorScale = () => scaleOrdinal({
-        domain: config.visualizationType === 'Pie' ? data.map(d => d[config.xAxis.dataKey]) : (config.seriesLabelsAll || config.seriesKeys),
+        domain: config.seriesLabelsAll || config.seriesKeys,
         range: palette,
       });
 
