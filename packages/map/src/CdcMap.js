@@ -28,7 +28,6 @@ import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Open Viz
-import '@cdc/core';
 import Loading from '@cdc/core/components/Loading';
 
 // Components
