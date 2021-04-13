@@ -18,12 +18,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config, currentViewport } = useContext<any>(Context);
-  let [ width ] = dimensions;
-
-  if(!config.legend.hide && currentViewport === 'lg') {
-    width = width * 0.73
-  }
+  const { data, dimensions, config } = useContext<any>(Context);
+  const [ width ] = dimensions;
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
