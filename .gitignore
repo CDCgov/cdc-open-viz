@@ -36,3 +36,5 @@ coverage/
 
 # Lerna
 lerna-debug.log
+
+.history/
