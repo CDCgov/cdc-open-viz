@@ -85,7 +85,7 @@ const UsaMap = (props) => {
 
       let textColor = '#FFF';
 
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         // Use white text if the background is dark, and dark grey if it's light
         if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
           textColor = '#202020';
@@ -132,6 +132,13 @@ const UsaMap = (props) => {
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const geoList = (geographies) => {
+    const unusedStyles = {
+      default: {
+        stroke: geoStrokeColor,
+        strokeWidth: '1.3px',
+        fill: '#E6E6E6'
+      }
+    }
     // If there's regions and they are filled out, slot the geos into groups
     if (state.general.hasRegions === true && state.columns.geosInRegion.name.length > 0) {
       // Create new geographies list where all the data is keyed to the original data object.
@@ -159,7 +166,7 @@ const UsaMap = (props) => {
         }
 
         // If a legend applies, return it with appropriate information.
-        if (legendColors) {
+        if (legendColors && legendColors[0] !== '#000000') {
           const toolTip = applyTooltipsToGeo(regionName, regionData);
 
           const stylesObj = {
@@ -220,13 +227,6 @@ const UsaMap = (props) => {
       // Regions are done, render out the remaining
       const unusedGeos = Object.keys(regionGeographies).map((key) => {
         const geo = regionGeographies[key];
-        const unusedStyles = {
-            default: {
-              stroke: geoStrokeColor,
-              strokeWidth: '1.3px',
-              fill: '#E6E6E6'
-            }
-        }
 
         return (
           <Geography
@@ -262,20 +262,20 @@ const UsaMap = (props) => {
       const geoDisplayName = displayGeoName(geoKey);
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
 
         const stylesObj = {
           default: {
-            fill: legendColors[0] === '#000000' ? '#E6E6E6' : legendColors[0],
+            fill: legendColors[0],
             stroke: geoStrokeColor
           },
           hover: {
-            fill: legendColors[1] === '#280001' ? '#E6E6E6' : legendColors[1],
+            fill: legendColors[1],
             stroke: geoStrokeColor
           },
           pressed: {
-            fill: legendColors[2] === '#000000' ? '#E6E6E6' : legendColors[2],
+            fill: legendColors[2],
             stroke: geoStrokeColor
           },
         };
@@ -293,7 +293,7 @@ const UsaMap = (props) => {
             data-tip={toolTip}
             data-for="tooltip"
             tabIndex={-1}
-            className={`rsm-geography mark1 ${state.general.geoBorderColor}`}
+            className={`rsm-geography ${state.general.geoBorderColor}`}
             key={geo.rsmKey}
             geography={geo}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -308,8 +308,8 @@ const UsaMap = (props) => {
       return (
         <Geography
           key={geo.rsmKey}
-          className={`rsm-geography mark2 ${state.general.geoBorderColor}`}
-          style={{ stroke: state.general.geoBorderColor }}
+          className={`rsm-geography ${state.general.geoBorderColor}`}
+          style={ unusedStyles }
           tabIndex={-1}
           geography={geo}
         />
