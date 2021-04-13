@@ -69,6 +69,7 @@
 }
 
 .cdc-open-viz-module {
+  position: relative;
   color: $baseColor;
   @import "data-table";
   @import "global";

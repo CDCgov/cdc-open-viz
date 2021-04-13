@@ -67,6 +67,9 @@ module.exports = (env = {}, { mode }) => {
         libraryTarget: 'umd',
     },
     resolve: {
+      alias: {
+        react: path.resolve('./node_modules/react')
+      },
       extensions: ['*', '.tsx', '.ts', '.js'],
     },
     target: 'web',
