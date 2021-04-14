@@ -1370,7 +1370,8 @@ class CdcMap extends Component {
 
                         <section className="geography-container" aria-hidden="true" ref={this.mapSvg}>
                             {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                                {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {'us' === this.state.general.geoType && !this.state.general.displayAsHex && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {this.state.general.displayAsHex && 'data' === this.state.general.type && <HexMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
                                 {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
                                 {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
 
