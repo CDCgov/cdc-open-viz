@@ -14,7 +14,6 @@
                     ],
                     "properties": {
                         "label": "Maine",
-                        "bees": 60.5,
                         "iso3166_2": "ME",
                         "google_name": "Maine (United States)",
                         "state": "Maine"
@@ -32,7 +31,6 @@
                     ],
                     "properties": {
                         "label": "R.I.",
-                        "bees": 47.8,
                         "iso3166_2": "RI",
                         "google_name": "Rhode Island (United States)",
                         "state": "Rhode Island"
@@ -50,7 +48,6 @@
                     ],
                     "properties": {
                         "label": "Vt.",
-                        "bees": 33.9,
                         "iso3166_2": "VT",
                         "google_name": "Vermont (United States)",
                         "state": "Vermont"
@@ -70,7 +67,6 @@
                     ],
                     "properties": {
                         "label": "Okla.",
-                        "bees": 63.4,
                         "iso3166_2": "OK",
                         "google_name": "Oklahoma (United States)",
                         "state": "Oklahoma"
@@ -90,7 +86,6 @@
                     ],
                     "properties": {
                         "label": "S.C.",
-                        "bees": 26.6,
                         "iso3166_2": "SC",
                         "google_name": "South Carolina (United States)",
                         "state": "South Carolina"
@@ -110,7 +105,6 @@
                     ],
                     "properties": {
                         "label": "D.C.",
-                        "bees": null,
                         "iso3166_2": "DC",
                         "google_name": "District of Columbia (United States)",
                         "state": "District of Columbia"
@@ -130,10 +124,9 @@
                     ],
                     "properties": {
                         "label": "W.Va.",
-                        "bees": 59.5,
                         "iso3166_2": "WV",
                         "google_name": "West Virginia (United States)",
-                        "state": "West Virgina"
+                        "state": "West Virginia"
                     }
                 },
                 {
@@ -148,7 +141,6 @@
                     ],
                     "properties": {
                         "label": "Calif.",
-                        "bees": 40.1,
                         "iso3166_2": "CA",
                         "google_name": "California (United States)",
                         "state": "California"
@@ -168,7 +160,6 @@
                     ],
                     "properties": {
                         "label": "Kan.",
-                        "bees": 40.8,
                         "iso3166_2": "KS",
                         "google_name": "Kansas (United States)",
                         "state": "Kansas"
@@ -188,7 +179,6 @@
                     ],
                     "properties": {
                         "label": "Ky.",
-                        "bees": 47.7,
                         "iso3166_2": "KY",
                         "google_name": "Kentucky (United States)",
                         "state": "Kentucky"
@@ -208,7 +198,6 @@
                     ],
                     "properties": {
                         "label": "Md.",
-                        "bees": 60.9,
                         "iso3166_2": "MD",
                         "google_name": "Maryland (United States)",
                         "state": "Maryland"
@@ -228,7 +217,6 @@
                     ],
                     "properties": {
                         "label": "Mo.",
-                        "bees": 34.9,
                         "iso3166_2": "MO",
                         "google_name": "Missouri (United States)",
                         "state": "Missouri"
@@ -248,7 +236,6 @@
                     ],
                     "properties": {
                         "label": "Neb.",
-                        "bees": 37.3,
                         "iso3166_2": "NE",
                         "google_name": "Nebraska (United States)",
                         "state": "Nebraska"
@@ -268,7 +255,6 @@
                     ],
                     "properties": {
                         "label": "N.M.",
-                        "bees": 46.1,
                         "iso3166_2": "NM",
                         "google_name": "New Mexico (United States)",
                         "state": "New Mexico"
@@ -288,7 +274,6 @@
                     ],
                     "properties": {
                         "label": "N.C.",
-                        "bees": 41.5,
                         "iso3166_2": "NC",
                         "google_name": "North Carolina (United States)",
                         "state": "North Carolina"
@@ -308,7 +293,6 @@
                     ],
                     "properties": {
                         "label": "Tenn.",
-                        "bees": 36.4,
                         "iso3166_2": "TN",
                         "google_name": "Tennessee (United States)",
                         "state": "Tennessee"
@@ -328,7 +312,6 @@
                     ],
                     "properties": {
                         "label": "Iowa",
-                        "bees": 61.4,
                         "iso3166_2": "IA",
                         "google_name": "Iowa (United States)",
                         "state": "Iowa"
@@ -348,7 +331,6 @@
                     ],
                     "properties": {
                         "label": "Nev.",
-                        "bees": 26.7,
                         "iso3166_2": "NV",
                         "google_name": "Nevada (United States)",
                         "state": "Nevada"
@@ -368,7 +350,6 @@
                     ],
                     "properties": {
                         "label": "N.J.",
-                        "bees": 47.6,
                         "iso3166_2": "NJ",
                         "google_name": "New Jersey (United States)",
                         "state": "New Jersey"
@@ -388,7 +369,6 @@
                     ],
                     "properties": {
                         "label": "S.D.",
-                        "bees": 36.1,
                         "iso3166_2": "SD",
                         "google_name": "South Dakota (United States)",
                         "state": "South Dakota"
@@ -408,7 +388,6 @@
                     ],
                     "properties": {
                         "label": "Ohio",
-                        "bees": 49.8,
                         "iso3166_2": "OH",
                         "google_name": "Ohio (United States)",
                         "state": "Ohio"
@@ -428,7 +407,6 @@
                     ],
                     "properties": {
                         "label": "Wyo.",
-                        "bees": 32.5,
                         "iso3166_2": "WY",
                         "google_name": "Wyoming (United States)",
                         "state": "Wyoming"
@@ -446,7 +424,6 @@
                     ],
                     "properties": {
                         "label": "Va.",
-                        "bees": 45.6,
                         "iso3166_2": "VA",
                         "google_name": "Virginia (United States)",
                         "state": "Virginia"
@@ -461,7 +438,6 @@
                     ],
                     "properties": {
                         "label": "D.C.",
-                        "bees": null,
                         "iso3166_2": "PR",
                         "google_name": "Puerto Rico (United States)",
                         "state": "Puerto Rico"
@@ -476,7 +452,6 @@
                     ],
                     "properties": {
                         "label": "D.C.",
-                        "bees": null,
                         "iso3166_2": "VI",
                         "google_name": "Virgin Islands (United States)",
                         "state": "Virgin Islands"
@@ -495,7 +470,6 @@
                     ],
                     "properties": {
                         "label": "Del.",
-                        "bees": 61,
                         "iso3166_2": "DE",
                         "google_name": "Delaware (United States)",
                         "state": "Delaware"
@@ -512,7 +486,6 @@
                     ],
                     "properties": {
                         "label": "Fla.",
-                        "bees": 54.8,
                         "iso3166_2": "FL",
                         "google_name": "Florida (United States)",
                         "state": "Florida"
@@ -532,7 +505,6 @@
                     ],
                     "properties": {
                         "label": "N.H.",
-                        "bees": 39.4,
                         "iso3166_2": "NH",
                         "google_name": "New Hampshire (United States)",
                         "state": "New Hampshire"
@@ -547,7 +519,6 @@
                     ],
                     "properties": {
                         "label": "H.I.",
-                        "bees": 13.9,
                         "iso3166_2": "HI",
                         "google_name": "Hawaii (United States)",
                         "state": "Hawaii"
@@ -564,7 +535,6 @@
                     ],
                     "properties": {
                         "label": "Texas",
-                        "bees": 46.3,
                         "iso3166_2": "TX",
                         "google_name": "Texas (United States)",
                         "state": "Texas"
@@ -584,7 +554,6 @@
                     ],
                     "properties": {
                         "label": "Ala.",
-                        "bees": 48.1,
                         "iso3166_2": "AL",
                         "google_name": "Alabama (United States)",
                         "state": "Alabama"
@@ -602,7 +571,6 @@
                     ],
                     "properties": {
                         "label": "Ariz.",
-                        "bees": 42.9,
                         "iso3166_2": "AZ",
                         "google_name": "Arizona (United States)",
                         "state": "Arizona"
@@ -621,7 +589,6 @@
                     ],
                     "properties": {
                         "label": "Ga.",
-                        "bees": 34.9,
                         "iso3166_2": "GA",
                         "google_name": "Georgia (United States)",
                         "state": "Georgia"
@@ -641,7 +608,6 @@
                     ],
                     "properties": {
                         "label": "La.",
-                        "bees": 44.3,
                         "iso3166_2": "LA",
                         "google_name": "Louisiana (United States)",
                         "state": "Louisiana"
@@ -660,7 +626,6 @@
                     ],
                     "properties": {
                         "label": "Miss.",
-                        "bees": 38.7,
                         "iso3166_2": "MS",
                         "google_name": "Mississippi (United States)",
                         "state": "Mississippi"
@@ -680,7 +645,6 @@
                     ],
                     "properties": {
                         "label": "Utah",
-                        "bees": 33.5,
                         "iso3166_2": "UT",
                         "google_name": "Utah (United States)",
                         "state": "Utah"
@@ -700,7 +664,6 @@
                     ],
                     "properties": {
                         "label": "Colo.",
-                        "bees": 38,
                         "iso3166_2": "CO",
                         "google_name": "Colorado (United States)",
                         "state": "Colorado"
@@ -720,7 +683,6 @@
                     ],
                     "properties": {
                         "label": "Ark.",
-                        "bees": 48.3,
                         "iso3166_2": "AR",
                         "google_name": "Arkansas (United States)",
                         "state": "Arkansas"
@@ -740,7 +702,6 @@
                     ],
                     "properties": {
                         "label": "Idaho",
-                        "bees": 33.3,
                         "iso3166_2": "ID",
                         "google_name": "Idaho (United States)",
                         "state": "Idaho"
@@ -758,7 +719,6 @@
                     ],
                     "properties": {
                         "label": "Ore.",
-                        "bees": 25.2,
                         "iso3166_2": "OR",
                         "google_name": "Oregon (United States)",
                         "state": "Oregon"
@@ -778,7 +738,6 @@
                     ],
                     "properties": {
                         "label": "Ill.",
-                        "bees": 62.4,
                         "iso3166_2": "IL",
                         "google_name": "Illinois (United States)",
                         "state": "Illinois"
@@ -798,7 +757,6 @@
                     ],
                     "properties": {
                         "label": "Pa.",
-                        "bees": 60.6,
                         "iso3166_2": "PA",
                         "google_name": "Pennsylvania (United States)",
                         "state": "Pennsylvania"
@@ -818,7 +776,6 @@
                     ],
                     "properties": {
                         "label": "Ind.",
-                        "bees": 49.1,
                         "iso3166_2": "IN",
                         "google_name": "Indiana (United States)",
                         "state": "Indiana"
@@ -837,7 +794,6 @@
                     ],
                     "properties": {
                         "label": "N.Y.",
-                        "bees": 54.1,
                         "iso3166_2": "NY",
                         "google_name": "New York (United States)",
                         "state": "New York"
@@ -854,7 +810,6 @@
                     ],
                     "properties": {
                         "label": "Wash.",
-                        "bees": 39.3,
                         "iso3166_2": "WA",
                         "google_name": "Washington (United States)",
                         "state": "Washington"
@@ -872,7 +827,6 @@
                     ],
                     "properties": {
                         "label": "Wis.",
-                        "bees": 60.2,
                         "iso3166_2": "WI",
                         "google_name": "Wisconsin (United States)",
                         "state": "Wisconsin"
@@ -892,7 +846,6 @@
                     ],
                     "properties": {
                         "label": "Mass.",
-                        "bees": 46.4,
                         "iso3166_2": "MA",
                         "google_name": "Massachusetts (United States)",
                         "state": "Massachusetts"
@@ -909,7 +862,6 @@
                     ],
                     "properties": {
                         "label": "Mich.",
-                        "bees": 27.7,
                         "iso3166_2": "MI",
                         "google_name": "Michigan (United States)",
                         "state": "Michigan"
@@ -928,7 +880,6 @@
                     ],
                     "properties": {
                         "label": "Minn.",
-                        "bees": 51.2,
                         "iso3166_2": "MN",
                         "google_name": "Minnesota (United States)",
                         "state": "Minnesota"
@@ -947,7 +898,6 @@
                     ],
                     "properties": {
                         "label": "Mont.",
-                        "bees": 41.1,
                         "iso3166_2": "MT",
                         "google_name": "Montana (United States)",
                         "state": "Montana"
@@ -966,7 +916,6 @@
                     ],
                     "properties": {
                         "label": "N.D.",
-                        "bees": 40.4,
                         "iso3166_2": "ND",
                         "google_name": "North Dakota (United States)",
                         "state": "North Dakota"
@@ -981,7 +930,6 @@
                     ],
                     "properties": {
                         "label": "A.K.",
-                        "bees": null,
                         "iso3166_2": "AK",
                         "google_name": "Alaska (United States)",
                         "state": "Alaska"
@@ -1000,7 +948,6 @@
                     ],
                     "properties": {
                         "label": "Conn.",
-                        "bees": 57.5,
                         "iso3166_2": "CT",
                         "google_name": "Connecticut (United States)",
                         "state": "Connecticut"
