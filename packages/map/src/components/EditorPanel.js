@@ -938,7 +938,6 @@ const EditorPanel = memo((props) => {
                     <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
                       <option value="data">Data</option>
                       <option value="navigation">Navigation</option>
-                      <option value="hex">Hex</option>
                     </select>
                   </label>
                   {'us' === state.general.geoType && 'data' === state.general.type &&
