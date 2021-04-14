@@ -193,7 +193,7 @@ const EditorPanel = memo(() => {
                       <label><span className="edit-label">Displaying</span></label>
                       <ul className="series-list">
                         {config.seriesKeys.map((key, i) => (
-                          <li key={key}>{key} <span onClick={(i) => removeSeriesKey(i)}>X</span></li>
+                          <li key={key}>{key} <span onClick={() => removeSeriesKey(i)}>X</span></li>
                         ))}
                       </ul>
                     </>)}
@@ -213,6 +213,11 @@ const EditorPanel = memo(() => {
                   <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                   <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
                   <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
+                  <span className="divider-heading">Number Formatting</span>
+                  <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
+                  <TextField value={config.dataFormat.roundTo} type="number" section="dataFormat" fieldName="roundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} />
+                  <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
+                  <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -234,6 +239,16 @@ const EditorPanel = memo(() => {
                   )}
                   <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
                   <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />                  
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Regions
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                    Lorem ipsum
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

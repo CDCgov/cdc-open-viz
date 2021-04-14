@@ -25,5 +25,6 @@ export default {
         position: "right"
     },
     palette: "qualitative-bold",
-    labels: false
+    labels: false,
+    dataFormat: {}
 }

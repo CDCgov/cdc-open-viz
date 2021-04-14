@@ -10,7 +10,7 @@
         "upper": "Upper"
     },
     "dataFormat": {
-        "roundTo": -1,
+        
         "commas": false,
         "prefix": "Lorem",
         "suffix": "Suffix"

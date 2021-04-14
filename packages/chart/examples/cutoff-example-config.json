@@ -8,7 +8,6 @@
     "height": 300,
     "dataCutoff": "0.1",
     "dataFormat": {
-        "roundTo": -1,
         "commas": false,
         "prefix": "",
         "suffix": ""
