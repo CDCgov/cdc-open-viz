@@ -53,6 +53,26 @@ const HexMap = (props) => {
 
   useEffect(() => rebuildTooltips());
 
+  const styles = {
+    container: {
+      position: 'relative',
+      height: 0,
+      paddingBottom: '50%'
+    },
+    innerContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    },
+    map: {
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+    }
+  };
+
   const debug = (item, item2 = null) => {
     debugger;
 
@@ -95,112 +115,16 @@ const HexMap = (props) => {
     return returnVal;
   }
 
-
+  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const geoList = (geographies, mercator) => {
-//     if (state.general.hasRegions === true && state.columns.geosInRegion.name.length > 0) {
-//       // Create new geographies list where all the data is keyed to the original data object.
-//       const regionGeographies = {};
-
-//       geographies.forEach((geo) => {
-//         regionGeographies[geo.properties.name] = geo;
-//       });
-
-//       // Get list of geos in every region
-//       const regions = Object.keys(processedData);
-
-//       const regionsJsx = [];
-
-//       regions.forEach((regionName) => {
-//         const regionData = processedData[regionName];
-
-//         let legendColors;
-
-//         const geosInRegion = regionData[state.columns.geosInRegion.name].split(', ');
-
-//         // Once we receive data for this geographic item, setup variables.
-//         if (regionData !== undefined) {
-//           legendColors = applyLegendToValue(regionData);
-//         }
-
-//         // If a legend applies, return it with appropriate information.
-//         if (legendColors) {
-//           const toolTip = applyTooltipsToGeo(regionName, regionData);
-
-//           const stylesObj = {
-//             base: {
-//               fill: `${legendColors[0]} !important`,
-//               '&:hover': {
-//                 fill: `${legendColors[1]} !important`
-//               },
-//               '&:active': {
-//                 fill: `${legendColors[2]} !important`
-//               },
-//             }
-//           };
-// debugger;
-//           // When to add pointer cursor
-//           if ((state.columns.navigate && regionData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-//             stylesObj.base = {
-//               ...stylesObj.base,
-//               cursor: 'pointer'
-//             };
-//           }
-
-//           let regionPath = '';
-
-//           geosInRegion.forEach((name) => {
-//             const topoJsonData = regionGeographies[name];
-
-//             // If a city of territory slipped in, ignore instead of failing
-//             if (!topoJsonData) {
-//               return true;
-//             }
-
-//             // Add the path data for this geo to the larger region path
-//             regionPath += topoJsonData.svgPath;
-
-//             // When done processing, remove this item from the full list so we know to render the remaining geos on the map out differently after we're done constructing our regions.
-//             delete regionGeographies[name];
-//           });
-
-//           const regionGroup = (
-//             <path
-//               css={stylesObj.base}
-//               data-tip={toolTip}
-//               data-for="tooltip"
-//               tabIndex={-1}
-//               className={`rsm-geography ${state.general.geoBorderColor} ${state.general.geoBorderColor} region-${regionName}`}
-//               style={{ stroke: state.general.backgroundColor }}
-//               key={`region-${regionName}`}
-//               onClick={() => geoClickHandler(regionName, regionData)}
-//               d={regionPath}
-//             />
-//           );
-
-//           regionsJsx.push(regionGroup);
-//         }
-//       });
-
-//       // Regions are done, render out the remaining
-//       const unusedGeos = Object.keys(regionGeographies).map((key) => {
-//         const geo = regionGeographies[key];
-
-//         return (
-//           <Geography
-//             key={geo.rsmKey}
-//             className={`rsm-geography ${state.general.geoBorderColor}`}
-//             style={{ stroke: state.general.backgroundColor }}
-//             tabIndex={-1}
-//             geography={geo}
-//           />
-//         );
-//       });
-
-//       regionsJsx.push(unusedGeos);
-
-//       return regionsJsx;
-//     }
+    const unusedStyles = {
+      default: {
+        stroke: geoStrokeColor,
+        strokeWidth: '1.3px',
+        fill: '#E6E6E6'
+      }
+    }
     const geosJsx = geographies.map((geo) => {
       const geoName = geo.properties.state;
 
@@ -223,12 +147,12 @@ const HexMap = (props) => {
       
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
 
         const stylesObj = {
           base: {
-            fill: `${legendColors[0]} !important`,
+            fill: legendColors[0],
             '&:hover': {
               fill: `${legendColors[1]} !important`
             },
@@ -268,9 +192,8 @@ const HexMap = (props) => {
               key={geo.rsmKey}
               d={geoHex.path || ''}
               className={`rsm-geography ${state.general.geoBorderColor}`}
-              stroke={background}
-              strokeWidth={0.5}
               css={stylesObj.base}
+              style={stylesObj.base}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
             />
             <text
@@ -278,9 +201,7 @@ const HexMap = (props) => {
               y={geoHex.centroid[1]+5}
               key={geo.rsmKey}
               textAnchor='middle'
-              style={{pointerEvents: "none"}}
-              // fill='#fff'
-              // href={'#' + feature.properties.iso3166_2}
+              style={{pointerEvents: "none", fontSize: '16px'}}
             >
               {geoHex.feature.properties.iso3166_2}
             </text>
@@ -294,20 +215,19 @@ const HexMap = (props) => {
       return (
         <g>
           <path 
-            // id={feature.properties.iso3166_2}
             data-found='none'
             key={geo.rsmKey}
             className={`rsm-geography ${state.general.geoBorderColor}`}
             d={geoHex.path || ''}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            style={unusedStyles.default}
           />
           <text
             x={geoHex.centroid[0]}
             y={geoHex.centroid[1]+5}
             key={geo.rsmKey+'-text'}
             textAnchor='middle'
-            // fill='#fff'
-            // href={'#' + feature.properties.iso3166_2}
+            style={{pointerEvents: "none", fontSize: '16px'}}
           >
             {geoHex.feature.properties.iso3166_2}
           </text>
@@ -327,7 +247,7 @@ const HexMap = (props) => {
 
   return width < 10 ? null : ( 
 
-    <svg width={width} height={height}>
+    <svg className="rsm-svg" width={width} height={height}>
     <rect x={0} y={0} width={width} height={height} fill={background} rx={14} />
 
     <Mercator

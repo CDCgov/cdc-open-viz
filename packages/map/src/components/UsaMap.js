@@ -205,7 +205,7 @@ const UsaMap = (props) => {
             // When done processing, remove this item from the full list so we know to render the remaining geos on the map out differently after we're done constructing our regions.
             delete regionGeographies[name];
           });
-debugger;
+
           const regionGroup = (
             <path
               css={stylesObj.base}
