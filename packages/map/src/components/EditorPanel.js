@@ -319,6 +319,16 @@ const EditorPanel = memo((props) => {
                 }
             })
       break;
+      case 'toggleDisplayAsHex':
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        displayAsHex: !prevState.general.displayAsHex
+                    }
+                }
+            })
+      break;
       case 'editorMapType':
         switch(value) {
             case 'data':
@@ -931,6 +941,12 @@ const EditorPanel = memo((props) => {
                       <option value="hex">Hex</option>
                     </select>
                   </label>
+                  {'us' === state.general.geoType && 'data' === state.general.type &&
+                    <label className="checkbox mt-4">
+                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("toggleDisplayAsHex", event.target.checked) }} />
+                      <span className="edit-label">Display As Hex Map</span>
+                    </label>
+                  }
                   <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
                   <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
