@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -112,6 +112,10 @@ export default function LinearChart() {
       });
     }
   }
+
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  }, [config]);
 
   return (
     <ErrorBoundary component="LinearChart">
