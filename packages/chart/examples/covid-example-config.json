@@ -8,7 +8,6 @@
     "barThickness": 0.3,
     "height": 300,
     "dataFormat": {
-        "roundTo": -1,
         "commas": false,
         "prefix": "",
         "suffix": ""

@@ -40,7 +40,7 @@ export default function CdcChart(
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
-  const [dimensions, setDimensions] = useState<Array<Number>>([]);
+  const [dimensions, setDimensions] = useState<Array<number>>([]);
 
   const outerContainerRef = useRef(null);
 
@@ -239,7 +239,7 @@ export default function CdcChart(
         num = cutoff;  
       }
     }
-    if (config.dataFormat.roundTo !== -1) num = num.toFixed(config.dataFormat.roundTo);
+    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
     if (config.dataFormat.commas) num = num.toLocaleString('en-US');
     return prefix + num + config.dataFormat.suffix;
   };
