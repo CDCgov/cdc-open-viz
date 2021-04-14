@@ -160,7 +160,8 @@ class CdcMap extends Component {
 
         // Construct filename with timestamp
         const date = new Date()
-        const filename = this.state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+        let filename = (this.state.general.title) ? this.state.general.title.replace(/\s+/g, '-').toLowerCase() : 'map-export'
+        filename = filename + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
         switch (type) {
             case 'image':
