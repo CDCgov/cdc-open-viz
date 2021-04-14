@@ -40,7 +40,7 @@ export default function CdcChart(
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
-  const [dimensions, setDimensions] = useState<Array<number>>([]);
+  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   const outerContainerRef = useRef(null);
 
