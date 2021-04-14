@@ -131,8 +131,8 @@ const HexMap = (props) => {
       // Map the name from the geo data with the appropriate key for the processed data
       const geoKey = Object.keys(supportedStates).find((key) => supportedStates[key].includes(geoName));
 
-      const geoData = processedData[geoName];
-// debugger;
+      const geoData = processedData[geoKey];
+
       let legendColors;
 
       // Once we receive data for this geographic item, setup variables.
@@ -173,7 +173,6 @@ const HexMap = (props) => {
             stroke: state.general.backgroundColor
           },
         };
-
         
         // When to add pointer cursor
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
@@ -247,9 +246,8 @@ const HexMap = (props) => {
 
   return width < 10 ? null : ( 
 
-    <svg className="rsm-svg" width={width} height={height}>
+    <svg viewBox="0 0 880 500" data-html2canvas="true" className="rsm-svg" style={{width: '100%', height:'100%', overflow: 'hidden'}}>
     <rect x={0} y={0} width={width} height={height} fill={background} rx={14} />
-
     <Mercator
       data={usa.features}
       scale={scale}
