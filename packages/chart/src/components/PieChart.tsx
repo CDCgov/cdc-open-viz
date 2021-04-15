@@ -19,7 +19,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -112,7 +112,11 @@ export default function PieChart() {
     );
   }
 
-  const [ width ] = dimensions;
+  let [ width ] = dimensions;
+
+  if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+    width = width * 0.73;
+  }
   
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
