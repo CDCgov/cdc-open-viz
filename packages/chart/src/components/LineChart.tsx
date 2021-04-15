@@ -14,7 +14,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
 
   return (
     <ErrorBoundary component="LineChart">
-      <Group left={config.yAxis.size}>
+      <Group left={config.runtime.yAxis.size}>
         { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
           <Group
             key={`series-${seriesKey}`}
@@ -39,11 +39,11 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
                   fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
                   style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
                   data-tip={`<div>
-                    ${config.xAxis.label}: ${d[config.xAxis.dataKey]} <br/>
-                    ${config.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
+                    ${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]} <br/>
+                    ${config.runtime.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
                     ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
                   </div>`}
-                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
+                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
             ))}
