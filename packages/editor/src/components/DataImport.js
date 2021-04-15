@@ -226,7 +226,7 @@ export default function DataImport() {
         ))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
         {/* TODO: Add more sample data in, but this will do for now. */}
-        <h3>Load Sample Data:</h3>
+        <span className="heading">Load Sample Data:</span>
         <ul className="sample-data-list">
           <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
         </ul>
