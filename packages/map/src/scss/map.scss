@@ -181,8 +181,6 @@ header + .map-container.full-border {
         font-size: 12px;
         width: 30px; 
         height: 17.32px;
-        // border-left: 1px solid rgba(0,0,0,0.2);
-        // border-right: 1px solid rgba(0,0,0,0.2);
         cursor: default; 
 
         &:before,
@@ -197,7 +195,6 @@ header + .map-container.full-border {
           transform: scaleY(0.5774) rotate(-45deg);
           background-color: inherit;
           left: 4.4px;
-          // box-shadow: 0 0 1px rgba(0,0,0,1);
         }
         &:before {
           top: -10.6px;
