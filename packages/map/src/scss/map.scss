@@ -152,6 +152,72 @@ header + .map-container.full-border {
     }
   }
 }
+
+// hex maps
+.hex-territories {
+  padding: 1em 100px 0 1em;
+  margin-bottom: 2em;
+  ul {
+    display: flex;
+
+    li {
+      position: relative;
+      display: inline-block;
+      font-size: 1vw;
+      transition: .3s all;
+      
+      &.label {
+        max-width: 30%;
+        display: flex;
+        align-items: center;
+        text-align: left;
+        font-size: 1em !important;
+        margin: 0 14px 0 0;
+      }
+      &:not(:first-child) {
+        position: relative;
+        margin: 2px 3px 0;
+        text-align: center;
+        font-size: 12px;
+        width: 30px; 
+        height: 17.32px;
+        // border-left: 1px solid rgba(0,0,0,0.2);
+        // border-right: 1px solid rgba(0,0,0,0.2);
+        cursor: default; 
+
+        &:before,
+        &:after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          width: 20.5px;
+          height: 21px;
+          -webkit-transform: scaleY(0.5774) rotate(-45deg);
+          -ms-transform: scaleY(0.5774) rotate(-45deg);
+          transform: scaleY(0.5774) rotate(-45deg);
+          background-color: inherit;
+          left: 4.4px;
+          // box-shadow: 0 0 1px rgba(0,0,0,1);
+        }
+        &:before {
+          top: -10.6px;
+        }
+        &:after {
+          bottom: -10.6px;
+        }
+      }
+      &.darkGray {
+        border: rgba(0,0,0,.2) 1px solid !important;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+    }
+  }
+}
+
 .zoom-controls {
   display: flex;
   position: absolute;

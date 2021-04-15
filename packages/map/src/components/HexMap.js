@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { scaleQuantize } from '@visx/scale';
 import { Mercator, Graticule } from '@visx/geo';
 import * as topojson from 'topojson-client';
 import topology from "../data/us-states-geo-topo.json";
 import Territory from './Territory';
-import chroma from 'chroma-js';
-
-export const background = '#ffffff';
 
 const usa = topojson.feature(topology, topology.objects.us_states_geo);
 const geographies = usa.features;
 
-const color = scaleQuantize({
-  domain: [
-    Math.min(...usa.features.map((f) => f.properties.bees)),
-    Math.max(...usa.features.map((f) => f.properties.bees))
-  ],
-  range: [
-    '#ffb01d', '#ffa020', '#ff9221', '#ff8424', '#ff7425', '#fc5e2f', '#f94b3a', '#f63a48'
-  ]
-});
-
-// todo remove this sizing
 const HexMap = (props) => {
   const {
     state,
@@ -53,51 +38,121 @@ const HexMap = (props) => {
 
   useEffect(() => rebuildTooltips());
 
-  const styles = {
-    container: {
-      position: 'relative',
-      height: 0,
-      paddingBottom: '50%'
-    },
-    innerContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    },
-    map: {
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden',
+  // Set text to black or white based on the background color
+  const setTextContrast = (hexcolor) => {
+    // If a leading # is provided, remove it
+    if (hexcolor.slice(0, 1) === '#') {
+      hexcolor = hexcolor.slice(1);
     }
+  
+    // If a three-character hexcode, make six-character
+    if (hexcolor.length === 3) {
+      hexcolor = hexcolor.split('').map(function (hex) {
+        return hex + hex;
+      }).join('');
+    }
+  
+    // Convert to RGB value
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+  
+    // Get YIQ ratio
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  
+    // Check contrast
+    return (yiq >= 128) ? 'black' : 'white';
   };
 
-  const debug = (item, item2 = null) => {
-    debugger;
+  const territories = [];
 
-    return item;
-  }
+  territoriesData.forEach((territory) => {
+    const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : '#fff';
 
-  // const styles = {
-  //   container: {
-  //     position: 'relative',
-  //     height: 0,
-  //     paddingBottom: '50%'
-  //   },
-  //   innerContainer: {
-  //     position: 'absolute',
-  //     top: 0,
-  //     left: 0,
-  //     right: 0,
-  //     bottom: 0
-  //   },
-  //   map: {
-  //     width: '100%',
-  //     height: '100%',
-  //     overflow: 'hidden',
-  //   }
-  // };
+    const territoryData = processedData[territory];
+
+    let toolTip;
+
+    let territoryStyles = {
+      backgroundColor: '#E6E6E6',
+      color: '#202020',
+      borderColor: `${geoBorderColor} !important`,
+      borderWidth: 1,
+      borderStyle: 'solid'
+    };
+
+    if (territoryData) {
+      toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData);
+
+      const legendColors = applyLegendToValue(territoryData);
+
+      let textColor = '#FFF';
+
+      if (legendColors && legendColors[0] !== '#000000') {
+
+        let needsPointer = false;
+
+        // If we need to add a pointer cursor
+        if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+          needsPointer = true;
+        }
+
+        territoryStyles = {
+          backgroundColor: legendColors[0],
+          borderRight: `1px solid ${geoBorderColor}!important`,
+          borderLeft: `1px solid ${geoBorderColor} !important`,
+          color: setTextContrast(legendColors[0]),
+
+          // psuedo elements used to make the tops and bottoms 
+          // of the hexagons are actually borders
+          '&:before': {
+            // the shape is a border so needs the background color
+            borderBottomColor: `${legendColors[0]} !important`,
+            // the border is a boxshadow since we can't apply a border to a border
+            boxShadow: `.75px -.75px 1px ${geoBorderColor}`, 
+          },
+          '&:after': {
+            borderTopColor: `${legendColors[0]} !important`,
+            boxShadow: `-.75px .75px 1px ${geoBorderColor}`,
+          },
+          '&:hover': {
+            backgroundColor: legendColors[1],
+            '&:before': {
+              borderBottomColor: `${legendColors[1]} !important`,
+            },
+            '&:after': {
+              borderTopColor: `${legendColors[1]} !important`,
+            }
+          },
+          '&:active': {
+            backgroundColor: legendColors[2],
+            '&:hover': {
+              backgroundColor: legendColors[2],
+              '&:before': {
+                borderBottomColor: `${legendColors[2]} !important`,
+              },
+              '&:after': {
+                borderTopColor: `${legendColors[2]} !important`,
+              }
+            },
+          }
+        };
+      }
+    }
+
+    territories.push((
+      <Territory
+        key={`territory-${territory}`}
+        geoBorderColor={geoBorderColor}
+        toolTip={toolTip}
+        geoClickHandler={geoClickHandler}
+        styles={territoryStyles}
+        territoryData={territoryData}
+        label={supportedTerritories[territory][1]}
+        fullName={territory}
+      />
+    ));
+  });
 
   const stateLookup = ( searchValue, array ) => {
     var returnVal = null;
@@ -106,12 +161,10 @@ const HexMap = (props) => {
     {
       if(array[i].feature.properties.state === searchValue)
       {
-        
         returnVal = array[i];
         break;
       }
     }
-    
     return returnVal;
   }
 
@@ -145,7 +198,6 @@ const HexMap = (props) => {
       // Get path for geo
       let geoHex = stateLookup( geoName, mercator.features)
       
-
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
@@ -159,19 +211,7 @@ const HexMap = (props) => {
             '&:active': {
               fill: `${legendColors[2]} !important`
             },
-          },
-          default: { 
-            fill: legendColors[0],
-            stroke: state.general.backgroundColor
-          },
-          hover: {
-            fill: legendColors[1],
-            stroke: state.general.backgroundColor
-          },
-          pressed: {
-            fill: legendColors[2],
-            stroke: state.general.backgroundColor
-          },
+          }
         };
         
         // When to add pointer cursor
@@ -198,9 +238,9 @@ const HexMap = (props) => {
             <text
               x={geoHex.centroid[0]}
               y={geoHex.centroid[1]+5}
-              key={geo.rsmKey}
+              key={geo.rsmKey+'-text'}
               textAnchor='middle'
-              style={{pointerEvents: "none", fontSize: '16px'}}
+              style={{pointerEvents: "none", fontSize: '16px', fill: setTextContrast(legendColors[0])}}
             >
               {geoHex.feature.properties.iso3166_2}
             </text>
@@ -237,30 +277,53 @@ const HexMap = (props) => {
     return geosJsx;
   };
 
-  //todo remove static sizing
-  const width = 1000;
-  const height = 500;
+  const width = 880; // same as usa
+  const height = 500; // same as usa
   const centerX = width / 2;
   const centerY = height / 2;
-  const scale = (width / 250) * 150;
+  const scale = (width / 230) * 150;
 
   return width < 10 ? null : ( 
-
-    <svg viewBox="0 0 880 500" data-html2canvas="true" className="rsm-svg" style={{width: '100%', height:'100%', overflow: 'hidden'}}>
-    <rect x={0} y={0} width={width} height={height} fill={background} rx={14} />
-    <Mercator
-      data={usa.features}
-      scale={scale}
-      translate={[centerX + 1000, centerY + 500]}
-    >
-      {mercator => (
-        <g>
-          <Graticule graticule={g => mercator.path(g) || ''} stroke="none" />
-            {geoList(geographies, mercator)}
-        </g>
-      )}
-    </Mercator>
-  </svg>
+    <div>
+      <svg 
+        viewBox={`0 0 ${width} ${height}`} 
+        data-html2canvas="true" 
+        className="rsm-svg" 
+        style={{width: '100%', height:'100%', overflow: 'hidden'}}
+      >
+        <rect 
+          x={0}
+          y={0} 
+          width={width} 
+          height={height} 
+          fill='transparent' 
+          rx={14} 
+        />
+        <Mercator
+          key='hex-map'
+          data={usa.features}
+          scale={scale}
+          translate={ [centerX + 1000, centerY + height] }
+        >
+          {mercator => (
+            <g>
+              <Graticule graticule={g => mercator.path(g) || ''} stroke="none" />
+                {geoList(geographies, mercator)}
+            </g>
+          )}
+        </Mercator>
+        
+     </svg>
+     {territories.length > 0
+          && (
+            <section className="hex-territories">
+              <ul>
+                <li className="label">{state.general.territoriesLabel}</li>
+                {territories}
+              </ul>
+            </section>
+          )}
+    </div>
   )
 }
 

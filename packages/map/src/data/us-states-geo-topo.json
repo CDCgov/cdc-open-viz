@@ -433,34 +433,6 @@
                     "type": "Polygon",
                     "arcs": [
                         [
-                            95
-                        ]
-                    ],
-                    "properties": {
-                        "label": "D.C.",
-                        "iso3166_2": "PR",
-                        "google_name": "Puerto Rico (United States)",
-                        "state": "Puerto Rico"
-                    }
-                },
-                {
-                    "type": "Polygon",
-                    "arcs": [
-                        [
-                            96
-                        ]
-                    ],
-                    "properties": {
-                        "label": "D.C.",
-                        "iso3166_2": "VI",
-                        "google_name": "Virgin Islands (United States)",
-                        "state": "Virgin Islands"
-                    }
-                },
-                {
-                    "type": "Polygon",
-                    "arcs": [
-                        [
                             97,
                             98,
                             -94,
