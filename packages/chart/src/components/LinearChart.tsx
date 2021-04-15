@@ -18,21 +18,23 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config } = useContext<any>(Context);
-  const [ width ] = dimensions;
+  const { data, dimensions, config, currentViewport } = useContext<any>(Context);
+  let [ width ] = dimensions;
+
+  if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+    width = width * 0.73;
+  }
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
-  const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
+  const xMax = width - config.runtime.yAxis.size - config.padding.left - config.padding.right;
+  const yMax = height - config.runtime.xAxis.size;
 
-  const xMax = width - config.yAxis.size - config.padding.left - config.padding.right;
-  const yMax = height - config.xAxis.size;
-
-  const parseDate = timeParse(config.xAxis.dateParseFormat);
-  const format = timeFormat(config.xAxis.dateDisplayFormat);
+  const parseDate = timeParse(config.runtime.xAxis.dateParseFormat);
+  const format = timeFormat(config.runtime.xAxis.dateDisplayFormat);
   const formatDate = (date) => format(new Date(date));
 
-  const getXAxisData = (d: any) => config.xAxis.type === 'date' ? (parseDate(d[mappedXAxis.dataKey]) as Date).getTime() : d[mappedXAxis.dataKey];
+  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey]) as Date).getTime() : d[config.runtime.originalXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
   let xScale;
@@ -40,8 +42,8 @@ export default function LinearChart() {
   let seriesScale;
 
   if (data) {
-    let min = config.yAxis.min !== undefined ? config.yAxis.min : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
-    let max = config.yAxis.max !== undefined ? config.yAxis.max : Number.MIN_VALUE;
+    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
+    let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
@@ -72,8 +74,8 @@ export default function LinearChart() {
     }
 
     //Adds Y Axis data padding if applicable
-    if(config.yAxis.paddingPercent) { 
-      let paddingValue = (max - min) * config.yAxis.paddingPercent;
+    if(config.runtime.yAxis.paddingPercent) { 
+      let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent;
       min -= paddingValue;
       max += paddingValue;
     }
@@ -86,7 +88,7 @@ export default function LinearChart() {
         range: [0, xMax]
       });
 
-      yScale = config.xAxis.type === 'date' ? 
+      yScale = config.runtime.xAxis.type === 'date' ? 
         scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
         scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
 
@@ -102,7 +104,7 @@ export default function LinearChart() {
         range: [yMax, 0]
       });
 
-      xScale = config.xAxis.type === 'date' ? 
+      xScale = config.runtime.xAxis.type === 'date' ? 
         scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)], range: [0, xMax]}) : 
         scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
 
@@ -129,7 +131,7 @@ export default function LinearChart() {
             const width = to - from;
 
             return (
-              <Group className="regions" left={config.yAxis.size} key={region.label}>
+              <Group className="regions" left={config.runtime.yAxis.size} key={region.label}>
                 <path stroke="#333" d={`M${from} -5
                           L${from} 5
                           M${from} 0
@@ -158,10 +160,10 @@ export default function LinearChart() {
           {/* Y axis */}
           <AxisLeft
             scale={yScale}
-            left={config.yAxis.size}
-            label={config.yAxis.label}
+            left={config.runtime.yAxis.size}
+            label={config.runtime.yAxis.label}
             stroke="#333"
-            numTicks={config.yAxis.numTicks || undefined}
+            numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
@@ -180,7 +182,7 @@ export default function LinearChart() {
                           stroke="#333"
                           display={config.horizontal ? 'none' : 'block'}
                         />
-                        { config.yAxis.gridLines ? (
+                        { config.runtime.yAxis.gridLines ? (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
                             to={tick.from}
@@ -213,7 +215,7 @@ export default function LinearChart() {
                   <Text
                     textAnchor="middle"
                     verticalAnchor="start"
-                    transform={`translate(${-1 * config.yAxis.size}, ${axisCenter}) rotate(-90)`}
+                    transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
                     fontWeight="bold"
                   >
                     {props.label}
@@ -226,13 +228,13 @@ export default function LinearChart() {
           {/* X axis */}
           <AxisBottom
             top={yMax}
-            left={config.yAxis.size}
-            label={config.xAxis.label}
-            tickFormat={config.xAxis.type === 'date' ? formatDate : (tick) => tick}
+            left={config.runtime.yAxis.size}
+            label={config.runtime.xAxis.label}
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
-            numTicks={config.xAxis.numTicks || undefined}
+            numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
@@ -251,10 +253,10 @@ export default function LinearChart() {
                           stroke="#333"
                         />
                         <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.xAxis.tickRotation : 0})`}
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
-                          textAnchor={config.xAxis.tickRotation ? 'end' : 'middle'}
-                          width={config.xAxis.tickRotation ? undefined : tickWidth}
+                          textAnchor={config.runtime.xAxis.tickRotation ? 'end' : 'middle'}
+                          width={config.runtime.xAxis.tickRotation ? undefined : tickWidth}
                         >
                           {tick.formattedValue}
                         </Text>
@@ -268,7 +270,7 @@ export default function LinearChart() {
                   />
                   <Text
                     x={axisCenter}
-                    y={config.xAxis.size}
+                    y={config.runtime.xAxis.size}
                     textAnchor="middle"
                     verticalAnchor="end"
                     fontWeight="bold"
@@ -290,7 +292,7 @@ export default function LinearChart() {
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
       </svg>
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }

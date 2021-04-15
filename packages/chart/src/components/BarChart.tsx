@@ -11,16 +11,14 @@ import Context from '../context';
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
-  const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
-
   return (
     <ErrorBoundary component="BarChart">
-      <Group left={config.yAxis.size}>
+      <Group left={config.runtime.yAxis.size}>
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
             data={data.reverse()}
             keys={(config.barSeriesKeys || config.seriesKeys)}
-            x={(d: any) => d[config.xAxis.dataKey]}
+            x={(d: any) => d[config.runtime.xAxis.dataKey]}
             xScale={xScale}
             yScale={yScale}
             color={colorScale}
@@ -54,11 +52,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   opacity={transparentBar ? 0.5 : 1}
                   display={displayBar ? 'block' : 'none'}
                   data-tip={`<div>
-                        ${config.xAxis.label}: ${data[bar.index][config.xAxis.dataKey]} <br/>
-                        ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
+                        ${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]} <br/>
+                        ${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
                         ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                       </div>`}
-                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
+                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
             )}
@@ -71,7 +69,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={(config.barSeriesKeys || config.seriesKeys)}
               height={yMax}
-              x0={(d: any) => d[mappedXAxis.dataKey]}
+              x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
               yScale={config.horizontal ? xScale : yScale}
@@ -112,11 +110,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
                         data-tip={`<div>
-                          ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
+                          ${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]} <br/>
+                          ${config.runtime.yAxis.label}: ${config.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)} <br/>
                           ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
                         </div>`}
-                        data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
+                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
                   )}
@@ -131,7 +129,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let tickWidth = 5;
 
               return (
-                <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="#333" strokeWidth="2px" d={`
+                <path key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`} stroke="#333" strokeWidth="2px" d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}
                   M${xPos} ${upperPos}

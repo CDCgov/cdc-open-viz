@@ -136,12 +136,12 @@ const Regions = memo(({config, setConfig}) => {
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
 const EditorPanel = memo(() => {
-  const { config, setConfig, loading, colorPalettes, data } = useContext(Context);
+  const { config, updateConfig, loading, colorPalettes, data } = useContext(Context);
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
     if( null === section && null === subsection) {
-      setConfig({...config, [fieldName]: newValue})
+      updateConfig({...config, [fieldName]: newValue})
       return
     }
 
@@ -164,7 +164,7 @@ const EditorPanel = memo(() => {
       [section]: sectionValue
     }
 
-    setConfig({...config, ...updatedConfig})
+    updateConfig({...config, ...updatedConfig})
   }
 
   const [ requiredColumns, setRequiredColumns ] = useState([])
@@ -185,13 +185,13 @@ const EditorPanel = memo(() => {
       delete newConfig.seriesKeys
     }
 
-    setConfig(newConfig)
+    updateConfig(newConfig)
   }
 
   const addNewSeries = (value) => {
     let newSeriesKeys = config.seriesKeys ? [...config.seriesKeys] : []
     newSeriesKeys.push(value)
-    setConfig({...config, seriesKeys: newSeriesKeys})
+    updateConfig({...config, seriesKeys: newSeriesKeys})
   }
 
   const getColumns = () => {
@@ -334,7 +334,7 @@ const EditorPanel = memo(() => {
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
                       {headerColors.map( (palette) => (
-                        <li title={ palette } key={ palette } onClick={ () => { setConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette}>
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette}>
                         </li>
                       ))}
                     </ul>
@@ -359,7 +359,7 @@ const EditorPanel = memo(() => {
                       }
 
                       return (
-                          <li title={ palette } key={ palette } onClick={ () => { setConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
                             <span style={colorOne}></span>
                             <span  style={colorTwo}></span>
                             <span  style={colorThree}></span>
@@ -384,7 +384,7 @@ const EditorPanel = memo(() => {
                       }
 
                       return (
-                          <li title={ palette } key={ palette } onClick={ () => { setConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
                             <span style={colorOne}></span>
                             <span  style={colorTwo}></span>
                             <span  style={colorThree}></span>

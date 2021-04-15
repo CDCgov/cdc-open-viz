@@ -25,13 +25,10 @@ export default function DataTable() {
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
-  const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
-  const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
-
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
-  const formatDate = (date) => timeFormat(config.xAxis.dateDisplayFormat)(new Date(date));
+  const formatDate = (date) => timeFormat(config.runtime.xAxis.dateDisplayFormat)(new Date(date));
 
   const DownloadButton = memo(({ data }: any) => {
     const fileName = `${config.title.substring(0, 50)}.csv`;
@@ -80,7 +77,7 @@ export default function DataTable() {
 
     data.map((d) => {
         const newCol = {
-          Header: config.xAxis.type === 'date' ? formatDate(d[mappedXAxis.dataKey]) : d[mappedXAxis.dataKey],
+          Header: config.runtime.xAxis.type === 'date' ? formatDate(d[config.runtime.originalXAxis.dataKey]) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
             return (
               <>
@@ -88,7 +85,7 @@ export default function DataTable() {
               </>
             );
           },
-          id: d[mappedXAxis.dataKey],
+          id: d[config.runtime.originalXAxis.dataKey],
           canSort: true
         };
 
