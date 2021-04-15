@@ -32,10 +32,9 @@ export default function ChooseTab() {
         <div className="choose-vis">
             <h2>Charts</h2>
             <ul className="grid">
-                <li><IconButton label="Bar" type="chart" subType="bar" icon={ <BarIcon /> } /></li>
-                <li><IconButton label="Line" type="chart" subType="line" icon={ <LineIcon /> } /></li>
-                <li><IconButton label="Area" type="chart" subType="area" icon={ <AreaIcon /> } /></li>
-                <li><IconButton label="Pie" type="chart" subType="pie" icon={ <PieIcon /> } /></li>
+                <li><IconButton label="Bar" type="chart" subType="Bar" icon={ <BarIcon /> } /></li>
+                <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
+                <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
             </ul>
             <h2 className="mt-4">Maps</h2>
             <ul className="grid">

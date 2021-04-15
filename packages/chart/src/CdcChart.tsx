@@ -68,6 +68,10 @@ export default function CdcChart(
 
     let newConfig = {...defaults, ...response}
 
+    if(newConfig.newViz) {
+      setLoading(false)
+    }
+
     updateConfig(newConfig);
   }
 
@@ -97,7 +101,7 @@ export default function CdcChart(
       newConfig.horizontal = false;
     }
 
-    if(newConfig.seriesLabels){
+    if(newConfig.seriesLabels && newConfig.seriesKeys){
       newConfig.runtime.seriesLabelsAll = [];
       newConfig.seriesKeys.forEach((seriesKey) => {
         newConfig.runtime.seriesLabelsAll.push(newConfig.seriesLabels[seriesKey])
@@ -329,32 +333,24 @@ export default function CdcChart(
   // Prevent render if loading
   let body = (<Loading />)
 
-  if(undefined === config.seriesKeys) {
+  if(false === loading) {
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <Waiting requiredColumns={['Series Keys']} className="waiting" />
-      </>)
-  }
-
-  if(false === loading && config.seriesKeys) {
-    body = (
-      <>
-        {isEditor && <EditorPanel />}
-        <div className="cdc-chart-inner-container">
+        {!config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
           {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
           {/* Visualization */}
           <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
             {chartComponents[visualizationType]}
             {/* Legend */}
-            {false === config.legend.hide && <Legend />}
+            {!config.legend.hide && <Legend />}
           </div>
           {/* Description */}
           {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
           {config.xAxis.dataKey && <DataTable />}
-        </div>
+        </div>}
       </>
     )
   }

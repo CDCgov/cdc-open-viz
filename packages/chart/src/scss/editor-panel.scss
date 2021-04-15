@@ -1,10 +1,22 @@
 .editor-panel {
+    .heading {
+      font-size: 1.2em;
+    }
     + .cdc-chart-inner-container > * {
       margin: 1em;
     }
+    .two-col-inputs {
+      display: flex;
+      margin-top: 1em;
+      justify-content: space-between;
+      > label {
+        width: 48%;
+        margin-top: 0 !important
+      }
+    }
     .divider-heading {
       display: block;
-      font-size: .9em;
+      font-size: 1em;
       margin-top: 1em;
     }
     .series-list {

@@ -29,14 +29,14 @@ import Waiting from '@cdc/core/components/Waiting'
   window.CustomEvent = CustomEvent;
 })();
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
 
   useEffect(() => {
     if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
-      updateField(section, subsection, fieldName, debouncedValue)
+      updateField(section, subsection, fieldName, debouncedValue, i)
     }
   }, [debouncedValue])
 
@@ -71,11 +71,11 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   </label>
 ))
 
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName}>{optionName}</option>)
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initial: initialValue, ...attributes}) => {
+  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
 
   if(initialValue) {
-    optionsJsx.unshift(<option value={initialValue} disabled>{initialValue}</option>)
+    optionsJsx.unshift(<option value="" key="initial" disabled>{initialValue}</option>)
   }
 
   return (
@@ -88,10 +88,69 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
   )
 })
 
+const Regions = memo(({config, updateConfig}) => {
+  let regionUpdate = (fieldName, value, i) => {
+    let regions = []
+
+    if(config.regions) {
+      regions = [...config.regions]
+    }
+
+    regions[i][fieldName] = value
+    updateConfig({...config, regions})
+  }
+
+  let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
+
+  let removeColumn = (i) => {
+    let regions = []
+
+    if(config.regions) {
+      regions = [...config.regions]
+    }
+
+    regions.splice(i, 1)
+
+    updateConfig({...config, regions})
+  }
+
+  let addColumn = () => {
+    let regions = []
+
+    if(config.regions) {
+      regions = [...config.regions]
+    }
+
+    regions.push({})
+
+    updateConfig({...config, regions})
+  }
+
+  return (
+    <>
+      {config.regions && config.regions.map(({label, color, from, to, background}, i) => (
+        <div className="edit-block" key={`region-${i}`}>
+          <button className="remove-column" onClick={(event) => { event.preventDefault(); removeColumn(i)}}>Remove</button>
+          <TextField value={label} label="Region Label" fieldName="label" i={i} updateField={updateField} />
+          <div className="two-col-inputs">
+            <TextField value={color} label="Text Color" fieldName="color" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+            <TextField value={background} label="Background" fieldName="background" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+          </div>
+          <div className="two-col-inputs">
+            <TextField value={from} label="From Value" fieldName="from" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+            <TextField value={to} label="To Value" fieldName="to" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+          </div>
+        </div>
+      ))}
+      <button className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
+    </>
+  )
+})
+
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
 const EditorPanel = memo(() => {
-  const { config, updateConfig, loading, colorPalettes, data } = useContext(Context);
+  const { config, updateConfig, loading, colorPalettes, data, setDimensions, dimensions } = useContext(Context);
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -122,7 +181,6 @@ const EditorPanel = memo(() => {
     updateConfig({...config, ...updatedConfig})
   }
 
-  const [ requiredColumns, setRequiredColumns ] = useState([])
   const [ addSeries, setAddSeries ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true)
 
@@ -149,19 +207,39 @@ const EditorPanel = memo(() => {
     updateConfig({...config, seriesKeys: newSeriesKeys})
   }
 
-  const getColumns = () => {
+  const getColumns = (filter = true) => {
     let columns = {}
 
     data.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
+    if(filter) {
+      Object.keys(columns).forEach(key => {
+        if((config.seriesKeys && config.seriesKeys.includes(key)) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+          delete columns[key]
+        }
+      })
+    }
+
     return Object.keys(columns)
+  }
+
+  const Confirm = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Finish Configuring</h3>
+          <p>Set all your options to the left and confirm below to display a preview of the chart.</p>
+          <button className="btn" style={{margin: '1em auto'}} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
+        </section>
+      </section>
+    );
   }
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
+      {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <h2>Configure Chart</h2>
@@ -197,8 +275,15 @@ const EditorPanel = memo(() => {
                         ))}
                       </ul>
                     </>)}
-                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
+                    <Select value={addSeries || ""} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
                     <button onClick={(e) => { e.preventDefault(); addNewSeries(addSeries) }} className="btn btn-primary">Add Data Series</button>
+                    {config.seriesKeys && config.seriesKeys.length <= 1 && config.visualizationType === "Bar" && (
+                      <>
+                        <span className="divider-heading">Confidence Keys</span>
+                        <Select value={config.confidenceKeys.upper || ""} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()} />
+                        <Select value={config.confidenceKeys.lower || ""} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()} />
+                      </>
+                    )}
                 </AccordionItemPanel>
               </AccordionItem>}
               <AccordionItem>
@@ -208,16 +293,18 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.yAxis.dataKey} section="yAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
                   <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
+                  <Select value={config.yAxis.dataKey} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
                   <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                   <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
                   <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
                   <span className="divider-heading">Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
                   <TextField value={config.dataFormat.roundTo} type="number" section="dataFormat" fieldName="roundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} />
-                  <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
-                  <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
+                  <div className="two-col-inputs">
+                    <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
+                    <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -228,7 +315,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
-                  <Select value={config.xAxis.dataKey} section="xAxis" fieldName="dataKey" label="Data Key" updateField={updateField} options={['Race', 'Age-adjusted rate']} />
+                  <Select value={config.xAxis.dataKey} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
                   <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
                   {config.xAxis.type === "date" && (
                     <>
@@ -248,7 +335,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem ipsum
+                  <Regions config={config} updateConfig={updateConfig} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

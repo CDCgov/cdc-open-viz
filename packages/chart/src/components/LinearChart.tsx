@@ -66,7 +66,7 @@ export default function LinearChart() {
         }, [] as number[]);
 
         max = Math.max(...yTotals);
-      } else if(config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && config.confidenceKeys) {
+      } else if(config.visualizationType === 'Bar' && config.confidenceKeys) {
         max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
       } else {
         max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
@@ -124,6 +124,8 @@ export default function LinearChart() {
       <svg width={width} height={height} className="linear">
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
+            if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+
             const from = xScale((parseDate(region.from) as Date).getTime());
             const to = xScale((parseDate(region.to) as Date).getTime());
             const width = to - from;
