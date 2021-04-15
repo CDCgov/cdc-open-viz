@@ -26,5 +26,6 @@ export default {
     },
     palette: "qualitative-bold",
     labels: false,
-    dataFormat: {}
+    dataFormat: {},
+    confidenceKeys: {}
 }

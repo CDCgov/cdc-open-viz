@@ -187,13 +187,17 @@ export default function DataTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {config.regions.map((region) => (
-                    <tr key={`row-${region.label}`}>
-                      <td>{region.label}</td>
-                      <td>{formatDate(region.from)}</td>
-                      <td>{formatDate(region.to)}</td>
-                    </tr>
-                  ))}
+                  {config.regions.map((region) => {
+                    if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+
+                    return (
+                      <tr key={`row-${region.label}`}>
+                        <td>{region.label}</td>
+                        <td>{formatDate(region.from)}</td>
+                        <td>{formatDate(region.to)}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             ) : ''}

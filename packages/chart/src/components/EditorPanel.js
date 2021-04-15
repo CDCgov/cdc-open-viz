@@ -29,14 +29,14 @@ import Waiting from '@cdc/core/components/Waiting'
   window.CustomEvent = CustomEvent;
 })();
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
 
   useEffect(() => {
     if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
-      updateField(section, subsection, fieldName, debouncedValue)
+      updateField(section, subsection, fieldName, debouncedValue, i)
     }
   }, [debouncedValue])
 
@@ -71,11 +71,11 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   </label>
 ))
 
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName}>{optionName}</option>)
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initial: initialValue, ...attributes}) => {
+  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
 
   if(initialValue) {
-    optionsJsx.unshift(<option value={initialValue} disabled>{initialValue}</option>)
+    optionsJsx.unshift(<option value="" key="initial" disabled>{initialValue}</option>)
   }
 
   return (
@@ -85,6 +85,51 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
         {optionsJsx}
       </select>
     </label>
+  )
+})
+
+const Regions = memo(({config, setConfig}) => {
+  let regionUpdate = (fieldName, value, i) => {
+    let regions = [...config.regions]
+    regions[i][fieldName] = value
+    setConfig({...config, regions})
+  }
+
+  let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
+
+  let removeColumn = (i) => {
+    let regions = [...config.regions]
+
+    regions.splice(i, 1)
+
+    setConfig({...config, regions})
+  }
+
+  let addColumn = () => {
+    let regions = [...config.regions]
+    regions.push({})
+
+    setConfig({...config, regions})
+  }
+
+  return (
+    <>
+      {config.regions && config.regions.map(({label, color, from, to, background}, i) => (
+        <div className="edit-block" key={`region-${i}`}>
+          <button className="remove-column" onClick={(event) => { event.preventDefault(); removeColumn(i)}}>Remove</button>
+          <TextField value={label} label="Region Label" fieldName="label" i={i} updateField={updateField} />
+          <div className="two-col-inputs">
+            <TextField value={color} label="Text Color" fieldName="color" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+            <TextField value={background} label="Background" fieldName="background" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+          </div>
+          <div className="two-col-inputs">
+            <TextField value={from} label="From Value" fieldName="from" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+            <TextField value={to} label="To Value" fieldName="to" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
+          </div>
+        </div>
+      ))}
+      <button className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
+    </>
   )
 })
 
@@ -156,6 +201,12 @@ const EditorPanel = memo(() => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
+    Object.keys(columns).forEach(key => {
+      if(config.seriesKeys.includes(key) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+        delete columns[key]
+      }
+    })
+
     return Object.keys(columns)
   }
 
@@ -197,8 +248,15 @@ const EditorPanel = memo(() => {
                         ))}
                       </ul>
                     </>)}
-                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
+                    <Select value={addSeries || ""} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
                     <button onClick={(e) => { e.preventDefault(); addNewSeries(addSeries) }} className="btn btn-primary">Add Data Series</button>
+                    {config.seriesKeys.length <= 1 && config.visualizationType === "Bar" && (
+                      <>
+                        <span className="divider-heading">Confidence Keys</span>
+                        <Select value={config.confidenceKeys.upper || ""} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()} />
+                        <Select value={config.confidenceKeys.lower || ""} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()} />
+                      </>
+                    )}
                 </AccordionItemPanel>
               </AccordionItem>}
               <AccordionItem>
@@ -248,7 +306,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    Lorem ipsum
+                  <Regions config={config} setConfig={setConfig} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
