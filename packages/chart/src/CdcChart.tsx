@@ -68,35 +68,46 @@ export default function CdcChart(
 
     let newConfig = {...defaults, ...response}
 
+    updateConfig(newConfig);
+  }
+
+  const updateConfig = (newConfig) => {
     // Deeper copy
     Object.keys(defaults).forEach( key => {
       if(newConfig[key] && 'object' === typeof newConfig[key]) {
         newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
-    })
+    });
 
-    if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
-      let tempAxis = newConfig.yAxis;
-      newConfig.yAxis = newConfig.xAxis;
-      newConfig.xAxis = tempAxis;
-      newConfig.horizontal = true;
-    }
-
-    if(newConfig.seriesLabels){
-      newConfig.seriesLabelsAll = [];
-      newConfig.seriesKeys.forEach((seriesKey) => {
-        newConfig.seriesLabelsAll.push(newConfig.seriesLabels[seriesKey])
-      });
-    }
-
-    //Enforce default values that need to be calculated at runtime
     if(newConfig.visualizationType === 'Pie') {
       newConfig.seriesKeys = data.map(d => d[newConfig.xAxis.dataKey]);
     }
-    newConfig.uniqueId = Date.now();
+
+    //Enforce default values that need to be calculated at runtime
+    newConfig.runtime = {};
+    newConfig.runtime.originalXAxis = newConfig.xAxis;
+
+    if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
+      newConfig.runtime.xAxis = newConfig.yAxis;
+      newConfig.runtime.yAxis = newConfig.xAxis;
+      newConfig.horizontal = true;
+    } else {
+      newConfig.runtime.xAxis = newConfig.xAxis;
+      newConfig.runtime.yAxis = newConfig.yAxis;
+      newConfig.horizontal = false;
+    }
+
+    if(newConfig.seriesLabels){
+      newConfig.runtime.seriesLabelsAll = [];
+      newConfig.seriesKeys.forEach((seriesKey) => {
+        newConfig.runtime.seriesLabelsAll.push(newConfig.seriesLabels[seriesKey])
+      });
+    }
+
+    newConfig.runtime.uniqueId = Date.now();
 
     setConfig(newConfig);
-  }
+  };
 
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
@@ -144,10 +155,6 @@ export default function CdcChart(
             setCurrentViewport(newViewport)
         }
 
-        if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
-          width = width * 0.73;
-        }
-
         if(isEditor) {
           width = width - 350;
         }
@@ -175,7 +182,7 @@ export default function CdcChart(
       palette = palette.slice(0, numberOfKeys);
 
       const newColorScale = () => scaleOrdinal({
-        domain: config.seriesLabelsAll || config.seriesKeys,
+        domain: config.runtime.seriesLabelsAll || config.seriesKeys,
         range: palette,
       });
 
@@ -280,7 +287,7 @@ export default function CdcChart(
                 let itemName:any = label.datum
 
                 if(config.seriesLabels){
-                  let index = config.seriesLabelsAll.indexOf(itemName)
+                  let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                   itemName = config.seriesKeys[index]
                 }
 
@@ -353,7 +360,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading, setConfig, colorPalettes }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading, updateConfig, colorPalettes }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

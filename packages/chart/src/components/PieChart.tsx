@@ -19,7 +19,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber } = useContext<any>(Context);
+  const { data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -68,10 +68,10 @@ export default function PieChart() {
                   }))}
                   fill={colorScale((arc.data as any).name)}
                   data-tip={`<div>
-                    ${config.xAxis.label}: ${(arc.data as any).name} <br/>
-                    ${config.yAxis.label}: ${formatNumber(arc.data[config.yAxis.dataKey])}
+                    ${config.runtime.xAxis.label}: ${(arc.data as any).name} <br/>
+                    ${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}
                   </div>`}
-                  data-for={`cdc-open-viz-tooltip-${config.uniqueId}`}
+                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
             );
@@ -112,7 +112,11 @@ export default function PieChart() {
     );
   }
 
-  const [ width ] = dimensions;
+  let [ width ] = dimensions;
+
+  if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+    width = width * 0.73;
+  }
   
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
@@ -126,7 +130,7 @@ export default function PieChart() {
       let newFilteredData = [];
 
       data.forEach((d) => {
-        if(seriesHighlight.indexOf(d[config.xAxis.dataKey]) !== -1) {
+        if(seriesHighlight.indexOf(d[config.runtime.xAxis.dataKey]) !== -1) {
           newFilteredData.push(d);
         }
       });
@@ -147,7 +151,7 @@ export default function PieChart() {
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
-            pieValue={d => d[config.yAxis.dataKey]}
+            pieValue={d => d[config.runtime.yAxis.dataKey]}
             pieSortValues={() => -1}
             innerRadius={radius - donutThickness}
             outerRadius={radius}
@@ -155,13 +159,13 @@ export default function PieChart() {
             {pie => (
               <AnimatedPie<any>
                 {...pie}
-                getKey={d => d.data[config.xAxis.dataKey]}
+                getKey={d => d.data[config.runtime.xAxis.dataKey]}
               />
             )}
           </Pie>
         </Group>
       </svg>
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
 }
