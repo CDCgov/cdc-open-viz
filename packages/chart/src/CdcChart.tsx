@@ -144,10 +144,6 @@ export default function CdcChart(
             setCurrentViewport(newViewport)
         }
 
-        if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
-          width = width * 0.73;
-        }
-
         if(isEditor) {
           width = width - 350;
         }
