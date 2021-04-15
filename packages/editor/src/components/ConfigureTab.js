@@ -10,7 +10,7 @@ export default function ConfigureTab() {
     const { data, type, subType, config, keepURL, dataURL, hostname } = useContext(GlobalState);
 
     // If there's no preexisting config (this is a new visualiztaion) we just pass in an object created with only the data.
-    let configObj = config ?? {data}
+    let configObj = config ?? {data, newViz: true}
 
     if(data) {
         configObj = {...configObj, data}

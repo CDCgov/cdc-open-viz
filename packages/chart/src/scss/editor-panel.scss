@@ -1,4 +1,7 @@
 .editor-panel {
+    .heading {
+      font-size: 1.2em;
+    }
     + .cdc-chart-inner-container > * {
       margin: 1em;
     }
@@ -13,7 +16,7 @@
     }
     .divider-heading {
       display: block;
-      font-size: .9em;
+      font-size: 1em;
       margin-top: 1em;
     }
     .series-list {
