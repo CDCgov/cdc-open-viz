@@ -21,32 +21,41 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
             opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
             display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
           >
-            { data.map((d, dataIndex) => (
-              <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-              <Text 
-                  display={config.labels ? 'block' : 'none'}
-                  x={xScale(getXAxisData(d))}
-                  y={yScale(getYAxisData(d, seriesKey))}
-                  fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                  textAnchor="middle">
-                    {formatNumber(d[seriesKey])}
-                </Text>
-                <circle
-                  key={`${seriesKey}-${dataIndex}`}
-                  r={3}
-                  cx={xScale(getXAxisData(d))}
-                  cy={yScale(getYAxisData(d, seriesKey))}
-                  fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                  style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
-                  data-tip={`<div>
-                    ${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]} <br/>
-                    ${config.runtime.yAxis.label}: ${formatNumber(d[seriesKey])} <br/>
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
-                  </div>`}
-                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                />
-              </Group>
-            ))}
+            { data.map((d, dataIndex) => {
+              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${d[config.runtime.yAxis.dataKey]}` : d[config.runtime.yAxis.dataKey]
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
+
+              const tooltip = `<div>
+              ${yAxisTooltip}<br />
+              ${xAxisTooltip}<br />
+              ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+            </div>`
+
+              let circleRadii = 4.5
+
+              return (
+                <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                <Text 
+                    display={config.labels ? 'block' : 'none'}
+                    x={xScale(getXAxisData(d))}
+                    y={yScale(getYAxisData(d, seriesKey))}
+                    fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    textAnchor="middle">
+                      {formatNumber(d[seriesKey])}
+                  </Text>
+                  <circle
+                    key={`${seriesKey}-${dataIndex}`}
+                    r={circleRadii}
+                    cx={xScale(getXAxisData(d))}
+                    cy={yScale(getYAxisData(d, seriesKey))}
+                    fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
+                    data-tip={tooltip}
+                    data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                  />
+                </Group>
+            )
+            })}
             <LinePath
               curve={allCurves.curveLinear}
               data={data}

@@ -294,7 +294,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
-                  <Select value={config.yAxis.dataKey} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
+                  <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
                   <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                   <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
                   <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
@@ -315,7 +315,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
-                  <Select value={config.xAxis.dataKey} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
+                  <Select value={config.xAxis.dataKey || ""} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
                   <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
                   {config.xAxis.type === "date" && (
                     <>
