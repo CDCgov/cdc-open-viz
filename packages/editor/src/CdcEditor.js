@@ -13,9 +13,16 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
   const [dataURL, setDataURL] = useState(null)
   const [data, setData] = useState(null)
   const [keepURL, setKeepURL] = useState(false)
-  const [type, setType] = useState(null)
-  const [subType, setSubType] = useState(null)
+  const [type, setType] = useState(configObj.type || null)
   const [errors, setErrors] = useState([])
+
+  let startingSubType = configObj.visualizationType || null
+
+  if(configObj.general && configObj.general.geoType) {
+    startingSubType = configObj.geoType
+  }
+
+  const [subType, setSubType] = useState(startingSubType)
 
   let startingTab = config ? 2 : 0;
 
@@ -30,6 +37,9 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
   useEffect(() => {
     if(config && config.hasOwnProperty('data')) {
       setData(config.data)
+    }
+    if(config && config.hasOwnProperty('type')) {
+      setType(config.type)
     }
   }, [config])
 

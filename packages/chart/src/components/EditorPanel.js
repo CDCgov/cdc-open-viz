@@ -184,6 +184,9 @@ const EditorPanel = memo(() => {
   const [ addSeries, setAddSeries ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true)
 
+  // Used to pipe a JSON version of the config you are creating out
+  const [ configData, setConfigData ] = useState({})
+
   if(loading) {
     return null
   }
@@ -236,6 +239,29 @@ const EditorPanel = memo(() => {
       </section>
     );
   }
+
+  const convertStateToConfigFile = () => {
+    let strippedState = JSON.parse(JSON.stringify(config))
+    delete strippedState.newViz
+    delete strippedState.runtime
+
+    return JSON.stringify( strippedState )
+  }
+
+  useEffect(() => {
+    const parsedData = convertStateToConfigFile()
+
+    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
+
+    setConfigData(formattedData)
+
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
+
+    window.dispatchEvent(event)
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config])
 
   return (
     <ErrorBoundary component="EditorPanel">
