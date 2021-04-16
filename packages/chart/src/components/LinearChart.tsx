@@ -66,7 +66,7 @@ export default function LinearChart() {
         }, [] as number[]);
 
         max = Math.max(...yTotals);
-      } else if(config.visualizationType === 'Bar' && config.confidenceKeys) {
+      } else if(config.visualizationType === 'Bar' && config.confidenceKeys && config.confidenceKeys.upper) {
         max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
       } else {
         max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
