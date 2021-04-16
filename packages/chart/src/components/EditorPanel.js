@@ -270,9 +270,52 @@ const EditorPanel = memo(() => {
                     <>
                       <label><span className="edit-label">Displaying</span></label>
                       <ul className="series-list">
-                        {config.seriesKeys.map((key, i) => (
-                          <li key={key}>{key} <span onClick={() => removeSeriesKey(i)}>X</span></li>
-                        ))}
+                        {config.seriesKeys.map((key, i) => {
+                          if(config.visualizationType === "Combo") {
+                            let changeType = (value) => {
+                                let lineSeriesKeys = config.lineSeriesKeys || []
+                                let barSeriesKeys = config.barSeriesKeys || []
+
+                                // Remove the values first
+                                if( lineSeriesKeys.includes(key) ) {
+                                  let index = lineSeriesKeys.indexOf(key)
+                                  lineSeriesKeys.splice(index, 1)
+                                }
+
+                                if( barSeriesKeys.includes(key) ) {
+                                  let index = barSeriesKeys.indexOf(key)
+                                  barSeriesKeys.splice(index, 1)
+                                }
+
+                                // Add value to new appropriate array
+                                if(value === "Bar") {
+                                  barSeriesKeys.push(key)
+                                } else if(value === "Line") {
+                                  lineSeriesKeys.push(key)
+                                }
+
+                                updateConfig({...config, barSeriesKeys, lineSeriesKeys})
+                            }
+
+                            let determineValue = () => {
+                              if(config.lineSeriesKeys.includes(key)) {
+                                return "Line"
+                              }
+
+                              return "Bar"
+                            }
+                            let typeDropdown = (
+                              <select value={determineValue() || ""} onChange={(event) => { changeType(event.target.value) }} style={{width: "100px", marginRight: "10px"}}>
+                                <option value="" default>Select</option>
+                                <option value="Bar">Bar</option>
+                                <option value="Line">Line</option>
+                              </select>
+                            )
+
+                            return (<li key={key}>{key} <span>{typeDropdown} <span onClick={() => removeSeriesKey(i)}>X</span></span></li>)
+                          }
+                          return (<li key={key}>{key} <span onClick={() => removeSeriesKey(i)}>X</span></li>)
+                        })}
                       </ul>
                     </>)}
                     <Select value={addSeries || ""} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
@@ -423,6 +466,7 @@ const EditorPanel = memo(() => {
                   </ul>
                   <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
                   <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
+                  {( config.visualizationType === "Bar" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
