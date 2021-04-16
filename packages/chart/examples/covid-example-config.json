@@ -17,13 +17,11 @@
         "right": 10
     },
     "yAxis": {
-        "label": "Rate per 100,000 population",
         "dataKey": "Age-adjusted rate",
         "gridLines": false,
         "numTicks": 3
     },
     "xAxis": {
-        "label": "Race",
         "dataKey": "Race",
         "size": 20,
         "wrap": true

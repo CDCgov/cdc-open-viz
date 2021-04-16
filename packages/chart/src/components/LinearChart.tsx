@@ -284,7 +284,7 @@ export default function LinearChart() {
 
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
           
           {/* Bar chart */}
