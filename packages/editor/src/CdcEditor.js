@@ -13,12 +13,22 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
   const [dataURL, setDataURL] = useState(null)
   const [data, setData] = useState(null)
   const [keepURL, setKeepURL] = useState(false)
-  const [type, setType] = useState(configObj.type || null)
   const [errors, setErrors] = useState([])
 
-  let startingSubType = configObj.visualizationType || null
+  let startingType = null
+  let startingSubType = null
 
-  if(configObj.general && configObj.general.geoType) {
+  if(configObj && configObj.type) {
+    startingType = configObj.type
+  }
+
+  const [type, setType] = useState(startingType)
+
+  if(configObj && configObj.visualizationType) {
+    startingSubType = configObj.visualizationType
+  }
+
+  if(configObj && configObj.general && configObj.general.geoType) {
     startingSubType = configObj.geoType
   }
 
