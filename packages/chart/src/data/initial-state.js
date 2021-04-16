@@ -12,6 +12,8 @@ export default {
         size: 50,
         gridLines: false
     },
+    barThickness: 0.35,
+    height: 300,
     xAxis: {
         size: 75,
         tickRotation: 0

@@ -252,7 +252,20 @@ export default function CdcChart(
     }
     if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
     if (config.dataFormat.commas) num = num.toLocaleString('en-US');
-    return prefix + num + config.dataFormat.suffix;
+
+    let result = ""
+
+    if(prefix) {
+      result += prefix
+    }
+
+    result += num
+
+    if(config.dataFormat.suffix) {
+      result += config.dataFormat.suffix
+    }
+
+    return result
   };
 
   // Destructure items from config for more readable JSX
