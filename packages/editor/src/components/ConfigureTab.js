@@ -33,6 +33,9 @@ export default function ConfigureTab() {
         configObj.dataUrl = dataURL
     }
 
+    // Add top level type to the visualization
+    configObj.type = type
+
     switch (type) {
         case 'map':
             return (
