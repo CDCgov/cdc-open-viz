@@ -1,6 +1,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const svgToMiniDataURI = require('mini-svg-data-uri')
+const { ModuleFilenameHelpers } = require('webpack')
 
 module.exports = (env = {}, { mode }) => {
   const prodExternals = {

@@ -24,6 +24,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             color={colorScale}
           >
             {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+
+              const tooltip = `<div>
+              ${yAxisTooltip}<br />
+              ${xAxisTooltip}<br />
+              ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+
               let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
               let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
               let barThickness = xMax / barStack.bars.length;
@@ -51,11 +59,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   strokeWidth={config.barBorderThickness || 1}
                   opacity={transparentBar ? 0.5 : 1}
                   display={displayBar ? 'block' : 'none'}
-                  data-tip={`<div>
-                        ${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]} <br/>
-                        ${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
-                        ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                      </div>`}
+                  data-tip={tooltip}
                   data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
@@ -86,6 +90,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let offset = (config.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                     let barWidth = barGroupWidth / barGroup.bars.length;
                     let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
+
+                    let yAxisValue = config.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)
+
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]}` : data[barGroup.index][config.runtime.xAxis.dataKey]
+      
+                    const tooltip = `<div>
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
+                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
                       <Text 
@@ -109,11 +124,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         style={{fill: barColor}}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
-                        data-tip={`<div>
-                          ${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]} <br/>
-                          ${config.runtime.yAxis.label}: ${config.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)} <br/>
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                        </div>`}
+                        data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
@@ -122,7 +133,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 </Group>
               ))}
             </BarGroup>
-            {config.confidenceKeys ? data.map((d) => {
+            {Object.keys(config.confidenceKeys).length > 0 ? data.map((d) => {
               let xPos = xScale(getXAxisData(d));
               let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
               let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));

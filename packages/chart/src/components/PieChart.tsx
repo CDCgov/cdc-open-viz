@@ -57,6 +57,13 @@ export default function PieChart() {
             props: PieStyles;
             key: string;
           }) => {
+            let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
+            let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${(arc.data as any).name}` : (arc.data as any).name
+
+            const tooltip = `<div>
+            ${yAxisTooltip}<br />
+            ${xAxisTooltip}<br />`
+
             return (
               <Group key={key} style={{ opacity: (config.legend.highlight === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
                 <animated.path
@@ -67,10 +74,7 @@ export default function PieChart() {
                     endAngle,
                   }))}
                   fill={colorScale((arc.data as any).name)}
-                  data-tip={`<div>
-                    ${config.runtime.xAxis.label}: ${(arc.data as any).name} <br/>
-                    ${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}
-                  </div>`}
+                  data-tip={tooltip}
                   data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
