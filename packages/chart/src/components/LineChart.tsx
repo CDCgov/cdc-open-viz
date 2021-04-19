@@ -22,7 +22,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
             display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
           >
             { data.map((d, dataIndex) => {
-              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${d[config.runtime.yAxis.dataKey]}` : d[config.runtime.yAxis.dataKey]
+              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
               let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
 
               const tooltip = `<div>
