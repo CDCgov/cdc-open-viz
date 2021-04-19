@@ -350,6 +350,7 @@ const EditorPanel = memo((props) => {
                           ...prevState.general,
                           showSidebar: false,
                           type: "navigation",
+                          displayAsHex: false
                         },
                         tooltips: {
                             ...prevState.tooltips,

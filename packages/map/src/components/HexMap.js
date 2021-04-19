@@ -109,11 +109,11 @@ const HexMap = (props) => {
             // the shape is a border so needs the background color
             borderBottomColor: `${legendColors[0]} !important`,
             // the border is a boxshadow since we can't apply a border to a border
-            boxShadow: `.75px -.75px 1px ${geoBorderColor}`, 
+            boxShadow: `1px -1px 2px ${geoBorderColor}`, 
           },
           '&:after': {
             borderTopColor: `${legendColors[0]} !important`,
-            boxShadow: `-.75px .75px 1px ${geoBorderColor}`,
+            boxShadow: `-1px 1px 2px ${geoBorderColor}`,
           },
           '&:hover': {
             backgroundColor: legendColors[1],
@@ -266,7 +266,7 @@ const HexMap = (props) => {
             y={geoHex.centroid[1]+5}
             key={geo.rsmKey+'-text'}
             textAnchor='middle'
-            style={{pointerEvents: "none", fontSize: '16px'}}
+            style={{pointerEvents: "none", fontSize: '.9em'}}
           >
             {geoHex.feature.properties.iso3166_2}
           </text>
@@ -281,7 +281,7 @@ const HexMap = (props) => {
   const height = 500; // same as usa
   const centerX = width / 2;
   const centerY = height / 2;
-  const scale = (width / 230) * 160;
+  const scale = (width / 220) * 160;
 
   return width < 10 ? null : ( 
     <div>
