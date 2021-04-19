@@ -362,11 +362,15 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                   <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
-                  <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
-                  <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
-                  <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
+                  {config.visualizationType !== "Pie" && (
+                    <>
+                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
+                      <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
+                      <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
+                    </>
+                  )}
                   <span className="divider-heading">Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
                   <TextField value={config.dataFormat.roundTo} type="number" section="dataFormat" fieldName="roundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} />
@@ -383,21 +387,25 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
                   <Select value={config.xAxis.dataKey || ""} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
-                  <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
-                  {config.xAxis.type === "date" && (
+                  {config.visualizationType !== 'Pie' && (
                     <>
-                      <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
-                      <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
-                      <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                      <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
+                      <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
+                      {config.xAxis.type === "date" && (
+                        <>
+                          <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
+                          <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
+                          <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                        </>
+                      )}
+                      <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
+                      <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} /> 
                     </>
-                  )}
-                  <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
-                  <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />                  
+                  )}                 
                 </AccordionItemPanel>
               </AccordionItem>
-              <AccordionItem>
+              {config.visualizationType !== 'Pie' && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Regions
@@ -406,7 +414,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <Regions config={config} updateConfig={updateConfig} />
                 </AccordionItemPanel>
-              </AccordionItem>
+              </AccordionItem> }
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -490,8 +498,12 @@ const EditorPanel = memo(() => {
                       )
                     })}
                   </ul>
-                  <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
-                  <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
+                  {config.visualizationType !== 'Pie' && (
+                    <> 
+                      <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
+                      <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
+                    </>
+                  )}
                   {( config.visualizationType === "Bar" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
