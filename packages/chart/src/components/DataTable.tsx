@@ -93,7 +93,7 @@ export default function DataTable() {
     });
 
     return newTableColumns;
-  }, []);
+  }, [config]);
 
   const tableData = useMemo(
     () => config.seriesKeys,
