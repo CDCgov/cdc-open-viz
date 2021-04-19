@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
-import { Mercator, Graticule } from '@visx/geo';
+import { Mercator, Graticule, Scale } from '@visx/geo';
 import * as topojson from 'topojson-client';
 import topology from "../data/us-states-geo-topo.json";
 import Territory from './Territory';
@@ -281,7 +281,7 @@ const HexMap = (props) => {
   const height = 500; // same as usa
   const centerX = width / 2;
   const centerY = height / 2;
-  const scale = (width / 230) * 150;
+  const scale = (width / 230) * 160;
 
   return width < 10 ? null : ( 
     <div>
@@ -303,7 +303,7 @@ const HexMap = (props) => {
           key='hex-map'
           data={usa.features}
           scale={scale}
-          translate={ [centerX + 1000, centerY + height] }
+          translate={ [centerX + 1150, centerY + 525] }
         >
           {mercator => (
             <g>
