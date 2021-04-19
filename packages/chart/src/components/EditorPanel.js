@@ -293,6 +293,7 @@ const EditorPanel = memo(() => {
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
+                  <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               {config.visualizationType !== "Pie" && <AccordionItem>
