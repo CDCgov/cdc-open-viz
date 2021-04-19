@@ -94,6 +94,7 @@ const HexMap = (props) => {
 
         // If we need to add a pointer cursor
         if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+          
           needsPointer = true;
         }
 
@@ -102,6 +103,7 @@ const HexMap = (props) => {
           borderRight: `1px solid ${geoBorderColor}!important`,
           borderLeft: `1px solid ${geoBorderColor} !important`,
           color: setTextContrast(legendColors[0]),
+          cursor: needsPointer ? 'pointer' : 'default',
 
           // psuedo elements used to make the tops and bottoms 
           // of the hexagons are actually borders
@@ -216,8 +218,8 @@ const HexMap = (props) => {
         
         // When to add pointer cursor
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-          stylesObj.hover = {
-            ...stylesObj.hover,
+          stylesObj.base = {
+            ...stylesObj.base,
             cursor: 'pointer'
           };
         }
