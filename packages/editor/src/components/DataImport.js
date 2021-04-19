@@ -17,7 +17,7 @@ import CloseIcon from '../assets/icons/close.svg';
 import validMapData from '../../sampledata/valid-data-map.csv';
 
 export default function DataImport() {
-  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL} = useContext(GlobalState);
+  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL, setGlobalActive} = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -226,7 +226,7 @@ export default function DataImport() {
         ))}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
         {/* TODO: Add more sample data in, but this will do for now. */}
-        <h3>Load Sample Data:</h3>
+        <span className="heading">Load Sample Data:</span>
         <ul className="sample-data-list">
           <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
         </ul>
@@ -236,6 +236,11 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
+        {data && (
+          <div>
+            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
+          </div>
+        )}
       </div>
       <div className="right-col">
         <PreviewDataTable data={data} />

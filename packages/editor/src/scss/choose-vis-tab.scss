@@ -1,17 +1,66 @@
 @import 'variables';
 
-#visualizationList {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $gbl-padding;
-    padding: $gbl-padding 0;
-
-    @media only screen and ( min-width: $sm ) {
-        grid-template-columns: 1fr 1fr 1fr;
+.cdc-editor .choose-vis {
+    padding: $gbl-padding;
+    .capitalize {
+        text-transform: capitalize;
     }
-
-    button {
-        border: solid 1px rgba( $lightGray, .5 );
-        padding: $gbl-padding;
+    .grid {
+        margin-top: 1rem;
+        list-style: none;
+        display: flex;
+        li {
+            margin-right: 1rem;
+        }
+        button {
+            background-color: #fff;
+            color: $mediumGray;
+            border: solid 1px rgba( $lightGray, .5 );
+            padding: $gbl-padding;
+            height: 100%;
+            align-items: center;
+            display: flex;
+            border: $lightGray 1px solid;
+            margin-right: 1em;
+            cursor: pointer;
+            transition: .2s all; 
+            flex-direction: column;
+            span {
+            text-transform: none;
+            font-size: 1em;
+            }
+            &:hover {
+            background: #F2F2F2;
+            transition: .2s all;  
+            }
+            &.active {
+            background: #fff;
+            border-color: #005eaa;
+            color: #005eaa;
+            position: relative;
+                path {
+                    fill: #005eaa;
+                }
+                &:before {
+                    content: " ";
+                    width: 5px;
+                    background: #005eaa;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    position: absolute;
+                }
+            }
+            svg {
+                display: block;
+                margin: .5em auto;
+                box-sizing: border-box;
+                width: 100px;
+                height: 75px;
+                path {
+                fill: currentColor
+                }
+            }
+        }
     }
 }

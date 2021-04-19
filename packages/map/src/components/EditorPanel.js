@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, memo } from 'react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import {
   Accordion,
   AccordionItem,
@@ -11,7 +10,9 @@ import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDebounce } from 'use-debounce';
 
-import Waiting from './Waiting';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Waiting from '@cdc/core/components/Waiting'
+
 import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '../images/usa-graphic.svg';
 import WorldGraphic from '../images/world-graphic.svg';

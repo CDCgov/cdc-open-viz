@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
+import { Text } from '@visx/text';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -10,35 +11,43 @@ import Context from '../context';
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
-  const mappedXAxis = config.horizontal ? config.yAxis : config.xAxis;
-
   return (
     <ErrorBoundary component="BarChart">
-      <Group left={config.yAxis.size}>
+      <Group left={config.runtime.yAxis.size}>
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
-            data={data}
+            data={data.reverse()}
             keys={(config.barSeriesKeys || config.seriesKeys)}
-            x={(d: any) => d[config.xAxis.dataKey]}
+            x={(d: any) => d[config.runtime.xAxis.dataKey]}
             xScale={xScale}
             yScale={yScale}
             color={colorScale}
           >
-            {barStacks => barStacks.map(barStack => barStack.bars.map(bar => {
+            {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+
+              const tooltip = `<div>
+              ${yAxisTooltip}<br />
+              ${xAxisTooltip}<br />
+              ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+
+              let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
+              let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
               let barThickness = xMax / barStack.bars.length;
               let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-              <text 
-                display={config.labels && config.labels.display ? 'block': 'none'}
+              <Text 
+                display={config.labels && displayBar ? 'block' : 'none'}
+                opacity={transparentBar ? 0.5 : 1}
                 x={barThickness * (bar.index + 0.5) + offset}
                 y={bar.y - 5}
                 fill={bar.color}
-                fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                 textAnchor="middle">
                   {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
-              </text>
+              </Text>
                 <rect
                   key={`bar-stack-${barStack.index}-${bar.index}`}
                   x={barThickness * bar.index + offset}
@@ -48,14 +57,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   fill={bar.color}
                   stroke="#333"
                   strokeWidth={config.barBorderThickness || 1}
-                  opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                  display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                  data-tip={`<div>
-                        ${config.xAxis.label}: ${data[bar.index][config.xAxis.dataKey]} <br/>
-                        ${config.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)} <br/>
-                        ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                      </div>`}
-                  data-for="global"
+                  opacity={transparentBar ? 0.5 : 1}
+                  display={displayBar ? 'block' : 'none'}
+                  data-tip={tooltip}
+                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
               </Group>
             )}
@@ -68,7 +73,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={(config.barSeriesKeys || config.seriesKeys)}
               height={yMax}
-              x0={(d: any) => d[mappedXAxis.dataKey]}
+              x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
               yScale={config.horizontal ? xScale : yScale}
@@ -77,23 +82,36 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barGroups) => barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
+                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
+                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = Math.abs(yScale(bar.value) - yScale(0));
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
                     let barGroupWidth = (config.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                     let offset = (config.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                     let barWidth = barGroupWidth / barGroup.bars.length;
                     let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
+
+                    let yAxisValue = config.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)
+
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]}` : data[barGroup.index][config.runtime.xAxis.dataKey]
+      
+                    const tooltip = `<div>
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
+                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
-                      <text 
-                        display={config.labels && config.labels.display ? 'block': 'none'}
+                      <Text 
+                        display={config.labels && displayBar ? 'block' : 'none'}
+                        opacity={transparentBar ? 0.5 : 1}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
                         y={barY - 5}
                         fill={barColor}
-                        fontSize={(config.labels && config.labels.fontSize) ? config.labels.fontSize : 16}
                         textAnchor="middle">
                           {formatNumber(bar.value)}
-                      </text>
+                      </Text>
                       <rect
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={config.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
@@ -104,14 +122,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         stroke="#333"
                         strokeWidth={config.barBorderThickness || 1}
                         style={{fill: barColor}}
-                        opacity={config.legend.highlight && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1 ? 0.5 : 1}
-                        display={config.legend.highlight || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1 ? 'block' : 'none'}
-                        data-tip={`<div>
-                          ${config.xAxis.label}: ${data[barGroup.index][config.xAxis.dataKey]} <br/>
-                          ${config.yAxis.label}: ${config.horizontal ? data[barGroup.index][mappedXAxis.dataKey] : formatNumber(bar.value)} <br/>
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''} 
-                        </div>`}
-                        data-for="global"
+                        opacity={transparentBar ? 0.5 : 1}
+                        display={displayBar ? 'block' : 'none'}
+                        data-tip={tooltip}
+                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
                   )}
@@ -119,14 +133,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 </Group>
               ))}
             </BarGroup>
-            {config.confidenceKeys ? data.map((d) => {
+            {Object.keys(config.confidenceKeys).length > 0 ? data.map((d) => {
               let xPos = xScale(getXAxisData(d));
               let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));
               let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper));
               let tickWidth = 5;
 
               return (
-                <path key={`confidence-interval-${d[mappedXAxis.dataKey]}`} stroke="#333" strokeWidth="2px" d={`
+                <path key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`} stroke="#333" strokeWidth="2px" d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}
                   M${xPos} ${upperPos}
