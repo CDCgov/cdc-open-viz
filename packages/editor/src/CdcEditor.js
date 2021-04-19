@@ -1,4 +1,7 @@
 import React, { useState, useEffect, memo } from 'react';
+
+import 'core-js/stable'
+
 import GlobalState from './context';
 import DataImport from './components/DataImport';
 import ChooseTab from './components/ChooseTab';

@@ -1,8 +1,8 @@
-// External
 import React, { Component } from 'react';
-import html2pdf from 'html2pdf.js'
-import html2canvas from 'html2canvas';
-import Canvg from 'canvg';
+
+// IE11
+import 'core-js/stable'
+import 'whatwg-fetch'
 
 // Third party
 import ReactTooltip from 'react-tooltip';
@@ -11,6 +11,9 @@ import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
 import ResizeObserver from 'resize-observer-polyfill';
+import html2pdf from 'html2pdf.js'
+import html2canvas from 'html2canvas';
+import Canvg from 'canvg';
 
 // Data
 import ExternalIcon from './images/external-link.svg';

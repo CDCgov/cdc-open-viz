@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
+// IE11
+import 'core-js/stable'
+import ResizeObserver from 'resize-observer-polyfill'
+import 'whatwg-fetch'
+
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import parse from 'html-react-parser';

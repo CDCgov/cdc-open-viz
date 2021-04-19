@@ -20,8 +20,24 @@ import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
 
-const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
+
+const arrayMoveMutate = (array, from, to) => {
+	const startIndex = from < 0 ? array.length + from : from;
+
+	if (startIndex >= 0 && startIndex < array.length) {
+		const endIndex = to < 0 ? array.length + to : to;
+
+		const [item] = array.splice(from, 1);
+		array.splice(endIndex, 0, item);
+	}
+};
+
+const arrayMove = (array, from, to) => {
+	array = [...array];
+	arrayMoveMutate(array, from, to);
+	return array;
+};
 
 // IE11 Custom Event polyfill
 (function () {
