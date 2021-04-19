@@ -35,8 +35,6 @@ These shared elements are stored in the root of this repository. This ensures th
 
   * Code Linting configuration (ESLint/Lint Staged)
   * Build process (Webpack)
-  * devDependencies
-    * Individual packages should not have their own devDependencies. All needed devDependencies are standardized and included in the root `package.json`. This ensures that we are using the same versions for core dependencies like React across all codebases.
 
 ### Each package has its own version number.
 

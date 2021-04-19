@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin');
 const svgToMiniDataURI = require('mini-svg-data-uri')
 
 module.exports = (env = {}, { mode }) => {
@@ -21,8 +22,8 @@ module.exports = (env = {}, { mode }) => {
     options: {
       presets: [
         ['@babel/preset-env', {
-          useBuiltIns: 'entry',
-          corejs: '3.8.3',
+          useBuiltIns: 'usage',
+          corejs: '3.8',
           targets: {
             browsers: [
                 'IE 11',
@@ -41,12 +42,9 @@ module.exports = (env = {}, { mode }) => {
                 useModules: false,
                 "version": "7.12.5"
               }
-            ],
+            ]
           ]
         }
-      ],
-      plugins: [
-        '@babel/plugin-transform-arrow-functions'
       ]
     },
   }
@@ -54,6 +52,11 @@ module.exports = (env = {}, { mode }) => {
   const configObj = {
     mode,
     entry,
+    optimization: {
+      minimizer: [new TerserPlugin({
+        extractComments: false,
+      })],
+    },
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
       hints: false,
@@ -65,6 +68,15 @@ module.exports = (env = {}, { mode }) => {
         path: packagePath + `/dist`,
         filename: () => `${packageName.toLowerCase()}.js`,
         libraryTarget: 'umd',
+        environment: {
+          arrowFunction: false,
+          bigIntLiteral: false,
+          const: false,
+          destructuring: false,
+          dynamicImport: false,
+          forOf: false,
+          module: false,
+        },
     },
     resolve: {
       alias: {
@@ -78,6 +90,43 @@ module.exports = (env = {}, { mode }) => {
         {
           // JS, JSX - Transpiles JSX
           test: /\.m?jsx?$/,
+          exclude: (path) => {
+            // TODO: Refactor this or hopefully delete it and drop IE11 support :D
+            let excluded = [
+              '/node_modules/',
+              // Due to symlinking, we have to explicitly exclude these files or Babel will try to parse them.
+              'dist/cdcchart.js',
+              'dist/cdcmap.js',
+              'dist/cdceditor.js',
+            ]
+
+            let except = [
+              '/node_modules/d3-',
+              '/node_modules/react-spring',
+              '/node_modules/delaunator',
+              '/node_modules/internmap'
+            ]
+
+            let shouldExclude = false
+
+            for(let p of excluded) {
+              if(path.includes(p)) {
+                shouldExclude = true
+                break
+              }
+            }
+
+            if(shouldExclude) {
+              for(let p of except) {
+                if( path.includes(p) && false === path.includes('d3-interpolate-path') ) { // No joke, none of the core d3 libraries export transcoded but this random plugin does!
+                  shouldExclude = false
+                  break
+                }
+              }
+            }
+
+            return shouldExclude
+          },
           use: babelLoader
         },
         {

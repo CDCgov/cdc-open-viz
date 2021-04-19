@@ -9,7 +9,7 @@ import {
   useSortBy, 
   useResizeColumns, 
   useBlockLayout
-} from 'react-table/src';
+} from 'react-table';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
 import { timeFormat } from 'd3-time-format';
