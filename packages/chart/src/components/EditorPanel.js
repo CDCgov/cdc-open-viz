@@ -152,10 +152,20 @@ const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','th
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, colorPalettes, data, setDimensions, dimensions } = useContext(Context);
 
+  const enforceRestrictions = (updatedConfig) => {
+    if(updatedConfig.visualizationSubType === 'horizontal'){
+      updatedConfig.labels = false;
+    }
+  };
+
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
     if( null === section && null === subsection) {
-      updateConfig({...config, [fieldName]: newValue})
+      let updatedConfig = {...config, [fieldName]: newValue};
+
+      enforceRestrictions(updatedConfig);
+
+      updateConfig(updatedConfig);
       return
     }
 
@@ -174,10 +184,10 @@ const EditorPanel = memo(() => {
       }
     }
 
-    let updatedConfig = {
-      [section]: sectionValue
-    }
+    let updatedConfig = {...config, [section]: sectionValue};
 
+    enforceRestrictions(updatedConfig);
+    
     updateConfig({...config, ...updatedConfig})
   }
 
@@ -500,7 +510,9 @@ const EditorPanel = memo(() => {
                   </ul>
                   {config.visualizationType !== 'Pie' && (
                     <> 
-                      <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
+                      {config.visualizationSubType !== 'horizontal' && 
+                        <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
+                      }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                     </>
                   )}
