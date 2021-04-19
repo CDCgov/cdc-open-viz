@@ -29,7 +29,7 @@ import Waiting from '@cdc/core/components/Waiting'
   window.CustomEvent = CustomEvent;
 })();
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -42,7 +42,17 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
 
-  const onChange = (e) => setValue(e.target.value);
+  const onChange = (e) => {
+    if('number' !== type || min === null){
+      setValue(e.target.value);
+    } else {
+      if(!e.target.value || min <= parseFloat(e.target.value)){
+        setValue(e.target.value);
+      } else {
+        setValue(min.toString());
+      }
+    }
+  };
 
   let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value} />
 
@@ -187,8 +197,8 @@ const EditorPanel = memo(() => {
     let updatedConfig = {...config, [section]: sectionValue};
 
     enforceRestrictions(updatedConfig);
-    
-    updateConfig({...config, ...updatedConfig})
+
+    updateConfig(updatedConfig)
   }
 
   const [ addSeries, setAddSeries ] = useState('');
@@ -384,7 +394,7 @@ const EditorPanel = memo(() => {
                   )}
                   <span className="divider-heading">Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
-                  <TextField value={config.dataFormat.roundTo} type="number" section="dataFormat" fieldName="roundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} />
+                  <TextField value={config.dataFormat.roundTo} type="number" section="dataFormat" fieldName="roundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} min={0} />
                   <div className="two-col-inputs">
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
