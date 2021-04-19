@@ -36,7 +36,10 @@
     }
   }
 
-  table {    
+  table {   
+    tr {
+      width: 100% !important;
+    } 
     th,
     td {
       white-space: nowrap;

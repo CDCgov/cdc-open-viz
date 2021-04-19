@@ -1,25 +1,33 @@
 export default {
     type: 'chart',
-    title: {},
+    title: '',
     theme: 'theme-blue',
+    fontSize: 'medium',
+    height: 500,
     padding: {
-        left: 0,
-        right: 0
+        left: 5,
+        right: 5
     },
-    minHeight: 400,
     yAxis: {
         size: 50,
-        labelFontSize: 11,
-        tickFontSize: 9
+        gridLines: false
     },
+    barThickness: 0.35,
+    height: 300,
     xAxis: {
         size: 75,
-        labelFontSize: 11,
-        tickFontSize: 9,
         tickRotation: 0
     },
     table: {
-        label: 'Data Table'
+        label: 'Data Table',
+        expanded: true
     },
-    legend: {}
+    legend: {
+        behavior: "isolate",
+        position: "right"
+    },
+    palette: "qualitative-bold",
+    labels: false,
+    dataFormat: {},
+    confidenceKeys: {}
 }
