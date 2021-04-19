@@ -3,10 +3,14 @@
   position: relative;
   z-index: 3;
 
+  .map-downloads__ui.btn-group {
+    transform: scale(.8);
+  }
+
   .map-downloads__ui {
     position: absolute;
-    top: 1em;
-    left: 1em;
+    top: .5em;
+    left: .5em;
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 5px 12px -8px rgba(0, 0, 0, .50);
     user-select: none;
@@ -163,7 +167,7 @@ header + .map-container.full-border {
     li {
       position: relative;
       display: inline-block;
-      font-size: 1vw;
+      font-size: .9em;
       transition: .3s all;
       
       &.label {
@@ -175,32 +179,32 @@ header + .map-container.full-border {
         margin: 0 14px 0 0;
       }
       &:not(:first-child) {
+        transform: scale(.8);
         position: relative;
-        margin: 2px 3px 0;
         text-align: center;
-        font-size: 12px;
-        width: 30px; 
-        height: 17.32px;
-        cursor: default; 
+        width: 40px; 
+        height: 23.09px;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
 
         &:before,
         &:after {
           content: "";
           position: absolute;
           z-index: -1;
-          width: 20.5px;
-          height: 21px;
-          -webkit-transform: scaleY(0.5774) rotate(-45deg);
-          -ms-transform: scaleY(0.5774) rotate(-45deg);
+          width: 28.28px;
+          height: 28.28px;
           transform: scaleY(0.5774) rotate(-45deg);
           background-color: inherit;
           left: 4.4px;
         }
         &:before {
-          top: -10.6px;
+          top: -14.1421px;
         }
         &:after {
-          bottom: -10.6px;
+          bottom: -14.1421px;
         }
       }
       &.darkGray {
@@ -255,6 +259,23 @@ header + .map-container.full-border {
 }
 
 @include breakpointClass(md) {
+  .map-downloads .map-downloads__ui.btn-group {
+    top: 1em;
+    left: 1em;
+    transform: none;
+  }
+  .hex-territories ul li:not(:first-child) {
+    transform: none;
+    margin: 2px 3px 0;
+
+    &:before {
+      box-shadow: -.75px .75px 1px inherit;
+    }
+
+    &:after {
+      box-shadow: .75px -.75px 1px inherit;
+    }
+}
   .territories {
     font-size: 1em;
     padding-top: 3em;
