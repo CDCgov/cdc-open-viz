@@ -1,11 +1,11 @@
 {
-    "title": {
-        "text": "Planet Radius (Bar Example)"
-    },
+    "title": "Planet Radius (Bar Example)",
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
     "visualizationSubType": "stacked",
     "seriesKeys": ["Radius", "Diameter"],
+    "fontSize": "medium",
+    "dataCutoff": "0.5",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -22,8 +22,7 @@
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
-        "tickRotation": 30,
-        "size": 90
+        "tickRotation": 30
     },
     "legend": {
         "hide": false

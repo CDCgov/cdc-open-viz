@@ -25,16 +25,13 @@ export default function DataTable() {
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
-  const horizontal = (config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal');
-  const mappedXAxis = horizontal ? config.yAxis : config.xAxis;
-
-  const [tableExpanded, setTableExpanded] = useState<boolean>(false);
+  const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
-  const formatDate = (date) => timeFormat(config.xAxis.dateDisplayFormat)(new Date(date));
+  const formatDate = (date) => timeFormat(config.runtime.xAxis.dateDisplayFormat)(new Date(date));
 
   const DownloadButton = memo(({ data }: any) => {
-    const fileName = `${config.title.text.substring(0, 50)}.csv`;
+    const fileName = `${config.title.substring(0, 50)}.csv`;
 
     const csvData = Papa.unparse(data);
 
@@ -80,7 +77,7 @@ export default function DataTable() {
 
     data.map((d) => {
         const newCol = {
-          Header: config.xAxis.type === 'date' ? formatDate(d[mappedXAxis.dataKey]) : d[mappedXAxis.dataKey],
+          Header: config.runtime.xAxis.type === 'date' ? formatDate(d[config.runtime.originalXAxis.dataKey]) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
             return (
               <>
@@ -88,7 +85,7 @@ export default function DataTable() {
               </>
             );
           },
-          id: d[mappedXAxis.dataKey],
+          id: d[config.runtime.originalXAxis.dataKey],
           canSort: true
         };
 
@@ -177,7 +174,7 @@ export default function DataTable() {
               </tbody>
             </table>
             {config.regions ? (
-              <table className="region-table">
+              <table className="region-table data-table">
                 <caption className="visually-hidden">Table of the highlighted regions in the visualization</caption>
                 <thead>
                   <tr>
@@ -187,13 +184,17 @@ export default function DataTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {config.regions.map((region) => (
-                    <tr>
-                      <td>{region.label}</td>
-                      <td>{formatDate(region.from)}</td>
-                      <td>{formatDate(region.to)}</td>
-                    </tr>
-                  ))}
+                  {config.regions.map((region) => {
+                    if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+
+                    return (
+                      <tr key={`row-${region.label}`}>
+                        <td>{region.label}</td>
+                        <td>{formatDate(region.from)}</td>
+                        <td>{formatDate(region.to)}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             ) : ''}
