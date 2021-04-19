@@ -1,44 +1,33 @@
 {
-    "title": {
-        "text": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
-        "fontSize": 32
-    },
+    "title": "Confidence Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity — COVID-NET, March 1–December 26, 2020",
     "dataUrl":  "/examples/covid-example-data-confidence.json",
     "visualizationType": "Bar",
+    "fontSize": "small",
     "seriesKeys": ["Age-adjusted rate"],
     "seriesLabels": {"Age-adjusted rate": "Rate", "Lower": "Low Bound", "Upper": "High Bound"},
     "confidenceKeys": {
         "lower": "Lower",
         "upper": "Upper"
     },
-    "minHeight": 300,
     "dataFormat": {
-        "roundTo": -1,
         "commas": false,
-        "prefix": "",
-        "suffix": ""
+        "prefix": "Lorem",
+        "suffix": "Suffix"
     },
     "padding": {
         "left": 10,
         "right": 10
     },
     "yAxis": {
-        "label": "Rate per 100,000 population",
         "dataKey": "Age-adjusted rate",
-        "labelFontSize": 24,
-        "tickFontSize": 18,
         "gridLines": true,
         "numTicks": 3,
-        "size": 75
+        "size": 80
     },
     "xAxis": {
-        "label": "Race",
         "dataKey": "Race",
-        "labelFontSize": 22,
-        "tickFontSize": 22,
-        "tickRotation": 72,
-        "size": 200,
-        "wrap": true
+        "tickRotation": 20,
+        "size": 130
     },
     "table": {
         "label": "Age-adjusted COVID-19-associated hospitalization rates by race and ethnicity",
