@@ -85,7 +85,7 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
   let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
 
   if(initialValue) {
-    optionsJsx.unshift(<option value="" key="initial" disabled>{initialValue}</option>)
+    optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
   }
 
   return (
@@ -365,8 +365,8 @@ const EditorPanel = memo(() => {
                         })}
                       </ul>
                     </>)}
-                    <Select value={addSeries || ""} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
-                    <button onClick={(e) => { e.preventDefault(); addNewSeries(addSeries) }} className="btn btn-primary">Add Data Series</button>
+                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
+                    <button onClick={(e) => { e.preventDefault(); if(addSeries.length > 0) { addNewSeries(addSeries); } setAddSeries(''); }} className="btn btn-primary">Add Data Series</button>
                     {config.seriesKeys && config.seriesKeys.length <= 1 && config.visualizationType === "Bar" && (
                       <>
                         <span className="divider-heading">Confidence Keys</span>

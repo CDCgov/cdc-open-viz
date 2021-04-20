@@ -136,7 +136,6 @@ export default function CdcChart(
   }
 
   const viewports:keyable = {
-    'lg': 1200,
     'md': 992,
     'sm': 768,
     'xs': 576,
@@ -144,10 +143,11 @@ export default function CdcChart(
   }
 
   const getViewport = size => {
-    let result = currentViewport
+    let result = 'lg'
     let viewportList = Object.keys( viewports )
 
     for(let viewport of viewportList) {
+        console.log(size)
         if(size <= viewports[viewport]) {
             result = viewport
         }
@@ -160,17 +160,15 @@ export default function CdcChart(
   const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
-        let newViewport = getViewport(width)
-        
-        if( newViewport !== currentViewport ) {
-            setCurrentViewport(newViewport)
-        }
+      let newViewport = getViewport(width)
 
-        if(isEditor) {
-          width = width - 350;
-        }
+      setCurrentViewport(newViewport)
 
-        setDimensions([width, height])
+      if(isEditor) {
+        width = width - 350;
+      }
+
+      setDimensions([width, height])
     }
   })
 
