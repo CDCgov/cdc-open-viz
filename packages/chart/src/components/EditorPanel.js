@@ -167,6 +167,9 @@ const EditorPanel = memo(() => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
     }
+    if(config.visualizationType === 'Pie' && updatedConfig.visualizationType !== 'Pie'){
+      updatedConfig.seriesKeys = [];
+    }
   };
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -256,6 +259,18 @@ const EditorPanel = memo(() => {
     return Object.keys(columns)
   }
 
+  const Error = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    );
+
+  }
+
   const Confirm = () => {
     return (
       <section className="waiting">
@@ -293,6 +308,7 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
+      {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
