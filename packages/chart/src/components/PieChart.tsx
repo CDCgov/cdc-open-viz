@@ -65,7 +65,7 @@ export default function PieChart() {
             ${xAxisTooltip}<br />`
 
             return (
-              <Group key={key} style={{ opacity: (config.legend.highlight === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
+              <Group key={key} style={{ opacity: (config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
                 <animated.path
                   // compute interpolated path d attribute from intermediate angle values
                   d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) => path({
