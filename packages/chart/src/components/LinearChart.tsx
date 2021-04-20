@@ -7,8 +7,6 @@ import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 
-import { timeParse, timeFormat } from 'd3-time-format';
-
 import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
@@ -18,7 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config, currentViewport } = useContext<any>(Context);
+  const { data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
   if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
@@ -30,11 +28,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - config.padding.left - config.padding.right;
   const yMax = height - config.runtime.xAxis.size;
 
-  const parseDate = timeParse(config.runtime.xAxis.dateParseFormat);
-  const format = timeFormat(config.runtime.xAxis.dateDisplayFormat);
-  const formatDate = (date) => format(new Date(date));
-
-  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey]) as Date).getTime() : d[config.runtime.originalXAxis.dataKey];
+  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
 
   let xScale;
@@ -126,8 +120,8 @@ export default function LinearChart() {
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-            const from = xScale((parseDate(region.from) as Date).getTime());
-            const to = xScale((parseDate(region.to) as Date).getTime());
+            const from = xScale((parseDate(region.from)).getTime());
+            const to = xScale((parseDate(region.to)).getTime());
             const width = to - from;
 
             return (

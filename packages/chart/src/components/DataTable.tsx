@@ -12,7 +12,6 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
-import { timeFormat } from 'd3-time-format';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -20,15 +19,13 @@ import Context from '../context';
 
 export default function DataTable() {
 
-  const { data, config, colorScale, formatNumber:numberFormatter } = useContext<any>(Context);
+  const { data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
-
-  const formatDate = (date) => timeFormat(config.runtime.xAxis.dateDisplayFormat)(new Date(date));
 
   const DownloadButton = memo(({ data }: any) => {
     const fileName = `${config.title.substring(0, 50)}.csv`;
@@ -77,11 +74,11 @@ export default function DataTable() {
 
     data.map((d) => {
         const newCol = {
-          Header: config.runtime.xAxis.type === 'date' ? formatDate(d[config.runtime.originalXAxis.dataKey]) : d[config.runtime.originalXAxis.dataKey],
+          Header: config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
             return (
               <>
-                {numberFormatter(d[row.original])}
+                {numberFormatter(config.visualizationType === 'Pie' ? d[config.yAxis.dataKey] : d[row.original])}
               </>
             );
           },
@@ -190,8 +187,8 @@ export default function DataTable() {
                     return (
                       <tr key={`row-${region.label}`}>
                         <td>{region.label}</td>
-                        <td>{formatDate(region.from)}</td>
-                        <td>{formatDate(region.to)}</td>
+                        <td>{formatDate(parseDate(region.from))}</td>
+                        <td>{formatDate(parseDate(region.to))}</td>
                       </tr>
                     )
                   })}

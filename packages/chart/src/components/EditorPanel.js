@@ -10,9 +10,10 @@ import {
 import { useDebounce } from 'use-debounce';
 
 import Context from '../context';
+import WarningImage from '../images/warning.svg';
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Waiting from '@cdc/core/components/Waiting'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Waiting from '@cdc/core/components/Waiting';
 
 // IE11 Custom Event polyfill
 (function () {
@@ -81,7 +82,7 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   </label>
 ))
 
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, updateField, initial: initialValue, ...attributes}) => {
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
 
   if(initialValue) {
@@ -91,7 +92,7 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
   return (
     <label>
       <span className="edit-label">{label}</span>
-      <select name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
+      <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
         {optionsJsx}
       </select>
     </label>
@@ -166,6 +167,9 @@ const EditorPanel = memo(() => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
     }
+    if(config.visualizationType === 'Pie' && updatedConfig.visualizationType !== 'Pie'){
+      updatedConfig.seriesKeys = [];
+    }
   };
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -201,8 +205,15 @@ const EditorPanel = memo(() => {
     updateConfig(updatedConfig)
   }
 
+  const missingRequiredSections = () => {
+    if(config.seriesKeys && config.seriesKeys.length > 0 && config.xAxis.dataKey && (config.visualizationType !== 'Pie' || config.yAxis.dataKey)) {
+      return false;
+    }
+    return true;
+  };
+
   const [ addSeries, setAddSeries ] = useState('');
-  const [ displayPanel, setDisplayPanel ] = useState(true)
+  const [ displayPanel, setDisplayPanel ] = useState(true);
 
   // Used to pipe a JSON version of the config you are creating out
   const [ configData, setConfigData ] = useState({})
@@ -248,13 +259,25 @@ const EditorPanel = memo(() => {
     return Object.keys(columns)
   }
 
+  const Error = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    );
+
+  }
+
   const Confirm = () => {
     return (
       <section className="waiting">
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
-          <p>Set all your options to the left and confirm below to display a preview of the chart.</p>
-          <button className="btn" style={{margin: '1em auto'}} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
+          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
         </section>
       </section>
     );
@@ -285,6 +308,7 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
+      {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
@@ -309,11 +333,12 @@ const EditorPanel = memo(() => {
               {config.visualizationType !== "Pie" && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Data Series
+                    Data Series {(!config.seriesKeys || config.seriesKeys.length === 0) && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {config.seriesKeys && (
+                  {(!config.seriesKeys || config.seriesKeys.length === 0) && <p className="warning">At least one series is required</p>}
+                  {config.seriesKeys && config.seriesKeys.length !== 0 && (
                     <>
                       <label><span className="edit-label">Displaying</span></label>
                       <ul className="series-list">
@@ -379,12 +404,12 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Y Axis
+                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
-                  {config.visualizationType !== "Pie" && (
+                  {config.visualizationType === 'Pie' && <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} /> }
+                  {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
@@ -404,11 +429,11 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    X Axis
+                    X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.xAxis.dataKey || ""} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" updateField={updateField} options={getColumns(false)} />
+                  <Select value={config.xAxis.dataKey || ""} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} />
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
