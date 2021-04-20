@@ -317,7 +317,7 @@ const EditorPanel = memo(() => {
               {config.visualizationType !== "Pie" && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Data Series {(!config.seriesKeys || config.seriesKeys.length === 0) && <WarningImage width="30" className="warning-icon" />}
+                    Data Series {(!config.seriesKeys || config.seriesKeys.length === 0) && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -388,7 +388,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="30" className="warning-icon" />}
+                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -413,7 +413,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    X Axis {!config.xAxis.dataKey && <WarningImage width="30" className="warning-icon" />}
+                    X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
