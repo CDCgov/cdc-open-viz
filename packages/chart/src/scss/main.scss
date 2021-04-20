@@ -40,7 +40,12 @@
   }
 
   .warning-icon {
-    vertical-align: top;
+    width: 15px;
+    height: 15px;
+    margin-top: 7px;
+    path {
+      fill: #d8000c;
+    }
   }
 
   h1.chart-title {
