@@ -90,6 +90,8 @@ export default function CdcChart(
 
     if(newConfig.visualizationType === 'Pie') {
       newConfig.seriesKeys = data.map(d => d[newConfig.xAxis.dataKey]);
+    } else {
+      newConfig.seriesKeys = newConfig.seriesKeys || [];
     }
 
     //Enforce default values that need to be calculated at runtime

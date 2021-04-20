@@ -255,8 +255,8 @@ export default function LinearChart() {
                         <Text
                           transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
-                          textAnchor={config.runtime.xAxis.tickRotation ? 'end' : 'middle'}
-                          width={config.runtime.xAxis.tickRotation ? undefined : tickWidth}
+                          textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                          width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
                           {tick.formattedValue}
                         </Text>
