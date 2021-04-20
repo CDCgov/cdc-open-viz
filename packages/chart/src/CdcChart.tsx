@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+import { timeParse, timeFormat } from 'd3-time-format';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
@@ -111,6 +112,7 @@ export default function CdcChart(
     }
 
     newConfig.runtime.uniqueId = Date.now();
+    newConfig.runtime.editorErrorMessage = '';
 
     setConfig(newConfig);
   };
@@ -238,12 +240,28 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
+  
+  const parseDate = (dateString: string) => {
+    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
+    if(!date) {
+      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`;
+      return new Date();
+    } else {
+      return date;
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
+  };
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+    let original = num;
     let prefix = config.dataFormat.prefix;
-    if (!config.dataFormat) return num;
     if (typeof num !== 'number') num = parseFloat(num);
+    if(isNaN(num)) config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
+    if (!config.dataFormat) return num;
     if (config.dataCutoff){
       let cutoff = config.dataCutoff
       if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
@@ -371,7 +389,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, formatNumber, loading, updateConfig, colorPalettes }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
