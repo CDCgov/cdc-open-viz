@@ -54,7 +54,7 @@ export default function DataTable() {
   
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
-    const newTableColumns = [{
+    const newTableColumns = config.visualizationType === 'Pie' ? [] : [{
       Header: '',
       Cell: ({ row }) => {
         const seriesLabel = config.seriesLabels ? config.seriesLabels[row.original] : row.original;
@@ -78,7 +78,7 @@ export default function DataTable() {
           Cell: ({ row }) => {
             return (
               <>
-                {numberFormatter(config.visualizationType === 'Pie' ? d[config.yAxis.dataKey] : d[row.original])}
+                {numberFormatter(d[row.original])}
               </>
             );
           },
@@ -93,7 +93,7 @@ export default function DataTable() {
   }, [config]);
 
   const tableData = useMemo(
-    () => config.seriesKeys,
+    () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.seriesKeys,
     [config.seriesKeys]
   );
 
