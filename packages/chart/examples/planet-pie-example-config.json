@@ -3,7 +3,6 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Pie",
     "palette": "qualitative-soft",
-    "seriesKeys": ["Radius"],
     "aspectRatio": 1,
     "dataFormat": {
         "roundTo": 1,

@@ -15,7 +15,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
   return (
     <ErrorBoundary component="LineChart">
       <Group left={config.runtime.yAxis.size}>
-        { (config.lineSeriesKeys || config.seriesKeys).map((seriesKey, index) => (
+        { (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
           <Group
             key={`series-${seriesKey}`}
             opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
@@ -39,7 +39,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
                     display={config.labels ? 'block' : 'none'}
                     x={xScale(getXAxisData(d))}
                     y={yScale(getYAxisData(d, seriesKey))}
-                    fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                     textAnchor="middle">
                       {formatNumber(d[seriesKey])}
                   </Text>
@@ -48,8 +48,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
                     r={circleRadii}
                     cx={xScale(getXAxisData(d))}
                     cy={yScale(getYAxisData(d, seriesKey))}
-                    fill={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                    style={{fill: colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}}
+                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    style={{fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}}
                     data-tip={tooltip}
                     data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                   />
@@ -61,7 +61,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
               data={data}
               x={(d) => xScale(getXAxisData(d))}
               y={(d) => yScale(getYAxisData(d, seriesKey))}
-              stroke={colorScale ? colorScale(config.seriesLabels ? config.seriesLabels[seriesKey] : seriesKey) : '#000'}
+              stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
               strokeWidth={2}
               strokeOpacity={1}
               shapeRendering="geometricPrecision"

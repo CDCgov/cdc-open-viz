@@ -3,8 +3,7 @@
     "dataUrl":  "/examples/covid-example-data-confidence.json",
     "visualizationType": "Bar",
     "fontSize": "small",
-    "seriesKeys": ["Age-adjusted rate"],
-    "seriesLabels": {"Age-adjusted rate": "Rate", "Lower": "Low Bound", "Upper": "High Bound"},
+    "series": [{"dataKey": "Age-adjusted rate", "label": "Rate"}],
     "confidenceKeys": {
         "lower": "Lower",
         "upper": "Upper"
