@@ -161,7 +161,7 @@ export default function LinearChart() {
           >
             {props => {
               const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
-              const horizontalTickOffset = yMax / props.ticks.length / 2 - 5;
+              const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               return (
                 <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
@@ -187,8 +187,7 @@ export default function LinearChart() {
                         <Text
                           x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                           y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          dy={config.runtime.horizontal ? -5 : 0}
-                          verticalAnchor="middle"
+                          verticalAnchor="start"
                           textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                         >{tick.formattedValue}</Text>
                       </Group>
