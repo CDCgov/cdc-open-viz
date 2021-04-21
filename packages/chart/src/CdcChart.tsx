@@ -277,7 +277,7 @@ export default function CdcChart(
       let cutoff = config.dataCutoff
       if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
       if(num < cutoff) {
-        prefix = '< ' + prefix;
+        prefix = '< ' + (prefix || '');
         num = cutoff;  
       }
     }
