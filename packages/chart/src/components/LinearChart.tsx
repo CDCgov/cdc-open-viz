@@ -91,7 +91,7 @@ export default function LinearChart() {
         range: [0, yMax]
       });
 
-      yScale.rangeRound([yMax, 0]);
+      yScale.rangeRound([0, yMax]);
     } else {
       yScale = scaleLinear<number>({
         domain: [min, max],
