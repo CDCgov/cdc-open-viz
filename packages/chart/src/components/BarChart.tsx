@@ -91,10 +91,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barWidth = barGroupWidth / barGroup.bars.length;
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
-                    let yAxisValue = config.runtime.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)
+                    let yAxisValue = formatNumber(bar.value);
+                    let xAxisValue = data[barGroup.index][config.runtime.originalXAxis.dataKey];
+
+                    if(config.runtime.horizontal){
+                      let tempValue = yAxisValue;
+                      yAxisValue = xAxisValue;
+                      xAxisValue = tempValue;
+                    }
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]}` : data[barGroup.index][config.runtime.xAxis.dataKey]
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
       
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
