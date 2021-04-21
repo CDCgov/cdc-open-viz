@@ -73,10 +73,10 @@ export default function CdcChart(
       setLoading(false)
     }
 
-    updateConfig(newConfig);
+    updateConfig(newConfig, data);
   }
 
-  const updateConfig = (newConfig) => {
+  const updateConfig = (newConfig, dataOverride = undefined) => {
     // Deeper copy
     Object.keys(defaults).forEach( key => {
       if(newConfig[key] && 'object' === typeof newConfig[key]) {
@@ -84,35 +84,46 @@ export default function CdcChart(
       }
     });
 
-    if(newConfig.visualizationType === 'Pie') {
-      newConfig.seriesKeys = data.map(d => d[newConfig.xAxis.dataKey]);
-    } else {
-      newConfig.seriesKeys = newConfig.seriesKeys || [];
-    }
-
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {};
-    newConfig.runtime.originalXAxis = newConfig.xAxis;
+    newConfig.runtime.seriesLabels = {};
+    newConfig.runtime.seriesLabelsAll = [];
+    newConfig.runtime.originalXAxis = newConfig.xAxis;   
+
+    if(newConfig.visualizationType === 'Pie') {
+      newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
+    } else {
+      newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
+        newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey;
+        newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey);
+        return series.dataKey;
+      }) : [];
+    }
+
+    if(newConfig.visualizationType === 'Combo' && newConfig.series){
+      newConfig.runtime.barSeriesKeys = [];
+      newConfig.runtime.lineSeriesKeys = [];
+      newConfig.series.forEach((series) => {
+        if(series.type === 'Bar'){
+          newConfig.runtime.barSeriesKeys.push(series.dataKey);
+        }
+        if(series.type === 'Line'){
+          newConfig.runtime.lineSeriesKeys.push(series.dataKey);
+        }
+      });
+    }
 
     if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
-      newConfig.horizontal = true;
+      newConfig.runtime.horizontal = true;
     } else {
       newConfig.runtime.xAxis = newConfig.xAxis;
       newConfig.runtime.yAxis = newConfig.yAxis;
-      newConfig.horizontal = false;
+      newConfig.runtime.horizontal = false;
     }
-
-    if(newConfig.seriesLabels && newConfig.seriesKeys){
-      newConfig.runtime.seriesLabelsAll = [];
-      newConfig.seriesKeys.forEach((seriesKey) => {
-        newConfig.runtime.seriesLabelsAll.push(newConfig.seriesLabels[seriesKey])
-      });
-    }
-
     newConfig.runtime.uniqueId = Date.now();
-    newConfig.runtime.editorErrorMessage = '';
+    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
     setConfig(newConfig);
   };
@@ -179,9 +190,9 @@ export default function CdcChart(
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(data && config.xAxis && config.seriesKeys) {
+    if(data && config.xAxis && config.runtime.seriesKeys) {
       let palette = colorPalettes[config.palette]
-      let numberOfKeys = config.seriesKeys.length
+      let numberOfKeys = config.runtime.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
         palette = palette.concat(palette);
@@ -190,7 +201,7 @@ export default function CdcChart(
       palette = palette.slice(0, numberOfKeys);
 
       const newColorScale = () => scaleOrdinal({
-        domain: config.runtime.seriesLabelsAll || config.seriesKeys,
+        domain: config.runtime.seriesLabelsAll,
         range: palette,
       });
 
@@ -208,7 +219,7 @@ export default function CdcChart(
     const newSeriesHighlight = [];
 
     // If we're highlighting all the series, reset them
-    if(seriesHighlight.length + 1 === config.seriesKeys.length) {
+    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
       highlightReset()
       return
     }
@@ -218,10 +229,10 @@ export default function CdcChart(
     });
 
     let newHighlight = label.datum;
-    if(config.seriesLabels){
-      for(let i = 0; i < config.seriesKeys.length; i++) {
-        if(config.seriesLabels[config.seriesKeys[i]] === label.datum){
-          newHighlight = config.seriesKeys[i];
+    if(config.runtime.seriesLabels){
+      for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
+        if(config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum){
+          newHighlight = config.runtime.seriesKeys[i];
           break;
         }
       }
@@ -323,9 +334,9 @@ export default function CdcChart(
 
                 let itemName:any = label.datum
 
-                if(config.seriesLabels){
+                if(config.runtime.seriesLabels){
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                  itemName = config.seriesKeys[index]
+                  itemName = config.runtime.seriesKeys[index]
                 }
 
                 if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) ) {
@@ -370,7 +381,7 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!config.newViz && <div className="cdc-chart-inner-container">
+        {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-chart-inner-container">
           {/* Title */}
           {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
           {/* Visualization */}

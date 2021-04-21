@@ -36,7 +36,7 @@ export default function LinearChart() {
   let seriesScale;
 
   if (data) {
-    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.seriesKeys.map((key) => Number(d[key])))));
+    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
@@ -48,7 +48,7 @@ export default function LinearChart() {
       //If stacked bar, add together y values to get max, otherwise map data to find max
       if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
         const yTotals = data.reduce((allTotals, xValue) => {
-          const totalYValues = config.seriesKeys.reduce((yTotal, k) => {
+          const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
             yTotal += Number(xValue[k]);
             return yTotal;
           }, 0);
@@ -63,7 +63,7 @@ export default function LinearChart() {
       } else if(config.visualizationType === 'Bar' && config.confidenceKeys && config.confidenceKeys.upper) {
         max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
       } else {
-        max = Math.max(...data.map((d) => Math.max(...config.seriesKeys.map((key) => Number(d[key])))));
+        max = Math.max(...data.map((d) => Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
       }
     }
 
@@ -76,7 +76,7 @@ export default function LinearChart() {
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
 
-    if(config.horizontal){
+    if(config.runtime.horizontal){
       xScale = scaleLinear<number>({
         domain: [min, max],
         range: [0, xMax]
@@ -87,7 +87,7 @@ export default function LinearChart() {
         scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
 
       seriesScale = scalePoint<string>({
-        domain: (config.barSeriesKeys || config.seriesKeys),
+        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [0, yMax]
       });
 
@@ -103,7 +103,7 @@ export default function LinearChart() {
         scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
 
       seriesScale = scalePoint<string>({
-        domain: (config.barSeriesKeys || config.seriesKeys),
+        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [0, xMax]
       });
     }
@@ -174,7 +174,7 @@ export default function LinearChart() {
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
-                          display={config.horizontal ? 'none' : 'block'}
+                          display={config.runtime.horizontal ? 'none' : 'block'}
                         />
                         { config.runtime.yAxis.gridLines ? (
                           <Line
@@ -185,11 +185,11 @@ export default function LinearChart() {
                           ) : ''
                         }
                         <Text
-                          x={config.horizontal ? tick.from.x + 2 : tick.to.x}
-                          y={tick.to.y + (config.horizontal ? horizontalTickOffset : 0)}
-                          dy={config.horizontal ? -5 : 0}
+                          x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                          y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                          dy={config.runtime.horizontal ? -5 : 0}
                           verticalAnchor="middle"
-                          textAnchor={config.horizontal ? 'start' : 'end'}
+                          textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                         >{tick.formattedValue}</Text>
                       </Group>
                     );
@@ -247,7 +247,7 @@ export default function LinearChart() {
                           stroke="#333"
                         />
                         <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}

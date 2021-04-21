@@ -57,7 +57,7 @@ export default function DataTable() {
     const newTableColumns = config.visualizationType === 'Pie' ? [] : [{
       Header: '',
       Cell: ({ row }) => {
-        const seriesLabel = config.seriesLabels ? config.seriesLabels[row.original] : row.original;
+        const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original;
         return (
           <>
             {config.visualizationType !== 'Pie' ? (
@@ -93,8 +93,8 @@ export default function DataTable() {
   }, [config]);
 
   const tableData = useMemo(
-    () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.seriesKeys,
-    [config.seriesKeys]
+    () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
+    [config.runtime.seriesKeys]
   );
 
   // Change accessibility label depending on expanded status

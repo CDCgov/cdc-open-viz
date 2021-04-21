@@ -17,7 +17,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
             data={data.reverse()}
-            keys={(config.barSeriesKeys || config.seriesKeys)}
+            keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
             x={(d: any) => d[config.runtime.xAxis.dataKey]}
             xScale={xScale}
             yScale={yScale}
@@ -71,27 +71,27 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           <Group>
             <BarGroup
               data={data}
-              keys={(config.barSeriesKeys || config.seriesKeys)}
+              keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
               height={yMax}
               x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
-              x0Scale={config.horizontal ? yScale : xScale}
+              x0Scale={config.runtime.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
-              yScale={config.horizontal ? xScale : yScale}
+              yScale={config.runtime.horizontal ? xScale : yScale}
               color={() => {return '';}}
             >
               {(barGroups) => barGroups.map((barGroup) => (
-                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
+                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = Math.abs(yScale(bar.value) - yScale(0));
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
-                    let barGroupWidth = (config.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
-                    let offset = (config.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+                    let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
+                    let offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
                     let barWidth = barGroupWidth / barGroup.bars.length;
-                    let barColor = config.seriesLabels && config.seriesLabels[bar.key] ? colorScale(config.seriesLabels[bar.key]) : colorScale(bar.key);
+                    let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
-                    let yAxisValue = config.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)
+                    let yAxisValue = config.runtime.horizontal ? data[barGroup.index][config.runtime.originalXAxis.dataKey] : formatNumber(bar.value)
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[barGroup.index][config.runtime.xAxis.dataKey]}` : data[barGroup.index][config.runtime.xAxis.dataKey]
@@ -114,10 +114,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </Text>
                       <rect
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                        x={config.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                        y={config.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY}
-                        width={config.horizontal ?  bar.y : barWidth}
-                        height={config.horizontal ? barWidth : barHeight}
+                        x={config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                        y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) : barY}
+                        width={config.runtime.horizontal ?  bar.y : barWidth}
+                        height={config.runtime.horizontal ? barWidth : barHeight}
                         fill={barColor}
                         stroke="#333"
                         strokeWidth={config.barBorderThickness || 1}

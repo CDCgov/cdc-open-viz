@@ -167,9 +167,6 @@ const EditorPanel = memo(() => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
     }
-    if(config.visualizationType === 'Pie' && updatedConfig.visualizationType !== 'Pie'){
-      updatedConfig.seriesKeys = [];
-    }
   };
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -206,10 +203,21 @@ const EditorPanel = memo(() => {
   }
 
   const missingRequiredSections = () => {
-    if(config.seriesKeys && config.seriesKeys.length > 0 && config.xAxis.dataKey && (config.visualizationType !== 'Pie' || config.yAxis.dataKey)) {
-      return false;
+    if(config.visualizationType === 'Pie') {
+      if(!config.yAxis.dataKey){
+        return true;
+      }
+    } else {
+      if(!config.series || !config.series.length > 0){
+        return true;
+      }
     }
-    return true;
+
+    if(!config.xAxis.dataKey) {
+      return true;
+    }
+
+    return false;
   };
 
   const [ addSeries, setAddSeries ] = useState('');
@@ -222,23 +230,36 @@ const EditorPanel = memo(() => {
     return null
   }
 
-  const removeSeriesKey = (i) => {
-    let seriesKeys = [...config.seriesKeys]
-    seriesKeys.splice(i, 1)
+  const removeSeries = (seriesKey) => {
+    let series = [...config.series]
+    let seriesIndex = -1;
 
-    let newConfig = {...config, seriesKeys}
-
-    if(seriesKeys.length === 0) {
-      delete newConfig.seriesKeys
+    for(let i = 0; i < series.length; i++){
+      if(series[i].dataKey === seriesKey){
+        seriesIndex = i;
+        break;
+      }
     }
 
-    updateConfig(newConfig)
+    if(seriesIndex !== -1){
+      series.splice(seriesIndex, 1)
+
+      let newConfig = {...config, series}
+
+      if(series.length === 0) {
+        delete newConfig.series
+      }
+
+      updateConfig(newConfig)
+    }
   }
 
-  const addNewSeries = (value) => {
-    let newSeriesKeys = config.seriesKeys ? [...config.seriesKeys] : []
-    newSeriesKeys.push(value)
-    updateConfig({...config, seriesKeys: newSeriesKeys})
+  const addNewSeries = (seriesKey) => {
+    let newSeries = config.series ? [...config.series] : []
+    
+    newSeries.push({dataKey: seriesKey, type: 'Bar'})
+      
+    updateConfig({...config, series: newSeries})
   }
 
   const getColumns = (filter = true) => {
@@ -250,7 +271,7 @@ const EditorPanel = memo(() => {
 
     if(filter) {
       Object.keys(columns).forEach(key => {
-        if((config.seriesKeys && config.seriesKeys.includes(key)) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+        if((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
           delete columns[key]
         }
       })
@@ -333,66 +354,42 @@ const EditorPanel = memo(() => {
               {config.visualizationType !== "Pie" && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Data Series {(!config.seriesKeys || config.seriesKeys.length === 0) && <WarningImage width="25" className="warning-icon" />}
+                    Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {(!config.seriesKeys || config.seriesKeys.length === 0) && <p className="warning">At least one series is required</p>}
-                  {config.seriesKeys && config.seriesKeys.length !== 0 && (
+                  {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
+                  {config.series && config.series.length !== 0 && (
                     <>
                       <label><span className="edit-label">Displaying</span></label>
                       <ul className="series-list">
-                        {config.seriesKeys.map((key, i) => {
+                        {config.series.map((series, i) => {
                           if(config.visualizationType === "Combo") {
-                            let changeType = (value) => {
-                                let lineSeriesKeys = config.lineSeriesKeys || []
-                                let barSeriesKeys = config.barSeriesKeys || []
+                            let changeType = (i, value) => {
+                                let series = [...config.series];
 
-                                // Remove the values first
-                                if( lineSeriesKeys.includes(key) ) {
-                                  let index = lineSeriesKeys.indexOf(key)
-                                  lineSeriesKeys.splice(index, 1)
-                                }
+                                series[i].type = value;
 
-                                if( barSeriesKeys.includes(key) ) {
-                                  let index = barSeriesKeys.indexOf(key)
-                                  barSeriesKeys.splice(index, 1)
-                                }
-
-                                // Add value to new appropriate array
-                                if(value === "Bar") {
-                                  barSeriesKeys.push(key)
-                                } else if(value === "Line") {
-                                  lineSeriesKeys.push(key)
-                                }
-
-                                updateConfig({...config, barSeriesKeys, lineSeriesKeys})
+                                updateConfig({...config, series})
                             }
 
-                            let determineValue = () => {
-                              if(config.lineSeriesKeys.includes(key)) {
-                                return "Line"
-                              }
-
-                              return "Bar"
-                            }
                             let typeDropdown = (
-                              <select value={determineValue() || ""} onChange={(event) => { changeType(event.target.value) }} style={{width: "100px", marginRight: "10px"}}>
+                              <select value={series.type} onChange={(event) => { changeType(i, event.target.value) }} style={{width: "100px", marginRight: "10px"}}>
                                 <option value="" default>Select</option>
                                 <option value="Bar">Bar</option>
                                 <option value="Line">Line</option>
                               </select>
                             )
 
-                            return (<li key={key}>{key} <span>{typeDropdown} <span onClick={() => removeSeriesKey(i)}>X</span></span></li>)
+                            return (<li key={series.dataKey}>{series.dataKey} <span>{typeDropdown} <span onClick={() => removeSeries(series.dataKey)}>X</span></span></li>)
                           }
-                          return (<li key={key}>{key} <span onClick={() => removeSeriesKey(i)}>X</span></li>)
+                          return (<li key={series.dataKey}>{series.dataKey} <span onClick={() => removeSeries(series.dataKey)}>X</span></li>)
                         })}
                       </ul>
                     </>)}
                     <Select value={addSeries || ""} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
                     <button onClick={(e) => { e.preventDefault(); addNewSeries(addSeries) }} className="btn btn-primary">Add Data Series</button>
-                    {config.seriesKeys && config.seriesKeys.length <= 1 && config.visualizationType === "Bar" && (
+                    {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                       <>
                         <span className="divider-heading">Confidence Keys</span>
                         <Select value={config.confidenceKeys.upper || ""} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()} />
