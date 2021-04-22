@@ -3,7 +3,6 @@ import '../scss/choose-vis-tab.scss';
 
 import GlobalState from '../context';
 
-import AreaIcon from '../assets/icons/chart-area-solid.svg';
 import BarIcon from '../assets/icons/chart-bar-solid.svg';
 import LineIcon from '../assets/icons/chart-line-solid.svg';
 import PieIcon from '../assets/icons/chart-pie-solid.svg';
@@ -15,14 +14,17 @@ import UsaIcon from '../assets/usa-graphic.svg';
  */
 
 export default function ChooseTab() { 
-    const {type, setType, subType, setSubType, setGlobalActive} = useContext(GlobalState);
+    const {config, setConfig, setGlobalActive} = useContext(GlobalState);
 
-    const IconButton = ({icon, label, type: vizType, subType: vizSubType}) => {
-        let classNames = (type === vizType && subType === vizSubType) ? 'active' : ''
+    const IconButton = ({icon, label, type, subType}) => {
+        let subTypeProperty = type === "map" ? "geoType" : "visualizationType"
+
+        let classNames = (config.type === type && config[subTypeProperty] === subType) ? 'active' : ''
     
         let setTypes = () => {
-            setType(vizType)
-            setSubType(vizSubType)
+            let newConfig = {...config, type, [subTypeProperty]: subType}
+
+            setConfig(newConfig)
         }
         
         return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span className="mt-1">{label}</span></button>)
@@ -41,8 +43,8 @@ export default function ChooseTab() {
                 <li><IconButton label="United States" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
             </ul>
-            {type && <div className="mt-3">
-                <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(2)}>Configure your <span className="capitalize">{type}</span> &raquo;</span>
+            {config.type && <div className="mt-3">
+                <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(2)}>Configure your <span className="capitalize">{config.type}</span> &raquo;</span>
             </div>}
         </div>
     )

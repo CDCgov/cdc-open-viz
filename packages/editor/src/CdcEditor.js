@@ -11,33 +11,11 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ config: configObj = null, hostname }) {
+export default function CdcEditor({ config: configObj = {newViz: true}, hostname }) {
   const [config, setConfig] = useState(configObj)
-  const [dataURL, setDataURL] = useState(null)
-  const [data, setData] = useState(null)
-  const [keepURL, setKeepURL] = useState(false)
   const [errors, setErrors] = useState([])
 
-  let startingType = null
-  let startingSubType = null
-
-  if(configObj && configObj.type) {
-    startingType = configObj.type
-  }
-
-  const [type, setType] = useState(startingType)
-
-  if(configObj && configObj.visualizationType) {
-    startingSubType = configObj.visualizationType
-  }
-
-  if(configObj && configObj.general && configObj.general.geoType) {
-    startingSubType = configObj.geoType
-  }
-
-  const [subType, setSubType] = useState(startingSubType)
-
-  let startingTab = config ? 2 : 0;
+  let startingTab = config.data ? 2 : 0;
 
   const [globalActive, setGlobalActive] = useState(startingTab);
 
@@ -46,15 +24,6 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
       setGlobalActive(-1)
     }
   }, [globalActive])
-
-  useEffect(() => {
-    if(config && config.hasOwnProperty('data')) {
-      setData(config.data)
-    }
-    if(config && config.hasOwnProperty('type')) {
-      setType(config.type)
-    }
-  }, [config])
 
   const maxFileSize = 5; // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
@@ -71,22 +40,12 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
   };
 
   const state = {
-    data,
-    setData,
-    type,
-    setType,
-    subType,
-    setSubType,
     config,
     setConfig,
     errors,
     setErrors,
     errorMessages,
     maxFileSize,
-    dataURL,
-    setDataURL,
-    keepURL,
-    setKeepURL,
     hostname,
     globalActive,
     setGlobalActive
@@ -99,10 +58,10 @@ export default function CdcEditor({ config: configObj = null, hostname }) {
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
-          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={null === data}>
+          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data}>
             <ChooseTab />
           </TabPane>
-          <TabPane title="3. Configure" disableRule={null === data || null === type}>
+          <TabPane title="3. Configure" disableRule={null === config.data}>
             <ConfigureTab />
           </TabPane>
         </Tabs>
