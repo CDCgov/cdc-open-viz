@@ -213,6 +213,14 @@ const DataTable = (props) => {
     [processedData, applyLegendToValue, customSort]
   );
 
+  const handleKeypress = e => {
+    //it triggers by pressing the enter key
+    if (e.keyCode === 13) {
+      // handleSubmit();
+alert('hit');
+    }
+  };
+
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.';
@@ -261,7 +269,12 @@ const DataTable = (props) => {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
+                <th tabIndex="0" 
+                  title={column.Header}
+                  {...column.getHeaderProps(column.getSortByToggleProps())} 
+                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                  onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                >
                   {column.render('Header')}
                   <div {...column.getResizerProps()} className="resizer" />
                 </th>
