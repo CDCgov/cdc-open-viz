@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import '../scss/choose-vis-tab.scss';
 
 import GlobalState from '../context';
@@ -14,15 +14,40 @@ import UsaIcon from '../assets/usa-graphic.svg';
  */
 
 export default function ChooseTab() { 
-    const {config, setConfig, setGlobalActive} = useContext(GlobalState);
+    const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
+
+    useEffect(() => {
+        if(tempConfig !== null) {
+            setConfig(tempConfig)
+            setTempConfig(null)
+        }
+    })
 
     const IconButton = ({icon, label, type, subType}) => {
-        let subTypeProperty = type === "map" ? "geoType" : "visualizationType"
+        let isSubType = false
 
-        let classNames = (config.type === type && config[subTypeProperty] === subType) ? 'active' : ''
+        if(type === 'map' && config.general) {
+            let geoType = config.general.geoType
+            isSubType = (subType === geoType)
+        }
+
+        if(type === 'chart') {
+            isSubType = (subType === config.visualizationType)
+        }
+
+        let classNames = (config.type === type && isSubType) ? 'active' : ''
     
         let setTypes = () => {
-            let newConfig = {...config, type, [subTypeProperty]: subType}
+            let newConfig = {...config, type}
+
+            if(type === 'map') {
+                newConfig.general = {
+                    ...newConfig.general,
+                    geoType: subType
+                }
+            } else {
+                newConfig.visualizationType = subType
+            }
 
             setConfig(newConfig)
         }
