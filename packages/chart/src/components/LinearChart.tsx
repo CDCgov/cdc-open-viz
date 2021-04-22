@@ -187,7 +187,7 @@ export default function LinearChart() {
                         <Text
                           x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                           y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          verticalAnchor="start"
+                          verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                           textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                         >{tick.formattedValue}</Text>
                       </Group>
