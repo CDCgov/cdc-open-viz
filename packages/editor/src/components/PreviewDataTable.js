@@ -6,7 +6,7 @@ import {
   useSortBy,
   useResizeColumns,
   usePagination
-} from 'react-table/src';
+} from 'react-table';
 import GlobalState from '../context';
 import { useDebounce } from 'use-debounce';
 

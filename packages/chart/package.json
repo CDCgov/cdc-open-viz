@@ -18,7 +18,7 @@
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
   "license": "Apache-2.0",
-  "dependencies": {
+  "devDependencies": {
     "@cdc/core": "^1.0.1-alpha.0",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
@@ -30,7 +30,6 @@
     "@visx/scale": "^1.0.0",
     "@visx/shape": "^1.0.0",
     "@visx/tooltip": "^1.1.0",
-    "bootstrap": "^4.3.1",
     "d3-array": "^2.8.0",
     "d3-time-format": "^3.0.0",
     "html-react-parser": "^0.14.0",
@@ -39,15 +38,13 @@
     "react-accessible-accordion": "^3.3.4",
     "react-spring": "^8.0.27",
     "react-table": "^7.5.0",
-    "react-tooltip": "^4.2.11",
-    "use-debounce": "^6.0.1"
+    "react-tooltip": "4.2.8",
+    "use-debounce": "^6.0.1",
+    "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
     "react": ">=16.8",
     "react-dom": ">=16"
   },
-  "browserslist": [
-    "last 1 Chrome version"
-  ],
   "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81"
 }

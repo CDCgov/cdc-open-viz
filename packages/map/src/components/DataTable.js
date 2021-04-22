@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
-} from 'react-table/src';
+} from 'react-table';
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
 import { Base64 } from 'js-base64';

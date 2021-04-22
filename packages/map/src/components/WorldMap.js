@@ -126,11 +126,11 @@ const WorldMap = (props) => {
         }
 
         // If a legend applies, return it with appropriate information.
-        if (legendColors) {
+        if (legendColors && legendColors[0] !== '#000000') {
           const toolTip = applyTooltipsToGeo(regionName, regionData);
 
           stylesObj.base = {
-            fill: `${legendColors[0]} !important`,
+            fill: legendColors[0],
             '&:hover': {
               fill: `${legendColors[1]} !important`
             },
@@ -236,23 +236,33 @@ const WorldMap = (props) => {
         legendColors = applyLegendToValue(geoData);
       }
 
+      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+
+      const unusedStyles = {
+        default: {
+          stroke: geoStrokeColor,
+          strokeWidth: '0.7px',
+          fill: '#E6E6E6'
+        }
+      }
+
       // If a legend applies, return it with appropriate information.
-      if (legendColors) {
+      if (legendColors && legendColors[0] !== '#000000') {
         const toolTip = applyTooltipsToGeo(geoDisplayName,
           geoData);
 
         const stylesObj = {
           default: {
             fill: legendColors[0],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           hover: {
             fill: legendColors[1],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
           pressed: {
             fill: legendColors[2],
-            stroke: state.general.backgroundColor
+            stroke: geoStrokeColor
           },
         };
 
@@ -285,7 +295,7 @@ const WorldMap = (props) => {
         <Geography
           key={geo.rsmKey}
           className={`rsm-geography ${state.general.geoBorderColor}`}
-          style={stylesObj.default}
+          style={ unusedStyles }
           tabIndex={-1}
           geography={geo}
         />
