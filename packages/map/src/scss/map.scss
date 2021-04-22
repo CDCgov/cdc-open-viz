@@ -3,10 +3,14 @@
   position: relative;
   z-index: 3;
 
+  .map-downloads__ui.btn-group {
+    transform: scale(.8);
+  }
+
   .map-downloads__ui {
     position: absolute;
-    top: 1em;
-    left: 1em;
+    top: .5em;
+    left: .5em;
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 5px 12px -8px rgba(0, 0, 0, .50);
     user-select: none;
@@ -152,6 +156,68 @@ header + .map-container.full-border {
     }
   }
 }
+
+// hex maps
+.hex-territories {
+  padding: 1em 100px 0 1em;
+  margin-bottom: 2em;
+  ul {
+    display: flex;
+
+    li {
+      position: relative;
+      display: inline-block;
+      font-size: .9em;
+      transition: .3s all;
+      
+      &.label {
+        max-width: 30%;
+        display: flex;
+        align-items: center;
+        text-align: left;
+        font-size: 1em !important;
+        margin: 0 14px 0 0;
+      }
+      &:not(:first-child) {
+        transform: scale(.8);
+        position: relative;
+        text-align: center;
+        width: 40px; 
+        height: 23.09px;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+
+        &:before,
+        &:after {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          width: 28.28px;
+          height: 28.28px;
+          transform: scaleY(0.5774) rotate(-45deg);
+          background-color: inherit;
+          left: 4.4px;
+        }
+        &:before {
+          top: -14.1421px;
+        }
+        &:after {
+          bottom: -14.1421px;
+        }
+      }
+      &.darkGray {
+        border: rgba(0,0,0,.2) 1px solid !important;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+    }
+  }
+}
+
 .zoom-controls {
   display: flex;
   position: absolute;
@@ -192,6 +258,23 @@ header + .map-container.full-border {
 }
 
 @include breakpointClass(md) {
+  .map-downloads .map-downloads__ui.btn-group {
+    top: 1em;
+    left: 1em;
+    transform: none;
+  }
+  .hex-territories ul li:not(:first-child) {
+    transform: none;
+    margin: 2px 3px 0;
+
+    &:before {
+      box-shadow: -.75px .75px 1px inherit;
+    }
+
+    &:after {
+      box-shadow: .75px -.75px 1px inherit;
+    }
+}
   .territories {
     font-size: 1em;
     padding-top: 3em;

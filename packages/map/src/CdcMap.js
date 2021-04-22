@@ -1,9 +1,8 @@
-// External
 import React, { Component } from 'react';
-import html2pdf from 'html2pdf.js'
-import html2canvas from 'html2canvas';
-import Canvg from 'canvg';
-import { createCanvas } from 'canvas'
+
+// IE11
+import 'core-js/stable'
+import 'whatwg-fetch'
 
 // Third party
 import ReactTooltip from 'react-tooltip';
@@ -12,6 +11,9 @@ import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
 import ResizeObserver from 'resize-observer-polyfill';
+import html2pdf from 'html2pdf.js'
+import html2canvas from 'html2canvas';
+import Canvg from 'canvg';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
@@ -36,6 +38,7 @@ import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import HexMap from './components/HexMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
@@ -143,8 +146,10 @@ class CdcMap extends Component {
         const xmlSerializer = new XMLSerializer()
         const svgStr = xmlSerializer.serializeToString(baseSvg)
         const options = { log: false, ignoreMouse: true }
-        const canvas = createCanvas(1440, calcHeight)
+        const canvas = document.createElement('canvas')
         const ctx = canvas.getContext('2d')
+        ctx.canvas.width = 1440
+        ctx.canvas.height = calcHeight
         const canvg = Canvg.fromString(ctx, svgStr, options)
         canvg.start()
 
@@ -168,7 +173,8 @@ class CdcMap extends Component {
                     backgroundColor: '#ffffff',
                     width: 1440,
                     windowWidth: 1440,
-                    scale: 1
+                    scale: 1,
+                    logging: false
                 }).then(canvas => {
                     this.saveImageAs(canvas.toDataURL(), filename + '.png')
                 }).then(() => {
@@ -180,7 +186,7 @@ class CdcMap extends Component {
                     margin:       0.2,
                     filename:     filename + '.pdf',
                     image:        { type: 'png' },
-                    html2canvas:  { scale: 2 },
+                    html2canvas:  { scale: 2, logging: false },
                     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
                 };
 
@@ -1368,7 +1374,8 @@ class CdcMap extends Component {
 
                         <section className="geography-container" aria-hidden="true" ref={this.mapSvg}>
                             {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                                {'us' === this.state.general.geoType && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {'us' === this.state.general.geoType && !this.state.general.displayAsHex && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
+                                {this.state.general.displayAsHex && 'data' === this.state.general.type && <HexMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
                                 {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
                                 {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
 

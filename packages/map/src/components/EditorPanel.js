@@ -20,8 +20,24 @@ import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
 
-const arrayMove = require('array-move');
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
+
+const arrayMoveMutate = (array, from, to) => {
+	const startIndex = from < 0 ? array.length + from : from;
+
+	if (startIndex >= 0 && startIndex < array.length) {
+		const endIndex = to < 0 ? array.length + to : to;
+
+		const [item] = array.splice(from, 1);
+		array.splice(endIndex, 0, item);
+	}
+};
+
+const arrayMove = (array, from, to) => {
+	array = [...array];
+	arrayMoveMutate(array, from, to);
+	return array;
+};
 
 // IE11 Custom Event polyfill
 (function () {
@@ -320,6 +336,16 @@ const EditorPanel = memo((props) => {
                 }
             })
       break;
+      case 'toggleDisplayAsHex':
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        displayAsHex: !prevState.general.displayAsHex
+                    }
+                }
+            })
+      break;
       case 'editorMapType':
         switch(value) {
             case 'data':
@@ -340,6 +366,7 @@ const EditorPanel = memo((props) => {
                           ...prevState.general,
                           showSidebar: false,
                           type: "navigation",
+                          displayAsHex: false
                         },
                         tooltips: {
                             ...prevState.tooltips,
@@ -348,6 +375,17 @@ const EditorPanel = memo((props) => {
                     }
                 })
                 break;
+            case 'hex':
+            setState( (prevState) => {
+                return {
+                    general: {
+                      ...prevState.general,
+                      showSidebar: true,
+                      type: "hex",
+                    }
+                }
+            })
+            break;
             default:
                 console.warn("Map type not set")
             break;
@@ -920,6 +958,12 @@ const EditorPanel = memo((props) => {
                       <option value="navigation">Navigation</option>
                     </select>
                   </label>
+                  {'us' === state.general.geoType && 'data' === state.general.type &&
+                    <label className="checkbox mt-4">
+                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("toggleDisplayAsHex", event.target.checked) }} />
+                      <span className="edit-label">Display As Hex Map</span>
+                    </label>
+                  }
                   <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
                   <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
