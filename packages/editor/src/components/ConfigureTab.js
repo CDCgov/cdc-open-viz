@@ -20,7 +20,9 @@ export default function ConfigureTab() {
     if(type === 'map') {
         let general = configObj.general ?? {}
 
-        general.geoType = subType
+        if(subType) {
+            general.geoType = subType
+        }
         configObj.general = general
     }
 
