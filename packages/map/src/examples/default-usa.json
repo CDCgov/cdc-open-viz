@@ -431,48 +431,6 @@
 			"link": "https://cdc.gov/"
 		},
 		{
-			"Insured Rate": "23",
-			"Coverage Status": "Insured",
-			"state": "AS",
-			"Year (Good filter option)": "2010",
-			"link": "https://cdc.gov/"
-		},
-		{
-			"Insured Rate": "83",
-			"Coverage Status": "Insured",
-			"state": "GU",
-			"Year (Good filter option)": "2010",
-			"link": "https://cdc.gov/"
-		},
-		{
-			"Insured Rate": "73",
-			"Coverage Status": "Insured",
-			"state": "MP",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "13",
-			"Coverage Status": "Insured",
-			"state": "FM",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "93",
-			"Coverage Status": "Insured",
-			"state": "PW",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
-			"Insured Rate": "3",
-			"Coverage Status": "Insured",
-			"state": "MH",
-			"Year (Good filter option)": "2010",
-			"link": ""
-		},
-		{
 			"Insured Rate": "43",
 			"Coverage Status": "Insured",
 			"state": "Alabama",
