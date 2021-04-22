@@ -16,7 +16,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={config.runtime.yAxis.size}>
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
-            data={data.reverse()}
+            data={data}
             keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
             x={(d: any) => d[config.runtime.xAxis.dataKey]}
             xScale={xScale}
