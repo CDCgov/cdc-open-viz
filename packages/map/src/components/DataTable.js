@@ -213,14 +213,6 @@ const DataTable = (props) => {
     [processedData, applyLegendToValue, customSort]
   );
 
-  const handleKeypress = e => {
-    //it triggers by pressing the enter key
-    if (e.keyCode === 13) {
-      // handleSubmit();
-alert('hit');
-    }
-  };
-
   // Change accessibility label depending on expanded status
   useEffect(() => {
     const expandedLabel = 'Accessible data table.';
