@@ -5,9 +5,8 @@ import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import GlobalState from '../context';
 
-
 export default function ConfigureTab() {
-    const { config, setConfig, hostname } = useContext(GlobalState);
+    const { config, setTempConfig, hostname } = useContext(GlobalState);
 
     let { type } = config
 
@@ -15,13 +14,13 @@ export default function ConfigureTab() {
         case 'map':
             return (
                 <ErrorBoundary component="CdcMap">
-                    <CdcMap isEditor={true} config={config} hostname={hostname} setConfig={setConfig} />
+                    <CdcMap isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} />
                 </ErrorBoundary>
             )
         case 'chart':
             return (
                 <ErrorBoundary component="CdcChart">
-                    <CdcChart isEditor={true} config={config} hostname={hostname} setConfig={setConfig} />
+                    <CdcChart isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} />
                 </ErrorBoundary>
             )
         default:

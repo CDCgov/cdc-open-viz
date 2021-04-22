@@ -713,7 +713,7 @@ const EditorPanel = memo((props) => {
     zIndex:"999"
   }
 
-  const convertStateToConfigFile = () => {
+  const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(state))
 
     // Strip ref
@@ -755,7 +755,11 @@ const EditorPanel = memo((props) => {
 
     strippedState.general = strippedGeneral
 
-    return JSON.stringify( strippedState )
+    if(type === "JSON") {
+      return JSON.stringify( strippedState )
+    }
+
+    return strippedState
   }
 
   useEffect(() => setLoadedDefault(state.defaultData), [state.defaultData])
@@ -864,7 +868,7 @@ const EditorPanel = memo((props) => {
   }
 
   useEffect(() => {
-    const parsedData = convertStateToConfigFile()
+    const parsedData = convertStateToConfig()
 
     const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
 
@@ -877,8 +881,8 @@ const EditorPanel = memo((props) => {
 
     // Pass up to Editor if needed
     if(setParentConfig) {
-      console.log('setting parent config')
-      setParentConfig(parsedData)
+      const newConfig = convertStateToConfig("object")
+      setParentConfig(newConfig)
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

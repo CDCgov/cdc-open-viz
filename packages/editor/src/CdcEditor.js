@@ -13,6 +13,7 @@ import './scss/main.scss';
 
 export default function CdcEditor({ config: configObj = {newViz: true}, hostname }) {
   const [config, setConfig] = useState(configObj)
+  const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
 
   let startingTab = config.data ? 2 : 0;
@@ -48,7 +49,9 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     maxFileSize,
     hostname,
     globalActive,
-    setGlobalActive
+    setGlobalActive,
+    tempConfig,
+    setTempConfig
   }
 
   return (

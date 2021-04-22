@@ -14,10 +14,21 @@ import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
-import validMapData from '../../sampledata/valid-data-map.csv';
+import validMapData from '../../example/valid-data-map.csv';
+import validChartData from '../../example/valid-chart-data.json';
 
 export default function DataImport() {
-  const {config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive} = useContext(GlobalState);
+  const {
+    config,
+    setConfig,
+    errors,
+    setErrors,
+    errorMessages,
+    maxFileSize,
+    setGlobalActive,
+    tempConfig,
+    setTempConfig
+  } = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -29,6 +40,13 @@ export default function DataImport() {
     '.csv': 'text/csv',
     '.json': 'application/json'
   };
+
+  useEffect(() => {
+    if(tempConfig !== null) {
+        setConfig(tempConfig)
+        setTempConfig(null)
+    }
+  })
 
   useEffect(() => {
     if(true === keepURL) {
@@ -231,6 +249,7 @@ export default function DataImport() {
         <span className="heading">Load Sample Data:</span>
         <ul className="sample-data-list">
           <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
+          <li onClick={() => setConfig({...config, data: validChartData})}>Chart Sample Data</li>
         </ul>
         <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
           <div>
