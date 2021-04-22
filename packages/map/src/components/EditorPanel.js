@@ -96,7 +96,8 @@ const EditorPanel = memo((props) => {
     setState,
     generateValuesForFilter,
     processData,
-    processLegend
+    processLegend,
+    setParentConfig
   } = props
 
   const { general, color, columns, legend, data, filters, dataTable, tooltips, processedData, processedLegend, loading } = state
@@ -722,6 +723,8 @@ const EditorPanel = memo((props) => {
     delete strippedState.processedData
     delete strippedState.processedLegend
 
+    delete strippedState.newViz
+
     // Remove the legend
     let strippedLegend = JSON.parse(JSON.stringify(state.legend))
 
@@ -871,6 +874,12 @@ const EditorPanel = memo((props) => {
     const event = new CustomEvent('updateMapConfig', { detail: parsedData})
 
     window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if(setParentConfig) {
+      console.log('setting parent config')
+      setParentConfig(parsedData)
+    }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
