@@ -4,7 +4,7 @@
     "dataUrl":  "/examples/covid-example-data.json",
     "visualizationType": "Bar",
     "visualizationSubType": "horizontal",
-    "seriesKeys": ["Age-adjusted rate"],
+    "series": [{"dataKey": "Age-adjusted rate"}],
     "barThickness": 0.3,
     "height": 300,
     "dataFormat": {
@@ -17,7 +17,6 @@
         "right": 10
     },
     "yAxis": {
-        "dataKey": "Age-adjusted rate",
         "gridLines": false,
         "numTicks": 3
     },
