@@ -19,7 +19,7 @@ export default function LinearChart() {
   const { data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
-  if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+  if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
 
