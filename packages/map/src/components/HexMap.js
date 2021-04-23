@@ -100,42 +100,41 @@ const HexMap = (props) => {
 
         territoryStyles = {
           backgroundColor: legendColors[0],
-          borderRight: `1px solid ${geoBorderColor}!important`,
-          borderLeft: `1px solid ${geoBorderColor} !important`,
+          border: `1px solid ${geoBorderColor}!important`,
           color: setTextContrast(legendColors[0]),
           cursor: needsPointer ? 'pointer' : 'default',
 
           // psuedo elements used to make the tops and bottoms 
           // of the hexagons are actually borders
-          '&:before': {
-            // the shape is a border so needs the background color
-            borderBottomColor: `${legendColors[0]} !important`,
-            // the border is a boxshadow since we can't apply a border to a border
-            boxShadow: `1px -1px 2px ${geoBorderColor}`, 
-          },
-          '&:after': {
-            borderTopColor: `${legendColors[0]} !important`,
-            boxShadow: `-1px 1px 2px ${geoBorderColor}`,
-          },
+          // '&:before': {
+          //   // the shape is a border so needs the background color
+          //   borderBottomColor: `${legendColors[0]} !important`,
+          //   // the border is a boxshadow since we can't apply a border to a border
+          //   boxShadow: `1px -1px 2px ${geoBorderColor}`, 
+          // },
+          // '&:after': {
+          //   borderTopColor: `${legendColors[0]} !important`,
+          //   boxShadow: `-1px 1px 2px ${geoBorderColor}`,
+          // },
           '&:hover': {
             backgroundColor: legendColors[1],
-            '&:before': {
-              borderBottomColor: `${legendColors[1]} !important`,
-            },
-            '&:after': {
-              borderTopColor: `${legendColors[1]} !important`,
-            }
+            // '&:before': {
+            //   borderBottomColor: `${legendColors[1]} !important`,
+            // },
+            // '&:after': {
+            //   borderTopColor: `${legendColors[1]} !important`,
+            // }
           },
           '&:active': {
             backgroundColor: legendColors[2],
             '&:hover': {
               backgroundColor: legendColors[2],
-              '&:before': {
-                borderBottomColor: `${legendColors[2]} !important`,
-              },
-              '&:after': {
-                borderTopColor: `${legendColors[2]} !important`,
-              }
+              // '&:before': {
+              //   borderBottomColor: `${legendColors[2]} !important`,
+              // },
+              // '&:after': {
+              //   borderTopColor: `${legendColors[2]} !important`,
+              // }
             },
           }
         };
