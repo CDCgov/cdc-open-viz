@@ -19,7 +19,7 @@ export default function LinearChart() {
   const { data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
-  if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+  if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
 
@@ -187,7 +187,7 @@ export default function LinearChart() {
                         <Text
                           x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                           y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          verticalAnchor="start"
+                          verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                           textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                         >{tick.formattedValue}</Text>
                       </Group>
