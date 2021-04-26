@@ -1170,7 +1170,7 @@ class CdcMap extends Component {
     }
 
     getViewport(size) {
-        let result = this.state.viewport
+        let result = 'lg'
         let viewports = Object.keys( this.viewports )
 
         for(let viewport of viewports) {

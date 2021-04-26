@@ -160,7 +160,6 @@ export default function CdcChart(
     let viewportList = Object.keys( viewports )
 
     for(let viewport of viewportList) {
-        console.log(size)
         if(size <= viewports[viewport]) {
             result = viewport
         }
