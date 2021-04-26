@@ -97,46 +97,17 @@ const HexMap = (props) => {
           
           needsPointer = true;
         }
-
         territoryStyles = {
           backgroundColor: legendColors[0],
-          borderRight: `1px solid ${geoBorderColor}!important`,
-          borderLeft: `1px solid ${geoBorderColor} !important`,
+          fill: legendColors[0],
+          stroke: `${geoBorderColor} !important`,
           color: setTextContrast(legendColors[0]),
           cursor: needsPointer ? 'pointer' : 'default',
-
-          // psuedo elements used to make the tops and bottoms 
-          // of the hexagons are actually borders
-          '&:before': {
-            // the shape is a border so needs the background color
-            borderBottomColor: `${legendColors[0]} !important`,
-            // the border is a boxshadow since we can't apply a border to a border
-            boxShadow: `1px -1px 2px ${geoBorderColor}`, 
-          },
-          '&:after': {
-            borderTopColor: `${legendColors[0]} !important`,
-            boxShadow: `-1px 1px 2px ${geoBorderColor}`,
-          },
           '&:hover': {
-            backgroundColor: legendColors[1],
-            '&:before': {
-              borderBottomColor: `${legendColors[1]} !important`,
-            },
-            '&:after': {
-              borderTopColor: `${legendColors[1]} !important`,
-            }
+            fill: legendColors[1],
           },
           '&:active': {
-            backgroundColor: legendColors[2],
-            '&:hover': {
-              backgroundColor: legendColors[2],
-              '&:before': {
-                borderBottomColor: `${legendColors[2]} !important`,
-              },
-              '&:after': {
-                borderTopColor: `${legendColors[2]} !important`,
-              }
-            },
+            fill: legendColors[2],
           }
         };
       }
@@ -152,6 +123,7 @@ const HexMap = (props) => {
         territoryData={territoryData}
         label={supportedTerritories[territory][1]}
         fullName={territory}
+        mapType='hex'
       />
     ));
   });
@@ -318,7 +290,7 @@ const HexMap = (props) => {
      </svg>
      {territories.length > 0
           && (
-            <section className="territories">
+            <section className="territories hex-territories">
               <ul>
                 <li className="label">{state.general.territoriesLabel}</li>
                 {territories}

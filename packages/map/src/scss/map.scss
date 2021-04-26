@@ -157,66 +157,14 @@ header + .map-container.full-border {
   }
 }
 
-// hex maps
 .hex-territories {
-  padding: 1em 0 0 1em;
-  margin-bottom: 2em;
-  ul {
-    transform: scale(.6);
-    transform-origin: 0 50%;
-    display: -ms-grid;
-    display: grid;
-    -ms-grid-columns: 7em 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-columns: 7em repeat(8, minmax(45px,50px));
-
-    li {
-      position: relative;
-      display: inline-block;
-      font-size: .9em;
-      transition: .3s all;
-      
-      &.label {
-        max-width: 30%;
-        display: flex;
-        align-items: center;
-        text-align: left;
-        font-size: 1.5em;
-        margin: 0 14px 0 0;
-      }
-      &:not(:first-child) {
-        position: relative;
-        text-align: center;
-        width: 40px; 
-        height: 23.09px;
-        display: flex;
-        align-items: center;
-        justify-content: center; 
-
-        &:before,
-        &:after {
-          content: "";
-          position: absolute;
-          z-index: -1;
-          width: 28.28px;
-          height: 28.28px;
-          transform: scaleY(0.5774) rotate(-45deg);
-          background-color: inherit;
-          left: 4.4px;
-        }
-        &:before {
-          top: -14.1421px;
-        }
-        &:after {
-          bottom: -14.1421px;
-        }
-      }
-      &.darkGray {
-        border: rgba(0,0,0,.2) 1px solid !important;
-      }
-      a {
-        text-decoration: none;
-        color: inherit;
-        display: block;
+  li {
+    min-width: 25px !important;
+    svg {
+      text {
+        pointer-events: none;
+        font-size: 4.5em;
+        font-weight: 400;
       }
     }
   }
@@ -267,30 +215,6 @@ header + .map-container.full-border {
     left: 1em;
     transform: none;
   }
-  .hex-territories ul {
-    transform: none;
-    transform-origin: none;
-    -ms-grid-columns: 5em 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-columns: 5em repeat(8, minmax(30px, 50px));
-
-    li {
-      font-size: .9em;
-
-      &:not(:first-child) {
-        margin: 2px 3px 0;
-    
-        &.label {
-          grid-row: inherit;
-        }
-        &:before {
-          box-shadow: -.75px .75px 1px inherit;
-        }
-        &:after {
-          box-shadow: .75px -.75px 1px inherit;
-        }
-      }
-    }
-  }
   .territories {
     font-size: 1em;
     padding-top: 3em;
@@ -301,6 +225,13 @@ header + .map-container.full-border {
         &:not(:first-child) {
           padding: .3em;
         }
+      }
+    }
+  }
+  .hex-territories {
+    svg {
+      text {
+        font-size: 3.25em;
       }
     }
   }
