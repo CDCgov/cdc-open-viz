@@ -983,10 +983,10 @@ const EditorPanel = memo((props) => {
                   {'us' === state.general.geoType &&
                     <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
                   }
-                  <label className="checkbox mt-4">
+                  {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
-                  </label>
+                  </label> */}
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem> {/* Columns */}
