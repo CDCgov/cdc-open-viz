@@ -161,7 +161,14 @@ const Regions = memo(({config, updateConfig}) => {
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
 const EditorPanel = memo(() => {
-  const { config, updateConfig, loading, colorPalettes, data, setDimensions, dimensions } = useContext(Context);
+  const {
+    config,
+    updateConfig,
+    loading,
+    colorPalettes,
+    data,
+    setParentConfig
+  } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
@@ -304,16 +311,20 @@ const EditorPanel = memo(() => {
     );
   }
 
-  const convertStateToConfigFile = () => {
+  const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     delete strippedState.newViz
     delete strippedState.runtime
 
-    return JSON.stringify( strippedState )
+    if(type === "JSON") {
+      return JSON.stringify( strippedState )
+    }
+
+    return strippedState
   }
 
   useEffect(() => {
-    const parsedData = convertStateToConfigFile()
+    const parsedData = convertStateToConfig()
 
     const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
 
@@ -323,6 +334,12 @@ const EditorPanel = memo(() => {
     const event = new CustomEvent('updateMapConfig', { detail: parsedData})
 
     window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if(setParentConfig) {
+      const newConfig = convertStateToConfig("object")
+      setParentConfig(newConfig)
+    }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
