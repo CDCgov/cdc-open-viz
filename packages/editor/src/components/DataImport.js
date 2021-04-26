@@ -14,14 +14,27 @@ import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
 
-import validMapData from '../../sampledata/valid-data-map.csv';
+import validMapData from '../../example/valid-data-map.csv';
+import validChartData from '../../example/valid-chart-data.json';
 
 export default function DataImport() {
-  const {data, setData, errors, setErrors, errorMessages, maxFileSize, setDataURL, keepURL, setKeepURL, setGlobalActive} = useContext(GlobalState);
+  const {
+    config,
+    setConfig,
+    errors,
+    setErrors,
+    errorMessages,
+    maxFileSize,
+    setGlobalActive,
+    tempConfig,
+    setTempConfig
+  } = useContext(GlobalState);
 
   const [externalURL, setExternalURL] = useState('')
 
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200);
+
+  const [keepURL, setKeepURL] = useState(config.dataUrl || false)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -29,8 +42,15 @@ export default function DataImport() {
   };
 
   useEffect(() => {
+    if(tempConfig !== null) {
+        setConfig(tempConfig)
+        setTempConfig(null)
+    }
+  })
+
+  useEffect(() => {
     if(true === keepURL) {
-      setDataURL(debouncedExternalURL)
+      setConfig({...config, dataUrl: debouncedExternalURL})
     }
   }, [debouncedExternalURL, keepURL])
 
@@ -183,7 +203,7 @@ export default function DataImport() {
       // Validate parsed data and set if no issues.
       try {
         text = validateData(text);
-        setData(text);
+        setConfig({...config, data:text});
       } catch (err) {
           setErrors(err);
       }
@@ -229,6 +249,7 @@ export default function DataImport() {
         <span className="heading">Load Sample Data:</span>
         <ul className="sample-data-list">
           <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
+          <li onClick={() => setConfig({...config, data: validChartData})}>Chart Sample Data</li>
         </ul>
         <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
           <div>
@@ -236,14 +257,14 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-        {data && (
+        {config.data && (
           <div>
             <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
           </div>
         )}
       </div>
       <div className="right-col">
-        <PreviewDataTable data={data} />
+        <PreviewDataTable data={config.data} />
       </div>
     </>
   );
