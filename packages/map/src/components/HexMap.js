@@ -318,7 +318,7 @@ const HexMap = (props) => {
      </svg>
      {territories.length > 0
           && (
-            <section className="hex-territories">
+            <section className="territories">
               <ul>
                 <li className="label">{state.general.territoriesLabel}</li>
                 {territories}

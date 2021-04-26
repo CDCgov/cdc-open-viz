@@ -261,7 +261,12 @@ const DataTable = (props) => {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
+                <th tabIndex="0" 
+                  title={column.Header}
+                  {...column.getHeaderProps(column.getSortByToggleProps())} 
+                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                  onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                >
                   {column.render('Header')}
                   <div {...column.getResizerProps()} className="resizer" />
                 </th>
