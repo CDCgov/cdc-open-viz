@@ -57,13 +57,13 @@ export default function ChooseTab() {
 
     return (
         <div className="choose-vis">
-            <h2>Charts</h2>
+            <h2 style={{fontSize: "1.4rem"}}>Charts</h2>
             <ul className="grid">
                 <li><IconButton label="Bar" type="chart" subType="Bar" icon={ <BarIcon /> } /></li>
                 <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
                 <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
             </ul>
-            <h2 className="mt-4">Maps</h2>
+            <h2 className="mt-4" style={{fontSize: "1.4rem"}}>Maps</h2>
             <ul className="grid">
                 <li><IconButton label="United States" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
