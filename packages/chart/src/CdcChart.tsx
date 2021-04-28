@@ -374,7 +374,7 @@ export default function CdcChart(
 
   // Prevent render if loading
   let body = (<Loading />)
-  if(undefined === config.runtime) { debugger }
+
   if(false === loading) {
     body = (
       <>
