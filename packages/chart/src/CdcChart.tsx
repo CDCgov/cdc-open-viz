@@ -74,10 +74,6 @@ export default function CdcChart(
 
     let newConfig = {...defaults, ...response}
 
-    if(newConfig.newViz) {
-      setLoading(false)
-    }
-
     updateConfig(newConfig, data);
   }
 
@@ -93,7 +89,7 @@ export default function CdcChart(
     newConfig.runtime = {};
     newConfig.runtime.seriesLabels = {};
     newConfig.runtime.seriesLabelsAll = [];
-    newConfig.runtime.originalXAxis = newConfig.xAxis;   
+    newConfig.runtime.originalXAxis = newConfig.xAxis;
 
     if(newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
@@ -378,7 +374,7 @@ export default function CdcChart(
 
   // Prevent render if loading
   let body = (<Loading />)
-
+  if(undefined === config.runtime) { debugger }
   if(false === loading) {
     body = (
       <>
