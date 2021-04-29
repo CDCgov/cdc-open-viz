@@ -1,6 +1,6 @@
 # @cdc/map
 
-![npm](https://img.shields.io/npm/v/@cdc/map)
+[![npm](https://img.shields.io/npm/v/@cdc/map)](https://www.npmjs.com/package/@cdc/map)
 
 React component for visualizing tabular data on a map of the United States or the world. Includes support for filtering, toggling, numeric and categorical mapping as well as many other configuration options like color schemes. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 

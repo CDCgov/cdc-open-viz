@@ -1,6 +1,6 @@
 # @cdc/chart
 
-![npm](https://img.shields.io/npm/v/@cdc/chart)
+[![npm](https://img.shields.io/npm/v/@cdc/chart)](https://www.npmjs.com/package/@cdc/chart)
 
 
 `<CdcChart />` is a React component produced by the CDC for visualizing your data in a chart. Some supported types are Line, bar, pie, combination and horizontal bar chart. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
