@@ -1,6 +1,6 @@
 # @cdc/editor
 
-![npm](https://img.shields.io/npm/v/@cdc/editor)
+[![npm](https://img.shields.io/npm/v/@cdc/editor)](https://www.npmjs.com/package/@cdc/editor)
 
 React component for creating configurations for the [map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) and [chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) packages. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 
