@@ -1,6 +1,8 @@
 # @cdc/map
 
-React component for visualizing tabular data on a map of the United States or the world. Includes support for filtering, toggling, numeric and categorical mapping as well as many other configuration options like color schemes.
+![npm](https://img.shields.io/npm/v/@cdc/map)
+
+React component for visualizing tabular data on a map of the United States or the world. Includes support for filtering, toggling, numeric and categorical mapping as well as many other configuration options like color schemes. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 
 **Examples**
 * [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
@@ -8,10 +10,10 @@ React component for visualizing tabular data on a map of the United States or th
 * [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
 * [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
 
-## Installation
-`npm install @cdc/map`
+### Installation and Usage
 
-## Usage
+1. Install the package in your React project `npm install @cdc/map`
+2. Import the component and begin using in your code.
 
 ```JSX
 import CdcMap from '@cdc/map'
@@ -30,7 +32,7 @@ export default App;
 
 Note: If no properties are passed, the map will load a default configuration file.
 
-## Props
+### Properties
 
 | Property          | Type     | Description                                                                                                                                                                                                                                                                             |
 |-------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
