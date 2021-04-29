@@ -93,6 +93,7 @@ export default function CdcChart(
 
     if(newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
+      newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys;
     } else {
       newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
         newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey;

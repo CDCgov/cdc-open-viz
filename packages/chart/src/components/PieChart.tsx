@@ -73,7 +73,7 @@ export default function PieChart() {
                     startAngle,
                     endAngle,
                   }))}
-                  fill={colorScale((arc.data as any).name)}
+                  fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
                   data-tip={tooltip}
                   data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 />
