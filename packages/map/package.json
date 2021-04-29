@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
-    "prepublishOnly": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js"
+    "prepublishOnly": "lerna run --scope @cdc/map build"
   },
   "repository": {
     "type": "git",
