@@ -1170,7 +1170,7 @@ class CdcMap extends Component {
     }
 
     getViewport(size) {
-        let result = this.state.viewport
+        let result = 'lg'
         let viewports = Object.keys( this.viewports )
 
         for(let viewport of viewports) {
@@ -1338,7 +1338,7 @@ class CdcMap extends Component {
         return (
             <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className} ${this.state.viewport}` : `cdc-open-viz-module cdc-map-outer-container ${this.state.viewport}` } ref={this.outerContainerRef}>
                 {true === this.state.loading && <Loading />}
-                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} />}
+                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} setParentConfig={this.props.setConfig} />}
                 <section className={`cdc-map-inner-container ${this.state.viewport}`} aria-label={'Map: ' + title}>
                     {'hover' === this.state.tooltips.appearanceType &&
                         <ReactTooltip

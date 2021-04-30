@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart -c ../../webpack.config.js",
-    "prepublishOnly": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart -c ../../webpack.config.js"
+    "prepublishOnly": "lerna run --scope @cdc/chart build"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cdc/core": "^1.0.1-alpha.0",
+    "@cdc/core": "^1.0.0",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",

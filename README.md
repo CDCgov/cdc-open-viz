@@ -7,6 +7,8 @@ This project is still under heavy initial development with the roadmap extending
 | Package | Description |
 | --- | ----------- |
 | [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | React component for visualizing tabular data on a map of the United States or the world. |
+| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) | React component for visualizing data with a chart. |
+| [@cdc/editor](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor) | React component for importing data and creating a map or chart configuration. |
 
 ## Setup
 
