@@ -58,14 +58,14 @@ export default function PieChart() {
             key: string;
           }) => {
             let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
-            let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${(arc.data as any).name}` : (arc.data as any).name
+            let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${arc.data[config.runtime.xAxis.dataKey]}` : arc.data[config.runtime.xAxis.dataKey]
 
             const tooltip = `<div>
             ${yAxisTooltip}<br />
             ${xAxisTooltip}<br />`
 
             return (
-              <Group key={key} style={{ opacity: (config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf((arc.data as any).name) === -1) ? 0.5 : 1 }}>
+              <Group key={key} style={{ opacity: (config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1) ? 0.5 : 1 }}>
                 <animated.path
                   // compute interpolated path d attribute from intermediate angle values
                   d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) => path({
