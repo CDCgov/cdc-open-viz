@@ -1,0 +1,271 @@
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton,
+} from 'react-accessible-accordion';
+import { useDebounce } from 'use-debounce';
+
+import Context from '../context';
+import WarningImage from '../images/warning.svg';
+
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Waiting from '@cdc/core/components/Waiting';
+
+// IE11 Custom Event polyfill
+(function () {
+
+  if ( typeof window.CustomEvent === "function" ) return false;
+
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: null };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+   }
+
+  window.CustomEvent = CustomEvent;
+})();
+
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
+  const [ value, setValue ] = useState(stateValue);
+
+  const [ debouncedValue ] = useDebounce(value, 500);
+
+  useEffect(() => {
+    if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
+      updateField(section, subsection, fieldName, debouncedValue, i)
+    }
+  }, [debouncedValue])
+
+  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
+
+  const onChange = (e) => {
+    if('number' !== type || min === null){
+      setValue(e.target.value);
+    } else {
+      if(!e.target.value || min <= parseFloat(e.target.value)){
+        setValue(e.target.value);
+      } else {
+        setValue(min.toString());
+      }
+    }
+  };
+
+  let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value} />
+
+  if('textarea' === type) {
+    formElement = (
+      <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
+    )
+  }
+  
+  if('number' === type) {
+    formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
+  }
+
+  return (
+    <label>
+      <span className="edit-label column-heading">{label}</span>
+      {formElement}
+    </label>
+  )
+})
+
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+  <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+    <span className="edit-label">{label}</span>
+  </label>
+))
+
+const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
+  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
+
+  if(initialValue) {
+    optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
+  }
+
+  return (
+    <label>
+      <span className="edit-label">{label}</span>
+      <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
+        {optionsJsx}
+      </select>
+    </label>
+  )
+})
+
+const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
+
+const EditorPanel = memo(() => {
+  const {
+    config,
+    updateConfig,
+    loading,
+    data,
+    setParentConfig
+  } = useContext(Context);
+
+  const enforceRestrictions = (updatedConfig) => {
+    // TODO
+  };
+
+  const updateField = (section, subsection, fieldName, newValue) => {
+    // Top level
+    if( null === section && null === subsection) {
+      let updatedConfig = {...config, [fieldName]: newValue};
+
+      enforceRestrictions(updatedConfig);
+
+      updateConfig(updatedConfig);
+      return
+    }
+
+    const isArray = Array.isArray(config[section]);
+
+    let sectionValue = isArray ? [...config[section], newValue] : {...config[section], [fieldName]: newValue};
+
+    if(null !== subsection) {
+      if(isArray) {
+        sectionValue = [...config[section]]
+        sectionValue[subsection] = {...sectionValue[subsection], [fieldName]: newValue}
+      } else if(typeof newValue === "string") {
+        sectionValue[subsection] = newValue
+      } else {
+        sectionValue = {...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue}}
+      }
+    }
+
+    let updatedConfig = {...config, [section]: sectionValue};
+
+    enforceRestrictions(updatedConfig);
+
+    updateConfig(updatedConfig)
+  }
+
+  const missingRequiredSections = () => {
+    //TODO 
+
+    return false;
+  };
+
+  const [ displayPanel, setDisplayPanel ] = useState(true);
+
+  // Used to pipe a JSON version of the config you are creating out
+  const [ configData, setConfigData ] = useState({})
+
+  if(loading) {
+    return null
+  }
+
+  const getColumns = (filter = true) => {
+    let columns = {}
+
+    data.map(row => {
+      Object.keys(row).forEach(columnName => columns[columnName] = true)
+    })
+
+    if(filter) {
+      Object.keys(columns).forEach(key => {
+        if((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+          delete columns[key]
+        }
+      })
+    }
+
+    return Object.keys(columns)
+  }
+
+  const Error = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    );
+
+  }
+
+  const Confirm = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Finish Configuring</h3>
+          <p>Set all required options to the left and confirm below to display a preview of the dashboard.</p>
+          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
+        </section>
+      </section>
+    );
+  }
+
+  const convertStateToConfig = (type = "JSON") => {
+    let strippedState = JSON.parse(JSON.stringify(config))
+    if(false === missingRequiredSections()) {
+      delete strippedState.newViz
+    }
+    delete strippedState.runtime
+
+    if(type === "JSON") {
+      return JSON.stringify( strippedState )
+    }
+
+    return strippedState
+  }
+
+  useEffect(() => {
+    const parsedData = convertStateToConfig()
+
+    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
+
+    setConfigData(formattedData)
+
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
+
+    window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if(setParentConfig) {
+      const newConfig = convertStateToConfig("object")
+      setParentConfig(newConfig)
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config])
+
+  return (
+    <ErrorBoundary component="EditorPanel">
+      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
+      {config.newViz && <Confirm />}
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
+      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+        <h2>Configure Dashboard</h2>
+        <section className="form-container">
+          <form>
+            <Accordion allowZeroExpanded={true}>
+              <AccordionItem> {/* General */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    General
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <TextField value={config.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
+                </AccordionItemPanel>
+              </AccordionItem>
+           </Accordion>
+          </form>
+        </section>
+      </section>
+    </ErrorBoundary>
+  )
+})
+
+export default EditorPanel;
