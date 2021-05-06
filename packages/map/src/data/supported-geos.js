@@ -50,7 +50,6 @@ export const supportedStates = {
   'US-WV': ['West Virginia', 'WV'],
   'US-WI': ['Wisconsin', 'WI'],
   'US-WY': ['Wyoming', 'WY'],
-  'US-DC': ['District of Columbia'] // this is used for treating DC as a state for hex maps
 };
 
 export const supportedCountries = {
