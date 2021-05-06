@@ -171,7 +171,7 @@ const HexMap = (props) => {
         legendColors = applyLegendToValue(geoData);
       }
 
-      const geoDisplayName = displayGeoName(geoKey);
+      const geoDisplayName = (geoKey === 'US-DC') ? displayGeoName(geoName) : displayGeoName(geoKey);
 
       // Get path for geo
       let geoHex = stateLookup( geoName, mercator.features)
