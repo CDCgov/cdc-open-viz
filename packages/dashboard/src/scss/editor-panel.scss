@@ -503,7 +503,47 @@
       opacity: 0.5;
       cursor: auto;
     }
+
+    .current-viz-list {
+      margin: 0.5em 0;
+      padding-left: 1.25em;
+
+      li button {
+        float: right;
+        margin: 0 0.5em;
+        border: 1px solid gray;
+      }
+    }
   
+    .viz-icon {
+      background-color: #FFF;
+      color: #565656;
+      border: #797979 1px solid;
+      padding: 10px;
+      margin: 1em;
+
+      span {
+        text-transform: none;
+        font-size: 1em;
+        margin-top: 1em;
+      }
+
+      &:hover {
+        background: #F2F2F2;
+        transition: .2s all;  
+      }
+
+      svg {
+          display: block;
+          margin: .5em auto;
+          box-sizing: border-box;
+          width: 100px;
+          height: 75px;
+          path {
+            fill: currentColor
+          }
+      }
+    }
 }  
 .editor-toggle {
   background: #F2F2F2;

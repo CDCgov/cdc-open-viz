@@ -97,7 +97,9 @@ const EditorPanel = memo((props) => {
     generateValuesForFilter,
     processData,
     processLegend,
-    setParentConfig
+    isDashboard,
+    setParentConfig,
+    setEditing
   } = props
 
   const { general, color, columns, legend, data, filters, dataTable, tooltips, processedData, processedLegend, loading } = state
@@ -839,6 +841,14 @@ const EditorPanel = memo((props) => {
     setState(() => updatedState)
   }
 
+  const onBackClick = () => {
+    if(isDashboard){
+      setEditing('');
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
+  }
+
   const filtersJSX = filters.map( (filter, index) => {
     return (
         <fieldset className="edit-block">
@@ -938,8 +948,8 @@ const EditorPanel = memo((props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} data-html2canvas-ignore></button>
+      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard && ' dashboard'}`} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>

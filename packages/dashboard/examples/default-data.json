@@ -1,0 +1,42 @@
+[
+	{
+		"Insured Rate": "43",
+		"state": "Alabama"
+	},
+	{
+		"Insured Rate": "0",
+		"state": "Alaska"
+	},
+	{
+		"Insured Rate": "72.7",
+		"state": "Arizona"
+	},
+	{
+		"Insured Rate": "78.7",
+		"state": "Arkansas"
+	},
+	{
+		"Insured Rate": "37.2",
+		"state": "California"
+	},
+	{
+		"Insured Rate": "50.6",
+		"state": "Colorado"
+	},
+	{
+		"Insured Rate": "83.2",
+		"state": "Connecticut"
+	},
+	{
+		"Insured Rate": "90",
+		"state": "Delaware"
+	},
+	{
+		"Insured Rate": "77",
+		"state": "District of Columbia"
+	},
+	{
+		"Insured Rate": "83",
+		"state": "Florida"
+	}
+]

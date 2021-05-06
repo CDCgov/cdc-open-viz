@@ -18,7 +18,7 @@ import defaults from './data/initial-state';
 import './scss/main.scss';
 
 export default function CdcDashboard(
-  { configUrl = '', config: configObj = undefined, isEditor = false } 
+  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined } 
 ) {
 
   const [config, setConfig] = useState({});
@@ -26,6 +26,8 @@ export default function CdcDashboard(
   const [data, setData] = useState([]);
 
   const [loading, setLoading] = useState(true);
+
+  const [editing, setEditing] = useState('');
   
   const { title, description } = config.dashboard || config;
 
@@ -87,9 +89,9 @@ export default function CdcDashboard(
 
             switch(visualizationConfig.type){
               case 'chart':
-                return <CdcChart key={visualizationKey} config={visualizationConfig} />;
+                return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} isDashboard={true} setEditing={setEditing} />;
               case 'map': 
-                return <CdcMap key={visualizationKey} config={visualizationConfig} />;
+                return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} isDashboard={true} setEditing={setEditing} />;
                 default: 
               return <></>;
             }
@@ -103,7 +105,7 @@ export default function CdcDashboard(
   }
 
   return (
-    <Context.Provider value={{ config, data, loading, updateConfig }}>
+    <Context.Provider value={{ config, data, loading, updateConfig, setParentConfig, setEditing }}>
       <div className="cdc-open-viz-module type-dashboard">
         {body}
       </div>

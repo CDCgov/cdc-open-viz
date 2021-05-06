@@ -10,10 +10,14 @@ import {
 import { useDebounce } from 'use-debounce';
 
 import Context from '../context';
-import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import Waiting from '@cdc/core/components/Waiting';
+
+import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
+import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
+import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
+import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
+import WorldIcon from '@cdc/core/assets/world-graphic.svg';
 
 // IE11 Custom Event polyfill
 (function () {
@@ -107,7 +111,8 @@ const EditorPanel = memo(() => {
     updateConfig,
     loading,
     data,
-    setParentConfig
+    setParentConfig,
+    setEditing
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
@@ -204,6 +209,36 @@ const EditorPanel = memo(() => {
     );
   }
 
+  const addVisualization = (type, subType) => {
+    let newVisualizations = config.visualizations ? {...config.visualizations} : {}
+    
+    let newVisualizationConfig = {type};
+
+    if(type === 'chart'){
+      newVisualizationConfig.visualizationType = subType;
+    } else if(type === 'map'){
+      newVisualizationConfig.general = {};
+      newVisualizationConfig.general.geoType = subType;
+    }
+
+    newVisualizations[type + Date.now()] = newVisualizationConfig;
+      
+    updateConfig({...config, visualizations: newVisualizations})
+  }
+
+  const capitalize = (s) => {
+    if (typeof s !== 'string') return ''
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
+  const removeVisualization = (visualizationKey) => {
+    let newConfig = {...config};
+
+    delete newConfig.visualizations[visualizationKey];
+
+    updateConfig(newConfig);
+  }
+
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
@@ -256,8 +291,37 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
+                  <TextField value={config.dashboard.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem> {/* Visualizations */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Visualizations
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <h2>Current Visualizations</h2>
+                  <ol className="current-viz-list">
+                    {Object.keys(config.visualizations).map((visualizationKey) => (
+                      <li>
+                        {config.visualizations[visualizationKey].type === 'chart' && (config.visualizations[visualizationKey].visualizationType + ' Chart')} 
+                        {config.visualizations[visualizationKey].type === 'map' && (capitalize(config.visualizations[visualizationKey].general.geoType) + ' Map')} 
+                        <button type="button" onClick={() => {setEditing(visualizationKey)}}>Edit</button>
+                        <button type="button" onClick={() => {removeVisualization(visualizationKey)}}>Remove</button>
+                      </li>
+                    ))}
+                  </ol>
+
+                  <h2>Add Visualization</h2>
+                  <h3>Chart</h3>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Bar')}><BarIcon /><span>Bar</span></button>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Line')}><LineIcon /><span>Line</span></button>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Pie')}><PieIcon /><span>Pie</span></button>
+                  <h3>Map</h3>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'us')}><UsaIcon /><span>United States</span></button>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'world')}><WorldIcon /><span>World</span></button>
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>

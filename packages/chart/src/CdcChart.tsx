@@ -23,8 +23,8 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig} : 
-  { configUrl?: string, config?: any, isEditor?: boolean, setConfig? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} : 
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
@@ -399,7 +399,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes, setParentConfig }}>
+    <Context.Provider value={{ config, data, seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes, isDashboard, setParentConfig, setEditing }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
