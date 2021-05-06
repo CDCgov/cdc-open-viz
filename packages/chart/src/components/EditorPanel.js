@@ -167,7 +167,9 @@ const EditorPanel = memo(() => {
     loading,
     colorPalettes,
     data,
-    setParentConfig
+    isDashboard,
+    setParentConfig,
+    setEditing
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
@@ -287,6 +289,14 @@ const EditorPanel = memo(() => {
     return Object.keys(columns)
   }
 
+  const onBackClick = () => {
+    if(isDashboard){
+      setEditing('');
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
+  }
+
   const Error = () => {
     return (
       <section className="waiting">
@@ -350,8 +360,8 @@ const EditorPanel = memo(() => {
     <ErrorBoundary component="EditorPanel">
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
+      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard && ' dashboard'}`}>
         <h2>Configure Chart</h2>
         <section className="form-container">
           <form>
