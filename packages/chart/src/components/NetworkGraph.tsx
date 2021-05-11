@@ -30,18 +30,19 @@ export default function NetworkGraph() {
 
       if (!nodesProcessed.includes(value[config.nodeSourceColumn])) {
         let node = {
-          id: value[config.nodeSourceColumn]
+          id: value[config.nodeSourceColumn],
+          nodeLabel: config.nodeLabelColumn ? value[config.nodeLabelColumn] : value[config.nodeSourceColumn]
         };
         nodes.push(node);
         nodesProcessed.push(value[config.nodeSourceColumn])
       }
-      if (!nodesProcessed.includes(value[config.nodeTargetColumn])) {
-        let node = {
-          id: value[config.nodeTargetColumn]
-        };
-        nodes.push(node);
-        nodesProcessed.push(value[config.nodeTargetColumn])
-      }
+      // if (!nodesProcessed.includes(value[config.nodeTargetColumn])) {
+      //   let node = {
+      //     id: value[config.nodeTargetColumn]
+      //   };
+      //   nodes.push(node);
+      //   nodesProcessed.push(value[config.nodeTargetColumn])
+      // }
 
       links.push(
         {

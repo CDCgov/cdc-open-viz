@@ -384,6 +384,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <Select value={config.nodeSourceColumn || ""} fieldName="nodeSourceColumn" label="Source Node Column" updateField={updateField} initial="Select" options={getColumns()} />
                   <Select value={config.nodeTargetColumn || ""} fieldName="nodeTargetColumn" label="Target Node Column" updateField={updateField} initial="Select" options={getColumns()} />
+                  <Select value={config.nodeLabelColumn || ""} fieldName="nodeLabelColumn" label="Node Label Column" updateField={updateField} initial="Select" options={getColumns()} />
                 </AccordionItemPanel>
               </AccordionItem>}
               {!["Pie","Graph"].includes(config.visualizationType) && <AccordionItem>

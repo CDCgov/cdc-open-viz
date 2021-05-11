@@ -1,58 +1,37 @@
 [
     {
         "source": "Yellow",
-        "target": "Orange"
+        "target": "Orange",
+        "title": "Title 1"
     },
     {
-        "source": "Yellow",
-        "target": "Green"
-    },
-    {
-        "source": "Yellow",
-        "target": "White"
+        "source": "Orange",
+        "target": "White",
+        "title": "Title 1"
     },
     {
         "source": "White",
-        "target": "Green"
+        "target": "Green",
+        "title": "Title 1"
     },
     {
-        "source": "Orange",
-        "target": "White"
+        "source": "Green",
+        "target": "Purple",
+        "title": "Title 1"
     },
     {
         "source": "Purple",
-        "target": "Black"
+        "target": "Black",
+        "title": "Title 1"
     },
     {
         "source": "Black",
-        "target": "Green"
+        "target": "Teal",
+        "title": "Title 1"
     },
     {
-        "source": "Orange",
-        "target": "Black"
-    },
-    {
-        "source": "Purple",
-        "target": "Orange"
-    },
-    {
-        "source": "Purple",
-        "target": "Green"
-    },
-    {
-        "source": "Red",
-        "target": "Teal"
-    },
-    {
-        "source": "Red",
-        "target": "Black"
-    },
-    {
-        "source": "Black",
-        "target": "Teal"
-    },
-    {
-        "source": "Red",
-        "target": "Orange"
+        "source": "Teal",
+        "target": "Yellow",
+        "title": "Title 1"
     }
 ]
