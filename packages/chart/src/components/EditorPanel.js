@@ -14,6 +14,7 @@ import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
+import { CirclePicker } from 'react-color'
 
 // IE11 Custom Event polyfill
 (function () {
@@ -62,7 +63,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -263,9 +264,9 @@ const EditorPanel = memo(() => {
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
-    
+
     newSeries.push({dataKey: seriesKey, type: 'Bar'})
-      
+
     updateConfig({...config, series: newSeries})
   }
 
@@ -309,6 +310,10 @@ const EditorPanel = memo(() => {
         </section>
       </section>
     );
+  }
+
+  const colorChangeComplete = function(color, event, field) {
+    updateConfig({...config, [field]: color.hex})
   }
 
   const convertStateToConfig = (type = "JSON") => {
@@ -363,14 +368,25 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Graph']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
                   <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
-              {config.visualizationType !== "Pie" && <AccordionItem>
+              {"Graph" === config.visualizationType && <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Data {(!config.nodeSourceColumn || !config.nodeTargetColumn) && <WarningImage width="25" className="warning-icon" />}
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <Select value={config.nodeSourceColumn || ""} fieldName="nodeSourceColumn" label="Source Node Column" updateField={updateField} initial="Select" options={getColumns()} />
+                  <Select value={config.nodeTargetColumn || ""} fieldName="nodeTargetColumn" label="Target Node Column" updateField={updateField} initial="Select" options={getColumns()} />
+                </AccordionItemPanel>
+              </AccordionItem>}
+              {!["Pie","Graph"].includes(config.visualizationType) && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
@@ -386,9 +402,7 @@ const EditorPanel = memo(() => {
                           if(config.visualizationType === "Combo") {
                             let changeType = (i, value) => {
                                 let series = [...config.series];
-
                                 series[i].type = value;
-
                                 updateConfig({...config, series})
                             }
 
@@ -417,7 +431,7 @@ const EditorPanel = memo(() => {
                     )}
                 </AccordionItemPanel>
               </AccordionItem>}
-              <AccordionItem>
+              {"Graph"!==config.visualizationType && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -427,7 +441,7 @@ const EditorPanel = memo(() => {
                   {config.visualizationType === 'Pie' && <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} /> }
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
+                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                       <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
                       <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
@@ -441,8 +455,8 @@ const EditorPanel = memo(() => {
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
                 </AccordionItemPanel>
-              </AccordionItem>
-              <AccordionItem>
+              </AccordionItem>}
+              {"Graph"!==config.visualizationType && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -462,12 +476,12 @@ const EditorPanel = memo(() => {
                         </>
                       )}
                       <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} /> 
+                      <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                     </>
-                  )}                 
+                  )}
                 </AccordionItemPanel>
-              </AccordionItem>
-              {config.visualizationType !== 'Pie' && <AccordionItem>
+              </AccordionItem>}
+              {!["Pie","Graph"].includes(config.visualizationType) && <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Regions
@@ -507,6 +521,20 @@ const EditorPanel = memo(() => {
                       ))}
                     </ul>
                   </label>
+                  {"Graph"===config.visualizationType && <>
+                    <label className="header">
+                      <span className="edit-label">Node Color</span>
+                      <CirclePicker color={ config.nodeColor } size={290} circleSize={21} circleSpacing={3} fieldName="nodeColor" onChangeComplete={ (node, event) => { colorChangeComplete(node, event, "nodeColor"); }} />
+                    </label>
+                    <Select value={config.nodeType} fieldName="nodeType" label="Node Type" updateField={updateField} options={['circle','cross','diamond','square','star','triangle','wye']} />
+                    <TextField type="number" value={config.nodeSize} fieldName="nodeSize" label="Node Size (px)" updateField={updateField} />
+                    <label className="header">
+                      <span className="edit-label">Link/Line Color</span>
+                      <CirclePicker color={ config.nodeLinkColor } size={290} circleSize={21} circleSpacing={3} fieldName="linkColor" onChangeComplete={ (node, event) => { colorChangeComplete(node, event, "nodeLinkColor"); }} />
+                    </label>
+                    <TextField type="number" value={config.nodeLinkWidth} fieldName="nodeLinkWidth" label="Link/Line Width (px)" updateField={updateField} />
+                  </>}
+                  {"Graph"!==config.visualizationType && <>
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
@@ -561,14 +589,15 @@ const EditorPanel = memo(() => {
                     })}
                   </ul>
                   {config.visualizationType !== 'Pie' && (
-                    <> 
-                      {config.visualizationSubType !== 'horizontal' && 
+                    <>
+                      {config.visualizationSubType !== 'horizontal' &&
                         <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
                       }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                     </>
                   )}
                   {( config.visualizationType === "Bar" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
+                  </>}
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

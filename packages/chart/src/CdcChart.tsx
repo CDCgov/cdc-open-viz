@@ -16,6 +16,7 @@ import Waiting from '@cdc/core/components/Waiting';
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
 import DataTable from './components/DataTable';
+import NetworkGraph from './components/NetworkGraph';
 import Context from './context';
 import defaults from './data/initial-state';
 
@@ -23,14 +24,14 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig} : 
+  { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig} :
   { configUrl?: string, config?: any, isEditor?: boolean, setConfig? }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
 
   interface keyable {
-    [key: string]: any  
+    [key: string]: any
   }
 
   const [config, setConfig] = useState<keyable>({});
@@ -250,7 +251,7 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
-  
+
   const parseDate = (dateString: string) => {
     let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
     if(!date) {
@@ -277,7 +278,7 @@ export default function CdcChart(
       if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
-        num = cutoff;  
+        num = cutoff;
       }
     }
     if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
@@ -307,6 +308,7 @@ export default function CdcChart(
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
     'Pie' : <PieChart />,
+    'Graph' : <NetworkGraph />
   }
 
   // JSX for Legend

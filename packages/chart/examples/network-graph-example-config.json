@@ -1,0 +1,17 @@
+{
+    "title": "Sample Network Graph",
+    "theme": "theme-brown",
+    "dataUrl":  "/examples/network-graph-data.json",
+    "visualizationType": "Graph",
+    "visualizationSubType": "",
+    "series": [{"dataKey": "Age-adjusted rate"}],
+    "height": 300,
+    "legend": {
+        "hide": true
+    },
+    "table": {
+        "label": "Sample Network Data",
+        "expanded": true,
+        "download": true
+    }
+}
