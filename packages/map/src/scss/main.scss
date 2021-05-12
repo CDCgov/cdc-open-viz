@@ -59,7 +59,7 @@
     border: 0;
   }
 
-  h1.map-title {
+  div.map-title {
     margin: 0;
     color: #fff;
     font-size: 1.1em;
@@ -72,7 +72,7 @@
     }
   }
 
-  h1.map-title:not(:empty) {
+  div.map-title:not(:empty) {
     margin: 0 !important;
     padding: .6em .8em;
     border-bottom-width: 3px;
@@ -196,7 +196,7 @@
     border-top: $lightGray 1px solid;
     label {
       flex-grow: 1;
-      > h5 {
+      > div.select-heading {
         font-size: 1.1em;
         font-weight: 600;
         margin-bottom: .75em; 
