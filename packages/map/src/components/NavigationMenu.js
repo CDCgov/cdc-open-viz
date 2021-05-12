@@ -52,7 +52,7 @@ const NavigationMenu = ({
     <section className="navigation-menu">
       <form onSubmit={handleSubmit} type="get">
         <label htmlFor="dropdown">
-          <h5>{navSelect}</h5>
+          <div className="select-heading">{navSelect}</div>
           <select value={activeGeo} id="dropdown" onChange={(e) => setActiveGeo(e.target.value)}>
             {Object.keys(dropdownItems).map((key, i) => <option key={key} value={key}>{key}</option>)}
           </select>

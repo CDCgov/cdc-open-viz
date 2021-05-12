@@ -1350,9 +1350,9 @@ class CdcMap extends Component {
                         />
                     }
                     <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                        <h1 className={'map-title ' + headerColor}>
+                        <div role="heading" className={'map-title ' + headerColor}>
                             { parse(title) }
-                        </h1>
+                        </div>
                     </header>
 
                     <section className={mapContainerClasses.join(' ')} onClick={(e) => this.closeModal(e)}>
