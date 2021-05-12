@@ -382,7 +382,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
           {/* Visualization */}
           <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
             {chartComponents[visualizationType]}
