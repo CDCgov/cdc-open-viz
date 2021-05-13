@@ -39,21 +39,6 @@ const arrayMove = (array, from, to) => {
 	return array;
 };
 
-// IE11 Custom Event polyfill
-(function () {
-
-  if ( typeof window.CustomEvent === "function" ) return false;
-
-  function CustomEvent ( event, params ) {
-    params = params || { bubbles: false, cancelable: false, detail: null };
-    var evt = document.createEvent( 'CustomEvent' );
-    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-    return evt;
-   }
-
-  window.CustomEvent = CustomEvent;
-})();
-
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
@@ -873,11 +858,6 @@ const EditorPanel = memo((props) => {
     const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
 
     setConfigData(formattedData)
-
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
-
-    window.dispatchEvent(event)
 
     // Pass up to Editor if needed
     if(setParentConfig) {
