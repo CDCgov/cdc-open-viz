@@ -98,9 +98,7 @@ export default function LinearChart() {
         range: [yMax, 0]
       });
 
-      xScale = config.runtime.xAxis.type === 'date' ? 
-        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)], range: [0, xMax]}) : 
-        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
+      xScale = scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
 
       seriesScale = scalePoint<string>({
         domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
