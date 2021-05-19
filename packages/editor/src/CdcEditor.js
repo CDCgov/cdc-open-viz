@@ -16,9 +16,30 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
 
-  let startingTab = config.data ? 2 : 0;
+  let startingTab = 0;
+
+  if(config.data && config.type) {
+    startingTab = 2
+  }
 
   const [globalActive, setGlobalActive] = useState(startingTab);
+
+  // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
+  useEffect(() => {
+    if(null !== tempConfig) {
+      const parsedData = JSON.stringify(tempConfig)
+      // Emit the data in a regular JS event so it can be consumed by anything.
+      const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+      window.dispatchEvent(event)
+    }
+  }, [tempConfig])
+
+  useEffect(() => {
+    const parsedData = JSON.stringify(config)
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+    window.dispatchEvent(event)
+  }, [config])
 
   useEffect(() => {
     if(globalActive > -1) {
