@@ -72,26 +72,6 @@ export default function CdcChart(
       data = await dataString.json();
     }
 
-    // After data is grabbed, loop through and generate filter column values if there are any
-    if (response.filters) {
-      const filterList = [];
-
-      response.filters.forEach((filter) => {
-          filterList.push(filter.columnName);
-      });
-
-      filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, data);
-
-          response.filters[index].values = filterValues;
-
-          // Initial filter should be active
-          response.filters[index].active = filterValues[0];
-      });
-
-      setFilteredData(filterData(response.filters, data));
-    }
-
     setData(data);
 
     let newConfig = {...defaults, ...response}
@@ -106,6 +86,29 @@ export default function CdcChart(
         newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
     });
+
+    // After data is grabbed, loop through and generate filter column values if there are any
+    let currentData;
+    if (newConfig.filters) {
+      const filterList = [];
+
+      newConfig.filters.forEach((filter) => {
+          filterList.push(filter.columnName);
+      });
+
+      filterList.forEach((filter, index) => {
+          const filterValues = generateValuesForFilter(filter, (dataOverride || data));
+
+          newConfig.filters[index].values = filterValues;
+
+          // Initial filter should be active
+          newConfig.filters[index].active = filterValues[0];
+      });
+
+      currentData = filterData(newConfig.filters, (dataOverride || data));
+
+      setFilteredData(currentData);
+    }
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {};
@@ -148,6 +151,17 @@ export default function CdcChart(
     }
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
+
+    // Check for duplicate x axis values in data
+    if(!currentData) currentData = (dataOverride || data);
+    let uniqueXValues = {};
+    for(let i = 0; i < currentData.length; i++) {
+      if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+        newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+      } else {
+        uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+      }
+    }
 
     setConfig(newConfig);
   };
@@ -501,7 +515,7 @@ export default function CdcChart(
   }
 
   return (
-    <Context.Provider value={{ config, data: (filteredData || data), seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes, isDashboard, setParentConfig, setEditing }}>
+    <Context.Provider value={{ config, rawData: data, data: filteredData || data, seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes, isDashboard, setParentConfig, setEditing }}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
