@@ -166,7 +166,7 @@ const EditorPanel = memo(() => {
     updateConfig,
     loading,
     colorPalettes,
-    data,
+    rawData,
     isDashboard,
     setParentConfig,
     setEditing
@@ -239,6 +239,30 @@ const EditorPanel = memo(() => {
     return null
   }
 
+  const removeFilter = (index) => {
+    let filters = [...config.filters];
+
+    filters.splice(index, 1);
+
+    updateConfig({...config, filters})
+  }
+
+  const updateFilterProp = (name, index, value) => {
+    let filters = [...config.filters];
+
+    filters[index][name] = value;
+
+    updateConfig({...config, filters});
+  }
+
+  const addNewFilter = () => {
+    let filters = [...config.filters];
+
+    filters.push({values: []});
+
+    updateConfig({...config, filters});
+  }
+
   const removeSeries = (seriesKey) => {
     let series = [...config.series]
     let seriesIndex = -1;
@@ -274,7 +298,7 @@ const EditorPanel = memo(() => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    data.map(row => {
+    rawData.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
@@ -361,7 +385,7 @@ const EditorPanel = memo(() => {
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
-      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard && ' dashboard'}`}>
+      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <h2>Configure Chart</h2>
         <section className="form-container">
           <form>
@@ -500,6 +524,38 @@ const EditorPanel = memo(() => {
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={['right', 'left']} />
                 </AccordionItemPanel>
               </AccordionItem>
+              {<AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Filters
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <ul className="filters-list">
+                    {config.filters.map((filter, index) => (
+                        <fieldset className="edit-block">
+                          <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
+                          <label>
+                            <span className="edit-label column-heading">Filter</span>
+                            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                              <option value="">- Select Option -</option>
+                              {getColumns().map((dataKey) => (
+                                <option value={dataKey}>{dataKey}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Label</span>
+                            <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
+                          </label>
+                        </fieldset>
+                      )
+                    )}
+                  </ul>
+
+                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                </AccordionItemPanel>
+              </AccordionItem>}
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
