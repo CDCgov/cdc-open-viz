@@ -7,6 +7,7 @@ export default {
     showDownloadButton: true,
     showDownloadMediaButton: false,
     displayAsHex: false,
+    displayStateLabels: false,
     territoriesLabel: 'Territories',
     modalOpen: false,
     modalContent: null,
