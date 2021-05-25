@@ -498,6 +498,16 @@ const EditorPanel = memo((props) => {
             }
         })
       break;
+      case 'displayStateLabels':
+            setState( (prevState) => {
+                return {
+                    general: {
+                        ...prevState.general,
+                        displayStateLabels: !prevState.general.displayStateLabels
+                    }
+                }
+            })
+      break;
       case 'capitalizeLabels':
           setState( (prevState) => {
 
@@ -955,6 +965,12 @@ const EditorPanel = memo((props) => {
                     <label className="checkbox mt-4">
                       <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("toggleDisplayAsHex", event.target.checked) }} />
                       <span className="edit-label">Display As Hex Map</span>
+                    </label>
+                  }
+                  {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
+                    <label className="checkbox mt-4">
+                      <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
+                      <span className="edit-label">Display state labels</span>
                     </label>
                   }
                   <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
