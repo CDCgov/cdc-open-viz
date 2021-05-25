@@ -5,12 +5,16 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import {
   ComposableMap,
   Geographies,
-  Geography
+  Geography,
+  Marker,
+  Annotation
 } from 'react-simple-maps';
+import { geoCentroid } from "d3-geo";
 import topoJsonStates from 'us-atlas/states-10m.json';
 import chroma from 'chroma-js';
 import Territory from './Territory';
 import CityList from './CityList';
+import stateAbbrs from '../data/us-states-abbr.json';
 
 const UsaMap = (props) => {
   const {
@@ -319,6 +323,18 @@ const UsaMap = (props) => {
     return geosJsx;
   };
 
+  const offsets = {
+    VT: [50, -8],
+    NH: [34, 2],
+    MA: [30, -1],
+    RI: [28, 2],
+    CT: [35, 10],
+    NJ: [34, 1],
+    DE: [33, 0],
+    MD: [47, 10],
+    DC: [49, 21]
+  };
+
   return (
     <ErrorBoundary component="UsaMap">
       <div style={styles.container}>
@@ -331,7 +347,45 @@ const UsaMap = (props) => {
             data-html2canvas-ignore
           >
             <Geographies geography={topoJsonStates}>
-              {({ geographies }) => geoList(geographies)}
+              {({ geographies }) => (
+                <>
+                  {geoList(geographies)}
+                  {state.general.displayStateLabels && geographies.map(geo => {
+                    console.log({geo})
+                    const centroid = geoCentroid(geo);
+                    const cur = stateAbbrs.find(s => s.val === geo.id)
+                    return (
+                      <g key={geo.rsmKey + "-name"}>
+                        {cur &&
+                          centroid[0] > -160 &&
+                          centroid[0] < -67 &&
+                          (Object.keys(offsets).indexOf(cur.id) === -1 ? (
+                            <Marker coordinates={centroid}>
+                              <text y="5" fontSize={12} style={{fill: "rgba(0, 0, 0, .8)"}} textAnchor="middle">
+                                {cur.id}
+                              </text>
+                            </Marker>
+                          ) : (
+                            <Annotation
+                              subject={centroid}
+                              dx={offsets[cur.id][0]}
+                              dy={offsets[cur.id][1]}
+                              connectorProps={{
+                                stroke: "rgba(0,0,0,.5)",
+                                strokeWidth: 2,
+                                strokeLinecap: "round"
+                              }}
+                            >
+                              <text x={4} fontSize={14} alignmentBaseline="middle">
+                                {cur.id}
+                              </text>
+                            </Annotation>
+                          ))}
+                      </g>
+                    );
+                  })}
+                </>
+              )}
             </Geographies>
             <CityList
               processedData={processedData}
