@@ -714,10 +714,6 @@ const EditorPanel = memo((props) => {
     // Strip ref
     delete strippedState[""]
 
-    // Delete processed data and legend
-    delete strippedState.processedData
-    delete strippedState.processedLegend
-
     delete strippedState.newViz
 
     // Remove the legend
@@ -727,12 +723,6 @@ const EditorPanel = memo((props) => {
     delete strippedLegend.disabledAmt
 
     strippedState.legend = strippedLegend
-
-    // Remove loading status
-    delete strippedState.loading
-
-    // Remove viewport
-    delete strippedState.viewport
 
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
@@ -744,9 +734,6 @@ const EditorPanel = memo((props) => {
     delete strippedGeneral.modalContent;
     delete strippedGeneral.parentUrl;
     delete strippedGeneral.logoImage;
-
-    // Strip out computed items
-    delete strippedGeneral.viewportSize;
 
     strippedState.general = strippedGeneral
 
