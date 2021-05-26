@@ -3,7 +3,12 @@ import closeIcon from '../images/close.svg?inline';
 
 const Modal = (props) => {
   const {
-    applyTooltipsToGeo, content, capitalize, applyLegendToValue, state
+    applyTooltipsToGeo,
+    content,
+    capitalize,
+    applyLegendToValue,
+    viewport,
+    state
   } = props;
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.geoData, 'jsx');
@@ -11,7 +16,7 @@ const Modal = (props) => {
   const legendColors = applyLegendToValue(content.geoData);
 
   return (
-    <section className={capitalize ? 'modal-content tooltip capitalize ' + state.viewport : 'modal-content tooltip ' + state.viewport} aria-hidden="true">
+    <section className={capitalize ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport} aria-hidden="true">
       <img src={closeIcon} className="modal-close" alt="Close Modal" />
       {state.general.type === 'data' && <span className="legend-color" style={{ backgroundColor: legendColors[0] }} />}
       <div className="content">

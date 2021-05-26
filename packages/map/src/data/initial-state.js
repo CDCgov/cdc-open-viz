@@ -65,12 +65,5 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true
-  },
-  processedData: {},
-  processedLegend: {
-    data: [],
-    categoryValuesOrder: []
-  },
-  loading: true,
-  viewport: "lg"
+  }
 };
