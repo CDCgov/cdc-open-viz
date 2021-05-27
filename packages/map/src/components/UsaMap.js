@@ -351,7 +351,6 @@ const UsaMap = (props) => {
                 <>
                   {geoList(geographies)}
                   {state.general.displayStateLabels && geographies.map(geo => {
-                    console.log({geo})
                     const centroid = geoCentroid(geo);
                     const cur = stateAbbrs.find(s => s.val === geo.id)
                     return (

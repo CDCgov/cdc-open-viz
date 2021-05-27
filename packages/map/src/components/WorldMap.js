@@ -219,6 +219,8 @@ const WorldMap = (props) => {
       return regionsJsx;
     }
 
+
+
     // Normal country display
     const geosJsx = geographies.filter((geo) => countryValues.includes(geo.properties.name)).map((geo) => {
       const geoName = geo.properties.name;

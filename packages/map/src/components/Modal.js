@@ -8,7 +8,7 @@ const Modal = (props) => {
     capitalize,
     applyLegendToValue,
     viewport,
-    state
+    type
   } = props;
 
   const tooltip = applyTooltipsToGeo(content.geoName, content.geoData, 'jsx');
@@ -18,7 +18,7 @@ const Modal = (props) => {
   return (
     <section className={capitalize ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport} aria-hidden="true">
       <img src={closeIcon} className="modal-close" alt="Close Modal" />
-      {state.general.type === 'data' && <span className="legend-color" style={{ backgroundColor: legendColors[0] }} />}
+      {type === 'data' && <span className="legend-color" style={{ backgroundColor: legendColors[0] }} />}
       <div className="content">
         {tooltip}
       </div>
