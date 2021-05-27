@@ -306,12 +306,12 @@ const EditorPanel = memo((props) => {
           }
         })
       break;
-      case 'toggleDisplayAsHex':
+      case 'displayAsHex':
         setState({
           ...state,
           general: {
               ...state.general,
-              toggleDisplayAsHex: !state.general.toggleDisplayAsHex
+              displayAsHex: value
           }
         })
       break;
@@ -886,7 +886,7 @@ const EditorPanel = memo((props) => {
                   </label>
                   {'us' === state.general.geoType && 'data' === state.general.type &&
                     <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("toggleDisplayAsHex", event.target.checked) }} />
+                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
                       <span className="edit-label">Display As Hex Map</span>
                     </label>
                   }
