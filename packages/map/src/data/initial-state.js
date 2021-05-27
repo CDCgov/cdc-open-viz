@@ -9,8 +9,6 @@ export default {
     displayAsHex: false,
     displayStateLabels: false,
     territoriesLabel: 'Territories',
-    modalOpen: false,
-    modalContent: null,
     language: 'en',
     geoType: 'us',
     hasRegions: false,
@@ -65,12 +63,5 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true
-  },
-  processedData: {},
-  processedLegend: {
-    data: [],
-    categoryValuesOrder: []
-  },
-  loading: true,
-  viewport: "lg"
+  }
 };
