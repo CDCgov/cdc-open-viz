@@ -15,22 +15,9 @@ export default ((props) => {
     </li>
   );
 
-  // If it has a value, apply it
-  if (styles.backgroundColor !== '#E6E6E6' && mapType !== 'hex') {
+  if(mapType === 'hex') {
     Territory = (
-      <li
-        css={styles}
-        key={label}
-        data-tip={toolTip}
-        data-for="tooltip"
-        onClick={() => geoClickHandler(fullName, territoryData)}
-      >
-        {label}
-      </li>
-    );
-  } else {
-    Territory = (
-      <li key={label} style={{borderColor: 'transparent'}} style={{width: '8%', height:'8%', padding:0, borderColor:'transparent' }}>
+      <li key={label} style={{width: '8%', height:'8%', padding:0, borderColor:'transparent' }}>
         <svg 
           style={{width: '100%', height:'100%', overflow: 'hidden', borderColor:'transparent'}} 
           viewBox="0 0 173.20508075688772 200"
@@ -56,6 +43,18 @@ export default ((props) => {
         
       </li>
     )
+  } else if(styles.backgroundColor !== '#E6E6E6') {
+    Territory = (
+      <li
+        css={styles}
+        key={label}
+        data-tip={toolTip}
+        data-for="tooltip"
+        onClick={() => geoClickHandler(fullName, territoryData)}
+      >
+        {label}
+      </li>
+    );
   }
 
   return Territory;
