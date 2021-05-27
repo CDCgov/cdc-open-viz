@@ -963,9 +963,9 @@ class CdcMap extends Component {
     }
 
     // This calculates what is actually going to be seen and displayed by the map and data table at render. It accounts for things like toggling legend items as well as filters.
-    processData () {
+    processData (dataOverride = null) {
 
-        let dataObj = this.state.data
+        let dataObj = dataOverride || this.state.data;
 
         const parsedData = {}
 
@@ -1156,6 +1156,23 @@ class CdcMap extends Component {
             const processedData = this.processData()
 
             if(processedData) {
+                this.setState(() => { return {processedData} })
+            }
+        }
+
+        if(prevProps.config.data && prevProps.config.data.length > 0){
+            let same = true;
+
+            Object.keys(prevProps.config.data[0]).forEach((dataKey) => {
+                if(prevProps.config.data[0][dataKey] !== this.state.data[0][dataKey]){
+                    same = false;
+                }
+            });
+
+            if(!same) {
+                this.setState({...this.state, data: prevProps.config.data});
+
+                const processedData = this.processData(prevProps.config.data)
                 this.setState(() => { return {processedData} })
             }
         }
