@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, lazy } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -43,13 +43,15 @@ import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
-const CdcMap = ({className, config, navigationHandler:customNavigationHandler, isEditor, configUrl}) => {
+const CdcMap = ({className, config, navigationHandler:customNavigationHandler, isEditor, configUrl, logo = null, setConfig}) => {
     // State
     const [state, setState] = useState( JSON.parse(JSON.stringify(initialState)) )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')
     const [processedData, setProcessedData] = useState( [{}] )
     const [processedLegend, setProcessedLegend] = useState({data: [], categoryValuesOrder: []})
+    const [modal, setModal] = useState(null)
+    const [accessibleStatus, setAccessibleStatus] = useState('')
 
     const outerContainerRef = useRef(null);
     const mapSvg = useRef(null);
@@ -61,21 +63,14 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     const territoryValues = Object.values(supportedTerritories).flat()
     const territoryKeys = Object.keys(supportedTerritories)
 
-    const countryValues = Object.values(supportedCountries)
+    const countryValues = Object.values(supportedCountries).flat()
     const countryKeys = Object.keys(supportedCountries)
 
     const cityNames = Object.keys(supportedCities)
 
     const closeModal = ({target}) => {
-        if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && state.general.modalOpen) {
-            setState( (prevState) => {
-                return {
-                    general: {
-                        ...prevState.general,
-                        modalOpen: false
-                    }
-                }
-            })
+        if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && null !== modal) {
+            setModal(null)
         }
     }
 
@@ -184,23 +179,19 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         currentFilters[num].active = parsedActiveValue
 
         setState({
+            ...state,
             filters: currentFilters
         })
 
         // Regenerate data excluding non active filters.
         setProcessedData( processData() )
-
-        // Rebuild the legend with the new values.
-        setProcessedLegend( processLegend() )
     }
 
     // This is only used when building a legend that has the unified option checked.
     // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
     const processUnifiedData = () => {
         // All the data to be mapped
-        let dataObj = state.data
-
-        let rawData = dataObj
+        let rawData = state.data
 
         const parsedData = []
 
@@ -841,22 +832,15 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
     // This resets all active legend toggles. Should always be called with "await" to make sure it's done processing before you continue. See usage example in changeFilterActive.
     const resetLegendToggles = async () => {
-        setState((prevState) => {
+        let data = [...processedLegend.data]
 
-            const legendData = prevprocessedLegend.data
-
-            legendData.forEach((item) => {
-                delete item.disabled
-            })
-
-            return {
-                processedLegend: {
-                    ...prevprocessedLegend,
-                    disabledAmt: 0,
-                    data: legendData,
-                },
+        for(let i of data) {
+            if(i.disabled) {
+                delete i.disabled 
             }
-        })
+        }
+
+        setProcessedLegend({...processedLegend, data, disabledAmt: 0})
     }
 
     // Supports JSON or CSV
@@ -1100,7 +1084,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         }
 
         // Set properties that can be passed directly and require no additional computation
-        setState(() => newState)
+        setState(newState)
 
         // Done loading
         setLoading(false)
@@ -1171,29 +1155,15 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }
 
     const announceChange = (value) => {
-        setState( (prevState) => {
-            return {
-                ...prevState,
-                accessibleStatus: value
-            }
-        })
+        setAccessibleStatus(value)
     }
 
     const geoClickHandler = (key, value) => {
         // If modals are set or we are on a mobile viewport, display modal
         if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
-            setState( (prevState) => {
-                return {
-                    ...prevState,
-                    general: {
-                        ...prevState.general,
-                        modalOpen: true,
-                        modalContent: {
-                            geoName: key,
-                            geoData: value
-                        },
-                    }
-                }
+            setModal({
+                geoName: key,
+                geoData: value
             })
 
             return;
@@ -1246,8 +1216,9 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }, [])
 
     useEffect(() => {
+        if(processedData.length !== state.data.length || state.filters.length)
         setProcessedData( processData() )
-    }, [state.data])
+    }, [state.data, state.filters])
 
     useEffect(() => {
         let newProcessedLegend = processLegend()
@@ -1256,7 +1227,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
             setProcessedLegend(newProcessedLegend)
         }
     }, [processedData])
-
+console.log({state})
     // Map Container Classes
     let mapContainerClasses = [
         'map-container',
@@ -1265,7 +1236,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         state.general.geoType
     ]
 
-    if(true === state.general.modalOpen) {
+    if(null !== modal) {
         mapContainerClasses.push('modal-background')
     }
 
@@ -1273,6 +1244,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         mapContainerClasses.push('full-border')
     }
 
+    // Props passed to all map types
     const mapProps = {
         state,
         processedData,
@@ -1287,12 +1259,10 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
     const { title = '', subtext = ''} = state.general
 
-    const headerColor = state.general.headerColor || 'theme-blue'
-
     return (
         <div className={className ? `cdc-open-viz-module cdc-map-outer-container ${className} ${viewport}` : `cdc-open-viz-module cdc-map-outer-container ${viewport}` } ref={outerContainerRef}>
             {true === loading && <Loading />}
-            {true === isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} generateValuesForFilter={generateValuesForFilter} processData={processData} processLegend={processLegend} setParentConfig={setConfig} />}
+            {true === isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} generateValuesForFilter={generateValuesForFilter} processData={processData} setProcessedData={setProcessedData} processedData={processedData} processLegend={processLegend} setProcessedLegend={setProcessedLegend} processedLegend={processedLegend} setParentConfig={setConfig} loading={loading} />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {'hover' === state.tooltips.appearanceType &&
                     <ReactTooltip
@@ -1304,7 +1274,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     />
                 }
                 <header className={state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                    <div role="heading" className={'map-title ' + headerColor}>
+                    <div role="heading" className={'map-title ' + state.general.headerColor}>
                         { parse(title) }
                     </div>
                 </header>
@@ -1326,12 +1296,11 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     }
 
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {true === state.general.modalOpen && <Modal state={state} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToValue={applyLegendToValue} capitalize={state.tooltips.capitalizeLabels} content={state.general.modalContent} />}
+                        {null !== modal && <Modal type={state.general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToValue={applyLegendToValue} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === state.general.geoType && !state.general.displayAsHex && <UsaMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
                             {state.general.displayAsHex && 'data' === state.general.type && <HexMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
                             {'world' === state.general.geoType && <WorldMap supportedCountries={supportedCountries} countryValues={countryValues} {...mapProps} />}
-                            {"data" === state.general.type && state.general.logoImage && <img src={state.general.logoImage} alt="" className="map-logo"/>}
-
+                            {"data" === state.general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {"navigation" === state.general.type &&
                         <NavigationMenu
@@ -1342,7 +1311,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                             navigationHandler={(val) => navigationHandler(val)}
                         />
                     }
-                    {state.general.showSidebar && 'navigation' !== state.general.type && false === state.loading  && Object.keys(processedData).length > 0 &&
+                    {state.general.showSidebar && 'navigation' !== state.general.type && false === loading  && Object.keys(processedData).length > 0 &&
                         <Sidebar
                             viewport={viewport}
                             legend={state.legend}
@@ -1351,6 +1320,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                             sharing={state.sharing}
                             prefix={state.columns.primary.prefix}
                             suffix={state.columns.primary.suffix}
+                            setProcessedLegend={setProcessedLegend}
                             processedLegend={processedLegend}
                             setState={setState}
                             resetLegendToggles={resetLegendToggles}
@@ -1381,7 +1351,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                 }
                 {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
             </section>
-            <div aria-live="assertive" className="cdcdataviz-sr-only">{ state.accessibleStatus }</div>
+            <div aria-live="assertive" className="cdcdataviz-sr-only">{ accessibleStatus }</div>
         </div>
     )
 }

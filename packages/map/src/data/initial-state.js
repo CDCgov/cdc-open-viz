@@ -9,8 +9,6 @@ export default {
     displayAsHex: false,
     displayStateLabels: false,
     territoriesLabel: 'Territories',
-    modalOpen: false,
-    modalContent: null,
     language: 'en',
     geoType: 'us',
     hasRegions: false,
