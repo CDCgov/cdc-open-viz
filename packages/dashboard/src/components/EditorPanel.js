@@ -110,7 +110,7 @@ const EditorPanel = memo(() => {
     config,
     updateConfig,
     loading,
-    data,
+    rawData,
     setParentConfig,
     setEditing
   } = useContext(Context);
@@ -122,7 +122,11 @@ const EditorPanel = memo(() => {
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
     if( null === section && null === subsection) {
-      let updatedConfig = {...config, [fieldName]: newValue};
+      let dashboardConfig = config.dashboard;
+
+      dashboardConfig[fieldName] = newValue;
+
+      let updatedConfig = {...config, dashboard: dashboardConfig};
 
       enforceRestrictions(updatedConfig);
 
@@ -170,7 +174,7 @@ const EditorPanel = memo(() => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    data.map(row => {
+    rawData.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
@@ -272,7 +276,31 @@ const EditorPanel = memo(() => {
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config])
+  }, [config]);
+
+  const removeFilter = (index) => {
+    let dashboardConfig = config.dashboard;
+
+    dashboardConfig.filters.splice(index, 1);
+
+    updateConfig({...config, dashboard: dashboardConfig});
+  }
+
+  const updateFilterProp = (name, index, value) => {
+    let dashboardConfig = config.dashboard;
+
+    dashboardConfig.filters[index][name] = value;
+
+    updateConfig({...config, dashboard: dashboardConfig});
+  }
+
+  const addNewFilter = () => {
+    let dashboardConfig = config.dashboard;
+
+    dashboardConfig.filters.push({values: []});
+
+    updateConfig({...config, dashboard: dashboardConfig});
+  }
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -322,6 +350,38 @@ const EditorPanel = memo(() => {
                   <h3>Map</h3>
                   <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'us')}><UsaIcon /><span>United States</span></button>
                   <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'world')}><WorldIcon /><span>World</span></button>
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Filters
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <ul className="filters-list">
+                    {config.dashboard.filters && config.dashboard.filters.map((filter, index) => (
+                        <fieldset className="edit-block">
+                          <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
+                          <label>
+                            <span className="edit-label column-heading">Filter</span>
+                            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                              <option value="">- Select Option -</option>
+                              {getColumns().map((dataKey) => (
+                                <option value={dataKey}>{dataKey}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Label</span>
+                            <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
+                          </label>
+                        </fieldset>
+                      )
+                    )}
+                  </ul>
+
+                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>

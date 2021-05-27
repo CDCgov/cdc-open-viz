@@ -524,7 +524,7 @@ const EditorPanel = memo(() => {
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={['right', 'left']} />
                 </AccordionItemPanel>
               </AccordionItem>
-              {<AccordionItem>
+              <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Filters
@@ -532,7 +532,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <ul className="filters-list">
-                    {config.filters.map((filter, index) => (
+                    {config.filters && config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -555,7 +555,7 @@ const EditorPanel = memo(() => {
 
                   <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
                 </AccordionItemPanel>
-              </AccordionItem>}
+              </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>

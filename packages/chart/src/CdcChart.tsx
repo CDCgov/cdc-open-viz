@@ -35,9 +35,9 @@ export default function CdcChart(
 
   const [config, setConfig] = useState<keyable>({});
 
-  const [filteredData, setFilteredData] = useState<Array<Object>>();
-
   const [data, setData] = useState<Array<Object>>([]);
+
+  const [filteredData, setFilteredData] = useState<Array<Object>>();
 
   const [loading, setLoading] = useState<Boolean>(true);
 
@@ -280,6 +280,10 @@ export default function CdcChart(
       data.sort(sortData);
     }
   }, [config, data])
+
+  useEffect(() => {
+    loadConfig();
+  }, [configObj.data])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {

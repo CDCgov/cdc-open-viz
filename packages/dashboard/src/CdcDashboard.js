@@ -25,6 +25,8 @@ export default function CdcDashboard(
 
   const [data, setData] = useState([]);
 
+  const [filteredData, setFilteredData] = useState();
+
   const [loading, setLoading] = useState(true);
 
   const [editing, setEditing] = useState('');
@@ -47,18 +49,70 @@ export default function CdcDashboard(
 
     let newConfig = {...defaults, ...response}
 
-    updateConfig(newConfig);
+    updateConfig(newConfig, data);
 
     setLoading(false);
   }
 
-  const updateConfig = (newConfig) => {
+  const filterData = (filters, data) => {
+    let filteredData = [];
+
+    data.forEach((row) => {
+      let add = true;
+      
+      filters.forEach((filter) => {
+        if(row[filter.columnName] !== filter.active) {
+          add = false;
+        }
+      });
+
+      if(add) filteredData.push(row);
+    });
+
+    return filteredData;
+  }
+
+  // Gets filer values from dataset
+  const generateValuesForFilter = (columnName, data = this.state.data) => {
+    const values = [];
+
+    data.forEach( (row) => {
+        const value = row[columnName]
+        if(value && false === values.includes(value)) {
+            values.push(value)
+        }
+    });
+
+    return values;
+  }
+
+  const updateConfig = (newConfig, dataOverride = null) => {
     // Deeper copy
     Object.keys(defaults).forEach( key => {
       if(newConfig[key] && 'object' === typeof newConfig[key]) {
         newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
     });
+    
+    // After data is grabbed, loop through and generate filter column values if there are any
+    if (newConfig.dashboard.filters) {
+      const filterList = [];
+
+      newConfig.dashboard.filters.forEach((filter) => {
+          filterList.push(filter.columnName);
+      });
+
+      filterList.forEach((filter, index) => {
+          const filterValues = generateValuesForFilter(filter, (dataOverride || data));
+
+          newConfig.dashboard.filters[index].values = filterValues;
+
+          // Initial filter should be active
+          newConfig.dashboard.filters[index].active = filterValues[0];
+      });
+
+      setFilteredData(filterData(newConfig.dashboard.filters, (dataOverride || data)));
+    }
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {};
@@ -71,6 +125,52 @@ export default function CdcDashboard(
     loadConfig();
   }, []);
 
+  const Filters = () => {
+    const changeFilterActive = (index, value) => {
+      let dashboardConfig = {...config.dashboard};
+
+      dashboardConfig.filters[index].active = value;
+
+      setConfig({...config, dashboard: dashboardConfig});
+
+      setFilteredData(filterData(dashboardConfig.filters, data));
+    };
+
+    const announceChange = (text) => {
+
+    };
+
+    return config.dashboard.filters.map((singleFilter, index) => {
+      const values = [];
+  
+      singleFilter.values.forEach((filterOption, index) => {
+        values.push(<option
+          key={index}
+          value={filterOption}
+        >{filterOption}
+        </option>);
+      });
+  
+      return (
+        <section className="filters-section" key={index}>
+          <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
+          <select
+            id={`filter-${index}`}
+            className="filter-select"
+            data-index="0"
+            value={singleFilter.active}
+            onChange={(val) => {
+              changeFilterActive(index, val.target.value);
+              announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
+            }}
+          >
+            {values}
+          </select>
+        </section>
+      );
+    });;
+  }
+
   // Prevent render if loading
   let body = (<Loading />)
 
@@ -82,10 +182,14 @@ export default function CdcDashboard(
           {/* Title */}
           {title && <h1 className={`dashboard-title ${config.dashboard.theme}`}>{title}</h1>}
 
+          {/* Filters */}
+          {config.dashboard.filters && <Filters />}
+
           {/* Visualizations */}
           {Object.keys(config.visualizations).map(visualizationKey => {
             let visualizationConfig = config.visualizations[visualizationKey];
-            visualizationConfig.data = data;
+
+            visualizationConfig.data = filteredData || data;
 
             switch(visualizationConfig.type){
               case 'chart':
@@ -105,7 +209,7 @@ export default function CdcDashboard(
   }
 
   return (
-    <Context.Provider value={{ config, data, loading, updateConfig, setParentConfig, setEditing }}>
+    <Context.Provider value={{ config, rawData: data, data: filteredData || data, loading, updateConfig, setParentConfig, setEditing }}>
       <div className="cdc-open-viz-module type-dashboard">
         {body}
       </div>
