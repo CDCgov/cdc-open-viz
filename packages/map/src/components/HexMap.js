@@ -24,6 +24,10 @@ const HexMap = (props) => {
 
   const [territoriesData, setTerritoriesData] = useState([]);
 
+  // Add DC as a State for Hex Display
+  let hexSupportedStates = supportedStates;
+  hexSupportedStates['US-DC'] = ['District of Columbia']
+
   useEffect(() => {
     const territoriesKeys = Object.keys(supportedTerritories); // processedData will have already mapped abbreviated territories to their full names
 
@@ -156,9 +160,9 @@ const HexMap = (props) => {
       const geoName = geo.properties.state;
 
       // Map the name from the geo data with the appropriate key for the processed data
-      const geoKey = Object.keys(supportedStates).find((key) => supportedStates[key].includes(geoName));
+      const geoKey = Object.keys(hexSupportedStates).find((key) => hexSupportedStates[key].includes(geoName));
 
-      const geoData = processedData[geoKey];
+      const geoData = (geoKey === 'US-DC') ? processedData[geoName] : processedData[geoKey];
 
       let legendColors;
 
@@ -167,7 +171,7 @@ const HexMap = (props) => {
         legendColors = applyLegendToValue(geoData);
       }
 
-      const geoDisplayName = displayGeoName(geoKey);
+      const geoDisplayName = (geoKey === 'US-DC') ? displayGeoName(geoName) : displayGeoName(geoKey);
 
       // Get path for geo
       let geoHex = stateLookup( geoName, mercator.features)

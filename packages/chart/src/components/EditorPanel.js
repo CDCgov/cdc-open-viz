@@ -15,21 +15,6 @@ import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-// IE11 Custom Event polyfill
-(function () {
-
-  if ( typeof window.CustomEvent === "function" ) return false;
-
-  function CustomEvent ( event, params ) {
-    params = params || { bubbles: false, cancelable: false, detail: null };
-    var evt = document.createEvent( 'CustomEvent' );
-    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-    return evt;
-   }
-
-  window.CustomEvent = CustomEvent;
-})();
-
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
@@ -345,35 +330,20 @@ const EditorPanel = memo(() => {
     );
   }
 
-  const convertStateToConfig = (type = "JSON") => {
+  const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
       delete strippedState.newViz
     }
     delete strippedState.runtime
 
-    if(type === "JSON") {
-      return JSON.stringify( strippedState )
-    }
-
     return strippedState
   }
 
   useEffect(() => {
-    const parsedData = convertStateToConfig()
-
-    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
-
-    setConfigData(formattedData)
-
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
-
-    window.dispatchEvent(event)
-
     // Pass up to Editor if needed
     if(setParentConfig) {
-      const newConfig = convertStateToConfig("object")
+      const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
 

@@ -39,21 +39,6 @@ const arrayMove = (array, from, to) => {
 	return array;
 };
 
-// IE11 Custom Event polyfill
-(function () {
-
-  if ( typeof window.CustomEvent === "function" ) return false;
-
-  function CustomEvent ( event, params ) {
-    params = params || { bubbles: false, cancelable: false, detail: null };
-    var evt = document.createEvent( 'CustomEvent' );
-    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-    return evt;
-   }
-
-  window.CustomEvent = CustomEvent;
-})();
-
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
@@ -99,14 +84,19 @@ const EditorPanel = memo((props) => {
     processLegend,
     isDashboard,
     setParentConfig,
-    setEditing
+    setEditing,
+    processedLegend,
+    setProcessedLegend,
+    setProcessedData,
+    processedData,
+    loading
   } = props
 
-  const { general, color, columns, legend, data, filters, dataTable, tooltips, processedData, processedLegend, loading } = state
+  const { general, color, columns, legend, data, filters, dataTable, tooltips} = state
 
   const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
 
-  const [ configData, setConfigData ] = useState({})
+  const [ configTextboxValue, setConfigTextbox ] = useState({})
 
   const [ loadedDefault, setLoadedDefault ] = useState(false)
 
@@ -148,153 +138,133 @@ const EditorPanel = memo((props) => {
   const handleEditorChanges = async (property, value) => {
     switch (property) {
       case 'showTitle':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    showTitle: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              showTitle: value
+          }
         })
       break;
       case 'showSidebar':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    showSidebar: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              showSidebar: value
+          }
         })
       break;
       case 'fullBorder':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    fullBorder: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              fullBorder: value
+          }
         })
       break;
       case 'expandDataTable':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    expandDataTable: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              expandDataTable: value
+          }
         })
       break;
       case 'color':
-        setState( (prevState) => {
-
-            return {
-                color: value
-            }
+        setState({
+          ...state,
+          color: value
         })
       break;
       case 'hasRegions':
-        setState( (prevState) => {
-
-              return {
-                  general: {
-                      ...prevState.general,
-                      hasRegions: value
-                  },
-                  columns: resetColumnsObj,
-                  processedData: {}
-              }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              hasRegions: value
+          },
+          columns: resetColumnsObj
         })
       break;
       case 'sidebarPosition':
-        setState( (prevState) => {
-
-            return {
-                legend: {
-                    ...prevState.legend,
-                    position: value
-                }
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              position: value
+          }
         })
       break;
       case 'geoBorderColor':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    geoBorderColor: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              geoBorderColor: value
+          }
         })
       break;
       case 'headerColor':
-        setState( (prevState) => {
-
-            return {
-                general: {
-                    ...prevState.general,
-                    headerColor: value
-                }
-            }
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              headerColor: value
+          }
         })
       break;
       case 'geoColumn':
-        setState( (prevState) => {
-
-              return {
-                  columns: {
-                      ...prevState.columns,
-                      geo: {
-                          ...prevState.columns.geo,
-                          name: value
-                      }
-                  }
+        setState({
+          ...state,
+          columns: {
+              ...state.columns,
+              geo: {
+                ...state.columns.geo,
+                name: value
               }
+          }
         })
       break;
       case 'navigateColumn':
-        setState( (prevState) => {
-
-            return {
-                columns: {
-                    ...prevState.columns,
-                    navigate: {
-                        ...prevState.columns.navigate,
-                        name: value
-                    }
-                }
-            }
+        setState({
+          ...state,
+          columns: {
+              ...state.columns,
+              navigate: {
+                ...state.columns.navigate,
+                name: value
+              }
+          }
         })
       break;
       case 'legendDescription':
-        setState( (prevState) => {
-
-            return {
-                legend: {
-                    ...prevState.legend,
-                    description: value
-                }
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              description: value
+          }
         })
       break;
       case 'legendType':
-        setState( (prevState) => { return {legend: {...legend, type: value} } } )
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            type: value
+          }
+        })
       break;
       case 'legendNumber':
-        setState( (prevState) => {
-              return {
-                  legend: {
-                    ...prevState.legend,
-                    numberOfItems: parseInt(value)
-                  }
-              }
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            numberOfItems: parseInt(value)
+          }
         })
       break;
       case 'changeActiveFilterValue':
@@ -303,102 +273,92 @@ const EditorPanel = memo((props) => {
         setActiveFilterValueForDescription(arrVal)
       break;
       case 'unifiedLegend':
-        setState( () => {
-            return {
-                legend: {...legend, unified: value}
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              unified: value
+          }
         })
       break;
       case 'separateZero':
-        setState( () => {
-            return {
-                legend: {...legend, separateZero: value}
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              separateZero: value
+          }
         })
       break;
-      case 'editorDataUrl':
-        setState({dataUrl: value})
-      break;
       case 'toggleDownloadButton':
-            setState( (prevState) => {
-                return {
-                    general: {
-                        ...prevState.general,
-                        showDownloadButton: !prevState.general.showDownloadButton
-                    }
-                }
-            })
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              showDownloadButton: !state.general.showDownloadButton
+          }
+        })
       break;
       case 'toggleDownloadMediaButton':
-            setState( (prevState) => {
-                return {
-                    general: {
-                        ...prevState.general,
-                        showDownloadMediaButton: !prevState.general.showDownloadMediaButton
-                    }
-                }
-            })
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              showDownloadMediaButton: !state.general.showDownloadMediaButton
+          }
+        })
       break;
-      case 'toggleDisplayAsHex':
-            setState( (prevState) => {
-                return {
-                    general: {
-                        ...prevState.general,
-                        displayAsHex: !prevState.general.displayAsHex
-                    }
-                }
-            })
+      case 'displayAsHex':
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              displayAsHex: value
+          }
+        })
       break;
       case 'editorMapType':
         switch(value) {
             case 'data':
-                setState( (prevState) => {
-                    return {
-                        general: {
-                            ...prevState.general,
-                            showSidebar: true,
-                            type: "data"
-                        },
-                    }
-                })
-                break;
-            case 'navigation':
-                setState( (prevState) => {
-                    return {
-                        general: {
-                          ...prevState.general,
-                          showSidebar: false,
-                          type: "navigation",
-                          displayAsHex: false
-                        },
-                        tooltips: {
-                            ...prevState.tooltips,
-                            appearanceType: "hover"
-                        }
-                    }
-                })
-                break;
-            case 'hex':
-            setState( (prevState) => {
-                return {
-                    general: {
-                      ...prevState.general,
-                      showSidebar: true,
-                      type: "hex",
-                    }
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    showSidebar: true,
+                    type: "data"
                 }
-            })
+              })
+              break;
+            case 'navigation':
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    showSidebar: false,
+                    type: "navigation"
+                },
+                tooltips: {
+                  ...state.tooltips,
+                  appearanceType: "hover"
+                }
+              })
+              break;
+            case 'hex':
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    showSidebar: true,
+                    type: "hex"
+                }
+              })
             break;
             default:
                 console.warn("Map type not set")
             break;
         }
 
-        setState(() => {
-            return {
-                processedData: processData()
-            }
-        })
+        setProcessedData( processData() )
       break;
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
@@ -416,25 +376,21 @@ const EditorPanel = memo((props) => {
 
         switch(value) {
             case 'us':
-                setState( (prevState) => {
-                    return {
-                        general: {
-                            ...prevState.general,
-                            geoType: "us"
-                        }
-                    }
-                })
-                break;
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    geoType: "us"
+                }
+              })
             case 'world':
-                setState( (prevState) => {
-                    return {
-                        general: {
-                            ...prevState.general,
-                            geoType: "world",
-                        }
-                    }
-                })
-                break;
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    geoType: "world"
+                }
+              })
             default:
                 console.warn("Map type not set.")
             break;
@@ -444,87 +400,84 @@ const EditorPanel = memo((props) => {
       break;
       case 'categoryOrder':
         const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
-
-        setState( (prevState) => {
-            return {
-              legend: {
-                ...prevState.legend,
-                categoryValuesOrder
-              }
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              categoryValuesOrder
+          }
         })
       break;
       case 'singleColumnLegend':
-        setState( (prevState) => {
-            return {
-                legend: {
-                    ...prevState.legend,
-                    singleColumn: !prevState.legend.singleColumn
-                }
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              singleColumn: !state.legend.singleColumn
+          }
         })
       break;
       case 'dynamicDescription':
-        setState( (prevState) => {
-            return {
-                editor: {
-                    ...prevState.editor,
-                    activeFilterValueForDescription: value
-                },
-                legend: {
-                    ...prevState.legend,
-                    dynamicDescription: !prevState.legend.dynamicDescription
-                }
-            }
+        setState({
+          ...state,
+          editor: {
+            ...state.editor,
+            activeFilterValueForDescription: value
+          },
+          legend: {
+              ...state.legend,
+              dynamicDescription: !state.legend.dynamicDescription
+          }
         })
       break;
       case 'changeLegendDescription':
         const [filterValKey, filterValDesc] = value
-
-        setState( (prevState) => {
-            return {
-                legend: {
-                    ...prevState.legend,
-                    descriptions: {
-                        ...prevState.legend.descriptions,
-                        [filterValKey]: [filterValDesc]
-                    }
-                }
-            }
+        setState({
+          ...state,
+          legend: {
+              ...state.legend,
+              descriptions: {
+                ...state.legend.descriptions,
+                [filterValKey]: [filterValDesc]
+              }
+          }
         })
       break;
       case 'appearanceType':
-        setState( (prevState) => {
-
-            return {
-                tooltips: {
-                    ...prevState.tooltips,
-                    appearanceType: value
-                }
-            }
+        setState({
+          ...state,
+          tooltips: {
+              ...state.tooltips,
+              appearanceType: value
+          }
         })
       break;
       case 'linkLabel':
-        setState( (prevState) => {
-
-            return {
-                tooltips: {
-                    ...prevState.tooltips,
-                    linkLabel: value
-                }
-            }
+        setState({
+          ...state,
+          tooltips: {
+              ...state.tooltips,
+              linkLabel: value
+          }
+        })
+      break;
+      case 'displayStateLabels':
+        setState({
+          ...state,
+          general: {
+              ...state.general,
+              displayStateLabels: !state.general.displayStateLabels
+          }
         })
       break;
       case 'capitalizeLabels':
-          setState( (prevState) => {
-
-              return {
-                  tooltips: {
-                      ...prevState.tooltips,
-                      capitalizeLabels: value
-                  }
-              }
-          })
+        setState({
+          ...state,
+          tooltips: {
+              ...state.tooltips,
+              capitalizeLabels: value
+          }
+        })
       break;
       default:
           console.warn(`Did not recognize editor property.`)
@@ -567,11 +520,12 @@ const EditorPanel = memo((props) => {
 
             updatedSpecialClasses.splice(value, 1)
 
-            setState( () => {
-                return {
-                    legend: {
-                      ...legend, specialClasses: updatedSpecialClasses}
-                }
+            setState({
+              ...state,
+              legend: {
+                ...state.legend,
+                specialClasses: updatedSpecialClasses
+              }
             })
         break;
         case 'specialClassAdd':
@@ -579,44 +533,38 @@ const EditorPanel = memo((props) => {
 
             newSpecialClasses.push(value.name)
 
-            setState( (prevState) => {
-                return {
-                    ...prevState,
-                    legend: {
-                      ...legend,
-                      specialClasses: newSpecialClasses
-                    }
-                }
+            setState({
+              ...state,
+              legend: {
+                  ...state.legend,
+                  specialClasses: newSpecialClasses
+              }
             })
         break;
         case 'name':
-          setState( (prevState) => {
-
-            return {
-                columns: {
-                    ...prevState.columns,
-                    [columnName]: {
-                        ...prevState.columns[columnName],
-                        [editTarget]: value
-                    }
+          setState({
+            ...state,
+            columns: {
+                ...state.columns,
+                [columnName]: {
+                  ...state.columns[columnName],
+                  [editTarget]: value
                 }
             }
           })
 
           break;
         default:
-            setState( (prevState) => {
-
-                return {
-                    columns: {
-                        ...prevState.columns,
-                        [columnName]: {
-                            ...prevState.columns[columnName],
-                            [editTarget]: value
-                        }
-                    }
+          setState({
+            ...state,
+            columns: {
+                ...state.columns,
+                [columnName]: {
+                  ...state.columns[columnName],
+                  [editTarget]: value
                 }
-            })
+            }
+          })
         break;
     }
   }
@@ -649,46 +597,39 @@ const EditorPanel = memo((props) => {
 
       }
 
-      setState(() => { return {filters: newFilters}})
-
-      const processedData = processData()
-
-      setState(() => { return {processedData} })
+      setState({
+        ...state,
+        filters: newFilters
+      })
   }
 
   const addAdditionalColumn = (number) => {
       const columnKey = `additionalColumn${number}`
 
-      setState( (prevState) => {
-          return {
-              columns: {
-                  ...prevState.columns,
-                  [columnKey]: {
-                      label: "New Column",
-                      dataTable: false,
-                      tooltips: false,
-                      prefix: "",
-                      suffix: ""
-                  }
-              }
+      setState({
+        ...state,
+        columns: {
+            ...state.columns,
+            [columnKey]: {
+              label: "New Column",
+              dataTable: false,
+              tooltips: false,
+              prefix: "",
+              suffix: ""
           }
-      }
-    )
-
+        }
+      })
   }
 
   const removeAdditionalColumn = (columnName) => {
-
       const newColumns = state.columns
 
       delete newColumns[columnName]
 
-      setState( (prevState) => {
-          return {
-              columns: newColumns
-          }
+      setState({
+        ...state,
+        columns: newColumns
       })
-
   }
 
   const displayFilterLegendValue = (arr) => {
@@ -721,10 +662,6 @@ const EditorPanel = memo((props) => {
     // Strip ref
     delete strippedState[""]
 
-    // Delete processed data and legend
-    delete strippedState.processedData
-    delete strippedState.processedLegend
-
     delete strippedState.newViz
 
     // Remove the legend
@@ -735,25 +672,11 @@ const EditorPanel = memo((props) => {
 
     strippedState.legend = strippedLegend
 
-    // Remove loading status
-    delete strippedState.loading
-
-    // Remove viewport
-    delete strippedState.viewport
-
     // Remove default data marker if the user started this map from default data
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
     let strippedGeneral = JSON.parse(JSON.stringify(state.general))
-
-    delete strippedGeneral.modalOpen;
-    delete strippedGeneral.modalContent;
-    delete strippedGeneral.parentUrl;
-    delete strippedGeneral.logoImage;
-
-    // Strip out computed items
-    delete strippedGeneral.viewportSize;
 
     strippedState.general = strippedGeneral
 
@@ -770,9 +693,7 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => {
     if(0 === requiredColumns.length && false === loading) {
-      const processedData = processData()
-
-      setState(() => { return {processedData} })
+      setProcessedData( processData() )
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requiredColumns])
@@ -781,7 +702,6 @@ const EditorPanel = memo((props) => {
   const columnsInData = [""]
 
   state.data.forEach( (row) => {
-
     Object.keys(row).forEach( (columnName) => {
       if(false === columnsInData.includes(columnName)) {
         columnsInData.push(columnName)
@@ -791,7 +711,6 @@ const EditorPanel = memo((props) => {
   } )
 
   const columnsOptions = columnsInData.map( (name) => {
-
     if("" === name) {
       return (<option value="" key={"Select Option"}>- Select Option -</option>)
     }
@@ -835,10 +754,11 @@ const EditorPanel = memo((props) => {
     }
 
     let updatedState = {
+      ...state,
       [section]: sectionValue
     }
 
-    setState(() => updatedState)
+    setState(updatedState)
   }
 
   const onBackClick = () => {
@@ -882,12 +802,7 @@ const EditorPanel = memo((props) => {
 
     const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
 
-    setConfigData(formattedData)
-
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
-
-    window.dispatchEvent(event)
+    setConfigTextbox(formattedData)
 
     // Pass up to Editor if needed
     if(setParentConfig) {
@@ -900,9 +815,7 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => {
     if('data' === state.general.type) {
-      const processedLegend = processLegend()
-
-      setState(() => { return {processedLegend} })
+      setProcessedLegend( processLegend() )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legend, processedData])
@@ -983,11 +896,17 @@ const EditorPanel = memo((props) => {
                   </label>
                   {'us' === state.general.geoType && 'data' === state.general.type &&
                     <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("toggleDisplayAsHex", event.target.checked) }} />
+                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
                       <span className="edit-label">Display As Hex Map</span>
                     </label>
                   }
-                  <TextField value={general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
+                  {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
+                    <label className="checkbox mt-4">
+                      <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
+                      <span className="edit-label">Display state labels</span>
+                    </label>
+                  }
+                  <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
                   <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
                   {'us' === state.general.geoType &&
@@ -1389,7 +1308,7 @@ const EditorPanel = memo((props) => {
               <React.Fragment>
                 <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>This can cause serious errors in your map.</p></div></section>
                 <p className="pb-2">This tool displays the actual map configuration <acronym title="JavaScript Object Notation">JSON</acronym> that is generated by this editor and allows you to edit properties directly and apply them.</p>
-                <textarea value={ configData } onChange={(event) => setConfigData(event.target.value)} />
+                <textarea value={ configTextboxValue } onChange={(event) => setConfigTextbox(event.target.value)} />
                 <button className="btn full-width" onClick={() => loadConfig(JSON.parse(configData))}>Apply</button>
               </React.Fragment>
             )}

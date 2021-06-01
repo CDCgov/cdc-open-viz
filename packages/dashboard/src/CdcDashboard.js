@@ -180,7 +180,7 @@ export default function CdcDashboard(
         {isEditor && <EditorPanel />}
         {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-dashboard-inner-container">
           {/* Title */}
-          {title && <h1 className={`dashboard-title ${config.dashboard.theme}`}>{title}</h1>}
+          {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
 
           {/* Filters */}
           {config.dashboard.filters && <Filters />}

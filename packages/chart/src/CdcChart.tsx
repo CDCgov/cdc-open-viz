@@ -500,7 +500,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <h1 className={`chart-title ${config.theme}`}>{title}</h1>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
