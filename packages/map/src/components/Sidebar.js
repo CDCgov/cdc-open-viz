@@ -14,6 +14,7 @@ const Sidebar = (props) => {
     resetLegendToggles,
     setState,
     processedLegend,
+    setProcessedLegend,
     prefix,
     suffix,
     viewport
@@ -50,7 +51,7 @@ const Sidebar = (props) => {
       data
     };
 
-    setState(() => ({ processedLegend: newObj }));
+    setProcessedLegend(newObj);
   };
 
   const legendList = processedLegend.data.map((entry, index) => {
