@@ -4,6 +4,7 @@ import 'core-js/stable'
 
 import GlobalState from './context';
 import DataImport from './components/DataImport';
+import FormatTab from './components/FormatTab';
 import ChooseTab from './components/ChooseTab';
 import ConfigureTab from './components/ConfigureTab';
 import TabPane from './components/TabPane';
@@ -82,10 +83,13 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
-          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data}>
+          <TabPane title="2. Format Data" className="data-formatter" disableRule={!config.data}>
+            <FormatTab />
+          </TabPane>
+          <TabPane title="3. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
             <ChooseTab />
           </TabPane>
-          <TabPane title="3. Configure" disableRule={null === config.data || !config.type}>
+          <TabPane title="4. Configure" disableRule={null === config.data || !config.type}>
             <ConfigureTab />
           </TabPane>
         </Tabs>
