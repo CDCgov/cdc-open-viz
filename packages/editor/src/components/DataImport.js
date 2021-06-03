@@ -8,7 +8,7 @@ import GlobalState from '../context';
 import '../scss/data-import.scss';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
-import PreviewDataTable from './PreviewDataTable'
+import PreviewDataTable from './PreviewDataTable';
 
 import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
@@ -16,6 +16,8 @@ import CloseIcon from '../assets/icons/close.svg';
 
 import validMapData from '../../example/valid-data-map.csv';
 import validChartData from '../../example/valid-chart-data.json';
+
+import { DataTransform } from '@cdc/core/components/DataTransform';
 
 export default function DataImport() {
   const {
@@ -29,6 +31,8 @@ export default function DataImport() {
     tempConfig,
     setTempConfig
   } = useContext(GlobalState);
+
+  const transform = new DataTransform();
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -53,30 +57,6 @@ export default function DataImport() {
       setConfig({...config, dataUrl: debouncedExternalURL})
     }
   }, [debouncedExternalURL, keepURL])
-
-  /**
-   * validateData:
-   * Check data for common issues
-   */
-  const validateData = (parsedData) => {
-    const errorsFound = []
-
-    // Empty data
-    if ( 0 === parsedData.length ) {
-      errorsFound.push(errorMessages.emptyData)
-    }
-
-    // Does it have the correct data structure?
-    if (parsedData.filter(row =>  row.constructor !== Object).length > 0) {
-      errorsFound.push(errorMessages.formatting);
-    }
-
-    if(errorsFound.length > 0) {
-      throw errorsFound;
-    }
-
-    return parsedData;
-  }
 
   const loadExternal = async () => {
     let dataURL = '';
@@ -202,7 +182,8 @@ export default function DataImport() {
   
       // Validate parsed data and set if no issues.
       try {
-        text = validateData(text);
+        text = transform.autoStandardize(text);
+        console.log(text);
         setConfig({...config, data:text});
       } catch (err) {
           setErrors(err);
@@ -239,11 +220,11 @@ export default function DataImport() {
             </label>
           </TabPane>
         </Tabs>
-        {errors.map((message, index) => (
+        {errors && (errors.map ? errors.map((message, index) => (
           <div className="error-box slim mt-2" key={`error-${message}`}>
             <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
           </div>
-        ))}
+        )) : errors.message)}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
         {/* TODO: Add more sample data in, but this will do for now. */}
         <span className="heading">Load Sample Data:</span>
@@ -259,7 +240,7 @@ export default function DataImport() {
         </a>
         {config.data && (
           <div>
-            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
+            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Format your data &raquo;</span>
           </div>
         )}
       </div>
