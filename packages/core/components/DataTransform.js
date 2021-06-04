@@ -50,48 +50,38 @@ export class DataTransform {
       throw 'Error';
     }
 
-    if(description.series === true){
-      if(description.singleRow !== undefined){
-        if(description.seriesKey !== undefined){
-          let standardized = [];
-          
-        } else {
-          throw 'Error';
-        }
+    if(description.series === undefined){
+      throw 'Error';
+    }
+
+    if(description.series === true && description.singleRow === undefined){
+      throw 'Error';
+    }
+
+    if(description.series === true && description.singleRow === false){
+      if(description.seriesKey !== undefined && description.xKey !== undefined && description.valueKey !== undefined){
+        let standardizedMapped = {};
+        let standardized = [];
+
+        data.forEach((row) => {
+          if(standardizedMapped[row[description.xKey]]){
+            standardizedMapped[row[description.xKey]][row[description.seriesKey]] = row[description.valueKey];
+          } else {
+            standardizedMapped[row[description.xKey]] = {[description.xKey]: row[description.xKey], [row[description.seriesKey]]: row[description.valueKey]};
+          }
+        });
+
+        Object.keys(standardizedMapped).forEach((key) => {
+          standardized.push(standardizedMapped[key]);
+        });
+
+        return standardized;
       } else {
         throw 'Error';
       }
-    }
+    } 
 
     return data;
-    /*if(!description || description.horizontal === 'undefined'){
-      return;
-    }
-
-    if(!description || !description.root){
-      throw {id: this.constants.descriptionRoot, details: Object.keys(data[0])};
-    }
-
-    if(description.filters){
-      description.filters.forEach((filter) => {
-
-      });
-    }
-
-    if(description.seriesKey && description.value){
-
-    }
-
-    let rootValues = {};
-    data.forEach((row) => {
-      if(row[description.root] && rootValues[row[description.root]]){
-        throw {id: this.constants.descriptionSeriesFilter};
-      } else {
-        rootValues[row[description.root]] = true;
-      }
-    });
-
-    return data;*/
   }
 }
 

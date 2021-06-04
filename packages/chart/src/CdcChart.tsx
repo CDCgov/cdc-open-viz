@@ -11,7 +11,7 @@ import { timeParse, timeFormat } from 'd3-time-format';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
-import Waiting from '@cdc/core/components/Waiting';
+import DataTransform from '@cdc/core/components/DataTransform';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -26,6 +26,8 @@ export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} : 
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
+
+  const transform = new DataTransform();
 
   const [colorScale, setColorScale] = useState<any>(null);
 
@@ -64,12 +66,19 @@ export default function CdcChart(
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
-    let data = response.data ?? {}
+    let data = response.formattedData || response.data || {};
 
     if(response.dataUrl) {
       const dataString = await fetch(response.dataUrl);
 
       data = await dataString.json();
+
+      try {
+        data = transform.autoStandardize(data);
+        data = transform.developerStandardize(data, response.dataDescription);
+      } catch(e) {
+        //Data not able to be standardized, leave as is
+      }
     }
 
     setData(data);
@@ -281,9 +290,11 @@ export default function CdcChart(
     }
   }, [config, data])
 
-  useEffect(() => {
-    loadConfig();
-  }, [configObj.data])
+  if(configObj){
+    useEffect(() => {
+      loadConfig();
+    }, [configObj.data]);
+  }
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
