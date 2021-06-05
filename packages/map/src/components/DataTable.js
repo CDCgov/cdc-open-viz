@@ -133,10 +133,11 @@ const DataTable = (props) => {
 
     const csvData = Papa.unparse(data);
 
+    const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
+
     const saveBlob = () => {
       if (navigator.msSaveBlob) {
-        const dataBlob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
-        navigator.msSaveBlob(dataBlob, fileName);
+        navigator.msSaveBlob(blob, fileName);
       }
     }
 
@@ -144,7 +145,7 @@ const DataTable = (props) => {
       <a
         download={fileName}
         onClick={saveBlob}
-        href={`data:text/csv;base64,${Base64.encode(csvData)}`}
+        href={URL.createObjectURL(blob)}
         aria-label="Download this data in a CSV file format."
         className={`${headerColor} btn btn-download no-border`}
         data-html2canvas-ignore

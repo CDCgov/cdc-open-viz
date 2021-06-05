@@ -165,7 +165,7 @@
 			"link": ""
 		},
 		{
-			"Insured Rate": "83.1",
+			"Insured Rate": "0",
 			"Coverage Status": "Insured",
 			"state": "Kentucky",
 			"Year (Good filter option)": "2010",
@@ -347,7 +347,7 @@
 			"link": ""
 		},
 		{
-			"Insured Rate": "26.96",
+			"Insured Rate": "8",
 			"Coverage Status": "Insured",
 			"state": "Texas",
 			"Year (Good filter option)": "2010",
@@ -361,7 +361,7 @@
 			"link": ""
 		},
 		{
-			"Insured Rate": "453.2",
+			"Insured Rate": "45.2",
 			"Coverage Status": "Medicaid",
 			"state": "Vermont",
 			"Year (Good filter option)": "2010",
@@ -403,7 +403,7 @@
 			"link": "https://cdc.gov/"
 		},
 		{
-			"Insured Rate": "63",
+			"Insured Rate": "23",
 			"Coverage Status": "Insured",
 			"state": "Dallas",
 			"Year (Good filter option)": "2010",
@@ -487,7 +487,7 @@
 			"link": ""
 		},
 		{
-			"Insured Rate": "77",
+			"Insured Rate": "95",
 			"Coverage Status": "Insured",
 			"state": "District of Columbia",
 			"Year (Good filter option)": "2015",

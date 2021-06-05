@@ -3,14 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 // IE11
 import 'core-js/stable'
 import 'whatwg-fetch'
+import ResizeObserver from 'resize-observer-polyfill';
 
 // Third party
 import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
 import Papa from 'papaparse';
-import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
-import ResizeObserver from 'resize-observer-polyfill';
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
@@ -30,10 +29,10 @@ import './scss/btn.scss'
 import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
-// Open Viz
+// Core
 import Loading from '@cdc/core/components/Loading';
 
-// Components
+// Child Components
 import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
@@ -43,7 +42,23 @@ import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
-const CdcMap = ({className, config, navigationHandler:customNavigationHandler, isEditor, configUrl, logo = null, setConfig}) => {
+// Data props
+const stateValues = Object.values(supportedStates).flat()
+const stateKeys = Object.keys(supportedStates)
+
+const territoryValues = Object.values(supportedTerritories).flat()
+const territoryKeys = Object.keys(supportedTerritories)
+
+const countryValues = Object.values(supportedCountries).flat()
+const countryKeys = Object.keys(supportedCountries)
+
+const cityNames = Object.keys(supportedCities)
+
+// Memoized hash table of legend color values to prevent excessive calls
+let legendColors = new Map()
+
+// Component
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
     // State
     const [state, setState] = useState( JSON.parse(JSON.stringify(initialState)) )
     const [loading, setLoading] = useState(true)
@@ -55,18 +70,6 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
     const outerContainerRef = useRef(null);
     const mapSvg = useRef(null);
-
-    // Data props
-    const stateValues = Object.values(supportedStates).flat()
-    const stateKeys = Object.keys(supportedStates)
-
-    const territoryValues = Object.values(supportedTerritories).flat()
-    const territoryKeys = Object.keys(supportedTerritories)
-
-    const countryValues = Object.values(supportedCountries).flat()
-    const countryKeys = Object.keys(supportedCountries)
-
-    const cityNames = Object.keys(supportedCities)
 
     const closeModal = ({target}) => {
         if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && null !== modal) {
@@ -187,52 +190,6 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         setProcessedData( processData() )
     }
 
-    // This is only used when building a legend that has the unified option checked.
-    // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
-    const processUnifiedData = () => {
-        // All the data to be mapped
-        let rawData = state.data
-
-        const parsedData = []
-
-        const geoColumnName = state.columns.geo.name
-
-        const supportedUsGeos = stateValues.concat(territoryValues, cityNames)
-
-        const supportedWorldGeos = countryValues.concat(cityNames)
-
-        rawData.forEach((row, i) => {
-            let addRow = true
-
-            // Empty row check - Just checks for value of geo column
-            if(!row[state.columns.geo.name]) {
-                addRow = false
-            }
-
-            // Geo matching
-            let geoName = row[geoColumnName]
-
-            // Don't add data that can't display on the map, so check based on map type
-            if(addRow && "us" === state.general.geoType && false === state.general.hasRegions) {
-                // If this doesn't match a supported US geo, don't add it.
-                if( false === supportedUsGeos.includes(geoName) ) {
-                    addRow = false
-                }
-            }
-
-            if(addRow && "world" === state.general.geoType && false === supportedWorldGeos.includes(geoName) && false === state.general.hasRegions) {
-                addRow = false
-            }
-
-            // Passed all of our checks, add to processedData
-            if(true === addRow) {
-                parsedData.push(row)
-            }
-        })
-
-        return parsedData
-    }
-
     const displayDataAsText = (value, columnName, returnJsx) => {
         if(value === null) {
             return ""
@@ -292,17 +249,26 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         return false
     }
 
-    const applyColorToLegend = (legend) => {
+    const applyColorToLegend = (legendIdx) => {
+        // Check for memoized value so we don't have to run through this whole function
+        if(legendColors.has(legendIdx)) {
+            return legendColors.get(legendIdx)
+        }
+
+        let legend = processedLegend.data[legendIdx]
+
+        let numberOfSpecialClasses = 0
+
         // Filter out special classes, they don't count.
-        let regularLegendItems = processedLegend.data.filter((legendItem) => !legendItem.special).length
+        let regularLegendItems = processedLegend.data.filter((legendItem) => {
+            if(legendItem.special) numberOfSpecialClasses += 1
+            return !legendItem.special
+        }).length
 
         // Default to "bluegreen" color scheme if the passed color isn't valid
-        let mapColorPalette = colorPalettes[state.color] ||
-            colorPalettes['bluegreen']
+        let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreen']
 
-        const numberOfSpecialClasses = processedLegend.data.length - regularLegendItems
-
-        let legendItemIndex = processedLegend.data.indexOf(legend) - numberOfSpecialClasses
+        let colorIdx = legendIdx - numberOfSpecialClasses
 
         let legendValue = legend.value || legend.category
 
@@ -314,13 +280,12 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
             return specialClassColors[state.legend.specialClasses.indexOf(
                 legendValue)]
-
         }
 
         let specificColor
 
 	    if ( state.color.includes( 'qualitative' ) ) {
-        	specificColor = legendItemIndex
+        	specificColor = colorIdx
 	    } else {
             const colorDistributions = {
                 1: [ 1 ],
@@ -334,11 +299,12 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                 9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
             }
 
-
             let distributionArray = colorDistributions[ regularLegendItems ]
 
-            specificColor = distributionArray[ legendItemIndex ]
+            specificColor = distributionArray[ colorIdx ]
         }
+      
+      legendColors.set(legendIdx, mapColorPalette[specificColor])
 
       return mapColorPalette[specificColor]
 
@@ -350,8 +316,8 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         const generateColorsArray = (color) => {
             return [
                 color,
-                chroma(color).saturate(1.5).hex(),
-                chroma(color).darken(0.5).hex()
+                chroma(color).saturate(1.3).hex(),
+                chroma(color).darken(0.3).hex()
             ]
         }
 
@@ -383,7 +349,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                 const legendValue = legend.value || legend.category
 
                 if (true === legend.special && value === legendValue) {
-                    color = applyColorToLegend(legend)
+                    color = applyColorToLegend(i)
 
                     if (legend && legend.disabled === true) {
                         return false
@@ -403,14 +369,16 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         // Check if it's a zero that needs to be separated
         if ( true === state.legend.separateZero && 0 === value && 0 < processedLegend.data.length ) {
             // Grab the 0 legend item
-            let legend = processedLegend.data.filter((legendItem) => legendItem.max === 0 && legendItem.min === 0)[0]
+            let idx = processedLegend.data.findIndex((legendItem) => legendItem.max === 0 && legendItem.min === 0)
+
+            let legend = processedLegend.data[idx]
 
             if (legend) {
                 if (legend.disabled === true) {
                     return false
                 }
 
-                color = applyColorToLegend(legend)
+                color = applyColorToLegend(idx)
             }
         }
 
@@ -428,7 +396,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                             return false
                         }
 
-                        color = applyColorToLegend(legend)
+                        color = applyColorToLegend(i)
                     }
 
                 }
@@ -443,7 +411,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
                     if (i === processedLegend.data.length - 1) {
                         if (value >= legend.min && value <= legend.max) {
-                            color = applyColorToLegend(legend)
+                            color = applyColorToLegend(i)
 
                             if (legend.disabled === true) {
                                 return false
@@ -452,7 +420,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                         }
                     } else {
                         if (value >= legend.min && value < legend.max) {
-                            color = applyColorToLegend(legend)
+                            color = applyColorToLegend(i)
 
                             if (legend.disabled === true) {
                                 return false
@@ -469,7 +437,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     const legend = processedLegend.data[i]
 
                     if (legend.category == value) { // eslint-disable-line
-                        color = applyColorToLegend(legend)
+                        color = applyColorToLegend(i)
 
                         if (legend.disabled === true) {
                             return false
@@ -535,7 +503,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
     }
 
-    // TODO: This needs a larger refactor at a later date to remove hashing and streamline the way it's doing a lot of things.
+    // TODO: This needs a refactor to remove hashing and streamline the way it's doing a lot of things.
     // This is working right now but is very messy and poorly commented.
     const processLegend = () => {
         const
@@ -767,7 +735,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     const hashedGeos = allData.selectedGeos.map( (row, i) => {
                         let fullRow = dataObj[row]
 
-                        let hashedString = Base64.encode( JSON.stringify( fullRow ) )
+                        let hashedString = hashRow(fullRow)
 
                         return hashedString
 
@@ -813,6 +781,8 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         }
 
         processedDataObj.data = legendData
+
+        legendColors = new Map() // Reset legend colors
 
         return processedDataObj
     }
@@ -915,7 +885,6 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
 
     // This calculates what is actually going to be seen and displayed by the map and data table at render. It accounts for things like toggling legend items as well as filters.
     const processData = () => {
-
         let dataObj = state.data
 
         const parsedData = {}
@@ -998,8 +967,54 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         return parsedData
     }
 
+    // This is only used when building a legend that has the unified option checked.
+    // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
+    const processUnifiedData = () => {
+        // All the data to be mapped
+        let rawData = state.data
+
+        const parsedData = []
+
+        const geoColumnName = state.columns.geo.name
+
+        const supportedUsGeos = stateValues.concat(territoryValues, cityNames)
+
+        const supportedWorldGeos = countryValues.concat(cityNames)
+
+        rawData.forEach((row, i) => {
+            let addRow = true
+
+            // Empty row check - Just checks for value of geo column
+            if(!row[state.columns.geo.name]) {
+                addRow = false
+            }
+
+            // Geo matching
+            let geoName = row[geoColumnName]
+
+            // Don't add data that can't display on the map, so check based on map type
+            if(addRow && "us" === state.general.geoType && false === state.general.hasRegions) {
+                // If this doesn't match a supported US geo, don't add it.
+                if( false === supportedUsGeos.includes(geoName) ) {
+                    addRow = false
+                }
+            }
+
+            if(addRow && "world" === state.general.geoType && false === supportedWorldGeos.includes(geoName) && false === state.general.hasRegions) {
+                addRow = false
+            }
+
+            // Passed all of our checks, add to processedData
+            if(true === addRow) {
+                parsedData.push(row)
+            }
+        })
+
+        return parsedData
+    }
+
     const navigationHandler = (urlString) => {
-        // Call custom navigation method if there is one
+        // Call custom navigation method if passed
         if(customNavigationHandler) {
             customNavigationHandler(urlString);
             return;
@@ -1111,11 +1126,9 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }
 
     const generateValuesForFilter = (columnName, data = state.data) => {
-
         const values = []
 
         data.forEach( (row) => {
-
             const value = row[columnName]
 
             if(value && false === values.includes(value)) {
@@ -1125,7 +1138,6 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
         })
 
         return values
-
     }
 
     const cleanCsvData = (data)  => {
@@ -1151,11 +1163,19 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }
 
     const hashRow = (rowObj)  => {
-        return Base64.encode( JSON.stringify( rowObj ) )
-    }
+        let str = JSON.stringify( rowObj )
 
-    const announceChange = (value) => {
-        setAccessibleStatus(value)
+        let hash = 0;
+
+        if (str.length == 0) return hash
+
+        for (let i = 0; i < str.length; i++) {
+            let char = str.charCodeAt(i);
+            hash = ((hash<<5)-hash)+char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        return hash
     }
 
     const geoClickHandler = (key, value) => {
@@ -1216,9 +1236,10 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }, [])
 
     useEffect(() => {
-        if(processedData.length !== state.data.length || state.filters.length)
-        setProcessedData( processData() )
-    }, [state.data, state.filters])
+        if(processedData.length !== state.data.length || state.filters.length) {
+            setProcessedData( processData() )
+        }
+    }, [state])
 
     useEffect(() => {
         let newProcessedLegend = processLegend()
@@ -1227,8 +1248,23 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
             setProcessedLegend(newProcessedLegend)
         }
     }, [processedData])
-console.log({state})
-    // Map Container Classes
+
+    // Destructuring for more readable JSX
+    const { general, tooltips, dataTable } = state
+    const { title = '', subtext = ''} = general
+
+    // Outer container classes
+    let outerContainerClasses = [
+        'cdc-open-viz-module',
+        'cdc-map-outer-container',
+        viewport
+    ]
+
+    if(className) {
+        outerContainerClasses.push(className)
+    }
+
+    // Map container classes
     let mapContainerClasses = [
         'map-container',
         state.legend.position,
@@ -1236,11 +1272,11 @@ console.log({state})
         state.general.geoType
     ]
 
-    if(null !== modal) {
+    if(modal) {
         mapContainerClasses.push('modal-background')
     }
 
-    if(state.general.type === 'navigation' && true === state.general.fullBorder) {
+    if(general.type === 'navigation' && true === general.fullBorder) {
         mapContainerClasses.push('full-border')
     }
 
@@ -1257,30 +1293,29 @@ console.log({state})
         displayGeoName
     }
 
-    const { title = '', subtext = ''} = state.general
+    let processedDataKeys = Object.keys(processedData)
 
     return (
-        <div className={className ? `cdc-open-viz-module cdc-map-outer-container ${className} ${viewport}` : `cdc-open-viz-module cdc-map-outer-container ${viewport}` } ref={outerContainerRef}>
+        <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
             {true === loading && <Loading />}
-            {true === isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} generateValuesForFilter={generateValuesForFilter} processData={processData} setProcessedData={setProcessedData} processedData={processedData} processLegend={processLegend} setProcessedLegend={setProcessedLegend} processedLegend={processedLegend} setParentConfig={setConfig} loading={loading} />}
+            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} generateValuesForFilter={generateValuesForFilter} processData={processData} setProcessedData={setProcessedData} processedData={processedData} processLegend={processLegend} setProcessedLegend={setProcessedLegend} processedLegend={processedLegend} setParentConfig={setConfig} loading={loading} />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
-                {'hover' === state.tooltips.appearanceType &&
+                {'hover' === tooltips.appearanceType &&
                     <ReactTooltip
                         id="tooltip"
                         place="right"
                         type="light"
                         html={true}
-                        className={state.tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
+                        className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
                     />
                 }
-                <header className={state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                    <div role="heading" className={'map-title ' + state.general.headerColor}>
+                <header className={general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
+                    <div role="heading" className={'map-title ' + general.headerColor}>
                         { parse(title) }
                     </div>
                 </header>
-
                 <section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
-                    {state.general.showDownloadMediaButton === true &&
+                    {general.showDownloadMediaButton === true &&
                         <div className="map-downloads" data-html2canvas-ignore>
                             <div className="map-downloads__ui btn-group">
                                 <button className="btn" title="Download Map as Image"
@@ -1296,22 +1331,22 @@ console.log({state})
                     }
 
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {null !== modal && <Modal type={state.general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToValue={applyLegendToValue} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                            {'us' === state.general.geoType && !state.general.displayAsHex && <UsaMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
-                            {state.general.displayAsHex && 'data' === state.general.type && <HexMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
-                            {'world' === state.general.geoType && <WorldMap supportedCountries={supportedCountries} countryValues={countryValues} {...mapProps} />}
-                            {"data" === state.general.type && logo && <img src={logo} alt="" className="map-logo"/>}
+                        {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToValue={applyLegendToValue} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                            {'us' === general.geoType && !general.displayAsHex && <UsaMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
+                            {general.displayAsHex && 'data' === general.type && <HexMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
+                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} countryValues={countryValues} {...mapProps} />}
+                            {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
-                    {"navigation" === state.general.type &&
+                    {"navigation" === general.type &&
                         <NavigationMenu
                             displayGeoName={displayGeoName}
                             processedData={processedData}
-                            options={state.general}
+                            options={general}
                             columns={state.columns}
                             navigationHandler={(val) => navigationHandler(val)}
                         />
                     }
-                    {state.general.showSidebar && 'navigation' !== state.general.type && false === loading  && Object.keys(processedData).length > 0 &&
+                    {general.showSidebar && 'navigation' !== general.type && false === loading  && processedDataKeys.length > 0 &&
                         <Sidebar
                             viewport={viewport}
                             legend={state.legend}
@@ -1326,26 +1361,26 @@ console.log({state})
                             resetLegendToggles={resetLegendToggles}
                             applyColorToLegend={applyColorToLegend}
                             changeFilterActive={changeFilterActive}
-                            announceChange={announceChange}
+                            setAccessibleStatus={setAccessibleStatus}
                         />
                     }
                 </section>
-                {true === state.dataTable.forceDisplay && state.general.type !== "navigation" && false === loading && Object.keys(processedData).length > 0 &&
+                {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading && processedDataKeys.length > 0 &&
                     <DataTable
                         state={state}
                         navigationHandler={navigationHandler}
-                        expandDataTable={state.general.expandDataTable}
-                        headerColor={state.general.headerColor}
+                        expandDataTable={general.expandDataTable}
+                        headerColor={general.headerColor}
                         columns={state.columns}
-                        showDownloadButton={state.general.showDownloadButton}
+                        showDownloadButton={general.showDownloadButton}
                         data={state.data}
                         processedData={processedData}
                         processedLegend={processedLegend}
                         displayDataAsText={displayDataAsText}
                         displayGeoName={displayGeoName}
                         applyLegendToValue={applyLegendToValue}
-                        tableTitle={state.dataTable.title}
-                        mapTitle={state.general.title}
+                        tableTitle={dataTable.title}
+                        mapTitle={general.title}
                         viewport={viewport}
                     />
                 }
