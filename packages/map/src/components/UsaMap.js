@@ -135,118 +135,93 @@ const UsaMap = (props) => {
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
-  const geoList = (geographies) => {
-    const unusedStyles = {
-      default: {
-        stroke: geoStrokeColor,
-        strokeWidth: '1.3px',
-        fill: '#E6E6E6'
+  const offsets = {
+    VT: [50, -8],
+    NH: [34, 2],
+    MA: [30, -1],
+    RI: [28, 2],
+    CT: [35, 10],
+    NJ: [34, 1],
+    DE: [33, 0],
+    MD: [47, 10]
+  };
+
+  const nudges = {
+    'FL': [15, 3],
+    'AK': [0, -8],
+    'CA': [-10, 0],
+    'NY': [5, 0],
+    'MI': [13, 20],
+    'LA': [-10, -3],
+    'HI': [-10, 10],
+    'ID': [0, 10],
+    'WV': [-2, 2]
+  }
+
+  let xyMemo = new Map()
+
+  const geoLabelJsx = (geo, bgColor = "#FFFFFF") => {
+      let centroid
+      
+      if( xyMemo.has(geo.id) ) {
+        centroid = xyMemo.get(geo.id)
+      } else {
+        centroid = geoCentroid(geo)
+        xyMemo.set(geo.id, centroid)
       }
-    }
-    // If there's regions and they are filled out, slot the geos into groups
-    if (state.general.hasRegions === true && state.columns.geosInRegion.name.length > 0) {
-      // Create new geographies list where all the data is keyed to the original data object.
-      const regionGeographies = {};
 
-      geographies.forEach((geo) => {
-        regionGeographies[geo.properties.name] = geo;
-      });
+      const curr = stateAbbrs.find(s => s.val === geo.id)
 
-      // Get list of geos in every region
-      const regions = Object.keys(processedData);
+      if(!curr) return null
 
-      const regionsJsx = [];
+      let textColor = "#FFF"
 
-      regions.forEach((regionName) => {
-        const regionData = processedData[regionName];
+      // Dynamic text color
+      if (chroma.contrast(textColor, bgColor) < 4.5 ) {
+        textColor = '#202020';
+      }
 
-        let legendColors;
+      let x = 0, y = 5
 
-        const geosInRegion = regionData[state.columns.geosInRegion.name].split(', ');
+      if(nudges[curr.id]) {
+        x += nudges[curr.id][0]
+        y += nudges[curr.id][1]
+      }
 
-        // Once we receive data for this geographic item, setup variables.
-        if (regionData !== undefined) {
-          legendColors = applyLegendToValue(regionData);
-        }
-
-        // If a legend applies, return it with appropriate information.
-        if (legendColors && legendColors[0] !== '#000000') {
-          const toolTip = applyTooltipsToGeo(regionName, regionData);
-
-          const stylesObj = {
-            base: {
-              fill: legendColors[0],
-              '&:hover': {
-                fill: `${legendColors[1]}  !important`,
-              },
-              '&:active': {
-                fill: `${legendColors[2]}  !important`
-              },
-            }
-          };
-
-          // When to add pointer cursor
-          if ((state.columns.navigate && regionData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-            stylesObj.base = {
-              ...stylesObj.base,
-              cursor: 'pointer'
-            };
-          }
-
-          let regionPath = '';
-
-          geosInRegion.forEach((name) => {
-            const topoJsonData = regionGeographies[name];
-
-            // If a city of territory slipped in, ignore instead of failing
-            if (!topoJsonData) {
-              return true;
-            }
-
-            // Add the path data for this geo to the larger region path
-            regionPath += topoJsonData.svgPath;
-
-            // When done processing, remove this item from the full list so we know to render the remaining geos on the map out differently after we're done constructing our regions.
-            delete regionGeographies[name];
-          });
-
-          const regionGroup = (
-            <path
-              css={stylesObj.base}
-              data-tip={toolTip}
-              data-for="tooltip"
-              tabIndex={-1}
-              className={`rsm-geography ${state.general.geoBorderColor} region-${regionName}`}
-              style={{ stroke: geoStrokeColor, strokeWidth: '1.3px', fill: legendColors[0] }}
-              key={`region-${regionName}`}
-              onClick={() => geoClickHandler(regionName, regionData)}
-              d={regionPath}
-            />
-          );
-
-          regionsJsx.push(regionGroup);
-        }
-      });
-
-      // Regions are done, render out the remaining
-      const unusedGeos = Object.keys(regionGeographies).map((key) => {
-        const geo = regionGeographies[key];
-
+      if( undefined === offsets[curr.id] && centroid[0] > -160 && centroid[0] < -67 ) {
         return (
-          <Geography
-            style={unusedStyles}
-            key={geo.rsmKey}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
-            tabIndex={-1}
-            geography={geo}
-          />
-        );
-      });
+          <Marker coordinates={centroid}>
+            <text x={x} y={y} fontSize={13} strokeWidth="0" style={{fill: textColor, stroke: 0}} textAnchor="middle">
+              {curr.id}
+            </text>
+          </Marker>
+        )
+      }
 
-      regionsJsx.push(unusedGeos);
+      let [dx, dy] = offsets[curr.id]
 
-      return regionsJsx;
-    }
+      return (
+        <Annotation
+          subject={centroid}
+          connectorProps={{
+            stroke: "rgba(0,0,0,.5)",
+            strokeWidth: 2,
+            strokeLinecap: "round"
+          }}
+          dx={dx}
+          dy={dy}
+        >
+          <text x={4} strokeWidth="0" fontSize={12} style={{fill: "#202020"}} alignmentBaseline="middle">
+            {curr.id}
+          </text>
+        </Annotation>
+      )
+  }
+
+  // Constructs and displays markup for all geos on the map (except territories right now)
+  const constructGeoJsx = (geographies) => {
+    // let label = state.general.displayStateLabels
+    let label = true
 
     const geosJsx = geographies.map((geo) => {
       const geoName = geo.properties.name;
@@ -270,15 +245,14 @@ const UsaMap = (props) => {
         const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
 
         const stylesObj = {
-          default: {
-            fill: legendColors[0],
-            stroke: geoStrokeColor
-          },
-          hover: {
+          fill: legendColors[0],
+          stroke: geoStrokeColor,
+          cursor: 'default',
+          '&:hover': {
             fill: legendColors[1],
             stroke: geoStrokeColor
           },
-          pressed: {
+          '&:active': {
             fill: legendColors[2],
             stroke: geoStrokeColor
           },
@@ -286,53 +260,57 @@ const UsaMap = (props) => {
 
         // When to add pointer cursor
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-          stylesObj.hover = {
-            ...stylesObj.hover,
-            cursor: 'pointer'
-          };
+          stylesObj.cursor = 'pointer'
         }
 
         const renderedGeo = (
-          <Geography
-            data-tip={toolTip}
-            data-for="tooltip"
-            tabIndex={-1}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
-            key={geo.rsmKey}
-            geography={geo}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
-            style={stylesObj}
-          />
+          <g className="geo-group" key={geo.rsmKey + "-group"} data-tip={toolTip} data-for="tooltip" css={stylesObj} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
+            <Geography
+              tabIndex={-1}
+              className={`rsm-geography ${state.general.geoBorderColor}`}
+              key={geo.rsmKey}
+              geography={geo}
+            />
+            {label && geoLabelJsx(geo, legendColors[0])}
+          </g>
         );
 
         return renderedGeo;
       }
 
-      // Default return state, just the geo territory with no additional information
+      const unusedStyles = {
+        stroke: geoStrokeColor,
+        strokeWidth: '1.3px',
+        fill: '#E6E6E6',
+        cursor: 'default'
+      }
+
+      // Default return state, just geo with no additional information
       return (
-        <Geography
-          key={geo.rsmKey}
-          className={`rsm-geography ${state.general.geoBorderColor}`}
-          style={ unusedStyles }
-          tabIndex={-1}
-          geography={geo}
-        />
-      );
+        <g className="geo-group" key={geo.rsmKey + "-group"} css={unusedStyles}>
+          <Geography
+            key={geo.rsmKey}
+            className={`rsm-geography ${state.general.geoBorderColor}`}
+            tabIndex={-1}
+            geography={geo}
+          />
+          {/* {label && geoLabelJsx(geo)} */}
+        </g>
+      )
     });
 
-    return geosJsx;
-  };
+    // Cities
+    geosJsx.push(<CityList
+      key="cities"
+      processedData={processedData}
+      state={state}
+      geoClickHandler={geoClickHandler}
+      applyTooltipsToGeo={applyTooltipsToGeo}
+      displayGeoName={displayGeoName}
+      applyLegendToValue={applyLegendToValue}
+    />)
 
-  const offsets = {
-    VT: [50, -8],
-    NH: [34, 2],
-    MA: [30, -1],
-    RI: [28, 2],
-    CT: [35, 10],
-    NJ: [34, 1],
-    DE: [33, 0],
-    MD: [47, 10],
-    DC: [49, 21]
+    return geosJsx;
   };
 
   return (
@@ -347,65 +325,19 @@ const UsaMap = (props) => {
             data-html2canvas-ignore
           >
             <Geographies geography={topoJsonStates}>
-              {({ geographies }) => (
-                <>
-                  {geoList(geographies)}
-                  {state.general.displayStateLabels && geographies.map(geo => {
-                    const centroid = geoCentroid(geo);
-                    const cur = stateAbbrs.find(s => s.val === geo.id)
-                    return (
-                      <g key={geo.rsmKey + "-name"}>
-                        {cur &&
-                          centroid[0] > -160 &&
-                          centroid[0] < -67 &&
-                          (Object.keys(offsets).indexOf(cur.id) === -1 ? (
-                            <Marker coordinates={centroid}>
-                              <text y="5" fontSize={12} style={{fill: "rgba(0, 0, 0, .8)"}} textAnchor="middle">
-                                {cur.id}
-                              </text>
-                            </Marker>
-                          ) : (
-                            <Annotation
-                              subject={centroid}
-                              dx={offsets[cur.id][0]}
-                              dy={offsets[cur.id][1]}
-                              connectorProps={{
-                                stroke: "rgba(0,0,0,.5)",
-                                strokeWidth: 2,
-                                strokeLinecap: "round"
-                              }}
-                            >
-                              <text x={4} fontSize={14} alignmentBaseline="middle">
-                                {cur.id}
-                              </text>
-                            </Annotation>
-                          ))}
-                      </g>
-                    );
-                  })}
-                </>
-              )}
+              {({ geographies }) => constructGeoJsx(geographies)}
             </Geographies>
-            <CityList
-              processedData={processedData}
-              state={state}
-              geoClickHandler={geoClickHandler}
-              applyTooltipsToGeo={applyTooltipsToGeo}
-              displayGeoName={displayGeoName}
-              applyLegendToValue={applyLegendToValue}
-            />
           </ComposableMap>
         </div>
       </div>
-      {territories.length > 0
-                && (
-                <section className="territories">
-                  <ul>
-                    <li className="label">{state.general.territoriesLabel}</li>
-                    {territories}
-                  </ul>
-                </section>
-                )}
+      {territories.length && (
+        <section className="territories">
+          <ul>
+            <li className="label">{state.general.territoriesLabel}</li>
+            {territories}
+          </ul>
+        </section>
+      )}
     </ErrorBoundary>
   );
 };

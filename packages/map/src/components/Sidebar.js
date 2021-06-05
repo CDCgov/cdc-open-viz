@@ -8,7 +8,7 @@ const Sidebar = (props) => {
     legend,
     filters,
     columns,
-    announceChange,
+    setAccessibleStatus,
     applyColorToLegend,
     changeFilterActive,
     resetLegendToggles,
@@ -30,10 +30,10 @@ const Sidebar = (props) => {
   };
 
   // Toggles if a legend is active and being applied to the map and data table.
-  const toggleLegendActive = (index) => {
+  const toggleLegendActive = (idx) => {
     const { data } = processedLegend;
 
-    const newValue = !data[index].disabled;
+    const newValue = !data[idx].disabled;
 
     let disabledAmt = processedLegend.disabledAmt || 0;
 
@@ -43,7 +43,7 @@ const Sidebar = (props) => {
       disabledAmt--;
     }
 
-    data[index].disabled = newValue; // Toggle!
+    data[idx].disabled = newValue; // Toggle!
 
     const newObj = {
       ...processedLegend,
@@ -54,7 +54,7 @@ const Sidebar = (props) => {
     setProcessedLegend(newObj);
   };
 
-  const legendList = processedLegend.data.map((entry, index) => {
+  const legendList = processedLegend.data.map((entry, idx) => {
     const entryMax = addCommas(entry.max);
 
     const entryMin = addCommas(entry.min);
@@ -62,7 +62,7 @@ const Sidebar = (props) => {
     let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
 
     // If interval, add some formatting
-    if (legend.type === 'equalinterval' && index
+    if (legend.type === 'equalinterval' && idx
       !== processedLegend.data.length - 1) {
       formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
     }
@@ -85,44 +85,42 @@ const Sidebar = (props) => {
 
     return (
       <li
-        key={index}
+        key={idx}
         title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => { toggleLegendActive(index); announceChange(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`); }}
+        onClick={() => { toggleLegendActive(idx); setAccessibleStatus(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`); }}
         className={disabled ? 'disabled single-legend' : 'single-legend'}
       ><span
         className="color"
         style={{
-          backgroundColor: applyColorToLegend(
-            entry
-          ),
+          backgroundColor: applyColorToLegend(idx),
         }}
       /> <span className="label">{legendLabel}</span>
       </li>
     );
   });
 
-  const filtersList = filters.map((singleFilter, index) => {
+  const filtersList = filters.map((singleFilter, idx) => {
     const values = [];
 
-    singleFilter.values.forEach((filterOption, index) => {
+    singleFilter.values.forEach((filterOption, idx) => {
       values.push(<option
-        key={index}
+        key={idx}
         value={filterOption}
       >{filterOption}
       </option>);
     });
 
     return (
-      <section key={index}>
-        <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
+      <section key={idx}>
+        <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>
         <select
-          id={`filter-${index}`}
+          id={`filter-${idx}`}
           className="filter-select"
-          data-index="0"
+          data-idx="0"
           value={singleFilter.active}
           onChange={(val) => {
-            changeFilterActive(index, val.target.value);
-            announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
+            changeFilterActive(idx, val.target.value);
+            setAccessibleStatus(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
           }}
         >
           {values}
@@ -141,7 +139,7 @@ const Sidebar = (props) => {
             onClick={(e) => {
               e.preventDefault();
               resetLegendToggles();
-              announceChange('Legend has been reset, please reference the data table to see updated values.');
+              setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.');
             }}
             className="clear btn"
           >Clear
@@ -150,8 +148,8 @@ const Sidebar = (props) => {
         {legend.title && <h2>{ parse(legend.title) }</h2>}
         {legend.dynamicDescription === false && legend.description
           && <p>{ parse(legend.description) }</p>}
-        {legend.dynamicDescription === true && filters.map((filter, index) => {
-          const lookupStr = `${index},${filter.values.indexOf(String(filter.active))}`;
+        {legend.dynamicDescription === true && filters.map((filter, idx) => {
+          const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`;
 
           // Do we have a custom description for this?
           const desc = legend.descriptions[lookupStr] || '';

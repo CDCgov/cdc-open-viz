@@ -171,6 +171,7 @@
   
     .accordion__button[aria-expanded='true']::before,
     .accordion__button[aria-selected='true']::before {
+      top: 45%;
       transform: rotate(45deg) translateY(-50%);
       margin-right: 1.3em;
       transition: .1s all;

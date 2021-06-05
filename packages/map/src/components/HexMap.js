@@ -261,11 +261,10 @@ const HexMap = (props) => {
   const centerY = height / 2;
   const scale = (width / 220) * 160;
 
-  return width < 10 ? null : ( 
+  return ( 
     <div>
       <svg 
-        viewBox={`0 0 ${width} ${height}`} 
-        data-html2canvas="true" 
+        viewBox={`0 0 ${width} ${height}`}
         className="rsm-svg" 
         style={{width: '100%', height:'100%', overflow: 'hidden'}}
       >

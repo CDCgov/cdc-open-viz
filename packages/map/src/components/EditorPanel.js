@@ -92,7 +92,7 @@ const EditorPanel = memo((props) => {
 
   const { general, color, columns, legend, data, filters, dataTable, tooltips} = state
 
-  const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
+  const [ requiredColumns, setRequiredColumns ] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const [ configTextboxValue, setConfigTextbox ] = useState({})
 
@@ -176,6 +176,7 @@ const EditorPanel = memo((props) => {
           ...state,
           color: value
         })
+        processLegend() // Needed to reset memoized legend colors
       break;
       case 'hasRegions':
         setState({
@@ -341,16 +342,6 @@ const EditorPanel = memo((props) => {
                 }
               })
               break;
-            case 'hex':
-              setState({
-                ...state,
-                general: {
-                    ...state.general,
-                    showSidebar: true,
-                    type: "hex"
-                }
-              })
-            break;
             default:
                 console.warn("Map type not set")
             break;
@@ -484,7 +475,7 @@ const EditorPanel = memo((props) => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    const columnList = []
+    let columnList = []
 
     // Geo is always required
     if('' === state.columns.geo.name) {
@@ -498,8 +489,8 @@ const EditorPanel = memo((props) => {
       columnList.push('Geos in Region')
     }
 
-    // Primary is required if we're on a data map
-    if('data' === state.general.type && '' === state.columns.primary.name) {
+    // Primary is required if we're on a data map or a point map
+    if('navigation' !== state.general.type && '' === state.columns.primary.name) {
       columnList.push('Primary')
     }
 
@@ -507,6 +498,8 @@ const EditorPanel = memo((props) => {
     if('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate) ) {
       columnList.push('Navigation')
     }
+
+    if(columnList.length === 0) columnList = null
 
     setRequiredColumns(columnList)
   }, [state.columns, state.general.hasRegions, state.general.type])
@@ -690,7 +683,7 @@ const EditorPanel = memo((props) => {
   useEffect(() => columnsRequiredChecker(), [state.columns, state.general])
 
   useEffect(() => {
-    if(0 === requiredColumns.length && false === loading) {
+    if(null === requiredColumns && false === loading) {
       setProcessedData( processData() )
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -850,20 +843,21 @@ const EditorPanel = memo((props) => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
+      {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>
-            <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* General */}
+            <Accordion>
+            <AccordionItem> {/* General */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    General
+                    Type
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {/* Geography */}
                   <label>
                     <span className="edit-label column-heading">Geography</span>
                     <ul className="geo-buttons">
@@ -878,30 +872,38 @@ const EditorPanel = memo((props) => {
                     </ul>
                   </label>
                   <label>
-                    <span className="edit-label column-heading">Map Type</span>
-                    <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
-                      <option value="data">Data</option>
-                      <option value="navigation">Navigation</option>
-                    </select>
+                  {/* Type */}
+                  <span className="edit-label column-heading">Map Type</span>
+                  <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
+                    <option value="data">Data</option>
+                    <option value="navigation">Navigation</option>
+                  </select>
                   </label>
+                  {/* SubType */}
                   {'us' === state.general.geoType && 'data' === state.general.type &&
-                    <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
-                      <span className="edit-label">Display As Hex Map</span>
-                    </label>
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
+                    <span className="edit-label">Display As Hex Map</span>
+                  </label>
                   }
                   {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
-                    <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
-                      <span className="edit-label">Display state labels</span>
-                    </label>
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
+                    <span className="edit-label">Display state labels</span>
+                  </label>
                   }
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem> {/* General */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    General
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
                   <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
                   <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
-                  {'us' === state.general.geoType &&
-                    <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
-                  }
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1299,7 +1301,7 @@ const EditorPanel = memo((props) => {
                 <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>This can cause serious errors in your map.</p></div></section>
                 <p className="pb-2">This tool displays the actual map configuration <acronym title="JavaScript Object Notation">JSON</acronym> that is generated by this editor and allows you to edit properties directly and apply them.</p>
                 <textarea value={ configTextboxValue } onChange={(event) => setConfigTextbox(event.target.value)} />
-                <button className="btn full-width" onClick={() => loadConfig(JSON.parse(configData))}>Apply</button>
+                <button className="btn full-width" onClick={() => loadConfig( JSON.parse( configTextboxValue ) )}>Apply</button>
               </React.Fragment>
             )}
           </div>
