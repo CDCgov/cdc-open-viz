@@ -76,7 +76,7 @@ export default function ChooseTab() {
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
             </ul>
             {config.type && <div className="mt-3">
-                <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(3)}>Configure your <span className="capitalize">{config.type}</span> &raquo;</span>
+                <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(2)}>Configure your <span className="capitalize">{config.type}</span> &raquo;</span>
             </div>}
         </div>
     )

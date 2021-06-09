@@ -15,6 +15,7 @@
         top: 0;
         margin-top: 3rem;
         z-index: 1;
+        overflow-y: auto;
         .tabs {
             > ul.nav {
                 display: flex;
@@ -81,6 +82,50 @@
             font-size: .8rem;
             font-style: italic;
             color: $mediumGray;
+        }
+        .btn {
+            display: inline;
+            margin: 0.25em;
+        }
+        .question {
+            margin-bottom: 1em;
+        }
+        .table-button {
+            display: inline-block;
+            max-width: 275px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            background-color: #eee;
+            padding: 1.5em 0.5em;
+            margin: 0.5em;
+            font-size: 0.8em;
+            text-align: center;
+
+            &.active {
+                border: 2px solid #005eaa;
+            }
+
+            p {
+                margin-bottom: 1em;
+            }
+
+            table {
+                border: 1px solid #aaa;
+                border-collapse: collapse;
+                margin: auto;
+
+                th {
+                    background-color: #005eaa;
+                    color: white;
+                    text-align: left;
+                }
+
+                th, td {
+                    border-top: 1px solid #aaa;
+                    border-bottom: 1px solid #aaa;
+                    padding: 0 5px;
+                }
+            }
         }
     }
     &::before {
