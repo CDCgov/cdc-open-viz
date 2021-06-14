@@ -7,13 +7,13 @@ import {
   AccordionItemPanel,
   AccordionItemButton,
 } from 'react-accessible-accordion';
-import { useDebounce } from 'use-debounce';
 
+import { useDebounce } from 'use-debounce';
 import Context from '../context';
 import WarningImage from '../images/warning.svg';
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
+import * as Constants from '../constants';
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -91,7 +91,6 @@ const EditorPanel = memo(() => {
     config,
     updateConfig,
     loading,
-    colorPalettes,
     data,
     setParentConfig
   } = useContext(Context);
@@ -104,6 +103,10 @@ const EditorPanel = memo(() => {
     // Top level
     if( null === section && null === subsection) {
       let updatedConfig = {...config, [fieldName]: newValue};
+
+      if ( 'filterColumn' === fieldName ) {
+        updatedConfig.filterValue = '';
+      }
 
       enforceRestrictions(updatedConfig);
 
@@ -143,7 +146,6 @@ const EditorPanel = memo(() => {
   // Used to pipe a JSON version of the config you are creating out
   const [ configData, setConfigData ] = useState({})
 
-
   useEffect(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
@@ -167,6 +169,30 @@ const EditorPanel = memo(() => {
         </section>
       </section>
     );
+  }
+
+  const getColumns = (filter = true) => {
+      let columns = {}
+
+      data.map(row => {
+        Object.keys(row).forEach(columnName => columns[columnName] = true)
+      })
+
+      return Object.keys(columns)
+  }
+
+  const getColumnValues = () => {
+    let filterDataOptions = []
+    if (data && config.filterColumn) {
+      data.forEach(function(row) {
+        if ( -1 === filterDataOptions.indexOf(row[config.filterColumn]) ) {
+          filterDataOptions.push(row[config.filterColumn]);
+        }
+      })
+      filterDataOptions.sort();
+    }
+    return filterDataOptions;
+
   }
 
   const Confirm = () => {
@@ -208,9 +234,29 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
-                 </AccordionItemPanel>
+                  <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title" updateField={updateField} />
+                  <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Data
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" options={getColumns()} />
+                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" options={Constants.DATA_FUNCTIONS} />
+                  <ul className="column-edit">
+                    <li className="three-col">
+                      <TextField value={config.prefix} fieldName="prefix" label="Prefix" updateField={updateField} />
+                      <TextField value={config.suffix} fieldName="suffix" label="Suffix" updateField={updateField} />
+                      <TextField type="number" value={config.roundToPlace} fieldName="roundToPlace" label="Round" updateField={updateField} />
+                    </li>
+                  </ul>
+                  <Select value={config.filterColumn || ""} fieldName="filterColumn" label="Filter Column" updateField={updateField} initial="Select" options={getColumns()} />
+                  <Select value={config.filterValue || ""} fieldName="filterValue" label="Filter Value" updateField={updateField} initial="Select" options={getColumnValues()} />
+                </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
@@ -219,6 +265,8 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
+                  <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image Position" updateField={updateField} initial="Select" options={Constants.IMAGE_POSITIONS} />
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <label className="header">
                     <span className="edit-label">Header Theme</span>

@@ -1,11 +1,25 @@
 export default {
-    type: 'data-bite',
-    title: 'Data Bite',
-    theme: 'theme-blue',
-    fontSize: 'medium',
-    height: 500,
-    padding: {
-        left: 5,
-        right: 5
+    "type": "data-bite",
+    "dataUrl": "",
+    "dataBite": "",
+    "dataFunction": "",
+    "dataColumn": "",
+    "imagePosition": "",
+    "imageUrl": "",
+    "biteBody": "",
+    "prefix": "",
+    "suffix": "",
+    "roundToPlace": "",
+    "filterValue": "",
+    "filterColumn": "",
+    "title": "Data Bite",
+    "theme": "theme-blue",
+    "height": 300,
+    "padding": {
+        "left": 10,
+        "right": 10
     }
 }
+
+
+

@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/maps"
+    "directory": "packages/map"
   },
   "author": "Daniel Immke <npm@daniel.do>",
   "bugs": {
