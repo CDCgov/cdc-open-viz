@@ -22,7 +22,7 @@ module.exports = (env = {}, { mode }) => {
     options: {
       presets: [
         ['@babel/preset-env', {
-          useBuiltIns: 'usage',
+          useBuiltIns: 'entry',
           corejs: '3.8',
           targets: {
             browsers: [

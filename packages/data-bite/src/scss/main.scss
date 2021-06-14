@@ -1,4 +1,91 @@
-@import "~@cdc/core/styles/base";
+@import '~@cdc/core/styles/base';
 @import "~@cdc/core/styles/heading-colors";
-@import "variables";
-@import "editor-panel";
+@import 'variables';
+@import 'bite';
+
+.cdc-open-viz-module.type-data-bite {
+  @import 'editor-panel';
+  .visually-hidden {
+    position: fixed;
+    left: -10000px;
+  }
+
+  .loader {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    animation: spin 1s linear infinite;
+
+    &::before {
+      content: '\21BB';
+    }
+  }
+
+  .btn {
+    background: #005eaa;
+    color: #fff !important;
+    border: 0;
+    padding: .4em .8em;
+    font-size: .9em;
+    display: block;
+    border-radius: 5px;
+    transition: .1s all;
+    cursor: pointer;
+
+    &[disabled] {
+      opacity: 0.5;
+      z-index: -1;
+      position: relative;
+    }
+  }
+
+  .warning-icon {
+    width: 15px;
+    height: 15px;
+    margin-top: 7px;
+    path {
+      fill: #d8000c;
+    }
+  }
+
+  .tooltip {
+    background-color: #fff;
+    border: rgba(0,0,0,0.3) 1px solid !important;
+    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+    line-height: 1.4em;
+    font-size: 1em !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    opacity: 1;
+  }
+  @include breakpointClass(xs) {
+    &.font-small {
+      font-size: .8em;
+    }
+    &.font-medium {
+      font-size: .9em;
+    }
+    &.font-large {
+      font-size: 1em;
+    }
+  }
+  @include breakpointClass(md) {
+    &.font-small {
+      font-size: .9em;
+    }
+    &.font-large {
+      font-size: 1.1em;
+    }
+  }
+  @include breakpointClass(lg) {
+    &.font-small {
+      font-size: 1em;
+    }
+    &.font-medium {
+      font-size: 1.1em;
+    }
+    &.font-large {
+      font-size: 1.2em;
+    }
+  }
+}

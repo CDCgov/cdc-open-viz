@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
-
-import CdcDataBite from './DataBite';
+import CdcDataBite from './CdcDataBite';
+export * from './constants';
 
 const domContainers = document.querySelectorAll('.react-container');
 
