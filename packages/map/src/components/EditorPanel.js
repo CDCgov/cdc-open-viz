@@ -862,7 +862,7 @@ const EditorPanel = memo((props) => {
     <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} data-html2canvas-ignore></button>
-      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard && ' dashboard'}`} data-html2canvas-ignore>
+      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard' : ''}`} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>
