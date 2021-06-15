@@ -1,12 +1,13 @@
+.table-container {
+  overflow-x: auto;
+}
+
 table.data-table {
   width: 100%;
   background: #fff;
   position: relative;
-  display: flex;
   overflow-x: auto;
-  flex-direction: column;
   border: 1px solid $lightGray;
-  align-items: stretch;
   border-collapse: collapse;
   overflow: auto;
   appearance: none;
@@ -25,7 +26,6 @@ table.data-table {
   
   thead {
     color: #fff;
-    display: flex;
     background-color: $mediumGray;
     .resizer {
       cursor: e-resize;
@@ -76,8 +76,6 @@ table.data-table {
   }
   
   tbody {
-    display: flex;
-    flex-direction: column;
     tr {
       width: 100%;
       &:hover {
@@ -87,7 +85,6 @@ table.data-table {
   }
 
   tr {
-    display: flex;
     border-bottom: solid 1px #E5E5E5;
     &:last-child {
       border-bottom: 0
