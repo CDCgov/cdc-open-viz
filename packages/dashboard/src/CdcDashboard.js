@@ -7,7 +7,7 @@ import 'whatwg-fetch'
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
-import Waiting from '@cdc/core/components/Waiting';
+import DataTransform from '@cdc/core/components/DataTransform';
 import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
 
@@ -20,6 +20,8 @@ import './scss/main.scss';
 export default function CdcDashboard(
   { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined } 
 ) {
+
+  const transform = new DataTransform();
 
   const [config, setConfig] = useState({});
 
@@ -37,12 +39,19 @@ export default function CdcDashboard(
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
-    let data = response.data ?? {}
+    let data = response.formattedData || response.data || {}
 
     if(response.dataUrl) {
       const dataString = await fetch(response.dataUrl);
 
       data = await dataString.json();
+
+      try {
+        data = transform.autoStandardize(data);
+        data = transform.developerStandardize(data, response.dataDescription);
+      } catch(e) {
+        //Data not able to be standardized, leave as is
+      }
     }
 
     setData(data);
