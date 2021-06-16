@@ -699,9 +699,9 @@ const EditorPanel = memo((props) => {
   }, [requiredColumns])
 
   // Generate all columns available by looping through the data - add a blank value at the top
-  const columnsInData = [""]
+  const columnsInData = [""];
 
-  state.data.forEach( (row) => {
+  (state.formattedData || state.data).forEach( (row) => {
     Object.keys(row).forEach( (columnName) => {
       if(false === columnsInData.includes(columnName)) {
         columnsInData.push(columnName)
