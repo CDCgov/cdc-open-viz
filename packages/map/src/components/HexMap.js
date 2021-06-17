@@ -13,7 +13,7 @@ const HexMap = (props) => {
   const {
     state,
     applyTooltipsToGeo,
-    processedData,
+    runtime,
     geoClickHandler,
     applyLegendToValue,
     displayGeoName,
@@ -29,16 +29,16 @@ const HexMap = (props) => {
   hexSupportedStates['US-DC'] = ['District of Columbia']
 
   useEffect(() => {
-    const territoriesKeys = Object.keys(supportedTerritories); // processedData will have already mapped abbreviated territories to their full names
+    const territoriesKeys = Object.keys(supportedTerritories); // runtime.data will have already mapped abbreviated territories to their full names
 
-    const dataKeys = Object.keys(processedData);
+    const dataKeys = Object.keys(runtime.data);
 
     // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
     const territoriesList = dataKeys.filter((name) => territoriesKeys.includes(name));
 
     setTerritoriesData(territoriesList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [processedData]);
+  }, [runtime.data]);
 
   useEffect(() => rebuildTooltips());
 
@@ -73,7 +73,7 @@ const HexMap = (props) => {
   territoriesData.forEach((territory) => {
     const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : '#fff';
 
-    const territoryData = processedData[territory];
+    const territoryData = runtime.data[territory];
 
     let toolTip;
 
@@ -162,7 +162,7 @@ const HexMap = (props) => {
       // Map the name from the geo data with the appropriate key for the processed data
       const geoKey = Object.keys(hexSupportedStates).find((key) => hexSupportedStates[key].includes(geoName));
 
-      const geoData = (geoKey === 'US-DC') ? processedData[geoName] : processedData[geoKey];
+      const geoData = (geoKey === 'US-DC') ? runtime.data[geoName] : runtime.data[geoKey];
 
       let legendColors;
 
@@ -208,7 +208,7 @@ const HexMap = (props) => {
               tabIndex={-1}
               key={geo.rsmKey}
               d={geoHex.path || ''}
-              className={`rsm-geography ${state.general.geoBorderColor}`}
+              className={`single-geo ${state.general.geoBorderColor}`}
               css={stylesObj.base}
               style={stylesObj.base}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -234,7 +234,7 @@ const HexMap = (props) => {
           <path 
             data-found='none'
             key={geo.rsmKey}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
+            className={`single-geo ${state.general.geoBorderColor}`}
             d={geoHex.path || ''}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
             style={unusedStyles.default}

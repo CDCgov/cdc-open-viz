@@ -110,6 +110,19 @@
     left: 0;
     top: 0;
     bottom: 0;
+    .__react_component_tooltip {
+      padding: 5px;
+      max-width: 300px;
+    }
+    .helper {
+      opacity: .7;
+      cursor: pointer;
+      width: 17px;
+      height: 17px;
+      align-self: center;
+      margin-left: .3rem;
+    }
+
     .accordion__heading {
       background: $lightestGray;
     }
@@ -229,7 +242,7 @@
       }
     }
   
-    h2 {
+    .base-label {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -249,7 +262,7 @@
       }
       span.edit-label {
         margin-bottom: .3em;
-        display: block;
+        display: flex;
       }
       span.column-heading {
         font-size: 1em;
@@ -621,7 +634,8 @@
       cursor: auto;
     }
   
-  }  
+  }
+
   @include breakpointClass(md) {
     .editor-panel:not(.hidden) + .cdc-map-inner-container {
       padding-left: $editorWidth;

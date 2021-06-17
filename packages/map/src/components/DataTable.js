@@ -6,16 +6,16 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
-import { Base64 } from 'js-base64';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 const DataTable = (props) => {
   const {
     tableTitle,
     mapTitle,
-    data,
+    rawData,
     showDownloadButton,
-    processedData,
+    runtimeData,
+    runtimeLegend,
     headerColor,
     expandDataTable,
     columns,
@@ -23,7 +23,7 @@ const DataTable = (props) => {
     applyLegendToValue,
     displayGeoName,
     navigationHandler,
-    viewport
+    viewport,
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -128,10 +128,10 @@ const DataTable = (props) => {
     return markup;
   }, [columns.navigate, navigationHandler]);
 
-  const DownloadButton = memo(({ data }) => {
+  const DownloadButton = memo(({ rawData }) => {
     const fileName = `${mapTitle}.csv`;
 
-    const csvData = Papa.unparse(data);
+    const csvData = Papa.unparse(rawData);
 
     const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
 
@@ -153,7 +153,7 @@ const DataTable = (props) => {
         Download Data (CSV)
       </a>
     )
-  }, [data]);
+  }, [rawData]);
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
@@ -165,8 +165,8 @@ const DataTable = (props) => {
           Header: columns[column].label || columns[column].name,
           id: column,
           accessor: (row) => {
-            if (processedData) {
-              return processedData[row][columns[column].name] || null;
+            if (runtimeData) {
+              return runtimeData[row][columns[column].name] || null;
             }
 
             return null;
@@ -177,7 +177,7 @@ const DataTable = (props) => {
         if (column === 'geo') {
           newCol.Header = 'Location';
           newCol.Cell = ({ row, value, ...props }) => {
-            const rowObj = processedData[row.original];
+            const rowObj = runtimeData[row.original];
 
             const legendColor = applyLegendToValue(rowObj);
 
@@ -207,11 +207,11 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [columns, applyLegendToValue, customSort, displayDataAsText, displayGeoName, getCellAnchor, processedData]);
+  }, [columns, runtimeData, runtimeLegend]);
 
   const tableData = useMemo(
-    () => Object.keys(processedData).filter((key) => applyLegendToValue(processedData[key])).sort((a, b) => customSort(a, b)),
-    [processedData, applyLegendToValue, customSort]
+    () => Object.keys(runtimeData).filter((key) => applyLegendToValue(runtimeData[key])).sort((a, b) => customSort(a, b)),
+    [runtimeLegend, runtimeData, applyLegendToValue, customSort]
   );
 
   // Change accessibility label depending on expanded status
@@ -290,7 +290,7 @@ const DataTable = (props) => {
           })}
         </tbody>
       </table>
-      {showDownloadButton === true && <DownloadButton data={data} />}
+      {showDownloadButton === true && <DownloadButton rawData={rawData} />}
     </section>
     </ErrorBoundary>
   );

@@ -18,6 +18,9 @@
   display: flex; // Needed for the main content
   font-size: 14px !important;
   line-height: 1.4;
+  .loading > div.la-ball-beat {
+    margin-top: 20%;
+  }
   @include breakpointClass(xs) {
     div#tooltip {
       display: none !important;

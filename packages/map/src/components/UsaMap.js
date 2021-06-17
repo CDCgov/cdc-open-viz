@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  Annotation
-} from 'react-simple-maps';
-import { geoCentroid } from "d3-geo";
-import topoJsonStates from 'us-atlas/states-10m.json';
+import { geoCentroid, geoAlbersUsa } from "d3-geo";
+import { feature } from "topojson-client";
+import topoJSON from 'us-atlas/states-10m.json';
+import { AlbersUsa } from '@visx/geo';
 import chroma from 'chroma-js';
 import Territory from './Territory';
 import CityList from './CityList';
+import Geo from './Geo';
 import stateAbbrs from '../data/us-states-abbr.json';
+
+const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
+
+let projection = geoAlbersUsa()
 
 const UsaMap = (props) => {
   const {
     state,
     applyTooltipsToGeo,
-    processedData,
+    data,
     geoClickHandler,
     applyLegendToValue,
     displayGeoName,
@@ -32,16 +32,16 @@ const UsaMap = (props) => {
   const [territoriesData, setTerritoriesData] = useState([]);
 
   useEffect(() => {
-    const territoriesKeys = Object.keys(supportedTerritories); // processedData will have already mapped abbreviated territories to their full names
+    const territoriesKeys = Object.keys(supportedTerritories); // data will have already mapped abbreviated territories to their full names
 
-    const dataKeys = Object.keys(processedData);
+    const dataKeys = Object.keys(data);
 
     // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
     const territoriesList = dataKeys.filter((name) => territoriesKeys.includes(name));
 
     setTerritoriesData(territoriesList);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [processedData]);
+  }, [data]);
 
   useEffect(() => rebuildTooltips());
 
@@ -70,7 +70,7 @@ const UsaMap = (props) => {
   territoriesData.forEach((territory) => {
     const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : '#fff';
 
-    const territoryData = processedData[territory];
+    const territoryData = data[territory];
 
     let toolTip;
 
@@ -166,13 +166,13 @@ const UsaMap = (props) => {
       if( xyMemo.has(geo.id) ) {
         centroid = xyMemo.get(geo.id)
       } else {
-        centroid = geoCentroid(geo)
+        centroid = projection(geoCentroid(geo))
         xyMemo.set(geo.id, centroid)
       }
 
-      const curr = stateAbbrs.find(s => s.val === geo.id)
+      let abbr = stateAbbrs[geo.id]
 
-      if(!curr) return null
+      if(undefined === abbr) return null
 
       let textColor = "#FFF"
 
@@ -183,53 +183,60 @@ const UsaMap = (props) => {
 
       let x = 0, y = 5
 
-      if(nudges[curr.id]) {
-        x += nudges[curr.id][0]
-        y += nudges[curr.id][1]
+      if(nudges[abbr]) {
+        x += nudges[abbr][0]
+        y += nudges[abbr][1]
       }
 
-      if( undefined === offsets[curr.id] && centroid[0] > -160 && centroid[0] < -67 ) {
+      if( undefined === offsets[abbr] ) {
         return (
-          <Marker coordinates={centroid}>
+          <g transform={`translate(${centroid})`}>
             <text x={x} y={y} fontSize={13} strokeWidth="0" style={{fill: textColor, stroke: 0}} textAnchor="middle">
-              {curr.id}
+              {abbr}
             </text>
-          </Marker>
+          </g>
         )
       }
 
-      let [dx, dy] = offsets[curr.id]
+      const createConnectorPath = (dx = 30, dy = 30) => {
+        const curvature = [0, 0]
+        const curveX = dx / 2 * curvature[0]
+        const curveY = dy / 2 * curvature[1]
+        return `M${0},${0} Q${-dx / 2 - curveX},${-dy / 2 + curveY} ${-dx},${-dy}`
+      }
+
+      let [dx, dy] = offsets[abbr]
 
       return (
-        <Annotation
-          subject={centroid}
-          connectorProps={{
-            stroke: "rgba(0,0,0,.5)",
-            strokeWidth: 2,
-            strokeLinecap: "round"
-          }}
-          dx={dx}
-          dy={dy}
-        >
+        <g transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+          <path d={createConnectorPath(dx, dy, 0.5)} stroke="rgba(0,0,0,.5)" fill="transparent" strokeWidth={2} />
           <text x={4} strokeWidth="0" fontSize={12} style={{fill: "#202020"}} alignmentBaseline="middle">
-            {curr.id}
+            {abbr}
           </text>
-        </Annotation>
+        </g>
       )
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies) => {
-    // let label = state.general.displayStateLabels
-    let label = true
-
-    const geosJsx = geographies.map((geo) => {
+    let showLabel = state.general.displayStateLabels
+    
+    const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
       const geoName = geo.properties.name;
+
+      let styles = {
+        stroke: geoStrokeColor,
+        strokeWidth: '1.3px',
+        fill: '#E6E6E6',
+        cursor: 'default'
+      }
 
       // Map the name from the geo data with the appropriate key for the processed data
       const geoKey = Object.keys(supportedStates).find((key) => supportedStates[key].includes(geoName));
 
-      const geoData = processedData[geoKey];
+      if(!geoKey) return
+
+      const geoData = data[geoKey];
 
       let legendColors;
 
@@ -242,9 +249,9 @@ const UsaMap = (props) => {
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
-        const toolTip = applyTooltipsToGeo(geoDisplayName, geoData);
+        const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
 
-        const stylesObj = {
+        styles = {
           fill: legendColors[0],
           stroke: geoStrokeColor,
           cursor: 'default',
@@ -260,49 +267,50 @@ const UsaMap = (props) => {
 
         // When to add pointer cursor
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-          stylesObj.cursor = 'pointer'
+          styles.cursor = 'pointer'
         }
 
-        const renderedGeo = (
-          <g className="geo-group" key={geo.rsmKey + "-group"} data-tip={toolTip} data-for="tooltip" css={stylesObj} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
-            <Geography
+        return (
+          <g
+            data-for="tooltip"
+            data-tip={tooltip}
+            key={geo.id + '-group'}
+            className="geo-group"
+            css={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+          >
+            <path
               tabIndex={-1}
-              className={`rsm-geography ${state.general.geoBorderColor}`}
-              key={geo.rsmKey}
-              geography={geo}
+              className='single-geo'
+              d={path}
             />
-            {label && geoLabelJsx(geo, legendColors[0])}
+            {showLabel && geoLabelJsx(geo, legendColors[0])}
           </g>
-        );
-
-        return renderedGeo;
-      }
-
-      const unusedStyles = {
-        stroke: geoStrokeColor,
-        strokeWidth: '1.3px',
-        fill: '#E6E6E6',
-        cursor: 'default'
+        )
       }
 
       // Default return state, just geo with no additional information
       return (
-        <g className="geo-group" key={geo.rsmKey + "-group"} css={unusedStyles}>
-          <Geography
-            key={geo.rsmKey}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
+        <g
+        key={geo.id + '-group'}
+          className="geo-group"
+          css={styles}
+        >
+          <path
             tabIndex={-1}
-            geography={geo}
+            className='single-geo'
+            d={path}
           />
-          {/* {label && geoLabelJsx(geo)} */}
+          {showLabel && geoLabelJsx(geo, style.default.fill)}
         </g>
       )
     });
 
     // Cities
     geosJsx.push(<CityList
+      projection={projection}
       key="cities"
-      processedData={processedData}
+      data={data}
       state={state}
       geoClickHandler={geoClickHandler}
       applyTooltipsToGeo={applyTooltipsToGeo}
@@ -313,24 +321,20 @@ const UsaMap = (props) => {
     return geosJsx;
   };
 
+  /* TODO: AlbersUsa translate={[440, 250]} once my PR gets in to visx core */
   return (
     <ErrorBoundary component="UsaMap">
       <div style={styles.container}>
         <div style={styles.innerContainer}>
-          <ComposableMap
-            width={880}
-            height={500}
-            style={styles.map}
-            projection="geoAlbersUsa"
-            data-html2canvas-ignore
-          >
-            <Geographies geography={topoJsonStates}>
-              {({ geographies }) => constructGeoJsx(geographies)}
-            </Geographies>
-          </ComposableMap>
+          <svg viewBox="0 0 880 500" style={styles.map}>
+              <AlbersUsa data={unitedStates}>
+                {({ features, path }) => {
+                  return constructGeoJsx(features); }}
+              </AlbersUsa>
+          </svg>
         </div>
       </div>
-      {territories.length && (
+      {territories.length > 0 && (
         <section className="territories">
           <ul>
             <li className="label">{state.general.territoriesLabel}</li>

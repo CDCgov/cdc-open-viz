@@ -1,20 +1,297 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+/** @jsx jsx */
+import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import {
-  ComposableMap,
-  Geographies,
-  ZoomableGroup,
-  Geography,
-} from 'react-simple-maps';
-import topoJsonWorld from '../data/world-topo.json';
-import { interpolatePath } from 'd3-interpolate-path';
+import { geoMercator  } from "d3-geo";
+import { Mercator } from '@visx/geo';
+import { feature } from "topojson-client";
+import topoJSON from '../data/world-topo.json';
+import ZoomableGroup from './ZoomableGroup';
+import Geo from './Geo'
 import CityList from './CityList';
+
+const { features: world } = feature(topoJSON, topoJSON.objects.countries)
+
+let projection = geoMercator()
+
+let topoToIso = {
+  "Zimbabwe": "ZWE",
+  "Zambia": "ZMB",
+  "Yemen": "YEM",
+  "Vietnam": "VNM",
+  "Venezuela": "VEN",
+  "Vatican": "VAT",
+  "Vanuatu": "VUT",
+  "Uzbekistan": "UZB",
+  "Uruguay": "URY",
+  "Micronesia": "FSM",
+  "Marshall Is.": "MHL",
+  "N. Mariana Is.": "MNP",
+  "U.S. Virgin Is.": "VIR",
+  "Guam": "GUM",
+  "American Samoa": "ASM",
+  "Puerto Rico": "PRI",
+  "United States of America": "USA",
+  "S. Geo. and the Is.": "SGS",
+  "Saint Helena": "SHN",
+  "Pitcairn Is.": "PCN",
+  "Anguilla": "AIA",
+  "Falkland Is.": "FLK",
+  "Cayman Is.": "CYM",
+  "Bermuda": "BMU",
+  "British Virgin Is.": "VGB",
+  "Turks and Caicos Is.": "TCA",
+  "Montserrat": "MSR",
+  "Jersey": "JEY",
+  "Guernsey": "GGY",
+  "Isle of Man": "IMN",
+  "United Kingdom": "GBR",
+  "United Arab Emirates": "ARE",
+  "Ukraine": "UKR",
+  "Uganda": "UGA",
+  "Turkmenistan": "TKM",
+  "Turkey": "TUR",
+  "Tunisia": "TUN",
+  "Trinidad and Tobago": "TTO",
+  "Tonga": "TON",
+  "Togo": "TGO",
+  "Timor-Leste": "TLS",
+  "Thailand": "THA",
+  "Tanzania": "TZA",
+  "Tajikistan": "TJK",
+  "Taiwan": "TWN",
+  "Syria": "SYR",
+  "Switzerland": "CHE",
+  "Sweden": "SWE",
+  "eSwatini": "SWZ",
+  "Suriname": "SUR",
+  "S. Sudan": "SSD",
+  "Sudan": "SDN",
+  "Sri Lanka": "LKA",
+  "Spain": "ESP",
+  "South Korea": "KOR",
+  "South Africa": "ZAF",
+  "Somalia": "SOM",
+  "Somaliland": "SOM",
+  "Solomon Is.": "SLB",
+  "Slovakia": "SVK",
+  "Slovenia": "SVN",
+  "Singapore": "SGP",
+  "Sierra Leone": "SLE",
+  "Seychelles": "SYC",
+  "Serbia": "SRB",
+  "Senegal": "SEN",
+  "Saudi Arabia": "SAU",
+  "São Tomé and Principe": "STP",
+  "San Marino": "SMR",
+  "Samoa": "WSM",
+  "St. Vin. and Gren.": "VCT",
+  "Saint Lucia": "LCA",
+  "St. Kitts and Nevis": "KNA",
+  "Rwanda": "RWA",
+  "Russia": "RUS",
+  "Romania": "ROU",
+  "Qatar": "QAT",
+  "Portugal": "PRT",
+  "Poland": "POL",
+  "Philippines": "PHL",
+  "Peru": "PER",
+  "Paraguay": "PRY",
+  "Papua New Guinea": "PNG",
+  "Panama": "PAN",
+  "Palau": "PLW",
+  "Pakistan": "PAK",
+  "Oman": "OMN",
+  "Norway": "NOR",
+  "North Korea": "PRK",
+  "Nigeria": "NGA",
+  "Niger": "NER",
+  "Nicaragua": "NIC",
+  "New Zealand": "NZL",
+  "Niue": "NIU",
+  "Cook Is.": "COK",
+  "Netherlands": "NLD",
+  "Aruba": "ABW",
+  "Curaçao": "CUW",
+  "Nepal": "NPL",
+  "Nauru": "NRU",
+  "Namibia": "NAM",
+  "Mozambique": "MOZ",
+  "Morocco": "MAR",
+  "W. Sahara": "ESH",
+  "Montenegro": "MNE",
+  "Mongolia": "MNG",
+  "Monaco": "MCO",
+  "Mexico": "MEX",
+  "Mauritius": "MUS",
+  "Mauritania": "MRT",
+  "Malta": "MLT",
+  "Mali": "MLI",
+  "Maldives": "MDV",
+  "Malaysia": "MYS",
+  "Malawi": "MWI",
+  "Madagascar": "MDG",
+  "Macedonia": "MKD",
+  "Luxembourg": "LUX",
+  "Lithuania": "LTU",
+  "Liechtenstein": "LIE",
+  "Libya": "LBY",
+  "Liberia": "LBR",
+  "Lesotho": "LSO",
+  "Lebanon": "LBN",
+  "Latvia": "LVA",
+  "Laos": "LAO",
+  "Kyrgyzstan": "KGZ",
+  "Kuwait": "KWT",
+  "Kosovo": "XKX",
+  "Kiribati": "KIR",
+  "Kenya": "KEN",
+  "Kazakhstan": "KAZ",
+  "Jordan": "JOR",
+  "Japan": "JPN",
+  "Jamaica": "JAM",
+  "Italy": "ITA",
+  "Israel": "ISR",
+  "Palestine": "PSE",
+  "Ireland": "IRL",
+  "Iraq": "IRQ",
+  "Iran": "IRN",
+  "Indonesia": "IDN",
+  "India": "IND",
+  "Iceland": "ISL",
+  "Hungary": "HUN",
+  "Honduras": "HND",
+  "Haiti": "HTI",
+  "Guyana": "GUY",
+  "Guinea-Bissau": "GNB",
+  "Guinea": "GIN",
+  "Guatemala": "GTM",
+  "Grenada": "GRD",
+  "Greece": "GRC",
+  "Ghana": "GHA",
+  "Germany": "DEU",
+  "Georgia": "GEO",
+  "Gambia": "GMB",
+  "Gabon": "GAB",
+  "France": "FRA",
+  "St. Pierre and Miquelon": "SPM",
+  "Wallis and Futuna Is.": "WLF",
+  "St-Martin": "MAF",
+  "St-Barthélemy": "BLM",
+  "Fr. Polynesia": "PYF",
+  "New Caledonia": "NCL",
+  "Fr. S. Antarctic Lands": "ATF",
+  "Åland": "ALA",
+  "Finland": "FIN",
+  "Fiji": "FJI",
+  "Ethiopia": "ETH",
+  "Estonia": "EST",
+  "Eritrea": "ERI",
+  "Eq. Guinea": "GNQ",
+  "El Salvador": "SLV",
+  "Egypt": "EGY",
+  "Ecuador": "ECU",
+  "Dominican Rep.": "DOM",
+  "Dominica": "DMA",
+  "Djibouti": "DJI",
+  "Greenland": "GRL",
+  "Faeroe Is.": "FRO",
+  "Denmark": "DNK",
+  "Czechia": "CZE",
+  "N. Cyprus": "CYP",
+  "Cyprus": "CYP",
+  "Cuba": "CUB",
+  "Croatia": "HRV",
+  "Côte d'Ivoire": "CIV",
+  "Costa Rica": "CRI",
+  "Dem. Rep. Congo": "COD",
+  "Congo": "COG",
+  "Comoros": "COM",
+  "Colombia": "COL",
+  "China": "CHN",
+  "Macao": "MAC",
+  "Hong Kong": "HKG",
+  "Chile": "CHL",
+  "Chad": "TCD",
+  "Central African Rep.": "CAF",
+  "Cabo Verde": "CPV",
+  "Canada": "CAN",
+  "Cameroon": "CMR",
+  "Cambodia": "KHM",
+  "Myanmar": "MMR",
+  "Burundi": "BDI",
+  "Burkina Faso": "BFA",
+  "Bulgaria": "BGR",
+  "Brunei": "BRN",
+  "Brazil": "BRA",
+  "Botswana": "BWA",
+  "Bosnia and Herz.": "BIH",
+  "Bolivia": "BOL",
+  "Bhutan": "BTN",
+  "Benin": "BEN",
+  "Belize": "BLZ",
+  "Belgium": "BEL",
+  "Belarus": "BLR",
+  "Barbados": "BRB",
+  "Bangladesh": "BGD",
+  "Bahrain": "BHR",
+  "Bahamas": "BHS",
+  "Azerbaijan": "AZE",
+  "Austria": "AUT",
+  "Australia": "AUS",
+  "Heard I. and McDonald Is.": "HMD",
+  "Norfolk Island": "NFK",
+  "Ashmore and Cartier Is.": "AUS",
+  "Armenia": "ARM",
+  "Argentina": "ARG",
+  "Antigua and Barb.": "ATG",
+  "Angola": "AGO",
+  "Andorra": "AND",
+  "Algeria": "DZA",
+  "Albania": "ALB",
+  "Afghanistan": "AFG",
+  "Sint Maarten": "SXM"
+}
+
+const handleZoomIn = (position, setPosition) => {
+  if (position.zoom >= 4) return;
+  setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
+};
+
+const handleZoomOut = (position, setPosition) => {
+  if (position.zoom <= 1) return;
+  setPosition((pos) => ({ ...pos, zoom: pos.zoom / 1.5 }));
+};
+
+const ZoomControls = ({position, setPosition}) => (
+  <div className="zoom-controls" data-html2canvas-ignore>
+    <button onClick={(position, setPosition) => handleZoomIn(position, setPosition)}>
+      <svg
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="3"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+    <button onClick={(position, setPosition) => handleZoomOut(position, setPosition)}>
+      <svg
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="3"
+      >
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+  </div>
+);
 
 const WorldMap = (props) => {
   const {
     state,
     applyTooltipsToGeo,
-    processedData,
+    data,
     geoClickHandler,
     applyLegendToValue,
     displayGeoName,
@@ -26,16 +303,6 @@ const WorldMap = (props) => {
   const [position, setPosition] = useState({ coordinates: [0, 20], zoom: 1.3 });
 
   useEffect(() => rebuildTooltips());
-
-  const handleZoomIn = () => {
-    if (position.zoom >= 4) return;
-    setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
-  };
-
-  const handleZoomOut = () => {
-    if (position.zoom <= 1) return;
-    setPosition((pos) => ({ ...pos, zoom: pos.zoom / 1.5 }));
-  };
 
   const handleMoveEnd = (position) => {
     setPosition(position);
@@ -55,179 +322,19 @@ const WorldMap = (props) => {
       bottom: 0
     },
     map: {
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden',
+      // width: '100%',
+      // height: '100%',
+      // overflow: 'hidden',
     }
   };
 
-  const ZoomControls = (
-    <div className="zoom-controls" data-html2canvas-ignore>
-      <button onClick={handleZoomIn}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="3"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
-      <button onClick={handleZoomOut}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="3"
-        >
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
-    </div>
-  );
+  const constructGeoJsx = (geographies) => {
+    const geosJsx = geographies.map(({ feature: geo, path }, i) => {
+      const geoKey = topoToIso[geo.properties.name]
 
-  const stylesObj = {
-    default: {
-      stroke: state.general.backgroundColor
-    }
-  };
+      if(!geoKey) return
 
-  const geoList = (geographies) => {
-    // If there's regions and they are filled out, slot the geos into groups
-    if (state.general.hasRegions === true && state.columns.primary.name.length > 0 && state.columns.geosInRegion.name.length > 0) {
-      // Create new geographies list where all the data is keyed to the original data object.
-      const regionGeographies = {};
-
-      geographies.forEach((geo) => {
-        regionGeographies[geo.properties.name] = geo;
-      });
-
-      // Get list of geos in every region
-      const regions = Object.keys(processedData);
-
-      const regionsJsx = [];
-
-      regions.forEach((regionName, i) => {
-        let regionPath = '';
-
-        let legendColors;
-
-        const regionData = processedData[regionName];
-        const geosInRegion = regionData[state.columns.geosInRegion.name].split(', ');
-
-        // Once we receive data for this geographic item, setup variables.
-        if (regionData !== undefined) {
-          legendColors = applyLegendToValue(regionData);
-        }
-
-        // If a legend applies, return it with appropriate information.
-        if (legendColors && legendColors[0] !== '#000000') {
-          const toolTip = applyTooltipsToGeo(regionName, regionData);
-
-          stylesObj.base = {
-            fill: legendColors[0],
-            '&:hover': {
-              fill: `${legendColors[1]} !important`
-            },
-            '&:active': {
-              fill: `${legendColors[2]} !important`
-            },
-          };
-
-          // When to add pointer cursor
-          if ((state.columns.navigate && regionData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-            stylesObj.base = {
-              ...stylesObj.base,
-              cursor: 'pointer'
-            };
-          }
-
-          const countriesList = [];
-
-          geosInRegion.forEach((name) => {
-            const geo = regionGeographies[name];
-
-            // If a city of territory slipped in, ignore instead of failing
-            if (!geo) {
-              return true;
-            }
-
-            // Add the correct geoPath data to the list for interpolation
-            const geoPaths = geo.feature;
-
-            const tempPath = interpolatePath(regionPath, geoPaths);
-
-            regionPath = tempPath(0);
-
-            // Add the actual geo
-            const country = (
-              <Geography
-                key={geo.rsmKey}
-                className={`rsm-geography ${state.general.geoBorderColor}`}
-                css={stylesObj.default}
-                tabIndex={-1}
-                geography={geo}
-              />
-            );
-
-            countriesList.push(country);
-
-            // When done processing, remove this item from the full list so we know to render the remaining geos on the map out differently after we're done constructing our regions.
-            delete regionGeographies[name];
-          });
-
-          const regionGroup = (
-            <path
-              css={stylesObj.base}
-              data-tip={toolTip}
-              data-for="tooltip"
-              tabIndex={-1}
-              className={`rsm-geography ${state.general.geoBorderColor} region-${i}`}
-              style={{ stroke: state.general.backgroundColor }}
-              key={`region-${i}`}
-              onClick={() => geoClickHandler(regionName, regionData)}
-              d={regionPath}
-            />
-          );
-
-          regionsJsx.push(regionGroup);
-        }
-      });
-
-      // Regions are done, render out the remaining
-      const unusedGeos = Object.keys(regionGeographies).filter((geo) => supportedCountries.includes(regionGeographies[geo].properties.NAME)).map((key) => {
-        const geo = regionGeographies[key];
-
-        return (
-          <Geography
-            key={geo.rsmKey}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
-            css={stylesObj.default}
-            tabIndex={-1}
-            geography={geo}
-          />
-        );
-      });
-
-      regionsJsx.push(unusedGeos);
-
-      return regionsJsx;
-    }
-
-
-
-    // Normal country display
-    const geosJsx = geographies.filter((geo) => countryValues.includes(geo.properties.name)).map((geo) => {
-      const geoName = geo.properties.name;
-
-      const geoKey = Object.keys(supportedCountries).find((key) => supportedCountries[key].includes(geoName));
-
-      const geoData = processedData[geoKey];
+      const geoData = data[geoKey];
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey][0]);
 
@@ -238,70 +345,54 @@ const WorldMap = (props) => {
         legendColors = applyLegendToValue(geoData);
       }
 
-      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255,255,255,0.7)'
 
-      const unusedStyles = {
-        default: {
-          stroke: geoStrokeColor,
-          strokeWidth: '0.7px',
-          fill: '#E6E6E6'
-        }
+      let styles = {
+        stroke: geoStrokeColor,
+        strokeWidth: '0.9px',
+        fill: '#E6E6E6',
+        cursor: 'default',
+        paintOrder: 'stroke'
       }
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
-        const toolTip = applyTooltipsToGeo(geoDisplayName,
-          geoData);
+        const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
 
-        const stylesObj = {
-          default: {
+          styles = {
+            ...styles,
             fill: legendColors[0],
-            stroke: geoStrokeColor
-          },
-          hover: {
-            fill: legendColors[1],
-            stroke: geoStrokeColor
-          },
-          pressed: {
-            fill: legendColors[2],
-            stroke: geoStrokeColor
-          },
-        };
+            stroke: geoStrokeColor,
+            cursor: 'default',
+            '&:hover': {
+              fill: legendColors[1],
+              stroke: geoStrokeColor
+            },
+            '&:active': {
+              fill: legendColors[2],
+              stroke: geoStrokeColor
+            },
+          };
 
         // When to add pointer cursor
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-          stylesObj.hover = {
-            ...stylesObj.hover,
-            cursor: 'pointer'
-          };
+          styles.cursor = 'pointer'
         }
 
-        const renderedGeo = (
-          <Geography
-            data-tip={toolTip}
+        return (
+          <Geo
+            key={i + '-geo'}
+            css={styles}
             data-for="tooltip"
-            tabIndex={-1}
-            className={`rsm-geography ${state.general.geoBorderColor}`}
-            key={geo.rsmKey}
-            geography={geo}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)} // Generic click handler to move all of the logic that needs to happen out of
-            style={stylesObj}
+            data-tip={tooltip}
+            path={path}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
           />
-        );
-
-        return renderedGeo;
+        )
       }
 
-      // Default return geo, just the SVG with no additional information
-      return (
-        <Geography
-          key={geo.rsmKey}
-          className={`rsm-geography ${state.general.geoBorderColor}`}
-          style={ unusedStyles }
-          tabIndex={-1}
-          geography={geo}
-        />
-      );
+      // Default return state, just geo with no additional information
+      return <Geo key={i + '-geo'} css={styles} path={path} />
     });
 
     return geosJsx;
@@ -309,37 +400,27 @@ const WorldMap = (props) => {
 
   return (
     <ErrorBoundary component="WorldMap">
-      {state.general.type === 'data' && ZoomControls}
-      <div style={styles.container}>
-        <div style={styles.innerContainer}>
-          <ComposableMap
-            projection="geoMercator"
-            width={880}
-            height={500}
-            style={styles.map}
-            data-html2canvas-ignore
+      <svg
+        viewBox="0 0 880 500"
+        style={styles.map}
+      >
+        <ZoomableGroup
+          zoom={position.zoom}
+          center={position.coordinates}
+          onMoveEnd={handleMoveEnd}
+          maxZoom={4}
+          projection={projection}
+          width={880}
+          height={500}
+        >
+          <Mercator
+            data={world}
           >
-            <ZoomableGroup
-              zoom={position.zoom}
-              center={position.coordinates}
-              onMoveEnd={handleMoveEnd}
-              maxZoom={3}
-            >
-              <Geographies geography={topoJsonWorld}>
-                {({ geographies }) => geoList(geographies)}
-              </Geographies>
-              <CityList
-                processedData={processedData}
-                state={state}
-                geoClickHandler={geoClickHandler}
-                applyTooltipsToGeo={applyTooltipsToGeo}
-                displayGeoName={displayGeoName}
-                applyLegendToValue={applyLegendToValue}
-              />
-            </ZoomableGroup>
-          </ComposableMap>
-        </div>
-      </div>
+            {({features}) => constructGeoJsx(features)}
+          </Mercator>
+        </ZoomableGroup>
+      </svg>
+      {state.general.type === 'data' && <ZoomControls position={position} setPosition={setPosition} />}
     </ErrorBoundary>
   );
 };

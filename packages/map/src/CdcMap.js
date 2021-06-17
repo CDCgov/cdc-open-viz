@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -54,21 +54,458 @@ const countryKeys = Object.keys(supportedCountries)
 
 const cityNames = Object.keys(supportedCities)
 
-// Memoized hash table of legend color values to prevent excessive calls
-let legendColors = new Map()
+const supportedUsGeos = stateKeys.concat(territoryKeys, cityNames)
 
-// Component
+const supportedWorldGeos = countryKeys.concat(cityNames)
+
+const generateColorsArray = (color = '#000000') => {
+    return [
+        color,
+        chroma(color).saturate(1.3).hex(),
+        chroma(color).darken(0.3).hex()
+    ]
+}
+
+let legendMemo = new Map();
+
+// Find all occurrences of a value in an array
+const getIndices = (arr, val) => {
+let indexes = []
+
+for(let i = 0; i < arr.length; i++) {
+    if (arr[i] === val) {
+        indexes.push(i);
+    }
+}
+
+return indexes
+}
+
+const hashRow = (row) => {
+    let str = JSON.stringify(row)
+
+	let hash = 0;
+	if (str.length == 0) return hash;
+	for (let i = 0; i < str.length; i++) {
+		let char = str.charCodeAt(i);
+		hash = ((hash<<5)-hash) + char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+
+    return hash;
+}
+
+// Checks if the string is a number and returns it as a number if it is
+const numberFromString = (value) => {
+    // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
+    let nonNumeric = /[^\d.]/g
+
+    if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
+        return parseFloat(value)
+    }
+
+    return value
+
+}
+
+const getViewport = size => {
+    let result = 'lg'
+
+    const viewports = {
+        "lg": 1200,
+        "md": 992,
+        "sm": 768,
+        "xs": 576,
+        "xxs": 350
+    }
+
+    if(size > 1200) return result
+
+    for(let viewport in viewports) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
+    }
+
+    return result
+}
+
+const getUniqueValues = (data, columnName) => {
+    if(!data) return []
+    
+    let hash = {}
+
+    for(let i = 0; i < data.length; i++) {
+        if(undefined === hash[data[i][columnName]]) {
+            hash[data[i][columnName]] = true
+        }
+    }
+
+    return Object.keys(hash)
+}
+
+const cleanCsvData = (data)  => {
+    return data.map( (row) => {
+
+        let deleteKeys = []
+
+        for(let property in row) {
+
+            if(0 === property.length) {
+                deleteKeys.push(property)
+            }
+
+            if ( 'string' === typeof row[property] ) {
+                row[ property ] = row[ property ].trim()
+            }
+        }
+
+        deleteKeys.forEach( (key) => delete row[key] )
+
+        return row
+    } )
+}
+
+const generateRuntime = (obj, setRuntime) => {   
+    const generateRuntimeFilters = () => {
+        if(undefined === obj.filters || obj.filters.length === 0) return null
+
+        let filters = [...obj.filters]
+
+        filters.forEach(({columnName}, idx) => {
+            filters[idx].values = getUniqueValues(obj.data, columnName)
+
+            // If no filter is active right now, set the first one
+            if(undefined === filters[idx].active) {
+                filters[idx].active = filters[idx].values[0]
+            }
+        })
+
+        return filters
+    }
+
+    const filters = generateRuntimeFilters()
+
+    // Creates a copy of the data pared down by geography
+    let geoData = {}
+
+    obj.data.forEach((row, idx) => {
+        // Geo matching
+        let geoName = row[obj.columns.geo.name]
+
+        // US obj & Territory Check
+        if("us" === obj.general.geoType) {
+            // Map abbreviations to full names first for objs and territories
+            let objName = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
+
+            if(objName) {
+                geoName = objName
+            }
+
+            let territoryName = territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
+
+            if(territoryName) {
+                geoName = territoryName
+            }
+
+            // If this doesn't match a supported geo
+            if( false === supportedUsGeos.includes(geoName) ) {
+                return false
+            }
+        }
+
+        // World Check
+        if("world" === obj.general.geoType) {
+            geoName = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
+
+            if(false === supportedWorldGeos.includes(geoName)) {
+                return false
+            }
+        }
+
+        if(undefined === geoData[geoName]) {
+            geoData[geoName] = row
+        }
+    })
+
+    // Calculates what's going to be displayed on the map and data table at render.
+    const generateRuntimeData = () => {
+        const result = {}
+
+        const geoColumnName = obj.columns.geo.name
+
+        for(let key in geoData) {
+            let row = geoData[key]
+
+            if(undefined === row[geoColumnName]) return false
+
+            // Filters
+            if(filters) {
+                filters.forEach((filter) => {
+                    // Non strict comparison to allow for strings that are numbers in the raw data
+                    if (row[filter.columnName] != filter.active) { // eslint-disable-line
+                        return false
+                    }
+                })
+            }
+
+            // If this is a navigation only map, skip if it doesn't have a URL
+            if("navigation" === obj.general.type ) {
+                let navigateUrl = row[obj.columns.navigate.name] || "";
+                if ( undefined !== navigateUrl ) {
+                    // Strip hidden characters before we check length
+                    navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
+                }
+                if ( 0 === navigateUrl.length ) {
+                    return false
+                }
+            }
+
+            if(undefined === result[key]) {
+                result[key] = row
+            }
+        }
+
+        return result
+    }
+
+    const data = generateRuntimeData()
+
+    const generateRuntimeLegend = () => {
+        legendMemo = new Map(); // Reset memoization
+    
+        const
+            primaryCol = obj.columns.primary.name,
+            type = obj.legend.type,
+            number = obj.legend.numberOfItems,
+            result = [];
+    
+        let dataSet = obj.legend.unified ? geoData : data
+    
+        let rows = Object.values(dataSet)
+    
+        dataSet = rows.map(row => numberFromString(row[primaryCol])).sort((a, b) => a - b)
+
+        let specialClasses = 0
+    
+        // Special classes
+        if (obj.legend.specialClasses.length) {
+            dataSet = dataSet.filter((val, idx) => {
+                if( obj.legend.specialClasses.includes(val) ) {
+                    result.push({
+                        special: true,
+                        value: val
+                    })
+
+                    specialClasses += 1
+
+                    legendMemo.set( hashRow(rows[idx]), result.length - 1)
+
+                    return false
+                }
+    
+                return true
+            })
+        }
+        rows.forEach(r => {
+            console.log( r[obj.columns.geo.name] )
+        })
+        // Category
+        if('category' === type) {
+            const uniqueValues = getUniqueValues(dataSet, dataCol)
+            let categoryValues = []
+        
+            // Sort the category by number/alphabetical so it doesn't just apply them in the order it found them in the file.
+            uniqueValues.sort((a, b) => a - b);
+        
+            let order = obj.legend.categoryValuesOrder
+        
+            if(obj.legend && order) {
+                uniqueValues.sort( (a, b) => {
+                    return order.indexOf(a) - order.indexOf(b);
+                })
+            }
+        
+            uniqueValues.forEach((val) => {
+                categoryValues.push(val)
+                result.push({value: val})
+            })
+        
+            // Add our generated legends to the obj
+            if(categoryValues.length > 0) {
+                obj.legend.categoryValuesOrder = categoryValues
+            }
+        
+            result.forEach((legendItem, idx) => {
+                legendItem.color = applyColorToLegend(idx)
+            })
+    
+            return result
+        }
+    
+        let legendNumber = number
+    
+        // Separate zero
+        if(true === obj.legend.separateZero) {
+            const zeroInData = getIndices(dataSet, 0)
+
+            // Remove them from dataSet and add a legend item
+            if(zeroInData.length) {
+                let i = zeroInData.length
+    
+                while (i--) {
+                    rows.splice(i, 1)
+                    dataSet.splice(i, 1)
+                }
+    
+                result.push({min: 0, max: 0})
+                legendNumber -= 1 // This zero takes up one legend item
+            }
+        }
+    
+        // Equal Number
+        if(type === 'equalnumber') {
+            let numberOfRows = dataSet.length
+    
+            let remainder
+            let changingNumber = legendNumber
+    
+            let chunkAmt
+
+            let legendItems = []
+    
+            // Loop through the array until it has been split into equal subarrays
+            while ( numberOfRows > 0 ) {
+                remainder = numberOfRows % changingNumber
+    
+                chunkAmt = Math.floor(numberOfRows / changingNumber)
+    
+                if (remainder > 0) {
+                    chunkAmt += 1
+                }
+                
+                let removedRows = rows.splice(0, chunkAmt).map(row => hashRow(row));
+
+                let subArr = dataSet.splice(0, chunkAmt);
+    
+                legendItems.push([subArr, removedRows])
+    
+                changingNumber -= 1
+                numberOfRows -= chunkAmt
+            }
+    
+            legendItems.forEach( ([item, hashes], idx) => {
+                result.push({
+                    min: item[0],
+                    max: item[item.length - 1]
+                })
+
+                if(result.length )
+
+                hashes.forEach(hash => {
+                    if(false === legendMemo.has(hash)) {
+                        legendMemo.set(hash, result.length - 1)
+                    }
+                })
+            })
+        }
+    
+        // Equal Interval
+        if(type === 'equalinterval') {
+            for (let i = 0; i < legendNumber; i++) {
+                let interval = intervalAmt[0]
+    
+                let min = dataMinValue + (interval * i)
+    
+                let max = min + interval
+    
+                // If this is the last loop, assign actual max of data as the end point
+                if (i === legendNumber - 1) {
+                    max = dataMaxValue
+                }
+    
+                let range = {
+                    min: Math.round(min * 100) / 100,
+                    max: Math.round(max * 100) / 100,
+                }
+    
+                result.push(range)
+            }
+        }
+    
+        // Add Colors to Legend
+        const colorDistributions = {
+            1: [ 1 ],
+            2: [ 1, 3 ],
+            3: [ 1, 3, 5 ],
+            4: [ 0, 2, 4, 6 ],
+            5: [ 0, 2, 4, 6, 7 ],
+            6: [ 0, 2, 3, 4, 5, 7 ],
+            7: [ 0, 2, 3, 4, 5, 6, 7 ],
+            8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
+            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+        }
+    
+        const applyColorToLegend = (legendIdx) => {
+            // Default to "bluegreen" color scheme if the passed color isn't valid
+            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
+        
+            let colorIdx = legendIdx - specialClasses
+        
+            if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
+        
+            let distributionArray = colorDistributions[ result.length - specialClasses ]
+        
+            const specificColor = distributionArray[ colorIdx ]
+    
+            // Special Classes (No Data)
+            if (result[legendIdx].special) {
+                const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+    
+                return specialClassColors[ legendIdx ]
+            }
+        
+            return mapColorPalette[specificColor]
+        }
+    
+        result.forEach((legendItem, idx) => {
+            legendItem.color = applyColorToLegend(idx)
+        })
+    
+        return result
+    }
+
+    const legend = generateRuntimeLegend()
+
+    setRuntime({
+        filters,
+        data,
+        legend
+    })
+}
+
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
-    // State
     const [state, setState] = useState( JSON.parse(JSON.stringify(initialState)) )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')
-    const [processedData, setProcessedData] = useState( [{}] )
-    const [processedLegend, setProcessedLegend] = useState({data: [], categoryValuesOrder: []})
+    const [runtime, setRuntime] = useState(null)
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
 
-    const outerContainerRef = useRef(null);
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            let newViewport = getViewport(entry.contentRect.width)
+    
+            setViewport(newViewport)
+        }
+    });
+
+    const outerContainerRef = useCallback(node => {
+        if (node !== null) {
+            resizeObserver.observe(node);
+        }
+    },[]);
+
     const mapSvg = useRef(null);
 
     const closeModal = ({target}) => {
@@ -174,20 +611,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const changeFilterActive = async (num, activeValue) => {
         const parsedActiveValue = numberFromString(activeValue)
 
-        // Reset all active legend toggles - needed await/async because setState is asynchronous and was causing issues.
+        // Reset all active legend toggles
         await resetLegendToggles()
 
         let currentFilters = state.filters
 
         currentFilters[num].active = parsedActiveValue
 
-        setState({
+        const newState = {
             ...state,
             filters: currentFilters
-        })
+        }
 
-        // Regenerate data excluding non active filters.
-        setProcessedData( processData() )
+        setState(newState)
+
+        // This is a very heavy function that we only want to call when we need to. That's why it isn't in a useEffect.
+        generateRuntime(newState, setRuntime)
     }
 
     const displayDataAsText = (value, columnName, returnJsx) => {
@@ -202,7 +641,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (columnObj) {
             // If value is a number, apply specific formattings
             if (Number(value)) {
-
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
 
@@ -220,7 +658,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
-            if (isSpecialClassValue(value) === false) {
+            if (false === state.legend.specialClasses.includes(value)) {
                 formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
             }
         }
@@ -232,237 +670,26 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return formattedValue
     }
 
-    const isSpecialClassValue = (value, compareArr) => {
-        // For instances where the special values have changed but aren't reflected in state yet, we check the array that is passed in to compare.
-        if(compareArr) {
-            if (compareArr.includes(value)) {
-                return true
-            }
-        } else {
-            if (state.legend.hasOwnProperty('specialClasses') &&
-                false !== state.legend.specialClasses &&
-                state.legend.specialClasses.includes(value)) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-    const applyColorToLegend = (legendIdx) => {
-        // Check for memoized value so we don't have to run through this whole function
-        if(legendColors.has(legendIdx)) {
-            return legendColors.get(legendIdx)
-        }
-
-        let legend = processedLegend.data[legendIdx]
-
-        let numberOfSpecialClasses = 0
-
-        // Filter out special classes, they don't count.
-        let regularLegendItems = processedLegend.data.filter((legendItem) => {
-            if(legendItem.special) numberOfSpecialClasses += 1
-            return !legendItem.special
-        }).length
-
-        // Default to "bluegreen" color scheme if the passed color isn't valid
-        let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreen']
-
-        let colorIdx = legendIdx - numberOfSpecialClasses
-
-        let legendValue = legend.value || legend.category
-
-        // Special Classes (No Data)
-        if (state.legend.specialClasses !== false && true === legend.special) {
-
-            const specialClassColors = chroma.scale(['#D4D4D4', '#939393'])
-                .colors(state.legend.specialClasses.length)
-
-            return specialClassColors[state.legend.specialClasses.indexOf(
-                legendValue)]
-        }
-
-        let specificColor
-
-	    if ( state.color.includes( 'qualitative' ) ) {
-        	specificColor = colorIdx
-	    } else {
-            const colorDistributions = {
-                1: [ 1 ],
-                2: [ 1, 3 ],
-                3: [ 1, 3, 5 ],
-                4: [ 0, 2, 4, 6 ],
-                5: [ 0, 2, 4, 6, 7 ],
-                6: [ 0, 2, 3, 4, 5, 7 ],
-                7: [ 0, 2, 3, 4, 5, 6, 7 ],
-                8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-                9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
-            }
-
-            let distributionArray = colorDistributions[ regularLegendItems ]
-
-            specificColor = distributionArray[ colorIdx ]
-        }
-      
-      legendColors.set(legendIdx, mapColorPalette[specificColor])
-
-      return mapColorPalette[specificColor]
-
-    }
-
-    const applyLegendToValue = (rowObj, type = state.legend.type) => {
-        let color = ''
-
-        const generateColorsArray = (color) => {
-            return [
-                color,
-                chroma(color).saturate(1.3).hex(),
-                chroma(color).darken(0.3).hex()
-            ]
-        }
-
-        // If we've got a nav map, simply give them all the same color and be done with it.
+    const applyLegendToValue = (rowObj) => {
+        // Navigation map
         if("navigation" === state.general.type) {
-          let mapColorPalette = colorPalettes[ state.color ]
-
-          if(!mapColorPalette) {
-            mapColorPalette = colorPalettes[ 'bluegreenreverse' ]
-          }
+          let mapColorPalette = colorPalettes[ state.color ] || colorPalettes[ 'bluegreenreverse' ]
 
           return generateColorsArray( mapColorPalette[ 3 ] )
         }
 
-        let value = rowObj[state.columns.primary.name]
+        let hash = hashRow(rowObj)
 
-        // First, check if it's a special class
-        let hasSpecialClasses = false
+        if( legendMemo.has(hash) ) {
+            let idx = legendMemo.get(hash)
 
-        if(Array.isArray( state.legend.specialClasses ) && state.legend.specialClasses.length > 0) {
-            hasSpecialClasses = true
+            if(runtime.legend[idx].disabled) return false
+
+            return generateColorsArray( runtime.legend[idx].color )
         }
 
-        if (hasSpecialClasses &&
-            state.legend.specialClasses.includes(value)) {
-            for (let i = 0; i < processedLegend.data.length; i++) {
-
-                const legend = processedLegend.data[i]
-                const legendValue = legend.value || legend.category
-
-                if (true === legend.special && value === legendValue) {
-                    color = applyColorToLegend(i)
-
-                    if (legend && legend.disabled === true) {
-                        return false
-                    }
-
-                    return [color, color, color]
-
-                }
-
-            }
-
-        }
-
-        // If the value is a string that can become a number, convert it.
-        value = numberFromString(value)
-
-        // Check if it's a zero that needs to be separated
-        if ( true === state.legend.separateZero && 0 === value && 0 < processedLegend.data.length ) {
-            // Grab the 0 legend item
-            let idx = processedLegend.data.findIndex((legendItem) => legendItem.max === 0 && legendItem.min === 0)
-
-            let legend = processedLegend.data[idx]
-
-            if (legend) {
-                if (legend.disabled === true) {
-                    return false
-                }
-
-                color = applyColorToLegend(idx)
-            }
-        }
-
-        switch (type) {
-            case 'equalnumber':
-                let hash = hashRow(rowObj)
-
-                for (var i = 0; i < processedLegend.data.length; i++) {
-
-                    var legend = processedLegend.data[i]
-
-                    if ( 'geos' in legend && legend.geos.includes(hash) ) {
-
-                        if(legend.disabled === true) {
-                            return false
-                        }
-
-                        color = applyColorToLegend(i)
-                    }
-
-                }
-
-                break
-            case 'equalinterval':
-                // Because equal intervals will have the same "max" for one legend item as the "min" for the next, we must only add if the value is less than (and not equal to) the MAXIMUM of the legend.
-                // The one edge case is if this is the last legend item.
-                for (let i = 0; i < processedLegend.data.length; i++) {
-
-                    const legend = processedLegend.data[i]
-
-                    if (i === processedLegend.data.length - 1) {
-                        if (value >= legend.min && value <= legend.max) {
-                            color = applyColorToLegend(i)
-
-                            if (legend.disabled === true) {
-                                return false
-                            }
-
-                        }
-                    } else {
-                        if (value >= legend.min && value < legend.max) {
-                            color = applyColorToLegend(i)
-
-                            if (legend.disabled === true) {
-                                return false
-                            }
-
-                        }
-                    }
-
-                }
-                break
-            case 'category':
-                for (let i = 0; i < processedLegend.data.length; i++) {
-
-                    const legend = processedLegend.data[i]
-
-                    if (legend.category == value) { // eslint-disable-line
-                        color = applyColorToLegend(i)
-
-                        if (legend.disabled === true) {
-                            return false
-                        }
-
-                    }
-
-                }
-                break
-            default:
-                console.warn(`Error: Legend type not recognized. Should either be equalnumber, equalinterval or category.`)
-            break;
-        }
-
-        // If at the end we aren't able to assign a color, give it black to signify a fail state. If a geo is black, this function isn't able to assign a legend to the value.
-        if(0 === color.length) {
-            if(true === loading) {
-                return false;
-            }
-
-            color = '#000000'
-        }
-
-        // Return array with the color, and a lighter and darker version for hover and pressed states
-        return generateColorsArray( color )
+        // Fail state
+        return generateColorsArray()
     }
 
     const applyTooltipsToGeo = (geoName, data, returnType = 'string') => {
@@ -503,314 +730,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     }
 
-    // TODO: This needs a refactor to remove hashing and streamline the way it's doing a lot of things.
-    // This is working right now but is very messy and poorly commented.
-    const processLegend = () => {
-        const
-            legendObj = state.legend,
-            type = legendObj.type,
-            number = legendObj.numberOfItems,
-            datacol = state.columns.primary.name,
-            statecol = state.columns.geo.name,
-            legendData = [],
-            specialClassesUsed = [];
-
-        let dataObj = Object.values(processedData);
-
-        // Replace dataObj with full data set if we're using unified
-        if(true === state.legend.unified) {
-            dataObj = processUnifiedData()
-        }
-
-        const allGeoList = Object.keys(dataObj)
-
-        const dataSet = Object.values(dataObj)
-
-        const processedDataObj = {
-            ...processedLegend,
-            disabledAmt: processedLegend.disabledAmt || 0
-        }
-
-        // Category
-        if('category' === type) {
-            const usedAlready = []
-            let categoryValues = []
-
-            // Find unique values
-            allGeoList.forEach((obj, i) => {
-                const data = dataSet[i][datacol]
-
-                if (usedAlready.includes(data) === false && usedAlready.length < 9 && undefined !== data) {
-                    usedAlready.push(data)
-                }
-
-                // TODO: This is a special case for JIC only. Remove this at a later date when we hopefully have a better solution to legend caps.
-                if(usedAlready.includes(data) === false && state.color === 'qualitative1' && true === state.general.hasRegions && usedAlready.length >= 9) {
-                    usedAlready.push(data)
-                }
-            })
-
-            // Sort the category by number/alphabetical so it doesn't just apply them in the order it found them in the file. DOES NOT INCLUDE SPECIAL CLASSES. Those always have to be at the beginning.
-            usedAlready.sort()
-
-            if(state.legend && state.legend.categoryValuesOrder) {
-                usedAlready.sort( (a, b) => {
-                    return state.legend.categoryValuesOrder.indexOf(a) - state.legend.categoryValuesOrder.indexOf(b);
-                })
-            }
-
-            usedAlready.forEach((val) => {
-                const newLegendItem = {
-                    category: val
-                }
-
-                // Push as an object with one property: a string with the category in it.
-                if( isSpecialClassValue(val, legendObj.specialClasses) && false === specialClassesUsed.includes(val) ) {
-                    newLegendItem.special = true
-                    specialClassesUsed.push(val)
-                    legendData.unshift(newLegendItem) // Always at the start
-                } else {
-                    categoryValues.push(val)
-                    legendData.push(newLegendItem)
-                }
-            })
-
-            // Add our generated legends to the state
-            if(categoryValues.length > 0) {
-                processedDataObj.categoryValuesOrder = categoryValues
-            }
-
-            processedDataObj.data = legendData
-
-            return processedDataObj
-        }
-
-        let realNumber = number
-
-        // Add special classes to legend if they're defined - Just store as a string instead of an object.
-        if (legendObj.specialClasses !== false) {
-            const deleteGeos = []
-
-            allGeoList.forEach((geo) => {
-                if (legendObj.specialClasses.includes(dataObj[geo][datacol])) {
-
-                    let valToCheck = dataObj[geo][datacol]
-                    if ( ! specialClassesUsed.includes( valToCheck ) ) {
-                        specialClassesUsed.push( valToCheck )
-                    }
-                    deleteGeos.push(geo)
-                }
-            })
-
-            deleteGeos.forEach((geo) => {
-                let i = allGeoList.indexOf(geo)
-
-                allGeoList.splice(i, 1)
-            })
-
-            legendObj.specialClasses.forEach((specialClass) => {
-                if (specialClassesUsed.includes(specialClass)) {
-                    legendData.push({ special: true, value: specialClass })
-                }
-            })
-        }
-
-        const getIntervalAmt = () => {
-
-            let allNums = new Map();
-            let allGeos = [];
-
-            allGeoList.forEach((obj, i) => {
-                if( false === Number.isNaN( parseFloat(dataObj[obj][datacol]) ) ) {
-                    allNums.set(allGeoList[i], parseFloat(dataObj[obj][datacol]))
-
-                    if( false === allGeos.includes(dataObj[obj][statecol]) ) {
-                        allGeos.push(dataObj[obj][statecol])
-                    }
-                }
-
-            })
-
-            allNums = new Map([...allNums.entries()].sort((a, b) => a[1] - b[1]));
-
-
-            let interval = (Math.max(...allNums.values()) - Math.min(...allNums.values())) / realNumber
-
-            interval = Math.round(interval * 10) / 10
-
-            // Returns min value, max value and the calculated interval between them
-            return [interval, allNums]
-        }
-
-        let intervalAmt
-        let dataMinValue
-        let dataMaxValue
-
-        intervalAmt = getIntervalAmt()
-
-        // Find all occurrences of a value in an array
-        const getAllIndexes = (arr, val) => {
-            let indexes = []
-
-            for(let i = 0; i < arr.length; i++) {
-                if (arr[i] === val) {
-                    indexes.push(i);
-                }
-            }
-
-            return indexes
-        }
-
-        let fullDataValues, fullDataKeys
-
-        // Get all indexes of the number.
-        fullDataValues = Array.from( intervalAmt[1].values() )
-        fullDataKeys = Array.from( intervalAmt[1].keys() )
-
-        if(true === legendObj.separateZero) {
-            const zeroInData = getAllIndexes(fullDataValues, 0)
-
-            // Splice them out of the array before the algorithms do their work on them.
-            if(zeroInData.length > 0) {
-                let i = zeroInData.length
-
-                while (i--) {
-                    if(fullDataValues.length > 0) {
-                        fullDataValues.splice(i, 1)
-                        fullDataKeys.splice(i, 1)
-                    }
-                }
-
-                // Push zero at the beginning of returned legend object
-                let range = {
-                    min: 0,
-                    max: 0,
-                }
-
-                legendData.push(range)
-                realNumber -= 1 // This zero takes up one legend item. Account for that.
-            }
-        }
-
-        dataMinValue = Math.min(...fullDataValues)
-        dataMaxValue = Math.max(...fullDataValues)
-
-        // Build the data for the legend
-        switch (type) {
-            case 'equalnumber':
-                let numberOfRows = fullDataValues.length
-
-                let remainder
-                let changingNumber = realNumber
-
-                let chunkAmt
-
-                // Declaring variable 'chunked' as an empty array
-                let chunked = []
-
-                // Looping through the array until it has been split into our subarrays
-                while ( numberOfRows > 0 ) {
-                    remainder = numberOfRows % changingNumber
-
-                    chunkAmt = Math.floor(numberOfRows / changingNumber)
-
-                    if (remainder > 0) {
-                        chunkAmt += 1
-                    }
-
-                    let selectedGeos = fullDataKeys.splice(0, chunkAmt);
-                    let selectedData = fullDataValues.splice(0, chunkAmt);
-
-                    chunked.push( {
-                        selectedGeos,
-                        selectedData
-                    })
-
-                    changingNumber -= 1
-                    numberOfRows -= chunkAmt
-
-                }
-
-                chunked.forEach((allData) => {
-                    const hashedGeos = allData.selectedGeos.map( (row, i) => {
-                        let fullRow = dataObj[row]
-
-                        let hashedString = hashRow(fullRow)
-
-                        return hashedString
-
-                    })
-
-                    let range = {
-                        min: allData.selectedData[0],
-                        max: allData.selectedData[allData.selectedData.length - 1],
-                        chunkAmount: chunkAmt,
-                        geos: hashedGeos,
-                    }
-
-                    legendData.push(range)
-
-                })
-
-                break
-            case 'equalinterval':
-                for (let i = 0; i < realNumber; i++) {
-
-                    let interval = intervalAmt[0]
-
-                    let min = dataMinValue + (interval * i)
-
-                    let max = min + interval
-
-                    // If this is the last loop, assign actual max of data as the end point
-                    if (i === realNumber - 1) {
-                        max = dataMaxValue
-                    }
-
-                    let range = {
-                        min: Math.round(min * 100) / 100,
-                        max: Math.round(max * 100) / 100,
-                    }
-
-                    legendData.push(range)
-
-                }
-                break
-            default:
-                console.warn('No valid data classification type.')
-        }
-
-        processedDataObj.data = legendData
-
-        legendColors = new Map() // Reset legend colors
-
-        return processedDataObj
-    }
-
-    // Checks if the string is a number and returns it as a number if it is
-    const numberFromString = (value) => {
-        // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
-        let nonNumeric = /[^\d.]/g
-
-        if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
-            return parseFloat(value)
-        }
-
-        return value
-
-    }
-
     // This resets all active legend toggles. Should always be called with "await" to make sure it's done processing before you continue. See usage example in changeFilterActive.
     const resetLegendToggles = async () => {
-        let data = [...processedLegend.data]
+        let data = [...runtime.legend]
 
-        for(let i of data) {
-            if(i.disabled) {
-                delete i.disabled 
-            }
-        }
+        data.forEach(legendItem => {
+            delete legendItem.disabled
+        })
 
-        setProcessedLegend({...processedLegend, data, disabledAmt: 0})
+        setRuntime({
+            ...runtime,
+            legend: data
+        })
     }
 
     // Supports JSON or CSV
@@ -883,136 +814,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return value
     }
 
-    // This calculates what is actually going to be seen and displayed by the map and data table at render. It accounts for things like toggling legend items as well as filters.
-    const processData = () => {
-        let dataObj = state.data
-
-        const parsedData = {}
-
-        const geoColumnName = state.columns.geo.name
-
-        const supportedUsGeos = stateKeys.concat(territoryKeys, cityNames)
-
-        const supportedWorldGeos = countryKeys.concat(cityNames)
-
-        dataObj.forEach((row, i) => {
-            let addRow = true
-
-            // Empty row check - Just checks for value of geo column
-            if(!row[state.columns.geo.name]) {
-                addRow = false
-            }
-
-            // Filters
-            if (addRow && state.filters.length > 0) {
-                state.filters.forEach((filter) => {
-                    // Non strict comparison to allow for strings that are numbers in the raw data
-                    if (row[filter.columnName] != filter.active) { // eslint-disable-line
-                        addRow = false
-                    }
-                })
-            }
-
-            // If this is a navigation only map, skip if it doesn't have a URL
-            if(addRow && "navigation" === state.general.type ) {
-                let navigateUrl = row[state.columns.navigate.name] || "";
-                if ( undefined !== navigateUrl ) {
-                    // Strip hidden characters before we check length
-                    navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
-                }
-                if ( 0 === navigateUrl.length ) {
-                    addRow = false
-                }
-            }
-
-            // Geo matching
-            let geoName = row[geoColumnName]
-
-            // US State & Territory Check
-            if(addRow && "us" === state.general.geoType && false === state.general.hasRegions) {
-                // Map abbreviations to full names first for states and territories
-                let stateName = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
-
-                if(stateName) {
-                    geoName = stateName
-                }
-
-                let territoryName = territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
-
-                if(territoryName) {
-                    geoName = territoryName
-                }
-
-                // If this doesn't match a supported geo
-                if( false === supportedUsGeos.includes(geoName) ) {
-                    addRow = false
-                }
-            }
-
-            // World Check
-            if(addRow && "world" === state.general.geoType && false === state.general.hasRegions) {
-                geoName = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
-
-                if(false === supportedWorldGeos.includes(geoName)) {
-                    addRow = false
-                }
-            }
-
-            // Passed all of our checks, add to processedData
-            if(true === addRow && undefined === parsedData[geoName]) {
-                parsedData[geoName] = row
-            }
-        })
-
-        return parsedData
-    }
-
-    // This is only used when building a legend that has the unified option checked.
-    // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
-    const processUnifiedData = () => {
-        // All the data to be mapped
-        let rawData = state.data
-
-        const parsedData = []
-
-        const geoColumnName = state.columns.geo.name
-
-        const supportedUsGeos = stateValues.concat(territoryValues, cityNames)
-
-        const supportedWorldGeos = countryValues.concat(cityNames)
-
-        rawData.forEach((row, i) => {
-            let addRow = true
-
-            // Empty row check - Just checks for value of geo column
-            if(!row[state.columns.geo.name]) {
-                addRow = false
-            }
-
-            // Geo matching
-            let geoName = row[geoColumnName]
-
-            // Don't add data that can't display on the map, so check based on map type
-            if(addRow && "us" === state.general.geoType && false === state.general.hasRegions) {
-                // If this doesn't match a supported US geo, don't add it.
-                if( false === supportedUsGeos.includes(geoName) ) {
-                    addRow = false
-                }
-            }
-
-            if(addRow && "world" === state.general.geoType && false === supportedWorldGeos.includes(geoName) && false === state.general.hasRegions) {
-                addRow = false
-            }
-
-            // Passed all of our checks, add to processedData
-            if(true === addRow) {
-                parsedData.push(row)
-            }
-        })
-
-        return parsedData
-    }
-
     const navigationHandler = (urlString) => {
         // Call custom navigation method if passed
         if(customNavigationHandler) {
@@ -1029,6 +830,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Open constructed link in new tab/window
         window.open(urlObj.toString(), '_blank');
+    }
+
+    const geoClickHandler = (key, value) => {
+        // If modals are set or we are on a mobile viewport, display modal
+        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
+            setModal({
+                geoName: key,
+                geoData: value
+            })
+
+            return;
+        }
+
+        // Otherwise if this item has a link specified for it, do regular navigation.
+        if (state.columns.navigate && value[state.columns.navigate.name]) {
+            navigationHandler(value[state.columns.navigate.name])
+        }
     }
 
     const loadConfig = async (configObj) => {
@@ -1076,127 +894,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
         })
 
-        // After data is grabbed, loop through and generate filter column values if there are any
-        if (newState.filters) {
-
-            const filterList = []
-
-            newState.filters.forEach((filter) => {
-
-                filterList.push(filter.columnName)
-
-            })
-
-            filterList.forEach((filter, index) => {
-                const filterValues = generateValuesForFilter(filter, newState.data)
-
-                newState.filters[index].values = filterValues
-
-                // Initial filter should be active
-                newState.filters[index].active = filterValues[0]
-            })
-
-        }
-
-        // Set properties that can be passed directly and require no additional computation
         setState(newState)
+        generateRuntime(newState, setRuntime)
 
         // Done loading
         setLoading(false)
     }
 
-    const getViewport = size => {
-        let result = 'lg'
-
-        const viewports = {
-            "lg": 1200,
-            "md": 992,
-            "sm": 768,
-            "xs": 576,
-            "xxs": 350
-        }
-
-        for(let v of Object.keys( viewports )) {
-            if(size <= viewports[v]) {
-                result = v
-            }
-        }
-
-        return result
-    }
-
-    const generateValuesForFilter = (columnName, data = state.data) => {
-        const values = []
-
-        data.forEach( (row) => {
-            const value = row[columnName]
-
-            if(value && false === values.includes(value)) {
-                values.push(value)
-            }
-
-        })
-
-        return values
-    }
-
-    const cleanCsvData = (data)  => {
-        return data.map( (row) => {
-
-            let deleteKeys = []
-
-            for(let property in row) {
-
-                if(0 === property.length) {
-                    deleteKeys.push(property)
-                }
-
-                if ( 'string' === typeof row[property] ) {
-                    row[ property ] = row[ property ].trim()
-                }
-            }
-
-            deleteKeys.forEach( (key) => delete row[key] )
-
-            return row
-        } )
-    }
-
-    const hashRow = (rowObj)  => {
-        let str = JSON.stringify( rowObj )
-
-        let hash = 0;
-
-        if (str.length == 0) return hash
-
-        for (let i = 0; i < str.length; i++) {
-            let char = str.charCodeAt(i);
-            hash = ((hash<<5)-hash)+char;
-            hash = hash & hash; // Convert to 32bit integer
-        }
-
-        return hash
-    }
-
-    const geoClickHandler = (key, value) => {
-        // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
-            setModal({
-                geoName: key,
-                geoData: value
-            })
-
-            return;
-        }
-
-        // Otherwise if this item has a link specified for it, do regular navigation.
-        if (state.columns.navigate && value[state.columns.navigate.name]) {
-            navigationHandler(value[state.columns.navigate.name])
-        }
-    }
-
+    // Initial load
     useEffect(() => {
-        let configData
+        let configData = null
 
         // Load the configuration data passed to this component if it exists
         if(config) {
@@ -1211,7 +918,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Finally, dynamically import the default configuration if nothing else was found.
-        if(!configData) {
+        if(null === configData) {
             configData = usaDefaultConfig
         }
 
@@ -1221,33 +928,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 await loadConfig(configData)
             })();
         }
-
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                let newViewport = getViewport(entry.contentRect.width)
-
-                if( newViewport !== viewport ) {
-                    setViewport(newViewport)
-                }
-            }
-        });
-
-        resizeObserver.observe(outerContainerRef.current);
     }, [])
-
-    useEffect(() => {
-        if(processedData.length !== state.data.length || state.filters.length) {
-            setProcessedData( processData() )
-        }
-    }, [state])
-
-    useEffect(() => {
-        let newProcessedLegend = processLegend()
-
-        if(newProcessedLegend) {
-            setProcessedLegend(newProcessedLegend)
-        }
-    }, [processedData])
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
@@ -1280,10 +961,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         mapContainerClasses.push('full-border')
     }
 
+    if(loading || null === runtime) return <Loading />
+
     // Props passed to all map types
     const mapProps = {
         state,
-        processedData,
+        runtime,
+        data: runtime.data,
         rebuildTooltips : ReactTooltip.rebuild,
         applyTooltipsToGeo,
         closeModal,
@@ -1293,12 +977,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName
     }
 
-    let processedDataKeys = Object.keys(processedData)
-
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {true === loading && <Loading />}
-            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} generateValuesForFilter={generateValuesForFilter} processData={processData} setProcessedData={setProcessedData} processedData={processedData} processLegend={processLegend} setProcessedLegend={setProcessedLegend} processedLegend={processedLegend} setParentConfig={setConfig} loading={loading} />}
+            {/* {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} loading={loading} runtime={runtime} />} */}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {'hover' === tooltips.appearanceType &&
                     <ReactTooltip
@@ -1340,42 +1021,41 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     {"navigation" === general.type &&
                         <NavigationMenu
                             displayGeoName={displayGeoName}
-                            processedData={processedData}
+                            data={runtime.data}
                             options={general}
                             columns={state.columns}
                             navigationHandler={(val) => navigationHandler(val)}
                         />
                     }
-                    {general.showSidebar && 'navigation' !== general.type && false === loading  && processedDataKeys.length > 0 &&
+                    {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
                             viewport={viewport}
                             legend={state.legend}
+                            runtime={runtime}
+                            setRuntime={setRuntime}
                             filters={state.filters}
                             columns={state.columns}
                             sharing={state.sharing}
                             prefix={state.columns.primary.prefix}
                             suffix={state.columns.primary.suffix}
-                            setProcessedLegend={setProcessedLegend}
-                            processedLegend={processedLegend}
                             setState={setState}
                             resetLegendToggles={resetLegendToggles}
-                            applyColorToLegend={applyColorToLegend}
                             changeFilterActive={changeFilterActive}
                             setAccessibleStatus={setAccessibleStatus}
                         />
                     }
                 </section>
-                {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading && processedDataKeys.length > 0 &&
+                {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading &&
                     <DataTable
                         state={state}
+                        rawData={state.data}
                         navigationHandler={navigationHandler}
                         expandDataTable={general.expandDataTable}
                         headerColor={general.headerColor}
                         columns={state.columns}
                         showDownloadButton={general.showDownloadButton}
-                        data={state.data}
-                        processedData={processedData}
-                        processedLegend={processedLegend}
+                        legend={runtime.legend}
+                        runtimeData={runtime.data}
                         displayDataAsText={displayDataAsText}
                         displayGeoName={displayGeoName}
                         applyLegendToValue={applyLegendToValue}
