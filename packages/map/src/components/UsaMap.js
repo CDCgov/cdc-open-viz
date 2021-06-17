@@ -9,7 +9,6 @@ import { AlbersUsa } from '@visx/geo';
 import chroma from 'chroma-js';
 import Territory from './Territory';
 import CityList from './CityList';
-import Geo from './Geo';
 import stateAbbrs from '../data/us-states-abbr.json';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
@@ -141,7 +140,7 @@ const UsaMap = (props) => {
     MA: [30, -1],
     RI: [28, 2],
     CT: [35, 10],
-    NJ: [34, 1],
+    NJ: [42, 1],
     DE: [33, 0],
     MD: [47, 10]
   };
@@ -301,7 +300,7 @@ const UsaMap = (props) => {
             className='single-geo'
             d={path}
           />
-          {showLabel && geoLabelJsx(geo, style.default.fill)}
+          {showLabel && geoLabelJsx(geo, style.fill)}
         </g>
       )
     });

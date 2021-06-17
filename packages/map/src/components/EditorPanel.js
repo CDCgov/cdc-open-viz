@@ -89,13 +89,15 @@ const EditorPanel = memo((props) => {
     data,
     loadConfig,
     setState,
-    processData,
-    processLegend,
     setParentConfig,
     runtime,
+    generateRuntime,
+    setRuntime,
     loading,
-    resetLegendMemo
+    getUniqueValues
   } = props
+
+  if(loading || null === runtime) return <Loading />
 
   const { general, color, columns, legend, dataTable, tooltips} = state
 
@@ -183,7 +185,6 @@ const EditorPanel = memo((props) => {
           ...state,
           color: value
         })
-        resetLegendMemo()
       break;
       case 'hasRegions':
         setState({
@@ -255,62 +256,47 @@ const EditorPanel = memo((props) => {
           }
         })
       break;
-      case 'legendType': {
-        let newLegend = {
-          ...state.legend,
-          type: value
-        }
-
+      case 'legendType':
         setState({
           ...state,
-          legend: newLegend
+          legend: {
+            ...state.legend,
+            type: value
+          }
         })
-        processData({newLegend})
-      } break;
-      case 'legendNumber': {
-        let newLegend = {
-          ...state.legend,
-          numberOfItems: parseInt(value)
-        }
-
+      break;
+      case 'legendNumber':
         setState({
           ...state,
-          legend: newLegend
+          legend: {
+            ...state.legend,
+            numberOfItems: parseInt(value)
+          }
         })
-        processLegend({newLegend})
-      } break;
+      break;
       case 'changeActiveFilterValue':
         const arrVal = value.split(',')
 
         setActiveFilterValueForDescription(arrVal)
       break;
-      case 'unifiedLegend': {
-        let newLegend = {
-          ...state.legend,
-          unified: value
-        }
-        console.log({newLegend})
-
+      case 'unifiedLegend':
         setState({
           ...state,
-          legend: newLegend
+          legend: {
+            ...state.legend,
+            unified: value
+          }
         })
-
-        processLegend({newLegend})
-      } break;
-      case 'separateZero': {
-        let newLegend = {
-          ...state.legend,
-          separateZero: value
-        }
-
+      break;
+      case 'separateZero':
         setState({
           ...state,
-          legend: newLegend
+          legend: {
+            ...state.legend,
+            separateZero: value
+          }
         })
-
-        processLegend({newLegend})
-      } break;
+      break;
       case 'toggleDownloadButton':
         setState({
           ...state,
@@ -369,8 +355,6 @@ const EditorPanel = memo((props) => {
                 console.warn("Map type not set")
             break;
         }
-
-        processData()
       break;
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
@@ -581,14 +565,9 @@ const EditorPanel = memo((props) => {
           })
         break;
     }
-    if(columnName === "primary" && editTarget === "name") {
-      processLegend({dataCol: editTarget})
-    }
-    processData()
   }
 
   const changeFilter = async (filterIndex, target, value) => {
-      console.log({filterIndex})
       let newFilters = Array.from(state.filters)
 
       switch (target) {
@@ -603,8 +582,7 @@ const EditorPanel = memo((props) => {
           case 'columnName':
               newFilters[filterIndex].columnName = value
 
-              // TODO: Integrate this the new way
-              let values = // TODO
+              let values = getUniqueValues(data, value)
 
               newFilters[filterIndex].values = values
 
@@ -613,7 +591,6 @@ const EditorPanel = memo((props) => {
           default:
               newFilters[filterIndex][target] = value
           break;
-
       }
 
       setState({
@@ -709,17 +686,12 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => columnsRequiredChecker(), [state.columns, state.general])
 
-  useEffect(() => {
-    if(null === requiredColumns && false === loading) {
-      processData()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requiredColumns])
+  useEffect(() => generateRuntime(state, setRuntime), [state])
 
   // Generate all columns available by looping through the data - add a blank value at the top
   const columnsInData = [""]
 
-  data.forEach( (row) => {
+  Object.values(data).forEach( (row) => {
     Object.keys(row).forEach( (columnName) => {
       if(false === columnsInData.includes(columnName)) {
         columnsInData.push(columnName)
@@ -853,8 +825,6 @@ const EditorPanel = memo((props) => {
       </Draggable>
     ))
   }
-
-  if(loading) return null
 
   return (
     <ErrorBoundary component="EditorPanel">

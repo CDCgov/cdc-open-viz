@@ -12,7 +12,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/editor build"
   },

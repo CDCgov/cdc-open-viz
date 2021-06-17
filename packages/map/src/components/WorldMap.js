@@ -265,7 +265,7 @@ const handleZoomOut = (position, setPosition) => {
 
 const ZoomControls = ({position, setPosition}) => (
   <div className="zoom-controls" data-html2canvas-ignore>
-    <button onClick={(position, setPosition) => handleZoomIn(position, setPosition)}>
+    <button onClick={() => handleZoomIn(position, setPosition)}>
       <svg
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -275,7 +275,7 @@ const ZoomControls = ({position, setPosition}) => (
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
     </button>
-    <button onClick={(position, setPosition) => handleZoomOut(position, setPosition)}>
+    <button onClick={() => handleZoomOut(position, setPosition)}>
       <svg
         viewBox="0 0 24 24"
         stroke="currentColor"
