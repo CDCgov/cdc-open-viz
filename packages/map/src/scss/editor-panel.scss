@@ -133,6 +133,11 @@
     .guidance-link {
       margin: 2em 1em 0;
       padding: .75em 1em;
+      align-items: center;
+      .heading-3 {
+        font-weight: 600;
+        font-size: 1.2em;
+      }
       svg {
         width: 60px;
         color: $blue;

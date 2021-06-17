@@ -68,19 +68,6 @@ const generateColorsArray = (color = '#000000') => {
 
 let legendMemo = new Map();
 
-// Find all occurrences of a value in an array
-const getIndices = (arr, val) => {
-let indexes = []
-
-for(let i = 0; i < arr.length; i++) {
-    if (arr[i] === val) {
-        indexes.push(i);
-    }
-}
-
-return indexes
-}
-
 const hashRow = (row) => {
     let str = JSON.stringify(row)
 
@@ -186,45 +173,51 @@ const generateRuntime = (obj, setRuntime) => {
 
     const filters = generateRuntimeFilters()
 
-    // Creates a copy of the data pared down by geography
-    let geoData = {}
+    // Creates a copy of the data keyed either to ISO code if it's a city, state, or country.
+    // Keyed to a hash in the case of points and regions.
+    let keyedData = {}
 
-    obj.data.forEach((row, idx) => {
-        // Geo matching
-        let geoName = row[obj.columns.geo.name]
-
-        // US obj & Territory Check
+    obj.data.forEach(row => {
+        // United States check
         if("us" === obj.general.geoType) {
-            // Map abbreviations to full names first for objs and territories
-            let objName = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
+            const geoName = row[obj.columns.geo.name]
 
-            if(objName) {
-                geoName = objName
+            // States
+            let key = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
+
+            // Territories
+            if(!key) {
+                key = territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
             }
 
-            let territoryName = territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
-
-            if(territoryName) {
-                geoName = territoryName
+            // Cities
+            if(!key) {
+                key = cityNames.find( (key) => key === geoName) 
             }
 
-            // If this doesn't match a supported geo
-            if( false === supportedUsGeos.includes(geoName) ) {
-                return false
+            if(key) {
+                if(undefined === keyedData[key]) keyedData[key] = row; // Only add first instance
+                return;
             }
         }
 
         // World Check
         if("world" === obj.general.geoType) {
-            geoName = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
+            const geoName = row[obj.columns.geo.name]
 
-            if(false === supportedWorldGeos.includes(geoName)) {
-                return false
+            let key = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
+
+            if(key) {
+                if(undefined === keyedData[key]) keyedData[key] = row; // Only add first instance
+                return;
             }
         }
 
-        if(undefined === geoData[geoName]) {
-            geoData[geoName] = row
+        // Doesn't match to a specific geo
+        let key = hashRow(row)
+
+        if(undefined === keyedData[key]) {
+            keyedData[key] = row
         }
     })
 
@@ -232,12 +225,8 @@ const generateRuntime = (obj, setRuntime) => {
     const generateRuntimeData = () => {
         const result = {}
 
-        const geoColumnName = obj.columns.geo.name
-
-        for(let key in geoData) {
-            let row = geoData[key]
-
-            if(undefined === row[geoColumnName]) return false
+        for(let key in keyedData) {
+            let row = keyedData[key]
 
             // Filters
             if(filters) {
@@ -261,6 +250,12 @@ const generateRuntime = (obj, setRuntime) => {
                 }
             }
 
+            // Data that wasn't key'd to a geo (Regions, custom points.) Disabling for now.
+            // TODO: When adding regions/custom points, turn this back on.
+            if(Number.parseInt(key)) {
+                continue
+            } 
+
             if(undefined === result[key]) {
                 result[key] = row
             }
@@ -273,33 +268,70 @@ const generateRuntime = (obj, setRuntime) => {
 
     const generateRuntimeLegend = () => {
         legendMemo = new Map(); // Reset memoization
-    
+
         const
             primaryCol = obj.columns.primary.name,
             type = obj.legend.type,
             number = obj.legend.numberOfItems,
             result = [];
     
-        let dataSet = obj.legend.unified ? geoData : data
-    
-        let rows = Object.values(dataSet)
-    
-        dataSet = rows.map(row => numberFromString(row[primaryCol])).sort((a, b) => a - b)
+        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use 
+        let dataSet = obj.legend.unified ? obj.data : Object.values(data);
+
+        const colorDistributions = {
+            1: [ 1 ],
+            2: [ 1, 3 ],
+            3: [ 1, 3, 5 ],
+            4: [ 0, 2, 4, 6 ],
+            5: [ 0, 2, 4, 6, 7 ],
+            6: [ 0, 2, 3, 4, 5, 7 ],
+            7: [ 0, 2, 3, 4, 5, 6, 7 ],
+            8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
+            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+        }
+
+        const applyColorToLegend = (legendIdx) => {
+            // Default to "bluegreen" color scheme if the passed color isn't valid
+            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
+        
+            let colorIdx = legendIdx - specialClasses
+        
+            if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
+        
+            let distributionArray = colorDistributions[ result.length - specialClasses ]
+        
+            const specificColor = distributionArray[ colorIdx ]
+        
+            // Special Classes (No Data)
+            if (result[legendIdx].special) {
+                const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+        
+                return specialClassColors[ legendIdx ]
+            }
+        
+            return mapColorPalette[specificColor]
+        }
+
+        // dataSet = rows.map(row => numberFromString(row[primaryCol])).sort((a, b) => a - b) // IMPORTANT
 
         let specialClasses = 0
-    
+
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter((val, idx) => {
+            dataSet = dataSet.filter((row, idx) => {
+                const val = numberFromString(row[primaryCol])
+
                 if( obj.legend.specialClasses.includes(val) ) {
                     result.push({
                         special: true,
                         value: val
                     })
 
+                    result[result.length - 1].color = applyColorToLegend(result.length - 1)
+
                     specialClasses += 1
 
-                    legendMemo.set( hashRow(rows[idx]), result.length - 1)
+                    legendMemo.set( hashRow(row), result.length - 1)
 
                     return false
                 }
@@ -307,22 +339,33 @@ const generateRuntime = (obj, setRuntime) => {
                 return true
             })
         }
-        rows.forEach(r => {
-            console.log( r[obj.columns.geo.name] )
-        })
+
         // Category
         if('category' === type) {
-            const uniqueValues = getUniqueValues(dataSet, dataCol)
-            let categoryValues = []
+            let uniqueValues = {}
         
-            // Sort the category by number/alphabetical so it doesn't just apply them in the order it found them in the file.
+            for(let i = 0; i < dataSet.length; i++) {
+                let row = dataSet[i]
+                let value = row[primaryCol]
+
+                if(undefined === uniqueValues[value]) {
+                    uniqueValues[value] = []
+                }
+
+                uniqueValues[value].push(hashRow(row))
+            }
+
+            // for(let key in uniqueValues) {}
+
+            // Sort the category so it doesn't just apply them in the order it found them in the file.
+            
             uniqueValues.sort((a, b) => a - b);
         
-            let order = obj.legend.categoryValuesOrder
+            let configuredOrder = obj.legend.categoryValuesOrder
         
-            if(obj.legend && order) {
+            if(configuredOrder.length) {
                 uniqueValues.sort( (a, b) => {
-                    return order.indexOf(a) - order.indexOf(b);
+                    return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
                 })
             }
         
@@ -332,13 +375,9 @@ const generateRuntime = (obj, setRuntime) => {
             })
         
             // Add our generated legends to the obj
-            if(categoryValues.length > 0) {
-                obj.legend.categoryValuesOrder = categoryValues
+            if(categoryValues.length ) {
+                result['categoryValuesOrder'] = categoryValues
             }
-        
-            result.forEach((legendItem, idx) => {
-                legendItem.color = applyColorToLegend(idx)
-            })
     
             return result
         }
@@ -346,33 +385,52 @@ const generateRuntime = (obj, setRuntime) => {
         let legendNumber = number
     
         // Separate zero
-        if(true === obj.legend.separateZero) {
-            const zeroInData = getIndices(dataSet, 0)
+        if(true === obj.legend.separateZero) {   
+            let addLegendItem = false; 
+       
+            for(let i = 0; i < dataSet.length; i++) {
+                if (numberFromString(dataSet[i][primaryCol]) === 0) {
+                    addLegendItem = true
 
-            // Remove them from dataSet and add a legend item
-            if(zeroInData.length) {
-                let i = zeroInData.length
-    
-                while (i--) {
-                    rows.splice(i, 1)
-                    dataSet.splice(i, 1)
+                    let row = dataSet.splice(i, 1)[0]
+
+                    legendMemo.set( hashRow(row), result.length)
+                    i--
                 }
-    
-                result.push({min: 0, max: 0})
+            }
+
+            if(addLegendItem) {
                 legendNumber -= 1 // This zero takes up one legend item
+
+                // Add new legend item
+                result.push({
+                    min: 0,
+                    max: 0
+                })
+
+                let lastIdx = result.length - 1
+
+                // Add color to new legend item
+                result[lastIdx].color = applyColorToLegend(lastIdx)
             }
         }
-    
+
+        // Sort data for use in equalnumber or equalinterval
+        dataSet.sort((a, b) => {
+            let aNum = numberFromString(a[primaryCol])
+            let bNum = numberFromString(b[primaryCol])
+
+            return aNum - bNum
+        })
+
         // Equal Number
         if(type === 'equalnumber') {
             let numberOfRows = dataSet.length
     
             let remainder
             let changingNumber = legendNumber
-    
-            let chunkAmt
 
-            let legendItems = []
+            let chunkAmt
     
             // Loop through the array until it has been split into equal subarrays
             while ( numberOfRows > 0 ) {
@@ -384,32 +442,27 @@ const generateRuntime = (obj, setRuntime) => {
                     chunkAmt += 1
                 }
                 
-                let removedRows = rows.splice(0, chunkAmt).map(row => hashRow(row));
+                let removedRows = dataSet.splice(0, chunkAmt);
+    
+                let min = removedRows[0][primaryCol],
+                    max = removedRows[removedRows.length - 1][primaryCol]
 
-                let subArr = dataSet.splice(0, chunkAmt);
-    
-                legendItems.push([subArr, removedRows])
-    
+                removedRows.forEach(row => {
+                    legendMemo.set( hashRow(row), result.length )
+                })
+
+                result.push({
+                    min,
+                    max
+                })
+
+                result[result.length - 1].color = applyColorToLegend(result.length - 1)
+
                 changingNumber -= 1
                 numberOfRows -= chunkAmt
             }
-    
-            legendItems.forEach( ([item, hashes], idx) => {
-                result.push({
-                    min: item[0],
-                    max: item[item.length - 1]
-                })
-
-                if(result.length )
-
-                hashes.forEach(hash => {
-                    if(false === legendMemo.has(hash)) {
-                        legendMemo.set(hash, result.length - 1)
-                    }
-                })
-            })
         }
-    
+
         // Equal Interval
         if(type === 'equalinterval') {
             for (let i = 0; i < legendNumber; i++) {
@@ -433,43 +486,8 @@ const generateRuntime = (obj, setRuntime) => {
             }
         }
     
-        // Add Colors to Legend
-        const colorDistributions = {
-            1: [ 1 ],
-            2: [ 1, 3 ],
-            3: [ 1, 3, 5 ],
-            4: [ 0, 2, 4, 6 ],
-            5: [ 0, 2, 4, 6, 7 ],
-            6: [ 0, 2, 3, 4, 5, 7 ],
-            7: [ 0, 2, 3, 4, 5, 6, 7 ],
-            8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
-        }
-    
-        const applyColorToLegend = (legendIdx) => {
-            // Default to "bluegreen" color scheme if the passed color isn't valid
-            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
-        
-            let colorIdx = legendIdx - specialClasses
-        
-            if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
-        
-            let distributionArray = colorDistributions[ result.length - specialClasses ]
-        
-            const specificColor = distributionArray[ colorIdx ]
-    
-            // Special Classes (No Data)
-            if (result[legendIdx].special) {
-                const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-    
-                return specialClassColors[ legendIdx ]
-            }
-        
-            return mapColorPalette[specificColor]
-        }
-    
         result.forEach((legendItem, idx) => {
-            legendItem.color = applyColorToLegend(idx)
+            legendItem.color = applyColorToLegend(idx, specialClasses, result)
         })
     
         return result
@@ -611,7 +629,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const changeFilterActive = async (num, activeValue) => {
         const parsedActiveValue = numberFromString(activeValue)
 
-        // Reset all active legend toggles
+        // Reset all active legend toggles TODO - Still needed?
         await resetLegendToggles()
 
         let currentFilters = state.filters
@@ -837,7 +855,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
-                geoData: value
+                keyedData: value
             })
 
             return;
@@ -979,7 +997,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {/* {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} loading={loading} runtime={runtime} />} */}
+            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} loading={loading} runtime={runtime} setRuntime={setRuntime} generateRuntime={generateRuntime} getUniqueValues={getUniqueValues} data={runtime.data} />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {'hover' === tooltips.appearanceType &&
                     <ReactTooltip
