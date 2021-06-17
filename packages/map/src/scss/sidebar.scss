@@ -41,12 +41,12 @@ aside {
   .legend-section {
     padding: 1em;
     position: relative;
-    h2 {
+    .heading-2 {
       font-size: 1.3em;
       padding-bottom: 0;
       display: inline-block;
     }
-    h2 + p, h2 + ul, p + ul, p + p {
+    .heading-2 + p, .heading-2 + ul, p + ul, p + p {
       padding-top: 1em;
     }
     .clear {
@@ -123,7 +123,7 @@ aside {
 
   .filters-section {
     padding: 0 1em .5em;
-    h3 {
+    .heading-3 {
       font-weight: bold;
       margin-bottom: .5em;
     }

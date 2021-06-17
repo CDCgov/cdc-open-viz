@@ -1,64 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { Marker } from 'react-simple-maps';
+import React, { useState, useEffect, useContext } from 'react';
+/** @jsx jsx */
+import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos';
 
 const CityList = (({
-  processedData, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToValue
+  data,
+  state,
+  geoClickHandler,
+  applyTooltipsToGeo,
+  displayGeoName,
+  applyLegendToValue,
+  projection
 }) => {
   const [citiesData, setCitiesData] = useState({});
 
   useEffect(() => {
-    const citiesList = Object.keys(processedData).filter((item) => Object.keys(supportedCities).includes(item));
+    const citiesList = Object.keys(data).filter((item) => Object.keys(supportedCities).includes(item));
 
     const citiesDictionary = {};
 
-    citiesList.map((city) => citiesDictionary[city] = processedData[city]);
+    citiesList.map((city) => citiesDictionary[city] = data[city]);
 
     setCitiesData(citiesDictionary);
-  }, [processedData]);
+  }, [data]);
 
-  const cityList = Object.keys(citiesData).filter((c) => undefined !== processedData[c]);
+  const cityList = Object.keys(citiesData).filter((c) => undefined !== data[c]);
 
   const cities = cityList.map((city, i) => {
     const cityDisplayName = displayGeoName(city);
 
-    const legendColors = applyLegendToValue(processedData[city]);
+    const legendColors = applyLegendToValue(data[city]);
 
     if (legendColors === false) {
       return true;
     }
 
     const styles = {
-      default: {
-        fill: legendColors[0],
-        outline: 0,
-      },
-      hover: {
+      fill: legendColors[0],
+      outline: 0,
+      stroke: 'rgba(0, 0, 0, 0.4)',
+      '&:hover': {
         fill: legendColors[1],
         outline: 0
       },
-      pressed: {
+      '&:active': {
         fill: legendColors[2],
         outline: 0
       }
     };
 
-    const geoData = processedData[city];
+    const geoData = data[city];
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, processedData[city]);
-
-    const cityBorderColor = 'rgba(0,0,0,.5)';
-
-    let cityDotStyles = {
-      stroke: cityBorderColor
-    };
+    const toolTip = applyTooltipsToGeo(cityDisplayName, data[city]);
 
     // If we need to add a cursor pointer
     if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-      cityDotStyles = {
-        ...cityDotStyles,
-        cursor: 'pointer'
-      };
+      styles.cursor = 'pointer'
     }
 
     const radius = state.general.geoType === 'us' ? 8 : 4;
@@ -70,21 +67,22 @@ const CityList = (({
         cx={0}
         cy={0}
         r={radius}
-        style={cityDotStyles}
         title="Click for more information"
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
       />
     );
 
+    let transform = `translate(${projection(supportedCities[city])})`
+
     return (
-      <Marker
+      <g
         key={i}
-        coordinates={supportedCities[city]}
-        style={styles}
-        className="city-dot"
+        transform={transform}
+        css={styles}
+        className="geo-point"
       >
         {circle}
-      </Marker>
+      </g>
     );
   });
 

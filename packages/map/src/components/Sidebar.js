@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -9,12 +9,10 @@ const Sidebar = (props) => {
     filters,
     columns,
     setAccessibleStatus,
-    applyColorToLegend,
     changeFilterActive,
     resetLegendToggles,
-    setState,
-    processedLegend,
-    setProcessedLegend,
+    runtime,
+    setRuntime,
     prefix,
     suffix,
     viewport
@@ -29,32 +27,33 @@ const Sidebar = (props) => {
     return value;
   };
 
+  let [disabled, setDisabled] = useState(0)
+
   // Toggles if a legend is active and being applied to the map and data table.
-  const toggleLegendActive = (idx) => {
-    const { data } = processedLegend;
+  const toggleLegendActive = (i) => {
+    const newValue = !runtime.legend[i].disabled;
 
-    const newValue = !data[idx].disabled;
+    let disabledAmt = disabled;
 
-    let disabledAmt = processedLegend.disabledAmt || 0;
+    newValue ? disabledAmt++ : disabledAmt--;
 
-    if (newValue === true) {
-      disabledAmt++;
-    } else {
-      disabledAmt--;
-    }
+    setDisabled(disabledAmt)
 
-    data[idx].disabled = newValue; // Toggle!
+    runtime.legend[i].disabled = newValue; // Toggle!
 
-    const newObj = {
-      ...processedLegend,
-      disabledAmt,
-      data
-    };
+    let newLegend = [...runtime.legend]
 
-    setProcessedLegend(newObj);
+    newLegend[i].disabled = newValue
+
+    setRuntime({
+      ...runtime,
+      legend: newLegend
+    })
+
+    setAccessibleStatus(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`);
   };
 
-  const legendList = processedLegend.data.map((entry, idx) => {
+  const legendList = runtime.legend.map((entry, idx) => {
     const entryMax = addCommas(entry.max);
 
     const entryMin = addCommas(entry.min);
@@ -62,8 +61,7 @@ const Sidebar = (props) => {
     let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
 
     // If interval, add some formatting
-    if (legend.type === 'equalinterval' && idx
-      !== processedLegend.data.length - 1) {
+    if (legend.type === 'equalinterval' && idx !== runtime.legend.length - 1) {
       formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
     }
 
@@ -87,12 +85,12 @@ const Sidebar = (props) => {
       <li
         key={idx}
         title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => { toggleLegendActive(idx); setAccessibleStatus(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`); }}
+        onClick={() => { toggleLegendActive(idx); }}
         className={disabled ? 'disabled single-legend' : 'single-legend'}
       ><span
         className="color"
         style={{
-          backgroundColor: applyColorToLegend(idx),
+          backgroundColor: entry.color,
         }}
       /> <span className="label">{legendLabel}</span>
       </li>
@@ -131,21 +129,22 @@ const Sidebar = (props) => {
 
   return (
     <ErrorBoundary component="Sidebar">
-      <aside className={`${legend.position} ${viewport}`}>
+      <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`}>
       <section className="legend-section" aria-label="Map Legend">
-        {processedLegend.disabledAmt > 0
-          && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              resetLegendToggles();
-              setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.');
-            }}
-            className="clear btn"
-          >Clear
-          </button>
+        {disabled > 0 &&
+          (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                resetLegendToggles();
+                setDisabled(0);
+                setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.');
+              }}
+              className="clear btn"
+            >Clear
+            </button>
           )}
-        {legend.title && <h2>{ parse(legend.title) }</h2>}
+        {legend.title && <span className="heading-2">{ parse(legend.title) }</span>}
         {legend.dynamicDescription === false && legend.description
           && <p>{ parse(legend.description) }</p>}
         {legend.dynamicDescription === true && filters.map((filter, idx) => {
@@ -163,17 +162,16 @@ const Sidebar = (props) => {
           {legendList}
         </ul>
       </section>
-      {filtersList.length > 0
-        && (
+      {filtersList.length > 0 &&
         <section className="filters-section" aria-label="Map Filters">
-          <h3>Filters</h3>
+          <span className="heading-3">Filters</span>
           <form>
             <section>
               {filtersList}
             </section>
           </form>
         </section>
-        )}
+      }
     </aside>
     </ErrorBoundary>
   );

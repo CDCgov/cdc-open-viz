@@ -19,7 +19,6 @@
 }
 
 .map-container {
-
   &.full-border {
     border: #C2C2C2 1px solid;
   }
@@ -61,9 +60,12 @@ header + .map-container.full-border {
   position: relative;
   flex-grow: 1;
   width: 100%;
-  .city-dot {
+  overflow: hidden;
+  .geo-point {
     transition: .3s all;
     circle {
+      fill: inherit;
+      stroke: inherit;
       stroke-width: 1.3px;
       transition: .3s transform;
     }
@@ -105,13 +107,10 @@ header + .map-container.full-border {
   }
 }
 
-// Border colors for territories
-.rsm-geography {
-  > g.geo-group > path.darkGray, &.darkGray {
-    stroke: rgba(0,0,0,.2) !important;
-  }
-  > g.geo-group > path.sameAsBackground, &.sameAsBackground {
-    stroke: rgba(255,255,255,.7) !important;
+.single-geo {
+  transition: .2s all;
+  &:focus {
+    outline: 0;
   }
 }
 

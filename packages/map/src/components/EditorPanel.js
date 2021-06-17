@@ -19,8 +19,17 @@ import WorldGraphic from '../images/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
+import QuestionIcon from '../images/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
+
+const Helper = ({text}) => {
+  return (
+    <span className='tooltip helper' data-tip={text}>
+      <QuestionIcon />
+    </span>
+  )
+}
 
 const arrayMoveMutate = (array, from, to) => {
 	const startIndex = from < 0 ? array.length + from : from;
@@ -39,7 +48,7 @@ const arrayMove = (array, from, to) => {
 	return array;
 };
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", helper = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -68,7 +77,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   return (
     <label>
-      <span className="edit-label column-heading">{label}</span>
+      <span className="edit-label column-heading">{label} {helper && <Helper text={helper} />}</span>
       {formElement}
     </label>
   )
@@ -77,20 +86,18 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 const EditorPanel = memo((props) => {
   const {
     state,
+    data,
     loadConfig,
     setState,
-    generateValuesForFilter,
     processData,
     processLegend,
     setParentConfig,
-    processedLegend,
-    setProcessedLegend,
-    setProcessedData,
-    processedData,
-    loading
+    runtime,
+    loading,
+    resetLegendMemo
   } = props
 
-  const { general, color, columns, legend, data, filters, dataTable, tooltips} = state
+  const { general, color, columns, legend, dataTable, tooltips} = state
 
   const [ requiredColumns, setRequiredColumns ] = useState(null) // Simple state so we know if we need more information before parsing the map
 
@@ -176,7 +183,7 @@ const EditorPanel = memo((props) => {
           ...state,
           color: value
         })
-        processLegend() // Needed to reset memoized legend colors
+        resetLegendMemo()
       break;
       case 'hasRegions':
         setState({
@@ -248,47 +255,62 @@ const EditorPanel = memo((props) => {
           }
         })
       break;
-      case 'legendType':
+      case 'legendType': {
+        let newLegend = {
+          ...state.legend,
+          type: value
+        }
+
         setState({
           ...state,
-          legend: {
-            ...state.legend,
-            type: value
-          }
+          legend: newLegend
         })
-      break;
-      case 'legendNumber':
+        processData({newLegend})
+      } break;
+      case 'legendNumber': {
+        let newLegend = {
+          ...state.legend,
+          numberOfItems: parseInt(value)
+        }
+
         setState({
           ...state,
-          legend: {
-            ...state.legend,
-            numberOfItems: parseInt(value)
-          }
+          legend: newLegend
         })
-      break;
+        processLegend({newLegend})
+      } break;
       case 'changeActiveFilterValue':
         const arrVal = value.split(',')
 
         setActiveFilterValueForDescription(arrVal)
       break;
-      case 'unifiedLegend':
+      case 'unifiedLegend': {
+        let newLegend = {
+          ...state.legend,
+          unified: value
+        }
+        console.log({newLegend})
+
         setState({
           ...state,
-          legend: {
-              ...state.legend,
-              unified: value
-          }
+          legend: newLegend
         })
-      break;
-      case 'separateZero':
+
+        processLegend({newLegend})
+      } break;
+      case 'separateZero': {
+        let newLegend = {
+          ...state.legend,
+          separateZero: value
+        }
+
         setState({
           ...state,
-          legend: {
-              ...state.legend,
-              separateZero: value
-          }
+          legend: newLegend
         })
-      break;
+
+        processLegend({newLegend})
+      } break;
       case 'toggleDownloadButton':
         setState({
           ...state,
@@ -327,6 +349,7 @@ const EditorPanel = memo((props) => {
                     type: "data"
                 }
               })
+              resetLegendMemo()
               break;
             case 'navigation':
               setState({
@@ -347,7 +370,7 @@ const EditorPanel = memo((props) => {
             break;
         }
 
-        setProcessedData( processData() )
+        processData()
       break;
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
@@ -388,7 +411,7 @@ const EditorPanel = memo((props) => {
         ReactTooltip.rebuild()
       break;
       case 'categoryOrder':
-        const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
+        const categoryValuesOrder = arrayMove(runtime.legend.categoryValuesOrder, value[0], value[1])
         setState({
           ...state,
           legend: {
@@ -558,10 +581,15 @@ const EditorPanel = memo((props) => {
           })
         break;
     }
+    if(columnName === "primary" && editTarget === "name") {
+      processLegend({dataCol: editTarget})
+    }
+    processData()
   }
 
   const changeFilter = async (filterIndex, target, value) => {
-      let newFilters = Array.from(filters)
+      console.log({filterIndex})
+      let newFilters = Array.from(state.filters)
 
       switch (target) {
           case 'addNew':
@@ -575,8 +603,8 @@ const EditorPanel = memo((props) => {
           case 'columnName':
               newFilters[filterIndex].columnName = value
 
-              // Regenerate legend values set one to active to pass to state
-              let values = generateValuesForFilter(value)
+              // TODO: Integrate this the new way
+              let values = // TODO
 
               newFilters[filterIndex].values = values
 
@@ -658,7 +686,6 @@ const EditorPanel = memo((props) => {
     // Remove the legend
     let strippedLegend = JSON.parse(JSON.stringify(state.legend))
 
-    delete strippedLegend.data
     delete strippedLegend.disabledAmt
 
     strippedState.legend = strippedLegend
@@ -684,7 +711,7 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => {
     if(null === requiredColumns && false === loading) {
-      setProcessedData( processData() )
+      processData()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requiredColumns])
@@ -692,7 +719,7 @@ const EditorPanel = memo((props) => {
   // Generate all columns available by looping through the data - add a blank value at the top
   const columnsInData = [""]
 
-  state.data.forEach( (row) => {
+  data.forEach( (row) => {
     Object.keys(row).forEach( (columnName) => {
       if(false === columnsInData.includes(columnName)) {
         columnsInData.push(columnName)
@@ -752,7 +779,7 @@ const EditorPanel = memo((props) => {
     setState(updatedState)
   }
 
-  const filtersJSX = filters.map( (filter, index) => {
+  const filtersJSX = state.filters.map( (filter, index) => {
     return (
         <fieldset className="edit-block">
           <button className="remove-column" onClick={(event) => { event.preventDefault(); changeFilter(index, "remove")}}>Remove</button>
@@ -762,21 +789,18 @@ const EditorPanel = memo((props) => {
               {columnsOptions}
             </select>
           </label>
-          <TextField value={filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
+          <TextField value={state.filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
         </fieldset>
-  )
+    )
   })
 
   const filterValueOptionList = []
 
-  if(filters.length > 0) {
-    filters.forEach( (filter, index) => {
-      filters[index].values.forEach( (value, valueNum) => {
-
+  if(state.filters.length > 0) {
+    state.filters.forEach( (filter, index) => {
+      state.filters[index].values.forEach( (value, valueNum) => {
         filterValueOptionList.push([index, valueNum])
-
       })
-
     })
   }
 
@@ -796,13 +820,6 @@ const EditorPanel = memo((props) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
 
-  useEffect(() => {
-    if('data' === state.general.type) {
-      setProcessedLegend( processLegend() )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [legend, processedData])
-
   let numberOfItemsLimit = 8
 
   const getItemStyle = (isDragging, draggableStyle) => ({
@@ -810,8 +827,8 @@ const EditorPanel = memo((props) => {
   });
 
   useEffect(() => {
-    setEditorCatOrder(processedLegend.categoryValuesOrder)
-  }, [processedLegend.categoryValuesOrder])
+    if(runtime.legend.categoryValuesOrder) setEditorCatOrder()
+  }, [runtime.legend.categoryValuesOrder])
 
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
@@ -837,20 +854,22 @@ const EditorPanel = memo((props) => {
     ))
   }
 
-  if(loading) {
-    return null
-  }
+  if(loading) return null
 
   return (
     <ErrorBoundary component="EditorPanel">
       {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
-        <h2>Configure Map</h2>
+        <ReactTooltip
+          html={true}
+          multiline={true}
+        />
+        <span className="base-label">Configure Map</span>
         <section className="form-container">
           <form>
             <Accordion>
-            <AccordionItem> {/* General */}
+              <AccordionItem> {/* Type */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Type
@@ -859,7 +878,7 @@ const EditorPanel = memo((props) => {
                 <AccordionItemPanel>
                   {/* Geography */}
                   <label>
-                    <span className="edit-label column-heading">Geography</span>
+                    <span className="edit-label column-heading"><span>Geography</span></span>
                     <ul className="geo-buttons">
                       <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
                         <UsaGraphic />
@@ -887,9 +906,15 @@ const EditorPanel = memo((props) => {
                   </label>
                   }
                   {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
-                  <label className="checkbox mt-4">
+                  <label className="checkbox">
                     <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
                     <span className="edit-label">Display state labels</span>
+                  </label>
+                  }
+                  {'us' === state.general.geoType &&
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
+                    <span className="edit-label">This map uses regions</span>
                   </label>
                   }
                 </AccordionItemPanel>
@@ -901,8 +926,7 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
-                  <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
+                  <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" helper="For accessibility reasons, you should enter a title even if you are not planning on displaying it." />
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
@@ -923,12 +947,6 @@ const EditorPanel = memo((props) => {
                       {columnsOptions}
                     </select>
                   </label>
-                  {'us' === state.general.geoType &&
-                  <label className="checkbox">
-                    <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
-                    <span className="edit-label">This map uses regions</span>
-                  </label>
-                  }
                   {state.general.hasRegions &&
                     <label className="edit-block geo">
                       <span className="edit-label column-heading">Geos In Region</span>
@@ -1156,18 +1174,17 @@ const EditorPanel = memo((props) => {
               <AccordionItem> {/* Tooltips */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Tooltips / Modals
+                    Interactivity
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <label>
-                    <span className="edit-label">Information on map appears on</span>
+                    <span className="edit-label">Detail displays on <Helper text="At mobile sizes, information always appears in a popover modal when a user taps on an item." /></span>
                     <select value={state.tooltips.appearanceType } onChange={(event) => { handleEditorChanges("appearanceType", event.target.value) }}>
                       <option value="hover">Hover - Tooltip</option>
                       <option value="click">Click - Popover Modal</option>
                     </select>
                   </label>
-                  <p className="info">On mobile, information always appears in a popover modal when a user taps on an item.</p>
                   {'click' === state.tooltips.appearanceType &&
                     <TextField value={tooltips.linkLabel} section="tooltips" fieldName="linkLabel" label="Tooltips Link Label" updateField={updateField} />
                   }
@@ -1290,7 +1307,7 @@ const EditorPanel = memo((props) => {
           <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
             <MapIcon />
             <div>
-              <h3>Get Maps Help</h3>
+              <span className="heading-3">Get Maps Help</span>
               <p>Examples and documentation</p>
             </div>
           </a>

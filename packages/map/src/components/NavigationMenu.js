@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const NavigationMenu = ({
-  processedData, navigationHandler, options, columns, displayGeoName
+  data, navigationHandler, options, columns, displayGeoName
 }) => {
   const [activeGeo, setActiveGeo] = useState('');
 
@@ -10,7 +10,7 @@ const NavigationMenu = ({
   const handleSubmit = (event) => {
     event.preventDefault();
     if (activeGeo !== '') {
-      const urlString = processedData[dropdownItems[activeGeo]][columns.navigate.name];
+      const urlString = runtime.data[dropdownItems[activeGeo]][columns.navigate.name];
 
       navigationHandler(urlString);
     }
@@ -33,7 +33,7 @@ const NavigationMenu = ({
 
     const processedDropdown = {};
 
-    Object.keys(processedData).forEach((val) => {
+    Object.keys(runtime.data).forEach((val) => {
       const fullName = displayGeoName(val);
 
       processedDropdown[fullName] = val;
@@ -46,7 +46,7 @@ const NavigationMenu = ({
     setDropdownItems(sortedOptions);
 
     setActiveGeo(Object.keys(sortedOptions)[0]);
-  }, [processedData, displayGeoName]);
+  }, [runtime.data, displayGeoName]);
 
   return (
     <section className="navigation-menu">
