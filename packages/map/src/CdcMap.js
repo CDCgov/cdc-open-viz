@@ -168,6 +168,13 @@ const generateRuntime = (obj, setRuntime) => {
     let keyedData = {}
 
     obj.data.forEach(row => {
+        let primaryValue = row[obj.columns.primary.name]
+
+        // Convert to actual number if possible
+        if(primaryValue) {
+            row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
+        }
+
         // United States check
         if("us" === obj.general.geoType) {
             const geoName = row[obj.columns.geo.name]
@@ -302,14 +309,12 @@ const generateRuntime = (obj, setRuntime) => {
             return mapColorPalette[specificColor]
         }
 
-        // dataSet = rows.map(row => numberFromString(row[primaryCol])).sort((a, b) => a - b) // IMPORTANT
-
         let specialClasses = 0
 
         // Special classes
         if (obj.legend.specialClasses.length) {
             dataSet = dataSet.filter((row, idx) => {
-                const val = numberFromString(row[primaryCol])
+                const val = row[primaryCol]
 
                 if( obj.legend.specialClasses.includes(val) ) {
                     result.push({
@@ -379,7 +384,7 @@ const generateRuntime = (obj, setRuntime) => {
             let addLegendItem = false; 
        
             for(let i = 0; i < dataSet.length; i++) {
-                if (numberFromString(dataSet[i][primaryCol]) === 0) {
+                if (dataSet[i][primaryCol] === 0) {
                     addLegendItem = true
 
                     let row = dataSet.splice(i, 1)[0]
@@ -407,8 +412,8 @@ const generateRuntime = (obj, setRuntime) => {
 
         // Sort data for use in equalnumber or equalinterval
         dataSet.sort((a, b) => {
-            let aNum = numberFromString(a[primaryCol])
-            let bNum = numberFromString(b[primaryCol])
+            let aNum = a[primaryCol]
+            let bNum = b[primaryCol]
 
             return aNum - bNum
         })
@@ -455,8 +460,8 @@ const generateRuntime = (obj, setRuntime) => {
 
         // Equal Interval
         if(type === 'equalinterval') {
-            let dataMin = numberFromString(dataSet[0][primaryCol])
-            let dataMax = numberFromString(dataSet[dataSet.length - 1][primaryCol])
+            let dataMin = dataSet[0][primaryCol]
+            let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
             let pointer = 0 // Start at beginning of dataSet
 
@@ -470,7 +475,7 @@ const generateRuntime = (obj, setRuntime) => {
                 if (i === legendNumber - 1) max = dataMax
 
                 // Add rows in dataSet that belong to this new legend item since we've got the data sorted
-                while(pointer < dataSet.length && numberFromString(dataSet[pointer][primaryCol]) <= max) {
+                while(pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
                     legendMemo.set(hashRow(dataSet[pointer]), result.length )
                     pointer += 1
                 }
