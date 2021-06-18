@@ -156,7 +156,7 @@ export default function CdcChart(
         "xs": 576,
         "xxs": 350
     }
-    console.log(size, typeof size)
+
     if(size > 1200) return result
 
     for(let viewport in viewports) {

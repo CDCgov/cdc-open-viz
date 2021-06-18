@@ -43,20 +43,10 @@ import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
 // Data props
-const stateValues = Object.values(supportedStates).flat()
 const stateKeys = Object.keys(supportedStates)
-
-const territoryValues = Object.values(supportedTerritories).flat()
 const territoryKeys = Object.keys(supportedTerritories)
-
-const countryValues = Object.values(supportedCountries).flat()
 const countryKeys = Object.keys(supportedCountries)
-
-const cityNames = Object.keys(supportedCities)
-
-const supportedUsGeos = stateKeys.concat(territoryKeys, cityNames)
-
-const supportedWorldGeos = countryKeys.concat(cityNames)
+const cityKeys = Object.keys(supportedCities)
 
 const generateColorsArray = (color = '#000000') => {
     return [
@@ -192,7 +182,7 @@ const generateRuntime = (obj, setRuntime) => {
 
             // Cities
             if(!key) {
-                key = cityNames.find( (key) => key === geoName) 
+                key = cityKeys.find( (key) => key === geoName) 
             }
 
             if(key) {
@@ -465,24 +455,34 @@ const generateRuntime = (obj, setRuntime) => {
 
         // Equal Interval
         if(type === 'equalinterval') {
+            let dataMin = numberFromString(dataSet[0][primaryCol])
+            let dataMax = numberFromString(dataSet[dataSet.length - 1][primaryCol])
+
+            let pointer = 0 // Start at beginning of dataSet
+
             for (let i = 0; i < legendNumber; i++) {
-                let interval = intervalAmt[0]
+                let interval = Math.abs(dataMax - dataMin) / legendNumber
     
-                let min = dataMinValue + (interval * i)
-    
+                let min = dataMin + (interval * i)    
                 let max = min + interval
     
                 // If this is the last loop, assign actual max of data as the end point
-                if (i === legendNumber - 1) {
-                    max = dataMaxValue
+                if (i === legendNumber - 1) max = dataMax
+
+                // Add rows in dataSet that belong to this new legend item since we've got the data sorted
+                while(pointer < dataSet.length && numberFromString(dataSet[pointer][primaryCol]) <= max) {
+                    legendMemo.set(hashRow(dataSet[pointer]), result.length )
+                    pointer += 1
                 }
-    
+
                 let range = {
                     min: Math.round(min * 100) / 100,
                     max: Math.round(max * 100) / 100,
                 }
     
                 result.push(range)
+
+                result[result.length - 1].color = applyColorToLegend(result.length - 1)
             }
         }
     
@@ -503,7 +503,7 @@ const generateRuntime = (obj, setRuntime) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
-    const [state, setState] = useState( JSON.parse(JSON.stringify(initialState)) )
+    const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')
     const [runtime, setRuntime] = useState(null)
@@ -537,11 +537,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
         const ieEdge = navigator.userAgent.match(/Edge/g)
         const ieVer=(ie ? ie[1] : (ie11 ? 11 : (ieEdge ? 12 : -1)));
-
-        if (ie && ieVer<10) {
-            console.log("IE10+ required");
-            return;
-        }
 
         if (ieVer>-1) {
             const fileAsBlob = new Blob([uri], {
@@ -621,7 +616,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 })
                 break
             default:
-                console.log('generateMedia param 2 type must be \'image\' or \'pdf\'')
+                console.warn('generateMedia param 2 type must be \'image\' or \'pdf\'')
                 break
         }
     }
