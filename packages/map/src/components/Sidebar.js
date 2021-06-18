@@ -30,7 +30,7 @@ const Sidebar = (props) => {
   let [disabled, setDisabled] = useState(0)
 
   // Toggles if a legend is active and being applied to the map and data table.
-  const toggleLegendActive = (i) => {
+  const toggleLegendActive = (i, legendLabel) => {
     const newValue = !runtime.legend[i].disabled;
 
     let disabledAmt = disabled;
@@ -85,7 +85,7 @@ const Sidebar = (props) => {
       <li
         key={idx}
         title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => { toggleLegendActive(idx); }}
+        onClick={() => { toggleLegendActive(idx, legendLabel); }}
         className={disabled ? 'disabled single-legend' : 'single-legend'}
       ><span
         className="color"

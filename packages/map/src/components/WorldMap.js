@@ -296,7 +296,6 @@ const WorldMap = (props) => {
     applyLegendToValue,
     displayGeoName,
     supportedCountries,
-    countryValues,
     rebuildTooltips
   } = props;
 
