@@ -118,7 +118,7 @@ export default function LinearChart() {
 
   useEffect(() => {
     ReactTooltip.rebuild();
-  }, [config]);
+  });
 
   return (
     <ErrorBoundary component="LinearChart">
