@@ -50,15 +50,48 @@ export class DataTransform {
       throw 'Error';
     }
 
-    if(description.series === undefined){
+    if(description.horizontal === undefined || description.series === undefined){
       throw 'Error';
     }
 
-    if(description.series === true && description.singleRow === undefined){
+    if(description.series === true && description.horizontal === false && description.singleRow === undefined){
       throw 'Error';
     }
 
-    if(description.series === true && description.singleRow === false){
+    if(description.horizontal === true){
+      if(description.series === true) {
+        if(!description.seriesKey){
+          throw 'Error';
+        }
+
+        let standardizedMapped = {};
+        let standardized = [];
+        data.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            if(key !== description.seriesKey){
+              if(!standardizedMapped[key]){
+                standardizedMapped[key] = {key};
+              }
+              standardizedMapped[key][row[description.seriesKey]] = row[key];
+            }
+          });
+        });
+
+        Object.keys(standardizedMapped).forEach((key) => {
+          standardized.push(standardizedMapped[key]);
+        });
+
+        return standardized;
+      } else {
+        let standardized = [];
+
+        Object.keys(data[0]).forEach((key) => {
+          standardized.push({key, value: data[0][key]});
+        });
+
+        return standardized;
+      }
+    } else if(description.series === true && description.singleRow === false){
       if(description.seriesKey !== undefined && description.xKey !== undefined && description.valueKey !== undefined){
         let standardizedMapped = {};
         let standardized = [];
