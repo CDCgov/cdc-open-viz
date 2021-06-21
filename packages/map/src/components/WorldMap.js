@@ -344,14 +344,13 @@ const WorldMap = (props) => {
         legendColors = applyLegendToValue(geoData);
       }
 
-      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255,255,255,0.7)'
+      const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
       let styles = {
         stroke: geoStrokeColor,
         strokeWidth: '0.9px',
         fill: '#E6E6E6',
-        cursor: 'default',
-        paintOrder: 'stroke'
+        cursor: 'default'
       }
 
       // If a legend applies, return it with appropriate information.
@@ -393,6 +392,18 @@ const WorldMap = (props) => {
       // Default return state, just geo with no additional information
       return <Geo key={i + '-geo'} css={styles} path={path} />
     });
+
+    // Cities
+    geosJsx.push(<CityList
+      projection={projection}
+      key="cities"
+      data={data}
+      state={state}
+      geoClickHandler={geoClickHandler}
+      applyTooltipsToGeo={applyTooltipsToGeo}
+      displayGeoName={displayGeoName}
+      applyLegendToValue={applyLegendToValue}
+    />)
 
     return geosJsx;
   };

@@ -31,23 +31,6 @@ const Helper = ({text}) => {
   )
 }
 
-const arrayMoveMutate = (array, from, to) => {
-	const startIndex = from < 0 ? array.length + from : from;
-
-	if (startIndex >= 0 && startIndex < array.length) {
-		const endIndex = to < 0 ? array.length + to : to;
-
-		const [item] = array.splice(from, 1);
-		array.splice(endIndex, 0, item);
-	}
-};
-
-const arrayMove = (array, from, to) => {
-	array = [...array];
-	arrayMoveMutate(array, from, to);
-	return array;
-};
-
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", helper = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
@@ -99,7 +82,7 @@ const EditorPanel = memo((props) => {
 
   if(loading || null === runtime) return <Loading />
 
-  const { general, color, columns, legend, dataTable, tooltips} = state
+  const { general, columns, legend, dataTable, tooltips} = state
 
   const [ requiredColumns, setRequiredColumns ] = useState(null) // Simple state so we know if we need more information before parsing the map
 
@@ -113,7 +96,7 @@ const EditorPanel = memo((props) => {
 
   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
 
-  const [ editorCatOrder, setEditorCatOrder ] = useState([])
+  const [ editorCatOrder, setEditorCatOrder ] = useState(state.legend.categoryValuesOrder || [])
 
   const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
@@ -140,6 +123,24 @@ const EditorPanel = memo((props) => {
     geosInRegion: {
         name: ''
     }
+  }
+
+  const categoryMove = (idx1, idx2) => {
+    let categoryValuesOrder = [...editorCatOrder]
+
+    let [movedItem] = categoryValuesOrder.splice(idx1, 1)
+
+    categoryValuesOrder.splice(idx2, 0, movedItem)
+
+    setEditorCatOrder(categoryValuesOrder)
+
+    setState({
+      ...state,
+      legend: {
+          ...state.legend,
+          categoryValuesOrder
+      }
+    })
   }
 
   const handleEditorChanges = async (property, value) => {
@@ -393,16 +394,6 @@ const EditorPanel = memo((props) => {
         }
 
         ReactTooltip.rebuild()
-      break;
-      case 'categoryOrder':
-        const categoryValuesOrder = arrayMove(runtime.legend.categoryValuesOrder, value[0], value[1])
-        setState({
-          ...state,
-          legend: {
-              ...state.legend,
-              categoryValuesOrder
-          }
-        })
       break;
       case 'singleColumnLegend':
         setState({
@@ -688,6 +679,14 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => generateRuntime(state, setRuntime), [state])
 
+  useEffect(() => {
+    if('category' === state.legend.type && editorCatOrder.length === 0) {
+      let arr = runtime.legend.filter(item => !item.special).map(({value}) => value)
+
+      setEditorCatOrder(arr)
+    }
+  }, [runtime])
+
   // Generate all columns available by looping through the data - add a blank value at the top
   const columnsInData = [""]
 
@@ -797,10 +796,6 @@ const EditorPanel = memo((props) => {
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
   });
-
-  useEffect(() => {
-    if(runtime.legend.categoryValuesOrder) setEditorCatOrder()
-  }, [runtime.legend.categoryValuesOrder])
 
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
@@ -1051,9 +1046,9 @@ const EditorPanel = memo((props) => {
                         <span className="edit-label">Category Order</span>
                       </label>
                       {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-                      <DragDropContext onDragEnd={({source, destination}) => { setEditorCatOrder(arrayMove(editorCatOrder, source.index, destination.index));  handleEditorChanges("categoryOrder", [source.index, destination.index]); }}>
+                      <DragDropContext onDragEnd={({source, destination}) => categoryMove(source.index, destination.index)}>
                         <Droppable droppableId="category_order">
-                          {(provided, snapshot) => (
+                          {(provided) => (
                             <ul
                               {...provided.droppableProps}
                               className="sort-list"
@@ -1065,7 +1060,7 @@ const EditorPanel = memo((props) => {
                           )}
                         </Droppable>
                       </DragDropContext>
-                      {editorCatOrder.length === 9 && <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</p></div></section>}
+                      {editorCatOrder.length >= 9 && <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories your map will not display properly.</p></div></section>}
                     </React.Fragment>
                   }
                   <TextField value={legend.title} updateField={updateField} section="legend" fieldName="title" label="Legend Title" placeholder="Legend Title" />
