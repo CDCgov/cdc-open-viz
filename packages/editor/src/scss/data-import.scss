@@ -109,6 +109,10 @@
                 margin-bottom: 1em;
             }
 
+            table + table {
+                margin-top: 1em;
+            }
+
             table {
                 border: 1px solid #aaa;
                 border-collapse: collapse;
