@@ -98,7 +98,6 @@ export default function LinearChart() {
           domain: [Math.min(...xAxisDataMapped), 
           Math.max(...xAxisDataMapped)], 
           range: [0, xMax],
-          // nice: true
         }) : 
         scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
 
