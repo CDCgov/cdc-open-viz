@@ -165,7 +165,7 @@ const DataTable = (props) => {
           id: column,
           accessor: (row) => {
             if (runtimeData) {
-              return runtimeData[row][columns[column].name] || null;
+              return runtimeData[row][columns[column].name] ?? null;
             }
 
             return null;
@@ -195,9 +195,9 @@ const DataTable = (props) => {
           };
         } else {
           newCol.Cell = ({ value }) => {
-            const cellMarkup = displayDataAsText(value, column, true);
+            const cellMarkup = displayDataAsText(value, column);
 
-            return cellMarkup;
+            return (cellMarkup);
           };
         }
 

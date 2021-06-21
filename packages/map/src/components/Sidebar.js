@@ -27,17 +27,9 @@ const Sidebar = (props) => {
     return value;
   };
 
-  let [disabled, setDisabled] = useState(0)
-
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
     const newValue = !runtime.legend[i].disabled;
-
-    let disabledAmt = disabled;
-
-    newValue ? disabledAmt++ : disabledAmt--;
-
-    setDisabled(disabledAmt)
 
     runtime.legend[i].disabled = newValue; // Toggle!
 
@@ -47,7 +39,8 @@ const Sidebar = (props) => {
 
     setRuntime({
       ...runtime,
-      legend: newLegend
+      legend: newLegend,
+      disabledAmt: newValue ? runtime.disabledAmt + 1 : runtime.disabledAmt - 1
     })
 
     setAccessibleStatus(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`);
@@ -67,8 +60,8 @@ const Sidebar = (props) => {
 
     const { disabled } = entry;
 
-    if (entry.category) {
-      formattedText = prefix + entry.category + suffix;
+    if (legend.type === 'category') {
+      formattedText = prefix + entry.value + suffix;
     }
 
     if (entry.max === 0 && entry.min === 0) {
@@ -78,7 +71,7 @@ const Sidebar = (props) => {
     let legendLabel = formattedText;
 
     if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.value || entry.category;
+      legendLabel = entry.value;
     }
 
     return (
@@ -131,13 +124,12 @@ const Sidebar = (props) => {
     <ErrorBoundary component="Sidebar">
       <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`}>
       <section className="legend-section" aria-label="Map Legend">
-        {disabled > 0 &&
+        {runtime.disabledAmt > 0 &&
           (
             <button
               onClick={(e) => {
                 e.preventDefault();
                 resetLegendToggles();
-                setDisabled(0);
                 setAccessibleStatus('Legend has been reset, please reference the data table to see updated values.');
               }}
               className="clear btn"

@@ -48,11 +48,15 @@ const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
 const cityKeys = Object.keys(supportedCities)
 
-const generateColorsArray = (color = '#000000') => {
+const generateColorsArray = (color = '#000000', special = false) => {
+    let colorObj = chroma(color)
+
+    let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
+
     return [
         color,
-        chroma(color).saturate(1.3).hex(),
-        chroma(color).darken(0.3).hex()
+        hoverColor,
+        colorObj.darken(0.3).hex()
     ]
 }
 
@@ -143,7 +147,11 @@ const cleanCsvData = (data)  => {
     } )
 }
 
-const generateRuntime = (obj, setRuntime) => {   
+const generateRuntime = (obj, setRuntime) => {
+    let rest = {
+        disabledAmt: 0
+    }
+
     const generateRuntimeFilters = () => {
         if(undefined === obj.filters || obj.filters.length === 0) return null
 
@@ -290,19 +298,20 @@ const generateRuntime = (obj, setRuntime) => {
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
             let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
-        
+
             let colorIdx = legendIdx - specialClasses
         
             if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
-        
-            let distributionArray = colorDistributions[ result.length - specialClasses ]
-        
+
+            let amt = Math.max( result.length - specialClasses, 1 )
+            let distributionArray = colorDistributions[ amt ]
+
             const specificColor = distributionArray[ colorIdx ]
-        
+ 
             // Special Classes (No Data)
             if (result[legendIdx].special) {
                 const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-        
+
                 return specialClassColors[ legendIdx ]
             }
         
@@ -337,41 +346,54 @@ const generateRuntime = (obj, setRuntime) => {
 
         // Category
         if('category' === type) {
-            let uniqueValues = {}
-        
+            let uniqueValues = new Map()
+            let count = 0
+
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
                 let value = row[primaryCol]
 
-                if(undefined === uniqueValues[value]) {
-                    uniqueValues[value] = []
+                if(false === uniqueValues.has(value)) {
+                    uniqueValues.set(value, [hashRow(row)]);
+                    count++
+                } else {
+                    uniqueValues.get(value).push(hashRow(row))
                 }
 
-                uniqueValues[value].push(hashRow(row))
+                if(count === 9) break // Can only have 9 categorical items for now
             }
-
-            // for(let key in uniqueValues) {}
-
-            // Sort the category so it doesn't just apply them in the order it found them in the file.
-            
-            uniqueValues.sort((a, b) => a - b);
-        
-            let configuredOrder = obj.legend.categoryValuesOrder
-        
+          
+            const sorted = [...uniqueValues.keys()]
+    
+            // Apply custom sorting or regular sorting
+            let configuredOrder = obj.legend.categoryValuesOrder ?? []
+    
             if(configuredOrder.length) {
-                uniqueValues.sort( (a, b) => {
+                sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
                 })
+            } else {
+                sorted.sort((a, b) => a - b)
             }
-        
-            uniqueValues.forEach((val) => {
-                categoryValues.push(val)
-                result.push({value: val})
+
+            // Add legend item for each
+            sorted.forEach((val) => {
+                result.push({
+                    value: val,
+                })
+
+                let lastIdx = result.length - 1
+                let arr = uniqueValues.get(val)
+
+                if(arr) {
+                    arr.forEach(hashedRow => legendMemo.set(hashedRow, lastIdx))
+                }
             })
-        
-            // Add our generated legends to the obj
-            if(categoryValues.length ) {
-                result['categoryValuesOrder'] = categoryValues
+
+            
+            // Add color to new legend item
+            for(let i = 0; i < result.length; i++) {
+                result[i].color = applyColorToLegend(i)
             }
     
             return result
@@ -503,7 +525,8 @@ const generateRuntime = (obj, setRuntime) => {
     setRuntime({
         filters,
         data,
-        legend
+        legend,
+        ...rest
     })
 }
 
@@ -647,7 +670,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateRuntime(newState, setRuntime)
     }
 
-    const displayDataAsText = (value, columnName, returnJsx) => {
+    const displayDataAsText = (value, columnName) => {
         if(value === null) {
             return ""
         }
@@ -681,10 +704,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
         }
 
-        if(true === returnJsx) {
-            return (formattedValue)
-        }
-
         return formattedValue
     }
 
@@ -703,7 +722,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             if(runtime.legend[idx].disabled) return false
 
-            return generateColorsArray( runtime.legend[idx].color )
+            return generateColorsArray( runtime.legend[idx].color, runtime.legend[idx].special)
         }
 
         // Fail state
@@ -758,7 +777,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         setRuntime({
             ...runtime,
-            legend: data
+            legend: data,
+            disabledAmt: 0
         })
     }
 
@@ -1033,7 +1053,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToValue={applyLegendToValue} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === general.geoType && !general.displayAsHex && <UsaMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
                             {general.displayAsHex && 'data' === general.type && <HexMap supportedStates={supportedStates} supportedTerritories={supportedTerritories} {...mapProps} />}
-                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} countryValues={countryValues} {...mapProps} />}
+                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                             {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {"navigation" === general.type &&
