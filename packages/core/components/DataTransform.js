@@ -97,10 +97,22 @@ export class DataTransform {
         let standardized = [];
 
         data.forEach((row) => {
-          if(standardizedMapped[row[description.xKey]]){
-            standardizedMapped[row[description.xKey]][row[description.seriesKey]] = row[description.valueKey];
+          let extraKeys = [];
+          let uniqueKey = row[description.xKey];
+          Object.keys(row).forEach((key) => {
+            if(key !== description.xKey && key !== description.seriesKey && key !== description.valueKey){
+              uniqueKey += '|' + key + '=' + row[key];
+              extraKeys.push(key);
+            }
+          });
+
+          if(standardizedMapped[uniqueKey]){
+            standardizedMapped[uniqueKey][row[description.seriesKey]] = row[description.valueKey];
           } else {
-            standardizedMapped[row[description.xKey]] = {[description.xKey]: row[description.xKey], [row[description.seriesKey]]: row[description.valueKey]};
+            standardizedMapped[uniqueKey] = {[description.xKey]: row[description.xKey], [row[description.seriesKey]]: row[description.valueKey]};
+            extraKeys.forEach((key) => {
+              standardizedMapped[uniqueKey][key] = row[key];
+            });
           }
         });
 
