@@ -241,7 +241,7 @@ const EditorPanel = memo(() => {
   }
 
   const addNewFilter = () => {
-    let filters = [...config.filters];
+    let filters = config.filters ? [...config.filters] : [];
 
     filters.push({values: []});
 
