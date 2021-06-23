@@ -17,15 +17,22 @@ export const DATA_FUNCTIONS = [
   DATA_FUNCTION_SUM
 ];
 
+export const BITE_LOCATION_TITLE = 'title';
+export const BITE_LOCATION_BODY = 'body';
+export const BITE_LOCATION_GRAPHIC = 'graphic';
+export const BITE_LOCATIONS = {
+  'title': 'As a title in the body',
+  'body': 'At the beginning of the body text',
+  'graphic': 'As a graphic'
+};
+
 export const IMAGE_POSITION_LEFT = 'Left';
 export const IMAGE_POSITION_RIGHT = 'Right';
 export const IMAGE_POSITION_TOP = 'Top';
 export const IMAGE_POSITION_BOTTOM = 'Bottom';
-export const IMAGE_POSITION_BACKGROUND = 'Background';
 export const IMAGE_POSITIONS = [
   IMAGE_POSITION_LEFT,
   IMAGE_POSITION_RIGHT,
   IMAGE_POSITION_TOP,
   IMAGE_POSITION_BOTTOM,
-  IMAGE_POSITION_BACKGROUND
 ];

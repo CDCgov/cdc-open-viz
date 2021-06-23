@@ -1,23 +1,135 @@
+@import "../../../core/styles/variables";
+
 .cdc-data-bite-inner-container {
 
   .bite {
-    background: #eee;
-    padding: 2.8em 1em .6em .6em;
     border-radius: .3em;
     box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px;
-    border: solid 1px #ccc;
     position: relative;
     overflow: hidden;
+    border: solid 1px #ccc;
+    border-top: none;
+    background: $lightestGray;
 
     .bite-header {
-      position: absolute;
-      height: 2.2em;
       width: 100%;
       padding-left: 0.7em;
       left: 0;
       top: 0;
       line-height: 2.2em;
       color: white;
+      &:empty {
+        min-height: 5px;
+      }
+    }
+
+    &.theme-blue {
+      .bite-value {
+        color: $primary;
+      }
+
+      .bite-header {
+        background-color: $primary;
+      }
+    }
+
+    &.theme-purple {
+      .bite-value {
+        color: $purple-primary;
+      }
+      .bite-header {
+        background-color: $purple-primary;
+      }
+    }
+
+    &.theme-amber {
+      .bite-value {
+        color: $amber-primary;
+      }
+      .bite-header {
+        background-color: $amber-primary;
+      }
+    }
+
+    &.theme-orange {
+      .bite-value {
+        color: $orange-primary;
+      }
+      .bite-header {
+        background-color: $orange-primary;
+      }
+    }
+
+    &.theme-brown {
+      .bite-value {
+        color: $brown-primary;
+      }
+      .bite-header {
+        background-color: $brown-primary;
+      }
+    }
+
+    &.theme-teal {
+      .bite-value {
+        color: $teal-primary;
+      }
+      .bite-header {
+        background-color: $teal-primary;
+      }
+    }
+
+    &.theme-pink {
+      .bite-value {
+        color: $pink-primary;
+      }
+      .bite-header {
+        background-color: $pink-primary;
+      }
+    }
+
+    &.theme-slate {
+      .bite-value {
+        color: $slate-primary;
+      }
+      .bite-header {
+        background-color: $slate-primary;
+      }
+    }
+
+    &.theme-indigo {
+      .bite-value {
+        color: $indigo-primary;
+      }
+      .bite-header {
+        background-color: $indigo-primary;
+      }
+    }
+
+    &.theme-cyan {
+      .bite-value {
+        color: $cyan-primary;
+      }
+      .bite-header {
+        background-color: $cyan-primary;
+      }
+    }
+
+    &.theme-green {
+      .bite-value {
+        color: $green-primary;
+      }
+      .bite-header {
+        background-color: $green-primary;
+      }
+    }
+
+    &.theme-purple {
+      .bite-value {
+        color: $purple-primary;
+      }
+      .bite-header {
+        background-color: $purple-primary;
+      }
     }
 
     h3 {
@@ -27,43 +139,78 @@
 
     .bite-image {
       min-width: 100px;
-      height: 100px;
+      width: 100%;
       border-radius: .3em;
       opacity: .7;
-      margin: 0 .6em 0 0;
+    }
+
+    p.subtext {
+      font-style: italic;
+      font-weight: bold;
+      font-size: 0.75em;
+      padding: 0 1em 1em;
     }
 
     .bite-content-container {
       display: flex;
-
+      padding: 1em 1em;
+      justify-content: space-between;
       .bite-content {
-        flex-grow: 1;
+
+        .bite-value {
+          font-size: 2em;
+          font-weight: 800;
+          line-height: 1.25em;
+        }
+
+        .data-bite-body {
+          margin-right: 5px;
+        }
 
         p {
           margin: 0;
           font-size: .7em;
           color: #222;
         }
+
+        p.subtext {
+          margin-top: 15px;
+        }
       }
+    }
+
+    &.bite-left .bite-content-container > :nth-child(1) {
+      width: 24%;
+    }
+
+    &.bite-left .bite-content-container > :nth-child(2) {
+      width: 74%;
+    }
+
+    &.bite-right .bite-content-container > :nth-child(1) {
+      width: 24%;
+    }
+
+    &.bite-right .bite-content-container > :nth-child(2) {
+      width: 74%;
     }
 
     &.bite-right {
       .bite-content-container {
         flex-direction: row-reverse;
-
-        .bite-image {
-          margin-right: 0px;
-          margin-left: 0.6em;
-        }
       }
     }
 
     &.bite-top {
       .bite-content-container {
-
+        flex-direction: column;
 
         .bite-image {
           margin: 0 0 0.6em 0;
+        }
+
+        > :nth-child(1) {
+          margin-bottom: 10px;
         }
       }
     }
@@ -73,7 +220,11 @@
         flex-direction: column;
 
         .bite-image {
-          margin: 0.6em 0 0 0;
+          margin: 0 0 0 0;
+        }
+
+        > :nth-child(1) {
+          margin-bottom: 10px;
         }
       }
     }
