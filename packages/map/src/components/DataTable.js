@@ -256,39 +256,41 @@ const DataTable = (props) => {
       >
         {tableTitle}
       </div>
-      <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-live="assertive" >
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th tabIndex="0" 
-                  title={column.Header}
-                  {...column.getHeaderProps(column.getSortByToggleProps())} 
-                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
-                  onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
-                >
-                  {column.render('Header')}
-                  <div {...column.getResizerProps()} className="resizer" />
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td tabIndex="0" {...cell.getCellProps()}>
-                    {cell.render('Cell')}
-                  </td>
+      <div className="table-container">
+        <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-live="assertive" >
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th tabIndex="0" 
+                    title={column.Header}
+                    {...column.getHeaderProps(column.getSortByToggleProps())} 
+                    className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                    onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                  >
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className="resizer" />
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <td tabIndex="0" {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       {showDownloadButton === true && <DownloadButton data={data} />}
     </section>
     </ErrorBoundary>
