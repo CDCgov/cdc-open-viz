@@ -67,12 +67,23 @@ export class DataTransform {
         let standardizedMapped = {};
         let standardized = [];
         data.forEach((row) => {
+          let nonNumericKeys = [];
           Object.keys(row).forEach((key) => {
-            if(key !== description.seriesKey){
-              if(!standardizedMapped[key]){
-                standardizedMapped[key] = {key};
+            if(key !== description.seriesKey && isNaN(parseFloat(row[key]))){
+              nonNumericKeys.push(key);
+            }
+          });
+
+          Object.keys(row).forEach((key) => {
+            if(key !== description.seriesKey && nonNumericKeys.indexOf(key) === -1) {
+              let uniqueKey = key + '|' + nonNumericKeys.map((nonNumericKey) => (nonNumericKey + '=' + row[nonNumericKey]));
+              if(!standardizedMapped[uniqueKey]){
+                standardizedMapped[uniqueKey] = {[row[description.seriesKey]]: row[key], key};
+                nonNumericKeys.forEach((nonNumericKey) => {
+                  standardizedMapped[uniqueKey][nonNumericKey] = row[nonNumericKey];
+                });
               }
-              standardizedMapped[key][row[description.seriesKey]] = row[key];
+              standardizedMapped[uniqueKey][row[description.seriesKey]] = row[key];
             }
           });
         });
@@ -85,8 +96,25 @@ export class DataTransform {
       } else {
         let standardized = [];
 
-        Object.keys(data[0]).forEach((key) => {
-          standardized.push({key, value: data[0][key]});
+        data.forEach((row) => {
+          let nonNumericKeys = [];
+          Object.keys(row).forEach((key) => {
+            if(isNaN(parseFloat(row[key]))){
+              nonNumericKeys.push(key);
+            }
+          });
+
+          Object.keys(row).forEach((key) => {
+            if(nonNumericKeys.indexOf(key) === -1){
+              let newRow = {key, value: row[key]};
+
+              nonNumericKeys.forEach((nonNumericKey) => {
+                newRow[nonNumericKey] = row[nonNumericKey];
+              });
+
+              standardized.push(newRow);
+            }
+          });
         });
 
         return standardized;
