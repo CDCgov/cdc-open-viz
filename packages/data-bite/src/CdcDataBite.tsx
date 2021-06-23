@@ -4,10 +4,10 @@ import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import ResizeObserver from 'resize-observer-polyfill';
 import Context from './context';
+// @ts-ignore
+import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
-import {arrify} from "ts-loader/dist/utils";
 import * as Constants from './constants/index';
-import * as constants from "constants";
 
 const CdcDataBite = (
     { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig } :
@@ -22,7 +22,7 @@ const CdcDataBite = (
   const [data, setData] = useState<Array<Object>>([]);
   const [loading, setLoading] = useState<Boolean>(true);
 
-  const { title, dataColumn, dataFunction, imageUrl, biteBody, prefix, suffix, roundToPlace, filterColumn, filterValue } = config;
+  const { title, dataColumn, dataFunction, imageUrl, biteBody, prefix, suffix, roundToPlace, biteLocation, filterColumn, filterValue, subtext } = config;
   const outerContainerRef = useRef(null);
 
   // Load data when component first mounts
@@ -213,7 +213,6 @@ const CdcDataBite = (
         break;
       case Constants.DATA_FUNCTION_RANGE:
         numericalData.sort();
-        debugger;
         dataBite = prefix + applyPrecision(numericalData[0]).toString() + suffix + ' - ' + prefix + applyPrecision(numericalData[numericalData.length - 1]).toString() + suffix;
         break;
       default:
@@ -231,43 +230,55 @@ const CdcDataBite = (
     let addImageTop = false;
     let addImageBottom = false;
 
-    switch ( config.imagePosition ) {
-      case Constants.IMAGE_POSITION_LEFT:
-        biteClasses.push( 'bite-left' );
-        addImageTop = true;
-        break;
-      case Constants.IMAGE_POSITION_RIGHT:
-        biteClasses.push( 'bite-right' );
-        addImageTop = true;
-        break;
-      case Constants.IMAGE_POSITION_TOP:
-        biteClasses.push( 'bite-top' );
-        addImageTop = true;
-        break;
-      case Constants.IMAGE_POSITION_BOTTOM:
-        biteClasses.push( 'bite-bottom' );
-        addImageBottom = true;
-        break;
-      case Constants.IMAGE_POSITION_BACKGROUND:
-        biteClasses.push( 'bite-back' );
-        addImageTop = true;
-        break;
+    if (
+      ( !['title','body'].includes(biteLocation) && !imageUrl ) ||
+      ( ['title','body'].includes(biteLocation) && imageUrl ) ||
+      ( 'graphic' === biteLocation && imageUrl )
+      ) {
+      switch (config.imagePosition) {
+        case Constants.IMAGE_POSITION_LEFT:
+          biteClasses.push('bite-left');
+          addImageTop = true;
+          break;
+        case Constants.IMAGE_POSITION_RIGHT:
+          biteClasses.push('bite-right');
+          addImageTop = true;
+          break;
+        case Constants.IMAGE_POSITION_TOP:
+          biteClasses.push('bite-top');
+          addImageTop = true;
+          break;
+        case Constants.IMAGE_POSITION_BOTTOM:
+          biteClasses.push('bite-bottom');
+          addImageBottom = true;
+          break;
+      }
     }
 
+    biteClasses.push(config.theme);
+    const showBite = undefined !== dataColumn && undefined !== dataFunction;
     body = (
       <>
         {isEditor && <EditorPanel />}
         <div className="cdc-data-bite-inner-container">
           <div className={`bite ${biteClasses.join(' ')}`}>
-            {title && <div className={`bite-header ${config.theme}`}>{title}</div>}
+            {title && <div className="bite-header">{title}</div>}
             <div className="bite-content-container">
-              {imageUrl && addImageTop && <img src={imageUrl} className="bite-image" />}
+              {showBite && 'graphic' === biteLocation && addImageTop && <CircleCallout theme={config.theme} text={calculateDataBite()} /> }
+              {imageUrl && 'graphic' !== biteLocation && addImageTop && <img src={imageUrl} className="bite-image" />}
               <div className="bite-content">
-                {dataColumn && dataFunction && <div className="bite-value">{calculateDataBite()}</div>}
-                {biteBody && <p>{biteBody}</p>}
+                {showBite && 'title' === biteLocation && <div className="bite-value">{calculateDataBite()}</div>}
+                {biteBody &&
+                  <p>
+                    {showBite && 'body' === biteLocation && <span className="bite-value data-bite-body">{calculateDataBite()}</span>}
+                    {biteBody}
+                  </p>
+                }
               </div>
-              {imageUrl && addImageBottom && <img src={imageUrl} className="bite-image" />}
+              {imageUrl && 'graphic' !== biteLocation && addImageBottom && <img src={imageUrl} className="bite-image" />}
+              {showBite && 'graphic' === biteLocation && addImageBottom && <CircleCallout theme={config.theme} text={calculateDataBite()} /> }
             </div>
+            {subtext && <p className="subtext">{subtext}</p>}
           </div>
         </div>
       </>

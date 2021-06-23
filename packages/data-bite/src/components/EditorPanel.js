@@ -68,7 +68,15 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
 ))
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
+  let optionsJsx = '';
+  if ( Array.isArray(options)) { //Handle basic array
+    optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
+  } else { //Handle object with value/name pairs
+    optionsJsx = [];
+    for (const [optionValue, optionName] of Object.entries(options)) {
+      optionsJsx.push(<option value={optionValue} key={optionValue}>{optionName}</option>)
+    }
+  }
 
   if(initialValue) {
     optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
@@ -236,6 +244,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title" updateField={updateField} />
                   <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} />
+                  <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation" placeholder="Data Bite Subtext or Citation" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -265,6 +274,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <Select value={config.biteLocation} fieldName="biteLocation" label="Bite Layout" updateField={updateField} options={Constants.BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
                   <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image Position" updateField={updateField} initial="Select" options={Constants.IMAGE_POSITIONS} />
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
