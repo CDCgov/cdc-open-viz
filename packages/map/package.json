@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
-    "@cdc/core": "^1.0.0",
+    "@cdc/core": "^1.0.1",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
     "@visx/geo": "^1.7.0",
