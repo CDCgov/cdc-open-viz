@@ -1,27 +1,53 @@
 [
-	["date", "series", "value", "gender"],
-	["01/01/2020", "series1", 90, "male"],
-	["02/01/2020", "series1", 120, "male"],
-	["03/01/2020", "series1", 150, "male"],
+	["date", "series", "value", "gender", "age"],
+	["01/01/2020", "series1", 90, "male", "old"],
+	["02/01/2020", "series1", 120, "male", "old"],
+	["03/01/2020", "series1", 150, "male", "old"],
 
-	["01/01/2020", "series2", 100, "male"],
-	["02/01/2020", "series2", 130, "male"],
-	["03/01/2020", "series2", 160, "male"],
+	["01/01/2020", "series2", 100, "male", "old"],
+	["02/01/2020", "series2", 130, "male", "old"],
+	["03/01/2020", "series2", 160, "male", "old"],
 
-	["01/01/2020", "series3", 80, "male"],
-	["02/01/2020", "series3", 110, "male"],
-	["03/01/2020", "series3", 140, "male"],
+	["01/01/2020", "series3", 80, "male", "old"],
+	["02/01/2020", "series3", 110, "male", "old"],
+	["03/01/2020", "series3", 140, "male", "old"],
 
 
-	["01/01/2020", "series1", 100, "female"],
-	["02/01/2020", "series1", 130, "female"],
-	["03/01/2020", "series1", 160, "female"],
+	["01/01/2020", "series1", 100, "female", "old"],
+	["02/01/2020", "series1", 130, "female", "old"],
+	["03/01/2020", "series1", 160, "female", "old"],
 
-	["01/01/2020", "series2", 110, "female"],
-	["02/01/2020", "series2", 140, "female"],
-	["03/01/2020", "series2", 170, "female"],
+	["01/01/2020", "series2", 110, "female", "old"],
+	["02/01/2020", "series2", 140, "female", "old"],
+	["03/01/2020", "series2", 170, "female", "old"],
 
-	["01/01/2020", "series3", 90, "female"],
-	["02/01/2020", "series3", 120, "female"],
-	["03/01/2020", "series3", 150, "female"]
+	["01/01/2020", "series3", 90, "female", "old"],
+	["02/01/2020", "series3", 120, "female", "old"],
+	["03/01/2020", "series3", 150, "female", "old"],
+
+	
+	["01/01/2020", "series1", 110, "male", "young"],
+	["02/01/2020", "series1", 140, "male", "young"],
+	["03/01/2020", "series1", 170, "male", "young"],
+
+	["01/01/2020", "series2", 120, "male", "young"],
+	["02/01/2020", "series2", 150, "male", "young"],
+	["03/01/2020", "series2", 180, "male", "young"],
+
+	["01/01/2020", "series3", 100, "male", "young"],
+	["02/01/2020", "series3", 130, "male", "young"],
+	["03/01/2020", "series3", 170, "male", "young"],
+
+
+	["01/01/2020", "series1", 120, "female", "young"],
+	["02/01/2020", "series1", 150, "female", "young"],
+	["03/01/2020", "series1", 180, "female", "young"],
+
+	["01/01/2020", "series2", 130, "female", "young"],
+	["02/01/2020", "series2", 160, "female", "young"],
+	["03/01/2020", "series2", 190, "female", "young"],
+
+	["01/01/2020", "series3", 110, "female", "young"],
+	["02/01/2020", "series3", 140, "female", "young"],
+	["03/01/2020", "series3", 170, "female", "young"]
 ]
