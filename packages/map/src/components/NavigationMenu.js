@@ -10,7 +10,7 @@ const NavigationMenu = ({
   const handleSubmit = (event) => {
     event.preventDefault();
     if (activeGeo !== '') {
-      const urlString = runtime.data[dropdownItems[activeGeo]][columns.navigate.name];
+      const urlString = data[dropdownItems[activeGeo]][columns.navigate.name];
 
       navigationHandler(urlString);
     }
@@ -33,7 +33,7 @@ const NavigationMenu = ({
 
     const processedDropdown = {};
 
-    Object.keys(runtime.data).forEach((val) => {
+    Object.keys(data).forEach((val) => {
       const fullName = displayGeoName(val);
 
       processedDropdown[fullName] = val;
@@ -46,7 +46,7 @@ const NavigationMenu = ({
     setDropdownItems(sortedOptions);
 
     setActiveGeo(Object.keys(sortedOptions)[0]);
-  }, [runtime.data, displayGeoName]);
+  }, [data, displayGeoName]);
 
   return (
     <section className="navigation-menu">

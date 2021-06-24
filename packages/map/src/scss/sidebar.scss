@@ -14,14 +14,12 @@ aside {
   border-top: $lightGray 1px solid;
   @include breakpointClass(md) {
     &.bottom {
-      margin: 0 1em;
       border: #c2c2c2 1px solid;
     }
     &.side {
       z-index: 1;
       box-sizing: content-box;
       max-width: 450px;
-      margin-right: 1em;
       margin-top: 2em;
       margin-bottom: 2em;
       align-self: flex-start;
@@ -30,7 +28,6 @@ aside {
       border: $lightGray 1px solid;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
       width: 50%;
-      margin-right: 1rem;
       top: 2em;
       right: 1em;
     }
@@ -58,6 +55,7 @@ aside {
       text-transform: uppercase;
       transition: .3s all;
       padding: .375em .65em;
+      border: rgba(0,0,0,.2) 1px solid;
       &:hover {
         background: rgba(0,0,0,.15);
         transition: .3s all;
@@ -94,20 +92,12 @@ aside {
     }
   }
 
-  @include breakpointClass(sm) {
-    .legend-section ul {
-      align-items: flex-start;
-      justify-content: space-between;
-      li {
-        width: 48%;
-        padding-right: .5em;
-        &:nth-last-of-type(-n+2) {
-          padding-bottom: 0
-        }
-      }
-      &.single-column {
+  &.side.single-column {
+    @include breakpointClass(md) {
+      width: 25%;
+      min-width: 200px;
+      .legend-section ul {
         flex-direction: column;
-        padding-right: 3em;
         li {
           width: 100%;
           &:nth-last-of-type(-n+2) {
@@ -121,24 +111,39 @@ aside {
     }
   }
 
+  @include breakpointClass(sm) {
+    .legend-section ul {
+      align-items: flex-start;
+      justify-content: space-between;
+      li {
+        width: 48%;
+        padding-right: .5em;
+        &:nth-last-of-type(-n+2) {
+          padding-bottom: 0
+        }
+      }
+    }
+  }
+
   .filters-section {
-    padding: 0 1em .5em;
+    padding: 0 1em 1em;
     .heading-3 {
       font-weight: bold;
       margin-bottom: .5em;
     }
     form {
+      margin-top: .5em;
       line-height: 2em;
-    }
-    form section {
-      display: inline-block;
-    }
-    label:not(:empty) {
-      margin-right: .4em;
-    }
-    select {
-      font-size: 1em;
-      margin-right: 1em;
+      display: flex;
+      align-items: flex-end;
+      section + section {
+        margin-left: .75em;
+      }
+      select {
+        display: block;
+        width: inherit;
+        font-size: 1em;
+      }
     }
   }
 }
