@@ -44,11 +44,12 @@
 		"type": "equalnumber",
 		"specialClasses": ["N/A"]
 	},
+	"filters": [],
 	"data": [
 		{
 			"Insured Rate": "43",
 			"Coverage Status": "Insured",
-			"state": "Alabama",
+			"state": "AL",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
@@ -813,37 +814,6 @@
 			"Coverage Status": "Insured",
 			"state": "PR",
 			"Year (Good filter option)": "2015",
-			"link": "https://cdc.gov/"
-		},
-		{
-			"Region Name": "Northeast",
-			"States in Region": "Connecticut, Delaware, Maine, Massachusetts, New Hampshire, New Jersey, New York, Pennsylvania, Rhode Island, Vermont",
-			"Insured Rate": "10",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Southeast",
-			"States in Region": "Louisiana, Alabama, Georgia, Tennessee, Florida, South Carolina, North Carolina, Mississippi, Kentucky, Virginia, West Virginia, Maryland",
-			"Insured Rate": "50",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Southwest",
-			"States in Region": "Oklahoma, Texas, New Mexico, Arizona",
-			"Insured Rate": "13",
-			"Coverage Status": "Insured"
-		},
-		{
-			"Region Name": "Midwest",
-			"States in Region": "Kansas, Nebraska, Iowa, Minnesota, Missouri, Illinois, Indiana, Ohio, Michigan, South Dakota, North Dakota, ",
-			"Insured Rate": "20",
-			"Coverage Status": "Uninsured"
-		},
-		{
-			"Region Name": "West",
-			"States in Region": "California, Hawaii, Alaska, Oregon, Washington, Nevada, Utah, Idaho, Montana",
-			"Insured Rate": "134",
-			"Coverage Status": "Insured",
 			"link": "https://cdc.gov/"
 		}
 	]

@@ -115,6 +115,7 @@
       max-width: 300px;
     }
     .helper {
+      position: relative;
       opacity: .7;
       cursor: pointer;
       width: 17px;
@@ -199,7 +200,7 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       padding: 1em 1.25em 2em;
       animation: fadein 0.2s ease-in;
-      h5 {
+      span.h5 {
         font-size: .8em;
       }
     }
@@ -256,7 +257,7 @@
       border-bottom:#565656 3px solid;
       z-index: 3;
     }
-  
+
     label {
       text-transform: uppercase;
       display: block;
@@ -643,13 +644,14 @@
 
   @include breakpointClass(md) {
     .editor-panel:not(.hidden) + .cdc-map-inner-container {
-      padding-left: $editorWidth;
+      margin-left: $editorWidth;
     }
     .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
       padding-left: 3em;
     }
     .waiting {
-      padding-left: 350px;
+      background-color: #fff;
+      margin-left: $editorWidth;
     }
   }
 }

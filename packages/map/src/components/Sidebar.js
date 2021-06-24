@@ -6,13 +6,13 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 const Sidebar = (props) => {
   const {
     legend,
-    filters,
+    runtimeFilters,
     columns,
     setAccessibleStatus,
     changeFilterActive,
     resetLegendToggles,
-    runtime,
-    setRuntime,
+    runtimeLegend,
+    setRuntimeLegend,
     prefix,
     suffix,
     viewport
@@ -29,24 +29,24 @@ const Sidebar = (props) => {
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
-    const newValue = !runtime.legend[i].disabled;
+    const newValue = !runtimeLegend[i].disabled;
 
-    runtime.legend[i].disabled = newValue; // Toggle!
+    runtimeLegend[i].disabled = newValue; // Toggle!
 
-    let newLegend = [...runtime.legend]
+    let newLegend = [...runtimeLegend]
 
     newLegend[i].disabled = newValue
 
-    setRuntime({
-      ...runtime,
-      legend: newLegend,
-      disabledAmt: newValue ? runtime.disabledAmt + 1 : runtime.disabledAmt - 1
-    })
+    const disabledAmt = runtimeLegend.disabledAmt ?? 0
 
-    setAccessibleStatus(`Disabled legend item ${legendLabel}. Please reference the data table to see updated values.`);
+    newLegend['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
+
+    setRuntimeLegend(newLegend)
+
+    setAccessibleStatus(`Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`);
   };
 
-  const legendList = runtime.legend.map((entry, idx) => {
+  const legendList = runtimeLegend.map((entry, idx) => {
     const entryMax = addCommas(entry.max);
 
     const entryMin = addCommas(entry.min);
@@ -54,7 +54,7 @@ const Sidebar = (props) => {
     let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
 
     // If interval, add some formatting
-    if (legend.type === 'equalinterval' && idx !== runtime.legend.length - 1) {
+    if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
       formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
     }
 
@@ -90,8 +90,10 @@ const Sidebar = (props) => {
     );
   });
 
-  const filtersList = filters.map((singleFilter, idx) => {
+  const filtersList = runtimeFilters.map((singleFilter, idx) => {
     const values = [];
+
+    if(undefined === singleFilter.active) return null
 
     singleFilter.values.forEach((filterOption, idx) => {
       values.push(<option
@@ -102,12 +104,11 @@ const Sidebar = (props) => {
     });
 
     return (
-      <section key={idx}>
-        <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>
+      <section className="filter-col" key={idx}>
+        {singleFilter.label.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
         <select
           id={`filter-${idx}`}
           className="filter-select"
-          data-idx="0"
           value={singleFilter.active}
           onChange={(val) => {
             changeFilterActive(idx, val.target.value);
@@ -124,7 +125,7 @@ const Sidebar = (props) => {
     <ErrorBoundary component="Sidebar">
       <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`}>
       <section className="legend-section" aria-label="Map Legend">
-        {runtime.disabledAmt > 0 &&
+        {runtimeLegend.disabledAmt > 0 &&
           (
             <button
               onClick={(e) => {
@@ -139,14 +140,14 @@ const Sidebar = (props) => {
         {legend.title && <span className="heading-2">{ parse(legend.title) }</span>}
         {legend.dynamicDescription === false && legend.description
           && <p>{ parse(legend.description) }</p>}
-        {legend.dynamicDescription === true && filters.map((filter, idx) => {
+        {legend.dynamicDescription === true && runtimeFilters.map((filter, idx) => {
           const lookupStr = `${idx},${filter.values.indexOf(String(filter.active))}`;
 
           // Do we have a custom description for this?
           const desc = legend.descriptions[lookupStr] || '';
 
           if (desc.length > 0) {
-            return (<p>{ desc }</p>);
+            return (<p key={`dynamic-description-${lookupStr}`}>{desc}</p>);
           }
           return true;
         })}
@@ -158,9 +159,7 @@ const Sidebar = (props) => {
         <section className="filters-section" aria-label="Map Filters">
           <span className="heading-3">Filters</span>
           <form>
-            <section>
-              {filtersList}
-            </section>
+            {filtersList}
           </form>
         </section>
       }

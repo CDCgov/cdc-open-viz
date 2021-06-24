@@ -14,245 +14,6 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
-let topoToIso = {
-  "Zimbabwe": "ZWE",
-  "Zambia": "ZMB",
-  "Yemen": "YEM",
-  "Vietnam": "VNM",
-  "Venezuela": "VEN",
-  "Vatican": "VAT",
-  "Vanuatu": "VUT",
-  "Uzbekistan": "UZB",
-  "Uruguay": "URY",
-  "Micronesia": "FSM",
-  "Marshall Is.": "MHL",
-  "N. Mariana Is.": "MNP",
-  "U.S. Virgin Is.": "VIR",
-  "Guam": "GUM",
-  "American Samoa": "ASM",
-  "Puerto Rico": "PRI",
-  "United States of America": "USA",
-  "S. Geo. and the Is.": "SGS",
-  "Saint Helena": "SHN",
-  "Pitcairn Is.": "PCN",
-  "Anguilla": "AIA",
-  "Falkland Is.": "FLK",
-  "Cayman Is.": "CYM",
-  "Bermuda": "BMU",
-  "British Virgin Is.": "VGB",
-  "Turks and Caicos Is.": "TCA",
-  "Montserrat": "MSR",
-  "Jersey": "JEY",
-  "Guernsey": "GGY",
-  "Isle of Man": "IMN",
-  "United Kingdom": "GBR",
-  "United Arab Emirates": "ARE",
-  "Ukraine": "UKR",
-  "Uganda": "UGA",
-  "Turkmenistan": "TKM",
-  "Turkey": "TUR",
-  "Tunisia": "TUN",
-  "Trinidad and Tobago": "TTO",
-  "Tonga": "TON",
-  "Togo": "TGO",
-  "Timor-Leste": "TLS",
-  "Thailand": "THA",
-  "Tanzania": "TZA",
-  "Tajikistan": "TJK",
-  "Taiwan": "TWN",
-  "Syria": "SYR",
-  "Switzerland": "CHE",
-  "Sweden": "SWE",
-  "eSwatini": "SWZ",
-  "Suriname": "SUR",
-  "S. Sudan": "SSD",
-  "Sudan": "SDN",
-  "Sri Lanka": "LKA",
-  "Spain": "ESP",
-  "South Korea": "KOR",
-  "South Africa": "ZAF",
-  "Somalia": "SOM",
-  "Somaliland": "SOM",
-  "Solomon Is.": "SLB",
-  "Slovakia": "SVK",
-  "Slovenia": "SVN",
-  "Singapore": "SGP",
-  "Sierra Leone": "SLE",
-  "Seychelles": "SYC",
-  "Serbia": "SRB",
-  "Senegal": "SEN",
-  "Saudi Arabia": "SAU",
-  "São Tomé and Principe": "STP",
-  "San Marino": "SMR",
-  "Samoa": "WSM",
-  "St. Vin. and Gren.": "VCT",
-  "Saint Lucia": "LCA",
-  "St. Kitts and Nevis": "KNA",
-  "Rwanda": "RWA",
-  "Russia": "RUS",
-  "Romania": "ROU",
-  "Qatar": "QAT",
-  "Portugal": "PRT",
-  "Poland": "POL",
-  "Philippines": "PHL",
-  "Peru": "PER",
-  "Paraguay": "PRY",
-  "Papua New Guinea": "PNG",
-  "Panama": "PAN",
-  "Palau": "PLW",
-  "Pakistan": "PAK",
-  "Oman": "OMN",
-  "Norway": "NOR",
-  "North Korea": "PRK",
-  "Nigeria": "NGA",
-  "Niger": "NER",
-  "Nicaragua": "NIC",
-  "New Zealand": "NZL",
-  "Niue": "NIU",
-  "Cook Is.": "COK",
-  "Netherlands": "NLD",
-  "Aruba": "ABW",
-  "Curaçao": "CUW",
-  "Nepal": "NPL",
-  "Nauru": "NRU",
-  "Namibia": "NAM",
-  "Mozambique": "MOZ",
-  "Morocco": "MAR",
-  "W. Sahara": "ESH",
-  "Montenegro": "MNE",
-  "Mongolia": "MNG",
-  "Monaco": "MCO",
-  "Mexico": "MEX",
-  "Mauritius": "MUS",
-  "Mauritania": "MRT",
-  "Malta": "MLT",
-  "Mali": "MLI",
-  "Maldives": "MDV",
-  "Malaysia": "MYS",
-  "Malawi": "MWI",
-  "Madagascar": "MDG",
-  "Macedonia": "MKD",
-  "Luxembourg": "LUX",
-  "Lithuania": "LTU",
-  "Liechtenstein": "LIE",
-  "Libya": "LBY",
-  "Liberia": "LBR",
-  "Lesotho": "LSO",
-  "Lebanon": "LBN",
-  "Latvia": "LVA",
-  "Laos": "LAO",
-  "Kyrgyzstan": "KGZ",
-  "Kuwait": "KWT",
-  "Kosovo": "XKX",
-  "Kiribati": "KIR",
-  "Kenya": "KEN",
-  "Kazakhstan": "KAZ",
-  "Jordan": "JOR",
-  "Japan": "JPN",
-  "Jamaica": "JAM",
-  "Italy": "ITA",
-  "Israel": "ISR",
-  "Palestine": "PSE",
-  "Ireland": "IRL",
-  "Iraq": "IRQ",
-  "Iran": "IRN",
-  "Indonesia": "IDN",
-  "India": "IND",
-  "Iceland": "ISL",
-  "Hungary": "HUN",
-  "Honduras": "HND",
-  "Haiti": "HTI",
-  "Guyana": "GUY",
-  "Guinea-Bissau": "GNB",
-  "Guinea": "GIN",
-  "Guatemala": "GTM",
-  "Grenada": "GRD",
-  "Greece": "GRC",
-  "Ghana": "GHA",
-  "Germany": "DEU",
-  "Georgia": "GEO",
-  "Gambia": "GMB",
-  "Gabon": "GAB",
-  "France": "FRA",
-  "St. Pierre and Miquelon": "SPM",
-  "Wallis and Futuna Is.": "WLF",
-  "St-Martin": "MAF",
-  "St-Barthélemy": "BLM",
-  "Fr. Polynesia": "PYF",
-  "New Caledonia": "NCL",
-  "Fr. S. Antarctic Lands": "ATF",
-  "Åland": "ALA",
-  "Finland": "FIN",
-  "Fiji": "FJI",
-  "Ethiopia": "ETH",
-  "Estonia": "EST",
-  "Eritrea": "ERI",
-  "Eq. Guinea": "GNQ",
-  "El Salvador": "SLV",
-  "Egypt": "EGY",
-  "Ecuador": "ECU",
-  "Dominican Rep.": "DOM",
-  "Dominica": "DMA",
-  "Djibouti": "DJI",
-  "Greenland": "GRL",
-  "Faeroe Is.": "FRO",
-  "Denmark": "DNK",
-  "Czechia": "CZE",
-  "N. Cyprus": "CYP",
-  "Cyprus": "CYP",
-  "Cuba": "CUB",
-  "Croatia": "HRV",
-  "Côte d'Ivoire": "CIV",
-  "Costa Rica": "CRI",
-  "Dem. Rep. Congo": "COD",
-  "Congo": "COG",
-  "Comoros": "COM",
-  "Colombia": "COL",
-  "China": "CHN",
-  "Macao": "MAC",
-  "Hong Kong": "HKG",
-  "Chile": "CHL",
-  "Chad": "TCD",
-  "Central African Rep.": "CAF",
-  "Cabo Verde": "CPV",
-  "Canada": "CAN",
-  "Cameroon": "CMR",
-  "Cambodia": "KHM",
-  "Myanmar": "MMR",
-  "Burundi": "BDI",
-  "Burkina Faso": "BFA",
-  "Bulgaria": "BGR",
-  "Brunei": "BRN",
-  "Brazil": "BRA",
-  "Botswana": "BWA",
-  "Bosnia and Herz.": "BIH",
-  "Bolivia": "BOL",
-  "Bhutan": "BTN",
-  "Benin": "BEN",
-  "Belize": "BLZ",
-  "Belgium": "BEL",
-  "Belarus": "BLR",
-  "Barbados": "BRB",
-  "Bangladesh": "BGD",
-  "Bahrain": "BHR",
-  "Bahamas": "BHS",
-  "Azerbaijan": "AZE",
-  "Austria": "AUT",
-  "Australia": "AUS",
-  "Heard I. and McDonald Is.": "HMD",
-  "Norfolk Island": "NFK",
-  "Ashmore and Cartier Is.": "AUS",
-  "Armenia": "ARM",
-  "Argentina": "ARG",
-  "Antigua and Barb.": "ATG",
-  "Angola": "AGO",
-  "Andorra": "AND",
-  "Algeria": "DZA",
-  "Albania": "ALB",
-  "Afghanistan": "AFG",
-  "Sint Maarten": "SXM"
-}
-
 const handleZoomIn = (position, setPosition) => {
   if (position.zoom >= 4) return;
   setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
@@ -293,7 +54,7 @@ const WorldMap = (props) => {
     applyTooltipsToGeo,
     data,
     geoClickHandler,
-    applyLegendToValue,
+    applyLegendToRow,
     displayGeoName,
     supportedCountries,
     rebuildTooltips
@@ -307,29 +68,9 @@ const WorldMap = (props) => {
     setPosition(position);
   };
 
-  const styles = {
-    container: {
-      position: 'relative',
-      height: 0,
-      paddingBottom: '50%'
-    },
-    innerContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    },
-    map: {
-      // width: '100%',
-      // height: '100%',
-      // overflow: 'hidden',
-    }
-  };
-
   const constructGeoJsx = (geographies) => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
-      const geoKey = topoToIso[geo.properties.name]
+      const geoKey = geo.properties.iso
 
       if(!geoKey) return
 
@@ -341,7 +82,7 @@ const WorldMap = (props) => {
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToValue(geoData);
+        legendColors = applyLegendToRow(geoData);
       }
 
       const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
@@ -402,7 +143,7 @@ const WorldMap = (props) => {
       geoClickHandler={geoClickHandler}
       applyTooltipsToGeo={applyTooltipsToGeo}
       displayGeoName={displayGeoName}
-      applyLegendToValue={applyLegendToValue}
+      applyLegendToRow={applyLegendToRow}
     />)
 
     return geosJsx;
@@ -410,10 +151,7 @@ const WorldMap = (props) => {
 
   return (
     <ErrorBoundary component="WorldMap">
-      <svg
-        viewBox="0 0 880 500"
-        style={styles.map}
-      >
+      <svg viewBox="0 0 880 500">
         <ZoomableGroup
           zoom={position.zoom}
           center={position.coordinates}

@@ -20,7 +20,7 @@ const DataTable = (props) => {
     expandDataTable,
     columns,
     displayDataAsText,
-    applyLegendToValue,
+    applyLegendToRow,
     displayGeoName,
     navigationHandler,
     viewport,
@@ -175,10 +175,10 @@ const DataTable = (props) => {
 
         if (column === 'geo') {
           newCol.Header = 'Location';
-          newCol.Cell = ({ row, value, ...props }) => {
+          newCol.Cell = ({ row, value }) => {
             const rowObj = runtimeData[row.original];
 
-            const legendColor = applyLegendToValue(rowObj);
+            const legendColor = applyLegendToRow(rowObj);
 
             let labelValue = displayGeoName(row.original);
 
@@ -209,8 +209,8 @@ const DataTable = (props) => {
   }, [columns, runtimeData, runtimeLegend]);
 
   const tableData = useMemo(
-    () => Object.keys(runtimeData).filter((key) => applyLegendToValue(runtimeData[key])).sort((a, b) => customSort(a, b)),
-    [runtimeLegend, runtimeData, applyLegendToValue, customSort]
+    () => Object.keys(runtimeData).filter((key) => applyLegendToRow(runtimeData[key])).sort((a, b) => customSort(a, b)),
+    [runtimeLegend, runtimeData, applyLegendToRow, customSort]
   );
 
   // Change accessibility label depending on expanded status
@@ -226,7 +226,7 @@ const DataTable = (props) => {
       setAccessibilityLabel(collapsedLabel);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, applyLegendToValue, customSort]);
+  }, [expanded, applyLegendToRow, customSort]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -257,7 +257,7 @@ const DataTable = (props) => {
         {tableTitle}
       </div>
       <div className="table-container">
-        <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-live="assertive" >
+        <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" >
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>

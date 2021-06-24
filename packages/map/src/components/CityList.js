@@ -9,7 +9,7 @@ const CityList = (({
   geoClickHandler,
   applyTooltipsToGeo,
   displayGeoName,
-  applyLegendToValue,
+  applyLegendToRow,
   projection
 }) => {
   const [citiesData, setCitiesData] = useState({});
@@ -29,7 +29,7 @@ const CityList = (({
   const cities = cityList.map((city, i) => {
     const cityDisplayName = displayGeoName(city);
 
-    const legendColors = applyLegendToValue(data[city]);
+    const legendColors = applyLegendToRow(data[city]);
 
     if (legendColors === false) {
       return true;

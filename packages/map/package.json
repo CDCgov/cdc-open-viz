@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "main": "dist/cdcmap",
   "scripts": {
@@ -23,7 +23,7 @@
     "@cdc/core": "^1.0.1",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
-    "@visx/geo": "^1.7.0",
+    "@visx/geo": "^1.13.0",
     "@visx/responsive": "^1.7.0",
     "@visx/scale": "^1.7.0",
     "@visx/zoom": "^1.7.0",
@@ -46,7 +46,6 @@
     "react-tooltip": "4.2.8",
     "stream": "0.0.2",
     "topojson-client": "^3.1.0",
-    "us-atlas": "^3.0.0",
     "use-debounce": "^5.2.0",
     "whatwg-fetch": "^3.6.2",
     "world-atlas": "^2.0.2"
