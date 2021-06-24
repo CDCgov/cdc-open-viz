@@ -5,6 +5,7 @@ export default {
     "dataFunction": "",
     "dataColumn": "",
     "imagePosition": "",
+    "biteFontSize": "16",
     "imageUrl": "",
     "biteBody": "",
     "prefix": "",

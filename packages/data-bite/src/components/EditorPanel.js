@@ -15,7 +15,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, max = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -29,10 +29,11 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
 
   const onChange = (e) => {
+    //TODO: This block gives a warning/error in the console, but it still works.
     if('number' !== type || min === null){
       setValue(e.target.value);
     } else {
-      if(!e.target.value || min <= parseFloat(e.target.value)){
+      if(!e.target.value || ( parseFloat(min) <= parseFloat(e.target.value ) & parseFloat(max) >= parseFloat(e.target.value))) {
         setValue(e.target.value);
       } else {
         setValue(min.toString());
@@ -277,7 +278,8 @@ const EditorPanel = memo(() => {
                   <Select value={config.biteLocation} fieldName="biteLocation" label="Data Bite Placement" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
                   <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image or Data Bite Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
-                  <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
+                  <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
