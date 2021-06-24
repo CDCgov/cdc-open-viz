@@ -27,6 +27,7 @@ const CdcDataBite = (
     dataFunction,
     imageUrl,
     biteBody,
+    biteFontSize,
     prefix,
     suffix,
     roundToPlace,
@@ -277,7 +278,7 @@ const CdcDataBite = (
           <div className={`bite ${biteClasses.join(' ')}`}>
             {title && <div className="bite-header">{title}</div>}
             <div className="bite-content-container">
-              {showBite && 'graphic' === biteLocation && addImageTop && <CircleCallout theme={config.theme} text={calculateDataBite()} /> }
+              {showBite && 'graphic' === biteLocation && addImageTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize ? biteFontSize.toString() : "16"} /> }
               {imageUrl && 'graphic' !== biteLocation && addImageTop && <img src={imageUrl} className="bite-image" />}
               <div className="bite-content">
                 {showBite && 'title' === biteLocation && <div className="bite-value">{calculateDataBite()}</div>}
@@ -289,7 +290,7 @@ const CdcDataBite = (
                 }
               </div>
               {imageUrl && 'graphic' !== biteLocation && addImageBottom && <img src={imageUrl} className="bite-image" />}
-              {showBite && 'graphic' === biteLocation && addImageBottom && <CircleCallout theme={config.theme} text={calculateDataBite()} /> }
+              {showBite && 'graphic' === biteLocation && addImageBottom && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize ? biteFontSize.toString() : "16"} /> }
             </div>
             {subtext && <p className="subtext">{subtext}</p>}
           </div>
