@@ -19,7 +19,6 @@
 }
 
 .map-container {
-
   &.full-border {
     border: #C2C2C2 1px solid;
   }
@@ -48,8 +47,12 @@ header + .map-container.full-border {
   }
 }
 
-// Data Specific Styles
 @include breakpointClass(md) {
+  // US Specific
+  .map-container.us {
+    margin: 0 1em;
+  }
+  // Data Specific
   .map-container.data {
     &.side {
       flex-direction: row;
@@ -61,18 +64,17 @@ header + .map-container.full-border {
   position: relative;
   flex-grow: 1;
   width: 100%;
-  .city-dot {
+  overflow: hidden;
+  .geo-point {
     transition: .3s all;
     circle {
+      fill: inherit;
+      stroke: inherit;
       stroke-width: 1.3px;
-      transition: .3s transform;
+      transition: .1s transform;
     }
     &:hover {
-      transition: .3s all;
-      circle {
-        transition: .3s transform;
-        transform: scale(1.2);
-      }
+      transition: .2s all;
     }
   }
   .map-logo {
@@ -93,79 +95,46 @@ header + .map-container.full-border {
       font-size: .8em;
     }
     path {
-      fill: #E6E6E6;
+      fill: inherit;
       stroke-width: 0.7px;
       transition: .3s all;
       position: relative;
       opacity: 1;
       &:focus {
+        fill: inherit;
         outline: 0;
+      }
+      &:hover {
+        fill: inherit;
       }
     }
   }
 }
 
-// Border colors for territories
-.rsm-geography {
-  > path.darkGray, &.darkGray {
-    stroke: rgba(0,0,0,.2) !important;
-  }
-  > path.sameAsBackground, &.sameAsBackground {
-    stroke: rgba(255,255,255,.7) !important;
+.single-geo {
+  transition: .2s fill;
+  &:focus {
+    outline: 0;
   }
 }
 
 // Cities and Territories
 .territories {
-  padding: 1em 100px 0 1em;
-  margin-bottom: 2em;
-  font-size: .8em;
-  ul {
-    display: flex;
-    li {
-      text-align: center;
-      min-width: 30px;
-      display: inline-block;
-      margin-right: .5em;
-      transition: .3s all;
-      &.label {
-        max-width: 30%;
-        display: flex;
-        align-items: center;
-        text-align: left;
-        font-size: 1em !important;
-        margin-bottom: 0;
-      }
-      &:not(:first-child) {
-        transition: .3s all;
-        padding: .15em .2em;
-        border-radius: 5px;
-        font-weight: 600;
-        line-height: 15px;
-        border-width: 1px !important;
-        border-style: solid !important;
-      }
-      &.darkGray {
-        border: rgba(0,0,0,.2) 1px solid !important;
-      }
-      a {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-      }
-    }
+  margin: 2em 100px 2em 0;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  > span {
+    margin-left: 1em;
+    margin-right: .5em;
   }
-}
-
-.hex-territories {
-  li {
-    min-width: 25px !important;
-    svg {
-      text {
-        pointer-events: none;
-        font-size: 4.5em;
-        font-weight: 400;
-      }
+  svg {
+    max-width: 35px;
+    margin-left: .5em;
+    transition: .3s all;
+    text {
+      font-size: .95em;
+      stroke-width: 0;
     }
   }
 }
@@ -201,7 +170,6 @@ header + .map-container.full-border {
   }
 }
 
-
 @include breakpointClass(sm) {
   .zoom-controls > button {
     height: 2.5em;
@@ -217,22 +185,11 @@ header + .map-container.full-border {
   }
   .territories {
     font-size: 1em;
-    padding-top: 3em;
-    ul {
-      max-width: none;
-      li {
-        margin-bottom: .5em;
-        &:not(:first-child) {
-          padding: .3em;
-        }
-      }
+    > span {
+      margin-left: 0;
     }
-  }
-  .hex-territories {
     svg {
-      text {
-        font-size: 3.25em;
-      }
+      max-width: 45px;
     }
   }
 }

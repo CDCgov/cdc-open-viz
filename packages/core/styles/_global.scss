@@ -4,7 +4,7 @@
   justify-content: space-between;
   padding: .3rem 1rem;
   font-size: .9rem;
-  h5 {
+  strong {
     font-weight: 600;
   }
   p {
@@ -28,6 +28,7 @@
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+  display: flex;
 }
 
 .inline-icon {
