@@ -13,7 +13,7 @@ import Context from '../context';
 import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
-import * as Constants from '../constants';
+import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -255,7 +255,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" options={getColumns()} />
-                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" options={Constants.DATA_FUNCTIONS} />
+                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" options={DATA_FUNCTIONS} />
                   <ul className="column-edit">
                     <li className="three-col">
                       <TextField value={config.prefix} fieldName="prefix" label="Prefix" updateField={updateField} />
@@ -274,12 +274,12 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.biteLocation} fieldName="biteLocation" label="Bite Layout" updateField={updateField} options={Constants.BITE_LOCATIONS} initial="Select" />
+                  <Select value={config.biteLocation} fieldName="biteLocation" label="Data Bite Placement" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
-                  <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image Position" updateField={updateField} initial="Select" options={Constants.IMAGE_POSITIONS} />
+                  <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image or Data Bite Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <label className="header">
-                    <span className="edit-label">Header Theme</span>
+                    <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map( (palette) => (
                         <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette}>

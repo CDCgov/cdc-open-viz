@@ -7,7 +7,6 @@ import Context from './context';
 // @ts-ignore
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
-import * as Constants from './constants/index';
 
 const CdcDataBite = (
     { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig } :
@@ -22,7 +21,21 @@ const CdcDataBite = (
   const [data, setData] = useState<Array<Object>>([]);
   const [loading, setLoading] = useState<Boolean>(true);
 
-  const { title, dataColumn, dataFunction, imageUrl, biteBody, prefix, suffix, roundToPlace, biteLocation, filterColumn, filterValue, subtext } = config;
+  const {
+    title,
+    dataColumn,
+    dataFunction,
+    imageUrl,
+    biteBody,
+    prefix,
+    suffix,
+    roundToPlace,
+    biteLocation,
+    filterColumn,
+    filterValue,
+    subtext
+  } = config;
+
   const outerContainerRef = useRef(null);
 
   // Load data when component first mounts
@@ -190,28 +203,28 @@ const CdcDataBite = (
     }).map(Number);
 
     switch (dataFunction) {
-      case Constants.DATA_FUNCTION_COUNT:
+      case DATA_FUNCTION_COUNT:
         dataBite = prefix + String(numericalData.length) + suffix;
         break;
-      case Constants.DATA_FUNCTION_SUM:
+      case DATA_FUNCTION_SUM:
         dataBite = prefix + String(getColumnSum(numericalData)) + suffix;
         break;
-      case Constants.DATA_FUNCTION_MEAN:
+      case DATA_FUNCTION_MEAN:
         dataBite = prefix + String(getColumnMean(numericalData)) + suffix;
         break;
-      case Constants.DATA_FUNCTION_MEDIAN:
+      case DATA_FUNCTION_MEDIAN:
         dataBite = prefix + getMedian(numericalData).toString() + suffix;
         break;
-      case Constants.DATA_FUNCTION_MAX:
+      case DATA_FUNCTION_MAX:
         dataBite = prefix + applyPrecision(Math.max(...numericalData)).toString() + suffix;
         break;
-      case Constants.DATA_FUNCTION_MIN:
+      case DATA_FUNCTION_MIN:
         dataBite = prefix + applyPrecision(Math.min(...numericalData)).toString() + suffix;
         break;
-      case Constants.DATA_FUNCTION_MODE:
+      case DATA_FUNCTION_MODE:
         dataBite = prefix + getMode(numericalData).join(', ') + suffix;
         break;
-      case Constants.DATA_FUNCTION_RANGE:
+      case DATA_FUNCTION_RANGE:
         numericalData.sort();
         dataBite = prefix + applyPrecision(numericalData[0]).toString() + suffix + ' - ' + prefix + applyPrecision(numericalData[numericalData.length - 1]).toString() + suffix;
         break;
@@ -236,19 +249,19 @@ const CdcDataBite = (
       ( 'graphic' === biteLocation && imageUrl )
       ) {
       switch (config.imagePosition) {
-        case Constants.IMAGE_POSITION_LEFT:
+        case IMAGE_POSITION_LEFT:
           biteClasses.push('bite-left');
           addImageTop = true;
           break;
-        case Constants.IMAGE_POSITION_RIGHT:
+        case IMAGE_POSITION_RIGHT:
           biteClasses.push('bite-right');
           addImageTop = true;
           break;
-        case Constants.IMAGE_POSITION_TOP:
+        case IMAGE_POSITION_TOP:
           biteClasses.push('bite-top');
           addImageTop = true;
           break;
-        case Constants.IMAGE_POSITION_BOTTOM:
+        case IMAGE_POSITION_BOTTOM:
           biteClasses.push('bite-bottom');
           addImageBottom = true;
           break;
@@ -295,3 +308,43 @@ const CdcDataBite = (
 };
 
 export default CdcDataBite;
+
+/* Constant */
+export const DATA_FUNCTION_MAX = 'Max';
+export const DATA_FUNCTION_COUNT = 'Count';
+export const DATA_FUNCTION_MEAN = 'Mean (Average)';
+export const DATA_FUNCTION_MEDIAN = 'Median';
+export const DATA_FUNCTION_MIN = 'Min';
+export const DATA_FUNCTION_MODE = 'Mode';
+export const DATA_FUNCTION_RANGE = 'Range';
+export const DATA_FUNCTION_SUM = 'Sum';
+export const DATA_FUNCTIONS = [
+  DATA_FUNCTION_COUNT,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_MODE,
+  DATA_FUNCTION_RANGE,
+  DATA_FUNCTION_SUM
+];
+
+export const BITE_LOCATION_TITLE = 'title';
+export const BITE_LOCATION_BODY = 'body';
+export const BITE_LOCATION_GRAPHIC = 'graphic';
+export const BITE_LOCATIONS = {
+  'title': 'As a title in the body',
+  'body': 'At the beginning of the body text',
+  'graphic': 'As a graphic'
+};
+
+export const IMAGE_POSITION_LEFT = 'Left';
+export const IMAGE_POSITION_RIGHT = 'Right';
+export const IMAGE_POSITION_TOP = 'Top';
+export const IMAGE_POSITION_BOTTOM = 'Bottom';
+export const IMAGE_POSITIONS = [
+  IMAGE_POSITION_LEFT,
+  IMAGE_POSITION_RIGHT,
+  IMAGE_POSITION_TOP,
+  IMAGE_POSITION_BOTTOM,
+];
