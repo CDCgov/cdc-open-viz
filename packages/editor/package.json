@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "dist/cdceditor",
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
@@ -12,14 +12,14 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/editor build"
   },
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
-    "@cdc/chart": "^1.1.0",
-    "@cdc/core": "^1.0.1",
+    "@cdc/chart": "^1.1.1",
+    "@cdc/core": "^1.0.2",
     "@cdc/map": "^2.4.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.3.1",

@@ -196,7 +196,7 @@ export const supportedCountries = {
   MYT: ['Mayotte', 'Mayotte (France)'],
   MEX: ['Mexico'],
   FSM: ['Micronesia', 'Federated States of Micronesia', 'Micronesia (Federated States of)', 'Micronesia, Federated States of'],
-  MDA: ['Moldvoa', 'Moldova, Republic of'],
+  MDA: ['Moldova', 'Moldova, Republic of'],
   MCO: ['Monaco'],
   MNG: ['Mongolia'],
   MNE: ['Montenegro'],
@@ -300,7 +300,8 @@ export const supportedCountries = {
   ESH: ['Western Sahara', 'W. Sahara'],
   YEM: ['Yemen'],
   ZMB: ['Zambia'],
-  ZWE: ['Zimbabwe']
+  ZWE: ['Zimbabwe'],
+  IOT: ['British Indian Ocean Territory']
 };
 
 export const supportedTerritories = {
