@@ -69,7 +69,7 @@ const TextField = ({label, section = null, subsection = null, fieldName, updateF
 const EditorPanel = (props) => {
   const {
     state,
-    columnsInData,
+    columnsInData = [],
     loadConfig,
     setState,
     setParentConfig,
@@ -82,8 +82,6 @@ const EditorPanel = (props) => {
   const [ requiredColumns, setRequiredColumns ] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const [ configTextboxValue, setConfigTextbox ] = useState({})
-
-  // const [ columnsInData, setColumnsInData ] = useState({})
 
   const [ loadedDefault, setLoadedDefault ] = useState(false)
 
@@ -203,20 +201,6 @@ const EditorPanel = (props) => {
               headerColor: value
           }
         })
-      break;
-      case 'geoColumn': {
-        console.log('Does this even fire...?')
-        const stateObj = {
-          ...state,
-          columns: {
-              ...state.columns,
-              geo: {
-                ...state.columns.geo,
-                name: value
-              }
-          }
-        }
-      }
       break;
       case 'navigateColumn':
         setState({
@@ -366,6 +350,7 @@ const EditorPanel = (props) => {
                   primary: {} 
                 }
               })
+              break;
             case 'world':
               setState({
                 ...state,
@@ -379,6 +364,7 @@ const EditorPanel = (props) => {
                   primary: {} 
                 }
               })
+              break;
             default:
                 console.warn("Map type not set.")
             break;
@@ -623,8 +609,8 @@ const EditorPanel = (props) => {
     zIndex:"999"
   }
 
-  const convertStateToConfig = (type = "JSON") => {
-    let strippedState = JSON.parse(JSON.stringify(state))
+  const convertStateToConfig = () => {
+    let strippedState = JSON.parse(JSON.stringify(state)) // Deep copy
 
     // Strip ref
     delete strippedState[""]
@@ -646,8 +632,9 @@ const EditorPanel = (props) => {
 
     strippedState.general = strippedGeneral
 
-    if(type === "JSON") {
-      return JSON.stringify( strippedState )
+    // Add columns property back to data if it's there
+    if(state.data.columns) {
+      strippedState.data.columns = state.data.columns
     }
 
     return strippedState
@@ -666,22 +653,6 @@ const EditorPanel = (props) => {
       setEditorCatOrder(arr)
     }
   }, [runtimeLegend])
-
-  // useEffect(() => {
-  //   // Generate all columns available by looping through the data - add a blank value at the top
-  //   const newObj = {}
-
-  //   Object.values(runtimeData).forEach(row => {
-  //     Object.keys(row).forEach(colName => {
-  //       if(undefined === newObj[colName]) {
-  //         newObj[colName] = true
-  //       }
-  //     })
-
-  //   })
-
-  //   setColumnsInData(newObj)
-  // }, [runtimeData])
 
   const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
   
@@ -765,13 +736,13 @@ const EditorPanel = (props) => {
   useEffect(() => {
     const parsedData = convertStateToConfig()
 
-    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
+    const formattedData = JSON.stringify(parsedData, undefined, 2);
 
     setConfigTextbox(formattedData)
 
     // Pass up to Editor if needed
     if(setParentConfig) {
-      const newConfig = convertStateToConfig("object")
+      const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
 
@@ -816,7 +787,6 @@ const EditorPanel = (props) => {
         <ReactTooltip
           html={true}
           multiline={true}
-          className='helper'
         />
         <span className="base-label">Configure Map</span>
         <section className="form-container">
