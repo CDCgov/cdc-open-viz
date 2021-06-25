@@ -352,8 +352,6 @@ const generateRuntimeLegend = (obj, runtimeData, hash) => {
 
             if(count === 9) break // Can only have 9 categorical items for now
         }
-      
-        const sorted = [...uniqueValues.keys()]
 
         // Apply custom sorting or regular sorting
         let configuredOrder = obj.legend.categoryValuesOrder ?? []

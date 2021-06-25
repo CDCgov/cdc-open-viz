@@ -83,8 +83,6 @@ const EditorPanel = (props) => {
 
   const [ configTextboxValue, setConfigTextbox ] = useState({})
 
-  // const [ columnsInData, setColumnsInData ] = useState({})
-
   const [ loadedDefault, setLoadedDefault ] = useState(false)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
@@ -847,6 +845,9 @@ const EditorPanel = (props) => {
                 <AccordionItemPanel>
                   <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" helper="For accessibility reasons, you should enter a title even if you are not planning on displaying it." />
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
+                  {'us' === state.general.geoType &&
+                    <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
+                  }
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
