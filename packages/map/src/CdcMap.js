@@ -110,28 +110,6 @@ const getViewport = size => {
     return result
 }
 
-const cleanCsvData = (data)  => {
-    return data.map( (row) => {
-
-        let deleteKeys = []
-
-        for(let property in row) {
-
-            if(0 === property.length) {
-                deleteKeys.push(property)
-            }
-
-            if ( 'string' === typeof row[property] ) {
-                row[ property ] = row[ property ].trim()
-            }
-        }
-
-        deleteKeys.forEach( (key) => delete row[key] )
-
-        return row
-    } )
-}
-
 // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
 // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
 const addUIDs = (obj, fromColumn) => {
@@ -168,30 +146,34 @@ const addUIDs = (obj, fromColumn) => {
         // TODO: Points
 
         if(uid) {
-            // Add unique values in dataset to uniqueValuesMemo
-            for(let colName in row) {
-                let val = row[colName]
-
-                if(undefined === uniqueValuesMemo[colName]) {
-                    uniqueValuesMemo[colName] = [
-                        {},
-                        []
-                    ]
-                }
-
-                if(uniqueValuesMemo[colName][0][val]) continue // Exact value for this column already stored
-
-                uniqueValuesMemo[colName][0][val] = true
-                uniqueValuesMemo[colName][1].push(val)
-            }
-
             Object.defineProperty(row, 'uid', {
                 value: uid,
                 writable: true
             });
         }
+
+        // Add unique values in dataset to uniqueValuesMemo
+        let cols = Object.keys(row)
+
+        for(let i = 0; i < cols.length; i++) {
+            let colName = cols[i]
+            let val = row[colName]
+
+            if(undefined === uniqueValuesMemo[colName]) {
+                uniqueValuesMemo[colName] = [
+                    {},
+                    []
+                ]
+            }
+
+            if(uniqueValuesMemo[colName][0][val]) continue // Exact value for this column already stored
+
+            uniqueValuesMemo[colName][0][val] = true
+            uniqueValuesMemo[colName][1].push(val)
+        }
     })
 
+    obj.data.columns = Object.keys(uniqueValuesMemo)
     obj.data.fromColumn = fromColumn
 }
 
@@ -226,7 +208,6 @@ const generateRuntimeFilters = (obj, hash, runtimeFilters) => {
 
 // Calculates what's going to be displayed on the map and data table at render.
 const generateRuntimeData = (obj, filters, hash) => {
-    console.log(`generateRuntimeData()`)
     const result = {}
 
     if(hash) {
@@ -404,6 +385,8 @@ const generateRuntimeLegend = (obj, runtimeData, hash) => {
         for(let i = 0; i < result.length; i++) {
             result[i].color = applyColorToLegend(i)
         }
+      
+        const sorted = [...uniqueValues.keys()]
 
         return result
     }
@@ -716,9 +699,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if( legendMemo.has(hash) ) {
             let idx = legendMemo.get(hash)
 
-            if(runtimeLegend[idx].disabled) return false
+            if(runtimeLegend[idx]?.disabled) return false
 
-            return generateColorsArray( runtimeLegend[idx].color, runtimeLegend[idx].special)
+            return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
         }
 
         // Fail state
@@ -902,31 +885,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
         }
 
-        if( Array.isArray(newState.data) ) {
-            // Process all the data and trim whitespace/returns/etc...
-            newState.data = cleanCsvData(newState.data)
-        }
-
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
         // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
         // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childprop1
         Object.keys(newState).forEach( (key) => {
             if("object" === typeof newState[key] && false === Array.isArray(newState[key])) {
                 if(initialState[key] ) {
-
                     Object.keys(initialState[key]).forEach( (property) => {
                         if(undefined === newState[key][property]) {
                             newState[key][property] = initialState[key][property]
                         }
                     })
-
                 }
             }
         })
 
         // If there's a name for the geo, add UIDs
         if(newState.columns.geo.name) {
-            console.log(`calling addUIDs from loadConfig()`)
             addUIDs(newState, newState.columns.geo.name)
         }
 
@@ -967,9 +942,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     useEffect(() => {
         // UID
-        console.log('uid fromColumn', state.data?.fromColumn)
         if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
-            console.log(`calling addUIDs from useEffect`)
             addUIDs(state, state.columns.geo.name)
         }
 
@@ -1011,7 +984,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            console.log(state.data)
             const data = generateRuntimeData(state, runtimeFilters, hashData)
 
             setRuntimeData(data)
@@ -1073,12 +1045,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName
     }
 
-    // columnsInData
-    let columnsInData = config ? config.data?.columns : Object.keys(uniqueValuesMemo)
-
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {isEditor && <EditorPanel state={state} columnsInData={columnsInData} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} />}
+            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={state.data.columns}  />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
