@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import CdcMap from '@cdc/map'; // TODO: Lazy load this
 import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 
