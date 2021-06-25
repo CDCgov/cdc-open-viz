@@ -10,9 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce';
 import Context from '../context';
-import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import Waiting from '@cdc/core/components/Waiting';
 import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, max = null, ...attributes}) => {
@@ -24,7 +22,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
     if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
-  }, [debouncedValue, section, subsection, fieldName, i])
+  }, [debouncedValue, section, subsection, fieldName, i, stateValue, updateField])
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
 
@@ -60,13 +58,6 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
     </label>
   )
 })
-
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
-  <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
-    <span className="edit-label">{label}</span>
-  </label>
-))
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = '';
@@ -104,6 +95,7 @@ const EditorPanel = memo(() => {
     setParentConfig
   } = useContext(Context);
 
+  const [ displayPanel, setDisplayPanel ] = useState(true);
   const enforceRestrictions = (updatedConfig) => {
    //If there are any dependencies between fields, etc../
   };
@@ -150,24 +142,14 @@ const EditorPanel = memo(() => {
     return false;
   };
 
-  const [ displayPanel, setDisplayPanel ] = useState(true);
-
-  // Used to pipe a JSON version of the config you are creating out
-  const [ configData, setConfigData ] = useState({})
-
   useEffect(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
-
-  if(loading) {
-    return null
-  }
 
   const Error = () => {
     return (
@@ -178,30 +160,6 @@ const EditorPanel = memo(() => {
         </section>
       </section>
     );
-  }
-
-  const getColumns = (filter = true) => {
-      let columns = {}
-
-      data.map(row => {
-        Object.keys(row).forEach(columnName => columns[columnName] = true)
-      })
-
-      return Object.keys(columns)
-  }
-
-  const getColumnValues = () => {
-    let filterDataOptions = []
-    if (data && config.filterColumn) {
-      data.forEach(function(row) {
-        if ( -1 === filterDataOptions.indexOf(row[config.filterColumn]) ) {
-          filterDataOptions.push(row[config.filterColumn]);
-        }
-      })
-      filterDataOptions.sort();
-    }
-    return filterDataOptions;
-
   }
 
   const Confirm = () => {
@@ -224,6 +182,58 @@ const EditorPanel = memo(() => {
     delete strippedState.runtime
 
     return strippedState
+  }
+
+  const removeFilter = (index) => {
+    let filters = [...config.filters];
+
+    filters.splice(index, 1);
+
+    updateConfig({...config, filters})
+  }
+
+  const updateFilterProp = (name, index, value) => {
+    let filters = [...config.filters];
+
+    filters[index][name] = value;
+
+    updateConfig({...config, filters});
+  }
+
+  const addNewFilter = () => {
+    let filters = config.filters ? [...config.filters] : [];
+
+    filters.push({values: []});
+
+    updateConfig({...config, filters});
+  }
+
+  const getColumns = (filter = true) => {
+    let columns = {}
+
+    data.map(row => {
+      Object.keys(row).forEach(columnName => columns[columnName] = true)
+    })
+
+    return Object.keys(columns)
+  }
+
+  const getFilterColumnValues = (index) => {
+    let filterDataOptions = []
+    const filterColumnName = config.filters[index].columnName;
+    if (data && filterColumnName) {
+      data.forEach(function(row) {
+        if ( undefined !== row[filterColumnName] && -1 === filterDataOptions.indexOf(row[filterColumnName]) ) {
+          filterDataOptions.push(row[filterColumnName]);
+        }
+      })
+      filterDataOptions.sort();
+    }
+    return filterDataOptions;
+  }
+
+  if(loading) {
+    return null
   }
 
   return (
@@ -264,8 +274,43 @@ const EditorPanel = memo(() => {
                       <TextField type="number" value={config.roundToPlace} fieldName="roundToPlace" label="Round" updateField={updateField} />
                     </li>
                   </ul>
-                  <Select value={config.filterColumn || ""} fieldName="filterColumn" label="Filter Column" updateField={updateField} initial="Select" options={getColumns()} />
-                  <Select value={config.filterValue || ""} fieldName="filterValue" label="Filter Value" updateField={updateField} initial="Select" options={getColumnValues()} />
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    Filters
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <ul className="filters-list">
+                    {config.filters && config.filters.map((filter, index) => (
+                        <fieldset className="edit-block">
+                          <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
+                          <label>
+                            <span className="edit-label column-heading">Column</span>
+                            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                              <option value="">- Select Option -</option>
+                              {getColumns().map((dataKey) => (
+                                <option value={dataKey}>{dataKey}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Column Value</span>
+                            <select value={filter.columnValue} onChange={(e) => {updateFilterProp('columnValue', index, e.target.value)}}>
+                              <option value="">- Select Option -</option>
+                              {getFilterColumnValues(index).map((dataKey) => (
+                                <option value={dataKey}>{dataKey}</option>
+                              ))}
+                            </select>
+                          </label>
+                        </fieldset>
+                      )
+                    )}
+                  </ul>
+
+                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

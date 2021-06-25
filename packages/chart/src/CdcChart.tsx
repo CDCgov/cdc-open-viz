@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -11,7 +11,6 @@ import { timeParse, timeFormat } from 'd3-time-format';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
-import Waiting from '@cdc/core/components/Waiting';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -23,14 +22,14 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig} : 
+  { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig} :
   { configUrl?: string, config?: any, isEditor?: boolean, setConfig? }
 ) {
 
   const [colorScale, setColorScale] = useState<any>(null);
 
   interface keyable {
-    [key: string]: any  
+    [key: string]: any
   }
 
   const [config, setConfig] = useState<keyable>({});
@@ -79,9 +78,9 @@ export default function CdcChart(
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
     // Deeper copy
-    Object.keys(defaults).forEach( key => {
-      if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...defaults[key], ...newConfig[key]}
+    Object.keys(defaults).forEach(key => {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     });
 
@@ -250,7 +249,7 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
-  
+
   const parseDate = (dateString: string) => {
     let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
     if(!date) {
@@ -277,7 +276,7 @@ export default function CdcChart(
       if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
-        num = cutoff;  
+        num = cutoff;
       }
     }
     if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);

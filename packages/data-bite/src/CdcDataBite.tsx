@@ -7,6 +7,8 @@ import Context from './context';
 // @ts-ignore
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
+import {Simulate} from "react-dom/test-utils";
+import load = Simulate.load;
 
 const CdcDataBite = (
     { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig } :
@@ -32,18 +34,11 @@ const CdcDataBite = (
     suffix,
     roundToPlace,
     biteLocation,
-    filterColumn,
-    filterValue,
+    filters,
     subtext
   } = config;
 
   const outerContainerRef = useRef(null);
-
-  // Load data when component first mounts
-  useEffect(() => {
-    loadConfig();
-    resizeObserver.observe(outerContainerRef.current);
-  }, []);
 
   useEffect( () => {
     setLoading(false);
@@ -107,10 +102,18 @@ const CdcDataBite = (
     updateConfig(newConfig, data);
   }
 
+  // Load data when component first mounts
+  useEffect(() => {
+    loadConfig();
+    resizeObserver.observe(outerContainerRef.current);
+  }, [resizeObserver, loadConfig]);
+
+
+
   const updateConfig = (newConfig, dataOverride = undefined) => {
     // Deeper copy
     Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key]) {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     });
@@ -183,13 +186,16 @@ const CdcDataBite = (
     let dataBite = '';
 
     //Optionally filter the data based on the user's filter
-
     let filteredData = data;
-    if ( filterColumn && filterValue ) {
-      filteredData = data.filter(function (e) {
-        return e[filterColumn] === filterValue;
-      });
-    }
+    filters.map((filter) => {
+      if ( filter.columnName && filter.columnValue ) {
+        filteredData = filteredData.filter(function (e) {
+          return e[filter.columnName] === filter.columnValue;
+        });
+      } else {
+        return false;
+      }
+    });
 
     //Get the column's data
     const columnData = filteredData.map(a => a[dataColumn]);
