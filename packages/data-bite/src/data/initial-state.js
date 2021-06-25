@@ -4,16 +4,15 @@ export default {
     "dataBite": "",
     "dataFunction": "",
     "dataColumn": "",
-    "imagePosition": "",
-    "biteFontSize": "16",
+    "imagePosition": "left",
+    "biteFontSize": "24",
     "imageUrl": "",
     "biteBody": "",
     "prefix": "",
     "suffix": "",
     "roundToPlace": "",
-    "biteLocation": "left",
-    "filterValue": "",
-    "filterColumn": "",
+    "biteLocation": "graphic",
+    "filters": [],
     "subtext": "",
     "title": "Data Bite",
     "theme": "theme-blue",
@@ -23,6 +22,3 @@ export default {
         "right": 10
     }
 }
-
-
-
