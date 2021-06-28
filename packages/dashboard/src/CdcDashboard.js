@@ -134,6 +134,19 @@ export default function CdcDashboard(
     loadConfig();
   }, []);
 
+  const updateChildConfig = (visualizationKey, newConfig) => {
+    let updatedConfig = JSON.parse(JSON.stringify(config));
+
+    if(!updatedConfig.visualizations) updatedConfig.visualizations = {};
+    updatedConfig.visualizations[visualizationKey] = newConfig;
+
+    if(setParentConfig){
+      setParentConfig(updatedConfig);
+    } else {
+      setConfig(updatedConfig);
+    }
+  };
+
   const Filters = () => {
     const changeFilterActive = (index, value) => {
       let dashboardConfig = {...config.dashboard};
@@ -202,9 +215,9 @@ export default function CdcDashboard(
 
             switch(visualizationConfig.type){
               case 'chart':
-                return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} isDashboard={true} setEditing={setEditing} />;
+                return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
               case 'map': 
-                return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} isDashboard={true} setEditing={setEditing} />;
+                return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
                 default: 
               return <></>;
             }
