@@ -297,6 +297,8 @@ const EditorPanel = memo(() => {
   const addNewFilter = () => {
     let dashboardConfig = config.dashboard;
 
+    dashboardConfig.filters = dashboardConfig.filters || [];
+
     dashboardConfig.filters.push({values: []});
 
     updateConfig({...config, dashboard: dashboardConfig});
