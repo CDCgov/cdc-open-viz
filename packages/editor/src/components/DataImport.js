@@ -183,7 +183,7 @@ export default function DataImport() {
       // Validate parsed data and set if no issues.
       try {
         text = transform.autoStandardize(text);
-        console.log(text);
+
         setConfig({...config, data:text});
       } catch (err) {
           setErrors(err);
