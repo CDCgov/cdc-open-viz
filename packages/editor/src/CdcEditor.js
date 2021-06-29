@@ -82,7 +82,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
           </TabPane>
-          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data}>
+          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
             <ChooseTab />
           </TabPane>
           <TabPane title="3. Configure" disableRule={null === config.data || !config.type}>

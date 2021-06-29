@@ -82,7 +82,9 @@ const EditorPanel = memo((props) => {
     generateValuesForFilter,
     processData,
     processLegend,
+    isDashboard,
     setParentConfig,
+    setEditing,
     processedLegend,
     setProcessedLegend,
     setProcessedData,
@@ -697,9 +699,9 @@ const EditorPanel = memo((props) => {
   }, [requiredColumns])
 
   // Generate all columns available by looping through the data - add a blank value at the top
-  const columnsInData = [""]
+  const columnsInData = [""];
 
-  state.data.forEach( (row) => {
+  (state.formattedData || state.data).forEach( (row) => {
     Object.keys(row).forEach( (columnName) => {
       if(false === columnsInData.includes(columnName)) {
         columnsInData.push(columnName)
@@ -757,6 +759,14 @@ const EditorPanel = memo((props) => {
     }
 
     setState(updatedState)
+  }
+
+  const onBackClick = () => {
+    if(isDashboard){
+      setEditing('');
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
   }
 
   const filtersJSX = filters.map( (filter, index) => {
@@ -851,8 +861,8 @@ const EditorPanel = memo((props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} data-html2canvas-ignore></button>
+      <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard' : ''}`} data-html2canvas-ignore>
         <h2>Configure Map</h2>
         <section className="form-container">
           <form>

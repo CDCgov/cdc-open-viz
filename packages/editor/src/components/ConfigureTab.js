@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import CdcDashboard from '@cdc/dashboard'; // TODO: Lazy load this
 import CdcMap from '@cdc/map'; // TODO: Lazy load this
 import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 
@@ -20,7 +21,13 @@ export default function ConfigureTab() {
         case 'chart':
             return (
                 <ErrorBoundary component="CdcChart">
-                    <CdcChart isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} />
+                    <CdcChart isEditor={true} config={config} setConfig={setTempConfig} />
+                </ErrorBoundary>
+            )
+        case 'dashboard':
+            return (
+                <ErrorBoundary component="CdcDashboard">
+                    <CdcDashboard isEditor={true} config={config} setConfig={setTempConfig} />
                 </ErrorBoundary>
             )
         default:

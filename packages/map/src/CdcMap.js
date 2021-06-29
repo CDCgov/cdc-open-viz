@@ -32,6 +32,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Open Viz
 import Loading from '@cdc/core/components/Loading';
+import DataTransform from '@cdc/core/components/DataTransform';
 
 // Components
 import Sidebar from './components/Sidebar';
@@ -44,6 +45,8 @@ import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
 const CdcMap = ({className, config, navigationHandler:customNavigationHandler, isEditor, configUrl, logo = null, setConfig}) => {
+    const transform = new DataTransform();
+
     // State
     const [state, setState] = useState( JSON.parse(JSON.stringify(initialState)) )
     const [loading, setLoading] = useState(true)
@@ -191,7 +194,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
     const processUnifiedData = () => {
         // All the data to be mapped
-        let rawData = state.data
+        let rawData = state.formattedData || state.data
 
         const parsedData = []
 
@@ -867,8 +870,6 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     .then(result => {
                         return result
                     })
-
-                return data
             }
 
             if ('json' === regex.exec(url)[1]) {
@@ -877,9 +878,12 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
                     .then(data => {
                         return data
                     })
-
-                return data
             }
+
+            data = transform.autoStandardize(data);
+            data = transform.developerStandardize(data, response.dataDescription);
+
+            return data;
         } catch {
             console.error(`Cannot parse URL: ${url}`);
         }
@@ -914,9 +918,9 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
     }
 
     // This calculates what is actually going to be seen and displayed by the map and data table at render. It accounts for things like toggling legend items as well as filters.
-    const processData = () => {
+    const processData = (dataOverride = null) => {
 
-        let dataObj = state.data
+        let dataObj = dataOverride || state.formattedData || state.data;
 
         const parsedData = {}
 
@@ -1227,7 +1231,7 @@ const CdcMap = ({className, config, navigationHandler:customNavigationHandler, i
             setProcessedLegend(newProcessedLegend)
         }
     }, [processedData])
-console.log({state})
+
     // Map Container Classes
     let mapContainerClasses = [
         'map-container',
@@ -1338,7 +1342,7 @@ console.log({state})
                         headerColor={state.general.headerColor}
                         columns={state.columns}
                         showDownloadButton={state.general.showDownloadButton}
-                        data={state.data}
+                        data={state.formattedData || state.data}
                         processedData={processedData}
                         processedLegend={processedLegend}
                         displayDataAsText={displayDataAsText}
