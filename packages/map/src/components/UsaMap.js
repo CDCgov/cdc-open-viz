@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -329,4 +329,4 @@ const UsaMap = (props) => {
   );
 };
 
-export default UsaMap;
+export default memo(UsaMap)

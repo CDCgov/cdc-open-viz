@@ -173,7 +173,6 @@ const addUIDs = (obj, fromColumn) => {
         }
     })
 
-    obj.data.columns = Object.keys(uniqueValuesMemo)
     obj.data.fromColumn = fromColumn
 }
 
@@ -353,6 +352,8 @@ const generateRuntimeLegend = (obj, runtimeData, hash) => {
             if(count === 9) break // Can only have 9 categorical items for now
         }
 
+        let sorted = [...uniqueValues.keys()]
+
         // Apply custom sorting or regular sorting
         let configuredOrder = obj.legend.categoryValuesOrder ?? []
 
@@ -383,8 +384,6 @@ const generateRuntimeLegend = (obj, runtimeData, hash) => {
         for(let i = 0; i < result.length; i++) {
             result[i].color = applyColorToLegend(i)
         }
-      
-        const sorted = [...uniqueValues.keys()]
 
         return result
     }
@@ -966,7 +965,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Legend
-        if(hashLegend !== runtimeLegend.fromHash) {
+        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
 
             setRuntimeLegend(legend)
@@ -1045,7 +1044,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={state.data.columns}  />}
+            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
