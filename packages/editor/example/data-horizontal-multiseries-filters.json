@@ -1,0 +1,20 @@
+[
+	["series", "01/01/2020", "02/01/2020", "03/01/2020", "gender", "age"],
+	["series1", 90, 120, 150, "male", "old"],
+	["series2", 100, 130, 160, "male", "old"],
+	["series3", 80, 110, 140, "male", "old"],
+
+	["series1", 100, 130, 160, "female", "old"],
+	["series2", 110, 140, 170, "female", "old"],
+	["series3", 90, 120, 150, "female", "old"],
+
+
+	["series1", 110, 140, 170, "male", "young"],
+	["series2", 120, 150, 180, "male", "young"],
+	["series3", 100, 130, 160, "male", "young"],
+
+	["series1", 120, 150, 180, "female", "young"],
+	["series2", 130, 160, 190, "female", "young"],
+	["series3", 110, 140, 170, "female", "young"]
+]
+  
