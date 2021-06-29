@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 const Geo = ({path, styles, ...props}) => {
   return (
@@ -16,4 +16,4 @@ const Geo = ({path, styles, ...props}) => {
   )
 }
 
-export default Geo;
+export default memo(Geo)
