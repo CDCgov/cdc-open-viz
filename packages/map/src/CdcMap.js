@@ -943,7 +943,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...state.filters
         })
 
-        if(state.filters.length && hashFilters !== runtimeFilters.fromHash && undefined === runtimeData.init) {
+        if(state.filters.length && hashFilters !== runtimeFilters.fromHash) {
             const filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
             if(filters) {
