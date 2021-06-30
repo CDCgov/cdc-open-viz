@@ -309,7 +309,7 @@ const UsaMap = (props) => {
 
   return (
     <ErrorBoundary component="UsaMap">
-      <svg viewBox="0 0 880 500" style={styles.map}>
+      <svg viewBox="0 0 880 500">
         {state.general.displayAsHex ?
             (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
               {({ features, projection }) => constructGeoJsx(features, projection)}
