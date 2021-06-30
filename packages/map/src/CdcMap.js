@@ -242,21 +242,26 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     
         let specialClasses = 0
+        let specialClassesHash = {}
     
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter((row, idx) => {
+            dataSet = dataSet.filter(row => {
                 const val = row[primaryCol]
     
                 if( obj.legend.specialClasses.includes(val) ) {
-                    result.push({
-                        special: true,
-                        value: val
-                    })
+                    if(undefined === specialClassesHash[val]) {
+                        specialClassesHash[val] = true
+
+                        result.push({
+                            special: true,
+                            value: val
+                        })
+        
+                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
     
-                    result[result.length - 1].color = applyColorToLegend(result.length - 1)
-    
-                    specialClasses += 1
+                        specialClasses += 1
+                    }
     
                     newLegendMemo.set( hashObj(row), result.length - 1)
     
