@@ -201,22 +201,10 @@ const EditorPanel = memo(() => {
 
   }
 
-  const Confirm = () => {
-    return (
-      <section className="waiting">
-        <section className="waiting-container">
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the dashboard.</p>
-          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
-        </section>
-      </section>
-    );
-  }
-
   const addVisualization = (type, subType) => {
     let newVisualizations = config.visualizations ? {...config.visualizations} : {}
     
-    let newVisualizationConfig = {type};
+    let newVisualizationConfig = {type, newViz: true};
 
     if(type === 'chart'){
       newVisualizationConfig.visualizationType = subType;
@@ -306,8 +294,7 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      {config.newViz && <Confirm />}
+      {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <h2>Configure Dashboard</h2>

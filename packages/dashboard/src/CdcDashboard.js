@@ -200,7 +200,7 @@ export default function CdcDashboard(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-dashboard-inner-container">
+        {!config.runtime.editorErrorMessage && <div className="cdc-dashboard-inner-container">
           {/* Title */}
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
 
