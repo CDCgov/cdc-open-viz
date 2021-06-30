@@ -261,6 +261,7 @@ export default function DataImport() {
                   <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', false)}}>
                     <p>Data is vertical. Geography/X-axis values are contained on a single column.</p>
                     <table>
+                      <tbody>
                         <tr>
                             <th>Date</th>
                             <th>Value</th>
@@ -276,8 +277,10 @@ export default function DataImport() {
                             <td>150</td>
                             <td>...</td>
                         </tr>
+                      </tbody>
                     </table>
                     <table>
+                      <tbody>
                         <tr>
                             <th>State</th>
                             <th>Value</th>
@@ -293,25 +296,29 @@ export default function DataImport() {
                             <td>150</td>
                             <td>...</td>
                         </tr>
+                      </tbody>
                     </table>
                   </div>
                   <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', true)}}>
                     <p>Data is horizontal. Geography/X-axis values are contained on a single row.</p>
                     <table>
-                        <tr>
-                            <th>Date</th>
-                            <td>01/01/2020</td>
-                            <td>02/01/2020</td>
-                            <td>...</td>
-                        </tr>
-                        <tr>
-                            <th>Value</th>
-                            <td>100</td>
-                            <td>150</td>
-                            <td>...</td>
-                        </tr>
+                        <tbody>
+                          <tr>
+                              <th>Date</th>
+                              <td>01/01/2020</td>
+                              <td>02/01/2020</td>
+                              <td>...</td>
+                          </tr>
+                          <tr>
+                              <th>Value</th>
+                              <td>100</td>
+                              <td>150</td>
+                              <td>...</td>
+                          </tr>
+                        </tbody>
                     </table>
                     <table>
+                      <tbody>
                         <tr>
                             <th>State</th>
                             <td>Georgia</td>
@@ -324,6 +331,7 @@ export default function DataImport() {
                             <td>150</td>
                             <td>...</td>
                         </tr>
+                      </tbody>
                     </table>
                   </div>
                 </div>
@@ -354,64 +362,68 @@ export default function DataImport() {
                                   <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
                                       <p>Each row contains the data for an individual series in itself.</p>
                                       <table>
-                                          <tr>
-                                              <th>Virus</th>
-                                              <th>01/01/2020</th>
-                                              <th>02/01/2020</th>
-                                              <th>...</th>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>100</td>
-                                              <td>150</td>
-                                              <td>...</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>15</td>
-                                              <td>20</td>
-                                              <td>...</td>
-                                          </tr>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>01/01/2020</th>
+                                                <th>02/01/2020</th>
+                                                <th>...</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>100</td>
+                                                <td>150</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>15</td>
+                                                <td>20</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
                                       </table>
                                   </div>
                                   <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
                                       <p>Each series data is broken out into multiple rows.</p>
                                       <table>
-                                          <tr>
-                                              <th>Virus</th>
-                                              <th>Date</th>
-                                              <th>Value</th>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>01/01/2020</td>
-                                              <td>100</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>02/01/2020</td>
-                                              <td>150</td>
-                                          </tr>
-                                          <tr>
-                                              <td>...</td>
-                                              <td>...</td>
-                                              <td>...</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>01/01/2020</td>
-                                              <td>15</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>02/01/2020</td>
-                                              <td>20</td>
-                                          </tr>
-                                          <tr>
-                                              <td>...</td>
-                                              <td>...</td>
-                                              <td>...</td>
-                                          </tr>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>Date</th>
+                                                <th>Value</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>01/01/2020</td>
+                                                <td>100</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>02/01/2020</td>
+                                                <td>150</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>01/01/2020</td>
+                                                <td>15</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>02/01/2020</td>
+                                                <td>20</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
                                       </table>
                                   </div>
                               </div>
