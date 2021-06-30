@@ -19,7 +19,7 @@ import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
-import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
+import usaDefaultConfig from './examples/default-world.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
