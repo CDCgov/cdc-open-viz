@@ -198,7 +198,7 @@ const PreviewDataTable = ({ data }) => {
   }
 
   if(!data) {
-    return [<Header />, <PlaceholderTable />]
+    return [<Header key="header" />, <PlaceholderTable key="table" />]
   }
 
   const Table = () => (
@@ -250,7 +250,7 @@ const PreviewDataTable = ({ data }) => {
     </>
   )
 
-  return [<Header data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table />]
+  return [<Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key="table" />]
 };
 
 export default PreviewDataTable;
