@@ -88,8 +88,6 @@ const WorldMap = (props) => {
       const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
       let styles = {
-        stroke: geoStrokeColor,
-        strokeWidth: '0.9px',
         fill: '#E6E6E6',
         cursor: 'default'
       }
@@ -101,15 +99,12 @@ const WorldMap = (props) => {
           styles = {
             ...styles,
             fill: legendColors[0],
-            stroke: geoStrokeColor,
             cursor: 'default',
             '&:hover': {
-              fill: legendColors[1],
-              stroke: geoStrokeColor
+              fill: legendColors[1]
             },
             '&:active': {
               fill: legendColors[2],
-              stroke: geoStrokeColor
             },
           };
 
@@ -125,6 +120,8 @@ const WorldMap = (props) => {
             data-for="tooltip"
             data-tip={tooltip}
             path={path}
+            stroke={geoStrokeColor}
+            strokeWidth={0.9}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
           />
         )

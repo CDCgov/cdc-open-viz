@@ -85,12 +85,10 @@ const UsaMap = (props) => {
 
   useEffect(() => rebuildTooltips());
 
-  const styles = {};
+  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
     const Shape = isHex ? Hexagon : Rect
-
-    const geoBorderColor = state.general.geoBorderColor !== 'sameAsBackground' ? state.general.geoBorderColor : '#fff';
 
     const territoryData = data[territory];
 
@@ -99,8 +97,6 @@ const UsaMap = (props) => {
     let styles = {
       fill: '#E6E6E6',
       color: '#202020',
-      stroke: `${geoBorderColor} !important`,
-      strokeWidth: 1
     };
 
     const label = supportedTerritories[territory][1]
@@ -129,8 +125,6 @@ const UsaMap = (props) => {
       styles = {
         color: textColor,
         fill: legendColors[0],
-        stroke: `${geoBorderColor} !important`,
-        strokeWidth: 1,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1],
@@ -147,12 +141,12 @@ const UsaMap = (props) => {
         text={styles.color}
         data-tip={toolTip}
         data-for="tooltip"
+        stroke={geoStrokeColor}
+        strokeWidth={1}
         onClick={() => geoClickHandler(territory, territoryData)}
       />)
     }
   });
-
-  const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const geoLabel = (geo, bgColor = "#FFFFFF", projection) => {
       let centroid = projection(geoCentroid(geo))
@@ -177,7 +171,7 @@ const UsaMap = (props) => {
       if( undefined === offsets[abbr] || isHex ) {
         return (
           <g transform={`translate(${centroid})`}>
-            <text x={x} y={y} fontSize={13} strokeWidth="0" style={{fill: textColor, stroke: 0}} textAnchor="middle">
+            <text x={x} y={y} fontSize={13} strokeWidth="0" style={{fill: textColor}} textAnchor="middle">
               {abbr.substring(3)}
             </text>
           </g>
@@ -204,8 +198,6 @@ const UsaMap = (props) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.id + '-group'
 
       let styles = {
-        stroke: geoStrokeColor,
-        strokeWidth: '1.3px',
         fill: '#E6E6E6',
         cursor: 'default'
       }
@@ -237,15 +229,12 @@ const UsaMap = (props) => {
 
         styles = {
           fill: legendColors[0],
-          stroke: geoStrokeColor,
           cursor: 'default',
           '&:hover': {
             fill: legendColors[1],
-            stroke: geoStrokeColor
           },
           '&:active': {
             fill: legendColors[2],
-            stroke: geoStrokeColor
           },
         };
 
@@ -258,7 +247,7 @@ const UsaMap = (props) => {
           <g
             data-for="tooltip"
             data-tip={tooltip}
-            key={key}
+            key={key}         
             className="geo-group"
             css={styles}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -266,6 +255,8 @@ const UsaMap = (props) => {
             <path
               tabIndex={-1}
               className='single-geo'
+              stroke={geoStrokeColor}
+              strokeWidth={1.3}   
               d={path}
             />
             {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
@@ -283,6 +274,8 @@ const UsaMap = (props) => {
           <path
             tabIndex={-1}
             className='single-geo'
+            stroke={geoStrokeColor}
+            strokeWidth={1.3}
             d={path}
           />
           {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}

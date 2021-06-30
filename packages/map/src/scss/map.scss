@@ -38,15 +38,6 @@ header + .map-container.full-border {
   }
 }
 
-// US Specific Styles
-.map-container.us {
-  .geography-container {
-    svg path {
-      stroke-width: 1.3px !important;
-    }
-  }
-}
-
 @include breakpointClass(md) {
   // US Specific
   .map-container.us {
@@ -69,8 +60,6 @@ header + .map-container.full-border {
     transition: .3s all;
     circle {
       fill: inherit;
-      stroke: inherit;
-      stroke-width: 1.3px;
       transition: .1s transform;
     }
     &:hover {
@@ -83,31 +72,6 @@ header + .map-container.full-border {
     right: 1em;
     z-index: 3;
     width: 75px;
-  }
-  svg[class^="rsm-"] {
-    padding: 0;
-    width: 100%;
-    height: auto;
-    z-index: 2;
-    position: relative;
-    .label {
-      fill: rgba(0,0,0,.8);
-      font-size: .8em;
-    }
-    path {
-      fill: inherit;
-      stroke-width: 0.7px;
-      transition: .3s all;
-      position: relative;
-      opacity: 1;
-      &:focus {
-        fill: inherit;
-        outline: 0;
-      }
-      &:hover {
-        fill: inherit;
-      }
-    }
   }
 }
 
@@ -134,7 +98,6 @@ header + .map-container.full-border {
     transition: .3s all;
     text {
       font-size: .95em;
-      stroke-width: 0;
     }
   }
 }
