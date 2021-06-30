@@ -4,7 +4,7 @@ import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
-import topoJSON from '../data/states-10m.json';
+import topoJSON from '../data/us-topo.json';
 import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
@@ -13,22 +13,22 @@ import CityList from './CityList';
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
 
-const Hexagon = ({label, text, ...props}) => {
+const Hexagon = ({label, text, stroke, strokeWidth, ...props}) => {
   return (
     <svg viewBox="0 0 45 51">
       <g {...props}>
-        <polygon points="22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702"/>
+        <polygon  stroke={stroke} strokeWidth={strokeWidth} points="22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702"/>
         <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
       </g>
     </svg>
   )
 }
 
-const Rect = ({label, text, ...props}) => {
+const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
   return (
     <svg viewBox="0 0 45 28">
       <g {...props} strokeLinejoin="round">
-        <path d="M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z" />
+        <path stroke={stroke} strokeWidth={strokeWidth} d="M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z" />
         <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
       </g>
     </svg>
@@ -142,7 +142,7 @@ const UsaMap = (props) => {
         data-tip={toolTip}
         data-for="tooltip"
         stroke={geoStrokeColor}
-        strokeWidth={1}
+        strokeWidth={1.5}
         onClick={() => geoClickHandler(territory, territoryData)}
       />)
     }

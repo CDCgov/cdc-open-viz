@@ -60,7 +60,7 @@ const WorldMap = (props) => {
     rebuildTooltips
   } = props;
 
-  const [position, setPosition] = useState({ coordinates: [0, 20], zoom: 1.3 });
+  const [position, setPosition] = useState({ coordinates: [0, 30], zoom: 1 });
 
   useEffect(() => rebuildTooltips());
 
@@ -92,6 +92,8 @@ const WorldMap = (props) => {
         cursor: 'default'
       }
 
+      const strokeWidth = .9
+
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
@@ -121,14 +123,14 @@ const WorldMap = (props) => {
             data-tip={tooltip}
             path={path}
             stroke={geoStrokeColor}
-            strokeWidth={0.9}
+            strokeWidth={strokeWidth}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
           />
         )
       }
 
       // Default return state, just geo with no additional information
-      return <Geo key={i + '-geo'} css={styles} path={path} />
+      return <Geo key={i + '-geo'} stroke={geoStrokeColor} strokeWidth={strokeWidth} css={styles} path={path} />
     });
 
     // Cities
