@@ -19,7 +19,7 @@ import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
-import usaDefaultConfig from './examples/default-world.json'; // Future: Lazy
+import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
@@ -514,7 +514,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
                     
-                    if (row[columnName] !== active) return false // Bail out, not part of the filter
+                    if (row[columnName] !== active) return false // Bail out, not part of filter
                 }
             }
     
@@ -944,11 +944,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Filters
-        const hashFilters = hashObj({
-            ...state.filters
-        })
+        const hashFilters = hashObj(state.filters)
 
-        if(state.filters.length && hashFilters !== runtimeFilters.fromHash) {
+        if(state.filters && hashFilters !== runtimeFilters.fromHash) {
             const filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
             if(filters) {

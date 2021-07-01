@@ -539,7 +539,7 @@ const EditorPanel = (props) => {
               })
           break;
           case 'remove':
-              newFilters = newFilters.filter( (value, index) => index !== idx);
+              newFilters.splice(idx, 1)
           break;
           case 'columnName':
               newFilters[idx] = {...newFilters[idx]}
