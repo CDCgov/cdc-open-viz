@@ -65,10 +65,6 @@ us.objects.states.geometries.filter(row => {
 
     let iso = row.properties['iso_3166_2'] // ADM0_A3_US for world
 
-    if(false === arr.includes(iso)) {
-        console.log(iso)
-    }
-
     row.properties = {iso}
 })
 

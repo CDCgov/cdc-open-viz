@@ -171,7 +171,7 @@ const UsaMap = (props) => {
       if( undefined === offsets[abbr] || isHex ) {
         return (
           <g transform={`translate(${centroid})`}>
-            <text x={x} y={y} fontSize={13} strokeWidth="0" style={{fill: textColor}} textAnchor="middle">
+            <text x={x} y={y} fontSize={14} strokeWidth="0" style={{fill: textColor}} textAnchor="middle">
               {abbr.substring(3)}
             </text>
           </g>
@@ -183,7 +183,7 @@ const UsaMap = (props) => {
       return (
         <g>
           <line x1={centroid[0]} y1={centroid[1]} x2={centroid[0] + dx} y2={centroid[1] + dy} stroke="rgba(0,0,0,.5)" strokeWidth={1} />
-          <text x={4} strokeWidth="0" fontSize={12} style={{fill: "#202020"}} alignmentBaseline="middle" transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
+          <text x={4} strokeWidth="0" fontSize={13} style={{fill: "#202020"}} alignmentBaseline="middle" transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}>
             {abbr.substring(3)}
           </text>
         </g>
@@ -195,7 +195,7 @@ const UsaMap = (props) => {
     let showLabel = state.general.displayStateLabels
 
     const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
-      const key = isHex ? geo.properties.iso + '-hex-group' : geo.id + '-group'
+      const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
         fill: '#E6E6E6',

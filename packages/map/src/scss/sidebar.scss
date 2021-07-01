@@ -47,18 +47,19 @@ aside {
       padding-top: 1em;
     }
     .clear {
-      font-size: .8em;
+      font-size: .75em;
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
-      transition: .3s all;
-      padding: .375em .65em;
+      transition: .2s all;
+      padding: .2em .5em;
       border: rgba(0,0,0,.2) 1px solid;
       &:hover {
+        text-decoration: none;
         background: rgba(0,0,0,.15);
-        transition: .3s all;
+        transition: .2s all;
       }
     }
     p {
