@@ -363,13 +363,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     
         // Sort data for use in equalnumber or equalinterval
-        dataSet.sort((a, b) => {
+        dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
             let aNum = a[primaryCol]
             let bNum = b[primaryCol]
-    
+
             return aNum - bNum
         })
-    
+
         // Equal Number
         if(type === 'equalnumber') {
             let numberOfRows = dataSet.length
@@ -412,6 +412,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
         // Equal Interval
         if(type === 'equalinterval') {
+            dataSet = dataSet.filter(row => row[primaryCol])
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
     
@@ -959,7 +960,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             numberOfItems: state.legend.numberOfItems,
             type: state.legend.type,
             separateZero: state.legend.separateZero ?? false,
-            categoryValuesOrder: state.legend.categoryValuesOrder
+            categoryValuesOrder: state.legend.categoryValuesOrder,
+            specialClasses: state.legend.specialClasses
         })
 
         // Legend
