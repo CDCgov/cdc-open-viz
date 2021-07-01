@@ -791,7 +791,7 @@ const EditorPanel = (props) => {
         <span className="base-label">Configure Map</span>
         <section className="form-container">
           <form>
-            <Accordion>
+            <Accordion allowZeroExpanded={true}>
               <AccordionItem> {/* Type */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
