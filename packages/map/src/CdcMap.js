@@ -961,7 +961,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             type: state.legend.type,
             separateZero: state.legend.separateZero ?? false,
             categoryValuesOrder: state.legend.categoryValuesOrder,
-            specialClasses: state.legend.specialClasses
+            specialClasses: state.legend.specialClasses,
+            geoType: state.general.geoType
         })
 
         // Legend

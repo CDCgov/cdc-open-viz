@@ -343,11 +343,6 @@ const EditorPanel = (props) => {
                 general: {
                     ...state.general,
                     geoType: "us"
-                },
-                columns: {
-                  ...state.columns,
-                  geo: {},
-                  primary: {} 
                 }
               })
               break;
@@ -357,11 +352,6 @@ const EditorPanel = (props) => {
                 general: {
                     ...state.general,
                     geoType: "world"
-                },
-                columns: {
-                  ...state.columns,
-                  geo: {},
-                  primary: {} 
                 }
               })
               break;
