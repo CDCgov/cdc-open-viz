@@ -9,5 +9,5 @@
     "moduleResolution": "node",
     "typeRoots": ["./node_modules/@types", "./src/@types"]
   },
-  "exclude": ["node_modules", "webpack"]
-} 
+  "exclude": ["node_modules", "webpack","*.js"]
+}
