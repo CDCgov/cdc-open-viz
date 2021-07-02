@@ -125,6 +125,8 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
+    const transform = new DataTransform()
+
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')

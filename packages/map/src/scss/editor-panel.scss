@@ -649,7 +649,7 @@
   }
 
   @include breakpointClass(md) {
-    .editor-panel:not(.hidden):not(.dashboard) + .cdc-map-inner-container { {
+    .editor-panel:not(.hidden):not(.dashboard) + .cdc-map-inner-container {
       margin-left: $editorWidth;
     }
     .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
