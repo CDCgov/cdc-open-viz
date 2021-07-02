@@ -31,6 +31,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading';
+import DataTransform from '@cdc/core/components/DataTransform';
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -779,8 +780,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     .then(result => {
                         return result
                     })
-
-                return data
             }
 
             if ('json' === regex.exec(url)[1]) {
@@ -789,9 +788,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     .then(data => {
                         return data
                     })
-
-                return data
             }
+
+            data = transform.autoStandardize(data);
+            data = transform.developerStandardize(data, response.dataDescription);
+
+            return data;
         } catch {
             console.error(`Cannot parse URL: ${url}`);
         }

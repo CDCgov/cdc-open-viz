@@ -72,6 +72,7 @@ const EditorPanel = (props) => {
     columnsInData = [],
     loadConfig,
     setState,
+    isDashboard,
     setParentConfig,
     runtimeFilters,
     runtimeLegend,
@@ -691,6 +692,14 @@ const EditorPanel = (props) => {
 
     setState(updatedState)
   }
+  
+  const onBackClick = () => {
+    if(isDashboard){
+      setEditing('');
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
+  }
 
   const usedFilterColumns = {}
 
@@ -700,7 +709,7 @@ const EditorPanel = (props) => {
     }
 
     return (
-        <fieldset className="edit-block" key={`filter-${index}`}>
+        <fieldset className="edit-block" key={'filter' + index}>
           <button className="remove-column" onClick={() => { changeFilter(index, "remove")}}>Remove</button>
           <TextField value={state.filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
           <label>
@@ -747,7 +756,7 @@ const EditorPanel = (props) => {
 
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
-      <Draggable key={value} draggableId={`${value}`} index={index}>
+      <Draggable key={value} draggableId={value} index={index}>
         {(provided, snapshot) => (
           <li
             style={{position: 'relative'}}

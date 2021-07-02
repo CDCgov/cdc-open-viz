@@ -1,137 +1,72 @@
-.cdc-open-viz-module {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-
-  .geo-buttons {
-    list-style: none;
-    display: flex;
-    color: $mediumGray;
-    svg {
-      display: block;
-      max-width: 80px;
-      max-height: 40px;
-      margin: .5em auto;
-      box-sizing: border-box;
-      path {
-        fill: currentColor
-      }
+.editor-panel {
+    font-size: 17.5px;
+    .heading {
+      font-size: 1.2em;
     }
-    li {
-      padding: .3em .75em;
+    + .cdc-dashboard-inner-container > * {
+      margin: 1em;
+    }
+    .two-col-inputs {
       display: flex;
+      margin-top: 1em;
+      justify-content: space-between;
+      > label {
+        width: 48%;
+        margin-top: 0 !important
+      }
+    }
+    .divider-heading {
+      display: block;
+      font-size: 1em;
+      margin-top: 1em;
+    }
+    .series-list {
+      list-style: none;
       border: $lightGray 1px solid;
-      width: 40%;
-      align-items: center;
-      margin-right: 1em;
-      cursor: pointer;
-      overflow: hidden;
-      flex-direction: column;
-      transition: .2s all; 
-      svg {
-        display: block;
-        height: 25px;
-        margin: .5em auto;
-        max-width: 100%;
+      &:empty {
+        border: none !important
       }
-      span {
-        text-transform: none;
-        font-size: 1em;
-      }
-      &:hover {
-        background: #F2F2F2;
-        transition: .2s all;  
-      }
-      &.active {
-        background: #fff;
-        border-color: #005eaa;
-        color: #005eaa;
-        position: relative;
-        path {
-          fill: #005eaa;
+      li {
+        padding: .3em .5em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .9em;
+        &:hover {
+          background-color: $lightestGray;
         }
-        &:before {
-          content: " ";
-          width: 5px;
-          background: #005eaa;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          position: absolute;
+        span {
+          font-size: .8em;
+          color: #f00;
+          cursor: pointer;
+        }
+        + li {
+          border-top: $lightGray 1px solid;
         }
       }
     }
-  }
-  
-  .editor-toggle {
-    background: #F2F2F2;
-    border-radius: 60px;
-    color: #000;
-    font-size: 1em;
-    border: 0;
-    position: fixed;
-    z-index: 100;
-    transition: .1s background;
-    cursor: pointer;
-    width: 25px;
-    height: 25px;
-    left: 307px;
-    top: 10px;
-    box-shadow: rgba(0,0,0,.5) 0 1px 2px;
-    &:before {
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      content: "\00ab";
-    }
-    &.collapsed {
-      left: 1em;
-      margin-left: 0;  
-      &:before {
-      content: "\00bb";
-     }
-    }
-    &:hover {
-      background: rgba(255,255,255,1)
-    }
-  }
-  
-  .editor-panel {
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
     overflow-x: hidden;
     position: fixed;
-    z-index: 7;
+    z-index: 8;
     display: flex;
     flex-direction: column;
     left: 0;
     top: 0;
     bottom: 0;
-    .remove-column {
-      font-size: 13px;
-    }
-    .__react_component_tooltip {
-      padding: 5px;
-      max-width: 300px;
-    }
-    .tooltip {
-      position: relative;
-    }
-    .helper {
-      position: relative;
-      opacity: .7;
-      cursor: pointer;
-      width: 17px;
-      height: 17px;
-      align-self: center;
-      margin-left: .3rem;
-    }
-
     .accordion__heading {
       background: $lightestGray;
+    }
+    .accordion__item {
+      select {
+        text-transform: capitalize;
+      }
+      .number-narrow {
+        min-width: auto;
+        width: 75px
+      }
     }
     .form-container {
       border-right: $lightGray 1px solid;
@@ -140,11 +75,6 @@
     .guidance-link {
       margin: 2em 1em 0;
       padding: .75em 1em;
-      align-items: center;
-      .heading-3 {
-        font-weight: 600;
-        font-size: 1.2em;
-      }
       svg {
         width: 60px;
         color: $blue;
@@ -177,7 +107,7 @@
       position: relative;
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     }
-  
+    .accordion__panel:first-child { margin-top: 0; }
     .accordion__button:before {
       display: inline-block;
       content: '';
@@ -196,7 +126,6 @@
   
     .accordion__button[aria-expanded='true']::before,
     .accordion__button[aria-selected='true']::before {
-      top: 45%;
       transform: rotate(45deg) translateY(-50%);
       margin-right: 1.3em;
       transition: .1s all;
@@ -206,7 +135,7 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       padding: 1em 1.25em 2em;
       animation: fadein 0.2s ease-in;
-      span.h5 {
+      h5 {
         font-size: .8em;
       }
     }
@@ -254,7 +183,7 @@
       }
     }
   
-    .base-label {
+    h2 {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -263,7 +192,7 @@
       border-bottom:#565656 3px solid;
       z-index: 3;
     }
-
+  
     label {
       text-transform: uppercase;
       display: block;
@@ -274,13 +203,12 @@
       }
       span.edit-label {
         margin-bottom: .3em;
-        display: flex;
+        display: block;
       }
       span.column-heading {
         font-size: 1em;
       }
       &.checkbox {
-        margin-top: .5rem;
         display: flex;
         span {
           display: inline;
@@ -408,76 +336,7 @@
         transition: .2s all;
       }
     }
-  
-    .data-toggle {
-      list-style: none;
-      li {
-        padding-left: 2em;
-        position: relative;
-        &:before {
-          content: " ";
-          position: absolute;
-          left: 20px;
-          top: 0;
-          bottom: 0;
-          border-left: rgba(0, 0, 0, 0.2) 4px solid;
-          transition: .2s all;
-        }
-        &:after {
-          content: " ";
-          background: url('../images/inactive-checkmark.svg') no-repeat;
-          width: 14px;
-          height: 14px;
-          background-size: 14px;
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 40;
-          opacity: .5;
-          transition: .2s opacity;
-        }
-        transition: .2s opacity;
-        cursor: pointer;
-        opacity: .7;
-        &:not(:first-child) {
-          margin-top: 1em;
-        }
-        input[type="text"], input[type="number"] {
-          font-size: 1em;
-        }
-        label {
-          margin-top: 0;
-        }
-        label + label {
-          margin-top: 1em;
-        }
-        &:hover {
-          &:before {
-            border-left: rgba(0, 0, 0, 0.7) 4px solid;
-            transition: .2s all;
-          }
-          &:after{
-            opacity: 1;
-            transition: .2s all;
-          }
-        }
-        &.active {
-          position: relative;
-          opacity: 1;
-          &:before {
-            border-left: rgba(0, 0, 0, 0.7) 4px solid;
-          }
-          &:after {
-            content: " ";
-            background-image: url(../images/active-checkmark.svg);
-            opacity: 1;
-            transition: .2s opacity;
-          }
-        }
-      }
-    }
-  
+
     span.subtext {
       display: block;
       color: rgba(0,0,0,.5);
@@ -505,7 +364,6 @@
       font-size: .8em;
       margin-bottom: .3em; 
       cursor: move;
-      z-index: 999;
     }
     
     .info {
@@ -645,19 +503,88 @@
       opacity: 0.5;
       cursor: auto;
     }
-  
-  }
 
-  @include breakpointClass(md) {
-    .editor-panel:not(.hidden):not(.dashboard) + .cdc-map-inner-container { {
-      margin-left: $editorWidth;
+    .current-viz-list {
+      margin: 0.5em 0;
+      padding-left: 1.25em;
+
+      li button {
+        float: right;
+        margin: 0 0.5em;
+        border: 1px solid gray;
+      }
     }
-    .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-      padding-left: 3em;
+  
+    .viz-icon {
+      background-color: #FFF;
+      color: #565656;
+      border: #797979 1px solid;
+      padding: 10px;
+      margin: 1em;
+
+      span {
+        text-transform: none;
+        font-size: 1em;
+        margin-top: 1em;
+      }
+
+      &:hover {
+        background: #F2F2F2;
+        transition: .2s all;  
+      }
+
+      svg {
+          display: block;
+          margin: .5em auto;
+          box-sizing: border-box;
+          width: 100px;
+          height: 75px;
+          path {
+            fill: currentColor
+          }
+      }
     }
-    .waiting {
-      background-color: #fff;
-      margin-left: $editorWidth;
-    }
+}  
+.editor-toggle {
+  background: #F2F2F2;
+  border-radius: 60px;
+  color: #000;
+  font-size: 1em;
+  border: 0;
+  position: fixed;
+  z-index: 100;
+  transition: .1s background;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  left: 307px;
+  top: 10px;
+  box-shadow: rgba(0,0,0,.5) 0 1px 2px;
+  &:before {
+    top: 43%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    content: "\00ab";
   }
+  &.collapsed {
+    left: 1em;
+    margin-left: 0;  
+    &:before {
+    content: "\00bb";
+   }
+  }
+  &:hover {
+    background: rgba(255,255,255,1)
+  }
+}
+
+.editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
+  padding-left: $editorWidth;
+}
+.editor-panel.hidden + .cdc-map-inner-container h1.map-title {
+  padding-left: 3em;
+}
+.waiting {
+  padding-left: 350px;
 }

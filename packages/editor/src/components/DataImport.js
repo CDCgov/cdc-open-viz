@@ -8,7 +8,7 @@ import GlobalState from '../context';
 import '../scss/data-import.scss';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
-import PreviewDataTable from './PreviewDataTable'
+import PreviewDataTable from './PreviewDataTable';
 
 import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
@@ -16,6 +16,8 @@ import CloseIcon from '../assets/icons/close.svg';
 
 import validMapData from '../../example/valid-data-map.csv';
 import validChartData from '../../example/valid-chart-data.json';
+
+import { DataTransform } from '@cdc/core/components/DataTransform';
 
 export default function DataImport() {
   const {
@@ -29,6 +31,8 @@ export default function DataImport() {
     tempConfig,
     setTempConfig
   } = useContext(GlobalState);
+
+  const transform = new DataTransform();
 
   const [externalURL, setExternalURL] = useState('')
 
@@ -53,30 +57,6 @@ export default function DataImport() {
       setConfig({...config, dataUrl: debouncedExternalURL})
     }
   }, [debouncedExternalURL, keepURL])
-
-  /**
-   * validateData:
-   * Check data for common issues
-   */
-  const validateData = (parsedData) => {
-    const errorsFound = []
-
-    // Empty data
-    if ( 0 === parsedData.length ) {
-      errorsFound.push(errorMessages.emptyData)
-    }
-
-    // Does it have the correct data structure?
-    if (parsedData.filter(row =>  row.constructor !== Object).length > 0) {
-      errorsFound.push(errorMessages.formatting);
-    }
-
-    if(errorsFound.length > 0) {
-      throw errorsFound;
-    }
-
-    return parsedData;
-  }
 
   const loadExternal = async () => {
     let dataURL = '';
@@ -202,7 +182,8 @@ export default function DataImport() {
   
       // Validate parsed data and set if no issues.
       try {
-        text = validateData(text);
+        text = transform.autoStandardize(text);
+
         setConfig({...config, data:text});
       } catch (err) {
           setErrors(err);
@@ -212,6 +193,20 @@ export default function DataImport() {
 
     filereader.readAsText(fileData, encoding)  
   }
+
+  useEffect(() => {
+    if(!config.formattedData && config.dataDescription) {
+        try {
+            setConfig({...config, formattedData: transform.developerStandardize(config.data, config.dataDescription)});
+        } catch(e) {
+            //Data description not sufficient
+        }
+    }
+  }, [config.dataDescription]);
+
+  const updateDescriptionProp = (key, value) => {
+      setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
+  };
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
@@ -240,11 +235,11 @@ export default function DataImport() {
             </label>
           </TabPane>
         </Tabs>
-        {errors.map((message, index) => (
+        {errors && (errors.map ? errors.map((message, index) => (
           <div className="error-box slim mt-2" key={`error-${message}`}>
             <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
           </div>
-        ))}
+        )) : errors.message)}
         <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
         {/* TODO: Add more sample data in, but this will do for now. */}
         <span className="heading">Load Sample Data:</span>
@@ -259,9 +254,214 @@ export default function DataImport() {
           </div>
         </a>
         {config.data && (
-          <div>
-            <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</span>
+          <>
+            <div>
+              <div className="question">
+                <span>Is the geography/X-axis value in your data structured horizontally, or vertically?</span>
+                <div>
+                  <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', false)}}>
+                    <p>Data is vertical. Geography/X-axis values are contained on a single column.</p>
+                    <table>
+                      <tbody>
+                        <tr>
+                            <th>Date</th>
+                            <th>Value</th>
+                            <th>...</th>
+                        </tr>
+                        <tr>
+                            <td>01/01/2020</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                        <tr>
+                            <td>02/01/2020</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table>
+                      <tbody>
+                        <tr>
+                            <th>State</th>
+                            <th>Value</th>
+                            <th>...</th>
+                        </tr>
+                        <tr>
+                            <td>Georgia</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                        <tr>
+                            <td>Florida</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', true)}}>
+                    <p>Data is horizontal. Geography/X-axis values are contained on a single row.</p>
+                    <table>
+                        <tbody>
+                          <tr>
+                              <th>Date</th>
+                              <td>01/01/2020</td>
+                              <td>02/01/2020</td>
+                              <td>...</td>
+                          </tr>
+                          <tr>
+                              <th>Value</th>
+                              <td>100</td>
+                              <td>150</td>
+                              <td>...</td>
+                          </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                      <tbody>
+                        <tr>
+                            <th>State</th>
+                            <td>Georgia</td>
+                            <td>Florida</td>
+                            <td>...</td>
+                        </tr>
+                        <tr>
+                            <th>Value</th>
+                            <td>100</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {config.dataDescription && (
+                  <>
+                      <div className="question">
+                          <span>Are there multiple series represented in your data?</span>
+                          <div>
+                              <button className="btn btn-primary" onClick={() => {updateDescriptionProp('series', true)}}>Yes</button>
+                              <button className="btn btn-primary" onClick={() => {updateDescriptionProp('series', false)}}>No</button>
+                          </div>
+                      </div>
+                      {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
+                        <div className="question">
+                          <span>Which property in the dataset represents which series the row is describing?</span>
+                          <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
+                              <option value="">Choose an option</option>
+                              {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
+                          </select>
+                        </div>
+                      )}
+                      {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
+                          <>
+                              <div className="question">
+                                  <span>Are the series values in your data represented in a single row, or across multiple rows?</span><br/>
+                                  <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
+                                      <p>Each row contains the data for an individual series in itself.</p>
+                                      <table>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>01/01/2020</th>
+                                                <th>02/01/2020</th>
+                                                <th>...</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>100</td>
+                                                <td>150</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>15</td>
+                                                <td>20</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                                  <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
+                                      <p>Each series data is broken out into multiple rows.</p>
+                                      <table>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>Date</th>
+                                                <th>Value</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>01/01/2020</td>
+                                                <td>100</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>02/01/2020</td>
+                                                <td>150</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>01/01/2020</td>
+                                                <td>15</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>02/01/2020</td>
+                                                <td>20</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                              {config.dataDescription.singleRow === false && (
+                                  <>
+                                      <div className="question">
+                                          <span>Which property in the dataset represents which series the row is describing?</span>
+                                          <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
+                                              <option value="">Choose an option</option>
+                                              {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
+                                          </select>
+                                      </div>
+                                      <div className="question">
+                                          <span>Which property in the dataset represents the X-axis, or geography value?</span>
+                                          <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
+                                              <option value="">Choose an option</option>
+                                              {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
+                                          </select>
+                                      </div>
+                                      <div className="question">
+                                          <span>Which property in the dataset represents the numeric value?</span>
+                                          <select onChange={(e) => {updateDescriptionProp('valueKey', e.target.value)}}>
+                                              <option value="">Choose an option</option>
+                                              {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
+                                          </select>
+                                      </div>
+                                  </>
+                              )}
+                          </>
+                      )}
+                  </>
+              )}
           </div>
+          {config.formattedData && (
+              <button className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
+          )}
+        </>
         )}
       </div>
       <div className="right-col">

@@ -216,7 +216,7 @@ const PreviewDataTable = ({ data }) => {
     )
   }
 
-  if(!data) return [<Header />, <PlaceholderTable />]
+  if(!data) return [<Header key="header" />, <PlaceholderTable key="table" />]
 
   const footerProps = {previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length}
 
@@ -256,7 +256,7 @@ const PreviewDataTable = ({ data }) => {
   </>
   )
 
-  return [<Header data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table />]
+  return [<Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key="table" />]
 };
 
 export default PreviewDataTable;
