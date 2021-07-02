@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import 'core-js/stable'
 import 'whatwg-fetch'
 
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
@@ -12,6 +15,7 @@ import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
 
 import EditorPanel from './components/EditorPanel';
+import Grid from './components/Grid';
 import Context from './context';
 import defaults from './data/initial-state';
 
@@ -97,11 +101,15 @@ export default function CdcDashboard(
 
   const updateConfig = (newConfig, dataOverride = null) => {
     // Deeper copy
-    Object.keys(defaults).forEach( key => {
-      if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...defaults[key], ...newConfig[key]}
-      }
-    });
+    // Object.keys(defaults).forEach( key => {
+    //   if(newConfig[key] && 'object' === typeof newConfig[key]) {
+    //     if(Array.isArray(newConfig[key])) {
+    //       newConfig[key] = [...defaults[key], ...newConfig[key]]
+    //     } else {
+    //       newConfig[key] = {...defaults[key], ...newConfig[key]}
+    //     }
+    //   }
+    // });
     
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
@@ -194,46 +202,67 @@ export default function CdcDashboard(
   }
 
   // Prevent render if loading
-  let body = (<Loading />)
+  if(loading) return <Loading />
 
-  if(false === loading) {
+  let body = null
+
+  // Editor mode
+  if(isEditor) {
     body = (
       <>
-        {isEditor && <EditorPanel />}
-        {!config.runtime.editorErrorMessage && <div className="cdc-dashboard-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
-
-          {/* Filters */}
-          {config.dashboard.filters && <Filters />}
-
-          {/* Visualizations */}
-          {Object.keys(config.visualizations).map(visualizationKey => {
-            let visualizationConfig = config.visualizations[visualizationKey];
-
-            visualizationConfig.data = filteredData || data;
-
-            switch(visualizationConfig.type){
-              case 'chart':
-                return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-              case 'map': 
-                return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-                default: 
-              return <></>;
-            }
-          })}
-
-          {/* Description */}
-          {description && <div className="dashboard-description">{parse(description)}</div>}
-        </div>}
+        <EditorPanel />
+        <Grid />
       </>
+    )
+  } else {
+    body = (
+      <div className="cdc-dashboard-inner-container">
+        {/* Title */}
+        {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
+
+        {/* Filters */}
+        {config.dashboard.filters && <Filters />}
+
+        {/* Visualizations */}
+        {/* {Object.keys(config.visualizations).map(visualizationKey => {
+          let visualizationConfig = config.visualizations[visualizationKey];
+
+          visualizationConfig.data = filteredData || data;
+
+          switch(visualizationConfig.type){
+            case 'chart':
+              return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
+            case 'map': 
+              return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
+              default: 
+            return <></>;
+          }
+        })} */}
+
+        {/* Description */}
+        {description && <div className="dashboard-description">{parse(description)}</div>}
+      </div>
     )
   }
 
+  const contextValues = {
+    config,
+    rawData: data,
+    data: filteredData ?? data,
+    visualizations: config.visualizations,
+    rows: config.rows,
+    loading,
+    updateConfig,
+    setParentConfig,
+    setEditing
+  }
+
   return (
-    <Context.Provider value={{ config, rawData: data, data: filteredData || data, loading, updateConfig, setParentConfig, setEditing }}>
+    <Context.Provider value={contextValues}>
       <div className="cdc-open-viz-module type-dashboard">
-        {body}
+        <DndProvider backend={HTML5Backend}>
+          {body}
+        </DndProvider>
       </div>
     </Context.Provider>
   );

@@ -6,6 +6,7 @@
 
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
+  @import 'grid';
   .visually-hidden {
     position: fixed;
     left: -10000px;

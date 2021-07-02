@@ -13,6 +13,8 @@ import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
+import Widget from './Widget'
+
 import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
 import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
@@ -202,8 +204,6 @@ const EditorPanel = memo(() => {
   }
 
   const addVisualization = (type, subType) => {
-    let newVisualizations = config.visualizations ? {...config.visualizations} : {}
-    
     let newVisualizationConfig = {type, newViz: true};
 
     if(type === 'chart'){
@@ -213,9 +213,9 @@ const EditorPanel = memo(() => {
       newVisualizationConfig.general.geoType = subType;
     }
 
-    newVisualizations[type + Date.now()] = newVisualizationConfig;
-      
-    updateConfig({...config, visualizations: newVisualizations})
+    newVisualizationConfig.uid = type + Date.now()
+
+    return newVisualizationConfig
   }
 
   const capitalize = (s) => {
@@ -333,12 +333,12 @@ const EditorPanel = memo(() => {
 
                   <h2>Add Visualization</h2>
                   <h3>Chart</h3>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Bar')}><BarIcon /><span>Bar</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Line')}><LineIcon /><span>Line</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Pie')}><PieIcon /><span>Pie</span></button>
+                  <Widget icon={<BarIcon />} addVisualization={() => addVisualization('chart', 'Bar')} label="Bar" />
+                  <Widget icon={<LineIcon />} addVisualization={() => addVisualization('chart', 'Line')} label="Line" />
+                  <Widget icon={<PieIcon />} addVisualization={() => addVisualization('chart', 'Pie')} label="Pie" />
                   <h3>Map</h3>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'us')}><UsaIcon /><span>United States</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'world')}><WorldIcon /><span>World</span></button>
+                  <Widget icon={<UsaIcon />} addVisualization={() => addVisualization('map', 'us')} label="United States" />
+                  <Widget icon={<WorldIcon />} addVisualization={() => addVisualization('map', 'world')} label="World" />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
