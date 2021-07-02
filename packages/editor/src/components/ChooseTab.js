@@ -9,12 +9,13 @@ import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import GlobeIcon from '@cdc/core/assets/world-graphic.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
+import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 
 /**
  * IconButton component
  */
 
-export default function ChooseTab() { 
+export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
 
     useEffect(() => {
@@ -36,10 +37,10 @@ export default function ChooseTab() {
             isSubType = (subType === config.visualizationType)
         }
 
-        if(type === 'dashboard') isSubType = true;
+        if(type === 'dashboard' || type === 'data-bite') isSubType = true;
 
         let classNames = (config.type === type && isSubType) ? 'active' : ''
-    
+
         let setTypes = () => {
             let newConfig = {...config, type}
 
@@ -54,7 +55,7 @@ export default function ChooseTab() {
 
             setConfig(newConfig)
         }
-        
+
         return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span className="mt-1">{label}</span></button>)
     }
 
@@ -63,6 +64,7 @@ export default function ChooseTab() {
             <h2 style={{fontSize: "1.4rem"}}>General</h2>
             <ul className="grid">
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
+                <li><IconButton label="Data Bite" type="data-bite" icon={ <DataBiteIcon /> } /></li>
             </ul>
             <h2 className="mt-4" style={{fontSize: "1.4rem"}}>Charts</h2>
             <ul className="grid">
