@@ -23,7 +23,7 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} : 
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
 
@@ -32,7 +32,7 @@ export default function CdcChart(
   const [colorScale, setColorScale] = useState<any>(null);
 
   interface keyable {
-    [key: string]: any  
+    [key: string]: any
   }
 
   const [config, setConfig] = useState<keyable>({});
@@ -90,9 +90,9 @@ export default function CdcChart(
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
     // Deeper copy
-    Object.keys(defaults).forEach( key => {
-      if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...defaults[key], ...newConfig[key]}
+    Object.keys(defaults).forEach(key => {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     });
 
@@ -180,7 +180,7 @@ export default function CdcChart(
 
     data.forEach((row) => {
       let add = true;
-      
+
       filters.forEach((filter) => {
         if(row[filter.columnName] !== filter.active) {
           add = false;
@@ -333,7 +333,7 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
-  
+
   const parseDate = (dateString: string) => {
     let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
     if(!date) {
@@ -360,7 +360,7 @@ export default function CdcChart(
       if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
-        num = cutoff;  
+        num = cutoff;
       }
     }
     if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
@@ -473,7 +473,7 @@ export default function CdcChart(
 
     return config.filters.map((singleFilter, index) => {
       const values = [];
-  
+
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
           key={index}
@@ -481,7 +481,7 @@ export default function CdcChart(
         >{filterOption}
         </option>);
       });
-  
+
       return (
         <section className="filters-section" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>

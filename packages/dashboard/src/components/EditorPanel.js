@@ -18,6 +18,7 @@ import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import WorldIcon from '@cdc/core/assets/world-graphic.svg';
+import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 
 // IE11 Custom Event polyfill
 (function () {
@@ -66,7 +67,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -157,7 +158,7 @@ const EditorPanel = memo(() => {
   }
 
   const missingRequiredSections = () => {
-    //TODO 
+    //TODO
 
     return false;
   };
@@ -203,18 +204,24 @@ const EditorPanel = memo(() => {
 
   const addVisualization = (type, subType) => {
     let newVisualizations = config.visualizations ? {...config.visualizations} : {}
-    
+
     let newVisualizationConfig = {type, newViz: true};
 
-    if(type === 'chart'){
-      newVisualizationConfig.visualizationType = subType;
-    } else if(type === 'map'){
-      newVisualizationConfig.general = {};
-      newVisualizationConfig.general.geoType = subType;
+    switch(type) {
+      case 'chart':
+        newVisualizationConfig.visualizationType = subType;
+        break;
+      case 'map':
+        newVisualizationConfig.general = {};
+        newVisualizationConfig.general.geoType = subType;
+        break;
+      case 'data-bite':
+        newVisualizationConfig.visualizationType = type;
+        break;
     }
 
     newVisualizations[type + Date.now()] = newVisualizationConfig;
-      
+
     updateConfig({...config, visualizations: newVisualizations})
   }
 
@@ -291,7 +298,7 @@ const EditorPanel = memo(() => {
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
-
+  
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
@@ -323,8 +330,9 @@ const EditorPanel = memo(() => {
                   <ol className="current-viz-list">
                     {Object.keys(config.visualizations).map((visualizationKey) => (
                       <li>
-                        {config.visualizations[visualizationKey].type === 'chart' && (config.visualizations[visualizationKey].visualizationType + ' Chart')} 
-                        {config.visualizations[visualizationKey].type === 'map' && (capitalize(config.visualizations[visualizationKey].general.geoType) + ' Map')} 
+                        {config.visualizations[visualizationKey].type === 'chart' && (config.visualizations[visualizationKey].visualizationType + ' Chart')}
+                        {config.visualizations[visualizationKey].type === 'map' && (capitalize(config.visualizations[visualizationKey].general.geoType) + ' Map')}
+                        {config.visualizations[visualizationKey].type === 'data-bite' && 'Date Bite'}
                         <button type="button" onClick={() => {setEditing(visualizationKey)}}>Edit</button>
                         <button type="button" onClick={() => {removeVisualization(visualizationKey)}}>Remove</button>
                       </li>
@@ -339,6 +347,8 @@ const EditorPanel = memo(() => {
                   <h3>Map</h3>
                   <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'us')}><UsaIcon /><span>United States</span></button>
                   <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'world')}><WorldIcon /><span>World</span></button>
+                  <h3>Misc</h3>
+                  <button className="viz-icon" type="button" onClick={() => addVisualization('data-bite', '')}><DataBiteIcon /><span>Data Bite</span></button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

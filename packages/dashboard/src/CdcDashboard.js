@@ -10,6 +10,7 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
+import CdcDataBite from '@cdc/data-bite';
 
 import EditorPanel from './components/EditorPanel';
 import Context from './context';
@@ -18,7 +19,7 @@ import defaults from './data/initial-state';
 import './scss/main.scss';
 
 export default function CdcDashboard(
-  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined } 
+  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined }
 ) {
 
   const transform = new DataTransform();
@@ -32,7 +33,7 @@ export default function CdcDashboard(
   const [loading, setLoading] = useState(true);
 
   const [editing, setEditing] = useState('');
-  
+
   const { title, description } = config.dashboard || config;
 
   const loadConfig = async () => {
@@ -68,7 +69,7 @@ export default function CdcDashboard(
 
     data.forEach((row) => {
       let add = true;
-      
+
       filters.forEach((filter) => {
         if(row[filter.columnName] !== filter.active) {
           add = false;
@@ -102,7 +103,7 @@ export default function CdcDashboard(
         newConfig[key] = {...defaults[key], ...newConfig[key]}
       }
     });
-    
+
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
       const filterList = [];
@@ -164,7 +165,7 @@ export default function CdcDashboard(
 
     return config.dashboard.filters.map((singleFilter, index) => {
       const values = [];
-  
+
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
           key={index}
@@ -172,7 +173,7 @@ export default function CdcDashboard(
         >{filterOption}
         </option>);
       });
-  
+
       return (
         <section className="filters-section" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
@@ -216,10 +217,12 @@ export default function CdcDashboard(
             switch(visualizationConfig.type){
               case 'chart':
                 return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-              case 'map': 
+              case 'map':
                 return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-                default: 
-              return <></>;
+              case 'data-bite':
+                return <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
+              default:
+                return <></>;
             }
           })}
 
@@ -229,7 +232,7 @@ export default function CdcDashboard(
       </>
     )
   }
-
+  
   return (
     <Context.Provider value={{ config, rawData: data, data: filteredData || data, loading, updateConfig, setParentConfig, setEditing }}>
       <div className="cdc-open-viz-module type-dashboard">
