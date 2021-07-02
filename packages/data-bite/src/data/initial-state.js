@@ -4,7 +4,7 @@ export default {
     "dataBite": "",
     "dataFunction": "",
     "dataColumn": "",
-    "imagePosition": "left",
+    "imagePosition": "Left",
     "biteFontSize": "24",
     "imageUrl": "",
     "biteBody": "",

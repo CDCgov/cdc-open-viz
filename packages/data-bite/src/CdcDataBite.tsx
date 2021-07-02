@@ -2,25 +2,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
-import ResizeObserver from 'resize-observer-polyfill';
+//import ResizeObserver from 'resize-observer-polyfill';
 import Context from './context';
 // @ts-ignore
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
-import {Simulate} from "react-dom/test-utils";
-import load = Simulate.load;
 
 const CdcDataBite = (
     { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig } :
     { configUrl?: string, config?: any, isEditor?: boolean, setConfig? }
 ) => {
 
+  console.log('CdcDataBite called');
+
   interface keyable {
     [key: string]: any
   }
 
   const [config, setConfig] = useState<keyable>({});
-  const [data, setData] = useState<Array<Object>>([]);
   const [loading, setLoading] = useState<Boolean>(true);
 
   const {
@@ -39,10 +38,6 @@ const CdcDataBite = (
   } = config;
 
   const outerContainerRef = useRef(null);
-
-  useEffect( () => {
-    setLoading(false);
-  }, [])
 
   const viewports:keyable = {
     'md': 992,
@@ -67,50 +62,24 @@ const CdcDataBite = (
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
-  // Observes changes to outermost container and changes viewport size in state
-  const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let { width, height } = entry.contentRect
-      let newViewport = getViewport(width)
+  //Observes changes to outermost container and changes viewport size in state
+  // const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
+  //   for (let entry of entries) {
+  //     let { width, height } = entry.contentRect
+  //     let newViewport = getViewport(width)
 
-      setCurrentViewport(newViewport)
+  //     setCurrentViewport(newViewport)
 
-      if(isEditor) {
-        width = width - 350;
-      }
+  //     if(isEditor) {
+  //       width = width - 350;
+  //     }
 
-      setDimensions([width, height])
-    }
-  })
+  //     setDimensions([width, height]);
+  //     console.log('setDimensions');
+  //   }
+  // })
 
-  const loadConfig = async () => {
-
-    let response = configObj || await (await fetch(configUrl)).json();
-
-    // If data is included through a URL, fetch that and store
-    let data = response.data ?? {}
-
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
-      data = await dataString.json();
-    }
-
-    setData(data);
-
-    let newConfig = {...defaults, ...response}
-
-    updateConfig(newConfig, data);
-  }
-
-  // Load data when component first mounts
-  useEffect(() => {
-    loadConfig();
-    resizeObserver.observe(outerContainerRef.current);
-  }, [resizeObserver, loadConfig]);
-
-
-
-  const updateConfig = (newConfig, dataOverride = undefined) => {
+  const updateConfig = (newConfig) => {
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -125,6 +94,24 @@ const CdcDataBite = (
     //Check things that are needed and set error messages if needed
     newConfig.runtime.editorErrorMessage = '';
     setConfig(newConfig);
+  }
+
+  const loadConfig = async () => {
+    console.log('loadConfig called');
+    let response = configObj || await (await fetch(configUrl)).json();
+
+    // If data is included through a URL, fetch that and store
+    let responseData = response.data ?? {}
+
+    if(response.dataUrl) {
+      const dataString = await fetch(response.dataUrl);
+      responseData = await dataString.json();
+    }
+
+    response.data = responseData;
+    console.log(response);
+    updateConfig({ ...defaults, ...response });
+    setLoading(false);
   }
 
   const calculateDataBite = () => {
@@ -186,7 +173,7 @@ const CdcDataBite = (
     let dataBite = '';
 
     //Optionally filter the data based on the user's filter
-    let filteredData = data;
+    let filteredData = config.data;
     filters.map((filter) => {
       if ( filter.columnName && filter.columnValue ) {
         filteredData = filteredData.filter(function (e) {
@@ -209,6 +196,8 @@ const CdcDataBite = (
       return include;
     }).map(Number);
 
+    console.log(numericalData);
+    debugger;
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
         dataBite = prefix + String(numericalData.length) + suffix;
@@ -242,10 +231,22 @@ const CdcDataBite = (
     return dataBite;
   }
 
+  // Load data when component first mounts
+  // useEffect(() => {
+  //   console.log('useEffect 1');
+  //   resizeObserver.observe(outerContainerRef.current);
+  // }, [resizeObserver]);
+
+  useEffect(() => {
+    console.log('useEffect 2');
+    loadConfig();
+  }, [])
+
   let body = (<Loading />)
 
+  console.log('Checking Loading');
   if(false === loading) {
-
+    console.log('Loading is false, rendering');
     let biteClasses = [];
     let addImageTop = false;
     let addImageBottom = false;
@@ -277,6 +278,12 @@ const CdcDataBite = (
 
     biteClasses.push(config.theme);
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
+
+    console.log({ showBite });
+    console.log({ biteLocation });
+    console.log({ addImageTop });
+    console.log({ addImageTop });
+    console.log(config.theme);
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -305,8 +312,9 @@ const CdcDataBite = (
     )
   }
 
+  console.log('About to render databite', config);
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data, setParentConfig }}>
+    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig }}>
       <div className={`cdc-open-viz-module type-data-bite ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

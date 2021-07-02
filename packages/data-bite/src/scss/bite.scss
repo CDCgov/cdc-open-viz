@@ -179,12 +179,24 @@
       }
     }
 
-    &.bite-left .bite-content-container > :nth-child(1) {
-      width: 39%;
+    &.bite-left .bite-content-container {
+      > :nth-child(1) {
+        width: 39%;
+      }
+
+      img {
+        margin-right: 15px;
+      }
     }
 
-    &.bite-left .bite-content-container > :nth-child(2) {
-      width: 59%;
+    &.bite-left .bite-content-container {
+      > :nth-child(2) {
+        width: 59%;
+      }
+
+      img {
+        margin-left: 15px;
+      }
     }
 
     &.bite-right .bite-content-container > :nth-child(1) {

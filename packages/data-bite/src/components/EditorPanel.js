@@ -146,6 +146,7 @@ const EditorPanel = memo(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
       const newConfig = convertStateToConfig()
+      console.log({ newConfig });
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
