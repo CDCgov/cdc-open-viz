@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/cdceditor",
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
@@ -19,9 +19,10 @@
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
     "@cdc/dashboard": "^1.0.0",
-    "@cdc/chart": "^1.0.0",
-    "@cdc/core": "^1.0.0",
-    "@cdc/map": "^2.3.0",
+    "@cdc/chart": "^1.0.1",
+    "@cdc/core": "^1.0.1",
+    "@cdc/map": "^2.4.0",
+    "@cdc/data-bite": "^1.0.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "d3": "^6.2.0",
