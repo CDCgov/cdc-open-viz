@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
-//import ResizeObserver from 'resize-observer-polyfill';
+import ResizeObserver from 'resize-observer-polyfill';
 import Context from './context';
 // @ts-ignore
 import CircleCallout from './components/CircleCallout';
@@ -37,47 +37,40 @@ const CdcDataBite = (
     subtext
   } = config;
 
-  const outerContainerRef = useRef(null);
-
-  const viewports:keyable = {
-    'md': 992,
-    'sm': 768,
-    'xs': 576,
-    'xxs': 350
-  }
-
   const getViewport = size => {
     let result = 'lg'
-    let viewportList = Object.keys( viewports )
 
-    for(let viewport of viewportList) {
-      if(size <= viewports[viewport]) {
-        result = viewport
-      }
+    const viewports = {
+        "lg": 1200,
+        "md": 992,
+        "sm": 768,
+        "xs": 576,
+        "xxs": 350
+    }
+
+    if(size > 1200) return result
+
+    for(let viewport in viewports) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
     }
 
     return result
-  }
+}
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   //Observes changes to outermost container and changes viewport size in state
-  // const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
-  //   for (let entry of entries) {
-  //     let { width, height } = entry.contentRect
-  //     let newViewport = getViewport(width)
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        let newViewport = getViewport(entry.contentRect.width)
 
-  //     setCurrentViewport(newViewport)
-
-  //     if(isEditor) {
-  //       width = width - 350;
-  //     }
-
-  //     setDimensions([width, height]);
-  //     console.log('setDimensions');
-  //   }
-  // })
+        console.log('viewport', newViewport, entry.contentRect.width)
+        setCurrentViewport(newViewport)
+    }
+});
 
   const updateConfig = (newConfig) => {
     // Deeper copy
@@ -197,7 +190,6 @@ const CdcDataBite = (
     }).map(Number);
 
     console.log(numericalData);
-    debugger;
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
         dataBite = prefix + String(numericalData.length) + suffix;
@@ -232,10 +224,11 @@ const CdcDataBite = (
   }
 
   // Load data when component first mounts
-  // useEffect(() => {
-  //   console.log('useEffect 1');
-  //   resizeObserver.observe(outerContainerRef.current);
-  // }, [resizeObserver]);
+  const outerContainerRef = useCallback(node => {
+      if (node !== null) {
+          resizeObserver.observe(node);
+      }
+  },[]);
 
   useEffect(() => {
     console.log('useEffect 2');
