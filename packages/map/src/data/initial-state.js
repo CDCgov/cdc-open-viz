@@ -35,9 +35,6 @@ export default {
     },
     navigate: {
       name: ''
-    },
-    geosInRegion: {
-      name: ''
     }
   },
   legend: {
@@ -51,9 +48,6 @@ export default {
     position: "side",
     title: "Legend",
   },
-  data: [
-    {},
-  ],
   filters: [],
   dataTable: {
     title: 'Data Table',
