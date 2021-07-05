@@ -546,7 +546,7 @@ const EditorPanel = memo(() => {
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
-                  <h5>Quantitative</h5>
+                  <span className="h5">Quantitative</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
 
@@ -571,7 +571,7 @@ const EditorPanel = memo(() => {
                       )
                     })}
                   </ul>
-                  <h5>Sequential</h5>
+                  <span className="h5">Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('sequential')).map( (palette) => {
 

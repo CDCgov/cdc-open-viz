@@ -1,10 +1,10 @@
 {
   "name": "@cdc/map",
-  "version": "2.3.0",
+  "version": "2.5.0",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "main": "dist/cdcmap",
   "scripts": {
-    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/map build"
   },
@@ -23,7 +23,7 @@
     "@cdc/core": "^1.0.1",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
-    "@visx/geo": "^1.7.0",
+    "@visx/geo": "^1.13.0",
     "@visx/responsive": "^1.7.0",
     "@visx/scale": "^1.7.0",
     "@visx/zoom": "^1.7.0",
@@ -33,29 +33,28 @@
     "chroma-js": "^2.1.0",
     "d3": "^6.6.0",
     "d3-geo-projection": "^3.0.0",
-    "d3-interpolate-path": "^2.2.1",
     "d3-scale-chromatic": "^2.0.0",
     "html-react-parser": "^1.2.1",
     "html2canvas": "^1.0.0-rc.7",
     "html2pdf.js": "^0.9.2",
-    "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.0.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-select": "^3.0.8",
-    "react-simple-maps": "^2.1.2",
     "react-table": "^7.5.0",
     "react-tag-autocomplete": "^6.0.0",
     "react-tooltip": "4.2.8",
     "stream": "0.0.2",
-    "us-atlas": "^3.0.0",
+    "topojson-client": "^3.1.0",
     "use-debounce": "^5.2.0",
-    "whatwg-fetch": "^3.6.2",
-    "world-atlas": "^2.0.2"
+    "whatwg-fetch": "^3.6.2"
   },
   "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81",
   "peerDependencies": {
     "react": ">=16.8",
     "react-dom": ">=16"
+  },
+  "dependencies": {
+    "@mapbox/geojson-merge": "^1.1.1"
   }
 }
