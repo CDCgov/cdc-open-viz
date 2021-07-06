@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "1.3",
+  "version": "1.3.0",
   "main": "dist/cdceditor",
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
