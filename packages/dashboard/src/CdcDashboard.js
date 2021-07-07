@@ -12,6 +12,7 @@ import parse from 'html-react-parser';
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import CdcMap from '@cdc/map';
+
 import CdcChart from '@cdc/chart';
 
 import EditorPanel from './components/EditorPanel';
@@ -99,18 +100,7 @@ export default function CdcDashboard(
     return values;
   }
 
-  const updateConfig = (newConfig, dataOverride = null) => {
-    // Deeper copy
-    // Object.keys(defaults).forEach( key => {
-    //   if(newConfig[key] && 'object' === typeof newConfig[key]) {
-    //     if(Array.isArray(newConfig[key])) {
-    //       newConfig[key] = [...defaults[key], ...newConfig[key]]
-    //     } else {
-    //       newConfig[key] = {...defaults[key], ...newConfig[key]}
-    //     }
-    //   }
-    // });
-    
+  const updateConfig = (newConfig, dataOverride = null) => {    
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
       const filterList = [];
@@ -224,7 +214,7 @@ export default function CdcDashboard(
         {config.dashboard.filters && <Filters />}
 
         {/* Visualizations */}
-        {/* {Object.keys(config.visualizations).map(visualizationKey => {
+        {Object.keys(config.visualizations).map(visualizationKey => {
           let visualizationConfig = config.visualizations[visualizationKey];
 
           visualizationConfig.data = filteredData || data;
@@ -237,7 +227,7 @@ export default function CdcDashboard(
               default: 
             return <></>;
           }
-        })} */}
+        })}
 
         {/* Description */}
         {description && <div className="dashboard-description">{parse(description)}</div>}

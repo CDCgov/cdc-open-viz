@@ -33,8 +33,6 @@ const RowMenu = ({ rowIdx, row }) => {
       r[i].width = layout[i] ?? null
     }
 
-    console.log({newRows})
-
     updateConfig({ ...config, rows: newRows})
     setCurr(layout.join(''))
   }
@@ -51,6 +49,30 @@ const RowMenu = ({ rowIdx, row }) => {
     rows[rowIdx] = temp
 
     updateConfig({...config, rows})
+
+    // TODO: Migrate this animation to a React animation library once one is selected for COVE. This is pretty minor so can stay for now.
+    let calcRowMove = dir === 'down' ? 202 : -202
+    let calcRowMove2 = dir === 'down' ? -202 : 202
+
+    let rowEle = document.querySelector('[data-row-id=\'' + rowIdx + '\']')
+    let rowNewEle = document.querySelector('[data-row-id=\'' + newIdx + '\']')
+
+    rowEle.style.pointerEvents = 'none'
+    rowNewEle.style.pointerEvents = 'none'
+    rowEle.style.top = calcRowMove + 'px'
+    rowNewEle.style.top = calcRowMove2 + 'px'
+
+    setTimeout(() => {
+      rowEle.style.transition = 'top 500ms cubic-bezier(0.16, 1, 0.3, 1)'
+      rowNewEle.style.transition = 'top 500ms cubic-bezier(0.16, 1, 0.3, 1)'
+      rowEle.style.top = '0'
+      rowNewEle.style.top = '0'
+    }, 0)
+
+    setTimeout(() => {
+      rowEle.style = null
+      rowNewEle.style = null
+    }, 500)
   }
   
   const deleteRow = () => {
@@ -60,19 +82,19 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const layoutList = [
-    <li className="row-menu__list--item" onClick={() => setRowLayout([ 12 ])} key="12" title="1 Column">
+    <li className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 12 ])} key="12" title="1 Column">
       <OneColIcon />
     </li>,
-    <li className="row-menu__list--item" onClick={() => setRowLayout([ 6, 6 ])} key="66" title="2 Columns">
+    <li className={curr === '66' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 6, 6 ])} key="66" title="2 Columns">
       <TwoColIcon />
     </li>,
-    <li className="row-menu__list--item" onClick={() => setRowLayout([ 4, 4, 4 ])} key="444" title="3 Columns">
+    <li className={curr === '444' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 4, 4, 4 ])} key="444" title="3 Columns">
       <ThreeColIcon />
     </li>,
-    <li className="row-menu__list--item" onClick={() => setRowLayout([ 4, 8 ])} key="48" title="2 Columns">
+    <li className={curr === '48' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 4, 8 ])} key="48" title="2 Columns">
       <FourEightColIcon />
     </li>,
-    <li className="row-menu__list--item" onClick={() => setRowLayout([ 8, 4 ])} key="84" title="2 Columns">
+    <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 8, 4 ])} key="84" title="2 Columns">
       <EightFourColIcon />
     </li>
   ]
@@ -100,10 +122,10 @@ const RowMenu = ({ rowIdx, row }) => {
 
 const Row = ({ row, idx: rowIdx }) => {
   return (
-    <div className="builder-row">
+    <div className="builder-row" data-row-id={rowIdx}>
       <RowMenu rowIdx={rowIdx} row={row} />
       <div className="column-container">
-        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} rowIdx={rowIdx} colIdx={colIdx} />)}
+        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} key={`row-${rowIdx}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />)}
       </div>
     </div>
   )

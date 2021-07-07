@@ -1,12 +1,14 @@
 $blue-light: #8bc6f7;
 $red: #f74242;
 
+.hidden.editor-panel + .builder-grid {
+  margin-left: 0 !important;
+}
+
 .builder-grid {
   margin-left: 350px;
   padding: 3em;
-
 }
-
 
 .column-container {
   display: flex;
@@ -50,21 +52,36 @@ $red: #f74242;
   margin-top: 2em;
 }
 
+.row-menu__btn:hover .row-menu__flyout {
+  transition: width .2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 144px;
+  li {
+    display: flex;
+  }
+  li + li {
+    margin-left: .3em;
+  }
+}
+
 .row-menu__flyout {
   list-style: none;
   display: flex;
   justify-content: flex-start;
   overflow: hidden;
-  transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width .2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1;
-  max-width: 25px;
-  &:hover {
-    transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    max-width: 200px;
+  width: 25px;
+  li:not(.current) {
+    display: none;
   }
-  li + li {
-    margin-left: .3em;
+  li svg {
+    opacity: .7;
   }
+
+  li:hover svg, li.current svg {
+    opacity: 1;
+  }
+
   .row-menu__list--item {
     display: flex;
   }
@@ -81,27 +98,6 @@ $red: #f74242;
   fill: #fff;
   + .row-menu__btn {
     margin-left: .2em;
-  }
-}
-
-.builder-row:hover {
-  .row-menu .row-menu__btn {
-    background-color: $blue;
-
-    &:hover {
-      background-color: lighten($blue, 8%);
-    }
-
-    &.row-menu__btn--edit {
-      background-color: transparent;
-    }
-
-    &.row-menu__btn--remove:hover {
-      background-color: $red;
-    }
-  }
-  .column-container {
-    border-color: $blue;
   }
 }
 
@@ -124,13 +120,11 @@ $red: #f74242;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   background-color: transparent;
-  background-image: url('../images/icon-move.svg');
-  background-repeat: no-repeat;
-  background-position: right .5em top .5em;
-  background-size: 1em;
   border: 2px dashed #C2C2C2;
   flex: 1 1 auto;
-
+  &:hover {
+    border-color: darken(#c2c2c2, 20%);
+  }
   &.column--populated {
     background: none;
     border: none;
@@ -151,42 +145,17 @@ $red: #f74242;
 .builder-column__text {
   padding: 0.5rem;
   text-align: center;
-  font-family: 'Arial', sans-serif;
   font-weight: 400;
   font-style: normal;
   font-size: 13px;
   line-height: 19px;
-  color: #333;
-}
-
-.widget-list {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-top: 1.25rem;
-  margin-left: 0.5rem;
-
-  > .widget {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 0.5rem;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    box-sizing: border-box;
-    flex: 1 0 0;
-    cursor: move;
-  }
-
-  .widget + .widget {
-    margin-left: .5rem;
-  }
+  color: $mediumGray;
 }
 
 .widget {
   display: flex;
   height: 100%;
-  border: 1px solid #cccccc;
+  border: 1px solid $lightGray;
   background-color: #fff;
   text-align: center;
   border-radius: 2px;
@@ -194,15 +163,22 @@ $red: #f74242;
   background-position: right 5px top 5px;
   width: 100%;
   padding: 0;
-}
-
-.widget__drag {
-  content: " ";
-  width: 1em;
-  background-color: $blue;
+  position: relative;
   cursor: move;
-  svg {
-    fill: #fff;
+  &:hover {
+    border-color: darken($lightGray, 20%);
+    .widget-menu-item svg {
+      fill: darken($mediumGray, 20%);
+    }
+    svg.drag-icon {
+      fill: darken($lightGray, 20%);
+    }
+  }
+  svg.drag-icon {
+    fill: $lightGray;
+    position: absolute;
+    left: .3em;
+    top: .3em;
   }
 }
 
@@ -229,8 +205,16 @@ $red: #f74242;
   font-family: sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 11px;
-  color: #333;
+  color: $darkGray;
+  flex-grow: 1;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  svg {
+    margin-bottom: .5em;
+  }
 }
 
 .widget-card {
@@ -252,15 +236,22 @@ $red: #f74242;
   }
 }
 
-.widget-card__remove {
-  display: block;
-  width: 17px;
-  height: 17px;
+.widget-menu {
   position: absolute;
   top: 6px;
   right: 6px;
+  display: flex;
+}
+
+.widget-menu-item {
+  display: block;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   user-select: none;
+  svg {
+    fill: $mediumGray;
+  }
 }
 
 .btn {
@@ -284,4 +275,38 @@ $red: #f74242;
   @extend .btn;
   width: 100%;
   text-align: center;
+}
+
+.builder-row {
+  position: relative;
+  .widget__content {
+    padding: 0 2em;
+    > svg {
+      width: 100%;
+      height: auto;
+      max-width: 100px;
+      max-height: 80px;
+      flex-grow: 1;
+    }
+  }
+  &:hover {
+    .row-menu .row-menu__btn {
+      background-color: $blue;
+  
+      &:hover {
+        background-color: lighten($blue, 8%);
+      }
+  
+      &.row-menu__btn--edit {
+        background-color: transparent;
+      }
+  
+      &.row-menu__btn--remove:hover {
+        background-color: $red;
+      }
+    }
+    .column-container {
+      border-color: $blue;
+    }
+  }
 }

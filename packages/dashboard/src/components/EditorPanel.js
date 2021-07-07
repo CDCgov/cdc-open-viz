@@ -15,12 +15,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Widget from './Widget'
 
-import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
-import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
-import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
-import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
-import WorldIcon from '@cdc/core/assets/world-graphic.svg';
-
 // IE11 Custom Event polyfill
 (function () {
 
@@ -223,14 +217,6 @@ const EditorPanel = memo(() => {
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
-  const removeVisualization = (visualizationKey) => {
-    let newConfig = {...config};
-
-    delete newConfig.visualizations[visualizationKey];
-
-    updateConfig(newConfig);
-  }
-
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
@@ -318,27 +304,19 @@ const EditorPanel = memo(() => {
                     Visualizations
                   </AccordionItemButton>
                 </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <h2>Current Visualizations</h2>
-                  <ol className="current-viz-list">
-                    {Object.keys(config.visualizations).map((visualizationKey) => (
-                      <li>
-                        {config.visualizations[visualizationKey].type === 'chart' && (config.visualizations[visualizationKey].visualizationType + ' Chart')} 
-                        {config.visualizations[visualizationKey].type === 'map' && (capitalize(config.visualizations[visualizationKey].general.geoType) + ' Map')} 
-                        <button type="button" onClick={() => {setEditing(visualizationKey)}}>Edit</button>
-                        <button type="button" onClick={() => {removeVisualization(visualizationKey)}}>Remove</button>
-                      </li>
-                    ))}
-                  </ol>
-
-                  <h2>Add Visualization</h2>
-                  <h3>Chart</h3>
-                  <Widget icon={<BarIcon />} addVisualization={() => addVisualization('chart', 'Bar')} label="Bar" />
-                  <Widget icon={<LineIcon />} addVisualization={() => addVisualization('chart', 'Line')} label="Line" />
-                  <Widget icon={<PieIcon />} addVisualization={() => addVisualization('chart', 'Pie')} label="Pie" />
-                  <h3>Map</h3>
-                  <Widget icon={<UsaIcon />} addVisualization={() => addVisualization('map', 'us')} label="United States" />
-                  <Widget icon={<WorldIcon />} addVisualization={() => addVisualization('map', 'world')} label="World" />
+                <AccordionItemPanel className="add-visualizations accordion__panel">
+                  <p>Click and drag an item onto the grid to add it to your dashboard.</p>
+                  <span className="subheading-3">Chart</span>
+                  <div className="drag-grid">
+                    <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar" />
+                    <Widget addVisualization={() => addVisualization('chart', 'Line')} type="Line" />
+                    <Widget addVisualization={() => addVisualization('chart', 'Pie')} type="Pie" />
+                  </div>
+                  <span className="subheading-3">Map</span>
+                  <div className="drag-grid">
+                    <Widget addVisualization={() => addVisualization('map', 'us')} type="us" />
+                    <Widget addVisualization={() => addVisualization('map', 'world')} type="world" />
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -350,14 +328,14 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <ul className="filters-list">
                     {config.dashboard.filters && config.dashboard.filters.map((filter, index) => (
-                        <fieldset className="edit-block">
+                        <fieldset className="edit-block" key={filter.columnName + index}>
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Filter</span>
                             <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
                               {getColumns().map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                                <option value={dataKey} key={dataKey}>{dataKey}</option>
                               ))}
                             </select>
                           </label>

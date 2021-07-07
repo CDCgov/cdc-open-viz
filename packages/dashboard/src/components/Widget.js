@@ -1,11 +1,33 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 import { useDrag } from 'react-dnd'
 import CloseIcon from '../images/icon-close.svg'
+import EditIcon from '../images/icon-edit.svg'
 import MoveIcon from '../images/icon-move.svg'
+import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
+import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
+import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
+import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
+import WorldIcon from '@cdc/core/assets/world-graphic.svg';
 
 import Context from '../context';
 
-const Widget = ({ label, icon, uid, data = {}, addVisualization }) => {
+const iconHash = {
+  'Bar' : <BarIcon />,
+  'Line' : <LineIcon />,
+  'Pie' : <PieIcon />,
+  'us' : <UsaIcon />,
+  'world' : <WorldIcon />
+}
+
+const labelHash = {
+  'Bar' : 'Bar',
+  'Line' : 'Line',
+  'Pie' : 'Pie',
+  'us' : 'United States',
+  'world' : 'World'
+}
+
+const Widget = ({ data = {}, addVisualization, type }) => {
   const { rows, visualizations, config, updateConfig } = useContext(Context)
 
   const handleWidgetMove = (item, monitor) => {
@@ -46,14 +68,22 @@ const Widget = ({ label, icon, uid, data = {}, addVisualization }) => {
     updateConfig({...config, rows, visualizations})
   }
 
+  const editWidget = () => {
+    // TODO
+  }
+
   return (
-    <div className={'widget viz-icon'} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
-      <div className="widget__drag"><MoveIcon /></div>
+    <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+      <MoveIcon className="drag-icon" />
       <div className="widget__content">
-        {data.rowIdx !== undefined && <div className={'widget-card__remove'} onClick={deleteWidget}><CloseIcon /></div>}
-        {icon && icon}
-        {label}
-        {uid && <span style={{fontSize: '1em', display: 'block'}}>{uid}</span>}
+        {data.rowIdx !== undefined && (
+          <div className="widget-menu">
+            <div className="widget-menu-item" onClick={editWidget}><EditIcon /></div>
+            <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
+          </div>
+        )}
+        {iconHash[type]}
+        <span>{labelHash[type]}</span>
       </div>
     </div>
   )

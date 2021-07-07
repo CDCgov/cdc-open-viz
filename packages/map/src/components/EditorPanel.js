@@ -14,8 +14,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Waiting from '@cdc/core/components/Waiting'
 
 import MapIcon from '../images/map-folded.svg';
-import UsaGraphic from '../images/usa-graphic.svg';
-import WorldGraphic from '../images/world-graphic.svg';
+import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
@@ -756,7 +756,7 @@ const EditorPanel = (props) => {
 
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
-      <Draggable key={value} draggableId={value} index={index}>
+      <Draggable key={value} draggableId={`item-${value}`} index={index}>
         {(provided, snapshot) => (
           <li
             style={{position: 'relative'}}
