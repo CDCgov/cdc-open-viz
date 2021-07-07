@@ -57,7 +57,8 @@
     ]
   },
   "scripts": {
-    "publish": "npx lerna publish"
+    "publish": "npx lerna publish",
+    "buildall": "lerna run --scope @cdc/map build && lerna run --scope @cdc/chart build && lerna run --scope @cdc/dashboard build && lerna run --scope @cdc/data-bite build && lerna run --scope @cdc/editor build"
   },
   "dependencies": {
     "@types/resize-observer-browser": "^0.1.5",
