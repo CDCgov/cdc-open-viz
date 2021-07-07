@@ -6,6 +6,13 @@
 
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
+  @import 'grid';
+  font-size: 16px;
+  line-height: 1.4;
+  .loading > div.la-ball-beat {
+    margin-top: 20%;
+  }
+
   .visually-hidden {
     position: fixed;
     left: -10000px;
