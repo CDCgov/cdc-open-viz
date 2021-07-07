@@ -1,0 +1,12 @@
+<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chart-pie" class="svg-inline--fa fa-chart-pie fa-w-17" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 512">
+    <style>
+        .graphic-needed {
+            font-weight: bold;
+            fill: black;
+            font-size: 70px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+    </style>
+    <text x="50%" y="50%" class="graphic-needed">Graphic Needed</text>
+</svg>

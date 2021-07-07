@@ -14,6 +14,7 @@ import DataTransform from '@cdc/core/components/DataTransform';
 import CdcMap from '@cdc/map';
 
 import CdcChart from '@cdc/chart';
+import CdcDataBite from '@cdc/data-bite';
 
 import EditorPanel from './components/EditorPanel';
 import Grid from './components/Grid';
@@ -23,7 +24,7 @@ import defaults from './data/initial-state';
 import './scss/main.scss';
 
 export default function CdcDashboard(
-  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined } 
+  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined }
 ) {
 
   const transform = new DataTransform();
@@ -37,7 +38,7 @@ export default function CdcDashboard(
   const [loading, setLoading] = useState(true);
 
   const [editing, setEditing] = useState('');
-  
+
   const { title, description } = config.dashboard || config;
 
   const loadConfig = async () => {
@@ -73,7 +74,7 @@ export default function CdcDashboard(
 
     data.forEach((row) => {
       let add = true;
-      
+
       filters.forEach((filter) => {
         if(row[filter.columnName] !== filter.active) {
           add = false;
@@ -162,7 +163,7 @@ export default function CdcDashboard(
 
     return config.dashboard.filters.map((singleFilter, index) => {
       const values = [];
-  
+
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
           key={index}
@@ -170,7 +171,7 @@ export default function CdcDashboard(
         >{filterOption}
         </option>);
       });
-  
+
       return (
         <section className="filters-section" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
@@ -246,7 +247,7 @@ export default function CdcDashboard(
     setParentConfig,
     setEditing
   }
-
+  
   return (
     <Context.Provider value={contextValues}>
       <div className="cdc-open-viz-module type-dashboard">

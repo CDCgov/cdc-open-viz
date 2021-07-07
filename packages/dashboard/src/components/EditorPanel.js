@@ -12,7 +12,6 @@ import { useDebounce } from 'use-debounce';
 import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-
 import Widget from './Widget'
 
 // IE11 Custom Event polyfill
@@ -62,7 +61,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -153,7 +152,7 @@ const EditorPanel = memo(() => {
   }
 
   const missingRequiredSections = () => {
-    //TODO 
+    //TODO
 
     return false;
   };
@@ -198,13 +197,19 @@ const EditorPanel = memo(() => {
   }
 
   const addVisualization = (type, subType) => {
-    let newVisualizationConfig = {type, newViz: true};
+    let newVisualizations = config.visualizations ? {...config.visualizations} : {}
 
-    if(type === 'chart'){
-      newVisualizationConfig.visualizationType = subType;
-    } else if(type === 'map'){
-      newVisualizationConfig.general = {};
-      newVisualizationConfig.general.geoType = subType;
+    switch(type) {
+      case 'chart':
+        newVisualizationConfig.visualizationType = subType;
+        break;
+      case 'map':
+        newVisualizationConfig.general = {};
+        newVisualizationConfig.general.geoType = subType;
+        break;
+      case 'data-bite':
+        newVisualizationConfig.visualizationType = type;
+        break;
     }
 
     newVisualizationConfig.uid = type + Date.now()
@@ -277,7 +282,7 @@ const EditorPanel = memo(() => {
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
-
+  
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
