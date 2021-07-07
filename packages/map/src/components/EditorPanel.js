@@ -747,7 +747,7 @@ const EditorPanel = (props) => {
 
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
-      <Draggable key={value} draggableId={`${value}`} index={index}>
+      <Draggable key={value} draggableId={`item-${value}`} index={index}>
         {(provided, snapshot) => (
           <li
             style={{position: 'relative'}}
