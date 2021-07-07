@@ -1,0 +1,8 @@
+{
+    "type": "data-bite",
+    "dataUrl": "/examples/example-data.json",
+    "filters": [],
+    "subtext": "Please note, this is the Waffle Chart's subtext or citation",
+    "title": "Waffle Chart",
+    "theme": "theme-blue"
+}

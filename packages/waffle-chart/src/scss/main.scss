@@ -1,0 +1,37 @@
+@import '~@cdc/core/styles/base';
+@import "~@cdc/core/styles/heading-colors";
+@import 'variables';
+
+.cdc-open-viz-module.type-waffle-chart {
+
+  @include breakpointClass(xs) {
+    &.font-small {
+      font-size: .8em;
+    }
+    &.font-medium {
+      font-size: .9em;
+    }
+    &.font-large {
+      font-size: 1em;
+    }
+  }
+  @include breakpointClass(md) {
+    &.font-small {
+      font-size: .9em;
+    }
+    &.font-large {
+      font-size: 1.1em;
+    }
+  }
+  @include breakpointClass(lg) {
+    &.font-small {
+      font-size: 1em;
+    }
+    &.font-medium {
+      font-size: 1.1em;
+    }
+    &.font-large {
+      font-size: 1.2em;
+    }
+  }
+}
