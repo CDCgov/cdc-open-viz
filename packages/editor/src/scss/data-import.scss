@@ -3,6 +3,7 @@
 .cdc-editor .data-designer {
     @import "data-table";
     display: flex;
+    justify-content: flex-end;
     .left-col {
         background: #fff;
         padding-top: $gbl-padding;
@@ -83,17 +84,27 @@
             color: $mediumGray;
         }
     }
-    &::before {
-        content: " ";
-        flex-shrink: 0;
-        width: 33.33%; // Space pseudo element
-    }
     .right-col {
         position: relative;
         background-color: $lightest-gray;
         padding: $gbl-padding;
-        flex-grow: 1;
-        max-width: 66.667%;
+        width: 66.667%;
+        .data-table-container {
+            overflow-x: scroll;
+            border: 1px solid #C7C7C7;
+            .data-table {
+                max-width: 100%;
+                border: 0;
+            }
+            tr {
+                width: 100%;
+                display: inline-flex !important;
+                border-bottom: 1px solid #C7C7C7 !important;
+                td, th {
+                    border-bottom: none !important;
+                }
+            }
+        }
     }
 
     .keep-url {
