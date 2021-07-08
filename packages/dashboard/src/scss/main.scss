@@ -85,4 +85,18 @@
   .dashboard-description {
     margin-bottom: 20px;
   }
+
+  .col {
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px;
+  }
+
+  .col-6 {
+    width: calc(50% - 30px);
+  }
+
+  .col-4 {
+    width: calc(33% - 30px);
+  }
 }

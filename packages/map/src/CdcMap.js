@@ -124,7 +124,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig}) => {
     const transform = new DataTransform()
 
     const [state, setState] = useState( {...initialState} )
@@ -1049,7 +1049,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
+            {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
