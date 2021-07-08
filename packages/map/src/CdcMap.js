@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
 
 // IE11
 import 'core-js/stable'
 import 'whatwg-fetch'
+import ResizeObserver from 'resize-observer-polyfill';
 
 // Third party
 import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
 import Papa from 'papaparse';
-import { Base64 } from 'js-base64';
 import parse from 'html-react-parser';
-import ResizeObserver from 'resize-observer-polyfill';
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
@@ -30,93 +29,524 @@ import './scss/btn.scss'
 import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
-// Open Viz
+// Core
 import Loading from '@cdc/core/components/Loading';
 
-// Components
+// Child Components
 import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
-import HexMap from './components/HexMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 
-class CdcMap extends Component {
-    constructor (props) {
-        super(props)
+// Data props
+const stateKeys = Object.keys(supportedStates)
+const territoryKeys = Object.keys(supportedTerritories)
+const countryKeys = Object.keys(supportedCountries)
+const cityKeys = Object.keys(supportedCities)
 
-        // Initial state property
-        this.state = JSON.parse(JSON.stringify(initialState));
+const generateColorsArray = (color = '#000000', special = false) => {
+    let colorObj = chroma(color)
 
-        // Data props
-        this.outerContainerRef = React.createRef();
-        this.mapSvg = React.createRef();
-        this.supportedStates = supportedStates;
-        this.supportedCountries = supportedCountries;
-        this.supportedTerritories = supportedTerritories;
-        this.stateValues = Object.values(supportedStates).flat()
-        this.stateKeys = Object.keys(supportedStates)
-        this.territoryValues = Object.values(supportedTerritories).flat()
-        this.territoryKeys = Object.keys(supportedTerritories)
-        this.countryValues = Object.values(supportedCountries).flat()
-        this.countryKeys = Object.keys(supportedCountries)
-        this.cityNames = Object.keys(supportedCities)
+    let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
 
-        this.viewports = {
-            "lg": 1200,
-            "md": 992,
-            "sm": 768,
-            "xs": 576,
-            "xxs": 350
-        }
+    return [
+        color,
+        hoverColor,
+        colorObj.darken(0.3).hex()
+    ]
+}
 
-        // Binding context
-        this.processData = this.processData.bind(this)
-        this.applyLegendToValue = this.applyLegendToValue.bind(this)
-        this.applyColorToLegend = this.applyColorToLegend.bind(this)
-        this.applyTooltipsToGeo = this.applyTooltipsToGeo.bind(this)
-        this.processLegend = this.processLegend.bind(this)
-        this.resetLegendToggles = this.resetLegendToggles.bind(this)
-        this.changeFilterActive = this.changeFilterActive.bind(this)
-        this.generateValuesForFilter = this.generateValuesForFilter.bind(this)
-        this.displayGeoName = this.displayGeoName.bind(this)
-        this.announceChange = this.announceChange.bind(this)
-        this.geoClickHandler = this.geoClickHandler.bind(this)
-        this.closeModal = this.closeModal.bind(this)
-        this.navigationHandler = this.navigationHandler.bind(this)
-        this.displayDataAsText = this.displayDataAsText.bind(this)
-        this.loadConfig = this.loadConfig.bind(this)
-        this.setState = this.setState.bind(this)
-        this.processUnifiedData = this.processUnifiedData.bind(this)
-        this.getViewport = this.getViewport.bind(this)
-        this.saveImageAs = this.saveImageAs.bind(this)
+const hashObj = (row) => {
+    let str = JSON.stringify(row)
+
+	let hash = 0;
+	if (str.length == 0) return hash;
+	for (let i = 0; i < str.length; i++) {
+		let char = str.charCodeAt(i);
+		hash = ((hash<<5)-hash) + char;
+		hash = hash & hash;
+	}
+
+    return hash;
+}
+
+// Checks if the string is a number and returns it as a number if it is
+const numberFromString = (value) => {
+    // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
+    let nonNumeric = /[^\d.]/g
+
+    if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
+        return parseFloat(value)
     }
 
-    closeModal({target}) {
-        if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && this.state.general.modalOpen) {
-            this.setState( (prevState) => {
-                return {
-                    general: {
-                        ...prevState.general,
-                        modalOpen: false
-                    }
+    return value
+}
+
+const getViewport = size => {
+    let result = 'lg'
+
+    const viewports = {
+        "lg": 1200,
+        "md": 992,
+        "sm": 768,
+        "xs": 576,
+        "xxs": 350
+    }
+
+    if(size > 1200) return result
+
+    for(let viewport in viewports) {
+        if(size <= viewports[viewport]) {
+            result = viewport
+        }
+    }
+
+    return result
+}
+
+const getUniqueValues = (data, columnName) => {
+    let result = {}
+
+    for(let i = 0; i < data.length; i++) {
+        const val = data[i][columnName]
+
+        if(!val) continue
+
+        if(undefined === result[val]) {
+            result[val] = true
+        }
+    }
+
+    return Object.keys(result)
+}
+
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+    const [state, setState] = useState( {...initialState} )
+    const [loading, setLoading] = useState(true)
+    const [viewport, setViewport] = useState('lg')
+    const [runtimeFilters, setRuntimeFilters] = useState([])
+    const [runtimeLegend, setRuntimeLegend] = useState([])
+    const [runtimeData, setRuntimeData] = useState({init: true})
+    const [modal, setModal] = useState(null)
+    const [accessibleStatus, setAccessibleStatus] = useState('')
+
+    let legendMemo = useRef(new Map())
+
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            let newViewport = getViewport(entry.contentRect.width)
+    
+            setViewport(newViewport)
+        }
+    });
+
+    // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
+    // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
+    const addUIDs = useCallback((obj, fromColumn) => {
+        obj.data.forEach(row => {
+            let uid = null
+
+            if(row.uid) row.uid = null // Wipe existing UIDs
+
+            // United States check
+            if("us" === obj.general.geoType) {
+                const geoName = row[obj.columns.geo.name]
+
+                // States
+                uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
+
+                // Territories
+                if(!uid) {
+                    uid = territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
                 }
+
+                // Cities
+                if(!uid) {
+                    uid = cityKeys.find( (key) => key === geoName) 
+                }
+            }
+
+            // World Check
+            if("world" === obj.general.geoType) {
+                const geoName = row[obj.columns.geo.name]
+
+                uid = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
+            }
+
+            // TODO: Points
+
+            if(uid) {
+                Object.defineProperty(row, 'uid', {
+                    value: uid,
+                    writable: true
+                });
+            }
+        })
+
+        obj.data.fromColumn = fromColumn
+    })
+
+    const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+        const newLegendMemo = new Map(); // Reset memoization
+    
+        const
+            primaryCol = obj.columns.primary.name,
+            type = obj.legend.type,
+            number = obj.legend.numberOfItems,
+            result = [];
+    
+        // Add a hash for what we're working from if passed
+        if(hash) {
+            result.fromHash = hash
+        }
+    
+        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use 
+        let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
+    
+        const colorDistributions = {
+            1: [ 1 ],
+            2: [ 1, 3 ],
+            3: [ 1, 3, 5 ],
+            4: [ 0, 2, 4, 6 ],
+            5: [ 0, 2, 4, 6, 7 ],
+            6: [ 0, 2, 3, 4, 5, 7 ],
+            7: [ 0, 2, 3, 4, 5, 6, 7 ],
+            8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
+            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+        }
+    
+        const applyColorToLegend = (legendIdx) => {
+            // Default to "bluegreen" color scheme if the passed color isn't valid
+            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
+    
+            let colorIdx = legendIdx - specialClasses
+    
+            // Special Classes (No Data)
+            if (result[legendIdx].special) {
+                const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+    
+                return specialClassColors[ legendIdx ]
+            }
+    
+            if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
+    
+            let amt = Math.max( result.length - specialClasses, 1 )
+            let distributionArray = colorDistributions[ amt ]
+    
+            const specificColor = distributionArray[ colorIdx ]
+        
+            return mapColorPalette[specificColor]
+        }
+    
+        let specialClasses = 0
+        let specialClassesHash = {}
+    
+        // Special classes
+        if (obj.legend.specialClasses.length) {
+            dataSet = dataSet.filter(row => {
+                const val = row[primaryCol]
+    
+                if( obj.legend.specialClasses.includes(val) ) {
+                    if(undefined === specialClassesHash[val]) {
+                        specialClassesHash[val] = true
+
+                        result.push({
+                            special: true,
+                            value: val
+                        })
+        
+                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+    
+                        specialClasses += 1
+                    }
+    
+                    newLegendMemo.set( hashObj(row), result.length - 1)
+    
+                    return false
+                }
+    
+                return true
             })
         }
+    
+        // Category
+        if('category' === type) {
+            let uniqueValues = new Map()
+            let count = 0
+    
+            for(let i = 0; i < dataSet.length; i++) {
+                let row = dataSet[i]
+                let value = row[primaryCol]
+                
+                if(undefined === value) continue
+    
+                if(false === uniqueValues.has(value)) {
+                    uniqueValues.set(value, [hashObj(row)]);
+                    count++
+                } else {
+                    uniqueValues.get(value).push(hashObj(row))
+                }
+    
+                if(count === 9) break // Can only have 9 categorical items for now
+            }
+    
+            let sorted = [...uniqueValues.keys()]
+    
+            // Apply custom sorting or regular sorting
+            let configuredOrder = obj.legend.categoryValuesOrder ?? []
+    
+            if(configuredOrder.length) {
+                sorted.sort( (a, b) => {
+                    return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
+                })
+            } else {
+                sorted.sort((a, b) => a - b)
+            }
+    
+            // Add legend item for each
+            sorted.forEach((val) => {
+                result.push({
+                    value: val,
+                })
+    
+                let lastIdx = result.length - 1
+                let arr = uniqueValues.get(val)
+    
+                if(arr) {
+                    arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
+                }
+            })
+    
+            
+            // Add color to new legend item
+            for(let i = 0; i < result.length; i++) {
+                result[i].color = applyColorToLegend(i)
+            }
+            legendMemo.current = newLegendMemo
+            return result
+        }
+    
+        let legendNumber = number
+    
+        // Separate zero
+        if(true === obj.legend.separateZero) {   
+            let addLegendItem = false; 
+       
+            for(let i = 0; i < dataSet.length; i++) {
+                if (dataSet[i][primaryCol] === 0) {
+                    addLegendItem = true
+    
+                    let row = dataSet.splice(i, 1)[0]
+    
+                    newLegendMemo.set( hashObj(row), result.length)
+                    i--
+                }
+            }
+    
+            if(addLegendItem) {
+                legendNumber -= 1 // This zero takes up one legend item
+    
+                // Add new legend item
+                result.push({
+                    min: 0,
+                    max: 0
+                })
+    
+                let lastIdx = result.length - 1
+    
+                // Add color to new legend item
+                result[lastIdx].color = applyColorToLegend(lastIdx)
+            }
+        }
+    
+        // Sort data for use in equalnumber or equalinterval
+        dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
+            let aNum = a[primaryCol]
+            let bNum = b[primaryCol]
+
+            return aNum - bNum
+        })
+
+        // Equal Number
+        if(type === 'equalnumber') {
+            let numberOfRows = dataSet.length
+    
+            let remainder
+            let changingNumber = legendNumber
+    
+            let chunkAmt
+    
+            // Loop through the array until it has been split into equal subarrays
+            while ( numberOfRows > 0 ) {
+                remainder = numberOfRows % changingNumber
+    
+                chunkAmt = Math.floor(numberOfRows / changingNumber)
+    
+                if (remainder > 0) {
+                    chunkAmt += 1
+                }
+                
+                let removedRows = dataSet.splice(0, chunkAmt);
+    
+                let min = removedRows[0][primaryCol],
+                    max = removedRows[removedRows.length - 1][primaryCol]
+    
+                removedRows.forEach(row => {
+                    newLegendMemo.set( hashObj(row), result.length )
+                })
+    
+                result.push({
+                    min,
+                    max
+                })
+    
+                result[result.length - 1].color = applyColorToLegend(result.length - 1)
+    
+                changingNumber -= 1
+                numberOfRows -= chunkAmt
+            }
+        }
+    
+        // Equal Interval
+        if(type === 'equalinterval') {
+            dataSet = dataSet.filter(row => row[primaryCol])
+            let dataMin = dataSet[0][primaryCol]
+            let dataMax = dataSet[dataSet.length - 1][primaryCol]
+    
+            let pointer = 0 // Start at beginning of dataSet
+    
+            for (let i = 0; i < legendNumber; i++) {
+                let interval = Math.abs(dataMax - dataMin) / legendNumber
+    
+                let min = dataMin + (interval * i)    
+                let max = min + interval
+    
+                // If this is the last loop, assign actual max of data as the end point
+                if (i === legendNumber - 1) max = dataMax
+    
+                // Add rows in dataSet that belong to this new legend item since we've got the data sorted
+                while(pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
+                    newLegendMemo.set(hashObj(dataSet[pointer]), result.length )
+                    pointer += 1
+                }
+    
+                let range = {
+                    min: Math.round(min * 100) / 100,
+                    max: Math.round(max * 100) / 100,
+                }
+    
+                result.push(range)
+    
+                result[result.length - 1].color = applyColorToLegend(result.length - 1)
+            }
+        }
+    
+        result.forEach((legendItem, idx) => {
+            legendItem.color = applyColorToLegend(idx, specialClasses, result)
+        })
+
+        legendMemo.current = newLegendMemo
+        return result
+    })
+
+    const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
+        if(undefined === obj.filters || obj.filters.length === 0) return []
+    
+        let filters = []
+    
+        if(hash) filters.fromHash = hash
+    
+        obj.filters.forEach(({columnName, label}, idx) => {
+            if(undefined === columnName) return
+    
+            let newFilter = runtimeFilters[idx]
+            let values = getUniqueValues(state.data, columnName)
+    
+            if(undefined === newFilter) {
+                newFilter = {}
+            }
+    
+            newFilter.label = label ?? ''
+            newFilter.columnName = columnName
+            newFilter.values = values
+            newFilter.active = values[0] // Default to first found value
+    
+            filters.push(newFilter)
+        })
+    
+        return filters
+    })
+    
+    // Calculates what's going to be displayed on the map and data table at render.
+    const generateRuntimeData = useCallback((obj, filters, hash) => {
+        const result = {}
+    
+        if(hash) {
+            // Adding property this way prevents it from being enumerated
+            Object.defineProperty(result, 'fromHash', {
+                value : hash
+            });
+        }
+    
+        obj.data.forEach(row => {
+            if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
+    
+            if(row[obj.columns.primary.name]) {
+                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
+            }
+    
+            // If this is a navigation only map, skip if it doesn't have a URL
+            if("navigation" === obj.general.type ) {
+                let navigateUrl = row[obj.columns.navigate.name] || "";
+                if ( undefined !== navigateUrl ) {
+                    // Strip hidden characters before we check length
+                    navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
+                }
+                if ( 0 === navigateUrl.length ) {
+                    return false
+                }
+            }
+    
+            // Filters
+            if(filters.length) {
+                for(let i = 0; i < filters.length; i++) {
+                    const {columnName, active} = filters[i]
+                    
+                    if (row[columnName] !== active) return false // Bail out, not part of filter
+                }
+            }
+    
+            // Don't add additional rows with same UID
+            if(undefined === result[row.uid]) {
+                result[row.uid] = row
+            }
+        })
+    
+        return result
+    })
+
+    const outerContainerRef = useCallback(node => {
+        if (node !== null) {
+            resizeObserver.observe(node);
+        }
+    },[]);
+
+    const mapSvg = useRef(null);
+
+    const closeModal = ({target}) => {
+        if('string' === typeof target.className && (target.className.includes('modal-close') || target.className.includes('modal-background') ) && null !== modal) {
+            setModal(null)
+        }
     }
 
-    saveImageAs(uri, filename) {
+    const saveImageAs = (uri, filename) => {
         const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
         const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
         const ieEdge = navigator.userAgent.match(/Edge/g)
         const ieVer=(ie ? ie[1] : (ie11 ? 11 : (ieEdge ? 12 : -1)));
-
-        if (ie && ieVer<10) {
-            console.log("IE10+ required");
-            return;
-        }
 
         if (ieVer>-1) {
             const fileAsBlob = new Blob([uri], {
@@ -137,9 +567,9 @@ class CdcMap extends Component {
         }
     }
 
-    generateMedia(target, type) {
+    const generateMedia = (target, type) => {
         // Convert SVG to canvas
-        const baseSvg = this.mapSvg.current.querySelector('.rsm-svg')
+        const baseSvg = mapSvg.current.querySelector('.rsm-svg')
 
         const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
         const calcHeight = ratio * 1440
@@ -164,7 +594,7 @@ class CdcMap extends Component {
 
         // Construct filename with timestamp
         const date = new Date()
-        const filename = this.state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+        const filename = state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
         switch (type) {
             case 'image':
@@ -176,7 +606,7 @@ class CdcMap extends Component {
                     scale: 1,
                     logging: false
                 }).then(canvas => {
-                    this.saveImageAs(canvas.toDataURL(), filename + '.png')
+                    saveImageAs(canvas.toDataURL(), filename + '.png')
                 }).then(() => {
                     generatedImage.remove() // Remove generated png
                     baseSvg.style.display = null // Re-display initial svg map
@@ -196,98 +626,39 @@ class CdcMap extends Component {
                 })
                 break
             default:
-                console.log('generateMedia param 2 type must be \'image\' or \'pdf\'')
+                console.warn('generateMedia param 2 type must be \'image\' or \'pdf\'')
                 break
         }
     }
 
-    async changeFilterActive (num, activeValue) {
+    const changeFilterActive = async (idx, activeValue) => {
+        // Reset active legend toggles
+        resetLegendToggles()
 
-        const parsedActiveValue = this.numberFromString(activeValue)
+        let filters = [...runtimeFilters]
 
-        // Reset all active legend toggles - needed await/async because setState is asynchronous and was causing issues.
-        await this.resetLegendToggles()
+        filters[idx] = {...filters[idx]}
 
-        let currentFilters = this.state.filters
+        filters[idx].active = activeValue
 
-        currentFilters[num].active = parsedActiveValue
+        const newData = generateRuntimeData(state, filters)
 
-        this.setState({
-            filters: currentFilters
-        })
-
-        // Regenerate data excluding non active filters.
-        const processedData = this.processData()
-
-        this.setState(() => { return {processedData} })
-
-        // Rebuild the legend with the new values.
-        const processedLegend = this.processLegend()
-
-        this.setState(() => { return {processedLegend} })
+        setRuntimeData(newData)
+        setRuntimeFilters(filters)
     }
 
-    // This is only used when building a legend that has the unified option checked.
-    // Returns an array of the entire data set that still performs some of the same validity checks as the regular processData method
-    processUnifiedData () {
-        // All the data to be mapped
-        let dataObj = this.state.data
-
-        let rawData = dataObj
-
-        const parsedData = []
-
-        const geoColumnName = this.state.columns.geo.name
-
-        const supportedUsGeos = this.stateValues.concat(this.territoryValues, this.cityNames)
-
-        const supportedWorldGeos = this.countryValues.concat(this.cityNames)
-
-        rawData.forEach((row, i) => {
-            let addRow = true
-
-            // Empty row check - Just checks for value of geo column
-            if(!row[this.state.columns.geo.name]) {
-                addRow = false
-            }
-
-            // Geo matching
-            let geoName = row[geoColumnName]
-
-            // Don't add data that can't display on the map, so check based on map type
-            if(addRow && "us" === this.state.general.geoType && false === this.state.general.hasRegions) {
-                // If this doesn't match a supported US geo, don't add it.
-                if( false === supportedUsGeos.includes(geoName) ) {
-                    addRow = false
-                }
-            }
-
-            if(addRow && "world" === this.state.general.geoType && false === supportedWorldGeos.includes(geoName) && false === this.state.general.hasRegions) {
-                addRow = false
-            }
-
-            // Passed all of our checks, add to processedData
-            if(true === addRow) {
-                parsedData.push(row)
-            }
-        })
-
-        return parsedData
-    }
-
-    displayDataAsText (value, columnName, returnJsx) {
+    const displayDataAsText = (value, columnName) => {
         if(value === null) {
             return ""
         }
 
         let formattedValue = value
 
-        let columnObj = this.state.columns[columnName]
+        let columnObj = state.columns[columnName]
 
         if (columnObj) {
             // If value is a number, apply specific formattings
             if (Number(value)) {
-
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
 
@@ -305,254 +676,50 @@ class CdcMap extends Component {
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
-            if (this.isSpecialClassValue(value) === false) {
+            if (false === state.legend.specialClasses.includes(value)) {
                 formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
             }
-        }
-
-        if(true === returnJsx) {
-            return (formattedValue)
         }
 
         return formattedValue
     }
 
-    isSpecialClassValue (value, compareArr) {
-        // For instances where the special values have changed but aren't reflected in state yet, we check the array that is passed in to compare.
-        if(compareArr) {
-            if (compareArr.includes(value)) {
-                return true
-            }
-        } else {
-            if (this.state.legend.hasOwnProperty('specialClasses') &&
-                false !== this.state.legend.specialClasses &&
-                this.state.legend.specialClasses.includes(value)) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-    applyColorToLegend (legend) {
-        // Filter out special classes, they don't count.
-        let regularLegendItems = this.state.processedLegend.data.filter((legendItem) => !legendItem.special).length
-
-        // Default to "bluegreen" color scheme if the passed color isn't valid
-        let mapColorPalette = colorPalettes[this.state.color] ||
-            colorPalettes['bluegreen']
-
-        const numberOfSpecialClasses = this.state.processedLegend.data.length - regularLegendItems
-
-        let legendItemIndex = this.state.processedLegend.data.indexOf(legend) - numberOfSpecialClasses
-
-        let legendValue = legend.value || legend.category
-
-        // Special Classes (No Data)
-        if (this.state.legend.specialClasses !== false && true === legend.special) {
-
-            const specialClassColors = chroma.scale(['#D4D4D4', '#939393'])
-                .colors(this.state.legend.specialClasses.length)
-
-            return specialClassColors[this.state.legend.specialClasses.indexOf(
-                legendValue)]
-
-        }
-
-        let specificColor
-
-	    if ( this.state.color.includes( 'qualitative' ) ) {
-        	specificColor = legendItemIndex
-	    } else {
-            const colorDistributions = {
-                1: [ 1 ],
-                2: [ 1, 3 ],
-                3: [ 1, 3, 5 ],
-                4: [ 0, 2, 4, 6 ],
-                5: [ 0, 2, 4, 6, 7 ],
-                6: [ 0, 2, 3, 4, 5, 7 ],
-                7: [ 0, 2, 3, 4, 5, 6, 7 ],
-                8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-                9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
-            }
-
-
-            let distributionArray = colorDistributions[ regularLegendItems ]
-
-            specificColor = distributionArray[ legendItemIndex ]
-        }
-
-      return mapColorPalette[specificColor]
-
-    }
-
-    applyLegendToValue (rowObj, type = this.state.legend.type) {
-        let color = ''
-
-        const generateColorsArray = (color) => {
-            return [
-                color,
-                chroma(color).saturate(1.5).hex(),
-                chroma(color).darken(0.5).hex()
-            ]
-        }
-
-        // If we've got a nav map, simply give them all the same color and be done with it.
-        if("navigation" === this.state.general.type) {
-          let mapColorPalette = colorPalettes[ this.state.color ]
-
-          if(!mapColorPalette) {
-            mapColorPalette = colorPalettes[ 'bluegreenreverse' ]
-          }
+    const applyLegendToRow = (rowObj) => {
+        // Navigation map
+        if("navigation" === state.general.type) {
+          let mapColorPalette = colorPalettes[ state.color ] || colorPalettes[ 'bluegreenreverse' ]
 
           return generateColorsArray( mapColorPalette[ 3 ] )
         }
 
-        let value = rowObj[this.state.columns.primary.name]
+        let hash = hashObj(rowObj)
 
-        // First, check if it's a special class
-        let hasSpecialClasses = false
+        if( legendMemo.current.has(hash) ) {
+            let idx = legendMemo.current.get(hash)
 
-        if(Array.isArray( this.state.legend.specialClasses ) && this.state.legend.specialClasses.length > 0) {
-            hasSpecialClasses = true
+            if(runtimeLegend[idx]?.disabled) return false
+
+            return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
         }
 
-        if (hasSpecialClasses &&
-            this.state.legend.specialClasses.includes(value)) {
-            for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-
-                const legend = this.state.processedLegend.data[i]
-                const legendValue = legend.value || legend.category
-
-                if (true === legend.special && value === legendValue) {
-                    color = this.applyColorToLegend(legend)
-
-                    if (legend && legend.disabled === true) {
-                        return false
-                    }
-
-                    return [color, color, color]
-
-                }
-
-            }
-
-        }
-
-        // If the value is a string that can become a number, convert it.
-        value = this.numberFromString(value)
-
-        // Check if it's a zero that needs to be separated
-        if ( true === this.state.legend.separateZero && 0 === value && 0 < this.state.processedLegend.data.length ) {
-            // Grab the 0 legend item
-            let legend = this.state.processedLegend.data.filter((legendItem) => legendItem.max === 0 && legendItem.min === 0)[0]
-
-            if (legend) {
-                if (legend.disabled === true) {
-                    return false
-                }
-
-                color = this.applyColorToLegend(legend)
-            }
-        }
-
-        switch (type) {
-            case 'equalnumber':
-                let hash = this.hashRow(rowObj)
-
-                for (var i = 0; i < this.state.processedLegend.data.length; i++) {
-
-                    var legend = this.state.processedLegend.data[i]
-
-                    if ( 'geos' in legend && legend.geos.includes(hash) ) {
-
-                        if(legend.disabled === true) {
-                            return false
-                        }
-
-                        color = this.applyColorToLegend(legend)
-                    }
-
-                }
-
-                break
-            case 'equalinterval':
-                // Because equal intervals will have the same "max" for one legend item as the "min" for the next, we must only add if the value is less than (and not equal to) the MAXIMUM of the legend.
-                // The one edge case is if this is the last legend item.
-                for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-
-                    const legend = this.state.processedLegend.data[i]
-
-                    if (i === this.state.processedLegend.data.length - 1) {
-                        if (value >= legend.min && value <= legend.max) {
-                            color = this.applyColorToLegend(legend)
-
-                            if (legend.disabled === true) {
-                                return false
-                            }
-
-                        }
-                    } else {
-                        if (value >= legend.min && value < legend.max) {
-                            color = this.applyColorToLegend(legend)
-
-                            if (legend.disabled === true) {
-                                return false
-                            }
-
-                        }
-                    }
-
-                }
-                break
-            case 'category':
-                for (let i = 0; i < this.state.processedLegend.data.length; i++) {
-
-                    const legend = this.state.processedLegend.data[i]
-
-                    if (legend.category == value) { // eslint-disable-line
-                        color = this.applyColorToLegend(legend)
-
-                        if (legend.disabled === true) {
-                            return false
-                        }
-
-                    }
-
-                }
-                break
-            default:
-                console.warn(`Error: Legend type not recognized. Should either be equalnumber, equalinterval or category.`)
-            break;
-        }
-
-        // If at the end we aren't able to assign a color, give it black to signify a fail state. If a geo is black, this function isn't able to assign a legend to the value.
-        if(0 === color.length) {
-            if(true === this.state.loading) {
-                return false;
-            }
-
-            color = '#000000'
-        }
-
-        // Return array with the color, and a lighter and darker version for hover and pressed states
-        return generateColorsArray( color )
+        // Fail state
+        return generateColorsArray()
     }
 
-    applyTooltipsToGeo (geoName, data, returnType = 'string') {
-        let toolTipText = `<strong>${this.displayGeoName(geoName)}</strong>`
+    const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
+        let toolTipText = `<strong>${displayGeoName(geoName)}</strong>`
 
-        if('data' === this.state.general.type) {
+        if('data' === state.general.type) {
             toolTipText += `<dl>`
 
-            Object.keys(this.state.columns).forEach((columnKey) => {
-                const column = this.state.columns[columnKey]
+            Object.keys(state.columns).forEach((columnKey) => {
+                const column = state.columns[columnKey]
 
                 if (true === column.tooltip) {
 
                     let label = column.label.length > 0 ? column.label : '';
 
-                    let value = this.displayDataAsText(data[column.name], columnKey);
+                    let value = displayDataAsText(row[column.name], columnKey);
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
                         toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
@@ -568,8 +735,8 @@ class CdcMap extends Component {
         if('jsx' === returnType) {
             toolTipText = [(<div key="modal-content">{parse(toolTipText)}</div>)]
 
-            if(this.state.columns.hasOwnProperty('navigate') && data[this.state.columns.navigate.name]) {
-                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => this.navigationHandler(data[this.state.columns.navigate.name])}>{this.state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1" /></span>) )
+            if(state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
+                toolTipText.push( (<span className="navigation-link" key="modal-navigation-link" onClick={() => navigationHandler(row[state.columns.navigate.name])}>{state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1" /></span>) )
             }
         }
 
@@ -577,323 +744,19 @@ class CdcMap extends Component {
 
     }
 
-    // TODO: This needs a larger refactor at a later date to remove hashing and streamline the way it's doing a lot of things.
-    // This is working right now but is very messy and poorly commented.
-    processLegend () {
-        const
-            legendObj = this.state.legend,
-            type = legendObj.type,
-            number = legendObj.numberOfItems,
-            datacol = this.state.columns.primary.name,
-            statecol = this.state.columns.geo.name,
-            legendData = [],
-            specialClassesUsed = [];
-
-        let dataObj = Object.values(this.state.processedData);
-
-        // Replace dataObj with full data set if we're using unified
-        if(true === this.state.legend.unified) {
-            dataObj = this.processUnifiedData()
-        }
-
-        const allGeoList = Object.keys(dataObj)
-
-        const dataSet = Object.values(dataObj)
-
-        const processedDataObj = {
-            ...this.state.processedLegend,
-            disabledAmt: this.state.processedLegend.disabledAmt || 0
-        }
-
-        // Category
-        if('category' === type) {
-            const usedAlready = []
-            let categoryValues = []
-
-            // Find unique values
-            allGeoList.forEach((obj, i) => {
-                const data = dataSet[i][datacol]
-
-                if (usedAlready.includes(data) === false && usedAlready.length < 9 && undefined !== data) {
-                    usedAlready.push(data)
-                }
-
-                // TODO: This is a special case for JIC only. Remove this at a later date when we hopefully have a better solution to legend caps.
-                if(usedAlready.includes(data) === false && this.state.color === 'qualitative1' && true === this.state.general.hasRegions && usedAlready.length >= 9) {
-                    usedAlready.push(data)
-                }
-            })
-
-            // Sort the category by number/alphabetical so it doesn't just apply them in the order it found them in the file. DOES NOT INCLUDE SPECIAL CLASSES. Those always have to be at the beginning.
-            usedAlready.sort()
-
-            if(this.state.legend && this.state.legend.categoryValuesOrder) {
-                usedAlready.sort( (a, b) => {
-                    return this.state.legend.categoryValuesOrder.indexOf(a) - this.state.legend.categoryValuesOrder.indexOf(b);
-                })
-            }
-
-            usedAlready.forEach((val) => {
-                const newLegendItem = {
-                    category: val
-                }
-
-                // Push as an object with one property: a string with the category in it.
-                if( this.isSpecialClassValue(val, legendObj.specialClasses) && false === specialClassesUsed.includes(val) ) {
-                    newLegendItem.special = true
-                    specialClassesUsed.push(val)
-                    legendData.unshift(newLegendItem) // Always at the start
-                } else {
-                    categoryValues.push(val)
-                    legendData.push(newLegendItem)
-                }
-            })
-
-            // Add our generated legends to the state
-            if(categoryValues.length > 0) {
-                processedDataObj.categoryValuesOrder = categoryValues
-            }
-
-            processedDataObj.data = legendData
-
-            return processedDataObj
-        }
-
-        let realNumber = number
-
-        // Add special classes to legend if they're defined - Just store as a string instead of an object.
-        if (legendObj.specialClasses !== false) {
-            const deleteGeos = []
-
-            allGeoList.forEach((geo) => {
-                if (legendObj.specialClasses.includes(dataObj[geo][datacol])) {
-
-                    let valToCheck = dataObj[geo][datacol]
-                    if ( ! specialClassesUsed.includes( valToCheck ) ) {
-                        specialClassesUsed.push( valToCheck )
-                    }
-                    deleteGeos.push(geo)
-                }
-            })
-
-            deleteGeos.forEach((geo) => {
-                let i = allGeoList.indexOf(geo)
-
-                allGeoList.splice(i, 1)
-            })
-
-            legendObj.specialClasses.forEach((specialClass) => {
-                if (specialClassesUsed.includes(specialClass)) {
-                    legendData.push({ special: true, value: specialClass })
-                }
-            })
-        }
-
-        const getIntervalAmt = () => {
-
-            let allNums = new Map();
-            let allGeos = [];
-
-            allGeoList.forEach((obj, i) => {
-                if( false === Number.isNaN( parseFloat(dataObj[obj][datacol]) ) ) {
-                    allNums.set(allGeoList[i], parseFloat(dataObj[obj][datacol]))
-
-                    if( false === allGeos.includes(dataObj[obj][statecol]) ) {
-                        allGeos.push(dataObj[obj][statecol])
-                    }
-                }
-
-            })
-
-            allNums = new Map([...allNums.entries()].sort((a, b) => a[1] - b[1]));
-
-
-            let interval = (Math.max(...allNums.values()) - Math.min(...allNums.values())) / realNumber
-
-            interval = Math.round(interval * 10) / 10
-
-            // Returns min value, max value and the calculated interval between them
-            return [interval, allNums]
-        }
-
-        let intervalAmt
-        let dataMinValue
-        let dataMaxValue
-
-        intervalAmt = getIntervalAmt()
-
-        // Find all occurrences of a value in an array
-        const getAllIndexes = (arr, val) => {
-            let indexes = []
-
-            for(let i = 0; i < arr.length; i++) {
-                if (arr[i] === val) {
-                    indexes.push(i);
-                }
-            }
-
-            return indexes
-        }
-
-        let fullDataValues, fullDataKeys
-
-        // Get all indexes of the number.
-        fullDataValues = Array.from( intervalAmt[1].values() )
-        fullDataKeys = Array.from( intervalAmt[1].keys() )
-
-        if(true === legendObj.separateZero) {
-            const zeroInData = getAllIndexes(fullDataValues, 0)
-
-            // Splice them out of the array before the algorithms do their work on them.
-            if(zeroInData.length > 0) {
-                let i = zeroInData.length
-
-                while (i--) {
-                    if(fullDataValues.length > 0) {
-                        fullDataValues.splice(i, 1)
-                        fullDataKeys.splice(i, 1)
-                    }
-                }
-
-                // Push zero at the beginning of returned legend object
-                let range = {
-                    min: 0,
-                    max: 0,
-                }
-
-                legendData.push(range)
-                realNumber -= 1 // This zero takes up one legend item. Account for that.
-            }
-        }
-
-        dataMinValue = Math.min(...fullDataValues)
-        dataMaxValue = Math.max(...fullDataValues)
-
-        // Build the data for the legend
-        switch (type) {
-            case 'equalnumber':
-                let numberOfRows = fullDataValues.length
-
-                let remainder
-                let changingNumber = realNumber
-
-                let chunkAmt
-
-                // Declaring variable 'chunked' as an empty array
-                let chunked = []
-
-                // Looping through the array until it has been split into our subarrays
-                while ( numberOfRows > 0 ) {
-                    remainder = numberOfRows % changingNumber
-
-                    chunkAmt = Math.floor(numberOfRows / changingNumber)
-
-                    if (remainder > 0) {
-                        chunkAmt += 1
-                    }
-
-                    let selectedGeos = fullDataKeys.splice(0, chunkAmt);
-                    let selectedData = fullDataValues.splice(0, chunkAmt);
-
-                    chunked.push( {
-                        selectedGeos,
-                        selectedData
-                    })
-
-                    changingNumber -= 1
-                    numberOfRows -= chunkAmt
-
-                }
-
-                chunked.forEach((allData) => {
-                    const hashedGeos = allData.selectedGeos.map( (row, i) => {
-                        let fullRow = dataObj[row]
-
-                        let hashedString = Base64.encode( JSON.stringify( fullRow ) )
-
-                        return hashedString
-
-                    })
-
-                    let range = {
-                        min: allData.selectedData[0],
-                        max: allData.selectedData[allData.selectedData.length - 1],
-                        chunkAmount: chunkAmt,
-                        geos: hashedGeos,
-                    }
-
-                    legendData.push(range)
-
-                })
-
-                break
-            case 'equalinterval':
-                for (let i = 0; i < realNumber; i++) {
-
-                    let interval = intervalAmt[0]
-
-                    let min = dataMinValue + (interval * i)
-
-                    let max = min + interval
-
-                    // If this is the last loop, assign actual max of data as the end point
-                    if (i === realNumber - 1) {
-                        max = dataMaxValue
-                    }
-
-                    let range = {
-                        min: Math.round(min * 100) / 100,
-                        max: Math.round(max * 100) / 100,
-                    }
-
-                    legendData.push(range)
-
-                }
-                break
-            default:
-                console.warn('No valid data classification type.')
-        }
-
-        processedDataObj.data = legendData
-
-        return processedDataObj
-    }
-
-    // Checks if the string is a number and returns it as a number if it is
-    numberFromString (value) {
-        // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
-        let nonNumeric = /[^\d.]/g
-
-        if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
-            return parseFloat(value)
-        }
-
-        return value
-
-    }
-
-    // This resets all active legend toggles. Should always be called with "await" to make sure it's done processing before you continue. See usage example in changeFilterActive.
-    async resetLegendToggles () {
-        this.setState((prevState) => {
-
-            const legendData = prevState.processedLegend.data
-
-            legendData.forEach((item) => {
-                delete item.disabled
-            })
-
-            return {
-                processedLegend: {
-                    ...prevState.processedLegend,
-                    disabledAmt: 0,
-                    data: legendData,
-                },
-            }
+    // This resets all active legend toggles.
+    const resetLegendToggles = async () => {
+        let newLegend = [...runtimeLegend]
+
+        newLegend.forEach(legendItem => {
+            delete legendItem.disabled
         })
+
+        setRuntimeLegend(newLegend)
     }
 
     // Supports JSON or CSV
-    async fetchRemoteData (url) {
+    const fetchRemoteData = async (url) => {
         try {
             const urlObj = new URL(url);
 
@@ -935,19 +798,19 @@ class CdcMap extends Component {
     }
 
     // Attempts to find the corresponding value
-    displayGeoName (key) {
+    const displayGeoName = (key) => {
         let value = key
 
         // Map to first item in values array which is the preferred label
-        if(this.stateKeys.includes(value)) {
+        if(stateKeys.includes(value)) {
             value = supportedStates[key][0]
         }
 
-        if(this.territoryKeys.includes(value)) {
+        if(territoryKeys.includes(value)) {
             value = supportedTerritories[key][0]
         }
 
-        if(this.countryKeys.includes(value)) {
+        if(countryKeys.includes(value)) {
             value = supportedCountries[key][0]
         }
 
@@ -962,101 +825,10 @@ class CdcMap extends Component {
         return value
     }
 
-    // This calculates what is actually going to be seen and displayed by the map and data table at render. It accounts for things like toggling legend items as well as filters.
-    processData () {
-
-        let dataObj = this.state.data
-
-        const parsedData = {}
-
-        const geoColumnName = this.state.columns.geo.name
-
-        const supportedUsGeos = this.stateKeys.concat(this.territoryKeys, this.cityNames)
-
-        const supportedWorldGeos = this.countryKeys.concat(this.cityNames)
-
-        dataObj.forEach((row, i) => {
-            let addRow = true
-
-            // Empty row check - Just checks for value of geo column
-            if(!row[this.state.columns.geo.name]) {
-                addRow = false
-            }
-
-            // Filters
-            if (addRow && this.state.filters.length > 0) {
-                this.state.filters.forEach((filter) => {
-                    // Non strict comparison to allow for strings that are numbers in the raw data
-                    if (row[filter.columnName] != filter.active) { // eslint-disable-line
-                        addRow = false
-                    }
-                })
-            }
-
-            // If this is a navigation only map, skip if it doesn't have a URL
-            if(addRow && "navigation" === this.state.general.type ) {
-                let navigateUrl = row[this.state.columns.navigate.name] || "";
-                if ( undefined !== navigateUrl ) {
-                    // Strip hidden characters before we check length
-                    navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
-                }
-                if ( 0 === navigateUrl.length ) {
-                    addRow = false
-                }
-            }
-
-            // Geo matching
-            let geoName = row[geoColumnName]
-
-            // US State & Territory Check
-            if(addRow && "us" === this.state.general.geoType && false === this.state.general.hasRegions) {
-                // Map abbreviations to full names first for states and territories
-                let stateName = this.stateKeys.find( (key) => supportedStates[key].includes(geoName) )
-
-                if(stateName) {
-                    geoName = stateName
-                }
-
-                let territoryName = this.territoryKeys.find( (key) => supportedTerritories[key].includes(geoName) )
-
-                if(territoryName) {
-                    geoName = territoryName
-                }
-
-                // If this doesn't match a supported geo
-                if( false === supportedUsGeos.includes(geoName) ) {
-                    addRow = false
-                }
-            }
-
-            // World Check
-            if(addRow && "world" === this.state.general.geoType && false === this.state.general.hasRegions) {
-                geoName = this.countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
-
-                if(false === supportedWorldGeos.includes(geoName)) {
-                    addRow = false
-                }
-            }
-
-            // Passed all of our checks, add to processedData
-            if(true === addRow && undefined === parsedData[geoName]) {
-                parsedData[geoName] = row
-            }
-        })
-
-        return parsedData
-    }
-
-    parseLinks(urlString) {
-        // This is here for the future if additional requests are made to adjust parsing before sending links
-        return urlString
-    }
-
-    navigationHandler(urlString) {
-        // Call custom navigation method if there is one
-        if(this.props.navigationHandler) {
-            this.props.navigationHandler(urlString);
-
+    const navigationHandler = (urlString) => {
+        // Call custom navigation method if passed
+        if(customNavigationHandler) {
+            customNavigationHandler(urlString);
             return;
         }
 
@@ -1071,13 +843,26 @@ class CdcMap extends Component {
         window.open(urlObj.toString(), '_blank');
     }
 
-    async loadConfig (configObj) {
-        // Set loading flag
-        const loadingObj = {
-            loading: true
+    const geoClickHandler = (key, value) => {
+        // If modals are set or we are on a mobile viewport, display modal
+        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
+            setModal({
+                geoName: key,
+                keyedData: value
+            })
+
+            return;
         }
 
-        this.setState(() => loadingObj)
+        // Otherwise if this item has a link specified for it, do regular navigation.
+        if (state.columns.navigate && value[state.columns.navigate.name]) {
+            navigationHandler(value[state.columns.navigate.name])
+        }
+    }
+
+    const loadConfig = async (configObj) => {
+        // Set loading flag
+        if(!loading) setLoading(true)
 
         // Create new config object the same way each time no matter when this method is called.
         let newState = {
@@ -1088,19 +873,14 @@ class CdcMap extends Component {
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = `https://${this.props.hostname}${newState.dataUrl}`
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl
             }
 
-            let newData = await this.fetchRemoteData(newState.dataUrl)
+            let newData = await fetchRemoteData(newState.dataUrl)
 
             if(newData) {
                 newState.data = newData
             }
-        }
-
-        if( Array.isArray(newState.data) ) {
-            // Process all the data and trim whitespace/returns/etc...
-            newState.data = this.cleanCsvData(newState.data)
         }
 
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
@@ -1109,330 +889,250 @@ class CdcMap extends Component {
         Object.keys(newState).forEach( (key) => {
             if("object" === typeof newState[key] && false === Array.isArray(newState[key])) {
                 if(initialState[key] ) {
-
                     Object.keys(initialState[key]).forEach( (property) => {
                         if(undefined === newState[key][property]) {
                             newState[key][property] = initialState[key][property]
                         }
                     })
-
                 }
             }
         })
 
-        // After data is grabbed, loop through and generate filter column values if there are any
-        if (newState.filters) {
-
-            const filterList = []
-
-            newState.filters.forEach((filter) => {
-
-                filterList.push(filter.columnName)
-
-            })
-
-            filterList.forEach((filter, index) => {
-                const filterValues = this.generateValuesForFilter(filter, newState.data)
-
-                newState.filters[index].values = filterValues
-
-                // Initial filter should be active
-                newState.filters[index].active = filterValues[0]
-            })
-
+        // If there's a name for the geo, add UIDs
+        if(newState.columns.geo.name) {
+            addUIDs(newState, newState.columns.geo.name)
         }
 
-        // Set properties that can be passed directly and require no additional computation
-        this.setState(() => newState)
+        setState(newState)
 
         // Done loading
-        this.setState(() => { return {loading: false} } )
+        setLoading(false)
     }
 
-    // Every time the state updates, rebuild the tooltips and see if we need to reprocess any data
-    componentDidUpdate (prevProps, prevState) {
-        if(prevState.data.length !== this.state.data.length) {
-            // After setting all of our initial information, create our processed data for use on map and data table and set it.
-            const processedData = this.processData()
-
-            if(processedData) {
-                this.setState(() => { return {processedData} })
-            }
-        }
-
-        if(Object.keys(prevState.processedData).length !== Object.keys(this.state.processedData).length && 'data' === this.state.general.type) {
-            const processedLegend = this.processLegend()
-
-            if(processedLegend) {
-                this.setState(() => { return {processedLegend} })
-            }
-        }
-    }
-
-    getViewport(size) {
-        let result = 'lg'
-        let viewports = Object.keys( this.viewports )
-
-        for(let viewport of viewports) {
-            if(size <= this.viewports[viewport]) {
-                result = viewport
-            }
-        }
-
-        return result
-    }
-
-    async componentDidMount () {
-        let configData
+    const init = async () => {
+        let configData = null
 
         // Load the configuration data passed to this component if it exists
-        if(this.props.config) {
-            configData = this.props.config
+        if(config) {
+            configData = config
         }
 
         // If the config passed is a string, try to load it as an ajax
-        if(this.props.configUrl) {
-            configData = await this.fetchRemoteData(configData)
+        if(configUrl) {
+            configData = await fetchRemoteData(configUrl)
         }
 
         // Finally, dynamically import the default configuration if nothing else was found.
-        if(!configData) {
+        if(null === configData) {
             configData = usaDefaultConfig
         }
 
         // Once we have a config verify that it is an object and load it
         if('object' === typeof configData) {
-            await this.loadConfig(configData)
+            loadConfig(configData)
         }
-
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                let newViewport = this.getViewport(entry.contentRect.width)
-
-                if( newViewport !== this.state.viewport ) {
-                    this.setState({
-                        ...this.state,
-                        viewport: newViewport
-                    })
-                }
-            }
-        });
-
-        resizeObserver.observe(this.outerContainerRef.current);
     }
 
-    generateValuesForFilter(columnName, data = this.state.data) {
+    // Initial load
+    useEffect(() => {
+        init()
+    }, [])
 
-        const values = []
+    useEffect(() => {
+        // UID
+        if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
+            addUIDs(state, state.columns.geo.name)
+        }
 
-        data.forEach( (row) => {
+        // Filters
+        const hashFilters = hashObj(state.filters)
 
-            const value = row[columnName]
+        if(state.filters && hashFilters !== runtimeFilters.fromHash) {
+            const filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
-            if(value && false === values.includes(value)) {
-                values.push(value)
+            if(filters) {
+                setRuntimeFilters(filters)
             }
+         }
 
+        const hashLegend = hashObj({
+            color: state.color,
+            numberOfItems: state.legend.numberOfItems,
+            type: state.legend.type,
+            separateZero: state.legend.separateZero ?? false,
+            categoryValuesOrder: state.legend.categoryValuesOrder,
+            specialClasses: state.legend.specialClasses,
+            geoType: state.general.geoType
         })
 
-        return values
+        // Legend
+        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+            const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
 
-    }
+            setRuntimeLegend(legend)
+        }
 
-    cleanCsvData(data) {
-        return data.map( (row) => {
-
-            let deleteKeys = []
-
-            for(let property in row) {
-
-                if(0 === property.length) {
-                    deleteKeys.push(property)
-                }
-
-                if ( 'string' === typeof row[property] ) {
-                    row[ property ] = row[ property ].trim()
-                }
-            }
-
-            deleteKeys.forEach( (key) => delete row[key] )
-
-            return row
-        } )
-    }
-
-    hashRow (rowObj) {
-        return Base64.encode( JSON.stringify( rowObj ) )
-    }
-
-    announceChange (value) {
-        this.setState( (prevState) => {
-            return {
-                ...prevState,
-                accessibleStatus: value
-            }
+        const hashData = hashObj({
+            geoType: state.general.geoType,
+            type: state.general.type,
+            geo: state.columns.geo.name,
+            primary: state.columns.primary.name,
+            ...runtimeFilters
         })
+
+        // Data
+        if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
+            const data = generateRuntimeData(state, runtimeFilters, hashData)
+
+            setRuntimeData(data)
+        }
+    }, [state])
+
+    useEffect(() => {
+        // Legend - Update when runtimeData does
+        if(undefined === runtimeData.init) {
+            const legend = generateRuntimeLegend(state, runtimeData)
+
+            setRuntimeLegend(legend)
+        }
+    }, [runtimeData])
+
+    // Destructuring for more readable JSX
+    const { general, tooltips, dataTable } = state
+    const { title = '', subtext = ''} = general
+
+    // Outer container classes
+    let outerContainerClasses = [
+        'cdc-open-viz-module',
+        'cdc-map-outer-container',
+        viewport
+    ]
+
+    if(className) {
+        outerContainerClasses.push(className)
     }
 
-    geoClickHandler (key, value) {
-        // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === this.state.viewport || 'xxs' === this.state.viewport || 'click' === this.state.tooltips.appearanceType) {
-            this.setState( (prevState) => {
-                return {
-                    ...prevState,
-                    general: {
-                        ...prevState.general,
-                        modalOpen: true,
-                        modalContent: {
-                            geoName: key,
-                            geoData: value
-                        },
-                    }
+    // Map container classes
+    let mapContainerClasses = [
+        'map-container',
+        state.legend.position,
+        state.general.type,
+        state.general.geoType
+    ]
+
+    if(modal) {
+        mapContainerClasses.push('modal-background')
+    }
+
+    if(general.type === 'navigation' && true === general.fullBorder) {
+        mapContainerClasses.push('full-border')
+    }
+
+    if(loading) return <Loading />
+
+    // Props passed to all map types
+    const mapProps = {
+        state,
+        data: runtimeData,
+        rebuildTooltips : ReactTooltip.rebuild,
+        applyTooltipsToGeo,
+        closeModal,
+        navigationHandler,
+        geoClickHandler,
+        applyLegendToRow,
+        displayGeoName
+    }
+
+    return (
+        <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
+            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
+            <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
+                    <ReactTooltip
+                        id="tooltip"
+                        place="right"
+                        type="light"
+                        html={true}
+                        className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
+                    />
                 }
-            })
-
-            return;
-        }
-
-        // Otherwise if this item has a link specified for it, do regular navigation.
-        if (this.state.columns.navigate && value[this.state.columns.navigate.name]) {
-            this.navigationHandler(value[this.state.columns.navigate.name])
-        }
-    }
-
-    render () {
-        let showDownloadMediaButton = this.state.general.showDownloadMediaButton
-
-        // Map Container Classes
-        let mapContainerClasses = [
-            'map-container',
-            this.state.legend.position,
-            this.state.general.type,
-            this.state.general.geoType
-        ]
-
-        if(true === this.state.general.modalOpen) {
-            mapContainerClasses.push('modal-background')
-        }
-
-        if(this.state.general.type === 'navigation' && true === this.state.general.fullBorder) {
-            mapContainerClasses.push('full-border')
-        }
-
-        const mapProps = {
-            state : this.state,
-            applyTooltipsToGeo : this.applyTooltipsToGeo,
-            rebuildTooltips : ReactTooltip.rebuild,
-            closeModal : this.closeModal,
-            processedData : this.state.processedData,
-            navigationHandler : this.navigationHandler,
-            geoClickHandler : this.geoClickHandler,
-            applyLegendToValue : this.applyLegendToValue,
-            displayGeoName : this.displayGeoName
-        }
-
-        const { title = '', subtext = ''} = this.state.general
-
-        const headerColor = this.state.general.headerColor || 'theme-blue'
-
-        return (
-            <div className={this.props.className ? `cdc-open-viz-module cdc-map-outer-container ${this.props.className} ${this.state.viewport}` : `cdc-open-viz-module cdc-map-outer-container ${this.state.viewport}` } ref={this.outerContainerRef}>
-                {true === this.state.loading && <Loading />}
-                {true === this.props.isEditor && <EditorPanel state={this.state} setState={this.setState} loadConfig={this.loadConfig} generateValuesForFilter={this.generateValuesForFilter} processData={this.processData} processLegend={this.processLegend} setParentConfig={this.props.setConfig} />}
-                <section className={`cdc-map-inner-container ${this.state.viewport}`} aria-label={'Map: ' + title}>
-                    {'hover' === this.state.tooltips.appearanceType &&
-                        <ReactTooltip
-                            id="tooltip"
-                            place="right"
-                            type="light"
-                            html={true}
-                            className={this.state.tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
-                        />
-                    }
-                    <header className={this.state.general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                        <div role="heading" className={'map-title ' + headerColor}>
-                            { parse(title) }
-                        </div>
-                    </header>
-
-                    <section className={mapContainerClasses.join(' ')} onClick={(e) => this.closeModal(e)}>
-
-                        {showDownloadMediaButton === true &&
-                            <div className="map-downloads" data-html2canvas-ignore>
-                                <div className="map-downloads__ui btn-group">
-                                    <button className="btn" title="Download Map as Image"
-                                            onClick={() => this.generateMedia(this.outerContainerRef.current, 'image')}>
-                                        <DownloadImg className="btn__icon" title='Download Map as Image'/>
-                                    </button>
-                                    <button className="btn" title="Download Map as PDF"
-                                            onClick={() => this.generateMedia(this.outerContainerRef.current, 'pdf')}>
-                                        <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
-                                    </button>
-                                </div>
+                <header className={general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
+                    <div role="heading" className={'map-title ' + general.headerColor}>
+                        { parse(title) }
+                    </div>
+                </header>
+                <section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+                    {general.showDownloadMediaButton === true &&
+                        <div className="map-downloads" data-html2canvas-ignore>
+                            <div className="map-downloads__ui btn-group">
+                                <button className="btn" title="Download Map as Image"
+                                        onClick={() => generateMedia(outerContainerRef.current, 'image')}>
+                                    <DownloadImg className="btn__icon" title='Download Map as Image'/>
+                                </button>
+                                <button className="btn" title="Download Map as PDF"
+                                        onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
+                                    <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
+                                </button>
                             </div>
-                        }
-
-                        <section className="geography-container" aria-hidden="true" ref={this.mapSvg}>
-                            {true === this.state.general.modalOpen && <Modal state={this.state} applyTooltipsToGeo={this.applyTooltipsToGeo} applyLegendToValue={this.applyLegendToValue}  capitalize={this.state.tooltips.capitalizeLabels} content={this.state.general.modalContent} />}
-                                {'us' === this.state.general.geoType && !this.state.general.displayAsHex && <UsaMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
-                                {this.state.general.displayAsHex && 'data' === this.state.general.type && <HexMap supportedStates={this.supportedStates} supportedTerritories={this.supportedTerritories} {...mapProps} />}
-                                {'world' === this.state.general.geoType && <WorldMap supportedCountries={this.supportedCountries} countryValues={this.countryValues} {...mapProps} />}
-                                {"data" === this.state.general.type && this.state.general.logoImage && <img src={this.state.general.logoImage} alt="" className="map-logo"/>}
-
-                        </section>
-                        {"navigation" === this.state.general.type &&
-                            <NavigationMenu
-                                displayGeoName={this.displayGeoName}
-                                processedData={this.state.processedData}
-                                options={this.state.general}
-                                columns={this.state.columns}
-                                navigationHandler={(val) => this.navigationHandler(val)}
-                            />
-                        }
-                        {this.state.general.showSidebar && 'navigation' !== this.state.general.type && false === this.state.loading  && Object.keys(this.state.processedData).length > 0 &&
-                            <Sidebar
-                                viewport={this.state.viewport}
-                                legend={this.state.legend}
-                                filters={this.state.filters}
-                                columns={this.state.columns}
-                                sharing={this.state.sharing}
-                                prefix={this.state.columns.primary.prefix}
-                                suffix={this.state.columns.primary.suffix}
-                                processedLegend={this.state.processedLegend}
-                                setState={this.setState}
-                                resetLegendToggles={this.resetLegendToggles}
-                                applyColorToLegend={this.applyColorToLegend}
-                                changeFilterActive={this.changeFilterActive}
-                                announceChange={this.announceChange}
-                            />
-                        }
+                        </div>
+                    }
+                    <section className="geography-container" aria-hidden="true" ref={mapSvg}>
+                        {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                            {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                            {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
-                    {true === this.state.dataTable.forceDisplay && this.state.general.type !== "navigation" && false === this.state.loading && Object.keys(this.state.processedData).length > 0 &&
-                        <DataTable
-                            state={this.state}
-                            navigationHandler={this.navigationHandler}
-                            expandDataTable={this.state.general.expandDataTable}
-                            headerColor={this.state.general.headerColor}
-                            columns={this.state.columns}
-                            showDownloadButton={this.state.general.showDownloadButton}
-                            data={this.state.data}
-                            processedData={this.state.processedData}
-                            processedLegend={this.state.processedLegend}
-                            displayDataAsText={this.displayDataAsText}
-                            displayGeoName={this.displayGeoName}
-                            applyLegendToValue={this.applyLegendToValue}
-                            geoNames={this.geoNames}
-                            tableTitle={this.state.dataTable.title}
-                            mapTitle={this.state.general.title}
-                            viewport={this.state.viewport}
+                    {general.showSidebar && 'navigation' !== general.type && false === loading  &&
+                        <Sidebar
+                            viewport={viewport}
+                            legend={state.legend}
+                            runtimeLegend={runtimeLegend}
+                            setRuntimeLegend={setRuntimeLegend}
+                            runtimeFilters={runtimeFilters}
+                            columns={state.columns}
+                            sharing={state.sharing}
+                            prefix={state.columns.primary.prefix}
+                            suffix={state.columns.primary.suffix}
+                            setState={setState}
+                            resetLegendToggles={resetLegendToggles}
+                            changeFilterActive={changeFilterActive}
+                            setAccessibleStatus={setAccessibleStatus}
                         />
                     }
-                    {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
                 </section>
-                <div aria-live="assertive" className="cdcdataviz-sr-only">{ this.state.accessibleStatus }</div>
-            </div>
-        )
-    }
+                {"navigation" === general.type &&
+                        <NavigationMenu
+                            displayGeoName={displayGeoName}
+                            data={runtimeData}
+                            options={general}
+                            columns={state.columns}
+                            navigationHandler={(val) => navigationHandler(val)}
+                        />
+                    }
+                {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading &&
+                    <DataTable
+                        state={state}
+                        rawData={state.data}
+                        navigationHandler={navigationHandler}
+                        expandDataTable={general.expandDataTable}
+                        headerColor={general.headerColor}
+                        columns={state.columns}
+                        showDownloadButton={general.showDownloadButton}
+                        runtimeLegend={runtimeLegend}
+                        runtimeData={runtimeData}
+                        displayDataAsText={displayDataAsText}
+                        displayGeoName={displayGeoName}
+                        applyLegendToRow={applyLegendToRow}
+                        tableTitle={dataTable.title}
+                        mapTitle={general.title}
+                        viewport={viewport}
+                    />
+                }
+                {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
+            </section>
+            <div aria-live="assertive" className="cdcdataviz-sr-only">{ accessibleStatus }</div>
+        </div>
+    )
 }
 
-export default CdcMap;
+export default memo(CdcMap)

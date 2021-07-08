@@ -7,9 +7,8 @@ export default {
     showDownloadButton: true,
     showDownloadMediaButton: false,
     displayAsHex: false,
+    displayStateLabels: false,
     territoriesLabel: 'Territories',
-    modalOpen: false,
-    modalContent: null,
     language: 'en',
     geoType: 'us',
     hasRegions: false,
@@ -36,9 +35,6 @@ export default {
     },
     navigate: {
       name: ''
-    },
-    geosInRegion: {
-      name: ''
     }
   },
   legend: {
@@ -52,9 +48,6 @@ export default {
     position: "side",
     title: "Legend",
   },
-  data: [
-    {},
-  ],
   filters: [],
   dataTable: {
     title: 'Data Table',
@@ -64,12 +57,5 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true
-  },
-  processedData: {},
-  processedLegend: {
-    data: [],
-    categoryValuesOrder: []
-  },
-  loading: true,
-  viewport: "lg"
+  }
 };

@@ -47,7 +47,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     }
   }, [globalActive])
 
-  const maxFileSize = 5; // Represents number of MB. Maybe move this to a prop eventually but static for now.
+  const maxFileSize = 10; // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
   const errorMessages = {
     emptyCols: "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",

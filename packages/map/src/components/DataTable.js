@@ -6,24 +6,24 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
-import { Base64 } from 'js-base64';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 const DataTable = (props) => {
   const {
     tableTitle,
     mapTitle,
-    data,
+    rawData,
     showDownloadButton,
-    processedData,
+    runtimeData,
+    runtimeLegend,
     headerColor,
     expandDataTable,
     columns,
     displayDataAsText,
-    applyLegendToValue,
+    applyLegendToRow,
     displayGeoName,
     navigationHandler,
-    viewport
+    viewport,
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -128,15 +128,15 @@ const DataTable = (props) => {
     return markup;
   }, [columns.navigate, navigationHandler]);
 
-  const DownloadButton = memo(({ data }) => {
+  const DownloadButton = memo(() => {
     const fileName = `${mapTitle}.csv`;
+    const csvData = Papa.unparse(rawData);
 
-    const csvData = Papa.unparse(data);
+    const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
 
     const saveBlob = () => {
       if (navigator.msSaveBlob) {
-        const dataBlob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
-        navigator.msSaveBlob(dataBlob, fileName);
+        navigator.msSaveBlob(blob, fileName);
       }
     }
 
@@ -144,7 +144,7 @@ const DataTable = (props) => {
       <a
         download={fileName}
         onClick={saveBlob}
-        href={`data:text/csv;base64,${Base64.encode(csvData)}`}
+        href={URL.createObjectURL(blob)}
         aria-label="Download this data in a CSV file format."
         className={`${headerColor} btn btn-download no-border`}
         data-html2canvas-ignore
@@ -152,7 +152,7 @@ const DataTable = (props) => {
         Download Data (CSV)
       </a>
     )
-  }, [data]);
+  }, [rawData]);
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
@@ -164,8 +164,8 @@ const DataTable = (props) => {
           Header: columns[column].label || columns[column].name,
           id: column,
           accessor: (row) => {
-            if (processedData) {
-              return processedData[row][columns[column].name] || null;
+            if (runtimeData) {
+              return runtimeData[row][columns[column].name] ?? null;
             }
 
             return null;
@@ -175,10 +175,10 @@ const DataTable = (props) => {
 
         if (column === 'geo') {
           newCol.Header = 'Location';
-          newCol.Cell = ({ row, value, ...props }) => {
-            const rowObj = processedData[row.original];
+          newCol.Cell = ({ row, value }) => {
+            const rowObj = runtimeData[row.original];
 
-            const legendColor = applyLegendToValue(rowObj);
+            const legendColor = applyLegendToRow(rowObj);
 
             let labelValue = displayGeoName(row.original);
 
@@ -195,9 +195,9 @@ const DataTable = (props) => {
           };
         } else {
           newCol.Cell = ({ value }) => {
-            const cellMarkup = displayDataAsText(value, column, true);
+            const cellMarkup = displayDataAsText(value, column);
 
-            return cellMarkup;
+            return (cellMarkup);
           };
         }
 
@@ -206,11 +206,11 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [columns, applyLegendToValue, customSort, displayDataAsText, displayGeoName, getCellAnchor, processedData]);
+  }, [columns, runtimeData, runtimeLegend]);
 
   const tableData = useMemo(
-    () => Object.keys(processedData).filter((key) => applyLegendToValue(processedData[key])).sort((a, b) => customSort(a, b)),
-    [processedData, applyLegendToValue, customSort]
+    () => Object.keys(runtimeData).filter((key) => applyLegendToRow(runtimeData[key])).sort((a, b) => customSort(a, b)),
+    [runtimeLegend, runtimeData, applyLegendToRow, customSort]
   );
 
   // Change accessibility label depending on expanded status
@@ -226,7 +226,7 @@ const DataTable = (props) => {
       setAccessibilityLabel(collapsedLabel);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, applyLegendToValue, customSort]);
+  }, [expanded, applyLegendToRow, customSort]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -256,40 +256,42 @@ const DataTable = (props) => {
       >
         {tableTitle}
       </div>
-      <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} {...getTableProps()} aria-live="assertive" >
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th tabIndex="0" 
-                  title={column.Header}
-                  {...column.getHeaderProps(column.getSortByToggleProps())} 
-                  className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
-                  onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
-                >
-                  {column.render('Header')}
-                  <div {...column.getResizerProps()} className="resizer" />
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td tabIndex="0" {...cell.getCellProps()}>
-                    {cell.render('Cell')}
-                  </td>
+      <div className="table-container">
+        <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" >
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th tabIndex="0" 
+                    title={column.Header}
+                    {...column.getHeaderProps(column.getSortByToggleProps())} 
+                    className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                    onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                  >
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className="resizer" />
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {showDownloadButton === true && <DownloadButton data={data} />}
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <td tabIndex="0" {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {showDownloadButton === true && <DownloadButton />}
     </section>
     </ErrorBoundary>
   );

@@ -196,7 +196,7 @@ export const supportedCountries = {
   MYT: ['Mayotte', 'Mayotte (France)'],
   MEX: ['Mexico'],
   FSM: ['Micronesia', 'Federated States of Micronesia', 'Micronesia (Federated States of)', 'Micronesia, Federated States of'],
-  MDA: ['Moldvoa', 'Moldova, Republic of'],
+  MDA: ['Moldova', 'Moldova, Republic of'],
   MCO: ['Monaco'],
   MNG: ['Mongolia'],
   MNE: ['Montenegro'],
@@ -221,7 +221,6 @@ export const supportedCountries = {
   OMN: ['Oman'],
   PAK: ['Pakistan'],
   PLW: ['Palau'],
-  PSE: ['Palestine', 'Palestine, State of'],
   PAN: ['Panama'],
   PNG: ['Papua New Guinea'],
   PRY: ['Paraguay'],
@@ -259,7 +258,7 @@ export const supportedCountries = {
   SOM: ['Somalia', 'Somaliland'],
   ZAF: ['South Africa'],
   SGS: ['South Georgia and the South Sandwich Islands', 'S. Geo. and the Is.'],
-  SSD: ['South Sudan', 'S. Sudan'],
+  SDS: ['South Sudan', 'S. Sudan'],
   ESP: ['Spain'],
   LKA: ['Sri Lanka'],
   SDN: ['Sudan'],
@@ -296,11 +295,12 @@ export const supportedCountries = {
   VGB: ['Virgin Islands (British)', 'British Virgin Is.'],
   VIR: ['Virgin Islands (U.S.)', 'U.S. Virgin Is.'],
   WLF: ['Wallis and Futuna', 'Wallis and Futuna Is.'],
-  XKX: ['Kosovo'],
-  ESH: ['Western Sahara', 'W. Sahara'],
+  KOS: ['Kosovo'],
+  SAH: ['Western Sahara', 'W. Sahara'],
   YEM: ['Yemen'],
   ZMB: ['Zambia'],
-  ZWE: ['Zimbabwe']
+  ZWE: ['Zimbabwe'],
+  IOT: ['British Indian Ocean Territory']
 };
 
 export const supportedTerritories = {
