@@ -92,7 +92,8 @@ const EditorPanel = memo(() => {
     updateConfig,
     loading,
     data,
-    setParentConfig
+    setParentConfig,
+    isDashboard
   } = useContext(Context);
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
@@ -146,11 +147,19 @@ const EditorPanel = memo(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
       const newConfig = convertStateToConfig()
-      console.log({ newConfig });
+      
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
+
+  const onBackClick = () => {
+    if(isDashboard){
+      updateConfig({...config, editing: false});
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
+  }
 
   const Error = () => {
     return (
@@ -241,7 +250,7 @@ const EditorPanel = memo(() => {
     <ErrorBoundary component="EditorPanel">
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <h2>Configure Data Bite</h2>
         <section className="form-container">

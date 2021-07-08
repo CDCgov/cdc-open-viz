@@ -153,8 +153,7 @@ const EditorPanel = memo(() => {
     colorPalettes,
     rawData,
     isDashboard,
-    setParentConfig,
-    setEditing
+    setParentConfig
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
@@ -300,7 +299,7 @@ const EditorPanel = memo(() => {
 
   const onBackClick = () => {
     if(isDashboard){
-      setEditing('');
+      updateConfig({...config, editing: false});
     } else {
       setDisplayPanel(!displayPanel);
     }
