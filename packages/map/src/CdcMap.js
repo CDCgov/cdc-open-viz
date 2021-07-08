@@ -123,7 +123,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')
@@ -873,7 +873,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = `https://${props.hostname}${newState.dataUrl}`
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl
             }
 
             let newData = await fetchRemoteData(newState.dataUrl)
