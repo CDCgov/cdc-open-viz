@@ -19,7 +19,7 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cdc/core": "^1.0.1",
+    "@cdc/core": "^1.0.2",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
