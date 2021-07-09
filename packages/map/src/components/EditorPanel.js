@@ -709,7 +709,7 @@ const EditorPanel = (props) => {
     }
 
     return (
-        <fieldset className="edit-block" key={'filter' + index}>
+        <fieldset className="edit-block" key={`filter-${index}`}>
           <button className="remove-column" onClick={() => { changeFilter(index, "remove")}}>Remove</button>
           <TextField value={state.filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
           <label>
