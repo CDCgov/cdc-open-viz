@@ -367,6 +367,10 @@
 			"columnName": "filter1"
 		}]
 	},
+	"rows": [
+		[{"width": 12, "widget": "chart1"}, {}, {}],
+		[{"width": 12, "widget": "map1"}, {}, {}]
+	],
 	"visualizations": {
 		"chart1": {
 			"type": "chart",
