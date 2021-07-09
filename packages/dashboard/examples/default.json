@@ -373,6 +373,7 @@
 	],
 	"visualizations": {
 		"chart1": {
+			"uid": "chart1",
 			"type": "chart",
 			"title": "Chart Example",
 			"visualizationType": "Pie",
@@ -405,6 +406,7 @@
 			}
 		},
 		"map1": {
+			"uid": "map1",
 			"type": "map",
 			"defaultData": false,
 			"general": {
