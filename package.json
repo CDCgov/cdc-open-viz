@@ -12,6 +12,7 @@
     "@types/react-dom": "17.x",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
+    "@types/resize-observer-browser": "^0.1.5",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "core-js": "^3.8.3",
@@ -24,7 +25,6 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "file-loader": "^6.2.0",
     "html-react-parser": "^1.2.4",
     "html-webpack-plugin": "^5.3.1",
     "husky": "^4.3.0",
@@ -58,9 +58,5 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
-  },
-  "dependencies": {
-    "@types/resize-observer-browser": "^0.1.5",
-    "npm-package-arg": "^8.1.1"
   }
 }
