@@ -1,9 +1,4 @@
 .cdc-open-viz-module {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-
   .geo-buttons {
     list-style: none;
     display: flex;
@@ -649,7 +644,7 @@
   }
 
   @include breakpointClass(md) {
-    .editor-panel:not(.hidden):not(.dashboard) + .cdc-map-inner-container {
+    .editor-panel:not(.hidden) + .cdc-map-inner-container {
       margin-left: $editorWidth;
     }
     .editor-panel.hidden + .cdc-map-inner-container h1.map-title {

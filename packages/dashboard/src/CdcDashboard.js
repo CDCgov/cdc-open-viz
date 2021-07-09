@@ -37,7 +37,7 @@ export default function CdcDashboard(
 
   const [loading, setLoading] = useState(true);
 
-  const [editing, setEditing] = useState('');
+  const [preview, setPreview] = useState(false);
 
   const { title, description } = config.dashboard || config;
 
@@ -198,16 +198,45 @@ export default function CdcDashboard(
   let body = null
 
   // Editor mode
-  if(isEditor) {
-    body = (
-      <>
-        <EditorPanel />
-        <Grid />
-      </>
-    )
+  if(isEditor && !preview) {
+    let subVisualizationEditing = false;
+
+    Object.keys(config.visualizations).forEach(visualizationKey => {
+      let visualizationConfig = config.visualizations[visualizationKey];
+
+      visualizationConfig.data = filteredData || data;
+
+      if(visualizationConfig.editing) {
+        subVisualizationEditing = true;
+
+        switch(visualizationConfig.type){
+          case 'chart':
+            body = <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />;
+            break;
+          case 'map': 
+            body = <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />;
+            break;
+          case 'data-bite':
+            body = <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />
+            break;
+        }
+      }
+    });
+
+    if(!subVisualizationEditing){
+      body = (
+        <>
+          <EditorPanel />
+          <Grid />
+        </>
+      )
+
+    }
   } else {
     body = (
       <div className="cdc-dashboard-inner-container">
+        {preview && <button onClick={() => {setPreview(false)}}>Layout Editor</button>}
+
         {/* Title */}
         {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
 
@@ -215,19 +244,23 @@ export default function CdcDashboard(
         {config.dashboard.filters && <Filters />}
 
         {/* Visualizations */}
-        {Object.keys(config.visualizations).map(visualizationKey => {
-          let visualizationConfig = config.visualizations[visualizationKey];
+        {config.rows && config.rows.map(row => {
+          return (
+            <div className="row">
+              {row.map(col => {
+                if(col.width){
+                  let visualizationConfig = config.visualizations[col.widget];
 
-          visualizationConfig.data = filteredData || data;
-
-          switch(visualizationConfig.type){
-            case 'chart':
-              return <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-            case 'map': 
-              return <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={visualizationKey === editing} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} setEditing={setEditing} />;
-              default: 
-            return <></>;
-          }
+                  visualizationConfig.data = filteredData || data;
+          
+                  return <div className={`col col-${col.width}`}>
+                    {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                    {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                    {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                  </div>
+                }
+              })}
+            </div>);
         })}
 
         {/* Description */}
@@ -245,7 +278,7 @@ export default function CdcDashboard(
     loading,
     updateConfig,
     setParentConfig,
-    setEditing
+    setPreview
   }
   
   return (

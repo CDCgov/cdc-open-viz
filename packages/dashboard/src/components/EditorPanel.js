@@ -197,7 +197,9 @@ const EditorPanel = memo(() => {
   }
 
   const addVisualization = (type, subType) => {
-    let newVisualizations = config.visualizations ? {...config.visualizations} : {}
+    let newVisualizationConfig = {};
+    newVisualizationConfig.uid = type + Date.now();
+    newVisualizationConfig.type = type;
 
     switch(type) {
       case 'chart':
@@ -211,8 +213,6 @@ const EditorPanel = memo(() => {
         newVisualizationConfig.visualizationType = type;
         break;
     }
-
-    newVisualizationConfig.uid = type + Date.now()
 
     return newVisualizationConfig
   }
@@ -311,6 +311,10 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel className="add-visualizations accordion__panel">
                   <p>Click and drag an item onto the grid to add it to your dashboard.</p>
+                  <span className="subheading-3">General</span>
+                  <div className="drag-grid">
+                    <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
+                  </div>
                   <span className="subheading-3">Chart</span>
                   <div className="drag-grid">
                     <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar" />

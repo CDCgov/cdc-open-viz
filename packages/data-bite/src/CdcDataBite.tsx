@@ -9,11 +9,9 @@ import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 
 const CdcDataBite = (
-    { configUrl, config: configObj, isEditor = false, setConfig: setParentConfig } :
-    { configUrl?: string, config?: any, isEditor?: boolean, setConfig? }
+    { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
+    { configUrl?: string, config?: any, isDashboard?: boolean, isEditor?: boolean, setConfig? }
 ) => {
-
-  console.log('CdcDataBite called');
 
   interface keyable {
     [key: string]: any
@@ -67,7 +65,6 @@ const CdcDataBite = (
     for (let entry of entries) {
         let newViewport = getViewport(entry.contentRect.width)
 
-        console.log('viewport', newViewport, entry.contentRect.width)
         setCurrentViewport(newViewport)
     }
 });
@@ -90,7 +87,6 @@ const CdcDataBite = (
   }
 
   const loadConfig = async () => {
-    console.log('loadConfig called');
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
@@ -102,7 +98,7 @@ const CdcDataBite = (
     }
 
     response.data = responseData;
-    console.log(response);
+
     updateConfig({ ...defaults, ...response });
     setLoading(false);
   }
@@ -189,7 +185,6 @@ const CdcDataBite = (
       return include;
     }).map(Number);
 
-    console.log(numericalData);
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
         dataBite = prefix + String(numericalData.length) + suffix;
@@ -231,15 +226,12 @@ const CdcDataBite = (
   },[]);
 
   useEffect(() => {
-    console.log('useEffect 2');
     loadConfig();
   }, [])
 
   let body = (<Loading />)
 
-  console.log('Checking Loading');
   if(false === loading) {
-    console.log('Loading is false, rendering');
     let biteClasses = [];
     let addImageTop = false;
     let addImageBottom = false;
@@ -272,11 +264,6 @@ const CdcDataBite = (
     biteClasses.push(config.theme);
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
-    console.log({ showBite });
-    console.log({ biteLocation });
-    console.log({ addImageTop });
-    console.log({ addImageTop });
-    console.log(config.theme);
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -304,10 +291,9 @@ const CdcDataBite = (
       </>
     )
   }
-
-  console.log('About to render databite', config);
+  
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig }}>
+    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
       <div className={`cdc-open-viz-module type-data-bite ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>

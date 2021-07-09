@@ -367,8 +367,13 @@
 			"columnName": "filter1"
 		}]
 	},
+	"rows": [
+		[{"width": 12, "widget": "chart1"}, {}, {}],
+		[{"width": 12, "widget": "map1"}, {}, {}]
+	],
 	"visualizations": {
 		"chart1": {
+			"uid": "chart1",
 			"type": "chart",
 			"title": "Chart Example",
 			"visualizationType": "Pie",
@@ -401,6 +406,7 @@
 			}
 		},
 		"map1": {
+			"uid": "map1",
 			"type": "map",
 			"defaultData": false,
 			"general": {
