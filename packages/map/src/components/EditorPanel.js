@@ -14,8 +14,8 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Waiting from '@cdc/core/components/Waiting'
 
 import MapIcon from '../images/map-folded.svg';
-import UsaGraphic from '../images/usa-graphic.svg';
-import WorldGraphic from '../images/world-graphic.svg';
+import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
@@ -72,6 +72,7 @@ const EditorPanel = (props) => {
     columnsInData = [],
     loadConfig,
     setState,
+    isDashboard,
     setParentConfig,
     runtimeFilters,
     runtimeLegend,
@@ -691,6 +692,14 @@ const EditorPanel = (props) => {
 
     setState(updatedState)
   }
+  
+  const onBackClick = () => {
+    if(isDashboard){
+      setState({...state, editing: false});
+    } else {
+      setDisplayPanel(!displayPanel);
+    }
+  }
 
   const usedFilterColumns = {}
 
@@ -772,7 +781,7 @@ const EditorPanel = (props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={(onBackClick)} data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <ReactTooltip
           html={true}

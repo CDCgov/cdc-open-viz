@@ -31,6 +31,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading';
+import DataTransform from '@cdc/core/components/DataTransform';
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -123,7 +124,9 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+    const transform = new DataTransform()
+
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [viewport, setViewport] = useState('lg')
@@ -142,7 +145,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setViewport(newViewport)
         }
     });
-
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
@@ -779,8 +781,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     .then(result => {
                         return result
                     })
-
-                return data
             }
 
             if ('json' === regex.exec(url)[1]) {
@@ -789,9 +789,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     .then(data => {
                         return data
                     })
-
-                return data
             }
+
+            data = transform.autoStandardize(data);
+            data = transform.developerStandardize(data, response.dataDescription);
+
+            return data;
         } catch {
             console.error(`Cannot parse URL: ${url}`);
         }
@@ -1045,7 +1048,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
+            {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
             <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
