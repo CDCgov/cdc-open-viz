@@ -16,6 +16,7 @@
     "build": "npx webpack --mode production --env packageName=CdcEditor --env folderName=editor -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/editor build"
   },
+  "files": ["./dist/"],
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
     "@cdc/chart": "^1.2.0",
