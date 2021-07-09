@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Accordion,
   AccordionItem,
@@ -19,27 +19,19 @@ import WorldGraphic from '../images/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../examples/default-world.json';
 import usaDefaultConfig from '../examples/default-usa.json';
+import QuestionIcon from '../images/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
-const arrayMoveMutate = (array, from, to) => {
-	const startIndex = from < 0 ? array.length + from : from;
+const Helper = ({text}) => {
+  return (
+    <span className='tooltip helper' data-tip={text}>
+      <QuestionIcon />
+    </span>
+  )
+}
 
-	if (startIndex >= 0 && startIndex < array.length) {
-		const endIndex = to < 0 ? array.length + to : to;
-
-		const [item] = array.splice(from, 1);
-		array.splice(endIndex, 0, item);
-	}
-};
-
-const arrayMove = (array, from, to) => {
-	array = [...array];
-	arrayMoveMutate(array, from, to);
-	return array;
-};
-
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", ...attributes}) => {
+const TextField = ({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", helper = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -68,31 +60,26 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   return (
     <label>
-      <span className="edit-label column-heading">{label}</span>
+      <span className="edit-label column-heading">{label} {helper && <Helper text={helper} />}</span>
       {formElement}
     </label>
   )
-})
+}
 
-const EditorPanel = memo((props) => {
+const EditorPanel = (props) => {
   const {
     state,
+    columnsInData = [],
     loadConfig,
     setState,
-    generateValuesForFilter,
-    processData,
-    processLegend,
     setParentConfig,
-    processedLegend,
-    setProcessedLegend,
-    setProcessedData,
-    processedData,
-    loading
+    runtimeFilters,
+    runtimeLegend,
   } = props
 
-  const { general, color, columns, legend, data, filters, dataTable, tooltips} = state
+  const { general, columns, legend, dataTable, tooltips} = state
 
-  const [ requiredColumns, setRequiredColumns ] = useState([]) // Simple state so we know if we need more information before parsing the map
+  const [ requiredColumns, setRequiredColumns ] = useState(null) // Simple state so we know if we need more information before parsing the map
 
   const [ configTextboxValue, setConfigTextbox ] = useState({})
 
@@ -104,33 +91,44 @@ const EditorPanel = memo((props) => {
 
   const [ activeFilterValueForDescription, setActiveFilterValueForDescription ] = useState([0,0])
 
-  const [ editorCatOrder, setEditorCatOrder ] = useState([])
+  const [ editorCatOrder, setEditorCatOrder ] = useState(state.legend.categoryValuesOrder || [])
 
   const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
-  const resetColumnsObj = {
-    geo: {
-        dataTable: true,
-        label: "",
-        name: "",
-        tooltip: false
-    },
-    primary: {
-        dataTable: true,
-        label: "",
-        name: "",
-        prefix: "",
-        suffix: "",
-        tooltip: true
-    },
-    navigate: {
-        dataTable: false,
-        name: "",
-        tooltip: false
-    },
-    geosInRegion: {
-        name: ''
-    }
+  const categoryMove = (idx1, idx2) => {
+    let categoryValuesOrder = [...editorCatOrder]
+
+    let [movedItem] = categoryValuesOrder.splice(idx1, 1)
+
+    categoryValuesOrder.splice(idx2, 0, movedItem)
+
+    setEditorCatOrder(categoryValuesOrder)
+
+    setState({
+      ...state,
+      legend: {
+          ...state.legend,
+          categoryValuesOrder
+      }
+    })
+  }
+
+  const DynamicDesc = ({label, fieldName, value: stateValue, type = "input", helper = null, ...attributes}) => {
+    const [ value, setValue ] = useState(stateValue);
+  
+    const [ debouncedValue ] = useDebounce(value, 500);
+  
+    useEffect(() => {
+      if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
+        handleEditorChanges("changeLegendDescription", [String(activeFilterValueForDescription), debouncedValue])
+      }
+    }, [debouncedValue])
+  
+    const onChange = (e) => setValue(e.target.value);
+  
+    return (
+      <textarea onChange={onChange} {...attributes} value={value}></textarea>
+    )
   }
 
   const handleEditorChanges = async (property, value) => {
@@ -177,16 +175,6 @@ const EditorPanel = memo((props) => {
           color: value
         })
       break;
-      case 'hasRegions':
-        setState({
-          ...state,
-          general: {
-              ...state.general,
-              hasRegions: value
-          },
-          columns: resetColumnsObj
-        })
-      break;
       case 'sidebarPosition':
         setState({
           ...state,
@@ -211,18 +199,6 @@ const EditorPanel = memo((props) => {
           general: {
               ...state.general,
               headerColor: value
-          }
-        })
-      break;
-      case 'geoColumn':
-        setState({
-          ...state,
-          columns: {
-              ...state.columns,
-              geo: {
-                ...state.columns.geo,
-                name: value
-              }
           }
         })
       break;
@@ -274,8 +250,8 @@ const EditorPanel = memo((props) => {
         setState({
           ...state,
           legend: {
-              ...state.legend,
-              unified: value
+            ...state.legend,
+            unified: value
           }
         })
       break;
@@ -283,8 +259,8 @@ const EditorPanel = memo((props) => {
         setState({
           ...state,
           legend: {
-              ...state.legend,
-              separateZero: value
+            ...state.legend,
+            separateZero: value
           }
         })
       break;
@@ -341,22 +317,10 @@ const EditorPanel = memo((props) => {
                 }
               })
               break;
-            case 'hex':
-              setState({
-                ...state,
-                general: {
-                    ...state.general,
-                    showSidebar: true,
-                    type: "hex"
-                }
-              })
-            break;
             default:
                 console.warn("Map type not set")
             break;
         }
-
-        setProcessedData( processData() )
       break;
       case 'geoType':
         // If we're still working with default data, switch to the world default to show it as an example
@@ -381,6 +345,7 @@ const EditorPanel = memo((props) => {
                     geoType: "us"
                 }
               })
+              break;
             case 'world':
               setState({
                 ...state,
@@ -389,22 +354,13 @@ const EditorPanel = memo((props) => {
                     geoType: "world"
                 }
               })
+              break;
             default:
                 console.warn("Map type not set.")
             break;
         }
 
         ReactTooltip.rebuild()
-      break;
-      case 'categoryOrder':
-        const categoryValuesOrder = arrayMove(processedLegend.categoryValuesOrder, value[0], value[1])
-        setState({
-          ...state,
-          legend: {
-              ...state.legend,
-              categoryValuesOrder
-          }
-        })
       break;
       case 'singleColumnLegend':
         setState({
@@ -484,22 +440,15 @@ const EditorPanel = memo((props) => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    const columnList = []
+    let columnList = []
 
     // Geo is always required
     if('' === state.columns.geo.name) {
-      let colName = state.general.hasRegions ? 'Region' : 'Geography'
-
-      columnList.push(colName)
+      columnList.push('Geography')
     }
 
-    // Geos in Region is required for region maps
-    if(true === state.general.hasRegions && '' === state.columns.geosInRegion.name) {
-      columnList.push('Geos in Region')
-    }
-
-    // Primary is required if we're on a data map
-    if('data' === state.general.type && '' === state.columns.primary.name) {
+    // Primary is required if we're on a data map or a point map
+    if('navigation' !== state.general.type && '' === state.columns.primary.name) {
       columnList.push('Primary')
     }
 
@@ -508,8 +457,10 @@ const EditorPanel = memo((props) => {
       columnList.push('Navigation')
     }
 
+    if(columnList.length === 0) columnList = null
+
     setRequiredColumns(columnList)
-  }, [state.columns, state.general.hasRegions, state.general.type])
+  }, [state.columns, state.general.type])
 
   const editColumn = async (columnName, editTarget, value) => {
     switch (editTarget) {
@@ -567,32 +518,26 @@ const EditorPanel = memo((props) => {
     }
   }
 
-  const changeFilter = async (filterIndex, target, value) => {
-      let newFilters = Array.from(filters)
+  const changeFilter = async (idx, target, value) => {
+      let newFilters = [...state.filters]
 
       switch (target) {
           case 'addNew':
               newFilters.push({
+                  label: '',
                   values:[]
               })
           break;
           case 'remove':
-              newFilters = newFilters.filter( (value, index) => index !== filterIndex);
+              newFilters.splice(idx, 1)
           break;
           case 'columnName':
-              newFilters[filterIndex].columnName = value
-
-              // Regenerate legend values set one to active to pass to state
-              let values = generateValuesForFilter(value)
-
-              newFilters[filterIndex].values = values
-
-              newFilters[filterIndex].active = values[0]
+              newFilters[idx] = {...newFilters[idx]}
+              newFilters[idx].columnName = value
           break;
           default:
-              newFilters[filterIndex][target] = value
+              newFilters[idx][target] = value
           break;
-
       }
 
       setState({
@@ -631,13 +576,13 @@ const EditorPanel = memo((props) => {
   }
 
   const displayFilterLegendValue = (arr) => {
+    const filterName = state.filters[ arr[0] ].label || `Unlabeled Legend`
 
-    const filterName = filters[ arr[0] ].label || `Unlabeled Legend`
-
-    const filterValue = filters[ arr[0] ].values[ arr[1] ]
-
-    return filterName + ' - ' + filterValue
-
+    const filterValue = runtimeFilters[ arr[0] ]
+    
+    if(filterValue) {
+      return filterName + ' - ' + filterValue.values[ arr[1] ]
+    }
   }
 
   const sortableItemStyles = {
@@ -654,8 +599,8 @@ const EditorPanel = memo((props) => {
     zIndex:"999"
   }
 
-  const convertStateToConfig = (type = "JSON") => {
-    let strippedState = JSON.parse(JSON.stringify(state))
+  const convertStateToConfig = () => {
+    let strippedState = JSON.parse(JSON.stringify(state)) // Deep copy
 
     // Strip ref
     delete strippedState[""]
@@ -665,7 +610,6 @@ const EditorPanel = memo((props) => {
     // Remove the legend
     let strippedLegend = JSON.parse(JSON.stringify(state.legend))
 
-    delete strippedLegend.data
     delete strippedLegend.disabledAmt
 
     strippedState.legend = strippedLegend
@@ -678,42 +622,32 @@ const EditorPanel = memo((props) => {
 
     strippedState.general = strippedGeneral
 
-    if(type === "JSON") {
-      return JSON.stringify( strippedState )
+    // Add columns property back to data if it's there
+    if(state.data.columns) {
+      strippedState.data.columns = state.data.columns
     }
 
     return strippedState
   }
 
-  useEffect(() => setLoadedDefault(state.defaultData), [state.defaultData])
+  useEffect(() => {
+    setLoadedDefault(state.defaultData)
 
-  useEffect(() => columnsRequiredChecker(), [state.columns, state.general])
+    columnsRequiredChecker()
+  }, [state])
 
   useEffect(() => {
-    if(0 === requiredColumns.length && false === loading) {
-      setProcessedData( processData() )
+    if('category' === state.legend.type && editorCatOrder.length === 0) {
+      let arr = runtimeLegend.filter(item => !item.special).map(({value}) => value)
+
+      setEditorCatOrder(arr)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requiredColumns])
+  }, [runtimeLegend])
 
-  // Generate all columns available by looping through the data - add a blank value at the top
-  const columnsInData = [""]
-
-  state.data.forEach( (row) => {
-    Object.keys(row).forEach( (columnName) => {
-      if(false === columnsInData.includes(columnName)) {
-        columnsInData.push(columnName)
-      }
-    })
-
-  } )
-
-  const columnsOptions = columnsInData.map( (name) => {
-    if("" === name) {
-      return (<option value="" key={"Select Option"}>- Select Option -</option>)
-    }
-
-    return (<option value={name} key={name}>{name}</option>)
+  const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
+  
+  columnsInData.map(colName => {
+    columnsOptions.push(<option value={colName} key={colName}>{colName}</option>)
   })
 
   const specialClasses = []
@@ -728,8 +662,7 @@ const EditorPanel = memo((props) => {
     const defaultCols = [
       'geo',
       'navigate',
-      'primary',
-      'geosInRegion'
+      'primary'
     ]
 
     if( true === defaultCols.includes(value) ) {
@@ -759,56 +692,52 @@ const EditorPanel = memo((props) => {
     setState(updatedState)
   }
 
-  const filtersJSX = filters.map( (filter, index) => {
+  const usedFilterColumns = {}
+
+  const filtersJSX = state.filters.map( (filter, index) => {
+    if(filter.columnName) {
+      usedFilterColumns[filter.columnName] = true
+    }
+
     return (
-        <fieldset className="edit-block">
-          <button className="remove-column" onClick={(event) => { event.preventDefault(); changeFilter(index, "remove")}}>Remove</button>
+        <fieldset className="edit-block" key={`filter-${index}`}>
+          <button className="remove-column" onClick={() => { changeFilter(index, "remove")}}>Remove</button>
+          <TextField value={state.filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
           <label>
-            <span className="edit-label column-heading">Filter</span>
+            <span className="edit-label column-heading">Filter Column <Helper text="Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column." /></span>
             <select value={filter.columnName} onChange={(event) => { changeFilter(index, "columnName", event.target.value) }}>
-              {columnsOptions}
+              {columnsOptions.filter(({key}) => undefined === usedFilterColumns[key] || filter.columnName === key)}
             </select>
           </label>
-          <TextField value={filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
         </fieldset>
-  )
+    )
   })
 
   const filterValueOptionList = []
 
-  if(filters.length > 0) {
-    filters.forEach( (filter, index) => {
-      filters[index].values.forEach( (value, valueNum) => {
-
+  if(runtimeFilters.length > 0) {
+    runtimeFilters.forEach( (filter, index) => {
+      runtimeFilters[index].values.forEach( (value, valueNum) => {
         filterValueOptionList.push([index, valueNum])
-
       })
-
     })
   }
 
   useEffect(() => {
     const parsedData = convertStateToConfig()
 
-    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
+    const formattedData = JSON.stringify(parsedData, undefined, 2);
 
     setConfigTextbox(formattedData)
 
     // Pass up to Editor if needed
     if(setParentConfig) {
-      const newConfig = convertStateToConfig("object")
+      const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
-
-  useEffect(() => {
-    if('data' === state.general.type) {
-      setProcessedLegend( processLegend() )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [legend, processedData])
 
   let numberOfItemsLimit = 8
 
@@ -816,13 +745,9 @@ const EditorPanel = memo((props) => {
     ...draggableStyle
   });
 
-  useEffect(() => {
-    setEditorCatOrder(processedLegend.categoryValuesOrder)
-  }, [processedLegend.categoryValuesOrder])
-
   const CategoryList = () => {
     return editorCatOrder.map((value, index) => (
-      <Draggable key={value} draggableId={`${value}`} index={index}>
+      <Draggable key={value} draggableId={`item-${value}`} index={index}>
         {(provided, snapshot) => (
           <li
             style={{position: 'relative'}}
@@ -844,28 +769,29 @@ const EditorPanel = memo((props) => {
     ))
   }
 
-  if(loading) {
-    return null
-  }
-
   return (
     <ErrorBoundary component="EditorPanel">
-      {0 !== requiredColumns.length && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
+      {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
-        <h2>Configure Map</h2>
+        <ReactTooltip
+          html={true}
+          multiline={true}
+        />
+        <span className="base-label">Configure Map</span>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* General */}
+              <AccordionItem> {/* Type */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    General
+                    Type
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {/* Geography */}
                   <label>
-                    <span className="edit-label column-heading">Geography</span>
+                    <span className="edit-label column-heading"><span>Geography</span></span>
                     <ul className="geo-buttons">
                       <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
                         <UsaGraphic />
@@ -878,26 +804,36 @@ const EditorPanel = memo((props) => {
                     </ul>
                   </label>
                   <label>
-                    <span className="edit-label column-heading">Map Type</span>
-                    <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
-                      <option value="data">Data</option>
-                      <option value="navigation">Navigation</option>
-                    </select>
+                  {/* Type */}
+                  <span className="edit-label column-heading">Map Type</span>
+                  <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
+                    <option value="data">Data</option>
+                    <option value="navigation">Navigation</option>
+                  </select>
                   </label>
+                  {/* SubType */}
                   {'us' === state.general.geoType && 'data' === state.general.type &&
-                    <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
-                      <span className="edit-label">Display As Hex Map</span>
-                    </label>
+                  <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.displayAsHex } onChange={(event) => { handleEditorChanges("displayAsHex", event.target.checked) }} />
+                    <span className="edit-label">Display As Hex Map</span>
+                  </label>
                   }
                   {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
-                    <label className="checkbox mt-4">
-                      <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
-                      <span className="edit-label">Display state labels</span>
-                    </label>
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
+                    <span className="edit-label">Display state labels</span>
+                  </label>
                   }
-                  <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" />
-                  <p className="info">For accessibility, you should enter a title even if you are not planning on displaying it.</p>
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem> {/* General */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>
+                    General
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <TextField value={state.general.title} updateField={updateField} section="general" fieldName="title" label="Title" placeholder="Map Title" helper="For accessibility reasons, you should enter a title even if you are not planning on displaying it." />
                   <TextField type="textarea" value={general.subtext} updateField={updateField} section="general" fieldName="subtext" label="Subtext" />
                   {'us' === state.general.geoType &&
                     <TextField value={general.territoriesLabel} updateField={updateField} section="general" fieldName="territoriesLabel" label="Territories Label" placeholder="Territories" />
@@ -916,39 +852,17 @@ const EditorPanel = memo((props) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <label className="edit-block geo">
-                    <span className="edit-label column-heading">{state.general.hasRegions ? `Region` : `Geography`}</span>
+                    <span className="edit-label column-heading">Geography</span>
                     <select value={state.columns.geo ? state.columns.geo.name : columnsOptions[0] } onChange={(event) => { editColumn("geo", "name", event.target.value) }}>
                       {columnsOptions}
                     </select>
                   </label>
-                  {'us' === state.general.geoType &&
-                  <label className="checkbox">
-                    <input type="checkbox" checked={ state.general.hasRegions || false} onChange={(event) => { handleEditorChanges("hasRegions", event.target.checked) }} />
-                    <span className="edit-label">This map uses regions</span>
-                  </label>
-                  }
-                  {state.general.hasRegions &&
-                    <label className="edit-block geo">
-                      <span className="edit-label column-heading">Geos In Region</span>
-                      <select value={state.columns.geo ? state.columns.geosInRegion.name : columnsOptions[0] } onChange={(event) => { editColumn("geosInRegion", "name", event.target.value) }}>
-                        {columnsOptions}
-                      </select>
-                    </label>
-                  }
                   {"navigation" !== state.general.type &&
                   <fieldset className="primary-fieldset edit-block">
                     <label>
                       <span className="edit-label column-heading">Primary</span>
                       <select value={state.columns.primary ? state.columns.primary.name : columnsOptions[0] } onChange={(event) => { editColumn("primary", "name", event.target.value) }}>
                         {columnsOptions}
-                      </select>
-                    </label>
-                    <label>
-                      <span className="edit-label">Data Classification Type</span>
-                      <select value={legend.type} onChange={(event) => { handleEditorChanges("legendType", event.target.value) }}>
-                        <option value="equalnumber">Equal Number</option>
-                        <option value="equalinterval">Equal Interval</option>
-                        <option value="category">Categorical</option>
                       </select>
                     </label>
                     <TextField value={columns.primary.label} section="columns" subsection="primary" fieldName="label" label="Label" updateField={updateField} />
@@ -1045,6 +959,22 @@ const EditorPanel = memo((props) => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <label>
+                    <span className="edit-label">Legend Type</span>
+                    <select value={legend.type} onChange={(event) => { handleEditorChanges("legendType", event.target.value) }}>
+                      <option value="equalnumber">Equal Number</option>
+                      <option value="equalinterval">Equal Interval</option>
+                      <option value="category">Categorical</option>
+                    </select>
+                  </label>
+                  {"category" !== legend.type && (
+                    <label className="checkbox">
+                      <input type="checkbox"
+                            checked={legend.separateZero || false}
+                            onChange={(event) => handleEditorChanges("separateZero", event.target.checked)}
+                      />
+                      <span className="edit-label">Separate Zero</span>
+                    </label>)}
                   {"category" !== legend.type &&
                     <label>
                       <span className="edit-label">Number of Items</span>
@@ -1061,9 +991,9 @@ const EditorPanel = memo((props) => {
                         <span className="edit-label">Category Order</span>
                       </label>
                       {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-                      <DragDropContext onDragEnd={({source, destination}) => { setEditorCatOrder(arrayMove(editorCatOrder, source.index, destination.index));  handleEditorChanges("categoryOrder", [source.index, destination.index]); }}>
+                      <DragDropContext onDragEnd={({source, destination}) => categoryMove(source.index, destination.index)}>
                         <Droppable droppableId="category_order">
-                          {(provided, snapshot) => (
+                          {(provided) => (
                             <ul
                               {...provided.droppableProps}
                               className="sort-list"
@@ -1075,7 +1005,7 @@ const EditorPanel = memo((props) => {
                           )}
                         </Droppable>
                       </DragDropContext>
-                      {editorCatOrder.length === 9 && <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories the additional categories will display as black on the map.</p></div></section>}
+                      {editorCatOrder.length >= 9 && <section className="error-box my-2"><div><strong className="pt-1">Warning</strong><p>The maximum number of categorical legend items is 9. If your data has more than 9 categories your map will not display properly.</p></div></section>}
                     </React.Fragment>
                   }
                   <TextField value={legend.title} updateField={updateField} section="legend" fieldName="title" label="Legend Title" placeholder="Legend Title" />
@@ -1086,8 +1016,8 @@ const EditorPanel = memo((props) => {
                     <React.Fragment>
                       <label>
                         <span>Legend Description</span>
-                        <span className="subtext">For {displayFilterLegendValue( activeFilterValueForDescription || [0,0] )}</span>
-                        <textarea value={legend.descriptions[String(activeFilterValueForDescription)] || ""} onChange={(event) => { handleEditorChanges("changeLegendDescription", [String(activeFilterValueForDescription), event.target.value]) }} />
+                        <span className="subtext">For {displayFilterLegendValue( activeFilterValueForDescription )}</span>
+                        <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
                       </label>
                       <label>
                         <select value={String(activeFilterValueForDescription)} onChange={(event) => { handleEditorChanges("changeActiveFilterValue", event.target.value) }}>
@@ -1097,14 +1027,6 @@ const EditorPanel = memo((props) => {
                         </select>
                       </label>
                     </React.Fragment>)}
-                    {"category" !== legend.type && (
-                    <label className="checkbox">
-                      <input type="checkbox"
-                            checked={legend.separateZero || false}
-                            onChange={(event) => handleEditorChanges("separateZero", event.target.checked)}
-                      />
-                      <span className="edit-label">Separate Zero</span>
-                    </label>)}
                   {filtersJSX.length > 0 && (
                       <label className="checkbox">
                         <input type="checkbox" checked={ legend.dynamicDescription} onChange={() => { handleEditorChanges("dynamicDescription", filterValueOptionList[0]) }} />
@@ -1154,18 +1076,17 @@ const EditorPanel = memo((props) => {
               <AccordionItem> {/* Tooltips */}
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Tooltips / Modals
+                    Interactivity
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <label>
-                    <span className="edit-label">Information on map appears on</span>
+                    <span className="edit-label">Detail displays on <Helper text="At mobile sizes, information always appears in a popover modal when a user taps on an item." /></span>
                     <select value={state.tooltips.appearanceType } onChange={(event) => { handleEditorChanges("appearanceType", event.target.value) }}>
                       <option value="hover">Hover - Tooltip</option>
                       <option value="click">Click - Popover Modal</option>
                     </select>
                   </label>
-                  <p className="info">On mobile, information always appears in a popover modal when a user taps on an item.</p>
                   {'click' === state.tooltips.appearanceType &&
                     <TextField value={tooltips.linkLabel} section="tooltips" fieldName="linkLabel" label="Tooltips Link Label" updateField={updateField} />
                   }
@@ -1231,7 +1152,7 @@ const EditorPanel = memo((props) => {
                   <label>
                     <span className="edit-label">Map Color Palette</span>
                   </label>
-                  <h5>Quantitative</h5>
+                  <span className="h5">Quantitative</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => !name.includes('qualitative')).map( (palette) => {
 
@@ -1256,7 +1177,7 @@ const EditorPanel = memo((props) => {
                       )
                     })}
                   </ul>
-                  <h5>Qualitative</h5>
+                  <span className="h5">Qualitative</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
 
@@ -1288,7 +1209,7 @@ const EditorPanel = memo((props) => {
           <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
             <MapIcon />
             <div>
-              <h3>Get Maps Help</h3>
+              <span className="heading-3">Get Maps Help</span>
               <p>Examples and documentation</p>
             </div>
           </a>
@@ -1296,10 +1217,10 @@ const EditorPanel = memo((props) => {
             <span className="advanced-toggle-link" onClick={() => setAdvancedToggle(!advancedToggle)}><span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options</span>
             {advancedToggle && (
               <React.Fragment>
-                <section className="error-box my-2"><div><h5 className="pt-1">Warning</h5><p>This can cause serious errors in your map.</p></div></section>
+                <section className="error-box py-2 px-3 my-2"><div><strong className="pt-1">Warning</strong><p>This can cause serious errors in your map.</p></div></section>
                 <p className="pb-2">This tool displays the actual map configuration <acronym title="JavaScript Object Notation">JSON</acronym> that is generated by this editor and allows you to edit properties directly and apply them.</p>
                 <textarea value={ configTextboxValue } onChange={(event) => setConfigTextbox(event.target.value)} />
-                <button className="btn full-width" onClick={() => loadConfig(JSON.parse(configData))}>Apply</button>
+                <button className="btn full-width" onClick={() => loadConfig( JSON.parse( configTextboxValue ) )}>Apply</button>
               </React.Fragment>
             )}
           </div>
@@ -1307,6 +1228,6 @@ const EditorPanel = memo((props) => {
       </section>
     </ErrorBoundary>
   )
-})
+}
 
 export default EditorPanel;

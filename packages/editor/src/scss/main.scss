@@ -4,11 +4,6 @@
 $tempLightGray: #C7C7C7;
 
 .cdc-editor {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-  @import "~bootstrap/scss/grid";
   min-height: inherit;
   display: flex;
   flex-direction: column;

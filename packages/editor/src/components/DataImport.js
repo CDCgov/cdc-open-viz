@@ -130,7 +130,6 @@ export default function DataImport() {
    * Handle loading data
    */
   const loadData = async (fileBlob = null) => {
-
     let fileData = fileBlob;
 
     // Get the raw data as text from the file
@@ -176,6 +175,7 @@ export default function DataImport() {
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
     let filereader = new FileReader();
+
     // Set encoding for CSV files - needed to render special characters properly
     let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
     filereader.onload = function() {
@@ -209,7 +209,8 @@ export default function DataImport() {
       }
 
     }
-      filereader.readAsText(fileData, encoding)    
+
+    filereader.readAsText(fileData, encoding)  
   }
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});

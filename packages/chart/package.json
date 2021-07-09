@@ -1,13 +1,14 @@
 {
   "name": "@cdc/chart",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "React component for visualizing tabular data in various types of charts",
   "main": "dist/cdcchart",
   "scripts": {
-    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/chart build"
   },
+  "files": ["./dist/"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
@@ -19,7 +20,7 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cdc/core": "^1.0.1",
+    "@cdc/core": "^1.0.2",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
@@ -45,6 +46,5 @@
   "peerDependencies": {
     "react": ">=16.8",
     "react-dom": ">=16"
-  },
-  "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81"
+  }
 }

@@ -12,6 +12,7 @@
     "@types/react-dom": "17.x",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
+    "@types/resize-observer-browser": "^0.1.5",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "core-js": "^3.8.3",
@@ -24,15 +25,14 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "file-loader": "^6.2.0",
     "html-react-parser": "^1.2.4",
     "html-webpack-plugin": "^5.3.1",
     "husky": "^4.3.0",
     "lerna": "^3.22.1",
     "lint-staged": "^10.4.0",
     "mini-svg-data-uri": "^1.2.3",
-    "react": "17.x",
-    "react-dom": "17.x",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
     "react-svg-loader": "^3.0.3",
     "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.32.8",
@@ -41,8 +41,8 @@
     "ts-loader": "^8.0.9",
     "typescript": "^4.0.5",
     "url-loader": "^4.1.1",
-    "webpack": "^5.16.0",
-    "webpack-cli": "^4.4.0",
+    "webpack": "^5.44.0",
+    "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2",
     "whatwg-fetch": "^3.6.2"
   },
@@ -58,9 +58,5 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
-  },
-  "dependencies": {
-    "@types/resize-observer-browser": "^0.1.5",
-    "npm-package-arg": "^8.1.1"
   }
 }
