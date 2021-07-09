@@ -1,4 +1,3 @@
-
 // This script is designed to modify exported topojson from https://mapshaper.org/ into a format for use by the <CdcMap /> component so it has less work to do at runtime.
 const fs = require('fs');
 

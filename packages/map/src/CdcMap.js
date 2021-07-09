@@ -124,7 +124,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
     const transform = new DataTransform()
 
     const [state, setState] = useState( {...initialState} )
@@ -145,7 +145,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setViewport(newViewport)
         }
     });
-
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
@@ -877,7 +876,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = `https://${props.hostname}${newState.dataUrl}`
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl
             }
 
             let newData = await fetchRemoteData(newState.dataUrl)

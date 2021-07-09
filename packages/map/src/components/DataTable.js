@@ -291,7 +291,7 @@ const DataTable = (props) => {
           </tbody>
         </table>
       </div>
-      {showDownloadButton === true && <DownloadButton data={data} />}
+      {showDownloadButton === true && <DownloadButton />}
     </section>
     </ErrorBoundary>
   );
