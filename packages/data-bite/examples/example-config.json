@@ -1,0 +1,24 @@
+{
+    "type": "data-bite",
+    "dataUrl": "/examples/example-data.json",
+    "dataBite": "",
+    "dataFunction": "Max",
+    "dataColumn": "Insured Rate",
+    "imagePosition": "Left",
+    "biteFontSize": "24",
+    "imageUrl": "",
+    "biteBody": "This is the max insured rate. This is the max insured rate. This is the max insured rate. This is the max insured rate.",
+    "prefix": "",
+    "suffix": "",
+    "roundToPlace": "",
+    "filters": [],
+    "biteLocation": "graphic",
+    "subtext": "Please note, this is the Data Bite's subtext or citation",
+    "title": "Data Bite",
+    "theme": "theme-blue",
+    "height": 300,
+    "padding": {
+        "left": 10,
+        "right": 10
+    }
+}

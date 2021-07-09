@@ -152,6 +152,19 @@
       }
     }
   }
+
+  .filters-section {
+      display: inline-block;
+      padding: 0 1em .5em;
+      label:not(:empty) {
+        margin-right: .4em;
+      }
+      select {
+        font-size: 1em;
+        margin-right: 1em;
+      }
+  }
+
   @include breakpointClass(xs) {
     &.font-small {
       font-size: .8em;

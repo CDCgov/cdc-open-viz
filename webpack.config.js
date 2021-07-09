@@ -22,7 +22,7 @@ module.exports = (env = {}, { mode }) => {
     options: {
       presets: [
         ['@babel/preset-env', {
-          useBuiltIns: 'usage',
+          useBuiltIns: 'entry',
           corejs: '3.8',
           targets: {
             browsers: [
@@ -95,9 +95,11 @@ module.exports = (env = {}, { mode }) => {
             let excluded = [
               '/node_modules/',
               // Due to symlinking, we have to explicitly exclude these files or Babel will try to parse them.
+              'dist/cdcdashboard.js',
               'dist/cdcchart.js',
               'dist/cdcmap.js',
               'dist/cdceditor.js',
+              'dist/cdcdatabite.js',
             ]
 
             let except = [
