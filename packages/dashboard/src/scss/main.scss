@@ -92,6 +92,10 @@
     margin: 15px;
   }
 
+  .col-12 {
+    width: calc(100% - 30px);
+  }
+
   .col-6 {
     width: calc(50% - 30px);
   }
