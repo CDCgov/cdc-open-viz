@@ -695,7 +695,7 @@ const EditorPanel = (props) => {
   
   const onBackClick = () => {
     if(isDashboard){
-      setEditing('');
+      setState({...state, editing: false});
     } else {
       setDisplayPanel(!displayPanel);
     }
@@ -709,7 +709,7 @@ const EditorPanel = (props) => {
     }
 
     return (
-        <fieldset className="edit-block" key={'filter' + index}>
+        <fieldset className="edit-block" key={`filter-${index}`}>
           <button className="remove-column" onClick={() => { changeFilter(index, "remove")}}>Remove</button>
           <TextField value={state.filters[index].label} section="filters" subsection={index} fieldName="label" label="Label" updateField={updateField} />
           <label>
@@ -781,7 +781,7 @@ const EditorPanel = (props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={(onBackClick)} data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <ReactTooltip
           html={true}

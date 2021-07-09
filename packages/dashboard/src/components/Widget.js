@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { useDrag } from 'react-dnd'
-import CloseIcon from '../images/icon-close.svg'
-import EditIcon from '../images/icon-edit.svg'
-import MoveIcon from '../images/icon-move.svg'
+import React, { useState, useEffect, useCallback, memo, useContext } from 'react';
+import { useDrag } from 'react-dnd';
+import CloseIcon from '../images/icon-close.svg';
+import EditIcon from '../images/icon-edit.svg';
+import MoveIcon from '../images/icon-move.svg';
+import BiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
 import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
@@ -12,6 +13,7 @@ import WorldIcon from '@cdc/core/assets/world-graphic.svg';
 import Context from '../context';
 
 const iconHash = {
+  'data-bite' : <BiteIcon />,
   'Bar' : <BarIcon />,
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
@@ -20,6 +22,7 @@ const iconHash = {
 }
 
 const labelHash = {
+  'data-bite' : 'Data Bite',
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
@@ -69,7 +72,9 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
-    // TODO
+    visualizations[data.uid].editing = true;
+
+    updateConfig({...config, visualizations});
   }
 
   return (
