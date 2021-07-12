@@ -1,11 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
-
 .cdc-waffle-chart {
   display: flex;
   flex-flow: row;
   justify-content: flex-start;
   align-items: flex-start;
-  font-family: 'Lato', sans-serif;
 
   .cdc-waffle-chart__chart {
     padding-right: 1rem;
@@ -24,11 +21,5 @@
       font-weight: 300;
       line-height: 1.25em;
     }
-  }
-}
-
-.cdc-open-viz-module.type-waffle-chart {
-  .cdc-waffle-chart {
-
   }
 }
