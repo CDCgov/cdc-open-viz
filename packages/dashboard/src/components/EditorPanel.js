@@ -244,7 +244,7 @@ const EditorPanel = memo(() => {
     setConfigData(formattedData)
 
     // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
 
     window.dispatchEvent(event)
 
