@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
@@ -7,10 +7,31 @@ import ResizeObserver from 'resize-observer-polyfill'
 import Context from './context'
 import './scss/main.scss'
 
-let chartText = 'of cases occurred at home/apartment'
 const canvas = React.createRef()
 
-const WaffleChart = ({ data, isEditor, color = '#B0BBDB', highlight = '#33437B', spacer, radius }) => {
+const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
+
+  let {
+    theme,
+    prefix,
+    suffix,
+    subtext
+  } = config
+
+  let themeColor = {
+    'theme-blue': '#005eaa',
+    'theme-purple': '#712177',
+    'theme-brown': '#705043',
+    'theme-teal': '#00695c',
+    'theme-pink': '#af4448',
+    'theme-orange': '#bb4d00',
+    'theme-slate': '#29434e',
+    'theme-indigo': '#26418f',
+    'theme-cyan': '#006778',
+    'theme-green': '#4b830d',
+    'theme-amber': '#fbab18',
+  }
+
   const ratio = (10 * (radius * 2)) + (9 * spacer)
 
   const calculatePos = (axis, index) => {
@@ -18,13 +39,19 @@ const WaffleChart = ({ data, isEditor, color = '#B0BBDB', highlight = '#33437B',
     return mod > 0 ? (mod * ((radius * 2) + spacer)) + radius : radius
   }
 
-  const drawCircle = (ctx, x, y, fill = color, stroke = false, strokeWidth = 0) => {
+  const drawCircle = (ctx, x, y, fill = color, active = false, stroke = false, strokeWidth = 0) => {
     ctx.beginPath()
     ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
+
+    if (!active) ctx.globalAlpha = 0.35
+
     if (fill) {
       ctx.fillStyle = fill
       ctx.fill()
     }
+
+    if (!active) ctx.globalAlpha = 1
+
     if (stroke) {
       ctx.lineWidth = strokeWidth
       ctx.strokeStyle = stroke
@@ -37,33 +64,35 @@ const WaffleChart = ({ data, isEditor, color = '#B0BBDB', highlight = '#33437B',
     ctx.width = ratio
     ctx.height = ratio
 
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
     for (let i = 0; i <= 100; i++) {
-      drawCircle(ctx, calculatePos('x', i), calculatePos('y', i), i + 1 <= (100 - Math.round(data)) ? color : highlight)
+      drawCircle(ctx, calculatePos('x', i), calculatePos('y', i), themeColor[theme], i + 1 > (100 - Math.round(data)))
     }
   })
 
   return (
-    <section className={'cdc-waffle-chart'} style={isEditor ? {paddingLeft: 350 + 'px'} : null}>
+    <section className={'cdc-waffle-chart'}>
       <div className="cdc-waffle-chart__chart">
         <canvas ref={canvas} width={ratio} height={ratio}/>
       </div>
       <div className="cdc-waffle-chart__data">
-        <div className="cdc-waffle-chart__data--primary" style={{ color: highlight }}>{data + '%'}</div>
-        <div className="cdc-waffle-chart__data--text" style={{ color: highlight }}>{chartText}</div>
+        <div className="cdc-waffle-chart__data--primary" style={{ color: themeColor[theme] }}>
+          {prefix ? prefix : null}{data}{suffix ? suffix : null}
+        </div>
+        <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}>{subtext}</div>
       </div>
     </section>
   )
 }
 
-const CdcWaffleChart = (
-  {
+const CdcWaffleChart = ({
     configUrl,
     config: configObj,
     isDashboard = false,
     isEditor = false,
     setConfig: setParentConfig
-  }
-) => {
+  }) => {
   const [ config, setConfig ] = useState({})
   const [ loading, setLoading ] = useState(true)
 
@@ -122,26 +151,25 @@ const CdcWaffleChart = (
     setConfig(newConfig)
   }
 
-  const loadConfig = async () => {
-    let response = configObj || await (await fetch(configUrl)).json()
+  useEffect(() => {
+    const loadData = async () => {
+      let response = configObj || await (await fetch(configUrl)).json()
 
-    // If data is included through a URL, fetch that and store
-    let responseData = response.data ?? {}
+      // If data is included through a URL, fetch that and store
+      let responseData = response.data ?? {}
 
-    if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-      responseData = await dataString.json()
+      if (response.dataUrl) {
+        const dataString = await fetch(response.dataUrl)
+        responseData = await dataString.json()
+      }
+
+      response.data = responseData
+
+      updateConfig({ ...defaults, ...response })
     }
 
-    response.data = responseData
-
-    updateConfig({ ...defaults, ...response })
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    loadConfig()
-  }, [])
+    loadData().then(r => setLoading(false));
+  }, [configObj, configUrl])
 
   let body = (<Loading/>)
 
@@ -151,9 +179,10 @@ const CdcWaffleChart = (
     classList.push(config.theme)
 
     body = (
-      <div className={'cdc-open-viz-module type-waffle-chart'}>
+      <div className={`cdc-open-viz-module type-waffle-chart ${classList.join(' ')}`} style={isEditor ? {paddingLeft: 350 + 'px'} : null}>
         {isEditor && <EditorPanel/>}
-        <WaffleChart data={78} spacer={1} radius={6} isEditor={isEditor}/>
+        {title}
+        <WaffleChart config={config} data={94.5} spacer={1} radius={6}/>
       </div>
     )
   }
@@ -167,7 +196,6 @@ const CdcWaffleChart = (
 
 export default CdcWaffleChart
 
-/* Constant */
 export const DATA_FUNCTION_MAX = 'Max'
 export const DATA_FUNCTION_COUNT = 'Count'
 export const DATA_FUNCTION_MEAN = 'Mean (Average)'
@@ -192,15 +220,9 @@ export const BITE_LOCATION_BODY = 'body'
 export const BITE_LOCATION_GRAPHIC = 'graphic'
 export const BITE_LOCATIONS =
 {
-  'title'
-:
-  'As a title in the body',
-    'body'
-:
-  'At the beginning of the body text',
-    'graphic'
-:
-  'As a graphic'
+  'title' : 'As a title in the body',
+  'body' : 'At the beginning of the body text',
+  'graphic' : 'As a graphic'
 }
 
 
