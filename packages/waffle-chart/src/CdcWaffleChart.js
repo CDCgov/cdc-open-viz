@@ -9,6 +9,20 @@ import './scss/main.scss'
 
 const canvas = React.createRef()
 
+const themeColor = {
+  'theme-blue': '#005eaa',
+  'theme-purple': '#712177',
+  'theme-brown': '#705043',
+  'theme-teal': '#00695c',
+  'theme-pink': '#af4448',
+  'theme-orange': '#bb4d00',
+  'theme-slate': '#29434e',
+  'theme-indigo': '#26418f',
+  'theme-cyan': '#006778',
+  'theme-green': '#4b830d',
+  'theme-amber': '#fbab18',
+}
+
 const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
 
   let {
@@ -19,20 +33,6 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
     subtext,
     content
   } = config
-
-  let themeColor = {
-    'theme-blue': '#005eaa',
-    'theme-purple': '#712177',
-    'theme-brown': '#705043',
-    'theme-teal': '#00695c',
-    'theme-pink': '#af4448',
-    'theme-orange': '#bb4d00',
-    'theme-slate': '#29434e',
-    'theme-indigo': '#26418f',
-    'theme-cyan': '#006778',
-    'theme-green': '#4b830d',
-    'theme-amber': '#fbab18',
-  }
 
   const ratio = (10 * (radius * 2)) + (9 * spacer)
 
@@ -74,7 +74,7 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
   })
 
   return (
-    <section className={`cdc-waffle-chart ${theme}`}>
+    <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
       <div className="cdc-waffle-chart__header">{title}</div>
       <div className="cdc-waffle-chart__inner-container">
         <div className="cdc-waffle-chart__chart">
@@ -183,7 +183,7 @@ const CdcWaffleChart = (
     classList.push(config.theme)
 
     body = (
-      <div className={`cdc-open-viz-module type-waffle-chart ${classList.join(' ')}`}
+      <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' '): ''}`}
            style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
         {isEditor && <EditorPanel/>}
         <WaffleChart config={config} data={94.5} spacer={1} radius={6}/>
@@ -228,16 +228,3 @@ export const BITE_LOCATIONS =
     'body': 'At the beginning of the body text',
     'graphic': 'As a graphic'
   }
-
-
-export const IMAGE_POSITION_LEFT = 'Left'
-export const IMAGE_POSITION_RIGHT = 'Right'
-export const IMAGE_POSITION_TOP = 'Top'
-export const IMAGE_POSITION_BOTTOM = 'Bottom'
-export const IMAGE_POSITIONS = [
-  IMAGE_POSITION_LEFT,
-  IMAGE_POSITION_RIGHT,
-  IMAGE_POSITION_TOP,
-  IMAGE_POSITION_BOTTOM,
-]
-

@@ -1,3 +1,11 @@
+@mixin set-theme($property, $color) {
+  @if $property == 'background-color' {
+    background-color: $color;
+  } @else if $property == 'color' {
+    color: $color;
+  }
+}
+
 .cdc-waffle-chart {
   position: relative;
   border: solid 1px #ccc;
@@ -21,6 +29,9 @@
   }
 
   .cdc-waffle-chart__chart {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     padding-right: 1rem;
   }
 }
@@ -36,18 +47,11 @@
       color: white;
     }
 
-    .cdc-waffle-chart.theme-blue #{&} {background-color: $primary;}
-    .cdc-waffle-chart.theme-purple #{&} {background-color: $purple-primary;}
-    .cdc-waffle-chart.theme-amber #{&} {background-color: $amber-primary;}
-    .cdc-waffle-chart.theme-orange #{&} {background-color: $orange-primary;}
-    .cdc-waffle-chart.theme-brown #{&} {background-color: $brown-primary;}
-    .cdc-waffle-chart.theme-teal #{&} {background-color: $teal-primary;}
-    .cdc-waffle-chart.theme-pink #{&} {background-color: $pink-primary;}
-    .cdc-waffle-chart.theme-slate #{&} {background-color: $slate-primary;}
-    .cdc-waffle-chart.theme-indigo #{&} {background-color: $indigo-primary;}
-    .cdc-waffle-chart.theme-cyan #{&} {background-color: $cyan-primary;}
-    .cdc-waffle-chart.theme-green #{&} {background-color: $green-primary;}
-    .cdc-waffle-chart.theme-purple #{&} {background-color: $purple-primary;}
+    @each $theme, $color in $theme-colors {
+      .cdc-waffle-chart.theme-#{$theme} #{&} {
+        @include set-theme("background-color", $color);
+      }
+    }
   }
 }
 
@@ -56,18 +60,27 @@
     .cdc-waffle-chart #{&} {
       width: 140px;
     }
-    .cdc-waffle-chart.theme-blue #{&} { color: $primary; }
-    .cdc-waffle-chart.theme-purple #{&} { color: $purple-primary; }
-    .cdc-waffle-chart.theme-amber #{&} { color: $amber-primary; }
-    .cdc-waffle-chart.theme-orange #{&} { color: $orange-primary; }
-    .cdc-waffle-chart.theme-brown #{&} { color: $brown-primary; }
-    .cdc-waffle-chart.theme-teal #{&} { color: $teal-primary; }
-    .cdc-waffle-chart.theme-pink #{&} { color: $pink-primary; }
-    .cdc-waffle-chart.theme-slate #{&} { color: $slate-primary; }
-    .cdc-waffle-chart.theme-indigo #{&} { color: $indigo-primary; }
-    .cdc-waffle-chart.theme-cyan #{&} { color: $cyan-primary; }
-    .cdc-waffle-chart.theme-green #{&} { color: $green-primary; }
-    .cdc-waffle-chart.theme-purple #{&} { color: $purple-primary; }
+
+    @each $theme, $color in $theme-colors {
+      .cdc-waffle-chart.theme-#{$theme} #{&} {
+        @include set-theme($color, "color");
+      }
+    }
+
+    .cdc-waffle-chart.font-small #{&} {
+      .cdc-waffle-chart__data--primary { font-size: 35px; }
+      .cdc-waffle-chart__data--text {  font-size: 12px; }
+    }
+
+    .cdc-waffle-chart.font-medium #{&} {
+      .cdc-waffle-chart__data--primary { font-size: 65px; }
+      .cdc-waffle-chart__data--text {  font-size: 16px; }
+    }
+
+    .cdc-waffle-chart.font-large #{&} {
+      .cdc-waffle-chart__data--primary { font-size: 90px; }
+      .cdc-waffle-chart__data--text { font-size: 22px; }
+    }
   }
 
   .cdc-waffle-chart__data--primary {
