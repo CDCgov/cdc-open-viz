@@ -9,6 +9,7 @@ import '../scss/data-import.scss';
 import TabPane from './TabPane';
 import Tabs from './Tabs';
 import PreviewDataTable from './PreviewDataTable';
+import DataDescription from './DataDescription';
 
 import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
@@ -47,6 +48,7 @@ export default function DataImport() {
 
   useEffect(() => {
     if(tempConfig !== null) {
+
         setConfig(tempConfig)
         setTempConfig(null)
     }
@@ -57,6 +59,22 @@ export default function DataImport() {
       setConfig({...config, dataUrl: debouncedExternalURL})
     }
   }, [debouncedExternalURL, keepURL])
+
+  // check to see if all series for the viz exists in the new dataset
+  const dataExists = (newData, oldSeries, oldAxisX) => {
+debugger;
+    // Loop through old series to make sure each exists in the new data
+    oldSeries.map(function(currentValue, index, newData){
+      if( ! newData.find( element => element.dataKey === currentValue.dataKey ) )
+        return false;
+    })
+
+    // Is the X Axis still in the dataset?
+    if( newData.columns.indexOf(oldAxisX) < 0 )
+      return false;
+
+    return true;
+  }
 
   const loadExternal = async () => {
     let dataURL = '';
@@ -112,11 +130,16 @@ export default function DataImport() {
   const loadData = async (fileBlob = null) => {
 
     let fileData = fileBlob;
-
+    let fileSource = fileData ? fileData.path : null;
+    let fileSourceType = 'file';
+    
     // Get the raw data as text from the file
     if(null === fileData) {
+      fileSourceType = 'url';
       try {
         fileData = await loadExternal();
+        fileSource = externalURL;
+        debugger;
       } catch (error) {
         setErrors([error]);
         return;
@@ -184,13 +207,52 @@ export default function DataImport() {
       try {
         text = transform.autoStandardize(text);
         console.log(text);
-        setConfig({...config, data:text});
+        
+        if (tempConfig) {
+          debugger;
+          if (dataExists(text, tempConfig.series, tempConfig.xAxis.dataKey)) {
+            debugger;
+            setConfig({
+              ...config, 
+              barThickness:tempConfig.barThickness,
+              confidenceKeys:tempConfig.confidenceKeys,
+              dataDescription:tempConfig.dataDescription,
+              data:text, // new data
+              dataFileSource:fileSource, // new file source
+              dataFileSourceType:fileSourceType ,// new file source type
+              dataFormat:tempConfig.dataFormat,
+              fontSize:tempConfig.fontSize,
+              height:tempConfig.height,
+              labels:tempConfig.labels,
+              legend:tempConfig.legend,
+              newViz:false,
+              padding:tempConfig.padding,
+              palette:tempConfig.palette,
+              series:tempConfig.series,
+              table:tempConfig.table,
+              theme:tempConfig.theme,
+              title:tempConfig.title,
+              type:tempConfig.type,
+              visualizationType:tempConfig.visualizationType,
+              xAxis:tempConfig.xAxis,
+              yAxis:tempConfig.yAxis
+            })
+          } else {
+            debugger;
+            setConfig({...config, data:text, dataFileSource:fileSource, dataFileSourceType:fileSourceType });
+          }
+        } else {
+          debugger;
+          setConfig({...config, data:text, dataFileSource:fileSource, dataFileSourceType:fileSourceType });
+        }
+        
+        debugger;
       } catch (err) {
           setErrors(err);
       }
 
     }
-      filereader.readAsText(fileData, encoding)    
+      filereader.readAsText(fileData, encoding)
   }
 
   useEffect(() => {
@@ -207,54 +269,129 @@ export default function DataImport() {
       setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
   };
 
+  const updateOriginProp = (key, value) => {
+      setConfig({...config, dataOrigin: {...config.dataOrigin, [key]: value}})
+  };
+
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
+
+  const debugFunc = (item) => {
+    // debugger;
+    updateOriginProp('horizontal', false)
+    return
+  }
+
+  const loadFileFromUrl = () => {
+    return (
+      <>
+        <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
+          <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
+          <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
+        </form>
+        <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
+          <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
+        </label>
+      </>
+    )
+  }
+
+  const resetEditor = ( config, tempConfig ) => {
+    debugger;
+    setTempConfig({});
+    tempConfig = {}
+    setConfig({});
+    config = {};
+    
+  }
+
+  const resetButton = () => {
+    return (
+      <button className="btn danger" onClick={() => setTempConfig({}) }>Reset 
+        <svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
+      </button>
+    )
+  }
 
   return (
     <>
+    
       <div className="left-col px-4">
-        <Tabs className="mb-4">
-          <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
-            <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
-              <FileUploadIcon />
-              <input {...getInputProps()} />
-              {
-                isDragActive ?
-                <p>Drop file here</p> :
-                <p>Drag file to this area, or <span>select a file</span>.</p>
-              }
-            </div>
-          </TabPane>
-          <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
-            <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
-              <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
-              <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
-            </form>
-            <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-              <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
-            </label>
-          </TabPane>
-        </Tabs>
-        {errors && (errors.map ? errors.map((message, index) => (
-          <div className="error-box slim mt-2" key={`error-${message}`}>
-            <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
+        {!config.data && (
+          <div className="load-data-area">
+            <Tabs className="mb-4">
+              <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
+                <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+                  <FileUploadIcon />
+                  <input {...getInputProps()} />
+                  {
+                    isDragActive ?
+                    <p>Drop file here</p> :
+                    <p>Drag file to this area, or <span>select a file</span>.</p>
+                  }
+                </div>
+              </TabPane>
+              <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
+                {loadFileFromUrl()}
+              </TabPane>
+            </Tabs>
+            {errors && (errors.map ? errors.map((message, index) => (
+              <div className="error-box slim mt-2" key={`error-${message}`}>
+                <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
+              </div>
+            )) : errors.message)}
+            <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
+            {/* TODO: Add more sample data in, but this will do for now. */}
+            <span className="heading">Load Sample Data:</span>
+            <ul className="sample-data-list">
+              <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
+              <li onClick={() => setConfig({...config, data: validChartData})}>Chart Sample Data</li>
+            </ul>
+            <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
+              <div>
+                <h3>Get Help</h3>
+                <p>Documentation and examples on formatting data and configuring visualizations.</p>
+              </div>
+            </a>
           </div>
-        )) : errors.message)}
-        <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
-        {/* TODO: Add more sample data in, but this will do for now. */}
-        <span className="heading">Load Sample Data:</span>
-        <ul className="sample-data-list">
-          <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
-          <li onClick={() => setConfig({...config, data: validChartData})}>Chart Sample Data</li>
-        </ul>
-        <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
-          <div>
-            <h3>Get Help</h3>
-            <p>Documentation and examples on formatting data and configuring visualizations.</p>
-          </div>
-        </a>
+        )}
+
         {config.data && (
           <>
+          {/* {debugFunc(config)} */}
             <div>
+              <div className="file-loaded-area">
+                
+                  
+                  {config.dataFileSourceType === 'file' && (
+                    <div className="data-source-options">
+                      <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        {
+                          isDragActive ?
+                          <p>Drop file here</p> :
+                          <p><FileUploadIcon /> <span>Replace data file</span></p>
+                        }
+                      </div>
+                      <div>
+                      {resetButton()}
+                      </div>
+                    </div>
+                  )} 
+                  
+                  {config.dataFileSourceType === 'url' && (
+                    <div className="url-source-options">
+                      <div>
+                        {loadFileFromUrl()}
+                      </div>
+                      <div>
+                        {resetButton()}
+                      </div>
+                    </div>
+                  )}
+                {/* {config.dataOrigin.fileName} */}
+                
+                <DataDescription dataOrigin={config} />
+              </div>
               <div className="question">
                 <span>Is the geography/X-axis value in your data structured horizontally, or vertically?</span>
                 <div>

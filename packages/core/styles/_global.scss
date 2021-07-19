@@ -1,3 +1,6 @@
+b {
+  font-weight: 600;
+}
 .error-box {
   background: #FFC2C2;
   display: flex;
@@ -66,9 +69,28 @@
       background: rgba(0,0,0,.5);
     }
   }
+  &.danger {
+    background-color: $white;
+    color: $red;
+    border: 1px solid $red;
+    transition: all .2s;
+    &:hover {
+      background-color: $red;
+      color: $white;
+    }
+  }
+  
   &:hover {
     transition: .1s all;
     background: lighten(#005eaa, 5%);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 2px;
+    margin-left: 5px;
   }
 }
 
