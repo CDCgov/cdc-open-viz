@@ -12,6 +12,7 @@ const canvas = React.createRef()
 const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
 
   let {
+    title,
     theme,
     prefix,
     suffix,
@@ -72,15 +73,21 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
   })
 
   return (
-    <section className={'cdc-waffle-chart'}>
-      <div className="cdc-waffle-chart__chart">
-        <canvas ref={canvas} width={ratio} height={ratio}/>
-      </div>
-      <div className="cdc-waffle-chart__data">
-        <div className="cdc-waffle-chart__data--primary" style={{ color: themeColor[theme] }}>
-          {prefix ? prefix : null}{data}{suffix ? suffix : null}
+    <section className={`cdc-waffle-chart ${theme}`}>
+      <div className="cdc-waffle-chart__header">{title}</div>
+      <div className="cdc-waffle-chart__inner-container">
+        <div className="cdc-waffle-chart__chart">
+          <canvas ref={canvas} width={ratio} height={ratio}/>
         </div>
-        <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}>{subtext}</div>
+        <div className="cdc-waffle-chart__data">
+          <div className="cdc-waffle-chart__data--primary" style={{ color: themeColor[theme] }}>
+            {prefix ? prefix : null}{data}{suffix ? suffix : null}
+          </div>
+          <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}></div>
+        </div>
+      </div>
+      <div className="cdc-waffle-chart__subtext">
+        {subtext}
       </div>
     </section>
   )
@@ -95,12 +102,6 @@ const CdcWaffleChart = ({
   }) => {
   const [ config, setConfig ] = useState({})
   const [ loading, setLoading ] = useState(true)
-
-  const {
-    title,
-    filters,
-    subtext
-  } = config
 
   const getViewport = size => {
     let result = 'lg'
@@ -181,7 +182,6 @@ const CdcWaffleChart = ({
     body = (
       <div className={`cdc-open-viz-module type-waffle-chart ${classList.join(' ')}`} style={isEditor ? {paddingLeft: 350 + 'px'} : null}>
         {isEditor && <EditorPanel/>}
-        {title}
         <WaffleChart config={config} data={94.5} spacer={1} radius={6}/>
       </div>
     )
