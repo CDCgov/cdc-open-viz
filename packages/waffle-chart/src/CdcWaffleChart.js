@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
@@ -16,7 +16,8 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
     theme,
     prefix,
     suffix,
-    subtext
+    subtext,
+    content
   } = config
 
   let themeColor = {
@@ -83,7 +84,7 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
           <div className="cdc-waffle-chart__data--primary" style={{ color: themeColor[theme] }}>
             {prefix ? prefix : null}{data}{suffix ? suffix : null}
           </div>
-          <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}></div>
+          <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}>{content}</div>
         </div>
       </div>
       <div className="cdc-waffle-chart__subtext">
@@ -93,13 +94,15 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
   )
 }
 
-const CdcWaffleChart = ({
+const CdcWaffleChart = (
+  {
     configUrl,
     config: configObj,
     isDashboard = false,
     isEditor = false,
     setConfig: setParentConfig
-  }) => {
+  }
+) => {
   const [ config, setConfig ] = useState({})
   const [ loading, setLoading ] = useState(true)
 
@@ -169,8 +172,8 @@ const CdcWaffleChart = ({
       updateConfig({ ...defaults, ...response })
     }
 
-    loadData().then(r => setLoading(false));
-  }, [configObj, configUrl])
+    loadData().then(r => setLoading(false))
+  }, [ configObj, configUrl ])
 
   let body = (<Loading/>)
 
@@ -180,7 +183,8 @@ const CdcWaffleChart = ({
     classList.push(config.theme)
 
     body = (
-      <div className={`cdc-open-viz-module type-waffle-chart ${classList.join(' ')}`} style={isEditor ? {paddingLeft: 350 + 'px'} : null}>
+      <div className={`cdc-open-viz-module type-waffle-chart ${classList.join(' ')}`}
+           style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
         {isEditor && <EditorPanel/>}
         <WaffleChart config={config} data={94.5} spacer={1} radius={6}/>
       </div>
@@ -219,11 +223,11 @@ export const BITE_LOCATION_TITLE = 'title'
 export const BITE_LOCATION_BODY = 'body'
 export const BITE_LOCATION_GRAPHIC = 'graphic'
 export const BITE_LOCATIONS =
-{
-  'title' : 'As a title in the body',
-  'body' : 'At the beginning of the body text',
-  'graphic' : 'As a graphic'
-}
+  {
+    'title': 'As a title in the body',
+    'body': 'At the beginning of the body text',
+    'graphic': 'As a graphic'
+  }
 
 
 export const IMAGE_POSITION_LEFT = 'Left'

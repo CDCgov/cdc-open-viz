@@ -297,12 +297,12 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title"
+                  <TextField value={config.title} fieldName="title" label="Title" placeholder="Waffle Chart Title"
                              updateField={updateField}/>
-                  <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message"
+                  <TextField type="textarea" value={config.content} fieldName="waffleContent" label="Message"
                              updateField={updateField}/>
                   <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation"
-                             placeholder="Data Bite Subtext or Citation" updateField={updateField}/>
+                             placeholder="Waffle Chart Subtext or Citation" updateField={updateField}/>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
