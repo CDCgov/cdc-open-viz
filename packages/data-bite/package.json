@@ -8,6 +8,7 @@
     "build": "npx webpack --mode production --env packageName=CdcDataBite --env folderName=data-bite -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/data-bite build"
   },
+  "files": ["./dist/"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
