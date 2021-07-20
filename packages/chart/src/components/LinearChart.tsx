@@ -93,6 +93,14 @@ export default function LinearChart() {
 
       yScale.rangeRound([0, yMax]);
     } else {
+      xScale = config.xAxis.type >= 1 ? 
+        scaleLinear<number>({
+          domain: [Math.min(...xAxisDataMapped), 
+          Math.max(...xAxisDataMapped)], 
+          range: [0, xMax],
+        }) : 
+        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
+
       yScale = scaleLinear<number>({
         domain: [min, max],
         range: [yMax, 0]
