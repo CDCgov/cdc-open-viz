@@ -694,11 +694,7 @@ const EditorPanel = (props) => {
   }
   
   const onBackClick = () => {
-    if(isDashboard){
-      setState({...state, editing: false});
-    } else {
-      setDisplayPanel(!displayPanel);
-    }
+    setDisplayPanel(!displayPanel);
   }
 
   const usedFilterColumns = {}

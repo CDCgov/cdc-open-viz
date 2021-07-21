@@ -9,8 +9,34 @@
   @import 'grid';
   font-size: 16px;
   line-height: 1.4;
+  color: #333;
   .loading > div.la-ball-beat {
     margin-top: 20%;
+  }
+  .editor-heading {
+    background-color: #F2F2F2;
+    padding: .5em 1em;
+    overflow: hidden;
+  }
+  .toggle-bar {
+    overflow: hidden;
+    float: right;
+    border-radius: .3em;
+    border: #C2C2C2 1px solid;
+    button {
+      background-color: #F2F2F2;
+      padding: .6em 1em;
+      color: #333;
+      &.active {
+        background-color: #fff;
+      }
+      &.inactive:hover {
+        color: #000;
+      }
+      &:first-child {
+        border-right: #C2C2C2 1px solid;
+      }
+    }
   }
 
   .visually-hidden {
@@ -56,14 +82,11 @@
     }
   }
 
-  h1.dashboard-title {
-      color: white;
-      padding: .6em .8em;
-      border-bottom-width: 3px;
-      border-bottom-style: solid;
-  }
-
-  h1.dashboard-title {
+  div.dashboard-title {
+    color: white;
+    padding: .6em .8em;
+    border-bottom-width: 3px;
+    border-bottom-style: solid;
     margin: 0;
     color: #fff;
     font-size: 1.1em;
@@ -86,21 +109,58 @@
     margin-bottom: 20px;
   }
 
-  .col {
+  .dashboard-row {
+    display: flex;
+  }
+
+  .dashboard-col {
     display: inline-block;
     vertical-align: top;
-    margin: 15px;
+    margin: 1em;
   }
 
-  .col-12 {
-    width: calc(100% - 30px);
+  .dashboard-col-12 {
+    width: 100%;
   }
 
-  .col-6 {
-    width: calc(50% - 30px);
+  .dashboard-col-8 {
+    width: 66%;
   }
 
-  .col-4 {
-    width: calc(33% - 30px);
+  .dashboard-col-6 {
+    width: 50%;
+  }
+
+  .dashboard-col-4 {
+    width: 33%;
+  }
+
+  .dashboard-filters-section {
+    margin: 1em
+  }
+  .builder-grid .editor-heading {
+    position: relative;
+    right: -2em;
+  }
+
+  .sub-editor {
+    margin-top: 40px;
+    .sub-editor-heading {
+      display: flex;
+      align-items: center;
+      padding: 1em;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 40px;
+      background-color: red;
+      z-index: 10;
+    }
+    .editor-panel {
+      top: 40px;
+    }
+    .editor-toggle {
+      top: 3em;
+    }
   }
 }

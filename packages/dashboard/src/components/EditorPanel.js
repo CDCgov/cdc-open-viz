@@ -217,11 +217,6 @@ const EditorPanel = memo(() => {
     return newVisualizationConfig
   }
 
-  const capitalize = (s) => {
-    if (typeof s !== 'string') return ''
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
@@ -311,10 +306,6 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel className="add-visualizations accordion__panel">
                   <p>Click and drag an item onto the grid to add it to your dashboard.</p>
-                  <span className="subheading-3">General</span>
-                  <div className="drag-grid">
-                    <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
-                  </div>
                   <span className="subheading-3">Chart</span>
                   <div className="drag-grid">
                     <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar" />
@@ -325,6 +316,10 @@ const EditorPanel = memo(() => {
                   <div className="drag-grid">
                     <Widget addVisualization={() => addVisualization('map', 'us')} type="us" />
                     <Widget addVisualization={() => addVisualization('map', 'world')} type="world" />
+                  </div>
+                  <span className="subheading-3">Misc.</span>
+                  <div className="drag-grid">
+                    <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
                   </div>
                 </AccordionItemPanel>
               </AccordionItem>
