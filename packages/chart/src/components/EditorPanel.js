@@ -298,11 +298,7 @@ const EditorPanel = memo(() => {
   }
 
   const onBackClick = () => {
-    if(isDashboard){
-      updateConfig({...config, editing: false});
-    } else {
       setDisplayPanel(!displayPanel);
-    }
   }
 
   const Error = () => {

@@ -18,10 +18,22 @@ import CdcDataBite from '@cdc/data-bite';
 
 import EditorPanel from './components/EditorPanel';
 import Grid from './components/Grid';
+import PreviewToggle from './components/PreviewToggle';
 import Context from './context';
 import defaults from './data/initial-state';
 
 import './scss/main.scss';
+
+const SubEditor = ({children, back}) => {
+  return (
+    <div className="sub-editor">
+      <div className="sub-editor-heading">
+        <p>You are editing a component inside of the dashboard. <span style={{textDecoration: 'underline'}} onClick={back}>Back to dashboard</span>.</p>
+      </div>
+      {children}
+    </div>
+  )
+}
 
 export default function CdcDashboard(
   { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined }
@@ -173,7 +185,7 @@ export default function CdcDashboard(
       });
 
       return (
-        <section className="filters-section" key={index}>
+        <section className="dashboard-filters-section" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
           <select
             id={`filter-${index}`}
@@ -209,15 +221,23 @@ export default function CdcDashboard(
       if(visualizationConfig.editing) {
         subVisualizationEditing = true;
 
+        const back = () => {
+          const newConfig = {...config}
+
+          delete newConfig.visualizations[visualizationKey].editing
+
+          setConfig(newConfig)
+        }
+
         switch(visualizationConfig.type){
           case 'chart':
-            body = <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />;
+            body = <SubEditor back={back}><CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></SubEditor>;
             break;
           case 'map': 
-            body = <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />;
+            body = <SubEditor back={back}><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></SubEditor>;
             break;
           case 'data-bite':
-            body = <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} />
+            body = <SubEditor back={back}><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></SubEditor>
             break;
         }
       }
@@ -230,15 +250,13 @@ export default function CdcDashboard(
           <Grid />
         </>
       )
-
     }
   } else {
     body = (
       <div className="cdc-dashboard-inner-container">
-        {preview && <button onClick={() => {setPreview(false)}}>Layout Editor</button>}
-
+        <PreviewToggle preview={preview} setPreview={setPreview} />
         {/* Title */}
-        {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme}`}>{title}</div>}
+        {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
         {/* Filters */}
         {config.dashboard.filters && <Filters />}
@@ -246,14 +264,16 @@ export default function CdcDashboard(
         {/* Visualizations */}
         {config.rows && config.rows.map(row => {
           return (
-            <div className="row">
+            <div className="dashboard-row">
               {row.map(col => {
-                if(col.width){
+                if(col.width) {
+                  if(!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
+
                   let visualizationConfig = config.visualizations[col.widget];
 
                   visualizationConfig.data = filteredData || data;
           
-                  return <div className={`col col-${col.width}`}>
+                  return <div className={`dashboard-col dashboard-col-${col.width}`}>
                     {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                     {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                     {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
