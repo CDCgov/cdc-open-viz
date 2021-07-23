@@ -48,6 +48,9 @@ const RowMenu = ({ rowIdx, row }) => {
     rows[newIdx] = row
     rows[rowIdx] = temp
 
+    rows[newIdx].uuid = Date.now();
+    rows[rowIdx].uuid = Date.now();
+
     updateConfig({...config, rows})
 
     // TODO: Migrate this animation to a React animation library once one is selected for COVE. This is pretty minor so can stay for now.
@@ -120,12 +123,12 @@ const RowMenu = ({ rowIdx, row }) => {
   )
 }
 
-const Row = ({ row, idx: rowIdx }) => {
+const Row = ({ row, idx: rowIdx, uuid}) => {
   return (
     <div className="builder-row" data-row-id={rowIdx}>
       <RowMenu rowIdx={rowIdx} row={row} />
       <div className="column-container">
-        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} key={`row-${rowIdx}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />)}
+        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />)}
       </div>
     </div>
   )
