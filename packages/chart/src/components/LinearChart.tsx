@@ -93,14 +93,6 @@ export default function LinearChart() {
 
       yScale.rangeRound([0, yMax]);
     } else {
-      xScale = config.xAxis.type >= 1 ? 
-        scaleLinear<number>({
-          domain: [Math.min(...xAxisDataMapped), 
-          Math.max(...xAxisDataMapped)], 
-          range: [0, xMax],
-        }) : 
-        scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
-
       yScale = scaleLinear<number>({
         domain: [min, max],
         range: [yMax, 0]
@@ -166,7 +158,7 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
-              const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+            const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               return (
                 <Group className="left-axis">
