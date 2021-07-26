@@ -292,9 +292,20 @@ const CdcDataBite = (
     )
   }
   
+  let classNames = [
+    'cdc-open-viz-module',
+    'type-data-bite',
+    currentViewport,
+    'font-' + config.fontSize
+  ];
+  if (isEditor) {
+    classNames.push('is-editor');
+  }
+
+
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      <div className={`cdc-open-viz-module type-data-bite ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
+      <div className={classNames.join(' ')} ref={outerContainerRef}>
         {body}
       </div>
     </Context.Provider>

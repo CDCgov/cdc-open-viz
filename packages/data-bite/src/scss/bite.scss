@@ -1,9 +1,21 @@
 @import "../../../core/styles/variables";
 
+.cdc-open-viz-module.type-data-bite.is-editor {
+  max-width: 40em;
+  margin-left: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+
+  .cdc-data-bite-inner-container {
+    margin: 3em;
+  }
+}
+
 .cdc-data-bite-inner-container {
 
   .bite {
-    border-radius: .3em;
     box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px;
     position: relative;
     overflow: hidden;
@@ -169,7 +181,7 @@
 
         p {
           margin: 0;
-          font-size: .7em;
+          font-size: 0.9em;
           color: #222;
         }
 
