@@ -422,7 +422,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                    {config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'} {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -447,7 +447,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                  {config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'} {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -466,7 +466,7 @@ const EditorPanel = memo(() => {
                       )}
                       {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} /> 
+                      {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
                     </>
                   )}                 
                 </AccordionItemPanel>
