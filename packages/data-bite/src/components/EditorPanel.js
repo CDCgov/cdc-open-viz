@@ -10,6 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce';
 import Context from '../context';
+import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
 
@@ -267,12 +268,12 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Data
+                    Data {(!config.dataColumn || !config.dataFunction) && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" options={getColumns()} />
-                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" options={DATA_FUNCTIONS} />
+                  <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" required={true} options={getColumns()} />
+                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" required={true} options={DATA_FUNCTIONS} />
                   <ul className="column-edit">
                     <li className="three-col">
                       <TextField value={config.prefix} fieldName="prefix" label="Prefix" updateField={updateField} />
