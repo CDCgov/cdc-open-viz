@@ -434,6 +434,15 @@ const EditorPanel = (props) => {
           }
         })
       break;
+      case 'showDataTable':
+        setState({
+          ...state,
+          dataTable: {
+              ...state.dataTable,
+              forceDisplay: value
+          }
+        })
+        break;
       default:
           console.warn(`Did not recognize editor property.`)
       break;
@@ -1068,6 +1077,10 @@ const EditorPanel = (props) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={dataTable.title} updateField={updateField} section="dataTable" fieldName="title" label="Data Table Title" placeholder="Data Table" />
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard } onChange={(event) => { handleEditorChanges("showDataTable", event.target.checked) }} />
+                    <span className="edit-label">Show Table</span>
+                  </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />
                     <span className="edit-label">Map loads with data table expanded</span>
