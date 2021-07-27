@@ -26,6 +26,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
 
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
+    debugger;
     if(null !== tempConfig) {
       const parsedData = JSON.stringify(tempConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
@@ -35,6 +36,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   }, [tempConfig])
 
   useEffect(() => {
+    debugger;
     const parsedData = JSON.stringify(config)
     // Emit the data in a regular JS event so it can be consumed by anything.
     const event = new CustomEvent('updateVizConfig', { detail: parsedData})
