@@ -10,7 +10,7 @@
     "biteBody": "This is the max insured rate. This is the max insured rate. This is the max insured rate. This is the max insured rate.",
     "prefix": "",
     "suffix": "",
-    "roundToPlace": "",
+    "roundToPlace": 0,
     "filters": [],
     "biteLocation": "graphic",
     "subtext": "Please note, this is the Data Bite's subtext or citation",

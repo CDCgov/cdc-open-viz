@@ -532,7 +532,7 @@
   }
 }
 @include breakpointClass(md) {
-  .editor-panel:not(.hidden) + .cdc-data-bite-inner-container {
+  .editor-panel:not(.hidden) + .cdc-open-viz-module.type-data-bite {
     padding-left: $editorWidth;
   }
 
