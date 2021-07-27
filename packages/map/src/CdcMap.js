@@ -906,6 +906,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             addUIDs(newState, newState.columns.geo.name)
         }
 
+        if(newState.dataTable.forceDisplay === undefined){
+            newState.dataTable.forceDisplay = !isDashboard;
+        }
+
         setState(newState)
 
         // Done loading

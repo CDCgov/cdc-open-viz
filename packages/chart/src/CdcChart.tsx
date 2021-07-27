@@ -526,7 +526,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && <DataTable />}
         </div>}
       </>
     )

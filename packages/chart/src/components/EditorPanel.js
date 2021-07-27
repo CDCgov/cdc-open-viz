@@ -160,6 +160,9 @@ const EditorPanel = memo(() => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
     }
+    if(updatedConfig.table.show === undefined){
+      updatedConfig.table.show = !isDashboard;
+    }
   };
 
   const updateField = (section, subsection, fieldName, newValue) => {
@@ -611,6 +614,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField} />
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
