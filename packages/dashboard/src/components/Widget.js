@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useDrag } from 'react-dnd';
 import CloseIcon from '../images/icon-close.svg';
 import EditIcon from '../images/icon-edit.svg';
@@ -72,6 +72,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
+    delete visualizations[data.uid].configNeeded
     visualizations[data.uid].editing = true;
 
     updateConfig({...config, visualizations});
@@ -89,6 +90,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         )}
         {iconHash[type]}
         <span>{labelHash[type]}</span>
+        {data.configNeeded && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
       </div>
     </div>
   )

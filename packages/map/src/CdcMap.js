@@ -32,6 +32,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 // Core
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -86,28 +87,6 @@ const numberFromString = (value) => {
     return value
 }
 
-const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-}
-
 const getUniqueValues = (data, columnName) => {
     let result = {}
 
@@ -129,7 +108,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
-    const [viewport, setViewport] = useState('lg')
+    const [currentViewport, setCurrentViewport] = useState('lg')
     const [runtimeFilters, setRuntimeFilters] = useState([])
     const [runtimeLegend, setRuntimeLegend] = useState([])
     const [runtimeData, setRuntimeData] = useState({init: true})
@@ -142,9 +121,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
     
-            setViewport(newViewport)
+            setCurrentViewport(newViewport)
         }
     });
+
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
@@ -848,7 +828,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const geoClickHandler = (key, value) => {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
+        if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
                 keyedData: value
@@ -1012,7 +992,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     let outerContainerClasses = [
         'cdc-open-viz-module',
         'cdc-map-outer-container',
-        viewport
+        currentViewport
     ]
 
     if(className) {
@@ -1053,8 +1033,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
             {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
-            <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
+            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
                         id="tooltip"
                         place="right"
@@ -1084,14 +1064,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         </div>
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                        {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                             {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                             {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
-                            viewport={viewport}
+                            viewport={currentViewport}
                             legend={state.legend}
                             runtimeLegend={runtimeLegend}
                             setRuntimeLegend={setRuntimeLegend}
@@ -1132,7 +1112,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         applyLegendToRow={applyLegendToRow}
                         tableTitle={dataTable.title}
                         mapTitle={general.title}
-                        viewport={viewport}
+                        viewport={currentViewport}
                     />
                 }
                 {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}

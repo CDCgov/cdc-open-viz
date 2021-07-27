@@ -1,8 +1,17 @@
+// Shift down for top level Dashboard bar when in edit mode
+.layout-container, .editor-panel + .cdc-dashboard-inner-container, .editor-heading + .cdc-open-viz-module {
+  position: relative;
+  top: 3em;
+  .editor-panel {
+    top: 3em;
+  }
+  .editor-toggle {
+    top: 3.5em;
+  }
+}
+
 .editor-panel {
-    .heading {
-      font-size: 1.2em;
-    }
-    + .cdc-dashboard-inner-container > * {
+    + .cdc-dashboard-inner-container > *:not(.editor-heading) {
       margin: 1em;
     }
     .two-col-inputs {
@@ -53,7 +62,7 @@
     display: flex;
     flex-direction: column;
     left: 0;
-    top: 0;
+    top: 48px;
     bottom: 0;
     .accordion__heading {
       background: $lightestGray;
@@ -182,7 +191,7 @@
       }
     }
   
-    h2 {
+    .heading-2 {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -557,7 +566,7 @@
   width: 25px;
   height: 25px;
   left: 307px;
-  top: 10px;
+  top: calc(3em + 10px);
   box-shadow: rgba(0,0,0,.5) 0 1px 2px;
   &:before {
     top: 43%;
@@ -617,7 +626,6 @@
       svg {
         width: 50px;
         height: 50px;
-        fill: $baseColor;
         margin-bottom: .5em;
       }
     }

@@ -248,7 +248,7 @@ const EditorPanel = memo(() => {
       {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
-        <h2>Configure Data Bite</h2>
+        <div className="heading-2">Configure Data Bite</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>

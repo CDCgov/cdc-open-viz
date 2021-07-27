@@ -7,34 +7,53 @@
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
   @import 'grid';
-  font-size: 16px;
-  line-height: 1.4;
-  color: #333;
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
   .editor-heading {
-    background-color: #F2F2F2;
-    padding: .5em 1em;
-    overflow: hidden;
-  }
-  .toggle-bar {
-    overflow: hidden;
-    float: right;
-    border-radius: .3em;
-    border: #C2C2C2 1px solid;
-    button {
-      background-color: #F2F2F2;
-      padding: .6em 1em;
-      color: #333;
-      &.active {
-        background-color: #fff;
+    background-color: #fff;
+    border-bottom: #C7C7C7 1px solid;
+    padding: 0 1em;
+    display: flex;
+    height: 3em;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    z-index: 3;
+    top: 0;
+    .heading-1 {
+      font-size: 1.2em;
+      &.back-to {
+        display: flex;
+        span {
+          font-weight: bold;
+          padding-right: .3em;
+        }
       }
-      &.inactive:hover {
-        color: #000;
-      }
-      &:first-child {
-        border-right: #C2C2C2 1px solid;
+    }
+
+    .toggle-bar {
+      overflow: hidden;
+      display: flex;
+      list-style: none;
+      align-self: stretch;
+      position: relative;
+      bottom: -1px;
+      li {
+        padding: .6em 1.5em;
+        color: $mediumGray;
+        border-bottom: #C7C7C7 1px solid;
+        cursor: pointer;
+        &.active {
+          border-bottom-width: 5px;
+          border-bottom-color: $mediumGray;
+          color: $darkGray;
+        }
+        &:hover {
+          border-bottom-color: $darkGray;
+          color: $darkGray;
+        }
       }
     }
   }
@@ -111,6 +130,7 @@
 
   .dashboard-row {
     display: flex;
+    flex-direction: column;
   }
 
   .dashboard-col {
@@ -122,17 +142,20 @@
   .dashboard-col-12 {
     width: 100%;
   }
-
-  .dashboard-col-8 {
-    width: 66%;
-  }
-
-  .dashboard-col-6 {
-    width: 50%;
-  }
-
-  .dashboard-col-4 {
-    width: 33%;
+  @include breakpointClass(lg) {
+    .dashboard-row {
+      flex-direction: row;
+    }
+    .dashboard-col-8 {
+      width: 66%;
+    }
+    .dashboard-col-6 {
+      width: 50%;
+    }
+  
+    .dashboard-col-4 {
+      width: 33%;
+    }
   }
 
   .dashboard-filters-section {

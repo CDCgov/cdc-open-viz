@@ -54,6 +54,7 @@ export default function ChooseTab() {
             }
 
             setConfig(newConfig)
+            setGlobalActive(2)
         }
 
         return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span className="mt-1">{label}</span></button>)
@@ -61,25 +62,22 @@ export default function ChooseTab() {
 
     return (
         <div className="choose-vis">
-            <h2 style={{fontSize: "1.4rem"}}>General</h2>
+            <div className="heading-2">General</div>
             <ul className="grid">
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
                 <li><IconButton label="Data Bite" type="data-bite" icon={ <DataBiteIcon /> } /></li>
             </ul>
-            <h2 className="mt-4" style={{fontSize: "1.4rem"}}>Charts</h2>
+            <div className="heading-2">Charts</div>
             <ul className="grid">
                 <li><IconButton label="Bar" type="chart" subType="Bar" icon={ <BarIcon /> } /></li>
                 <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
                 <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
             </ul>
-            <h2 className="mt-4" style={{fontSize: "1.4rem"}}>Maps</h2>
+            <div className="heading-2">Maps</div>
             <ul className="grid">
                 <li><IconButton label="United States" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
             </ul>
-            {config.type && <div className="mt-3">
-                <span className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(2)}>Configure your <span className="capitalize">{config.type}</span> &raquo;</span>
-            </div>}
         </div>
     )
 }
