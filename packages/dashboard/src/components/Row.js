@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Column from './Column'
 import Context from '../context'
 import CloseIcon from '../images/icon-close.svg'

@@ -1,14 +1,34 @@
 $blue-light: #8bc6f7;
 $red: #f74242;
 
+.layout-container {
+  display: flex;
+}
+
+.visualizations-panel {
+  background-color: #fff;
+  padding: 1em;
+  width: 350px;
+  border-right: #C7C7C7 1px solid;
+  position: fixed;
+  top: 3em;
+  bottom: 0;
+  z-index: 1;
+}
+
 .hidden.editor-panel + .builder-grid {
   margin-left: 0 !important;
 }
 
+.config-needed {
+  color: $red;
+  font-size: .75em;
+}
+
 .builder-grid {
-  margin-left: 350px;
-  padding: 3em;
-  padding-top: 1em;
+  flex-grow: 1;
+  padding: 5em 3em 3em;
+  margin-left: calc(350px + 1em);
 }
 
 .column-container {
@@ -255,21 +275,9 @@ $red: #f74242;
   }
 }
 
-.btn {
-  display: inline-block;
-  box-shadow: none;
-  background-color: $blue;
-  border: 0 solid #dadada;
-  outline: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 2px;
-  font-weight: bold;
-  color: #fff;
-  &.add-row {
-    padding: .75em;
-    font-size: 1em;
-  }
+.btn.add-row {
+  font-size: 1.2em;
+  width: 100%;
 }
 
 .btn--fluid {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -12,6 +12,7 @@ import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -51,8 +52,6 @@ export default function CdcChart(
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
-
-  const outerContainerRef = useRef(null);
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
@@ -222,29 +221,6 @@ export default function CdcChart(
     }
   }
 
-
-  const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-  }
-
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -261,10 +237,15 @@ export default function CdcChart(
     }
   })
 
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  },[]);
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
-    resizeObserver.observe(outerContainerRef.current);
   }, []);
 
   // Generates color palette to pass to child chart component

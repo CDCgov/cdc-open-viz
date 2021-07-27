@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
+import getViewport from '@cdc/core/helpers/getViewport';
 import ResizeObserver from 'resize-observer-polyfill';
 import Context from './context';
 // @ts-ignore
@@ -35,39 +36,16 @@ const CdcDataBite = (
     subtext
   } = config;
 
-  const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-}
-
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
-  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-        let newViewport = getViewport(entry.contentRect.width)
+        let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
 
         setCurrentViewport(newViewport)
     }
-});
+  });
 
   const updateConfig = (newConfig) => {
     // Deeper copy

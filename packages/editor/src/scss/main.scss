@@ -22,12 +22,6 @@ $tempLightGray: #C7C7C7;
       }
     }
   }
-  .editor-toggle {
-    top: 3.6rem !important;
-  }
-  .editor-panel {
-    top: 3rem !important
-  }
   // Top level tabs
   .top-level {
     position: fixed;
@@ -77,7 +71,6 @@ $tempLightGray: #C7C7C7;
       display: block
     }
   }
-
   .info-box {
     border: $lightGray 1px solid;
     padding: 1rem;

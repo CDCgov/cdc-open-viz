@@ -10,5 +10,5 @@ ReactDOM.render(
   <StrictMode>
     <CdcMap isEditor={isEditor} />
   </StrictMode>,
-  document.querySelector('.cdc-open-viz-module')
+  document.querySelector('.react-container')
 );

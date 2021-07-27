@@ -12,7 +12,6 @@ import { useDebounce } from 'use-debounce';
 import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import Widget from './Widget'
 
 // IE11 Custom Event polyfill
 (function () {
@@ -196,27 +195,6 @@ const EditorPanel = memo(() => {
 
   }
 
-  const addVisualization = (type, subType) => {
-    let newVisualizationConfig = {};
-    newVisualizationConfig.uid = type + Date.now();
-    newVisualizationConfig.type = type;
-
-    switch(type) {
-      case 'chart':
-        newVisualizationConfig.visualizationType = subType;
-        break;
-      case 'map':
-        newVisualizationConfig.general = {};
-        newVisualizationConfig.general.geoType = subType;
-        break;
-      case 'data-bite':
-        newVisualizationConfig.visualizationType = type;
-        break;
-    }
-
-    return newVisualizationConfig
-  }
-
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
@@ -283,7 +261,7 @@ const EditorPanel = memo(() => {
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
-        <h2>Configure Dashboard</h2>
+        <div className="heading-2">Configure</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -296,31 +274,6 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <TextField value={config.dashboard.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
                   <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
-                </AccordionItemPanel>
-              </AccordionItem>
-              <AccordionItem> {/* Visualizations */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Visualizations
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel className="add-visualizations accordion__panel">
-                  <p>Click and drag an item onto the grid to add it to your dashboard.</p>
-                  <span className="subheading-3">Chart</span>
-                  <div className="drag-grid">
-                    <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar" />
-                    <Widget addVisualization={() => addVisualization('chart', 'Line')} type="Line" />
-                    <Widget addVisualization={() => addVisualization('chart', 'Pie')} type="Pie" />
-                  </div>
-                  <span className="subheading-3">Map</span>
-                  <div className="drag-grid">
-                    <Widget addVisualization={() => addVisualization('map', 'us')} type="us" />
-                    <Widget addVisualization={() => addVisualization('map', 'world')} type="world" />
-                  </div>
-                  <span className="subheading-3">Misc.</span>
-                  <div className="drag-grid">
-                    <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
-                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

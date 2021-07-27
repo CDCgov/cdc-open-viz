@@ -212,8 +212,8 @@ export default function DataImport() {
 
   return (
     <>
-      <div className="left-col px-4">
-        <Tabs className="mb-4">
+      <div className="left-col">
+        <Tabs>
           <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
             <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
               <FileUploadIcon />
@@ -226,9 +226,9 @@ export default function DataImport() {
             </div>
           </TabPane>
           <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
-            <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
-              <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
-              <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
+            <form className="input-group" onSubmit={(e) => e.preventDefault()}>
+              <input id="external-data" type="text" className="form-control" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
+              <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
             </form>
             <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
               <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
@@ -240,23 +240,17 @@ export default function DataImport() {
             <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors( errors.filter((val, i) => i !== index) )} />
           </div>
         )) : errors.message)}
-        <p className="footnote mt-2 mb-4">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
+        <p className="footnote">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.</p>
         {/* TODO: Add more sample data in, but this will do for now. */}
-        <span className="heading">Load Sample Data:</span>
+        <div className="heading-3">Load Sample Data</div>
         <ul className="sample-data-list">
           <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}))}>United States Sample Data #1</li>
           <li onClick={() => setConfig({...config, data: validChartData})}>Chart Sample Data</li>
         </ul>
-        <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
-          <div>
-            <h3>Get Help</h3>
-            <p>Documentation and examples on formatting data and configuring visualizations.</p>
-          </div>
-        </a>
         {config.data && (
-          <>
             <div>
               <div className="question">
+                <div className="heading-3">Describe Data</div>
                 <span>Is the geography/X-axis value in your data structured horizontally, or vertically?</span>
                 <div>
                   <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', false)}}>
@@ -337,7 +331,6 @@ export default function DataImport() {
                   </div>
                 </div>
               </div>
-
               {config.dataDescription && (
                   <>
                       <div className="question">
@@ -458,10 +451,6 @@ export default function DataImport() {
                   </>
               )}
           </div>
-          {config.formattedData && (
-              <button className="btn btn-primary" style={{float: 'right'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
-          )}
-        </>
         )}
       </div>
       <div className="right-col">

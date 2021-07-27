@@ -5,6 +5,8 @@ import CdcMap from '@cdc/map'; // TODO: Lazy load this
 import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 import CdcDataBite from '@cdc/data-bite';
 
+import '../scss/configure-tab.scss';
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import GlobalState from '../context';
 
