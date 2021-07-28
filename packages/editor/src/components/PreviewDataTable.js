@@ -38,10 +38,29 @@ const TableFilter = memo(({globalFilter, setGlobalFilter, disabled = false}) => 
 });
 
 const Header = memo(({ globalFilter, data, setGlobalFilter}) => (
-  <header className="data-table-header mb-4">
+  <header className="data-table-header">
     <h2>Data Preview</h2>
     <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
   </header>
+))
+
+const Footer = memo(({previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages}) => (
+  <footer className="data-table-pagination">
+    <ul>
+      <li>
+        <button onClick={() => previousPage()} className="btn btn-prev" disabled={!canPreviousPage} title="Previous Page"></button>
+      </li>
+      <li>
+        <button onClick={() => nextPage()} className="btn btn-next" disabled={!canNextPage} title="Next Page"></button>
+      </li>
+    </ul>
+    <span>
+      Page{' '}
+      <strong>
+        {pageNumber} of {totalPages}
+      </strong>
+    </span>
+  </footer>
 ))
 
 const PreviewDataTable = ({ data }) => {
@@ -56,11 +75,12 @@ const PreviewDataTable = ({ data }) => {
       setErrors([errorMessages.emptyCols]);
     }
     
-    return columns.map((columnName) => {
+    return columns.map((columnName, idx) => {
         const columnConfig = {
           id: `column-${columnName}`,
           accessor: row => row[columnName],
-          Header: columnName
+          Header: columnName,
+          width: 250
         };
 
         return columnConfig
@@ -86,7 +106,6 @@ const PreviewDataTable = ({ data }) => {
       newData.columns = columns;
       return newData;
     }
-
   }, [])
 
   useEffect(() => {
@@ -197,60 +216,47 @@ const PreviewDataTable = ({ data }) => {
     )
   }
 
-  if(!data) {
-    return [<Header />, <PlaceholderTable />]
-  }
+  if(!data) return [<Header key="header" />, <PlaceholderTable key="table" />]
+
+  const footerProps = {previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length}
 
   const Table = () => (
     <>
-      <table className="data-table table-responsive" {...getTableProps()} aria-hidden="true">
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''} title={column.Header}>
-                {column.render('Header')}
-                <div {...column.getResizerProps()} className="resizer" />
-              </th>
+      <section className={`data-table-container`}>
+        <table className="data-table table-responsive" {...getTableProps()} aria-hidden="true">
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''} title={column.Header}>
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className="resizer" />
+                  </th>
+                ))}
+              </tr>
             ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {page.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => (
-                <td {...cell.getCellProps()} title={cell.value}>
-                  {cell.render('Cell')}
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-    <footer className="data-table-pagination">
-      <ul>
-        <li>
-          <button onClick={() => previousPage()} className="btn btn-prev" disabled={!canPreviousPage} title="Previous Page"></button>
-        </li>
-        <li>
-          <button onClick={() => nextPage()} className="btn btn-next" disabled={!canNextPage} title="Next Page"></button>
-        </li>
-      </ul>
-      <span>
-        Page{' '}
-        <strong>
-          {pageIndex + 1} of {pageOptions.length}
-        </strong>
-      </span>
-    </footer>
-    </>
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {page.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} title={cell.value}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+      <Footer {...footerProps} />
+  </>
   )
 
-  return [<Header data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table />]
+  return [<Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key="table" />]
 };
 
 export default PreviewDataTable;

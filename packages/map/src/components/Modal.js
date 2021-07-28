@@ -6,14 +6,14 @@ const Modal = (props) => {
     applyTooltipsToGeo,
     content,
     capitalize,
-    applyLegendToValue,
+    applyLegendToRow,
     viewport,
     type
   } = props;
 
-  const tooltip = applyTooltipsToGeo(content.geoName, content.geoData, 'jsx');
+  const tooltip = applyTooltipsToGeo(content.geoName, content.keyedData, 'jsx');
 
-  const legendColors = applyLegendToValue(content.geoData);
+  const legendColors = applyLegendToRow(content.keyedData);
 
   return (
     <section className={capitalize ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport} aria-hidden="true">

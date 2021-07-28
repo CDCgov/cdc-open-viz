@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 1.5em;
   h2 {
     font-weight: 600;
     font-size: 1.3em;
@@ -24,8 +25,6 @@
   
     th, 
     td {
-      width: inherit !important;
-      min-width: 100px !important;
       border-bottom: solid 1px #E5E5E5;
       border-right: solid 1px #E5E5E5
     }

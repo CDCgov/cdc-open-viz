@@ -35,9 +35,6 @@ export default {
     },
     navigate: {
       name: ''
-    },
-    geosInRegion: {
-      name: ''
     }
   },
   legend: {
@@ -51,13 +48,9 @@ export default {
     position: "side",
     title: "Legend",
   },
-  data: [
-    {},
-  ],
   filters: [],
   dataTable: {
-    title: 'Data Table',
-    forceDisplay: true // When standalone, this can't be removed. When this component is used in larger composed configurations there will be a different data table.
+    title: 'Data Table'
   },
   tooltips: {
     appearanceType: 'hover',

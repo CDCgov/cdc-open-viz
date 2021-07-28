@@ -4,11 +4,6 @@
 $tempLightGray: #C7C7C7;
 
 .cdc-editor {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-  @import "~bootstrap/scss/grid";
   min-height: inherit;
   display: flex;
   flex-direction: column;
@@ -26,12 +21,6 @@ $tempLightGray: #C7C7C7;
         cursor: default;
       }
     }
-  }
-  .editor-toggle {
-    top: 3.6rem !important;
-  }
-  .editor-panel {
-    top: 3rem !important
   }
   // Top level tabs
   .top-level {
@@ -82,7 +71,6 @@ $tempLightGray: #C7C7C7;
       display: block
     }
   }
-
   .info-box {
     border: $lightGray 1px solid;
     padding: 1rem;

@@ -1,8 +1,4 @@
 .editor-panel {
-    font-size: 17.5px;
-    .heading {
-      font-size: 1.2em;
-    }
     + .cdc-chart-inner-container > * {
       margin: 1em;
     }
@@ -183,7 +179,7 @@
       }
     }
   
-    h2 {
+    .heading-2 {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -539,13 +535,10 @@
   }
 }
 @include breakpointClass(md) {
-  .editor-panel:not(.hidden):not(.dashboard) + .cdc-chart-inner-container {
+  .editor-panel:not(.hidden) + .cdc-chart-inner-container {
     padding-left: $editorWidth;
   }
   .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
     padding-left: 3em;
-  }
-  .waiting {
-    padding-left: 350px;
   }
 }

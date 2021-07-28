@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -12,6 +12,7 @@ import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -21,9 +22,10 @@ import defaults from './data/initial-state';
 
 import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} : 
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
 
@@ -32,7 +34,7 @@ export default function CdcChart(
   const [colorScale, setColorScale] = useState<any>(null);
 
   interface keyable {
-    [key: string]: any  
+    [key: string]: any
   }
 
   const [config, setConfig] = useState<keyable>({});
@@ -51,8 +53,6 @@ export default function CdcChart(
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
-
-  const outerContainerRef = useRef(null);
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
@@ -90,9 +90,9 @@ export default function CdcChart(
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
     // Deeper copy
-    Object.keys(defaults).forEach( key => {
-      if(newConfig[key] && 'object' === typeof newConfig[key]) {
-        newConfig[key] = {...defaults[key], ...newConfig[key]}
+    Object.keys(defaults).forEach(key => {
+      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+        newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     });
 
@@ -180,7 +180,7 @@ export default function CdcChart(
 
     data.forEach((row) => {
       let add = true;
-      
+
       filters.forEach((filter) => {
         if(row[filter.columnName] !== filter.active) {
           add = false;
@@ -222,26 +222,6 @@ export default function CdcChart(
     }
   }
 
-  const viewports:keyable = {
-    'md': 992,
-    'sm': 768,
-    'xs': 576,
-    'xxs': 350
-  }
-
-  const getViewport = size => {
-    let result = 'lg'
-    let viewportList = Object.keys( viewports )
-
-    for(let viewport of viewportList) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-  }
-
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -258,10 +238,15 @@ export default function CdcChart(
     }
   })
 
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  },[]);
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
-    resizeObserver.observe(outerContainerRef.current);
   }, []);
 
   // Generates color palette to pass to child chart component
@@ -333,7 +318,7 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
-  
+
   const parseDate = (dateString: string) => {
     let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
     if(!date) {
@@ -352,15 +337,15 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
-    if (typeof num !== 'number') num = parseFloat(num);
+    num = numberFromString(num);
     if(isNaN(num)) config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
-      let cutoff = config.dataCutoff
-      if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
+      let cutoff = numberFromString(config.dataCutoff)
+
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
-        num = cutoff;  
+        num = cutoff;
       }
     }
     if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
@@ -473,7 +458,7 @@ export default function CdcChart(
 
     return config.filters.map((singleFilter, index) => {
       const values = [];
-  
+
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
           key={index}
@@ -481,7 +466,7 @@ export default function CdcChart(
         >{filterOption}
         </option>);
       });
-  
+
       return (
         <section className="filters-section" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
@@ -523,7 +508,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="chart-description">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && <DataTable />}
         </div>}
       </>
     )

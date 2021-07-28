@@ -109,7 +109,7 @@ export default function LinearChart() {
 
   useEffect(() => {
     ReactTooltip.rebuild();
-  }, [config]);
+  });
 
   return (
     <ErrorBoundary component="LinearChart">
@@ -158,7 +158,7 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
-              const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+            const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               return (
                 <Group className="left-axis">

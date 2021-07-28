@@ -13,12 +13,6 @@ import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
-import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
-import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
-import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
-import WorldIcon from '@cdc/core/assets/world-graphic.svg';
-
 // IE11 Custom Event polyfill
 (function () {
 
@@ -66,7 +60,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -157,7 +151,7 @@ const EditorPanel = memo(() => {
   }
 
   const missingRequiredSections = () => {
-    //TODO 
+    //TODO
 
     return false;
   };
@@ -201,48 +195,6 @@ const EditorPanel = memo(() => {
 
   }
 
-  const Confirm = () => {
-    return (
-      <section className="waiting">
-        <section className="waiting-container">
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the dashboard.</p>
-          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
-        </section>
-      </section>
-    );
-  }
-
-  const addVisualization = (type, subType) => {
-    let newVisualizations = config.visualizations ? {...config.visualizations} : {}
-    
-    let newVisualizationConfig = {type};
-
-    if(type === 'chart'){
-      newVisualizationConfig.visualizationType = subType;
-    } else if(type === 'map'){
-      newVisualizationConfig.general = {};
-      newVisualizationConfig.general.geoType = subType;
-    }
-
-    newVisualizations[type + Date.now()] = newVisualizationConfig;
-      
-    updateConfig({...config, visualizations: newVisualizations})
-  }
-
-  const capitalize = (s) => {
-    if (typeof s !== 'string') return ''
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
-  const removeVisualization = (visualizationKey) => {
-    let newConfig = {...config};
-
-    delete newConfig.visualizations[visualizationKey];
-
-    updateConfig(newConfig);
-  }
-
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
     if(false === missingRequiredSections()) {
@@ -265,7 +217,7 @@ const EditorPanel = memo(() => {
     setConfigData(formattedData)
 
     // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateMapConfig', { detail: parsedData})
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
 
     window.dispatchEvent(event)
 
@@ -297,18 +249,19 @@ const EditorPanel = memo(() => {
   const addNewFilter = () => {
     let dashboardConfig = config.dashboard;
 
+    dashboardConfig.filters = dashboardConfig.filters || [];
+
     dashboardConfig.filters.push({values: []});
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
-
+  
   return (
     <ErrorBoundary component="EditorPanel">
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      {config.newViz && <Confirm />}
+      {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
-        <h2>Configure Dashboard</h2>
+        <div className="heading-2">Configure</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -323,35 +276,6 @@ const EditorPanel = memo(() => {
                   <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
-              <AccordionItem> {/* Visualizations */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Visualizations
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <h2>Current Visualizations</h2>
-                  <ol className="current-viz-list">
-                    {Object.keys(config.visualizations).map((visualizationKey) => (
-                      <li>
-                        {config.visualizations[visualizationKey].type === 'chart' && (config.visualizations[visualizationKey].visualizationType + ' Chart')} 
-                        {config.visualizations[visualizationKey].type === 'map' && (capitalize(config.visualizations[visualizationKey].general.geoType) + ' Map')} 
-                        <button type="button" onClick={() => {setEditing(visualizationKey)}}>Edit</button>
-                        <button type="button" onClick={() => {removeVisualization(visualizationKey)}}>Remove</button>
-                      </li>
-                    ))}
-                  </ol>
-
-                  <h2>Add Visualization</h2>
-                  <h3>Chart</h3>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Bar')}><BarIcon /><span>Bar</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Line')}><LineIcon /><span>Line</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('chart', 'Pie')}><PieIcon /><span>Pie</span></button>
-                  <h3>Map</h3>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'us')}><UsaIcon /><span>United States</span></button>
-                  <button className="viz-icon" type="button" onClick={() => addVisualization('map', 'world')}><WorldIcon /><span>World</span></button>
-                </AccordionItemPanel>
-              </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -361,14 +285,14 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <ul className="filters-list">
                     {config.dashboard.filters && config.dashboard.filters.map((filter, index) => (
-                        <fieldset className="edit-block">
+                        <fieldset className="edit-block" key={filter.columnName + index}>
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Filter</span>
                             <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
                               {getColumns().map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                                <option value={dataKey} key={dataKey}>{dataKey}</option>
                               ))}
                             </select>
                           </label>

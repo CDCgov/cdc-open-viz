@@ -4,10 +4,11 @@
   "description": "React component for combining multiple visualizations into a single dashboard",
   "main": "dist/cdcdashboard",
   "scripts": {
-    "start": "webpack serve --mode development -c ../../webpack.config.js",
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
     "build": "npx webpack --mode production --env packageName=CdcDashboard --env folderName=dashboard -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/dashboard build"
   },
+  "files": ["./dist/"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
@@ -22,10 +23,13 @@
     "@cdc/chart": "^1.0.0",
     "@cdc/core": "^1.0.0",
     "@cdc/map": "^2.3.0",
+    "@cdc/data-bite": "^1.0.0",
     "html-react-parser": "^0.14.0",
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
+    "react-dnd": "^14.0.2",
+    "react-dnd-html5-backend": "^14.0.0",
     "react-table": "^7.5.0",
     "use-debounce": "^6.0.1",
     "whatwg-fetch": "^3.6.2"

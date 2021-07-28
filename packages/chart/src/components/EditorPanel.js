@@ -153,13 +153,15 @@ const EditorPanel = memo(() => {
     colorPalettes,
     rawData,
     isDashboard,
-    setParentConfig,
-    setEditing
+    setParentConfig
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
+    }
+    if(updatedConfig.table.show === undefined){
+      updatedConfig.table.show = !isDashboard;
     }
   };
 
@@ -299,11 +301,7 @@ const EditorPanel = memo(() => {
   }
 
   const onBackClick = () => {
-    if(isDashboard){
-      setEditing('');
-    } else {
       setDisplayPanel(!displayPanel);
-    }
   }
 
   const Error = () => {
@@ -356,7 +354,7 @@ const EditorPanel = memo(() => {
       {config.newViz && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
-        <h2>Configure Chart</h2>
+        <div className="heading-2">Configure Chart</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -424,7 +422,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                    {config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'} {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -449,7 +447,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                  {config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'} {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -463,10 +461,12 @@ const EditorPanel = memo(() => {
                           <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
                           <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
                           <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                          <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                         </>
                       )}
-                      <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} /> 
+                      {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
+                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
+                      {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
                     </>
                   )}                 
                 </AccordionItemPanel>
@@ -546,7 +546,7 @@ const EditorPanel = memo(() => {
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
-                  <h5>Quantitative</h5>
+                  <span className="h5">Quantitative</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
 
@@ -571,7 +571,7 @@ const EditorPanel = memo(() => {
                       )
                     })}
                   </ul>
-                  <h5>Sequential</h5>
+                  <span className="h5">Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('sequential')).map( (palette) => {
 
@@ -614,6 +614,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField} />
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />

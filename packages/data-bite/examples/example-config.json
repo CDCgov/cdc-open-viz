@@ -1,0 +1,19 @@
+{
+    "type": "data-bite",
+    "dataUrl": "/examples/example-data.json",
+    "dataBite": "",
+    "dataFunction": "Mean (Average)",
+    "dataColumn": "Insured Rate",
+    "bitePosition": "Left",
+    "biteFontSize": "24",
+    "imageUrl": "",
+    "biteBody": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla mauris, vel gravida libero mollis id. Etiam dignissim nunc ut ante fringilla, sit amet malesuada nibh accumsan.",
+    "prefix": "",
+    "suffix": "%",
+    "roundToPlace": 0,
+    "filters": [],
+    "biteStyle": "graphic",
+    "subtext": "*This is an optional subtext or citation.",
+    "title": "Average Insured Rate",
+    "theme": "theme-blue"
+}
