@@ -42,7 +42,13 @@ export default function ChooseTab() {
         let classNames = (config.type === type && isSubType) ? 'active' : ''
 
         let setTypes = () => {
-            let newConfig = {...config, type}
+
+            // Only take the data property from existing config. Covers case of selecting a new visualization.
+            let newConfig = {
+                data: [...config.data],
+                newViz: true,
+                type
+            }
 
             if(type === 'map') {
                 newConfig.general = {
