@@ -17,8 +17,8 @@ import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
-import worldDefaultConfig from '../examples/default-world.json';
-import usaDefaultConfig from '../examples/default-usa.json';
+import worldDefaultConfig from '../../examples/default-world.json';
+import usaDefaultConfig from '../../examples/default-usa.json';
 import QuestionIcon from '../images/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy

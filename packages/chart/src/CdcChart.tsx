@@ -22,6 +22,7 @@ import defaults from './data/initial-state';
 
 import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
@@ -336,12 +337,12 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
-    if (typeof num !== 'number') num = parseFloat(num);
+    num = numberFromString(num);
     if(isNaN(num)) config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
-      let cutoff = config.dataCutoff
-      if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
+      let cutoff = numberFromString(config.dataCutoff)
+
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
         num = cutoff;

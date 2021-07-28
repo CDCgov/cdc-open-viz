@@ -9,7 +9,7 @@ let isEditor = window.location.href.includes('editor=true');
 domContainers.forEach((domContainer) => {
   render(
     <React.StrictMode>
-      <CdcDataBite configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+      <CdcDataBite configUrl={domContainer.attributes['data-config']?.value} isEditor={isEditor} />
     </React.StrictMode>,
     domContainer,
   );

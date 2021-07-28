@@ -590,12 +590,7 @@
 .editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
   padding-left: $editorWidth;
 }
-.editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-  padding-left: 3em;
-}
-.waiting {
-  padding-left: 350px;
-}
+
 .subheading-3 {
   margin-top: 1em;
   margin-bottom: .5em;

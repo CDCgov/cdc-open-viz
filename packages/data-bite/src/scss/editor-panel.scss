@@ -1,3 +1,11 @@
+.spacing-wrapper {
+  padding-left: 350px;
+}
+
+.editor-panel.hidden + .spacing-wrapper {
+  padding-left: 0;
+}
+
 .editor-panel {
   .two-col-inputs {
     display: flex;
@@ -420,48 +428,6 @@
     max-width: 100%;
   }
 
-  @media screen and (min-width: 30em) {
-
-    .react-tags__search {
-      /* this will become the offsetParent for suggestions */
-      position: relative;
-    }
-
-  }
-
-  .react-tags__search input {
-    /* prevent autoresize overflowing the container */
-    max-width: 100%;
-
-    /* emove styles and layout from this element */
-    margin: 0;
-    outline: none;
-    padding: .5em .3em;
-
-    /* match the font styles */
-    font-size: inherit;
-    line-height: inherit;
-  }
-
-  .react-tags__search input::-ms-clear {
-    display: none;
-  }
-
-  .react-tags__suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-  }
-
-  @media screen and (min-width: 30em) {
-
-    .react-tags__suggestions {
-      width: 240px;
-    }
-
-  }
-
   .react-tags__suggestions ul {
     margin: 4px -1px;
     padding: 0;
@@ -529,14 +495,5 @@
   }
   &:hover {
     background: rgba(255,255,255,1)
-  }
-}
-@include breakpointClass(md) {
-  .editor-panel:not(.hidden) + .cdc-open-viz-module.type-data-bite {
-    padding-left: $editorWidth;
-  }
-
-  .waiting {
-    padding-left: 350px;
   }
 }

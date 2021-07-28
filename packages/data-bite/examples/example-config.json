@@ -2,23 +2,18 @@
     "type": "data-bite",
     "dataUrl": "/examples/example-data.json",
     "dataBite": "",
-    "dataFunction": "Max",
+    "dataFunction": "Mean (Average)",
     "dataColumn": "Insured Rate",
-    "imagePosition": "Left",
+    "bitePosition": "Left",
     "biteFontSize": "24",
     "imageUrl": "",
-    "biteBody": "This is the max insured rate. This is the max insured rate. This is the max insured rate. This is the max insured rate.",
+    "biteBody": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla mauris, vel gravida libero mollis id. Etiam dignissim nunc ut ante fringilla, sit amet malesuada nibh accumsan.",
     "prefix": "",
-    "suffix": "",
+    "suffix": "%",
     "roundToPlace": 0,
     "filters": [],
-    "biteLocation": "graphic",
-    "subtext": "Please note, this is the Data Bite's subtext or citation",
-    "title": "Data Bite",
-    "theme": "theme-blue",
-    "height": 300,
-    "padding": {
-        "left": 10,
-        "right": 10
-    }
+    "biteStyle": "graphic",
+    "subtext": "*This is an optional subtext or citation.",
+    "title": "Average Insured Rate",
+    "theme": "theme-blue"
 }

@@ -28,7 +28,7 @@ import Widget from './components/Widget'
 import './scss/main.scss';
 
 const addVisualization = (type, subType) => {
-  let newVisualizationConfig = {configNeeded: true};
+  let newVisualizationConfig = {newViz: true};
   newVisualizationConfig.uid = type + Date.now();
   newVisualizationConfig.type = type;
 
@@ -70,12 +70,12 @@ const VisualizationsPanel = () => (
 )
 
 export default function CdcDashboard(
-  { configUrl = '', config: configObj = undefined, isEditor = false, setParentConfig = undefined }
+  { configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }
 ) {
 
   const transform = new DataTransform();
 
-  const [config, setConfig] = useState({});
+  const [config, setConfig] = useState(configObj ?? {});
 
   const [data, setData] = useState([]);
 
@@ -181,17 +181,18 @@ export default function CdcDashboard(
     loadConfig();
   }, []);
 
-  const updateChildConfig = (visualizationKey, newConfig) => {
-    let updatedConfig = JSON.parse(JSON.stringify(config));
-
-    if(!updatedConfig.visualizations) updatedConfig.visualizations = {};
-    updatedConfig.visualizations[visualizationKey] = newConfig;
-
-    if(setParentConfig){
-      setParentConfig(updatedConfig);
-    } else {
-      setConfig(updatedConfig);
+  // Pass up to <CdcEditor /> if it exists when config state changes
+  useEffect(() => {
+    if(setParentConfig && isEditor) {
+      setParentConfig(config);
     }
+  }, [config])
+
+  const updateChildConfig = (visualizationKey, newConfig) => {
+    let updatedConfig = {...config}
+
+    updatedConfig.visualizations[visualizationKey] = newConfig;
+    setConfig(updatedConfig);
   };
 
   const Filters = () => {
@@ -268,7 +269,7 @@ export default function CdcDashboard(
 
       visualizationConfig.data = filteredData || data;
 
-      if(visualizationConfig.editing) {
+    if(visualizationConfig.editing) {
         subVisualizationEditing = true;
 
         const back = () => {
@@ -279,15 +280,18 @@ export default function CdcDashboard(
           setConfig(newConfig)
         }
 
+        const updateConfig = (newConfig) => updateChildConfig(visualizationKey, newConfig)
+
         switch(visualizationConfig.type){
           case 'chart':
-            body = <><Header back={back} subEditor="Chart" /><CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></>;
+            body = <><Header back={back} subEditor="Chart" /><CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>;
             break;
           case 'map': 
-            body = <><Header back={back} subEditor="Map" /><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></>;
+            body = <><Header back={back} subEditor="Map" /><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>;
             break;
           case 'data-bite':
-            body = <><Header back={back} subEditor="Data Bite" /><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={(newConfig) => {updateChildConfig(visualizationKey, newConfig)}} isDashboard={true} /></>
+            visualizationConfig = {...visualizationConfig, newViz: true}
+            body = <><Header back={back} subEditor="Data Bite" /><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
         }
       }

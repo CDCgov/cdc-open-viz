@@ -3,6 +3,7 @@ import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 import ResizeObserver from 'resize-observer-polyfill';
 import Context from './context';
 // @ts-ignore
@@ -18,7 +19,7 @@ const CdcDataBite = (
     [key: string]: any
   }
 
-  const [config, setConfig] = useState<keyable>({});
+  const [config, setConfig] = useState<keyable>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
 
   const {
@@ -31,7 +32,7 @@ const CdcDataBite = (
     prefix,
     suffix,
     roundToPlace,
-    biteLocation,
+    biteStyle,
     filters,
     subtext
   } = config;
@@ -137,7 +138,7 @@ const CdcDataBite = (
       return value;
     }
 
-    let dataBite = '';
+    let dataBite = null;
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
@@ -151,49 +152,51 @@ const CdcDataBite = (
       }
     });
 
-    //Get the column's data
-    const columnData = filteredData.map(a => a[dataColumn]);
+    let numericalData = []
 
-    //Filter the column's data for numerical values only
-    let numericalData = columnData.filter((value) => {
-      let include = false;
-      if ( Number(value) || Number.isFinite(Number(value)) ) {
-        include = true;
-      }
-      return include;
-    }).map(Number);
+    //Get the column's data
+    filteredData.forEach(row => {
+      let value = numberFromString(row[dataColumn])
+
+      if(typeof value === 'number') numericalData.push(value)
+    });
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
-        dataBite = prefix + String(numericalData.length) + suffix;
+        dataBite = numericalData.length;
         break;
       case DATA_FUNCTION_SUM:
-        dataBite = prefix + String(getColumnSum(numericalData)) + suffix;
+        dataBite = getColumnSum(numericalData);
         break;
       case DATA_FUNCTION_MEAN:
-        dataBite = prefix + String(getColumnMean(numericalData)) + suffix;
+        dataBite = getColumnMean(numericalData);
         break;
       case DATA_FUNCTION_MEDIAN:
-        dataBite = prefix + getMedian(numericalData).toString() + suffix;
+        dataBite = getMedian(numericalData);
         break;
       case DATA_FUNCTION_MAX:
-        dataBite = prefix + applyPrecision(Math.max(...numericalData)).toString() + suffix;
+        dataBite = Math.max(...numericalData);
         break;
       case DATA_FUNCTION_MIN:
-        dataBite = prefix + applyPrecision(Math.min(...numericalData)).toString() + suffix;
+        dataBite = Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = prefix + getMode(numericalData).join(', ') + suffix;
+        dataBite = getMode(numericalData).join(', ');
         break;
       case DATA_FUNCTION_RANGE:
-        numericalData.sort();
-        dataBite = prefix + applyPrecision(numericalData[0]).toString() + suffix + ' - ' + prefix + applyPrecision(numericalData[numericalData.length - 1]).toString() + suffix;
+        numericalData.sort((a, b) => a - b);
+        dataBite = applyPrecision(numericalData[0]) + suffix + ' - ' + prefix + applyPrecision(numericalData[numericalData.length - 1]);
         break;
       default:
-        console.log('Data bite function not recognized: ' + dataFunction);
+        console.warn('Data bite function not recognized: ' + dataFunction);
     }
 
-    return dataBite;
+    // Round
+    if(dataFunction !== DATA_FUNCTION_RANGE) {
+      dataBite = applyPrecision(dataBite)
+    }
+
+    return prefix + dataBite + suffix;
   }
 
   // Load data when component first mounts
@@ -211,59 +214,53 @@ const CdcDataBite = (
 
   if(false === loading) {
     let biteClasses = [];
-    let addImageTop = false;
-    let addImageBottom = false;
 
-    if (
-      ( !['title','body'].includes(biteLocation) && !imageUrl ) ||
-      ( ['title','body'].includes(biteLocation) && imageUrl ) ||
-      ( 'graphic' === biteLocation && imageUrl )
-      ) {
-      switch (config.imagePosition) {
-        case IMAGE_POSITION_LEFT:
-          biteClasses.push('bite-left');
-          addImageTop = true;
-          break;
-        case IMAGE_POSITION_RIGHT:
-          biteClasses.push('bite-right');
-          addImageTop = true;
-          break;
-        case IMAGE_POSITION_TOP:
-          biteClasses.push('bite-top');
-          addImageTop = true;
-          break;
-        case IMAGE_POSITION_BOTTOM:
-          biteClasses.push('bite-bottom');
-          addImageBottom = true;
-          break;
-      }
+    let isTop = true
+
+    switch (config.bitePosition) {
+      case IMAGE_POSITION_LEFT:
+        biteClasses.push('bite-left');
+        break;
+      case IMAGE_POSITION_RIGHT:
+        biteClasses.push('bite-right');
+        break;
+      case IMAGE_POSITION_TOP:
+        biteClasses.push('bite-top');
+        break;
+      case IMAGE_POSITION_BOTTOM:
+        biteClasses.push('bite-bottom');
+        isTop = false
+        break;
     }
 
-    biteClasses.push(config.theme);
+    if(config.shadow) biteClasses.push('shadow')
+
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
     body = (
       <>
         {isEditor && <EditorPanel />}
-        <div className="cdc-data-bite-inner-container">
-          <div className={`bite ${biteClasses.join(' ')}`}>
-            {title && <div className="bite-header">{title}</div>}
-            <div className="bite-content-container">
-              {showBite && 'graphic' === biteLocation && addImageTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize ? biteFontSize.toString() : "16"} /> }
-              {imageUrl && 'graphic' !== biteLocation && addImageTop && <img src={imageUrl} className="bite-image" />}
-              <div className="bite-content">
-                {showBite && 'title' === biteLocation && <div className="bite-value">{calculateDataBite()}</div>}
-                {biteBody &&
-                  <p>
-                    {showBite && 'body' === biteLocation && <span className="bite-value data-bite-body">{calculateDataBite()}</span>}
-                    {biteBody}
-                  </p>
-                }
+        <div className={isEditor ? 'spacing-wrapper' : ''}>
+          <div className="cdc-data-bite-inner-container">
+          {title && <div className="bite-header">{title}</div>}
+            <div className={`bite ${biteClasses.join(' ')}`}>
+              <div className="bite-content-container">
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
+                {imageUrl && 'graphic' !== biteStyle && isTop && <img src={imageUrl} className="bite-image callout" />}
+                <div className="bite-content">
+                  {showBite && 'title' === biteStyle && <div className="bite-value">{calculateDataBite()}</div>}
+                  {biteBody &&
+                    <p>
+                      {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body">{calculateDataBite()}</span>}
+                      {biteBody}
+                    </p>
+                  }
+                </div>
+                {imageUrl && 'image' === biteStyle && !isTop && <img src={imageUrl} className="bite-image callout" />}
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
               </div>
-              {imageUrl && 'graphic' !== biteLocation && addImageBottom && <img src={imageUrl} className="bite-image" />}
-              {showBite && 'graphic' === biteLocation && addImageBottom && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize ? biteFontSize.toString() : "16"} /> }
+              {subtext && <p className="subtext">{subtext}</p>}
             </div>
-            {subtext && <p className="subtext">{subtext}</p>}
           </div>
         </div>
       </>
@@ -274,6 +271,7 @@ const CdcDataBite = (
     'cdc-open-viz-module',
     'type-data-bite',
     currentViewport,
+    config.theme,
     'font-' + config.fontSize
   ];
   if (isEditor) {
@@ -316,9 +314,10 @@ export const BITE_LOCATION_TITLE = 'title';
 export const BITE_LOCATION_BODY = 'body';
 export const BITE_LOCATION_GRAPHIC = 'graphic';
 export const BITE_LOCATIONS = {
-  'title': 'As a title in the body',
-  'body': 'At the beginning of the body text',
-  'graphic': 'As a graphic'
+  'graphic': 'Graphic',
+  'image': 'Image',
+  'title': 'Text above body text',
+  'body': 'Inline with body text'
 };
 
 export const IMAGE_POSITION_LEFT = 'Left';
