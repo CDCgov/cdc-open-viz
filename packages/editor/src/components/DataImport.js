@@ -58,9 +58,11 @@ export default function DataImport() {
     }
   }, [debouncedExternalURL, keepURL])
 
-  
+  /**
+   * Check to see all series for the viz exists in the new dataset
+   */
   const dataExists = (newData, oldSeries, oldAxisX) => {
-    // check to see if all series for the viz exists in the new dataset
+    
     // Loop through old series to make sure each exists in the new data
     oldSeries.map(function(currentValue, index, newData){
       if( ! newData.find( element => element.dataKey === currentValue.dataKey ) )
@@ -86,10 +88,6 @@ export default function DataImport() {
 
     const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
 
-    const typeDictionary = {
-      '.csv': 'text/csv',
-      '.json': 'application/json'
-    }
     try {
       const response = await get( dataURL,
         {
@@ -130,22 +128,18 @@ export default function DataImport() {
     let fileSource = fileData?.path ?? fileName ?? null;
     let fileSourceType = 'file';
 
-    
-
     // Get the raw data as text from the file
     if(null === fileData) {
       fileSourceType = 'url';
       try {
         fileData = await loadExternal();
-        fileSource = externalURL;
-        console.log(fileData);
-        
+        fileSource = externalURL;        
       } catch (error) {
         setErrors([error]);
         return;
       }
     }
-    debugger;
+
     // Check if file is too big
     if(fileData.size > (maxFileSize * 1048576) ) {
       setErrors([errorMessages.fileTooLarge]);
@@ -207,10 +201,9 @@ export default function DataImport() {
       // Validate parsed data and set if no issues.
       try {
         text = transform.autoStandardize(text);
-        console.log('?', text);
 
-        if (tempConfig) {
-          if (dataExists(text, tempConfig.series, tempConfig?.xAxis.dataKey)) {
+        if (config.data) {
+          if (dataExists(text, config.series, config?.xAxis.dataKey)) {
             setConfig({
               ...config, 
               ...tempConfig, 
@@ -219,12 +212,12 @@ export default function DataImport() {
               dataFileSourceType:fileSourceType ,// new file source type
             })
           } else {
-            setConfig({...config, data:text, dataFileName:fileSource, dataFileSourceType:fileSourceType });
+            resetEditor({data:text, dataFileName:fileSource, dataFileSourceType:fileSourceType }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?');
           }
         } else {
             setConfig({...config, data:text, dataFileName:fileSource, dataFileSourceType:fileSourceType });
         }
-              } catch (err) {
+      } catch (err) {
           setErrors(err);
       }
 
@@ -246,10 +239,6 @@ export default function DataImport() {
       setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
   };
 
-  const updateOriginProp = (key, value) => {
-      setConfig({...config, dataOrigin: {...config.dataOrigin, [key]: value}})
-  };
-
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
   const loadFileFromUrl = () => {
@@ -266,14 +255,19 @@ export default function DataImport() {
     )
   }
 
-  const resetEditor = (  ) => {
-    setTempConfig({newViz:true});
-    setConfig({newViz:true});
+  const resetEditor = ( config = {}, message = 'Are you sure you want to do this?' ) => {
+    config.newViz = true;
+    const confirmDataReset = window.confirm('It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?');
+            
+    if (confirmDataReset === true) {
+      setTempConfig(null);
+      setConfig(config);
+    } 
   }
 
   const resetButton = () => {
     return ( //todo convert to modal
-       <button className="btn danger" onClick={() => { if (window.confirm('Reseting will remove your data and settings. Do you want to continue?')) resetEditor() } }>Reset 
+       <button className="btn danger" onClick={() => resetEditor( {}, 'Reseting will remove your data and settings. Do you want to continue?') }>Reset 
         <svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" className="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
       </button>
     )
@@ -350,7 +344,6 @@ export default function DataImport() {
                     </div>
                   </div>
                 )}
-              {/* {config.dataFileName} */}
             </div>
             <div className="question">
               <div className="heading-3">Describe Data</div>
