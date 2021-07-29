@@ -60,6 +60,13 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+  <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+    <span className="edit-label">{label}</span>
+  </label>
+))
+
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = '';
   if ( Array.isArray(options)) { //Handle basic array
@@ -246,7 +253,7 @@ const EditorPanel = memo(() => {
   return (
     <ErrorBoundary component="EditorPanel">
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      {config.newViz && <Confirm />}
+      {(!config.dataColumn || !config.dataFunction) && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <div className="heading-2">Configure Data Bite</div>
@@ -327,11 +334,12 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.biteLocation} fieldName="biteLocation" label="Data Bite Placement" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
-                  <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
-                  <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image or Data Bite Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
+                  <Select value={config.biteStyle} fieldName="biteStyle" label="Data Bite Style" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
+                  {config.biteStyle === 'image' && <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />}
+                  {['graphic', 'image'].includes(config.biteStyle) && <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />}
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">

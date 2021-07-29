@@ -47,7 +47,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
       } else {
         // Item does not exist, instantiate a new one
         const newViz = addVisualization()
-
         visualizations[newViz.uid] = newViz // Add to widgets collection
         rows[rowIdx][colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
       }
@@ -72,7 +71,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
-    delete visualizations[data.uid].configNeeded
+    delete visualizations[data.uid].newViz
     visualizations[data.uid].editing = true;
 
     updateConfig({...config, visualizations});
@@ -90,7 +89,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         )}
         {iconHash[type]}
         <span>{labelHash[type]}</span>
-        {data.configNeeded && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
+        {data.newViz && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
       </div>
     </div>
   )

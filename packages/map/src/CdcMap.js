@@ -19,7 +19,6 @@ import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
-import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
@@ -33,6 +32,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -75,32 +75,20 @@ const hashObj = (row) => {
     return hash;
 }
 
-// Checks if the string is a number and returns it as a number if it is
-const numberFromString = (value) => {
-    // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
-    let nonNumeric = /[^\d.]/g
-
-    if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
-        return parseFloat(value)
-    }
-
-    return value
-}
-
 const getUniqueValues = (data, columnName) => {
-    let result = {}
+    let result = new Map();
 
     for(let i = 0; i < data.length; i++) {
-        const val = data[i][columnName]
+        let val = data[i][columnName]
 
         if(!val) continue
 
-        if(undefined === result[val]) {
-            result[val] = true
+        if(false === result.has(val)) {
+            result.set(val, true)
         }
     }
 
-    return Object.keys(result)
+    return [...result.keys()]
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
@@ -496,8 +484,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(filters.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
-                    
-                    if (row[columnName] !== active) return false // Bail out, not part of filter
+
+                    if (row[columnName] !== numberFromString(active)) return false // Bail out, not part of filter
                 }
             }
     
@@ -747,7 +735,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let data = []
 
             if ('csv' === regex.exec(urlObj.pathname)[1]) {
-
                 data = await fetch(url)
                     .then(response => response.text())
                     .then(responseText =>{
@@ -776,7 +763,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             return data;
         } catch {
-            console.error(`Cannot parse URL: ${url}`);
+            // If we can't parse it, still attempt to fetch it
+            try {
+                let response = await (await fetch(configUrl)).json()
+                return response
+            } catch {
+                console.error(`Cannor parse URL: ${url}`);
+            }
         }
     }
 
@@ -907,11 +900,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If the config passed is a string, try to load it as an ajax
         if(configUrl) {
             configData = await fetchRemoteData(configUrl)
-        }
-
-        // Finally, dynamically import the default configuration if nothing else was found.
-        if(null === configData) {
-            configData = usaDefaultConfig
         }
 
         // Once we have a config verify that it is an object and load it
