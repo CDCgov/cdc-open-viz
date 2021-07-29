@@ -231,7 +231,7 @@ export default function DataImport() {
               <button className="input-group-text btn btn-primary" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
             </form>
             <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-              <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
+              <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} />&nbsp;Always load from URL (normally will only pull once)
             </label>
           </TabPane>
         </Tabs>

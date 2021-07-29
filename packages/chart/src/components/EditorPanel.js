@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import ReactTooltip from 'react-tooltip'
 
 import {
   Accordion,
@@ -14,6 +15,15 @@ import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+
+const Helper = ({text}) => {
+  return (
+    <span className='tooltip helper' data-tip={text}>
+      <QuestionIcon />
+    </span>
+  )
+}
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -64,6 +74,7 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
     <span className="edit-label">{label}</span>
+    {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
   </label>
 ))
 
@@ -614,7 +625,7 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField} />
+                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField}  />
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
@@ -623,6 +634,11 @@ const EditorPanel = memo(() => {
            </Accordion>
           </form>
         </section>
+        <ReactTooltip
+            html={true}
+            multiline={true}
+            className="helper-tooltip"
+          />
       </section>
     </ErrorBoundary>
   )
