@@ -138,6 +138,9 @@
     display: inline-block;
     vertical-align: top;
     margin: 1em;
+    &:empty {
+      display: none;
+    }
   }
 
   .dashboard-col-12 {
