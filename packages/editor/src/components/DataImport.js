@@ -130,11 +130,7 @@ export default function DataImport() {
     let fileSource = fileData?.path ?? fileName ?? null;
     let fileSourceType = 'file';
 
-    // Check if file is too big
-    if(fileData.size > (maxFileSize * 1048576) ) {
-      setErrors([errorMessages.fileTooLarge]);
-      return;
-    }
+    
 
     // Get the raw data as text from the file
     if(null === fileData) {
@@ -142,11 +138,18 @@ export default function DataImport() {
       try {
         fileData = await loadExternal();
         fileSource = externalURL;
-        debugger;
+        console.log(fileData);
+        
       } catch (error) {
         setErrors([error]);
         return;
       }
+    }
+    debugger;
+    // Check if file is too big
+    if(fileData.size > (maxFileSize * 1048576) ) {
+      setErrors([errorMessages.fileTooLarge]);
+      return;
     }
 
     // Pull out mime type of file
