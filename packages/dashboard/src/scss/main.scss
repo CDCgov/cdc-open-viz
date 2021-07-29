@@ -7,6 +7,7 @@
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
   @import 'grid';
+  @import 'datatable';
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }

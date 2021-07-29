@@ -9,5 +9,8 @@ export default {
       {}
     ]
   ],
-  visualizations: {}
+  visualizations: {},
+  table: {
+    label: 'Data Table'
+  }
 }
