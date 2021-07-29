@@ -77,9 +77,9 @@ input[type="text"], input[role="combobox"], input[type="number"], input[type="se
   padding: .5em .5em;
   font-size: 1em;
   font-family: sans-serif;
-  border: rgba(0,0,0,.3) 1px solid;
+  border: rgba(0,0,0,.3) 1px solid !important;
   &:focus {
-    border: rgba(0,0,0,.7) 1px solid;
+    border: rgba(0,0,0,.7) 1px solid !important;
     outline: 0;
   }
 }
@@ -88,8 +88,9 @@ textarea {
 }
 select {
   width: 100%;
-  font-size: 1.1em;
+  font-size: 1em;
   text-transform: none;
+  border: rgba(0, 0, 0, 0.3) 1px solid !important;
 }
 
 .input-group-text {

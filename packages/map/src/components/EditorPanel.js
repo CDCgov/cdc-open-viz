@@ -19,7 +19,7 @@ import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
-import QuestionIcon from '../images/question-circle.svg';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -1080,6 +1080,7 @@ const EditorPanel = (props) => {
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard } onChange={(event) => { handleEditorChanges("showDataTable", event.target.checked) }} />
                     <span className="edit-label">Show Table</span>
+                    <Helper text="Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version." />
                   </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />

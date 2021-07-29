@@ -11,6 +11,29 @@
         margin-top: 0 !important
       }
     }
+    .helper-tooltip {
+      padding: 5px;
+      max-width: 300px;
+    }
+    .helper {
+      position: relative;
+      opacity: .7;
+      cursor: pointer;
+      width: 17px;
+      height: 17px;
+      align-self: center;
+      margin-left: .3rem;
+      margin-top: -0.3rem;
+      border: none !important;
+      box-shadow: none !important;
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
     .divider-heading {
       display: block;
       font-size: 1em;
