@@ -10,10 +10,6 @@ import TabPane from './TabPane';
 import Tabs from './Tabs';
 import PreviewDataTable from './PreviewDataTable';
 
-import { Modal } from './modal/Modal'
-import { ConfirmationModal } from './modal/Confirmation'
-import { useModal } from './modal/UseModal';
-
 import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
 import CloseIcon from '../assets/icons/close.svg';
@@ -39,10 +35,6 @@ export default function DataImport() {
   const transform = new DataTransform();
 
   const [externalURL, setExternalURL] = useState('')
-  
-  // modal setup
-  const { isShown, toggle } = useModal();
-  let modalProps = {}
 
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200);
 
@@ -55,7 +47,6 @@ export default function DataImport() {
 
   useEffect(() => {
     if(tempConfig !== null) {
-
         setConfig(tempConfig)
         setTempConfig(null)        
     }
@@ -67,9 +58,9 @@ export default function DataImport() {
     }
   }, [debouncedExternalURL, keepURL])
 
-  // check to see if all series for the viz exists in the new dataset
+  
   const dataExists = (newData, oldSeries, oldAxisX) => {
-
+    // check to see if all series for the viz exists in the new dataset
     // Loop through old series to make sure each exists in the new data
     oldSeries.map(function(currentValue, index, newData){
       if( ! newData.find( element => element.dataKey === currentValue.dataKey ) )
@@ -275,65 +266,18 @@ export default function DataImport() {
   const resetEditor = (  ) => {
     setTempConfig({newViz:true});
     setConfig({newViz:true});
-    toggle();
-  }
-  const resetModal = {
-    headerText: 'Are you sure?',
-    modalContent: (<ConfirmationModal 
-      onConfirm={resetEditor} 
-      onCancel={toggle}
-      message='Reseting will remove your data and settings. Do you want to continue?'
-    />)
-  }
-
-  const dataMismatchModal = {
-    headerText: 'Data missing',
-    modalContent: (<ConfirmationModal 
-      onConfirm={resetEditor} 
-      onCancel={toggle}
-      message='It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
-    />)
-  }
-
-  const confirmSelection = (choice, modalProps) => {
-    debugger;
-    if (choice === 'reset') {
-      debugger;
-      
-      modalProps = resetModal;
-      
-    }
-    toggle();
   }
 
   const resetButton = () => {
-    // modalProps = resetModal;
-    return (
-       <button className="btn danger" onClick={ () => {toggle()}}>Reset 
+    return ( //todo convert to modal
+       <button className="btn danger" onClick={() => { if (window.confirm('Reseting will remove your data and settings. Do you want to continue?')) resetEditor() } }>Reset 
         <svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" className="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
       </button>
     )
   }
 
-  const modalPropsWorking = {
-    headerText: 'Are you sure?',
-    modalContent: (<ConfirmationModal 
-      onConfirm={resetEditor} 
-      onCancel={toggle}
-      message='Reseting will remove your data and settings. Do you want to continue?'
-    />)
-  }
-
-  // todo right now it is hard set to the reset. We need to swap these out depending on the situation.
-  modalProps = resetModal;
-
   return (
     <>
-      <Modal
-          isShown={isShown}
-          hide={toggle}
-          {...modalProps}
-        />
       <div className="left-col">
         {!config.data && (
           <div className="load-data-area">
