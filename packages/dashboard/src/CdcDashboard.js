@@ -23,7 +23,8 @@ import Grid from './components/Grid';
 import Header from './components/Header';
 import Context from './context';
 import defaults from './data/initial-state';
-import Widget from './components/Widget'
+import Widget from './components/Widget';
+import DataTable from './components/DataTable';
 
 import './scss/main.scss';
 
@@ -344,6 +345,9 @@ export default function CdcDashboard(
 
           {/* Description */}
           {description && <div className="dashboard-description">{parse(description)}</div>}
+
+          {/* Data Table */}
+          {config.table.show && <DataTable />}
         </div>
       </>
     )

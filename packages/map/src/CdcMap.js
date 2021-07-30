@@ -76,19 +76,19 @@ const hashObj = (row) => {
 }
 
 const getUniqueValues = (data, columnName) => {
-    let result = {}
+    let result = new Map();
 
     for(let i = 0; i < data.length; i++) {
-        const val = data[i][columnName]
+        let val = data[i][columnName]
 
         if(!val) continue
 
-        if(undefined === result[val]) {
-            result[val] = true
+        if(false === result.has(val)) {
+            result.set(val, true)
         }
     }
 
-    return Object.keys(result)
+    return [...result.keys()]
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
@@ -484,8 +484,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(filters.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
-                    
-                    if (row[columnName] !== active) return false // Bail out, not part of filter
+
+                    if (row[columnName] !== numberFromString(active)) return false // Bail out, not part of filter
                 }
             }
     
