@@ -11,7 +11,12 @@ export default {
     biteBody: "",
     prefix: "",
     suffix: "",
-    roundToPlace: 0,
+    dataFormat: {
+        roundToPlace: 0,
+        commas: true,
+        prefix: "",
+        suffix: "%"
+    },
     biteStyle: "graphic",
     filters: [],
     subtext: "",
