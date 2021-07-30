@@ -12,7 +12,7 @@ import PreviewDataTable from './PreviewDataTable';
 
 import LinkIcon from '../assets/icons/link.svg';
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg';
-import CloseIcon from '../assets/icons/close.svg';
+import CloseIcon from '@cdc/core/assets/icon-close.svg';
 
 import validMapData from '../../example/valid-data-map.csv';
 import validChartData from '../../example/valid-data-chart.csv';
@@ -267,8 +267,8 @@ export default function DataImport() {
 
   const resetButton = () => {
     return ( //todo convert to modal
-       <button className="btn danger" onClick={() => resetEditor( {}, 'Reseting will remove your data and settings. Do you want to continue?') }>Reset 
-        <svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" className="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
+       <button className="btn danger" onClick={() => resetEditor( {}, 'Reseting will remove your data and settings. Do you want to continue?') }>Clear 
+        <CloseIcon />
       </button>
     )
   }
@@ -320,7 +320,7 @@ export default function DataImport() {
             <div className="file-loaded-area">
                 {config.dataFileSourceType === 'file' && (
                   <div className="data-source-options">
-                    <div className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+                    <div className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
                       <input {...getInputProps()} />
                       {
                         isDragActive ?
@@ -347,10 +347,11 @@ export default function DataImport() {
             </div>
             <div className="question">
               <div className="heading-3">Describe Data</div>
-              <span>Is the geography/X-axis value in your data structured horizontally, or vertically?</span>
-              <div>
+              <div className="heading-4 data-question">Data Orientation</div>
+              <div className="table-button-container">
                 <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', false)}}>
-                  <p>Data is vertical. Geography/X-axis values are contained on a single column.</p>
+                  <strong>Vertical</strong>
+                  <p>Geography/X-axis values are contained on a single column.</p>
                   <table>
                     <tbody>
                       <tr>
@@ -391,7 +392,8 @@ export default function DataImport() {
                   </table>
                 </div>
                 <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', true)}}>
-                  <p>Data is horizontal. Geography/X-axis values are contained on a single row.</p>
+                  <strong>Horizontal</strong>
+                  <p>Geography/X-axis values are contained on a single row.</p>
                   <table>
                       <tbody>
                         <tr>
@@ -430,15 +432,15 @@ export default function DataImport() {
             {config.dataDescription && (
                 <>
                     <div className="question">
-                        <span>Are there multiple series represented in your data?</span>
+                        <div className="heading-4 data-question">Are there multiple series represented in your data?</div>
                         <div>
-                            <button className="btn btn-primary" onClick={() => {updateDescriptionProp('series', true)}}>Yes</button>
-                            <button className="btn btn-primary" onClick={() => {updateDescriptionProp('series', false)}}>No</button>
+                            <button className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'} style={{marginRight: '.5em'}} onClick={() => {updateDescriptionProp('series', true)}}>Yes</button>
+                            <button className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'} onClick={() => {updateDescriptionProp('series', false)}}>No</button>
                         </div>
                     </div>
                     {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
                       <div className="question">
-                        <span>Which property in the dataset represents which series the row is describing?</span>
+                        <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
                         <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
                             <option value="">Choose an option</option>
                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
@@ -448,93 +450,95 @@ export default function DataImport() {
                     {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
                         <>
                             <div className="question">
-                                <span>Are the series values in your data represented in a single row, or across multiple rows?</span><br/>
-                                <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
-                                    <p>Each row contains the data for an individual series in itself.</p>
-                                    <table>
-                                        <tbody>
-                                          <tr>
-                                              <th>Virus</th>
-                                              <th>01/01/2020</th>
-                                              <th>02/01/2020</th>
-                                              <th>...</th>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>100</td>
-                                              <td>150</td>
-                                              <td>...</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>15</td>
-                                              <td>20</td>
-                                              <td>...</td>
-                                          </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
-                                    <p>Each series data is broken out into multiple rows.</p>
-                                    <table>
-                                        <tbody>
-                                          <tr>
-                                              <th>Virus</th>
-                                              <th>Date</th>
-                                              <th>Value</th>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>01/01/2020</td>
-                                              <td>100</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 1</td>
-                                              <td>02/01/2020</td>
-                                              <td>150</td>
-                                          </tr>
-                                          <tr>
-                                              <td>...</td>
-                                              <td>...</td>
-                                              <td>...</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>01/01/2020</td>
-                                              <td>15</td>
-                                          </tr>
-                                          <tr>
-                                              <td>Virus 2</td>
-                                              <td>02/01/2020</td>
-                                              <td>20</td>
-                                          </tr>
-                                          <tr>
-                                              <td>...</td>
-                                              <td>...</td>
-                                              <td>...</td>
-                                          </tr>
-                                        </tbody>
-                                    </table>
+                                <div className="heading-4 data-question">Are the series values in your data represented in a single row, or across multiple rows?</div>
+                                <div className="table-button-container">
+                                  <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
+                                      <p>Each row contains the data for an individual series in itself.</p>
+                                      <table>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>01/01/2020</th>
+                                                <th>02/01/2020</th>
+                                                <th>...</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>100</td>
+                                                <td>150</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>15</td>
+                                                <td>20</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                                  <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
+                                      <p>Each series data is broken out into multiple rows.</p>
+                                      <table>
+                                          <tbody>
+                                            <tr>
+                                                <th>Virus</th>
+                                                <th>Date</th>
+                                                <th>Value</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>01/01/2020</td>
+                                                <td>100</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 1</td>
+                                                <td>02/01/2020</td>
+                                                <td>150</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>01/01/2020</td>
+                                                <td>15</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Virus 2</td>
+                                                <td>02/01/2020</td>
+                                                <td>20</td>
+                                            </tr>
+                                            <tr>
+                                                <td>...</td>
+                                                <td>...</td>
+                                                <td>...</td>
+                                            </tr>
+                                          </tbody>
+                                      </table>
+                                  </div>
                                 </div>
                             </div>
                             {config.dataDescription.singleRow === false && (
                                 <>
                                     <div className="question">
-                                        <span>Which property in the dataset represents which series the row is describing?</span>
+                                        <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
                                         <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
                                             <option value="">Choose an option</option>
                                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
                                         </select>
                                     </div>
                                     <div className="question">
-                                        <span>Which property in the dataset represents the X-axis, or geography value?</span>
+                                        <div className="heading-4 data-question">Which property in the dataset represents the X-axis, or geography value?</div>
                                         <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
                                             <option value="">Choose an option</option>
                                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
                                         </select>
                                     </div>
                                     <div className="question">
-                                        <span>Which property in the dataset represents the numeric value?</span>
+                                        <div className="heading-4 data-question">Which property in the dataset represents the numeric value?</div>
                                         <select onChange={(e) => {updateDescriptionProp('valueKey', e.target.value)}}>
                                             <option value="">Choose an option</option>
                                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
@@ -545,6 +549,9 @@ export default function DataImport() {
                         </>
                     )}
                 </>
+            )}
+            {config.formattedData && (
+              <button className="btn btn-primary" style={{float: 'right', marginBottom: '2em'}} onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
             )}
         </div>
         )}

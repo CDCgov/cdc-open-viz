@@ -51,11 +51,14 @@
   padding: .4em .8em;
   font-size: 1em;
   display: block;
-  border-radius: 5px;
-  transition: .1s all;
+  border-radius: .3em;
+  transition: .1s background-color;
   cursor: pointer;
   &.full-width {
     width: 100%;
+  }
+  &:hover {
+    transition: .1s background-color;
   }
   &.secondary {
     font-size: .8em;
@@ -68,13 +71,10 @@
     }
   }
   &.danger {
-    background-color: $white;
-    color: $red;
-    border: 1px solid $red;
-    transition: all .2s;
+    background-color: $red;
+    color: #fff;
     &:hover {
-      background-color: $red;
-      color: $white;
+      background-color: darken($red, 5%);
     }
   }
   
