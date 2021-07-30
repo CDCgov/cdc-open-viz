@@ -16,6 +16,10 @@
         margin-top: 3rem;
         z-index: 1;
         overflow-y: auto;
+        .heading-3 {
+            font-weight: 600;
+            margin-bottom: .5em;
+        }
         .tabs {
             margin-bottom: 2em;
             > ul.nav {
@@ -179,5 +183,36 @@
             text-decoration: underline;
             cursor: pointer
         }
+    }
+
+    .file-loaded-area {
+        margin-bottom: 20px;
+    }
+
+    .url-source-options,
+    .data-source-options {
+        display: grid;
+        grid-template-columns: 1fr 100px;
+        gap: 10px;
+        margin-bottom: 20px;
+
+        .btn {
+            margin: 0;
+        }
+
+        .cdcdataviz-file-selector {
+            padding: 8px;
+
+            svg {
+                position: relative;
+                top: 4px;
+                width: 20px;
+                height: 20px;
+                margin: 0;
+            }
+        }
+    }
+    .data-source-options {
+        align-items: center;
     }
 }
