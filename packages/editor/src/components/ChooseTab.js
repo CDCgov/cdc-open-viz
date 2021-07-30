@@ -43,9 +43,11 @@ export default function ChooseTab() {
 
         let setTypes = () => {
 
-            // Only take the data property from existing config. Covers case of selecting a new visualization.
+            // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
             let newConfig = {
                 data: [...config.data],
+                dataFileName: config.dataFileName,
+                dataFileSourceType: config.dataFileSourceType,
                 newViz: true,
                 type
             }

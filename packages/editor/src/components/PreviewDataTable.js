@@ -38,7 +38,7 @@ const TableFilter = memo(({globalFilter, setGlobalFilter, disabled = false}) => 
 });
 
 const Header = memo(({ globalFilter, data, setGlobalFilter}) => (
-  <header className="data-table-header mb-4">
+  <header className="data-table-header">
     <h2>Data Preview</h2>
     <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
   </header>
