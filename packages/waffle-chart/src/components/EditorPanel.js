@@ -11,7 +11,7 @@ import {
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcWaffleChart'
+import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 
 const TextField = memo((
   {
@@ -39,7 +39,6 @@ const TextField = memo((
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
   const onChange = (e) => {
-    //TODO: This block gives a warning/error in the console, but it still works.
     if ('number' !== type || min === null) {
       setValue(e.target.value)
     } else {
@@ -65,7 +64,7 @@ const TextField = memo((
 
   return (
     <label>
-      <span className="edit-label column-heading">{label}</span>
+      {label && <span className="edit-label column-heading">{label}</span>}
       {formElement}
     </label>
   )
@@ -103,7 +102,7 @@ const Select = memo((
 
   return (
     <label>
-      <span className="edit-label">{label}</span>
+      {label && <span className="edit-label">{label}</span>}
       <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => {
         updateField(section, subsection, fieldName, event.target.value)
       }} {...attributes}>
@@ -126,6 +125,7 @@ const EditorPanel = memo(() => {
   } = useContext(Context)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
+
   const enforceRestrictions = (updatedConfig) => {
     //If there are any dependencies between fields, etc../
   }
@@ -181,6 +181,22 @@ const EditorPanel = memo(() => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
+
+  useEffect(() => {
+    //Verify comparate data type
+    let operators = [ '<', '>', '<=', '>=' ]
+    if (config.dataConditionalComparate !== '') {
+      if (operators.indexOf(config.dataConditionalOperator) > -1 && isNaN(config.dataConditionalComparate)) {
+        updateConfig({ ...config, invalidComparate: true })
+      } else {
+        if (config.invalidComparate) {
+          updateConfig({ ...config, invalidComparate: false })
+        }
+      }
+    } else {
+      updateConfig({ ...config, invalidComparate: false })
+    }
+  }, [ config.dataConditionalOperator, config.dataConditionalComparate ])
 
   const onBackClick = () => {
     if (isDashboard) {
@@ -273,6 +289,11 @@ const EditorPanel = memo(() => {
     return filterDataOptions
   }
 
+  const toggleCustomDenom = () => {
+    let denom = { ...config }
+    updateConfig({ ...config, customDenom: !denom.customDenom })
+  }
+
   if (loading) {
     return null
   }
@@ -310,10 +331,66 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.dataColumn || ''} fieldName="dataColumn" label="Data Column"
-                          updateField={updateField} initial="Select" options={getColumns()}/>
-                  <Select value={config.dataFunction || ''} fieldName="dataFunction" label="Data Function"
-                          updateField={updateField} initial="Select" options={DATA_FUNCTIONS}/>
+                  <h4 style={{ fontWeight: '600' }}>Numerator</h4>
+                  <div className="accordion__panel-section">
+                    <Select value={config.dataColumn || ''} fieldName="dataColumn" label="Data Column"
+                            updateField={updateField} initial="Select" options={getColumns()}/>
+                    <Select value={config.dataFunction || ''} fieldName="dataFunction" label="Data Function"
+                            updateField={updateField} initial="Select" options={DATA_FUNCTIONS}/>
+                    <label><span className="edit-label">Data Conditional</span></label>
+                    <div className="accordion__panel-row accordion__small-inputs">
+                      <div className="accordion__panel-col">
+                        <Select value={config.dataConditionalColumn || ''} fieldName="dataConditionalColumn"
+                                updateField={updateField} initial="Select" options={getColumns()}/>
+                      </div>
+                      <div className="accordion__panel-col">
+                        <Select value={config.dataConditionalOperator || ''} fieldName="dataConditionalOperator"
+                                updateField={updateField} initial="Select" options={DATA_OPERATORS}/>
+                      </div>
+                      <div className="accordion__panel-col">
+                        <TextField value={config.dataConditionalComparate} fieldName={'dataConditionalComparate'}
+                                   updateField={updateField}
+                                   className={config.invalidComparate ? 'accordion__input-error' : ''}/>
+                      </div>
+                    </div>
+                    {config.invalidComparate &&
+                    <div className="accordion__panel-error">Non-numerical comparate values can only be used with = or
+                      ≠.</div>
+                    }
+                  </div>
+
+                  <div className="accordion__panel-row align-center">
+                    <div className="accordion__panel-col">
+                      <h4 style={{ fontWeight: '600' }}>Denominator</h4>
+                    </div>
+                    <div className="accordion__panel-col">
+                      <div className="d-flex justify-end">
+                        <label className={'accordion__panel-label--inline'}>Select from data</label>
+                        <div className={`accordion__panel-checkbox${config.customDenom ? ' checked' : ''}`}
+                             onClick={() => toggleCustomDenom()}/>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="accordion__panel-section">
+                    {!config.customDenom &&
+                    <div className="accordion__panel-row align-center">
+                      <div className="accordion__panel-col">
+                        <TextField value={config.dataDenom} fieldName="dataDenom" updateField={updateField}/>
+                      </div>
+                      <div className="accordion__panel-col">
+                        <label className={'accordion__panel-label--muted'}>default (100)</label>
+                      </div>
+                    </div>
+                    }
+                    {config.customDenom &&
+                    <>
+                      <Select value={config.dataDenomColumn || ''} fieldName="dataDenomColumn" label="Data Column"
+                              updateField={updateField} initial="Select" options={getColumns()}/>
+                      <Select value={config.dataDenomFunction || ''} fieldName="dataDenomFunction" label="Data Function"
+                              updateField={updateField} initial="Select" options={DATA_FUNCTIONS}/>
+                    </>
+                    }
+                  </div>
                   <ul className="column-edit">
                     <li className="three-col">
                       <TextField value={config.prefix} fieldName="prefix" label="Prefix" updateField={updateField}/>
@@ -333,7 +410,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <ul className="filters-list">
                     {config.filters && config.filters.map((filter, index) => (
-                        <fieldset className="edit-block">
+                        <fieldset className="edit-block" key={index}>
                           <button type="button" className="remove-column" onClick={() => {
                             removeFilter(index)
                           }}>Remove
@@ -344,8 +421,8 @@ const EditorPanel = memo(() => {
                               updateFilterProp('columnName', index, e.target.value)
                             }}>
                               <option value="">- Select Option -</option>
-                              {getColumns().map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                              {getColumns().map((dataKey, index) => (
+                                <option value={dataKey} key={index}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
@@ -355,8 +432,8 @@ const EditorPanel = memo(() => {
                               updateFilterProp('columnValue', index, e.target.value)
                             }}>
                               <option value="">- Select Option -</option>
-                              {getFilterColumnValues(index).map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                              {getFilterColumnValues(index).map((dataKey, index) => (
+                                <option value={dataKey} key={index}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
@@ -377,6 +454,8 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   {/*<Select value={config.biteLocation} fieldName="biteLocation" label="Waffle Chart Placement"
                           updateField={updateField} options={BITE_LOCATIONS} initial="Select"/>*/}
+                  <Select value={config.orientation} fieldName="orientation" label="Layout"
+                          updateField={updateField} options={[ 'horizontal', 'vertical' ]}/>
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size"
                           updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
                   <label className="header">

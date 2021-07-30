@@ -19,6 +19,16 @@
     display: flex;
     padding: 1em;
     justify-content: flex-start;
+
+    &.cdc-waffle-chart--verical {
+      align-items: center;
+      flex-flow: column;
+
+      .cdc-waffle-chart__data {
+        text-align: center;
+        margin-top: 1.25em;
+      }
+    }
   }
 
   .cdc-waffle-chart__subtext {
@@ -57,29 +67,25 @@
 
 .cdc-waffle-chart__data {
   @at-root {
-    .cdc-waffle-chart #{&} {
-      width: 140px;
-    }
-
     @each $theme, $color in $theme-colors {
       .cdc-waffle-chart.theme-#{$theme} #{&} {
-        @include set-theme($color, "color");
+        @include set-theme("color", $color);
       }
     }
 
     .cdc-waffle-chart.font-small #{&} {
       .cdc-waffle-chart__data--primary { font-size: 35px; }
-      .cdc-waffle-chart__data--text {  font-size: 12px; }
+      .cdc-waffle-chart__data--text {  font-size: 14px; }
     }
 
     .cdc-waffle-chart.font-medium #{&} {
-      .cdc-waffle-chart__data--primary { font-size: 65px; }
-      .cdc-waffle-chart__data--text {  font-size: 16px; }
+      .cdc-waffle-chart__data--primary { font-size: 50px; }
+      .cdc-waffle-chart__data--text {  font-size: 18px; }
     }
 
     .cdc-waffle-chart.font-large #{&} {
-      .cdc-waffle-chart__data--primary { font-size: 90px; }
-      .cdc-waffle-chart__data--text { font-size: 22px; }
+      .cdc-waffle-chart__data--primary { font-size: 80px; }
+      .cdc-waffle-chart__data--text { font-size: 20px; }
     }
   }
 

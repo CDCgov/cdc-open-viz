@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import Loading from '@cdc/core/components/Loading'
-import ResizeObserver from 'resize-observer-polyfill'
 import Context from './context'
 import './scss/main.scss'
 
@@ -23,7 +22,7 @@ const themeColor = {
   'theme-amber': '#fbab18',
 }
 
-const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
+const WaffleChart = ({ config, spacer, radius }) => {
 
   let {
     title,
@@ -31,37 +30,254 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
     prefix,
     suffix,
     subtext,
-    content
+    content,
+    orientation,
+    filters,
+    dataColumn,
+    dataFunction,
+    dataConditionalColumn,
+    dataConditionalOperator,
+    dataConditionalComparate,
+    customDenom,
+    dataDenom,
+    dataDenomColumn,
+    dataDenomFunction,
+    roundToPlace
   } = config
 
   const ratio = (10 * (radius * 2)) + (9 * spacer)
 
-  const calculatePos = (axis, index) => {
-    let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
-    return mod > 0 ? (mod * ((radius * 2) + spacer)) + radius : radius
-  }
+  const calculateData = useCallback(() => {
 
-  const drawCircle = (ctx, x, y, fill = color, active = false, stroke = false, strokeWidth = 0) => {
-    ctx.beginPath()
-    ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
-
-    if (!active) ctx.globalAlpha = 0.35
-
-    if (fill) {
-      ctx.fillStyle = fill
-      ctx.fill()
+    //If either the column or function aren't set, do not calculate
+    if (!dataColumn || !dataFunction) {
+      return '';
     }
 
-    if (!active) ctx.globalAlpha = 1
-
-    if (stroke) {
-      ctx.lineWidth = strokeWidth
-      ctx.strokeStyle = stroke
-      ctx.stroke()
+    const getColumnSum = (arr) => {
+      if (Array.isArray(arr) && arr.length > 0) {
+        const sum = arr.reduce((sum, x) => sum + x);
+        return applyPrecision(sum);
+      }
     }
-  }
+
+    const getColumnMean = (arr) => {
+      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0];
+      return applyPrecision(mean);
+    }
+
+    const getMode = (arr) => {
+      let freq = {}
+      let max = -Infinity
+
+      for(let i = 0; i < arr.length; i++) {
+        if (freq[arr[i]]) {
+          freq[arr[i]] += 1
+        } else {
+          freq[arr[i]] = 1
+        }
+
+        if (freq[arr[i]] > max) {
+          max = freq[arr[i]]
+        }
+      }
+
+      let res = []
+
+      for(let key in freq) {
+        if(freq[key] === max) res.push(key)
+      }
+
+      return res
+    }
+
+    const getMedian = arr => {
+      const mid = Math.floor(arr.length / 2),
+        nums = [...arr].sort((a, b) => a - b);
+      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+      return applyPrecision(value);
+    };
+
+    const applyPrecision = (value) => {
+      if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace)>-1) {
+        value = Number(value).toFixed(Number(roundToPlace));
+      }
+      return value;
+    }
+
+    //Optionally filter the data based on the user's filter
+    let filteredData = config.data
+
+    filters.map((filter) => {
+      if ( filter.columnName && filter.columnValue ) {
+        filteredData = filteredData.filter(function (e) {
+          return e[filter.columnName] === filter.columnValue;
+        });
+      } else {
+        return false;
+      }
+    });
+
+    let conditionalData = false
+
+    if (dataConditionalColumn !== '' && dataConditionalOperator !== '' && dataConditionalComparate !== '') {
+      switch (dataConditionalOperator) {
+        case ('<'):
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] < dataConditionalComparate )
+          break
+        case ('>'):
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] > dataConditionalComparate )
+          break
+        case ('<='):
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] <= dataConditionalComparate )
+          break
+        case ('>='):
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] >= dataConditionalComparate )
+          break
+        case ('='):
+          if (isNaN(Number(dataConditionalComparate))) {
+            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) === dataConditionalComparate )
+          } else {
+            conditionalData = filteredData.filter(e => e[dataConditionalColumn] === dataConditionalComparate )
+          }
+          break
+        case ('≠'):
+          if (isNaN(Number(dataConditionalComparate))) {
+            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) !== dataConditionalComparate )
+          } else {
+            conditionalData = filteredData.filter(e => e[dataConditionalColumn] !== dataConditionalComparate )
+          }
+          break
+        default:
+          conditionalData = false
+      }
+    }
+
+    //Get the column's data
+    const columnData = conditionalData ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
+    const denomColumnData = filteredData.map(a => a[dataDenomColumn])
+
+    //Filter the column's data for numerical values only
+    let numericalData = columnData.filter((value) => {
+      let include = false;
+      if ( Number(value) || Number.isFinite(Number(value)) ) {
+        include = true;
+      }
+      return include;
+    }).map(Number);
+
+    let numericalDenomData = denomColumnData.filter((value) => {
+      let include = false;
+      if ( Number(value) || Number.isFinite(Number(value)) ) {
+        include = true;
+      }
+      return include;
+    }).map(Number);
+
+    let waffleNumerator = ''
+
+    switch (dataFunction) {
+      case DATA_FUNCTION_COUNT:
+        waffleNumerator = String(numericalData.length);
+        break;
+      case DATA_FUNCTION_SUM:
+        waffleNumerator = String(getColumnSum(numericalData));
+        break;
+      case DATA_FUNCTION_MEAN:
+        waffleNumerator = String(getColumnMean(numericalData));
+        break;
+      case DATA_FUNCTION_MEDIAN:
+        waffleNumerator = getMedian(numericalData).toString();
+        break;
+      case DATA_FUNCTION_MAX:
+        waffleNumerator = Math.max(...numericalData).toString();
+        break;
+      case DATA_FUNCTION_MIN:
+        waffleNumerator = Math.min(...numericalData).toString();
+        break;
+      case DATA_FUNCTION_MODE:
+        waffleNumerator = getMode(numericalData).join(', ');
+        break;
+      default:
+        console.log('Function not recognized: ' + dataFunction);
+    }
+
+    let waffleDenominator = null
+
+    if (customDenom && dataDenomColumn && dataDenomFunction) {
+      switch (dataDenomFunction) {
+        case DATA_FUNCTION_COUNT:
+          waffleDenominator = String(numericalDenomData.length);
+          break;
+        case DATA_FUNCTION_SUM:
+          waffleDenominator = String(getColumnSum(numericalDenomData));
+          break;
+        case DATA_FUNCTION_MEAN:
+          waffleDenominator = String(getColumnMean(numericalDenomData));
+          break;
+        case DATA_FUNCTION_MEDIAN:
+          waffleDenominator = getMedian(numericalDenomData).toString();
+          break;
+        case DATA_FUNCTION_MAX:
+          waffleDenominator = Math.max(...numericalDenomData).toString();
+          break;
+        case DATA_FUNCTION_MIN:
+          waffleDenominator = Math.min(...numericalDenomData).toString();
+          break;
+        case DATA_FUNCTION_MODE:
+          waffleDenominator = getMode(numericalDenomData).join(', ');
+          break;
+        default:
+          console.log('Function not recognized: ' + dataFunction);
+      }
+    } else {
+      waffleDenominator = dataDenom > 0 ? dataDenom : 100
+    }
+
+    return applyPrecision((waffleNumerator / waffleDenominator) * 100);
+  }, [
+    dataColumn,
+    dataFunction,
+    config.data,
+    filters,
+    dataConditionalColumn,
+    dataConditionalOperator,
+    dataConditionalComparate,
+    customDenom,
+    dataDenomColumn,
+    dataDenomFunction,
+    roundToPlace,
+    dataDenom
+  ])
+
+  const dataPercentage = calculateData()
 
   useEffect(() => {
+    const calculatePos = (axis, index) => {
+      let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
+      return mod > 0 ? (mod * ((radius * 2) + spacer)) + radius : radius
+    }
+
+    const drawCircle = (ctx, x, y, fill, active = false, stroke = false, strokeWidth = 0) => {
+      ctx.beginPath()
+      ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
+
+      if (!active) ctx.globalAlpha = 0.35
+
+      if (fill) {
+        ctx.fillStyle = fill
+        ctx.fill()
+      }
+
+      if (!active) ctx.globalAlpha = 1
+
+      if (stroke) {
+        ctx.lineWidth = strokeWidth
+        ctx.strokeStyle = stroke
+        ctx.stroke()
+      }
+    }
+
     const ctx = canvas.current.getContext('2d')
     ctx.width = ratio
     ctx.height = ratio
@@ -69,22 +285,22 @@ const WaffleChart = ({ config, data, color = '#ffdc9b', spacer, radius }) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
     for (let i = 0; i <= 100; i++) {
-      drawCircle(ctx, calculatePos('x', i), calculatePos('y', i), themeColor[theme], i + 1 > (100 - Math.round(data)))
+      drawCircle(ctx, calculatePos('x', i), calculatePos('y', i), themeColor[theme], i + 1 > (100 - Math.round(dataPercentage)))
     }
-  })
+  }, [ratio, spacer, radius, theme, dataPercentage])
 
   return (
     <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
       <div className="cdc-waffle-chart__header">{title}</div>
-      <div className="cdc-waffle-chart__inner-container">
+      <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
         <div className="cdc-waffle-chart__chart">
           <canvas ref={canvas} width={ratio} height={ratio}/>
         </div>
         <div className="cdc-waffle-chart__data">
-          <div className="cdc-waffle-chart__data--primary" style={{ color: themeColor[theme] }}>
-            {prefix ? prefix : null}{data}{suffix ? suffix : null}
+          <div className="cdc-waffle-chart__data--primary">
+            {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
           </div>
-          <div className="cdc-waffle-chart__data--text" style={{ color: themeColor[theme] }}>{content}</div>
+          <div className="cdc-waffle-chart__data--text">{content}</div>
         </div>
       </div>
       <div className="cdc-waffle-chart__subtext">
@@ -105,38 +321,6 @@ const CdcWaffleChart = (
 ) => {
   const [ config, setConfig ] = useState({})
   const [ loading, setLoading ] = useState(true)
-
-  const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-      'lg': 1200,
-      'md': 992,
-      'sm': 768,
-      'xs': 576,
-      'xxs': 350
-    }
-
-    if (size > 1200) return result
-
-    for (let viewport in viewports) {
-      if (size <= viewports[viewport]) {
-        result = viewport
-      }
-    }
-
-    return result
-  }
-
-  const [ currentViewport, setCurrentViewport ] = useState('lg')
-
-  //Observes changes to outermost container and changes viewport size in state
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width)
-      setCurrentViewport(newViewport)
-    }
-  })
 
   const updateConfig = (newConfig) => {
     // Deeper copy
@@ -186,7 +370,7 @@ const CdcWaffleChart = (
       <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' '): ''}`}
            style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
         {isEditor && <EditorPanel/>}
-        <WaffleChart config={config} data={94.5} spacer={1} radius={6}/>
+        <WaffleChart config={config} spacer={1} radius={6}/>
       </div>
     )
   }
@@ -206,8 +390,8 @@ export const DATA_FUNCTION_MEAN = 'Mean (Average)'
 export const DATA_FUNCTION_MEDIAN = 'Median'
 export const DATA_FUNCTION_MIN = 'Min'
 export const DATA_FUNCTION_MODE = 'Mode'
-export const DATA_FUNCTION_RANGE = 'Range'
 export const DATA_FUNCTION_SUM = 'Sum'
+
 export const DATA_FUNCTIONS = [
   DATA_FUNCTION_COUNT,
   DATA_FUNCTION_MAX,
@@ -215,16 +399,21 @@ export const DATA_FUNCTIONS = [
   DATA_FUNCTION_MEDIAN,
   DATA_FUNCTION_MIN,
   DATA_FUNCTION_MODE,
-  DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 ]
 
-export const BITE_LOCATION_TITLE = 'title'
-export const BITE_LOCATION_BODY = 'body'
-export const BITE_LOCATION_GRAPHIC = 'graphic'
-export const BITE_LOCATIONS =
-  {
-    'title': 'As a title in the body',
-    'body': 'At the beginning of the body text',
-    'graphic': 'As a graphic'
-  }
+export const DATA_OPERATOR_LESS = '<'
+export const DATA_OPERATOR_GREATER = '>'
+export const DATA_OPERATOR_LESSEQUAL = '<='
+export const DATA_OPERATOR_GREATEREQUAL = '>='
+export const DATA_OPERATOR_EQUAL = '='
+export const DATA_OPERATOR_NOTEQUAL = '≠'
+
+export const DATA_OPERATORS = [
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+]

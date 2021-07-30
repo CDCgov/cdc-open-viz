@@ -102,10 +102,10 @@
   .warning {
     color: #D8000C;
     background-color: #FFD2D2;
+    border: #D8000C 1px solid;
     padding: .75em 1em;
     margin: 1em 0;
     font-size: .8em;
-    border: #D8000C 1px solid;
     border-radius: .4em;
 
     strong {
@@ -157,6 +157,109 @@
 
     h5 {
       font-size: .8em;
+    }
+
+    .accordion__panel-section {
+      padding: 16px;
+      border: 1px solid #c4c4c4;
+      border-radius: 8px;
+      margin-top: 8px;
+      margin-bottom: 24px;
+    }
+
+    .accordion__panel-row {
+      display: flex;
+      justify-content: flex-start;
+      margin-left: -4px;
+      margin-right: -4px;
+    }
+
+    .accordion__panel-col {
+      flex: 1 1 0;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .accordion__small-inputs {
+      input[type="text"] {
+        display: block;
+        width: 100%;
+        height: 22px;
+        min-width: unset !important;
+        padding-top: 0;
+        padding-bottom: 0;
+        font-size: 1.1em;
+        line-height: 1em;
+        box-sizing: border-box;
+      }
+    }
+
+    .accordion__panel-label {
+      font-size: 14px;
+      text-transform: unset;
+      font-weight: normal;
+      line-height: 16px;
+      user-select: none;
+    }
+
+    .accordion__panel-label--inline {
+      @extend .accordion__panel-label;
+      text-align: right;
+      margin-right: 8px;
+    }
+
+    .accordion__panel-label--muted {
+      @extend .accordion__panel-label;
+      color: #6f6f6f;
+    }
+
+    .d-flex {
+      display: flex;
+    }
+
+    .align-center {
+      align-items: center;
+    }
+
+    .justify-end {
+      justify-content: flex-end;
+    }
+
+    .accordion__panel-checkbox {
+      display: block;
+      width: 18px;
+      height: 18px;
+      border: 1px solid #c4c4c4;
+      cursor: pointer;
+
+      &.checked::after {
+        content: 'L';
+        display: block;
+        position: relative;
+        top: -7px;
+        left: -3px;
+        transform: scaleX(-1) rotate(-35deg);
+        font-size: 16px;
+        font-weight: bold;
+        color: #025eaa;
+        pointer-events: none;
+      }
+    }
+
+    .accordion__input-error {
+      color: #D8000C;
+      border: #D8000C 1px solid;
+    }
+
+    .accordion__panel-error {
+      color: #D8000C;
+      background-color: #FFD2D2;
+      border: #D8000C 1px solid;
+      margin-top: 12px;
+      padding: 4px 8px;
+      line-height: 1.2em;
+      font-size: 14px;
+      border-radius: 4px;
     }
   }
 
