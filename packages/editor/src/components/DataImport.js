@@ -48,7 +48,7 @@ export default function DataImport() {
   useEffect(() => {
     if(tempConfig !== null) {
         setConfig(tempConfig)
-        setTempConfig(null)        
+        setTempConfig(null)
     }
   })
 
