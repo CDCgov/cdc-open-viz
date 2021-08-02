@@ -276,7 +276,7 @@ export default function DataImport() {
   return (
     <>
       <div className="left-col">
-        {!config.data && (
+        { (!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
