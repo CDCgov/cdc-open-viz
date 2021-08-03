@@ -303,8 +303,8 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <ul className="filters-list">
-                    {config.filters && config.filters.map((filter, index) => (
+                  {config.filters && <ul className="filters-list">
+                    {config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -328,9 +328,9 @@ const EditorPanel = memo(() => {
                         </fieldset>
                       )
                     )}
-                  </ul>
-
-                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                  </ul>}
+                  {!config.filters || config.filters.length === 0 && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                  <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>

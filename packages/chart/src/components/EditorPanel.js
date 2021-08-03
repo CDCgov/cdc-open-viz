@@ -149,6 +149,7 @@ const Regions = memo(({config, updateConfig}) => {
           </div>
         </div>
       ))}
+      {!config.regions && <p style={{textAlign: "center"}}>There are currently no regions.</p>}
       <button className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
     </>
   )
@@ -512,8 +513,8 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <ul className="filters-list">
-                    {config.filters && config.filters.map((filter, index) => (
+                  {config.filters && <ul className="filters-list">
+                    {config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -532,9 +533,9 @@ const EditorPanel = memo(() => {
                         </fieldset>
                       )
                     )}
-                  </ul>
-
-                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                  </ul>}
+                  {!config.filters && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                  <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
