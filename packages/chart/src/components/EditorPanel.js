@@ -443,7 +443,7 @@ const EditorPanel = memo(() => {
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                       <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
-                      <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
+                      {config.visualizationSubType !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
                     </>
                   )}
                   <span className="divider-heading">Number Formatting</span>
