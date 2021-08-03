@@ -282,16 +282,26 @@
     li {
       margin-top: 1em;
     }
-    .three-col {
+    .three-col, .two-col {
       display: flex;
       justify-content: space-between;
       > label {
         margin-top: 0;
-        width: 30%;
         display: inline-block;
         input[type="text"], input[type="number"] {
           width: 50px;
         }
+      }
+    }
+    .three-col {
+      > label {
+        width: 30%;
+      }
+    }
+    .two-col {
+      > label {
+        margin-top: 0;
+        width: 49%;
       }
     }
   }
