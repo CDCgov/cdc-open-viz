@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect,  useState, useCallback } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
@@ -9,6 +9,7 @@ import Context from './context';
 // @ts-ignore
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
+import parse from 'html-react-parser'
 
 const CdcDataBite = (
     { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
@@ -246,13 +247,12 @@ const CdcDataBite = (
     if(config.shadow) biteClasses.push('shadow')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
-
     body = (
       <>
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className="cdc-data-bite-inner-container">
-          {title && <div className="bite-header">{title}</div>}
+            {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
@@ -262,14 +262,14 @@ const CdcDataBite = (
                   {biteBody &&
                     <p>
                       {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body">{calculateDataBite()}</span>}
-                      {biteBody}
+                      {parse(biteBody)}
                     </p>
                   }
                 </div>
                 {imageUrl && 'image' === biteStyle && !isTop && <img src={imageUrl} className="bite-image callout" />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
               </div>
-              {subtext && <p className="subtext">{subtext}</p>}
+              {subtext && <p className="subtext">{parse(subtext)}</p>}
             </div>
           </div>
         </div>
