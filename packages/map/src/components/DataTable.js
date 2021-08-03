@@ -7,6 +7,7 @@ import {
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import parse from 'html-react-parser';
 
 const DataTable = (props) => {
   const {
@@ -254,7 +255,7 @@ const DataTable = (props) => {
         tabIndex="0"
         onKeyDown={(e) => { if (e.keyCode === 13) { setExpanded(!expanded); } }}
       >
-        {tableTitle}
+        {parse(tableTitle)}
       </div>
       <div className="table-container">
         <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" >

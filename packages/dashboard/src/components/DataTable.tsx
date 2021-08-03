@@ -12,6 +12,7 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import { Base64 } from 'js-base64';
+import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -128,11 +129,11 @@ export default function DataTable() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.keyCode === 13) { setTableExpanded(!tableExpanded); } }}
           >
-            {config.table.label}
+            {parse(config.table.label)}
           </div>
           <div className="table-container">
             <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>
-              <caption className="visually-hidden">{config.table.label}</caption>
+              <caption className="visually-hidden">{parse(config.table.label)}</caption>
               <thead>
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>

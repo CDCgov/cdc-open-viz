@@ -387,7 +387,7 @@ export default function CdcChart(
 
     return (
       <div className={containerClasses.join(' ')}>
-        {legend.label && <h2>{legend.label}</h2>}
+        {legend.label && <h2>{parse(legend.label)}</h2>}
         <LegendOrdinal
         scale={colorScale}
         itemDirection="row"
@@ -496,7 +496,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`}>{parse(title)}</div>}
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}

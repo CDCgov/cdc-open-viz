@@ -9,6 +9,7 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
+import parse from 'html-react-parser';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -314,7 +315,7 @@ const UsaMap = (props) => {
       </svg>
       {territories.length > 0 && (
         <section className="territories">
-          <span className="label">{state.general.territoriesLabel}</span>
+          <span className="label">{parse(state.general.territoriesLabel)}</span>
           {territories}
         </section>
       )}

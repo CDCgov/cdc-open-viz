@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
 import { Text } from '@visx/text';
+import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -28,8 +29,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
 
               const tooltip = `<div>
-              ${yAxisTooltip}<br />
-              ${xAxisTooltip}<br />
+              ${parse(yAxisTooltip)}<br />
+              ${parse(xAxisTooltip)}<br />
               ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
               let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
@@ -104,8 +105,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
       
                     const tooltip = `<div>
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
+                    ${parse(yAxisTooltip)}<br />
+                    ${parse(xAxisTooltip)}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
                     return (

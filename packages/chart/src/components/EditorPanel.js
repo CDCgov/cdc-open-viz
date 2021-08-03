@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, memo, useContext } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 import {
@@ -14,7 +14,6 @@ import Context from '../context';
 import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import Waiting from '@cdc/core/components/Waiting';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 const Helper = ({text}) => {
