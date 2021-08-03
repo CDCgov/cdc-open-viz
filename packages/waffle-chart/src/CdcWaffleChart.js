@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
+import parse from 'html-react-parser'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import Loading from '@cdc/core/components/Loading'
@@ -291,7 +292,7 @@ const WaffleChart = ({ config, spacer, radius }) => {
 
   return (
     <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
-      <div className="cdc-waffle-chart__header">{title}</div>
+      <div className="cdc-waffle-chart__header">{parse(title)}</div>
       <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
         <div className="cdc-waffle-chart__chart">
           <canvas ref={canvas} width={ratio} height={ratio}/>
@@ -300,11 +301,11 @@ const WaffleChart = ({ config, spacer, radius }) => {
           <div className="cdc-waffle-chart__data--primary">
             {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
           </div>
-          <div className="cdc-waffle-chart__data--text">{content}</div>
+          <div className="cdc-waffle-chart__data--text">{parse(content)}</div>
         </div>
       </div>
       <div className="cdc-waffle-chart__subtext">
-        {subtext}
+        {parse(subtext)}
       </div>
     </section>
   )
