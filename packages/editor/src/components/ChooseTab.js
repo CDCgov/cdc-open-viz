@@ -48,6 +48,7 @@ export default function ChooseTab() {
                 data: [...config.data],
                 dataFileName: config.dataFileName,
                 dataFileSourceType: config.dataFileSourceType,
+                dataDescription: config.dataDescription,
                 newViz: true,
                 type
             }
