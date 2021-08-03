@@ -29,9 +29,6 @@ const CdcDataBite = (
     imageUrl,
     biteBody,
     biteFontSize,
-    prefix,
-    suffix,
-    roundToPlace,
     biteStyle,
     filters,
     subtext
@@ -132,8 +129,8 @@ const CdcDataBite = (
     };
 
     const applyPrecision = (value) => {
-      if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace)>-1) {
-        value = Number(value).toFixed(Number(roundToPlace));
+      if ('' !== config.dataFormat.roundToPlace && !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
+        value = Number(value).toFixed(Number(config.dataFormat.roundToPlace));
       }
       return value;
     }
@@ -157,7 +154,6 @@ const CdcDataBite = (
     //Get the column's data
     filteredData.forEach(row => {
       let value = numberFromString(row[dataColumn])
-
       if(typeof value === 'number') numericalData.push(value)
     });
 
@@ -185,18 +181,32 @@ const CdcDataBite = (
         break;
       case DATA_FUNCTION_RANGE:
         numericalData.sort((a, b) => a - b);
-        dataBite = applyPrecision(numericalData[0]) + suffix + ' - ' + prefix + applyPrecision(numericalData[numericalData.length - 1]);
+        let rangeMin = applyPrecision(numericalData[0]);
+        let rangeMax = applyPrecision(numericalData[numericalData.length - 1]);
+
+        if (config.dataFormat.commas) {
+          rangeMin = Number(rangeMin).toLocaleString('en-US');
+          rangeMax = Number(rangeMax).toLocaleString('en-US');
+        }
+
+        dataBite = config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + applyPrecision(rangeMax) + config.dataFormat.suffix;
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
     }
 
-    // Round
-    if(dataFunction !== DATA_FUNCTION_RANGE) {
-      dataBite = applyPrecision(dataBite)
-    }
+    // If not the range, then round and format here
+    if (dataFunction !== DATA_FUNCTION_RANGE) {
+      dataBite = applyPrecision(dataBite);
 
-    return prefix + dataBite + suffix;
+      if (config.dataFormat.commas) {
+        dataBite = Number(dataBite).toLocaleString('en-US');
+      }
+
+      return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+    } else { //Rounding and formatting for ranges happens earlier.
+      return dataBite;
+    }
   }
 
   // Load data when component first mounts
@@ -277,7 +287,6 @@ const CdcDataBite = (
   if (isEditor) {
     classNames.push('is-editor');
   }
-
 
   return (
     <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
