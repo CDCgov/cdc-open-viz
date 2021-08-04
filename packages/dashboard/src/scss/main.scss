@@ -7,7 +7,6 @@
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
   @import 'grid';
-  @import 'datatable';
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
@@ -135,21 +134,25 @@
   }
 
   .dashboard-col {
-    display: inline-block;
-    vertical-align: top;
-    margin: 1em;
-    &:empty {
-      display: none;
+    margin: 0;
+    // Disable the module individual margin
+    .map-container, .cdc-chart-inner-container > * {
+      margin-left: 0;
+      margin-right: 0;
     }
   }
 
   .dashboard-col-12 {
     width: 100%;
   }
-  @include breakpointClass(lg) {
+  @include breakpointClass(md) {
     .dashboard-row {
       flex-direction: row;
+      margin: 1em 0;
+      justify-content: space-between;
+      column-gap: 1em;
     }
+
     .dashboard-col-8 {
       width: 66%;
     }
@@ -163,11 +166,15 @@
   }
 
   .dashboard-filters-section {
-    margin: 1em
+    margin: 0 0 1em;
   }
   .builder-grid .editor-heading {
     position: relative;
     right: -2em;
+  }
+
+  .cdc-dashboard-inner-container {
+    margin: 1em;
   }
 
   .sub-editor {

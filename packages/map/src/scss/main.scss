@@ -3,16 +3,6 @@
 @import "variables";
 @import "editor-panel";
 
-@mixin legendDot() {
-  margin-right: 5px;
-  border-radius: 300px;
-  vertical-align: middle;
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  border: rgba(0,0,0,.3) 1px solid;
-}
-
 .cdc-map-outer-container {
   position: relative;
   display: flex; // Needed for the main content
@@ -115,8 +105,7 @@
         .content {
           flex-grow: 1;
         }
-        .legend-color {
-          @include legendDot;
+        .legend-item {
           margin-right: .75em;
           margin-top: 3px;
           flex-shrink: 0;
@@ -130,7 +119,7 @@
         @include breakpointClass(lg) {
           font-size: .9em;
           min-width: 300px;
-          .legend-color {
+          .legend-item {
             height: 1.3em;
             width: 1.3em;
           }
@@ -174,7 +163,7 @@
     }
   }
 
-  span.legend-color {
+  span.legend-item {
     margin-right: 5px;
     border-radius: 300px;
     vertical-align: middle;

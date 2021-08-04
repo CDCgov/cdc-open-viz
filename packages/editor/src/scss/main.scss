@@ -1,9 +1,7 @@
-@import 'variables';
 @import "@cdc/core/styles/base";
+@import 'variables';
 
-$tempLightGray: #C7C7C7;
-
-.cdc-editor {
+.cdc-open-viz-module.cdc-editor {
   min-height: inherit;
   display: flex;
   flex-direction: column;
@@ -33,12 +31,12 @@ $tempLightGray: #C7C7C7;
       li {
         background: #F2F2F2;
         line-height: 3rem;
-        border-bottom: 1px solid $tempLightGray;
+        border-bottom: 1px solid $lightGray;
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
         width: 25%;
-        border-right: 1px solid $tempLightGray;
+        border-right: 1px solid $lightGray;
         text-align: center;
         &:last-child {
           border-right: none;

@@ -20,9 +20,9 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cdc/chart": "^1.0.0",
-    "@cdc/core": "^1.0.0",
-    "@cdc/map": "^2.3.0",
+    "@cdc/chart": "^1.2.0",
+    "@cdc/core": "^1.0.2",
+    "@cdc/map": "^2.5.0",
     "@cdc/data-bite": "^1.0.0",
     "html-react-parser": "^0.14.0",
     "js-base64": "^2.5.2",

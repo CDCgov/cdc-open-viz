@@ -25,7 +25,7 @@ export default function LinearChart() {
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
-  const xMax = width - config.runtime.yAxis.size - config.padding.left - config.padding.right;
+  const xMax = width - config.runtime.yAxis.size;
   const yMax = height - config.runtime.xAxis.size;
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
