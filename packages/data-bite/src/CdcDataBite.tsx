@@ -258,25 +258,27 @@ const CdcDataBite = (
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
                 {imageUrl && 'graphic' !== biteStyle && isTop && <img src={imageUrl} className="bite-image callout" />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value">{calculateDataBite()}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                   {biteBody &&
-                    <p>
-                      {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body">{calculateDataBite()}</span>}
-                      {parse(biteBody)}
-                    </p>
+                    <>
+                      <p className="bite-text">
+                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
+                        {parse(biteBody)}
+                      </p>
+                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                    </>
                   }
                 </div>
                 {imageUrl && 'image' === biteStyle && !isTop && <img src={imageUrl} className="bite-image callout" />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
               </div>
-              {subtext && <p className="subtext">{parse(subtext)}</p>}
             </div>
           </div>
         </div>
       </>
     )
   }
-  
+
   let classNames = [
     'cdc-open-viz-module',
     'type-data-bite',
@@ -324,7 +326,6 @@ export const BITE_LOCATION_BODY = 'body';
 export const BITE_LOCATION_GRAPHIC = 'graphic';
 export const BITE_LOCATIONS = {
   'graphic': 'Graphic',
-  'image': 'Image',
   'title': 'Text above body text',
   'body': 'Inline with body text'
 };

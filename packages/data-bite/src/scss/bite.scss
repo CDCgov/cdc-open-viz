@@ -243,18 +243,16 @@
       opacity: .7;
     }
 
-    p.subtext {
-      text-align: right;
-      font-size: .9em;
-      padding: 0 1em 1em;
-    }
-
     .bite-content-container {
       display: flex;
       padding: 1em 1em;
       justify-content: space-between;
+
       .bite-content {
+        display: flex;
+        flex-direction: column;
         flex-grow: 1;
+
         .bite-value {
           font-size: 2em;
           font-weight: 800;
@@ -265,14 +263,16 @@
           margin-right: 5px;
         }
 
-        p {
-          margin: 0;
+        .bite-text {
+          margin-bottom: 15px;
           font-size: 0.9em;
           color: #222;
+          flex: 1 0 auto;
         }
 
-        p.subtext {
-          margin-top: 15px;
+        .bite-subtext {
+          font-size: .9em;
+          font-style: italic;
         }
       }
     }
