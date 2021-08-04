@@ -11,6 +11,7 @@ export default {
   ],
   visualizations: {},
   table: {
-    label: 'Data Table'
+    label: 'Data Table',
+    show: true
   }
 }

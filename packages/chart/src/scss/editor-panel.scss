@@ -1,7 +1,4 @@
 .editor-panel {
-    + .cdc-chart-inner-container > * {
-      margin: 1em;
-    }
     .two-col-inputs {
       display: flex;
       margin-top: 1em;
@@ -67,7 +64,6 @@
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
-    overflow-x: hidden;
     position: fixed;
     z-index: 8;
     display: flex;
@@ -560,8 +556,5 @@
 @include breakpointClass(md) {
   .editor-panel:not(.hidden) + .cdc-chart-inner-container {
     padding-left: $editorWidth;
-  }
-  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-    padding-left: 3em;
   }
 }

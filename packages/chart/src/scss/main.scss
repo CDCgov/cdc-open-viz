@@ -6,6 +6,7 @@
 .cdc-open-viz-module.type-chart {
   @import 'datatable';
   @import 'editor-panel';
+  
   .visually-hidden {
     position: fixed;
     left: -10000px;
@@ -83,7 +84,7 @@
     padding: 15px;
     vertical-align: top;
     text-align: center;
-    border: 1px solid #C7C7C7;
+    border: 1px solid $lightGray;
     order: 1;
     position: relative;
     .legend-reset {
@@ -102,7 +103,7 @@
         transition: .3s all;
       }
     }
-    .legend-color {
+    .legend-item {
       display: inline-block;
       margin: 0 .5rem 0 0;
     }
@@ -138,6 +139,7 @@
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
+    margin-bottom: 1em;
     &.legend-hidden > svg {
       width: 100% !important;
     }
@@ -153,13 +155,14 @@
 
   .filters-section {
       display: inline-block;
-      padding: 0 1em .5em;
       label:not(:empty) {
         margin-right: .4em;
       }
       select {
         font-size: 1em;
-        margin-right: 1em;
+      }
+      .single-filter + .single-filter {
+        margin-left: 1em;
       }
   }
 
@@ -189,6 +192,10 @@
     }
   }
   @include breakpointClass(md) {
+    .filters-section, .chart-container {
+      margin-left: 1em;
+      margin-right: 1em;
+    }
     .chart-container {
       flex-wrap: nowrap;
       .legend-container {

@@ -71,7 +71,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
-    delete visualizations[data.uid].newViz
     visualizations[data.uid].editing = true;
 
     updateConfig({...config, visualizations});

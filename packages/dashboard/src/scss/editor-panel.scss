@@ -11,9 +11,6 @@
 }
 
 .editor-panel {
-    + .cdc-dashboard-inner-container > *:not(.editor-heading) {
-      margin: 1em;
-    }
     .two-col-inputs {
       display: flex;
       margin-top: 1em;
@@ -79,7 +76,6 @@
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
-    overflow-x: hidden;
     position: fixed;
     z-index: 8;
     display: flex;
