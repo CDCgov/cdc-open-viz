@@ -164,6 +164,12 @@
     }
   }
 
+  @include breakpointClass(sm) {
+    .dashboard-col {
+      margin-bottom: 1em;
+    }
+  }
+  
   .dashboard-filters-section {
     margin: 0 0 1em;
   }
