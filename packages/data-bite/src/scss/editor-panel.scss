@@ -68,6 +68,12 @@
       width: 75px
     }
   }
+  .accordion__divider {
+    border: 0;
+    border-top: 1px solid #e2e2e2;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
   .form-container {
     border-right: $lightGray 1px solid;
     flex-grow: 1;

@@ -155,7 +155,7 @@ const EditorPanel = memo(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
       const newConfig = convertStateToConfig()
-      
+
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -267,11 +267,13 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <Select value={config.biteStyle} fieldName="biteStyle" label="Data Bite Style" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title" updateField={updateField} />
                   <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} />
                   <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation" placeholder="Data Bite Subtext or Citation" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -294,17 +296,11 @@ const EditorPanel = memo(() => {
                     </li>
                   </ul>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
-                </AccordionItemPanel>
-              </AccordionItem>
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Filters
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  {config.filters && <ul className="filters-list">
-                    {config.filters.map((filter, index) => (
+                  <hr className="accordion__divider" />
+                  {
+                    config.filters &&
+                    <ul className="filters-list">
+                      {config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -326,13 +322,14 @@ const EditorPanel = memo(() => {
                             </select>
                           </label>
                         </fieldset>
-                      )
-                    )}
-                  </ul>}
-                  {!config.filters || config.filters.length === 0 && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                      ))}
+                    </ul>
+                  }
+                  {(!config.filters || config.filters.length === 0) && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
                   <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -340,9 +337,13 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.biteStyle} fieldName="biteStyle" label="Data Bite Style" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
-                  {config.biteStyle === 'image' && <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />}
-                  {['graphic', 'image'].includes(config.biteStyle) && <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />}
+                  {
+                    ['title', 'body'].includes(config.biteStyle) &&
+                    <>
+                      <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
+                      <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
+                    </>
+                  }
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
