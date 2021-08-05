@@ -144,6 +144,7 @@
   .dashboard-col-12 {
     width: 100%;
   }
+
   @include breakpointClass(md) {
     .dashboard-row {
       flex-direction: row;
@@ -161,6 +162,12 @@
   
     .dashboard-col-4 {
       width: 33%;
+    }
+  }
+
+  @include breakpointClass(sm) {
+    .dashboard-col {
+      margin-bottom: 25px;
     }
   }
 
