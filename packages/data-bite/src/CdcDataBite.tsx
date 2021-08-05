@@ -140,6 +140,7 @@ const CdcDataBite = (
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
+
     filters.map((filter) => {
       if ( filter.columnName && filter.columnValue ) {
         filteredData = filteredData.filter(function (e) {
@@ -220,6 +221,12 @@ const CdcDataBite = (
   useEffect(() => {
     loadConfig();
   }, [])
+
+  if(configObj) {
+    useEffect(() => {
+      loadConfig();
+    }, [configObj.data])
+  }
 
   let body = (<Loading />)
 
