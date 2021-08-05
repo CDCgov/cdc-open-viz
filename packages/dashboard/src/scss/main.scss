@@ -164,6 +164,15 @@
     }
   }
 
+<<<<<<< Updated upstream
+=======
+  @include breakpointClass(sm) {
+    .dashboard-col {
+      margin-bottom: 1em;
+    }
+  }
+
+>>>>>>> Stashed changes
   .dashboard-filters-section {
     margin: 0 0 1em;
   }
