@@ -6,7 +6,9 @@ import {
 } from 'react-table';
 import Papa from 'papaparse';
 import ExternalIcon from '../images/external-link.svg';
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import LegendCircle from '@cdc/core/components/LegendCircle';
 
 const DataTable = (props) => {
   const {
@@ -186,7 +188,7 @@ const DataTable = (props) => {
 
             const cellMarkup = (
               <>
-                <span className="legend-color" style={{ backgroundColor: legendColor[0] }} />
+                <LegendCircle fill={legendColor[0]} />
                 {labelValue}
               </>
             );

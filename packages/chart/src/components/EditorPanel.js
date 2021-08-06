@@ -157,7 +157,7 @@ const Regions = memo(({config, updateConfig}) => {
 
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
-const EditorPanel = memo(() => {
+const EditorPanel = () => {
   const {
     config,
     updateConfig,
@@ -165,7 +165,8 @@ const EditorPanel = memo(() => {
     colorPalettes,
     rawData,
     isDashboard,
-    setParentConfig
+    setParentConfig,
+    missingRequiredSections
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
@@ -210,29 +211,8 @@ const EditorPanel = memo(() => {
     updateConfig(updatedConfig)
   }
 
-  const missingRequiredSections = () => {
-    if(config.visualizationType === 'Pie') {
-      if(!config.yAxis.dataKey){
-        return true;
-      }
-    } else {
-      if(!config.series || !config.series.length > 0){
-        return true;
-      }
-    }
-
-    if(!config.xAxis.dataKey) {
-      return true;
-    }
-
-    return false;
-  };
-
   const [ addSeries, setAddSeries ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true);
-
-  // Used to pipe a JSON version of the config you are creating out
-  const [ configData, setConfigData ] = useState({})
 
   if(loading) {
     return null
@@ -329,12 +309,21 @@ const EditorPanel = memo(() => {
   }
 
   const Confirm = () => {
+    const confirmDone = (e) => {
+      e.preventDefault()
+
+      let newConfig = {...config}
+      delete newConfig.newViz
+
+      updateConfig(newConfig)
+    }
+
     return (
       <section className="waiting">
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
+          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={confirmDone}>I'm Done</button>
         </section>
       </section>
     );
@@ -362,8 +351,8 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
+      {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <div className="heading-2">Configure Chart</div>
@@ -380,7 +369,7 @@ const EditorPanel = memo(() => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} />
                   <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
@@ -643,6 +632,6 @@ const EditorPanel = memo(() => {
       </section>
     </ErrorBoundary>
   )
-})
+}
 
 export default EditorPanel;

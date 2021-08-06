@@ -101,7 +101,7 @@ const EditorPanel = memo(() => {
     loading,
     data,
     setParentConfig,
-    isDashboard
+    isDashboard,
   } = useContext(Context);
 
   const [ displayPanel, setDisplayPanel ] = useState(true);

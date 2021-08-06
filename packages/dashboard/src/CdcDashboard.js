@@ -29,9 +29,11 @@ import DataTable from './components/DataTable';
 import './scss/main.scss';
 
 const addVisualization = (type, subType) => {
-  let newVisualizationConfig = {newViz: true};
-  newVisualizationConfig.uid = type + Date.now();
-  newVisualizationConfig.type = type;
+  let newVisualizationConfig = {
+    newViz: true,
+    uid: type + Date.now(),
+    type
+  };
 
   switch(type) {
     case 'chart':
@@ -323,6 +325,9 @@ export default function CdcDashboard(
 
           {/* Visualizations */}
           {config.rows && config.rows.map(row => {
+            // Empty check
+            if(row.filter(col => col.widget).length === 0) return null
+
             return (
               <div className="dashboard-row">
                 {row.map(col => {
@@ -343,11 +348,11 @@ export default function CdcDashboard(
               </div>);
           })}
 
-          {/* Description */}
-          {description && <div className="dashboard-description">{parse(description)}</div>}
-
           {/* Data Table */}
           {config.table.show && <DataTable />}
+
+          {/* Description */}
+          {description && <div className="subtext">{parse(description)}</div>}
         </div>
       </>
     )
