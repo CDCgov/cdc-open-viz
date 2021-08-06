@@ -237,10 +237,11 @@
     }
 
     .bite-image {
-      min-width: 100px;
       width: 100%;
+      min-width: 100px;
+      /*opacity: .7;*/
+      align-self: center;
       border-radius: .3em;
-      opacity: .7;
     }
 
     .bite-content-container {
