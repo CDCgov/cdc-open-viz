@@ -42,6 +42,7 @@ export default function ChooseTab() {
         let classNames = (config.type === type && isSubType) ? 'active' : ''
 
         let setTypes = () => {
+            
             // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
             let newConfig = {
                 data: [...config.data],
