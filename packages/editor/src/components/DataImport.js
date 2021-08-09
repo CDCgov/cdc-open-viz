@@ -441,7 +441,7 @@ export default function DataImport() {
                     {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
                       <div className="question">
                         <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
-                        <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
+                        <select onChange={(e) => { updateDescriptionProp('seriesKey', e.target.value) }} value={config.dataDescription.seriesKey}>
                             <option value="">Choose an option</option>
                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
                         </select>
