@@ -26,6 +26,8 @@ export default App;
 
 Note, you must pass in a configuration object. Configuration objects can be created with the [Editor package](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor).
 
+Sample config data can be found in [packages/dashboard/examples](https://github.com/CDCgov/cdc-open-viz/tree/integration/packages/dashboard/examples).
+
 ### Properties
 
 | Property          | Type     | Description                                                                                                                                                                                                                                                                             |
