@@ -73,16 +73,13 @@ export default function CdcChart(
       const dataString = await fetch(response.dataUrl);
 
       data = await dataString.json();
-
-      try {
+      if(response.dataDescription) {
         data = transform.autoStandardize(data);
         data = transform.developerStandardize(data, response.dataDescription);
-      } catch(e) {
-        //Data not able to be standardized, leave as is
       }
     }
 
-    setData(data);
+    if(data) setData(data);
 
     let newConfig = {...defaults, ...response}
     if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
@@ -99,6 +96,7 @@ export default function CdcChart(
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData;
+
     if (newConfig.filters) {
       const filterList = [];
 
@@ -535,8 +533,9 @@ export default function CdcChart(
 
   const contextValues = {
     config,
-    rawData: data,
-    data: filteredData || data,
+    rawData: config.data,
+    filteredData: filteredData ?? data,
+    unfilteredData: data,
     seriesHighlight,
     colorScale,
     dimensions,

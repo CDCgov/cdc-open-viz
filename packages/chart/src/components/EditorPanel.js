@@ -163,7 +163,7 @@ const EditorPanel = () => {
     updateConfig,
     loading,
     colorPalettes,
-    rawData,
+    unfilteredData,
     isDashboard,
     setParentConfig,
     missingRequiredSections
@@ -277,7 +277,7 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    rawData.map(row => {
+    unfilteredData.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
