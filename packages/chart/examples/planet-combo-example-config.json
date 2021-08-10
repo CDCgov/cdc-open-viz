@@ -2,7 +2,7 @@
     "title": "Planet Radius (Combo Example)",
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Combo",
-    "series": [{"dataKey":"Radius", "type":"Line"}, {"dataKey":"Diameter", "type":"Bar"}],
+    "series": [{"dataKey":"Radius", "type":"Line"}, {"dataKey":"Diameter of the planet in the universe", "type":"Bar"}],
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
