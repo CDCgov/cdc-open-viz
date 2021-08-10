@@ -233,21 +233,25 @@ const CdcDataBite = (
   if(false === loading) {
     let biteClasses = [];
 
-    let isTop = true
+    let isTop = false
+    let isBottom = false
 
     switch (config.bitePosition) {
       case IMAGE_POSITION_LEFT:
         biteClasses.push('bite-left');
+        isTop = true
         break;
       case IMAGE_POSITION_RIGHT:
         biteClasses.push('bite-right');
+        isTop = true
         break;
       case IMAGE_POSITION_TOP:
         biteClasses.push('bite-top');
+        isTop = true
         break;
       case IMAGE_POSITION_BOTTOM:
         biteClasses.push('bite-bottom');
-        isTop = false
+        isBottom = true
         break;
     }
 
@@ -276,7 +280,7 @@ const CdcDataBite = (
                     </>
                   }
                 </div>
-                {imageUrl && 'image' === biteStyle && !isTop && <img src={imageUrl} className="bite-image callout" />}
+                {imageUrl && 'graphic' !== biteStyle && isBottom && <img src={imageUrl} className="bite-image callout" />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
               </div>
             </div>
