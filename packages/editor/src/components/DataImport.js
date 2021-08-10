@@ -46,13 +46,6 @@ export default function DataImport() {
   };
 
   useEffect(() => {
-    if(tempConfig !== null) {
-        setConfig(tempConfig)
-        setTempConfig(null)
-    }
-  })
-
-  useEffect(() => {
     if(true === keepURL) {
       setConfig({...config, dataUrl: debouncedExternalURL})
     }
@@ -226,17 +219,28 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    if(!config.formattedData && config.dataDescription) {
-        try {
-            setConfig({...config, formattedData: transform.developerStandardize(config.data, config.dataDescription)});
-        } catch(e) {
-            //Data description not sufficient
-        }
+    let newConfig = {...config}
+    if(tempConfig !== null) {
+      newConfig = {...tempConfig}
+      
     }
-  }, [config.dataDescription]);
+
+    if(undefined === config.formattedData && config.dataDescription) {
+      const formattedData = transform.developerStandardize(config.data, config.dataDescription)
+      
+      if(formattedData) newConfig.formattedData = formattedData
+    }
+
+    if(tempConfig !== null) setTempConfig(null)
+
+    setConfig(newConfig)
+  }, []);
 
   const updateDescriptionProp = (key, value) => {
-      setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
+    let dataDescription = {...config.dataDescription, [key]: value}
+    let formattedData = transform.developerStandardize(config.data, dataDescription)
+
+    setConfig({...config, formattedData, dataDescription})
   };
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});

@@ -12,5 +12,5 @@ export default function LegendCircle({fill}) {
     backgroundColor: fill
   }
 
-  return <span class="legend-item" style={styles} />
+  return <span className="legend-item" style={styles} />
 }

@@ -11,10 +11,6 @@ import GlobeIcon from '@cdc/core/assets/world-graphic.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 
-/**
- * IconButton component
- */
-
 export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
 
@@ -25,6 +21,9 @@ export default function ChooseTab() {
         }
     })
 
+    /**
+     * IconButton component
+     */
     const IconButton = ({icon, label, type, subType}) => {
         let isSubType = false
 
@@ -50,6 +49,10 @@ export default function ChooseTab() {
                 dataDescription: config.dataDescription,
                 newViz: true,
                 type
+            }
+
+            if(config.formattedData) {
+                newConfig.formattedData = config.formattedData
             }
 
             if(type === 'map') {
