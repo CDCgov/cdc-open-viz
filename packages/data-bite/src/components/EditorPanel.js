@@ -337,13 +337,11 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {
-                    ['title', 'body'].includes(config.biteStyle) &&
-                    <>
-                      <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
-                      <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
-                    </>
+
+                  {['title', 'body'].includes(config.biteStyle) &&
+                    <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
                   }
+                  <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
