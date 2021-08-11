@@ -226,6 +226,14 @@ export default function DataImport() {
   }
 
   useEffect(() => {
+    //Old visualizations do not have a dataDescription, set a default. Old versions did not support horizontal, so default to false.
+    if (!config.dataDescription) {
+      const newDataDescription = {
+        "horizontal": false
+      };
+      setConfig({...config, dataDescription: newDataDescription});
+    }
+
     if(!config.formattedData && config.dataDescription) {
         try {
             setConfig({...config, formattedData: transform.developerStandardize(config.data, config.dataDescription)});
@@ -234,6 +242,14 @@ export default function DataImport() {
         }
     }
   }, [config.dataDescription]);
+
+  useEffect(() => {
+    //Old visualizations do not have a dataFileSourceType attribute. Default this.
+    if (!config.dataFileSourceType) {
+      const newDataFileSourceType = config.dataUrl ? 'url' : 'file';
+      setConfig({...config, dataFileSourceType: newDataFileSourceType});
+    }
+  }, [config.dataUrl, config.dataFileSourceType]);
 
   const updateDescriptionProp = (key, value) => {
       setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
@@ -276,7 +292,7 @@ export default function DataImport() {
   return (
     <>
       <div className="left-col">
-        { (!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+        { (!config.data) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon" />}>
@@ -314,7 +330,7 @@ export default function DataImport() {
           </div>
         )}
 
-        {config.dataFileSourceType && (
+        {(config.dataFileSourceType && config.data) && (
           <div>
             <div className="heading-3">Data Source</div>
             <div className="file-loaded-area">
