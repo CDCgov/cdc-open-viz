@@ -771,7 +771,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let response = await (await fetch(configUrl)).json()
                 return response
             } catch {
-                console.error(`Cannor parse URL: ${url}`);
+                console.error(`Cannot parse URL: ${url}`);
             }
         }
     }
