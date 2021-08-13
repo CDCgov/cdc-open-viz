@@ -732,37 +732,27 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const fetchRemoteData = async (url) => {
         try {
             const urlObj = new URL(url);
-
             const regex = /(?:\.([^.]+))?$/
-
+          
             let data = []
-
-            if ('csv' === regex.exec(urlObj.pathname)[1]) {
+          
+            const ext = (regex.exec(urlObj.pathname)[1])
+            if ('csv' === ext) {
                 data = await fetch(url)
                     .then(response => response.text())
-                    .then(responseText =>{
+                    .then(responseText => {
                         const parsedCsv = Papa.parse(responseText, {
                             header: true,
                             dynamicTyping: true
                         })
-
                         return parsedCsv.data
                     })
-                    .then(result => {
-                        return result
-                    })
             }
-
-            if ('json' === regex.exec(url)[1]) {
+          
+            if ('json' === ext) {
                 data = await fetch(url)
                     .then(response => response.json())
-                    .then(data => {
-                        return data
-                    })
             }
-
-            data = transform.autoStandardize(data);
-            data = transform.developerStandardize(data, response.dataDescription);
 
             return data;
         } catch {
@@ -856,6 +846,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             let newData = await fetchRemoteData(newState.dataUrl)
+
+            if(newData && newState.dataDescription) {
+                newData = transform.autoStandardize(data);
+                newData = transform.developerStandardize(data, newState.dataDescription);
+            }
 
             if(newData) {
                 newState.data = newData
