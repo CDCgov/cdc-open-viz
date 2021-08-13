@@ -139,29 +139,16 @@ export default function DataImport() {
       return;
     }
 
-    // Pull out mime type of file
-    let { type: mimeType } = fileData;
+    let path = fileBlob?.name || externalURL || fileName
+    let fileExtension = path.match(/(?:\.([^.]+))?$/g);
 
-    // Catch empty types - sometimes these are blank on Windows machines...
-    if ( mimeType === "" ) {
-      const fileExtension = Object.keys(supportedDataTypes).find(extension => fileBlob.name.endsWith(extension));
-      mimeType = ( fileExtension === ".csv" ) ? 'text/csv' : 'application/json';
+    if(fileExtension.length === 0) {
+      fileExtension = '.csv'
+    } else {
+      fileExtension = fileExtension[0]
     }
-    
-    // Consolidate CSV types since we need to know this before choosing encoding
-    switch (mimeType) {
-      case 'text/csv':
-      case 'application/csv':
-      case 'application/vnd.ms-excel':
-      case 'application/x-csv':
-      case 'text/x-comma-separated-values':
-      case 'text/comma-separated-values':
-        mimeType = 'text/csv';
-        break;
-      default: 
-        mimeType = mimeType;
-        break;
-    }
+
+    let mimeType = supportedDataTypes[fileExtension];
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
@@ -169,8 +156,8 @@ export default function DataImport() {
 
     // Set encoding for CSV files - needed to render special characters properly
     let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
-    filereader.onload = function() {
 
+    filereader.onload = function() {
       let text = this.result
 
       switch (mimeType) {
