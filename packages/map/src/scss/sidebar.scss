@@ -5,6 +5,7 @@
   .map-container.world aside.side {
     border-top: $lightGray 1px solid;
     position: absolute;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
   }
 }
 
@@ -26,13 +27,10 @@ aside {
       z-index: 4;
       right: 1em;
       border: $lightGray 1px solid;
-      box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
       width: 50%;
       top: 2em;
       right: 1em;
     }
-  }
-  @include breakpointClass(lg) {
   }
 
   .legend-section {
@@ -84,7 +82,6 @@ aside {
         }
         .color {
           flex-shrink: 0;
-          @include legendDot;
         }
         &.disabled {
           opacity: .4;

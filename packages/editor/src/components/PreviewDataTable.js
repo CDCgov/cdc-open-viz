@@ -38,7 +38,7 @@ const TableFilter = memo(({globalFilter, setGlobalFilter, disabled = false}) => 
 });
 
 const Header = memo(({ globalFilter, data, setGlobalFilter}) => (
-  <header className="data-table-header mb-4">
+  <header className="data-table-header">
     <h2>Data Preview</h2>
     <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
   </header>
@@ -55,10 +55,7 @@ const Footer = memo(({previousPage, nextPage, canPreviousPage, canNextPage, page
       </li>
     </ul>
     <span>
-      Page{' '}
-      <strong>
-        {pageNumber} of {totalPages}
-      </strong>
+      Page{' '} {pageNumber} of {totalPages}
     </span>
   </footer>
 ))
@@ -148,7 +145,8 @@ const PreviewDataTable = ({ data }) => {
     return (
       <section className="no-data">
         <NoData />
-        <table className="editor data-table table-responsive" role="table">
+        <div className="table-container">
+          <table className="editor data-table" role="table">
           <thead>
               <tr role="row">
                   <th scope="col" colSpan="1" role="columnheader">
@@ -212,51 +210,54 @@ const PreviewDataTable = ({ data }) => {
             </tr>
           </tbody>
         </table>
+        </div>
       </section>
     )
   }
 
-  if(!data) return [<Header />, <PlaceholderTable />]
+  if(!data) return [<Header key="header" />, <PlaceholderTable key="table" />]
 
   const footerProps = {previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length}
 
   const Table = () => (
     <>
-      <section className={`data-table-container`}>
-        <table className="data-table table-responsive" {...getTableProps()} aria-hidden="true">
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''} title={column.Header}>
-                    {column.render('Header')}
-                    <div {...column.getResizerProps()} className="resizer" />
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} title={cell.value}>
-                      {cell.render('Cell')}
-                    </td>
+      <section className="data-table-container">
+        <div className="table-container">
+          <table className="data-table" {...getTableProps()} aria-hidden="true">
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''} title={column.Header}>
+                      {column.render('Header')}
+                      <div {...column.getResizerProps()} className="resizer" />
+                    </th>
                   ))}
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => (
+                      <td {...cell.getCellProps()} title={cell.value}>
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </section>
       <Footer {...footerProps} />
   </>
   )
 
-  return [<Header data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table />]
+  return [<Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key="table" />]
 };
 
 export default PreviewDataTable;

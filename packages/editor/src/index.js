@@ -11,5 +11,5 @@ ReactDOM.render(
   <React.StrictMode>
     <CdcEditor startingTab={activeTab} />
   </React.StrictMode>,
-  document.querySelector('#react-container')
+  document.querySelector('.react-container')
 );

@@ -1,13 +1,11 @@
 @import "variables";
 
 .cdc-editor .data-designer {
-    @import "data-table";
     display: flex;
     justify-content: flex-end;
     .left-col {
         background: #fff;
-        padding-top: $gbl-padding;
-        padding-bottom: $gbl-padding;
+        padding: $gbl-padding;
         width: 33.333%;
         border-right: $lightGray 1px solid;
         position: fixed;
@@ -16,7 +14,16 @@
         top: 0;
         margin-top: 3rem;
         z-index: 1;
+        overflow-y: auto;
+        .heading-3 {
+            font-weight: 600;
+            margin-bottom: .5em;
+        }
+        .data-question {
+            margin-bottom: .5em;
+        }
         .tabs {
+            margin-bottom: 2em;
             > ul.nav {
                 display: flex;
             }
@@ -59,7 +66,7 @@
             svg {
                 max-width: 35px;
                 margin: 0 auto .5em;
-                color: $mediumGray;
+                color: $baseColor;
                 transition: .1s all;
                 path {
                     fill: currentColor
@@ -81,7 +88,118 @@
         .footnote {
             font-size: .8rem;
             font-style: italic;
+            margin: 1em 0 2em 0;
             color: $mediumGray;
+        }
+        .btn {
+            display: inline;
+        }
+        .btn.active {
+            background: darken($primary, 15%);
+        }
+        .question {
+            margin-bottom: 1em;
+        }
+        .table-button-container {
+            display: flex;
+            justify-content: space-between;
+
+        }
+        .table-button {
+            width: 49%;
+            border: 1px solid $lightGray;
+            border-radius: .3em;
+            background-color: $lightest-gray;
+            padding: .75em;
+            cursor: pointer;
+            strong {
+                font-weight: bold;
+            }
+            &.active {
+                border: 2px solid #005eaa;
+            }
+
+            p {
+                font-size: .8em;
+                margin-bottom: 1em;
+            }
+
+            table + table {
+                margin-top: 1em;
+            }
+
+            table {
+                font-size: .8em;
+                background-color: #fff;
+                border: 1px solid $lightGray;
+                border-collapse: collapse;
+                margin: auto;
+                th {
+                    background-color: $primary;
+                    color: white;
+                    text-align: left;
+                }
+                th, td {
+                    border-top: 1px solid $lightGray;
+                    border-bottom: 1px solid $lightGray;
+                    padding: 0 5px;
+                }
+            }
+        }
+        .input-group {
+            display: flex;
+            align-items: stretch;
+            input[type="text"] {
+                flex-grow: 1;
+                border-right: 0;
+            }
+        }
+    
+        .keep-url {
+            font-size:.8rem;
+            color: $mediumGray
+        }
+    
+        .sample-data-list {
+            font-size: .8rem;
+            list-style: none;
+            li {
+                margin-top: .3rem;
+                color: $blue;
+                text-decoration: underline;
+                cursor: pointer
+            }
+        }
+    
+        .file-loaded-area {
+            margin-bottom: 20px;
+        }
+    
+        .url-source-options,
+        .data-source-options {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            gap: 10px;
+            margin-bottom: 20px;
+    
+            .btn {
+                margin: 0;
+            }
+    
+            .cdcdataviz-file-selector.loaded-file {
+                font-size: .9em;
+                padding: .4rem 3rem;
+                svg {
+                    position: relative;
+                    top: 4px;
+                    width: 1em;
+                    height: 1em;
+                    margin: 0;
+                }
+            }
+        }
+        .data-source-options {
+            align-items: center;
         }
     }
     .right-col {
@@ -89,37 +207,6 @@
         background-color: $lightest-gray;
         padding: $gbl-padding;
         width: 66.667%;
-        .data-table-container {
-            overflow-x: scroll;
-            border: 1px solid #C7C7C7;
-            .data-table {
-                max-width: 100%;
-                border: 0;
-            }
-            tr {
-                width: 100%;
-                display: inline-flex !important;
-                border-bottom: 1px solid #C7C7C7 !important;
-                td, th {
-                    border-bottom: none !important;
-                }
-            }
-        }
-    }
-
-    .keep-url {
-        font-size:.8rem;
-        color: $mediumGray
-    }
-
-    .sample-data-list {
-        margin-left: 1rem;
-        font-size: .8rem;
-        li {
-            margin-top: .3rem;
-            color: $blue;
-            text-decoration: underline;
-            cursor: pointer
-        }
+        @import "data-table";
     }
 }

@@ -1,14 +1,7 @@
-@import 'variables';
 @import "@cdc/core/styles/base";
+@import 'variables';
 
-$tempLightGray: #C7C7C7;
-
-.cdc-editor {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-  @import "~bootstrap/scss/grid";
+.cdc-open-viz-module.cdc-editor {
   min-height: inherit;
   display: flex;
   flex-direction: column;
@@ -27,12 +20,6 @@ $tempLightGray: #C7C7C7;
       }
     }
   }
-  .editor-toggle {
-    top: 3.6rem !important;
-  }
-  .editor-panel {
-    top: 3rem !important
-  }
   // Top level tabs
   .top-level {
     position: fixed;
@@ -44,12 +31,12 @@ $tempLightGray: #C7C7C7;
       li {
         background: #F2F2F2;
         line-height: 3rem;
-        border-bottom: 1px solid $tempLightGray;
+        border-bottom: 1px solid $lightGray;
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
-        width: 33%;
-        border-right: 1px solid $tempLightGray;
+        width: 25%;
+        border-right: 1px solid $lightGray;
         text-align: center;
         &:last-child {
           border-right: none;
@@ -82,7 +69,6 @@ $tempLightGray: #C7C7C7;
       display: block
     }
   }
-
   .info-box {
     border: $lightGray 1px solid;
     padding: 1rem;
@@ -93,6 +79,78 @@ $tempLightGray: #C7C7C7;
     }
     ul {
       padding: inherit;
+    }
+  }
+}
+
+
+// Modal
+.modal-backdrop {
+  position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: rgba(255, 255, 255, 0.75);
+	z-index: 500;
+  backdrop-filter: blur(2px);
+}
+
+.modal-wrapper {
+  position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 700;
+	width: inherit;
+	outline: 0;
+  font-family: sans-serif;
+
+  .modal {
+    z-index: 100;
+    background: #fff;
+    position: relative;
+    margin: auto;
+    border-radius: 8px;
+    border: rgba(0,0,0,.3) 1px solid;
+    box-shadow: rgb(0 0 0 / 20%) 3px 3px 7px;
+    line-height: 1.4em;
+    padding: 16px 20px;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    justify-content: space-between;
+    padding: 0.3rem 0 0 0;
+  }
+
+  .modal-close {
+    position: absolute;
+    right: 20px;
+    top: 18px;
+    cursor: pointer;
+    width: 1em;
+  }
+
+  .confirmation-buttons {
+    text-align: right;
+  }
+
+  // todo import global style
+  .btn {
+    background: #005eaa;
+    color: #fff;
+    border: 0;
+    padding: 0.4em 0.8em;
+    font-size: 1em;
+    display: block;
+    border-radius: 5px;
+    transition: 0.1s all;
+    cursor: pointer;
+
+    &.btn-inline {
+      display: inline-block;
+      margin: 10px 0 0 10px;
     }
   }
 }

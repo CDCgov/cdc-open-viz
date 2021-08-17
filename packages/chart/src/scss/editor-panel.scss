@@ -1,11 +1,4 @@
 .editor-panel {
-    font-size: 17.5px;
-    .heading {
-      font-size: 1.2em;
-    }
-    + .cdc-chart-inner-container > * {
-      margin: 1em;
-    }
     .two-col-inputs {
       display: flex;
       margin-top: 1em;
@@ -13,6 +6,29 @@
       > label {
         width: 48%;
         margin-top: 0 !important
+      }
+    }
+    .helper-tooltip {
+      padding: 5px;
+      max-width: 300px;
+    }
+    .helper {
+      position: relative;
+      opacity: .7;
+      cursor: pointer;
+      width: 17px;
+      height: 17px;
+      align-self: center;
+      margin-left: .3rem;
+      margin-top: -0.3rem;
+      border: none !important;
+      box-shadow: none !important;
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
       }
     }
     .divider-heading {
@@ -48,7 +64,6 @@
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
-    overflow-x: hidden;
     position: fixed;
     z-index: 8;
     display: flex;
@@ -183,7 +198,7 @@
       }
     }
   
-    h2 {
+    .heading-2 {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -541,11 +556,5 @@
 @include breakpointClass(md) {
   .editor-panel:not(.hidden) + .cdc-chart-inner-container {
     padding-left: $editorWidth;
-  }
-  .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-    padding-left: 3em;
-  }
-  .waiting {
-    padding-left: 350px;
   }
 }

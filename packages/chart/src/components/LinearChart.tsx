@@ -16,7 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { filteredData:data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -25,7 +25,7 @@ export default function LinearChart() {
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
-  const xMax = width - config.runtime.yAxis.size - config.padding.left - config.padding.right;
+  const xMax = width - config.runtime.yAxis.size;
   const yMax = height - config.runtime.xAxis.size;
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
@@ -158,7 +158,7 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
-              const axisCenter = (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+            const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               return (
                 <Group className="left-axis">
