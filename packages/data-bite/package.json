@@ -1,6 +1,6 @@
 {
   "name": "@cdc/data-bite",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React component for displaying a single piece of data in a card module",
   "main": "dist/cdcdatabite",
   "scripts": {
@@ -8,7 +8,9 @@
     "build": "npx webpack --mode production --env packageName=CdcDataBite --env folderName=data-bite -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/data-bite build"
   },
-  "files": ["./dist/"],
+  "files": [
+    "./dist/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
@@ -21,7 +23,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "devDependencies": {
-    "@cdc/core": "^1.0.2",
+    "@cdc/core": "^1.1.0",
     "bootstrap": "^4.3.1",
     "html-react-parser": "^0.14.0",
     "react-accessible-accordion": "^3.3.4",
