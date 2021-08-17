@@ -268,7 +268,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-    
+
+            // Coerce strings to numbers inside configuredOrder property
+            for(let i = 0; i < configuredOrder.length; i++) {
+                configuredOrder[i] = numberFromString(configuredOrder[i])
+            }
+
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
@@ -297,6 +302,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 result[i].color = applyColorToLegend(i)
             }
             legendMemo.current = newLegendMemo
+            console.log(`returning result for categorical legend`, result)
             return result
         }
     
@@ -436,8 +442,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let newFilter = runtimeFilters[idx]
             let values = getUniqueValues(state.data, columnName)
 
-            // values = values.map(el => numberFromString(el)) // coerce to pure number if possible
-    
             if(undefined === newFilter) {
                 newFilter = {}
             }
