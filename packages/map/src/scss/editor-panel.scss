@@ -1,9 +1,4 @@
 .cdc-open-viz-module {
-  @import "~bootstrap/scss/functions";
-  @import "~bootstrap/scss/variables";
-  @import "~bootstrap/scss/mixins";
-  @import "~bootstrap/scss/utilities";
-
   .geo-buttons {
     list-style: none;
     display: flex;
@@ -102,7 +97,6 @@
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
-    overflow-x: hidden;
     position: fixed;
     z-index: 7;
     display: flex;
@@ -650,14 +644,11 @@
 
   @include breakpointClass(md) {
     .editor-panel:not(.hidden) + .cdc-map-inner-container {
-      margin-left: $editorWidth;
-    }
-    .editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-      padding-left: 3em;
+      padding-left: $editorWidth;
     }
     .waiting {
       background-color: #fff;
-      margin-left: $editorWidth;
+      padding-left: $editorWidth;
     }
   }
 }

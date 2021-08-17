@@ -1,13 +1,40 @@
+.collapsed + .table-container { border-bottom: none; }
 .table-container {
   overflow-x: auto;
+  border-right: 1px solid $lightGray;
+  border-left: 1px solid $lightGray;
+  border-bottom: 1px solid $lightGray;
+}
+
+div.data-table-heading {
+  background: rgba(0, 0, 0, 0.05);
+  padding: .5em .7em;
+  border: $lightGray 1px solid;
+  border-bottom: 0;
+  cursor: pointer;
+  background-image: url(~@cdc/core/assets/minus.svg);
+  background-size: 15px 15px; // Need to define both for IE11
+  background-position: right .7em center;
+  background-repeat: no-repeat;
+  &:focus {
+    z-index: 2;
+    position: relative;
+  }
+  &.collapsed {
+    background-image: url(~@cdc/core/assets/plus.svg);
+    background-size: 15px 15px; // Need to define both for IE11
+    background-position: right .7em center;
+    background-repeat: no-repeat;
+    border-bottom: $lightGray 1px solid;
+  }
 }
 
 table.data-table {
   width: 100%;
   background: #fff;
   position: relative;
+  border: none;
   overflow-x: auto;
-  border: 1px solid $lightGray;
   border-collapse: collapse;
   overflow: auto;
   appearance: none;
@@ -86,6 +113,7 @@ table.data-table {
 
   tr {
     border-bottom: solid 1px #E5E5E5;
+    min-width: 100%; // Needed to fill content up
     &:last-child {
       border-bottom: 0
     }
@@ -103,6 +131,9 @@ table.data-table {
     overflow: hidden;
     &:last-child {
       border-right: 0 !important;
+    }
+    &:first-child {
+      flex-grow: 1;
     }
   }
 
@@ -206,8 +237,13 @@ table.data-table {
   }
 }
 
-table.data-table {
-  tr {
-    width: 100% !important;
+.btn-download {
+  color: #fff;
+  float: right;
+  text-decoration: none;
+  transition: .3s all;
+  margin: 1em 0;
+  &:hover {
+    transition: .3s all;
   }
 }

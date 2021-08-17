@@ -4,6 +4,13 @@
     "dataUrl":  "/examples/temp-example-data.json",
     "visualizationType": "Line",
     "series": [{"dataKey": "New York", "label": "NY"}, {"dataKey": "San Francisco", "label": "SF"}, {"dataKey":"Austin", "label": "AU"}],
+    "filters":[{
+        "label": "Wind",
+        "columnName": "wind"
+    },{
+        "label": "Humidity",
+        "columnName": "humidity"
+    }],
     "seriesLabel": "City",
     "fontSize": "large",
     "dataFormat": {
@@ -44,7 +51,7 @@
             "color": "black",
             "background": "green",
             "from": "2011-10-02",
-            "to": "2011-12-06"
+            "to": "2011-10-03"
         }
     ]
 }

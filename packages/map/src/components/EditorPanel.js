@@ -14,12 +14,12 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Waiting from '@cdc/core/components/Waiting'
 
 import MapIcon from '../images/map-folded.svg';
-import UsaGraphic from '../images/usa-graphic.svg';
-import WorldGraphic from '../images/world-graphic.svg';
+import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
-import worldDefaultConfig from '../examples/default-world.json';
-import usaDefaultConfig from '../examples/default-usa.json';
-import QuestionIcon from '../images/question-circle.svg';
+import worldDefaultConfig from '../../examples/default-world.json';
+import usaDefaultConfig from '../../examples/default-usa.json';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -72,6 +72,7 @@ const EditorPanel = (props) => {
     columnsInData = [],
     loadConfig,
     setState,
+    isDashboard,
     setParentConfig,
     runtimeFilters,
     runtimeLegend,
@@ -433,6 +434,15 @@ const EditorPanel = (props) => {
           }
         })
       break;
+      case 'showDataTable':
+        setState({
+          ...state,
+          dataTable: {
+              ...state.dataTable,
+              forceDisplay: value
+          }
+        })
+        break;
       default:
           console.warn(`Did not recognize editor property.`)
       break;
@@ -691,6 +701,10 @@ const EditorPanel = (props) => {
 
     setState(updatedState)
   }
+  
+  const onBackClick = () => {
+    setDisplayPanel(!displayPanel);
+  }
 
   const usedFilterColumns = {}
 
@@ -772,7 +786,7 @@ const EditorPanel = (props) => {
   return (
     <ErrorBoundary component="EditorPanel">
       {requiredColumns && <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) } data-html2canvas-ignore></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={(onBackClick)} data-html2canvas-ignore></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
         <ReactTooltip
           html={true}
@@ -1063,6 +1077,11 @@ const EditorPanel = (props) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={dataTable.title} updateField={updateField} section="dataTable" fieldName="title" label="Data Table Title" placeholder="Data Table" />
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard } onChange={(event) => { handleEditorChanges("showDataTable", event.target.checked) }} />
+                    <span className="edit-label">Show Table</span>
+                    <Helper text="Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version." />
+                  </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />
                     <span className="edit-label">Map loads with data table expanded</span>

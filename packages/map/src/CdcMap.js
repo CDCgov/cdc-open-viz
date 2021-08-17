@@ -19,7 +19,6 @@ import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
-import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
@@ -31,6 +30,9 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading';
+import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -73,47 +75,14 @@ const hashObj = (row) => {
     return hash;
 }
 
-// Checks if the string is a number and returns it as a number if it is
-const numberFromString = (value) => {
-    // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
-    let nonNumeric = /[^\d.]/g
-
-    if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
-        return parseFloat(value)
-    }
-
-    return value
-}
-
-const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-}
-
+// returns string[]
 const getUniqueValues = (data, columnName) => {
-    let result = {}
+    let result = {};
 
     for(let i = 0; i < data.length; i++) {
-        const val = data[i][columnName]
+        let val = data[i][columnName]
 
-        if(!val) continue
+        if(undefined === val) continue
 
         if(undefined === result[val]) {
             result[val] = true
@@ -123,10 +92,12 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+    const transform = new DataTransform()
+
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
-    const [viewport, setViewport] = useState('lg')
+    const [currentViewport, setCurrentViewport] = useState('lg')
     const [runtimeFilters, setRuntimeFilters] = useState([])
     const [runtimeLegend, setRuntimeLegend] = useState([])
     const [runtimeData, setRuntimeData] = useState({init: true})
@@ -139,7 +110,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
     
-            setViewport(newViewport)
+            setCurrentViewport(newViewport)
         }
     });
 
@@ -297,7 +268,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-    
+
+            // Coerce strings to numbers inside configuredOrder property
+            for(let i = 0; i < configuredOrder.length; i++) {
+                configuredOrder[i] = numberFromString(configuredOrder[i])
+            }
+
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
@@ -326,6 +302,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 result[i].color = applyColorToLegend(i)
             }
             legendMemo.current = newLegendMemo
+            console.log(`returning result for categorical legend`, result)
             return result
         }
     
@@ -464,7 +441,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
             let newFilter = runtimeFilters[idx]
             let values = getUniqueValues(state.data, columnName)
-    
+
             if(undefined === newFilter) {
                 newFilter = {}
             }
@@ -476,7 +453,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
             filters.push(newFilter)
         })
-    
+        
         return filters
     })
     
@@ -514,8 +491,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(filters.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
-                    
-                    if (row[columnName] !== active) return false // Bail out, not part of filter
+
+                    if (row[columnName] != active) return false // Bail out, not part of filter
                 }
             }
     
@@ -759,41 +736,37 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const fetchRemoteData = async (url) => {
         try {
             const urlObj = new URL(url);
-
             const regex = /(?:\.([^.]+))?$/
-
+          
             let data = []
-
-            if ('csv' === regex.exec(urlObj.pathname)[1]) {
-
+          
+            const ext = (regex.exec(urlObj.pathname)[1])
+            if ('csv' === ext) {
                 data = await fetch(url)
                     .then(response => response.text())
-                    .then(responseText =>{
+                    .then(responseText => {
                         const parsedCsv = Papa.parse(responseText, {
                             header: true,
                             dynamicTyping: true
                         })
-
                         return parsedCsv.data
                     })
-                    .then(result => {
-                        return result
-                    })
-
-                return data
             }
-
-            if ('json' === regex.exec(url)[1]) {
+          
+            if ('json' === ext) {
                 data = await fetch(url)
                     .then(response => response.json())
-                    .then(data => {
-                        return data
-                    })
-
-                return data
             }
+
+            return data;
         } catch {
-            console.error(`Cannot parse URL: ${url}`);
+            // If we can't parse it, still attempt to fetch it
+            try {
+                let response = await (await fetch(configUrl)).json()
+                return response
+            } catch {
+                console.error(`Cannot parse URL: ${url}`);
+            }
         }
     }
 
@@ -845,7 +818,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const geoClickHandler = (key, value) => {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
+        if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
                 keyedData: value
@@ -878,6 +851,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newData = await fetchRemoteData(newState.dataUrl)
 
+            if(newData && newState.dataDescription) {
+                newData = transform.autoStandardize(data);
+                newData = transform.developerStandardize(data, newState.dataDescription);
+            }
+
             if(newData) {
                 newState.data = newData
             }
@@ -903,6 +881,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             addUIDs(newState, newState.columns.geo.name)
         }
 
+        if(newState.dataTable.forceDisplay === undefined){
+            newState.dataTable.forceDisplay = !isDashboard;
+        }
+
         setState(newState)
 
         // Done loading
@@ -920,11 +902,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If the config passed is a string, try to load it as an ajax
         if(configUrl) {
             configData = await fetchRemoteData(configUrl)
-        }
-
-        // Finally, dynamically import the default configuration if nothing else was found.
-        if(null === configData) {
-            configData = usaDefaultConfig
         }
 
         // Once we have a config verify that it is an object and load it
@@ -997,6 +974,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
+    if(config) {
+        useEffect(() => {
+            loadConfig(config)
+        }, [config.data])
+    }
+
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
     const { title = '', subtext = ''} = general
@@ -1005,7 +988,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     let outerContainerClasses = [
         'cdc-open-viz-module',
         'cdc-map-outer-container',
-        viewport
+        currentViewport
     ]
 
     if(className) {
@@ -1045,9 +1028,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-            {isEditor && <EditorPanel state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
-            <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
+            {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
+            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
                         id="tooltip"
                         place="right"
@@ -1077,14 +1060,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         </div>
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                        {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                             {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                             {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
-                            viewport={viewport}
+                            viewport={currentViewport}
                             legend={state.legend}
                             runtimeLegend={runtimeLegend}
                             setRuntimeLegend={setRuntimeLegend}
@@ -1125,7 +1108,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         applyLegendToRow={applyLegendToRow}
                         tableTitle={dataTable.title}
                         mapTitle={general.title}
-                        viewport={viewport}
+                        viewport={currentViewport}
                     />
                 }
                 {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
