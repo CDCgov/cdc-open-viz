@@ -81,7 +81,7 @@
 
         &.series-list__name--truncate {
           &[data-title] {
-            $bgColor: #565656;
+            $bgColor: rgb(34 34 34 / 90%);
             position: relative;
 
             &::before,
