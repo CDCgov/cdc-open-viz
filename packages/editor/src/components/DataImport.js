@@ -46,13 +46,6 @@ export default function DataImport() {
   };
 
   useEffect(() => {
-    if(tempConfig !== null) {
-        setConfig(tempConfig)
-        setTempConfig(null)
-    }
-  })
-
-  useEffect(() => {
     if(true === keepURL) {
       setConfig({...config, dataUrl: debouncedExternalURL})
     }
@@ -146,29 +139,16 @@ export default function DataImport() {
       return;
     }
 
-    // Pull out mime type of file
-    let { type: mimeType } = fileData;
+    let path = fileBlob?.name || externalURL || fileName
+    let fileExtension = path.match(/(?:\.([^.]+))?$/g);
 
-    // Catch empty types - sometimes these are blank on Windows machines...
-    if ( mimeType === "" ) {
-      const fileExtension = Object.keys(supportedDataTypes).find(extension => fileBlob.name.endsWith(extension));
-      mimeType = ( fileExtension === ".csv" ) ? 'text/csv' : 'application/json';
+    if(fileExtension.length === 0) {
+      fileExtension = '.csv'
+    } else {
+      fileExtension = fileExtension[0]
     }
-    
-    // Consolidate CSV types since we need to know this before choosing encoding
-    switch (mimeType) {
-      case 'text/csv':
-      case 'application/csv':
-      case 'application/vnd.ms-excel':
-      case 'application/x-csv':
-      case 'text/x-comma-separated-values':
-      case 'text/comma-separated-values':
-        mimeType = 'text/csv';
-        break;
-      default: 
-        mimeType = mimeType;
-        break;
-    }
+
+    let mimeType = supportedDataTypes[fileExtension];
 
     // Convert from blob into raw text
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
@@ -176,8 +156,8 @@ export default function DataImport() {
 
     // Set encoding for CSV files - needed to render special characters properly
     let encoding = ( mimeType === 'text/csv' ) ? 'ISO-8859-1' : '';
-    filereader.onload = function() {
 
+    filereader.onload = function() {
       let text = this.result
 
       switch (mimeType) {
@@ -202,7 +182,7 @@ export default function DataImport() {
       try {
         text = transform.autoStandardize(text);
 
-        if (config.data) {
+        if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
             setConfig({
               ...config, 
@@ -226,27 +206,39 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    if(!config.formattedData && config.dataDescription) {
-        try {
-            setConfig({...config, formattedData: transform.developerStandardize(config.data, config.dataDescription)});
-        } catch(e) {
-            //Data description not sufficient
-        }
+    let newConfig = {...config}
+    if(tempConfig !== null) {
+      newConfig = {...tempConfig}
+      
     }
-  }, [config.dataDescription]);
+
+    if(undefined === config.formattedData && config.dataDescription) {
+      const formattedData = transform.developerStandardize(config.data, config.dataDescription)
+      
+      if(formattedData) newConfig.formattedData = formattedData
+    }
+
+    if(tempConfig !== null) setTempConfig(null)
+
+    setConfig(newConfig)
+  }, []);
 
   const updateDescriptionProp = (key, value) => {
-      setConfig({...config, formattedData: undefined, dataDescription: {...config.dataDescription, [key]: value}})
+    let dataDescription = {...config.dataDescription, [key]: value}
+    let formattedData = transform.developerStandardize(config.data, dataDescription)
+
+    setConfig({...config, formattedData, dataDescription})
   };
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
-  const loadFileFromUrl = () => {
+  const loadFileFromUrl = (url) => {
+    const extUrl = (url) ? url : config.dataFileName; // set url to what is saved in config unless the user has entered something
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
-          <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)} />
-          <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData()}>Load</button>
+          <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0" placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL" aria-describedby="load-data" value={extUrl} onChange={(e) => setExternalURL(e.target.value)} />
+          <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data" onClick={() => loadData( null, externalURL )}>Load</button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
           <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)} /> Always load from URL (normally will only pull once)
@@ -257,7 +249,7 @@ export default function DataImport() {
 
   const resetEditor = ( config = {}, message = 'Are you sure you want to do this?' ) => {
     config.newViz = true;
-    const confirmDataReset = window.confirm('It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?');
+    const confirmDataReset = window.confirm(message);
             
     if (confirmDataReset === true) {
       setTempConfig(null);
@@ -290,7 +282,7 @@ export default function DataImport() {
                 </div>
               </TabPane>
               <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon" />}>
-                {loadFileFromUrl()}
+                {loadFileFromUrl(externalURL)}
               </TabPane>
             </Tabs>
             {errors && (errors.map ? errors.map((message, index) => (
@@ -337,7 +329,7 @@ export default function DataImport() {
                 {config.dataFileSourceType === 'url' && (
                   <div className="url-source-options">
                     <div>
-                      {loadFileFromUrl()}
+                      {loadFileFromUrl(externalURL)}
                     </div>
                     <div>
                       {resetButton()}

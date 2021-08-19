@@ -163,7 +163,7 @@ const EditorPanel = () => {
     updateConfig,
     loading,
     colorPalettes,
-    rawData,
+    unfilteredData,
     isDashboard,
     setParentConfig,
     missingRequiredSections
@@ -279,7 +279,7 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    rawData.map(row => {
+    unfilteredData.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
@@ -646,6 +646,7 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
+                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Column Index Label" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>

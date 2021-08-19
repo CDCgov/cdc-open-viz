@@ -1,6 +1,6 @@
 {
   "name": "@cdc/map",
-  "version": "2.5.0",
+  "version": "2.6.1",
   "description": "React component for visualizing tabular data on a map of the United States or the world.",
   "main": "dist/cdcmap",
   "scripts": {
@@ -8,7 +8,9 @@
     "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/map build"
   },
-  "files": ["./dist/"],
+  "files": [
+    "./dist/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
@@ -21,7 +23,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/runtime": "^7.12.5",
-    "@cdc/core": "^1.0.2",
+    "@cdc/core": "^1.1.1",
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
     "@visx/geo": "^1.13.0",
@@ -45,5 +47,6 @@
   "peerDependencies": {
     "react": ">=17",
     "react-dom": ">=17"
-  }
+  },
+  "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
 }

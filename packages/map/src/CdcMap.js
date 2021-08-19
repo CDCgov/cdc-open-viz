@@ -268,7 +268,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-    
+
+            // Coerce strings to numbers inside configuredOrder property
+            for(let i = 0; i < configuredOrder.length; i++) {
+                configuredOrder[i] = numberFromString(configuredOrder[i])
+            }
+
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
@@ -297,6 +302,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 result[i].color = applyColorToLegend(i)
             }
             legendMemo.current = newLegendMemo
+            console.log(`returning result for categorical legend`, result)
             return result
         }
     
@@ -436,8 +442,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let newFilter = runtimeFilters[idx]
             let values = getUniqueValues(state.data, columnName)
 
-            // values = values.map(el => numberFromString(el)) // coerce to pure number if possible
-    
             if(undefined === newFilter) {
                 newFilter = {}
             }
@@ -732,37 +736,27 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const fetchRemoteData = async (url) => {
         try {
             const urlObj = new URL(url);
-
             const regex = /(?:\.([^.]+))?$/
-
+          
             let data = []
-
-            if ('csv' === regex.exec(urlObj.pathname)[1]) {
+          
+            const ext = (regex.exec(urlObj.pathname)[1])
+            if ('csv' === ext) {
                 data = await fetch(url)
                     .then(response => response.text())
-                    .then(responseText =>{
+                    .then(responseText => {
                         const parsedCsv = Papa.parse(responseText, {
                             header: true,
                             dynamicTyping: true
                         })
-
                         return parsedCsv.data
                     })
-                    .then(result => {
-                        return result
-                    })
             }
-
-            if ('json' === regex.exec(url)[1]) {
+          
+            if ('json' === ext) {
                 data = await fetch(url)
                     .then(response => response.json())
-                    .then(data => {
-                        return data
-                    })
             }
-
-            data = transform.autoStandardize(data);
-            data = transform.developerStandardize(data, response.dataDescription);
 
             return data;
         } catch {
@@ -771,7 +765,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let response = await (await fetch(configUrl)).json()
                 return response
             } catch {
-                console.error(`Cannor parse URL: ${url}`);
+                console.error(`Cannot parse URL: ${url}`);
             }
         }
     }
@@ -856,6 +850,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             let newData = await fetchRemoteData(newState.dataUrl)
+
+            if(newData && newState.dataDescription) {
+                newData = transform.autoStandardize(data);
+                newData = transform.developerStandardize(data, newState.dataDescription);
+            }
 
             if(newData) {
                 newState.data = newData
