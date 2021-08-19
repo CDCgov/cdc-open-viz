@@ -6,7 +6,7 @@
 .cdc-open-viz-module.type-chart {
   @import 'datatable';
   @import 'editor-panel';
-  
+
   .visually-hidden {
     position: fixed;
     left: -10000px;
@@ -32,6 +32,7 @@
     border-radius: 5px;
     transition: .1s all;
     cursor: pointer;
+
     &[disabled] {
       opacity: 0.5;
       z-index: -1;
@@ -43,29 +44,29 @@
     width: 15px;
     height: 15px;
     margin-top: 7px;
+
     path {
       fill: #d8000c;
     }
   }
 
-  div.chart-title {
-      color: white;
-      padding: .6em .8em;
-      border-bottom-width: 3px;
-      border-bottom-style: solid;
-  }
-
-  div.chart-title {
+  .chart-title {
+    position: relative;
+    padding: .6em .8em;
     margin: 0;
     color: #fff;
     font-size: 1.1em;
-    position: relative;
+    border-bottom-width: 3px;
+    border-bottom-style: solid;
+
     em {
       font-style: italic;
     }
+
     strong {
       font-weight: bold;
     }
+
     &:not(:empty) {
       margin: 0 0 1rem 0 !important;
       padding: .6em .8em;
@@ -87,6 +88,7 @@
     border: 1px solid $lightGray;
     order: 1;
     position: relative;
+
     .legend-reset {
       font-size: .7em;
       color: rgba(0, 0, 0, 0.6);
@@ -98,22 +100,34 @@
       padding: .375rem;
       top: 1em;
       border-radius: 3px;
+
       &:hover {
-        background: rgba(0,0,0,.15);
+        background: rgba(0, 0, 0, .15);
         transition: .3s all;
       }
     }
+
     .legend-item {
-      display: inline-block;
-      margin: 0 .5rem 0 0;
+      text-align: left;
+      align-items: flex-start !important;
+      user-select: none;
     }
+
+    .legend-item > .legend-item {
+      display: inline-block;
+      margin-right: .5rem;
+      flex: 0 0 auto;
+    }
+
     h2 {
       font-size: 1.3em;
       margin-bottom: .3em;
     }
+
     .legend-item {
       cursor: pointer;
       transition: .2s all;
+
       &.inactive {
         opacity: .5;
         transition: .2s all;
@@ -123,8 +137,8 @@
 
   .tooltip {
     background-color: #fff;
-    border: rgba(0,0,0,0.3) 1px solid !important;
-    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+    border: rgba(0, 0, 0, 0.3) 1px solid !important;
+    box-shadow: rgba(0, 0, 0, .1) 3px 3px 7px;
     line-height: 1.4em;
     font-size: 1em !important;
     border-radius: 4px !important;
@@ -135,35 +149,68 @@
   .region-table {
     margin-top: 15px;
   }
+
   .chart-container {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
     margin-bottom: 1em;
+
     &.legend-hidden > svg {
       width: 100% !important;
     }
+
     > svg {
       overflow: visible;
       font-size: 14px;
       margin: 1rem 0 2rem;
+
       .visx-linepath {
         pointer-events: none;
+      }
+
+      circle {
+        opacity: 0;
+      }
+    }
+
+    &.chart-line--hover {
+      > svg circle {
+        opacity: 0;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    &.chart-line--always {
+      > svg circle {
+        opacity: 1;
+      }
+    }
+
+    &.chart-bar--no-border {
+      .visx-group:not(.visx-axis) rect {
+        stroke: none;
       }
     }
   }
 
   .filters-section {
-      display: inline-block;
-      label:not(:empty) {
-        margin-right: .4em;
-      }
-      select {
-        font-size: 1em;
-      }
-      .single-filter + .single-filter {
-        margin-left: 1em;
-      }
+    display: inline-block;
+
+    label:not(:empty) {
+      margin-right: .4em;
+    }
+
+    select {
+      font-size: 1em;
+    }
+
+    .single-filter + .single-filter {
+      margin-left: 1em;
+    }
   }
 
   @include breakpointClass(xs) {
@@ -173,16 +220,16 @@
       .chart-container > svg {
         font-size: 12px;
       }
-
     }
+
     &.font-medium {
       font-size: .9em;
 
       .chart-container > svg {
         font-size: 14px;
       }
-      
     }
+
     &.font-large {
       font-size: 1em;
 
@@ -191,41 +238,48 @@
       }
     }
   }
+
   @include breakpointClass(md) {
     .filters-section, .chart-container {
       margin-left: 1em;
       margin-right: 1em;
     }
+
     .chart-container {
       flex-wrap: nowrap;
+
       .legend-container {
         width: 25%;
         margin-left: 1em;
         order: 2;
+
         &.left {
           margin-left: 0;
           margin-right: 1em;
           order: 0;
         }
       }
+
       > svg {
         font-size: 16px;
         width: 75%;
         order: 1;
+
         circle {
-          filter: drop-shadow( 1px 1px 1px rgba(0, 0, 0, .5));
+          filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, .5));
           transform-origin: 50% 50%;
         }
       }
     }
+
     &.font-small {
       font-size: .9em;
 
       .chart-container > svg {
         font-size: 14px;
       }
-
     }
+
     &.font-large {
       font-size: 1.1em;
 
@@ -234,6 +288,7 @@
       }
     }
   }
+
   @include breakpointClass(lg) {
     &.font-small {
       font-size: 1em;
@@ -242,6 +297,7 @@
         font-size: 16px;
       }
     }
+
     &.font-medium {
       font-size: 1.1em;
 
@@ -249,6 +305,7 @@
         font-size: 18px;
       }
     }
+
     &.font-large {
       font-size: 1.2em;
 
