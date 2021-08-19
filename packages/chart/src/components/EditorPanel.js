@@ -169,6 +169,8 @@ const EditorPanel = () => {
     missingRequiredSections
   } = useContext(Context);
 
+  let hasLineChart = false
+
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
@@ -403,9 +405,28 @@ const EditorPanel = () => {
                               </select>
                             )
 
-                            return (<li key={series.dataKey}>{series.dataKey} <span>{typeDropdown} <span onClick={() => removeSeries(series.dataKey)}>X</span></span></li>)
+                            return (
+                              <li key={series.dataKey}>
+                                <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                  <div className="series-list__name-text">{series.dataKey}</div>
+                                </div>
+                                <span>
+                                  <span className="series-list__dropdown">{typeDropdown}</span>
+                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                </span>
+                              </li>
+                            )
                           }
-                          return (<li key={series.dataKey}>{series.dataKey} <span onClick={() => removeSeries(series.dataKey)}>X</span></li>)
+                          return (
+                            <li key={series.dataKey}>
+                              <div className="series-list__name" data-title={series.dataKey}>
+                                <div className="series-list__name--text">
+                                  {series.dataKey}
+                                </div>
+                              </div>
+                              <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                            </li>
+                          )
                         })}
                       </ul>
                     </>)}
@@ -535,6 +556,12 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  {config.series?.some(series => series.type === 'Bar') &&
+                  <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
+                  }
+                  {config.series?.some(series => series.type === 'Line') &&
+                  <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />
+                  }
                   <label className="header">
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
