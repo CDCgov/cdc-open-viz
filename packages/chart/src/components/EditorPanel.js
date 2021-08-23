@@ -57,7 +57,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -169,6 +169,8 @@ const EditorPanel = () => {
     missingRequiredSections
   } = useContext(Context);
 
+  let hasLineChart = false
+
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
@@ -268,9 +270,9 @@ const EditorPanel = () => {
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
-    
+
     newSeries.push({dataKey: seriesKey, type: 'Bar'})
-      
+
     updateConfig({...config, series: newSeries})
   }
 
@@ -403,9 +405,28 @@ const EditorPanel = () => {
                               </select>
                             )
 
-                            return (<li key={series.dataKey}>{series.dataKey} <span>{typeDropdown} <span onClick={() => removeSeries(series.dataKey)}>X</span></span></li>)
+                            return (
+                              <li key={series.dataKey}>
+                                <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                  <div className="series-list__name-text">{series.dataKey}</div>
+                                </div>
+                                <span>
+                                  <span className="series-list__dropdown">{typeDropdown}</span>
+                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                </span>
+                              </li>
+                            )
                           }
-                          return (<li key={series.dataKey}>{series.dataKey} <span onClick={() => removeSeries(series.dataKey)}>X</span></li>)
+                          return (
+                            <li key={series.dataKey}>
+                              <div className="series-list__name" data-title={series.dataKey}>
+                                <div className="series-list__name--text">
+                                  {series.dataKey}
+                                </div>
+                              </div>
+                              <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                            </li>
+                          )
                         })}
                       </ul>
                     </>)}
@@ -430,7 +451,7 @@ const EditorPanel = () => {
                   {config.visualizationType === 'Pie' && <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} /> }
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
+                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                       <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
                       {config.visualizationSubType !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
@@ -469,7 +490,7 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
                       {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
                     </>
-                  )}                 
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
               {config.visualizationType !== 'Pie' && <AccordionItem>
@@ -535,6 +556,12 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  {config.series?.some(series => series.type === 'Bar') &&
+                  <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
+                  }
+                  {config.series?.some(series => series.type === 'Line') &&
+                  <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />
+                  }
                   <label className="header">
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
@@ -598,8 +625,8 @@ const EditorPanel = () => {
                     })}
                   </ul>
                   {config.visualizationType !== 'Pie' && (
-                    <> 
-                      {config.visualizationSubType !== 'horizontal' && 
+                    <>
+                      {config.visualizationSubType !== 'horizontal' &&
                         <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
                       }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
@@ -619,6 +646,7 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
+                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Column Index Label" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>

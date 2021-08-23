@@ -1,6 +1,6 @@
 {
   "name": "@cdc/dashboard",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "React component for combining multiple visualizations into a single dashboard",
   "main": "dist/cdcdashboard",
   "scripts": {
@@ -8,7 +8,9 @@
     "build": "npx webpack --mode production --env packageName=CdcDashboard --env folderName=dashboard -c ../../webpack.config.js",
     "prepublishOnly": "lerna run --scope @cdc/dashboard build"
   },
-  "files": ["./dist/"],
+  "files": [
+    "./dist/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
@@ -20,10 +22,10 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cdc/chart": "^1.2.0",
-    "@cdc/core": "^1.0.2",
-    "@cdc/map": "^2.5.0",
-    "@cdc/data-bite": "^1.0.0",
+    "@cdc/chart": "^1.3.1",
+    "@cdc/core": "^1.1.1",
+    "@cdc/data-bite": "^1.1.1",
+    "@cdc/map": "^2.6.1",
     "html-react-parser": "^0.14.0",
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
@@ -39,5 +41,5 @@
     "react": ">=16.8",
     "react-dom": ">=16"
   },
-  "gitHead": "c807ea04c37d57b155410de1e00ea9e5e9b46f81"
+  "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
 }
