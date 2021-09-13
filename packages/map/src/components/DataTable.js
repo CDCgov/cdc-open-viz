@@ -138,7 +138,9 @@ const DataTable = (props) => {
     const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
 
     const saveBlob = () => {
-      if (navigator.msSaveBlob) {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        //@ts-ignore
         navigator.msSaveBlob(blob, fileName);
       }
     }

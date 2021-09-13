@@ -536,10 +536,10 @@ export default function CdcChart(
       </>
     )
   }
-
+  console.log("unfiltereds", config.unfilteredData);
   const contextValues = {
     config,
-    rawData: config.data,
+    rawData: data ?? {},
     filteredData: filteredData ?? data,
     unfilteredData: data,
     seriesHighlight,

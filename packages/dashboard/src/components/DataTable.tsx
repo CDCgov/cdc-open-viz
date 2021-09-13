@@ -30,9 +30,11 @@ export default function DataTable() {
     const csvData = Papa.unparse(data);
 
     const saveBlob = () => {
-      if (navigator.msSaveBlob) {
-        const dataBlob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
-        navigator.msSaveBlob(dataBlob, fileName);
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        const dataBlob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        //@ts-ignore
+        window.navigator.msSaveBlob(dataBlob, fileName);
       }
     }
 
