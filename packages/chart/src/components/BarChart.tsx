@@ -9,7 +9,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
   return (
     <ErrorBoundary component="BarChart">

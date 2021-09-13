@@ -17,9 +17,9 @@ import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
-import worldDefaultConfig from '../examples/default-world.json';
-import usaDefaultConfig from '../examples/default-usa.json';
-import QuestionIcon from '../images/question-circle.svg';
+import worldDefaultConfig from '../../examples/default-world.json';
+import usaDefaultConfig from '../../examples/default-usa.json';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -116,17 +116,17 @@ const EditorPanel = (props) => {
 
   const DynamicDesc = ({label, fieldName, value: stateValue, type = "input", helper = null, ...attributes}) => {
     const [ value, setValue ] = useState(stateValue);
-  
+
     const [ debouncedValue ] = useDebounce(value, 500);
-  
+
     useEffect(() => {
       if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
         handleEditorChanges("changeLegendDescription", [String(activeFilterValueForDescription), debouncedValue])
       }
     }, [debouncedValue])
-  
+
     const onChange = (e) => setValue(e.target.value);
-  
+
     return (
       <textarea onChange={onChange} {...attributes} value={value}></textarea>
     )
@@ -434,6 +434,15 @@ const EditorPanel = (props) => {
           }
         })
       break;
+      case 'showDataTable':
+        setState({
+          ...state,
+          dataTable: {
+              ...state.dataTable,
+              forceDisplay: value
+          }
+        })
+        break;
       default:
           console.warn(`Did not recognize editor property.`)
       break;
@@ -580,7 +589,7 @@ const EditorPanel = (props) => {
     const filterName = state.filters[ arr[0] ].label || `Unlabeled Legend`
 
     const filterValue = runtimeFilters[ arr[0] ]
-    
+
     if(filterValue) {
       return filterName + ' - ' + filterValue.values[ arr[1] ]
     }
@@ -646,7 +655,7 @@ const EditorPanel = (props) => {
   }, [runtimeLegend])
 
   const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
-  
+
   columnsInData.map(colName => {
     columnsOptions.push(<option value={colName} key={colName}>{colName}</option>)
   })
@@ -692,13 +701,9 @@ const EditorPanel = (props) => {
 
     setState(updatedState)
   }
-  
+
   const onBackClick = () => {
-    if(isDashboard){
-      setState({...state, editing: false});
-    } else {
-      setDisplayPanel(!displayPanel);
-    }
+    setDisplayPanel(!displayPanel);
   }
 
   const usedFilterColumns = {}
@@ -1072,6 +1077,12 @@ const EditorPanel = (props) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={dataTable.title} updateField={updateField} section="dataTable" fieldName="title" label="Data Table Title" placeholder="Data Table" />
+                  <TextField value={dataTable.indexTitle} updateField={updateField} section="dataTable" fieldName="indexTitle" label="Index Column Title" placeholder="Location" />
+                  <label className="checkbox">
+                    <input type="checkbox" checked={ state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard } onChange={(event) => { handleEditorChanges("showDataTable", event.target.checked) }} />
+                    <span className="edit-label">Show Table</span>
+                    <Helper text="Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version." />
+                  </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.expandDataTable || false } onChange={(event) => { handleEditorChanges("expandDataTable", event.target.checked) }} />
                     <span className="edit-label">Map loads with data table expanded</span>

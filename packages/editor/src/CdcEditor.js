@@ -1,6 +1,10 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 
+// IE11
 import 'core-js/stable'
+import ResizeObserver from 'resize-observer-polyfill'
+
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import GlobalState from './context';
 import DataImport from './components/DataImport';
@@ -16,6 +20,9 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
 
+  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [dimensions, setDimensions] = useState([])
+
   let startingTab = 0;
 
   if(config.data && config.type) {
@@ -23,6 +30,20 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   }
 
   const [globalActive, setGlobalActive] = useState(startingTab);
+
+  const resizeObserver = new ResizeObserver(([ container ]) => {
+    let { width, height } = container.contentRect
+    let newViewport = getViewport(width)
+
+    setDimensions([width, height])
+    setCurrentViewport(newViewport)
+  });
+
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  },[]);
 
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
@@ -77,7 +98,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
 
   return (
     <GlobalState.Provider value={state}>
-      <div className="cdc-open-viz-module cdc-editor">
+      <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
         <Tabs className="top-level" startingTab={globalActive}>
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
@@ -85,7 +106,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
           <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
             <ChooseTab />
           </TabPane>
-          <TabPane title="3. Configure" disableRule={null === config.data || !config.type}>
+          <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
             <ConfigureTab />
           </TabPane>
         </Tabs>

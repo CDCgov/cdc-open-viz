@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import LegendCircle from '@cdc/core/components/LegendCircle'
 
 const Sidebar = (props) => {
   const {
@@ -80,12 +81,7 @@ const Sidebar = (props) => {
         title={`Legend item ${legendLabel} - Click to disable`}
         onClick={() => { toggleLegendActive(idx, legendLabel); }}
         className={disabled ? 'disabled single-legend' : 'single-legend'}
-      ><span
-        className="color"
-        style={{
-          backgroundColor: entry.color,
-        }}
-      /> <span className="label">{legendLabel}</span>
+      ><LegendCircle fill={entry.color} /> <span className="label">{legendLabel}</span>
       </li>
     );
   });

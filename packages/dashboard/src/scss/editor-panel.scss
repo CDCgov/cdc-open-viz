@@ -1,10 +1,16 @@
+// Shift down for top level Dashboard bar when in edit mode
+.layout-container, .editor-panel + .cdc-dashboard-inner-container, .editor-heading + .cdc-open-viz-module {
+  position: relative;
+  top: 3em;
+  .editor-panel {
+    top: 3em;
+  }
+  .editor-toggle {
+    top: 3.5em;
+  }
+}
+
 .editor-panel {
-    .heading {
-      font-size: 1.2em;
-    }
-    + .cdc-dashboard-inner-container > * {
-      margin: 1em;
-    }
     .two-col-inputs {
       display: flex;
       margin-top: 1em;
@@ -12,6 +18,29 @@
       > label {
         width: 48%;
         margin-top: 0 !important
+      }
+    }
+    .helper-tooltip {
+      padding: 5px;
+      max-width: 300px;
+    }
+    .helper {
+      position: relative;
+      opacity: .7;
+      cursor: pointer;
+      width: 17px;
+      height: 17px;
+      align-self: center;
+      margin-left: .3rem;
+      margin-top: -0.3rem;
+      border: none !important;
+      box-shadow: none !important;
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
       }
     }
     .divider-heading {
@@ -47,13 +76,12 @@
     background: #fff;
     width: $editorWidth;
     overflow-y: overlay;
-    overflow-x: hidden;
     position: fixed;
     z-index: 8;
     display: flex;
     flex-direction: column;
     left: 0;
-    top: 0;
+    top: 48px;
     bottom: 0;
     .accordion__heading {
       background: $lightestGray;
@@ -182,7 +210,7 @@
       }
     }
   
-    h2 {
+    .heading-2 {
       background: #565656;
       color: #fff;
       font-size: 1.1em;
@@ -551,13 +579,13 @@
   font-size: 1em;
   border: 0;
   position: fixed;
-  z-index: 100;
+  z-index: 99;
   transition: .1s background;
   cursor: pointer;
   width: 25px;
   height: 25px;
   left: 307px;
-  top: 10px;
+  top: calc(3em + 10px);
   box-shadow: rgba(0,0,0,.5) 0 1px 2px;
   &:before {
     top: 43%;
@@ -581,12 +609,7 @@
 .editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
   padding-left: $editorWidth;
 }
-.editor-panel.hidden + .cdc-map-inner-container h1.map-title {
-  padding-left: 3em;
-}
-.waiting {
-  padding-left: 350px;
-}
+
 .subheading-3 {
   margin-top: 1em;
   margin-bottom: .5em;
@@ -617,7 +640,6 @@
       svg {
         width: 50px;
         height: 50px;
-        fill: $baseColor;
         margin-bottom: .5em;
       }
     }

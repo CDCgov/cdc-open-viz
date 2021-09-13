@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // IE11
 import 'core-js/stable'
@@ -12,6 +12,7 @@ import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -21,6 +22,8 @@ import defaults from './data/initial-state';
 
 import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import LegendCircle from '@cdc/core/components/LegendCircle';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
@@ -52,8 +55,6 @@ export default function CdcChart(
 
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
-  const outerContainerRef = useRef(null);
-
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
     'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -72,19 +73,16 @@ export default function CdcChart(
       const dataString = await fetch(response.dataUrl);
 
       data = await dataString.json();
-
-      try {
+      if(response.dataDescription) {
         data = transform.autoStandardize(data);
         data = transform.developerStandardize(data, response.dataDescription);
-      } catch(e) {
-        //Data not able to be standardized, leave as is
       }
     }
 
-    setData(data);
+    if(data) setData(data);
 
     let newConfig = {...defaults, ...response}
-
+    if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data);
   }
 
@@ -98,6 +96,7 @@ export default function CdcChart(
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData;
+
     if (newConfig.filters) {
       const filterList = [];
 
@@ -222,29 +221,6 @@ export default function CdcChart(
     }
   }
 
-
-  const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-  }
-
   // Observes changes to outermost container and changes viewport size in state
   const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -261,10 +237,15 @@ export default function CdcChart(
     }
   })
 
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  },[]);
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
-    resizeObserver.observe(outerContainerRef.current);
   }, []);
 
   // Generates color palette to pass to child chart component
@@ -355,12 +336,12 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
-    if (typeof num !== 'number') num = parseFloat(num);
+    num = numberFromString(num);
     if(isNaN(num)) config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
-      let cutoff = config.dataCutoff
-      if(typeof config.dataCutoff !== 'number') cutoff = parseFloat(config.dataCutoff);
+      let cutoff = numberFromString(config.dataCutoff)
+
       if(num < cutoff) {
         prefix = '< ' + (prefix || '');
         num = cutoff;
@@ -442,9 +423,7 @@ export default function CdcChart(
                         highlight(label);
                       }}
                     >
-                      <svg className="legend-color" width={legendGlyphSize} height={legendGlyphSize}>
-                        <circle r={legendGlyphSizeHalf} cx={legendGlyphSizeHalf} cy={legendGlyphSizeHalf} fill={label.value} stroke="rgba(0,0,0,0.3)" />
-                      </svg>
+                      <LegendCircle fill={label.value} />
                       <LegendLabel align="left" margin="0 0 0 4px">
                         {label.text}
                       </LegendLabel>
@@ -474,7 +453,7 @@ export default function CdcChart(
 
     };
 
-    return config.filters.map((singleFilter, index) => {
+    let filterList = config.filters.map((singleFilter, index) => {
       const values = [];
 
       singleFilter.values.forEach((filterOption, index) => {
@@ -486,7 +465,7 @@ export default function CdcChart(
       });
 
       return (
-        <section className="filters-section" key={index}>
+        <div className="single-filter" key={index}>
           <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
           <select
             id={`filter-${index}`}
@@ -500,40 +479,87 @@ export default function CdcChart(
           >
             {values}
           </select>
-        </section>
+        </div>
       );
-    });;
+    });
+
+    return (<section className="filters-section">{filterList}</section>)
   }
+
+  const missingRequiredSections = () => {
+    if(config.visualizationType === 'Pie') {
+      if(undefined === config?.yAxis.dataKey){
+        return true;
+      }
+    } else {
+      if(undefined === config?.series || false === config?.series.length > 0){
+        return true;
+      }
+    }
+
+    if(!config.xAxis.dataKey) {
+      return true;
+    }
+
+    return false;
+  };
 
   // Prevent render if loading
   let body = (<Loading />)
+  let lineDatapointClass = ''
+  let barBorderClass = ''
 
   if(false === loading) {
+    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
+    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
+    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!config.newViz && !config.runtime.editorErrorMessage && <div className="cdc-chart-inner-container">
+        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
           {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
-          <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`} style={{paddingLeft: config.padding.left}}>
+          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
             {chartComponents[visualizationType]}
             {/* Legend */}
             {!config.legend.hide && <Legend />}
           </div>
           {/* Description */}
-          {description && <div className="chart-description">{parse(description)}</div>}
+          {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && <DataTable />}
         </div>}
       </>
     )
   }
 
+  const contextValues = {
+    config,
+    rawData: config.data,
+    filteredData: filteredData ?? data,
+    unfilteredData: data,
+    seriesHighlight,
+    colorScale,
+    dimensions,
+    currentViewport,
+    parseDate,
+    formatDate,
+    formatNumber,
+    loading,
+    updateConfig,
+    colorPalettes,
+    isDashboard,
+    setParentConfig,
+    missingRequiredSections,
+    setEditing
+  }
+
   return (
-    <Context.Provider value={{ config, rawData: data, data: filteredData || data, seriesHighlight, colorScale, dimensions, currentViewport, parseDate, formatDate, formatNumber, loading, updateConfig, colorPalettes, isDashboard, setParentConfig, setEditing }}>
+    <Context.Provider value={contextValues}>
       <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
         {body}
       </div>
