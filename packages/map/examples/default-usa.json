@@ -50,11 +50,15 @@
 			"Insured Rate": "43",
 			"Coverage Status": "Insured",
 			"state": "AL",
-			"Year (Good filter option)": "2010",
+			"Year (Good filter option)": 2010,
 			"link": ""
 		},
 		{
-			"Year (Good filter option)": "2017"
+			"Insured Rate": "20",
+			"Coverage Status": "Insured",
+			"state": "AL",
+			"Year (Good filter option)": 2003,
+			"link": ""
 		},
 		{
 			"Insured Rate": "0",

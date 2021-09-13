@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Column from './Column'
 import Context from '../context'
 import CloseIcon from '../images/icon-close.svg'
@@ -47,6 +47,9 @@ const RowMenu = ({ rowIdx, row }) => {
 
     rows[newIdx] = row
     rows[rowIdx] = temp
+
+    rows[newIdx].uuid = Date.now();
+    rows[rowIdx].uuid = Date.now();
 
     updateConfig({...config, rows})
 
@@ -120,12 +123,12 @@ const RowMenu = ({ rowIdx, row }) => {
   )
 }
 
-const Row = ({ row, idx: rowIdx }) => {
+const Row = ({ row, idx: rowIdx, uuid}) => {
   return (
     <div className="builder-row" data-row-id={rowIdx}>
       <RowMenu rowIdx={rowIdx} row={row} />
       <div className="column-container">
-        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} key={`row-${rowIdx}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />)}
+        {row.filter(column => column.width).map((column, colIdx) => <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />)}
       </div>
     </div>
   )

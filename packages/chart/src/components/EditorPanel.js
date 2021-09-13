@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import ReactTooltip from 'react-tooltip'
 
 import {
   Accordion,
@@ -14,6 +15,15 @@ import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+
+const Helper = ({text}) => {
+  return (
+    <span className='tooltip helper' data-tip={text}>
+      <QuestionIcon />
+    </span>
+  )
+}
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -47,7 +57,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
       <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
     )
   }
-  
+
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
   }
@@ -64,6 +74,7 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
     <span className="edit-label">{label}</span>
+    {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
   </label>
 ))
 
@@ -138,6 +149,7 @@ const Regions = memo(({config, updateConfig}) => {
           </div>
         </div>
       ))}
+      {!config.regions && <p style={{textAlign: "center"}}>There are currently no regions.</p>}
       <button className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
     </>
   )
@@ -145,20 +157,26 @@ const Regions = memo(({config, updateConfig}) => {
 
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
-const EditorPanel = memo(() => {
+const EditorPanel = () => {
   const {
     config,
     updateConfig,
     loading,
     colorPalettes,
-    rawData,
+    unfilteredData,
     isDashboard,
-    setParentConfig
+    setParentConfig,
+    missingRequiredSections
   } = useContext(Context);
+
+  let hasLineChart = false
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.visualizationSubType === 'horizontal'){
       updatedConfig.labels = false;
+    }
+    if(updatedConfig.table.show === undefined){
+      updatedConfig.table.show = !isDashboard;
     }
   };
 
@@ -195,29 +213,8 @@ const EditorPanel = memo(() => {
     updateConfig(updatedConfig)
   }
 
-  const missingRequiredSections = () => {
-    if(config.visualizationType === 'Pie') {
-      if(!config.yAxis.dataKey){
-        return true;
-      }
-    } else {
-      if(!config.series || !config.series.length > 0){
-        return true;
-      }
-    }
-
-    if(!config.xAxis.dataKey) {
-      return true;
-    }
-
-    return false;
-  };
-
   const [ addSeries, setAddSeries ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true);
-
-  // Used to pipe a JSON version of the config you are creating out
-  const [ configData, setConfigData ] = useState({})
 
   if(loading) {
     return null
@@ -273,16 +270,16 @@ const EditorPanel = memo(() => {
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
-    
+
     newSeries.push({dataKey: seriesKey, type: 'Bar'})
-      
+
     updateConfig({...config, series: newSeries})
   }
 
   const getColumns = (filter = true) => {
     let columns = {}
 
-    rawData.map(row => {
+    unfilteredData.map(row => {
       Object.keys(row).forEach(columnName => columns[columnName] = true)
     })
 
@@ -298,11 +295,7 @@ const EditorPanel = memo(() => {
   }
 
   const onBackClick = () => {
-    if(isDashboard){
-      updateConfig({...config, editing: false});
-    } else {
       setDisplayPanel(!displayPanel);
-    }
   }
 
   const Error = () => {
@@ -318,12 +311,21 @@ const EditorPanel = memo(() => {
   }
 
   const Confirm = () => {
+    const confirmDone = (e) => {
+      e.preventDefault()
+
+      let newConfig = {...config}
+      delete newConfig.newViz
+
+      updateConfig(newConfig)
+    }
+
     return (
       <section className="waiting">
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={(e) => {e.preventDefault(); updateConfig({...config, newViz: false})}}>I'm Done</button>
+          <button className="btn" style={{margin: '1em auto'}} disabled={missingRequiredSections()} onClick={confirmDone}>I'm Done</button>
         </section>
       </section>
     );
@@ -351,11 +353,11 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.newViz && <Confirm />}
+      {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
-        <h2>Configure Chart</h2>
+        <div className="heading-2">Configure Chart</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -369,7 +371,7 @@ const EditorPanel = memo(() => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} fieldName="description" label="Description" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} />
                   <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
@@ -403,9 +405,28 @@ const EditorPanel = memo(() => {
                               </select>
                             )
 
-                            return (<li key={series.dataKey}>{series.dataKey} <span>{typeDropdown} <span onClick={() => removeSeries(series.dataKey)}>X</span></span></li>)
+                            return (
+                              <li key={series.dataKey}>
+                                <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                  <div className="series-list__name-text">{series.dataKey}</div>
+                                </div>
+                                <span>
+                                  <span className="series-list__dropdown">{typeDropdown}</span>
+                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                </span>
+                              </li>
+                            )
                           }
-                          return (<li key={series.dataKey}>{series.dataKey} <span onClick={() => removeSeries(series.dataKey)}>X</span></li>)
+                          return (
+                            <li key={series.dataKey}>
+                              <div className="series-list__name" data-title={series.dataKey}>
+                                <div className="series-list__name--text">
+                                  {series.dataKey}
+                                </div>
+                              </div>
+                              <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                            </li>
+                          )
                         })}
                       </ul>
                     </>)}
@@ -423,17 +444,17 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Y Axis {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                    {config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'} {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   {config.visualizationType === 'Pie' && <Select value={config.yAxis.dataKey || ""} section="yAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} /> }
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} /> 
+                      <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                       <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
-                      <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />
+                      {config.visualizationSubType !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
                     </>
                   )}
                   <span className="divider-heading">Number Formatting</span>
@@ -448,7 +469,7 @@ const EditorPanel = memo(() => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    X Axis {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                  {config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'} {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -462,12 +483,14 @@ const EditorPanel = memo(() => {
                           <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
                           <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
                           <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                          <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                         </>
                       )}
-                      <TextField value={config.xAxis.size} type="number" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.xAxis.tickRotation} type="number" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} /> 
+                      {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
+                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
+                      {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
                     </>
-                  )}                 
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
               {config.visualizationType !== 'Pie' && <AccordionItem>
@@ -500,8 +523,8 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <ul className="filters-list">
-                    {config.filters && config.filters.map((filter, index) => (
+                  {config.filters && <ul className="filters-list">
+                    {config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -520,9 +543,9 @@ const EditorPanel = memo(() => {
                         </fieldset>
                       )
                     )}
-                  </ul>
-
-                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                  </ul>}
+                  {!config.filters && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                  <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -533,6 +556,12 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  {config.series?.some(series => series.type === 'Bar') &&
+                  <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
+                  }
+                  {config.series?.some(series => series.type === 'Line') &&
+                  <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />
+                  }
                   <label className="header">
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
@@ -596,8 +625,8 @@ const EditorPanel = memo(() => {
                     })}
                   </ul>
                   {config.visualizationType !== 'Pie' && (
-                    <> 
-                      {config.visualizationSubType !== 'horizontal' && 
+                    <>
+                      {config.visualizationSubType !== 'horizontal' &&
                         <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
                       }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
@@ -613,17 +642,24 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField}  />
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
+                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Column Index Label" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
            </Accordion>
           </form>
         </section>
+        <ReactTooltip
+            html={true}
+            multiline={true}
+            className="helper-tooltip"
+          />
       </section>
     </ErrorBoundary>
   )
-})
+}
 
 export default EditorPanel;

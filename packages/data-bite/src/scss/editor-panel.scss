@@ -1,9 +1,12 @@
-.editor-panel {
-  font-size: 17.5px;
-  .heading {
-    font-size: 1.2em;
-  }
+.spacing-wrapper {
+  padding-left: 350px;
+}
 
+.editor-panel.hidden + .spacing-wrapper {
+  padding-left: 0;
+}
+
+.editor-panel {
   .two-col-inputs {
     display: flex;
     margin-top: 1em;
@@ -46,7 +49,6 @@
   background: #fff;
   width: $editorWidth;
   overflow-y: overlay;
-  overflow-x: hidden;
   position: fixed;
   z-index: 8;
   display: flex;
@@ -65,6 +67,12 @@
       min-width: auto;
       width: 75px
     }
+  }
+  .accordion__divider {
+    border: 0;
+    border-top: 1px solid #e2e2e2;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
   }
   .form-container {
     border-right: $lightGray 1px solid;
@@ -181,7 +189,7 @@
     }
   }
 
-  h2 {
+  .heading-2 {
     background: #565656;
     color: #fff;
     font-size: 1.1em;
@@ -279,16 +287,26 @@
     li {
       margin-top: 1em;
     }
-    .three-col {
+    .three-col, .two-col {
       display: flex;
       justify-content: space-between;
       > label {
         margin-top: 0;
-        width: 30%;
         display: inline-block;
         input[type="text"], input[type="number"] {
           width: 50px;
         }
+      }
+    }
+    .three-col {
+      > label {
+        width: 30%;
+      }
+    }
+    .two-col {
+      > label {
+        margin-top: 0;
+        width: 49%;
       }
     }
   }
@@ -425,48 +443,6 @@
     max-width: 100%;
   }
 
-  @media screen and (min-width: 30em) {
-
-    .react-tags__search {
-      /* this will become the offsetParent for suggestions */
-      position: relative;
-    }
-
-  }
-
-  .react-tags__search input {
-    /* prevent autoresize overflowing the container */
-    max-width: 100%;
-
-    /* emove styles and layout from this element */
-    margin: 0;
-    outline: none;
-    padding: .5em .3em;
-
-    /* match the font styles */
-    font-size: inherit;
-    line-height: inherit;
-  }
-
-  .react-tags__search input::-ms-clear {
-    display: none;
-  }
-
-  .react-tags__suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-  }
-
-  @media screen and (min-width: 30em) {
-
-    .react-tags__suggestions {
-      width: 240px;
-    }
-
-  }
-
   .react-tags__suggestions ul {
     margin: 4px -1px;
     padding: 0;
@@ -534,14 +510,5 @@
   }
   &:hover {
     background: rgba(255,255,255,1)
-  }
-}
-@include breakpointClass(md) {
-  .editor-panel:not(.hidden) + .cdc-data-bite-inner-container {
-    padding-left: $editorWidth;
-  }
-
-  .waiting {
-    padding-left: 350px;
   }
 }

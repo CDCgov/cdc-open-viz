@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useDrag } from 'react-dnd';
 import CloseIcon from '../images/icon-close.svg';
 import EditIcon from '../images/icon-edit.svg';
@@ -47,7 +47,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
       } else {
         // Item does not exist, instantiate a new one
         const newViz = addVisualization()
-
         visualizations[newViz.uid] = newViz // Add to widgets collection
         rows[rowIdx][colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
       }
@@ -89,6 +88,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         )}
         {iconHash[type]}
         <span>{labelHash[type]}</span>
+        {data.newViz && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
       </div>
     </div>
   )

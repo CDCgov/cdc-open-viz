@@ -24,7 +24,8 @@ export class DataTransform {
     }
 
     if(errorsFound.length > 0) {
-      throw errorsFound;
+      console.error(errorsFound);
+      return undefined;
     }
 
     //Convert array of arrays, to array of objects
@@ -47,21 +48,21 @@ export class DataTransform {
   developerStandardize(data, description){
     //Validate the description object
     if(!description){
-      throw 'Error';
+      return undefined
     }
 
     if(description.horizontal === undefined || description.series === undefined){
-      throw 'Error';
+      return undefined
     }
 
     if(description.series === true && description.horizontal === false && description.singleRow === undefined){
-      throw 'Error';
+      return undefined
     }
 
     if(description.horizontal === true){
       if(description.series === true) {
         if(!description.seriesKey){
-          throw 'Error';
+          return undefined
         }
 
         let standardizedMapped = {};
@@ -150,7 +151,7 @@ export class DataTransform {
 
         return standardized;
       } else {
-        throw 'Error';
+        return undefined
       }
     } 
 

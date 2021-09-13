@@ -2,24 +2,30 @@
 
 CDC OpenViz is a collection of React components and related packages centered around data visualization. These components are used to power visualizations across cdc.gov and affiliated projects.
 
-This project is still under heavy initial development with the roadmap extending into mid-late 2021.
+This project is still under heavy initial development with the roadmap extending into late 2021.
 
 | Package | Description |
 | --- | ----------- |
 | [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | React component for visualizing tabular data on a map of the United States or the world. |
 | [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) | React component for visualizing data with a chart. |
 | [@cdc/editor](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor) | React component for importing data and creating a map or chart configuration. |
+| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard) | React component to build and display multiple data visualizations. |
+| [@cdc/data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) | React component for bringing attention to and visualizing a smaller data point. |
 
-## Setup
+## Setup <a name="setup"></a>
 
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [npm](https://www.npmjs.com/) for package management (as opposed to Yarn.) To work on individual packages you must setup the entire monorepo.
 
 1. Start by cloning this repo and running `npm install` at the root. 
 2. Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
 3. Run `lerna link --force-local` which will tell Lerna to auto symlink the packages locally with each other (this will let you make a change in one and see it reflected in the others after building.)
-3. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-4. NOTE: To run the **editor** you will also need to build the packages that it consumes. `lerna run --scope @cdc/map build` and soon `lerna run --scope @cdc/chart build`.
-5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
+4. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
+5. NOTE: To run the **editor** you will also need to build the packages that it consumes:
+  - `lerna run --scope @cdc/map build`
+  - `lerna run --scope @cdc/chart build`
+  - `lerna run --scope @cdc/dashboard build`
+  - `lerna run --scope @cdc/data-bite build`
+6. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
 
 ## Development Guidelines
 

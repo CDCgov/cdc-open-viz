@@ -19,7 +19,6 @@ import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
-import usaDefaultConfig from './examples/default-usa.json'; // Future: Lazy
 
 // Sass
 import './scss/main.scss';
@@ -32,6 +31,8 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 // Core
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -74,47 +75,14 @@ const hashObj = (row) => {
     return hash;
 }
 
-// Checks if the string is a number and returns it as a number if it is
-const numberFromString = (value) => {
-    // Only do this to values that are ONLY numbers - without this parseFloat strips all the other text
-    let nonNumeric = /[^\d.]/g
-
-    if( false === Number.isNaN( parseFloat(value) ) && null === String(value).match(nonNumeric) ) {
-        return parseFloat(value)
-    }
-
-    return value
-}
-
-const getViewport = size => {
-    let result = 'lg'
-
-    const viewports = {
-        "lg": 1200,
-        "md": 992,
-        "sm": 768,
-        "xs": 576,
-        "xxs": 350
-    }
-
-    if(size > 1200) return result
-
-    for(let viewport in viewports) {
-        if(size <= viewports[viewport]) {
-            result = viewport
-        }
-    }
-
-    return result
-}
-
+// returns string[]
 const getUniqueValues = (data, columnName) => {
-    let result = {}
+    let result = {};
 
     for(let i = 0; i < data.length; i++) {
-        const val = data[i][columnName]
+        let val = data[i][columnName]
 
-        if(!val) continue
+        if(undefined === val) continue
 
         if(undefined === result[val]) {
             result[val] = true
@@ -129,7 +97,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
-    const [viewport, setViewport] = useState('lg')
+    const [currentViewport, setCurrentViewport] = useState('lg')
     const [runtimeFilters, setRuntimeFilters] = useState([])
     const [runtimeLegend, setRuntimeLegend] = useState([])
     const [runtimeData, setRuntimeData] = useState({init: true})
@@ -141,10 +109,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-    
-            setViewport(newViewport)
+
+            setCurrentViewport(newViewport)
         }
     });
+
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
@@ -167,7 +136,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 // Cities
                 if(!uid) {
-                    uid = cityKeys.find( (key) => key === geoName) 
+                    uid = cityKeys.find( (key) => key === geoName)
                 }
             }
 
@@ -193,21 +162,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
         const newLegendMemo = new Map(); // Reset memoization
-    
+
         const
             primaryCol = obj.columns.primary.name,
             type = obj.legend.type,
             number = obj.legend.numberOfItems,
             result = [];
-    
+
         // Add a hash for what we're working from if passed
         if(hash) {
             result.fromHash = hash
         }
-    
-        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use 
+
+        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
         let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
-    
+
         const colorDistributions = {
             1: [ 1 ],
             2: [ 1, 3 ],
@@ -219,38 +188,38 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
             9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
         }
-    
+
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
             let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
-    
+
             let colorIdx = legendIdx - specialClasses
-    
+
             // Special Classes (No Data)
             if (result[legendIdx].special) {
                 const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-    
+
                 return specialClassColors[ legendIdx ]
             }
-    
+
             if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
-    
+
             let amt = Math.max( result.length - specialClasses, 1 )
             let distributionArray = colorDistributions[ amt ]
-    
+
             const specificColor = distributionArray[ colorIdx ]
-        
+
             return mapColorPalette[specificColor]
         }
-    
+
         let specialClasses = 0
         let specialClassesHash = {}
-    
+
         // Special classes
         if (obj.legend.specialClasses.length) {
             dataSet = dataSet.filter(row => {
                 const val = row[primaryCol]
-    
+
                 if( obj.legend.specialClasses.includes(val) ) {
                     if(undefined === specialClassesHash[val]) {
                         specialClassesHash[val] = true
@@ -259,47 +228,52 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                             special: true,
                             value: val
                         })
-        
+
                         result[result.length - 1].color = applyColorToLegend(result.length - 1)
-    
+
                         specialClasses += 1
                     }
-    
+
                     newLegendMemo.set( hashObj(row), result.length - 1)
-    
+
                     return false
                 }
-    
+
                 return true
             })
         }
-    
+
         // Category
         if('category' === type) {
             let uniqueValues = new Map()
             let count = 0
-    
+
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
                 let value = row[primaryCol]
-                
+
                 if(undefined === value) continue
-    
+
                 if(false === uniqueValues.has(value)) {
                     uniqueValues.set(value, [hashObj(row)]);
                     count++
                 } else {
                     uniqueValues.get(value).push(hashObj(row))
                 }
-    
+
                 if(count === 9) break // Can only have 9 categorical items for now
             }
-    
+
             let sorted = [...uniqueValues.keys()]
-    
+
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-    
+
+            // Coerce strings to numbers inside configuredOrder property
+            for(let i = 0; i < configuredOrder.length; i++) {
+                configuredOrder[i] = numberFromString(configuredOrder[i])
+            }
+
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
@@ -307,22 +281,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             } else {
                 sorted.sort((a, b) => a - b)
             }
-    
+
             // Add legend item for each
             sorted.forEach((val) => {
                 result.push({
                     value: val,
                 })
-    
+
                 let lastIdx = result.length - 1
                 let arr = uniqueValues.get(val)
-    
+
                 if(arr) {
                     arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
                 }
             })
-    
-            
+
+
             // Add color to new legend item
             for(let i = 0; i < result.length; i++) {
                 result[i].color = applyColorToLegend(i)
@@ -330,40 +304,40 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             legendMemo.current = newLegendMemo
             return result
         }
-    
+
         let legendNumber = number
-    
+
         // Separate zero
-        if(true === obj.legend.separateZero) {   
-            let addLegendItem = false; 
-       
+        if(true === obj.legend.separateZero) {
+            let addLegendItem = false;
+
             for(let i = 0; i < dataSet.length; i++) {
                 if (dataSet[i][primaryCol] === 0) {
                     addLegendItem = true
-    
+
                     let row = dataSet.splice(i, 1)[0]
-    
+
                     newLegendMemo.set( hashObj(row), result.length)
                     i--
                 }
             }
-    
+
             if(addLegendItem) {
                 legendNumber -= 1 // This zero takes up one legend item
-    
+
                 // Add new legend item
                 result.push({
                     min: 0,
                     max: 0
                 })
-    
+
                 let lastIdx = result.length - 1
-    
+
                 // Add color to new legend item
                 result[lastIdx].color = applyColorToLegend(lastIdx)
             }
         }
-    
+
         // Sort data for use in equalnumber or equalinterval
         dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
             let aNum = a[primaryCol]
@@ -375,77 +349,77 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Equal Number
         if(type === 'equalnumber') {
             let numberOfRows = dataSet.length
-    
+
             let remainder
             let changingNumber = legendNumber
-    
+
             let chunkAmt
-    
+
             // Loop through the array until it has been split into equal subarrays
             while ( numberOfRows > 0 ) {
                 remainder = numberOfRows % changingNumber
-    
+
                 chunkAmt = Math.floor(numberOfRows / changingNumber)
-    
+
                 if (remainder > 0) {
                     chunkAmt += 1
                 }
-                
+
                 let removedRows = dataSet.splice(0, chunkAmt);
-    
+
                 let min = removedRows[0][primaryCol],
                     max = removedRows[removedRows.length - 1][primaryCol]
-    
+
                 removedRows.forEach(row => {
                     newLegendMemo.set( hashObj(row), result.length )
                 })
-    
+
                 result.push({
                     min,
                     max
                 })
-    
+
                 result[result.length - 1].color = applyColorToLegend(result.length - 1)
-    
+
                 changingNumber -= 1
                 numberOfRows -= chunkAmt
             }
         }
-    
+
         // Equal Interval
         if(type === 'equalinterval') {
             dataSet = dataSet.filter(row => row[primaryCol])
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
-    
+
             let pointer = 0 // Start at beginning of dataSet
-    
+
             for (let i = 0; i < legendNumber; i++) {
                 let interval = Math.abs(dataMax - dataMin) / legendNumber
-    
-                let min = dataMin + (interval * i)    
+
+                let min = dataMin + (interval * i)
                 let max = min + interval
-    
+
                 // If this is the last loop, assign actual max of data as the end point
                 if (i === legendNumber - 1) max = dataMax
-    
+
                 // Add rows in dataSet that belong to this new legend item since we've got the data sorted
                 while(pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
                     newLegendMemo.set(hashObj(dataSet[pointer]), result.length )
                     pointer += 1
                 }
-    
+
                 let range = {
                     min: Math.round(min * 100) / 100,
                     max: Math.round(max * 100) / 100,
                 }
-    
+
                 result.push(range)
-    
+
                 result[result.length - 1].color = applyColorToLegend(result.length - 1)
             }
         }
-    
+
         result.forEach((legendItem, idx) => {
             legendItem.color = applyColorToLegend(idx, specialClasses, result)
         })
@@ -456,50 +430,50 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
         if(undefined === obj.filters || obj.filters.length === 0) return []
-    
+
         let filters = []
-    
+
         if(hash) filters.fromHash = hash
-    
+
         obj.filters.forEach(({columnName, label}, idx) => {
             if(undefined === columnName) return
-    
+
             let newFilter = runtimeFilters[idx]
             let values = getUniqueValues(state.data, columnName)
-    
+
             if(undefined === newFilter) {
                 newFilter = {}
             }
-    
+
             newFilter.label = label ?? ''
             newFilter.columnName = columnName
             newFilter.values = values
             newFilter.active = values[0] // Default to first found value
-    
+
             filters.push(newFilter)
         })
-    
+
         return filters
     })
-    
+
     // Calculates what's going to be displayed on the map and data table at render.
     const generateRuntimeData = useCallback((obj, filters, hash) => {
         const result = {}
-    
+
         if(hash) {
             // Adding property this way prevents it from being enumerated
             Object.defineProperty(result, 'fromHash', {
                 value : hash
             });
         }
-    
+
         obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
-    
+
             if(row[obj.columns.primary.name]) {
                 row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
             }
-    
+
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
@@ -511,22 +485,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     return false
                 }
             }
-    
+
             // Filters
             if(filters.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
-                    
-                    if (row[columnName] !== active) return false // Bail out, not part of filter
+
+                    if (row[columnName] != active) return false // Bail out, not part of filter
                 }
             }
-    
+
             // Don't add additional rows with same UID
             if(undefined === result[row.uid]) {
                 result[row.uid] = row
             }
         })
-    
+
         return result
     })
 
@@ -761,42 +735,37 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const fetchRemoteData = async (url) => {
         try {
             const urlObj = new URL(url);
-
             const regex = /(?:\.([^.]+))?$/
 
             let data = []
 
-            if ('csv' === regex.exec(urlObj.pathname)[1]) {
-
+            const ext = (regex.exec(urlObj.pathname)[1])
+            if ('csv' === ext) {
                 data = await fetch(url)
                     .then(response => response.text())
-                    .then(responseText =>{
+                    .then(responseText => {
                         const parsedCsv = Papa.parse(responseText, {
                             header: true,
                             dynamicTyping: true
                         })
-
                         return parsedCsv.data
                     })
-                    .then(result => {
-                        return result
-                    })
             }
 
-            if ('json' === regex.exec(url)[1]) {
+            if ('json' === ext) {
                 data = await fetch(url)
                     .then(response => response.json())
-                    .then(data => {
-                        return data
-                    })
             }
-
-            data = transform.autoStandardize(data);
-            data = transform.developerStandardize(data, response.dataDescription);
 
             return data;
         } catch {
-            console.error(`Cannot parse URL: ${url}`);
+            // If we can't parse it, still attempt to fetch it
+            try {
+                let response = await (await fetch(configUrl)).json()
+                return response
+            } catch {
+                console.error(`Cannot parse URL: ${url}`);
+            }
         }
     }
 
@@ -848,7 +817,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const geoClickHandler = (key, value) => {
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === viewport || 'xxs' === viewport || 'click' === state.tooltips.appearanceType) {
+        if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
                 keyedData: value
@@ -881,6 +850,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newData = await fetchRemoteData(newState.dataUrl)
 
+            if(newData && newState.dataDescription) {
+                newData = transform.autoStandardize(data);
+                newData = transform.developerStandardize(data, newState.dataDescription);
+            }
+
             if(newData) {
                 newState.data = newData
             }
@@ -906,6 +880,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             addUIDs(newState, newState.columns.geo.name)
         }
 
+        if(newState.dataTable.forceDisplay === undefined){
+            newState.dataTable.forceDisplay = !isDashboard;
+        }
+
         setState(newState)
 
         // Done loading
@@ -923,11 +901,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If the config passed is a string, try to load it as an ajax
         if(configUrl) {
             configData = await fetchRemoteData(configUrl)
-        }
-
-        // Finally, dynamically import the default configuration if nothing else was found.
-        if(null === configData) {
-            configData = usaDefaultConfig
         }
 
         // Once we have a config verify that it is an object and load it
@@ -1000,6 +973,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
+    if(config) {
+        useEffect(() => {
+            loadConfig(config)
+        }, [config.data])
+    }
+
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
     const { title = '', subtext = ''} = general
@@ -1008,7 +987,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     let outerContainerClasses = [
         'cdc-open-viz-module',
         'cdc-map-outer-container',
-        viewport
+        currentViewport
     ]
 
     if(className) {
@@ -1049,8 +1028,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
             {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
-            <section className={`cdc-map-inner-container ${viewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(viewport) && 'hover' === tooltips.appearanceType &&
+            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType &&
                     <ReactTooltip
                         id="tooltip"
                         place="right"
@@ -1080,14 +1059,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         </div>
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {modal && <Modal type={general.type} viewport={viewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                        {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                             {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                             {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
-                            viewport={viewport}
+                            viewport={currentViewport}
                             legend={state.legend}
                             runtimeLegend={runtimeLegend}
                             setRuntimeLegend={setRuntimeLegend}
@@ -1127,8 +1106,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         displayGeoName={displayGeoName}
                         applyLegendToRow={applyLegendToRow}
                         tableTitle={dataTable.title}
+                        indexTitle={dataTable.indexTitle}
                         mapTitle={general.title}
-                        viewport={viewport}
+                        viewport={currentViewport}
                     />
                 }
                 {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}

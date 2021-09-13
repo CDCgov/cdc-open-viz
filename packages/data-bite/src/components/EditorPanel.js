@@ -10,6 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce';
 import Context from '../context';
+import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
 
@@ -59,6 +60,13 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+  <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+    <span className="edit-label">{label}</span>
+  </label>
+))
+
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = '';
   if ( Array.isArray(options)) { //Handle basic array
@@ -93,7 +101,7 @@ const EditorPanel = memo(() => {
     loading,
     data,
     setParentConfig,
-    isDashboard
+    isDashboard,
   } = useContext(Context);
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
@@ -147,18 +155,14 @@ const EditorPanel = memo(() => {
     // Pass up to Editor if needed
     if(setParentConfig) {
       const newConfig = convertStateToConfig()
-      
+
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
   const onBackClick = () => {
-    if(isDashboard){
-      updateConfig({...config, editing: false});
-    } else {
-      setDisplayPanel(!displayPanel);
-    }
+    setDisplayPanel(!displayPanel);
   }
 
   const Error = () => {
@@ -249,10 +253,10 @@ const EditorPanel = memo(() => {
   return (
     <ErrorBoundary component="EditorPanel">
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      {config.newViz && <Confirm />}
+      {(!config.dataColumn || !config.dataFunction) && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
-        <h2>Configure Data Bite</h2>
+        <div className="heading-2">Configure Data Bite</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -263,38 +267,40 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  <Select value={config.biteStyle} fieldName="biteStyle" label="Data Bite Style" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title" updateField={updateField} />
                   <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} />
                   <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation" placeholder="Data Bite Subtext or Citation" updateField={updateField} />
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    Data
+                    Data {(!config.dataColumn || !config.dataFunction) && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" options={getColumns()} />
-                  <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" options={DATA_FUNCTIONS} />
                   <ul className="column-edit">
-                    <li className="three-col">
-                      <TextField value={config.prefix} fieldName="prefix" label="Prefix" updateField={updateField} />
-                      <TextField value={config.suffix} fieldName="suffix" label="Suffix" updateField={updateField} />
-                      <TextField type="number" value={config.roundToPlace} fieldName="roundToPlace" label="Round" updateField={updateField} />
+                    <li className="two-col">
+                      <Select value={config.dataColumn || ""} fieldName="dataColumn" label="Data Column" updateField={updateField} initial="Select" required={true} options={getColumns()} />
+                      <Select value={config.dataFunction || ""} fieldName="dataFunction" label="Data Function" updateField={updateField} initial="Select" required={true} options={DATA_FUNCTIONS} />
                     </li>
                   </ul>
-                </AccordionItemPanel>
-              </AccordionItem>
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Filters
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <ul className="filters-list">
-                    {config.filters && config.filters.map((filter, index) => (
+                  <span className="divider-heading">Number Formatting</span>
+                  <ul className="column-edit">
+                    <li className="three-col">
+                      <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
+                      <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
+                      <TextField type="number" value={config.dataFormat.roundToPlace} section="dataFormat" fieldName="roundToPlace" label="Round" updateField={updateField} />
+                    </li>
+                  </ul>
+                  <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
+                  <hr className="accordion__divider" />
+                  {
+                    config.filters &&
+                    <ul className="filters-list">
+                      {config.filters.map((filter, index) => (
                         <fieldset className="edit-block">
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
@@ -316,13 +322,14 @@ const EditorPanel = memo(() => {
                             </select>
                           </label>
                         </fieldset>
-                      )
-                    )}
-                  </ul>
-
-                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                      ))}
+                    </ul>
+                  }
+                  {(!config.filters || config.filters.length === 0) && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                  <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -330,11 +337,14 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.biteLocation} fieldName="biteLocation" label="Data Bite Placement" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
-                  <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
-                  <Select value={config.imagePosition || ""} fieldName="imagePosition" label="Image or Data Bite Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
+
+                  {['title', 'body'].includes(config.biteStyle) &&
+                    <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
+                  }
+                  <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                  <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
