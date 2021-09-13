@@ -17,7 +17,7 @@ This project is still under heavy initial development with the roadmap extending
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [npm](https://www.npmjs.com/) for package management (as opposed to Yarn.) To work on individual packages you must setup the entire monorepo.
 
 1. Start by cloning this repo and running `npm install` at the root. 
-2. Verify that "lerna" is installed by running `lerna -v'. If it's not installed, Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
+2. Verify that "lerna" is installed by running `lerna -v`. If it's not installed, Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
 3. Run `lerna link --force-local` which will tell Lerna to auto symlink the packages locally with each other (this will let you make a change in one and see it reflected in the others after building.)
 4. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
 5. NOTE: To run the **editor** you will also need to build the packages that it consumes:
