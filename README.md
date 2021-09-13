@@ -24,7 +24,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
   - `lerna run --scope @cdc/chart build`
   - `lerna run --scope @cdc/dashboard build`
   - `lerna run --scope @cdc/data-bite build`
-5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
+5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
 
 ## Development Guidelines
 
