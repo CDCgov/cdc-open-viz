@@ -58,5 +58,10 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
+  },
+  "dependencies": {
+    "@visx/group": "^2.1.0",
+    "@visx/heatmap": "^2.1.0",
+    "@visx/scale": "^2.1.0"
   }
 }

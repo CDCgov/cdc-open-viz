@@ -1,13 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
-
 import parse from 'html-react-parser'
+import { Group } from '@visx/group';
+import { scaleLinear } from '@visx/scale';
+import { HeatmapCircle } from '@visx/heatmap';
+
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Loading from '@cdc/core/components/Loading'
+
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
-import Loading from '@cdc/core/components/Loading'
 import Context from './context'
 import './scss/main.scss'
-
-const canvas = React.createRef()
 
 const themeColor = {
   'theme-blue': '#005eaa',
@@ -23,8 +26,60 @@ const themeColor = {
   'theme-amber': '#fbab18',
 }
 
-const WaffleChart = ({ config, spacer, radius }) => {
+const hot1 = '#77312f';
+const hot2 = '#f33d15';
 
+export const background = '#28272c';
+
+const seededRandom = getSeededRandom(0.41);
+
+const binData = genBins(16, 16, idx => 150 * idx, (i, number) => 25 * (number - i) * seededRandom());
+
+function max<Datum>(data: Datum[], value: (d: Datum) => number): number {
+  return Math.max(...data.map(value));
+}
+
+function min<Datum>(data: Datum[], value: (d: Datum) => number): number {
+  return Math.min(...data.map(value));
+}
+
+// accessors
+const bins = (d: Bins) => d.bins;
+const count = (d: Bin) => d.count;
+
+const colorMax = max(binData, d => max(bins(d), count));
+const bucketSizeMax = max(binData, d => bins(d).length);
+
+// scales
+const xScale = scaleLinear({
+  domain: [0, binData.length],
+});
+
+const yScale = scaleLinear({
+  domain: [0, bucketSizeMax],
+});
+
+const circleColorScale = scaleLinear({
+  range: [hot1, hot2],
+  domain: [0, colorMax],
+});
+
+const opacityScale = scaleLinear({
+  range: [0.1, 1],
+  domain: [0, colorMax],
+});
+
+export type HeatmapProps = {
+  width: number;
+  height: number;
+  margin?: { top: number; right: number; bottom: number; left: number };
+  separation?: number;
+  events?: boolean;
+};
+
+const defaultMargin = { top: 10, left: 20, right: 20, bottom: 110 };
+
+const WaffleChart = ({ config }) => {
   let {
     title,
     theme,
@@ -45,8 +100,6 @@ const WaffleChart = ({ config, spacer, radius }) => {
     dataDenomFunction,
     roundToPlace
   } = config
-
-  const ratio = (10 * (radius * 2)) + (9 * spacer)
 
   const calculateData = useCallback(() => {
 
@@ -119,7 +172,7 @@ const WaffleChart = ({ config, spacer, radius }) => {
       }
     });
 
-    let conditionalData = false
+    let conditionalData = []
 
     if (dataConditionalColumn !== '' && dataConditionalOperator !== '' && dataConditionalComparate !== '') {
       switch (dataConditionalOperator) {
@@ -150,12 +203,12 @@ const WaffleChart = ({ config, spacer, radius }) => {
           }
           break
         default:
-          conditionalData = false
+          conditionalData = []
       }
     }
 
     //Get the column's data
-    const columnData = conditionalData ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
+    const columnData = conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
     const denomColumnData = filteredData.map(a => a[dataDenomColumn])
 
     //Filter the column's data for numerical values only
@@ -235,6 +288,7 @@ const WaffleChart = ({ config, spacer, radius }) => {
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
     }
 
+    // @ts-ignore
     return applyPrecision((waffleNumerator / waffleDenominator) * 100);
   }, [
     dataColumn,
@@ -254,48 +308,17 @@ const WaffleChart = ({ config, spacer, radius }) => {
   const dataPercentage = calculateData()
 
   useEffect(() => {
-    const calculatePos = (axis, index) => {
-      let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
-      return mod > 0 ? (mod * ((radius * 2) + spacer)) + radius : radius
-    }
 
-    const drawCircle = (ctx, x, y, fill, active = false, stroke = false, strokeWidth = 0) => {
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
-
-      if (!active) ctx.globalAlpha = 0.35
-
-      if (fill) {
-        ctx.fillStyle = fill
-        ctx.fill()
-      }
-
-      if (!active) ctx.globalAlpha = 1
-
-      if (stroke) {
-        ctx.lineWidth = strokeWidth
-        ctx.strokeStyle = stroke
-        ctx.stroke()
-      }
-    }
-
-    const ctx = canvas.current.getContext('2d')
-    ctx.width = ratio
-    ctx.height = ratio
-
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-    for (let i = 0; i <= 100; i++) {
-      drawCircle(ctx, calculatePos('x', i), calculatePos('y', i), themeColor[theme], i + 1 > (100 - Math.round(dataPercentage)))
-    }
-  }, [ratio, spacer, radius, theme, dataPercentage])
+  }, [theme, dataPercentage])
 
   return (
     <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
       <div className="cdc-waffle-chart__header">{parse(title)}</div>
       <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
         <div className="cdc-waffle-chart__chart">
-          <canvas ref={canvas} width={ratio} height={ratio}/>
+          <Group>
+
+          </Group>
         </div>
         <div className="cdc-waffle-chart__data">
           <div className="cdc-waffle-chart__data--primary">
@@ -320,7 +343,7 @@ const CdcWaffleChart = (
     setConfig: setParentConfig
   }
 ) => {
-  const [ config, setConfig ] = useState({})
+  const [ config, setConfig ] = useState({ theme: '', data: {}})
   const [ loading, setLoading ] = useState(true)
 
   const updateConfig = (newConfig) => {
@@ -371,15 +394,17 @@ const CdcWaffleChart = (
       <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' '): ''}`}
            style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
         {isEditor && <EditorPanel/>}
-        <WaffleChart config={config} spacer={1} radius={6}/>
+        <WaffleChart config={config}/>
       </div>
     )
   }
 
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-      {body}
-    </Context.Provider>
+    <ErrorBoundary component="WaffleChart">
+      <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+        {body}
+      </Context.Provider>
+    </ErrorBoundary>
   )
 }
 
