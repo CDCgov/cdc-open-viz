@@ -187,5 +187,49 @@ export default {
     '#ff7f00',
     '#ff3',
     '#a65628',
-    '#f781bf']
+    '#f781bf'],
+  qualitative5: [
+    '#5a1a5e',
+    '#a75fd4',
+    '#b8e5ff',
+    '#ce82ff',
+    '#8e29c4',
+    '#4f5dd6',
+    '#ff8fa9'],
+  qualitative6: [
+    '#26418f',
+    '#6c95c6',
+    '#dbefbd',
+    '#3ba3a1',
+    '#4063c9',
+    '#74cc95',
+    '#8ed3f2'
+  ],
+  qualitative7: [
+    '#363636',
+    '#98533e',
+    '#fbab18',
+    '#872e1c',
+    '#faebb0',
+    '#7ddbbe',
+    '#339699'
+  ],
+  qualitative8: [
+    '#00695c',
+    '#44c585',
+    '#f4fae0',
+    '#23444a',
+    '#994575',
+    '#bf7caa',
+    '#e6cbe0'
+  ],
+  qualitative9: [
+    '#497d0c',
+    '#84BC49',
+    '#88c3ea',
+    '#fcad90',
+    '#f26b4f',
+    '#c31b1f',
+    '#c31b1f'
+  ]
 };
