@@ -445,7 +445,11 @@ const EditorPanel = () => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'} {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                    { config.visualizationType !== 'Pie'
+                      ? config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'
+                      : 'Data Series'
+                    }
+                    { config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -470,7 +474,11 @@ const EditorPanel = () => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                  {config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'} {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
+                    {config.visualizationType !== "Pie"
+                        ? config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'
+                        : 'Segments'
+                    }
+                    {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
