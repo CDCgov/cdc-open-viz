@@ -192,7 +192,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
-            debugger;
             let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
             let colorIdx = legendIdx - specialClasses
@@ -885,7 +884,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-        debugger;
+
         setState(newState)
 
         // Done loading
