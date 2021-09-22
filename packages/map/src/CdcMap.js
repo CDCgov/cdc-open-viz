@@ -161,6 +161,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     })
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+
         const newLegendMemo = new Map(); // Reset memoization
 
         const
@@ -191,7 +192,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
-            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
+            let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
             let colorIdx = legendIdx - specialClasses
 
@@ -933,6 +934,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const hashLegend = hashObj({
             color: state.color,
+            customColors: state.customColors,
             numberOfItems: state.legend.numberOfItems,
             type: state.legend.type,
             separateZero: state.legend.separateZero ?? false,
@@ -942,9 +944,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Legend
-        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+        if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-
             setRuntimeLegend(legend)
         }
 
@@ -959,7 +960,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
             const data = generateRuntimeData(state, runtimeFilters, hashData)
-
             setRuntimeData(data)
         }
     }, [state])

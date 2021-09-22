@@ -739,7 +739,6 @@ const EditorPanel = (props) => {
 
   useEffect(() => {
     const parsedData = convertStateToConfig()
-
     const formattedData = JSON.stringify(parsedData, undefined, 2);
 
     setConfigTextbox(formattedData)
