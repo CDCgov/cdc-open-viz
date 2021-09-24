@@ -187,5 +187,14 @@ export default {
     '#ff7f00',
     '#ff3',
     '#a65628',
-    '#f781bf']
+    '#f781bf'],
+  qualitative9: [
+    '#497d0c',
+    '#84BC49',
+    '#88c3ea',
+    '#fcad90',
+    '#f26b4f',
+    '#c31b1f',
+    '#c31b1f'
+  ]
 };
