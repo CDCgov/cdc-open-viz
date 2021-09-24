@@ -222,6 +222,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 const val = row[primaryCol]
 
                 if( obj.legend.specialClasses.includes(val) ) {
+
+                    // apply the special color to the legend
                     if(undefined === specialClassesHash[val]) {
                         specialClassesHash[val] = true
 
@@ -234,8 +236,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                         specialClasses += 1
                     }
-
-                    newLegendMemo.set( hashObj(row), result.length - 1)
+                
+                    let specialColor = '';
+                    
+                    // color the state if val is in row 
+                    if ( Object.values(row).includes(val) ) {
+                        specialColor = result.findIndex(p => p.value === val)
+                    }
+                    newLegendMemo.set( hashObj(row), specialColor)
 
                     return false
                 }
