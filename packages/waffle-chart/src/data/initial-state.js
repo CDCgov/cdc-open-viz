@@ -17,6 +17,7 @@ export default {
   "dataDenomFunction": "",
   "suffix": "%",
   "roundToPlace": "0",
+  "shape": "circle",
   "theme": "theme-blue",
   "type": "waffle-chart"
 }
