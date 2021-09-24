@@ -275,7 +275,7 @@ const WaffleChart = ({ config }) => {
       }
       waffleData.push(newNode)
     }
-    console.log(waffleData)
+
     return waffleData
   },[theme, dataPercentage, shape])
 
@@ -287,6 +287,15 @@ const WaffleChart = ({ config }) => {
     return width / 512
   }
 
+  /* Fullsize person icon ------------------
+    <path style={{transform: `scale(${personShapeScale()}) translateX(${node.x * (personShapeScale() * 512)}px) translateY(${node.y * (personShapeScale() * 512)}px)`}}
+          fill={node.color} fillOpacity={node.opacity} key={key}
+          d="M96 0c35.346 0 64 28.654 64 64s-28.654 64-64 64-64-28.654-64-64S60.654 0 96 0m48 144h-11.36c-22.711 10.443-49.59
+          10.894-73.28 0H48c-26.51 0-48 21.49-48 48v136c0 13.255 10.745 24 24 24h16v136c0 13.255 10.745 24 24 24h64c13.255 0
+          24-10.745 24-24V352h16c13.255 0 24-10.745 24-24V192c0-26.51-21.49-48-48-48z">
+    </path>
+ */
+
   return (
     <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
       <div className="cdc-waffle-chart__header">{parse(title)}</div>
@@ -296,15 +305,15 @@ const WaffleChart = ({ config }) => {
             <Group>
               {buildWaffle() && buildWaffle().map((node, key) => (
                 node.shape === 'square'
-                  ? <Bar x={node.x} y={node.y} width={width} height={width} fill={node.color} fillOpacity={node.opacity} key={key} />
+                  ? <Bar className="cdc-waffle-chart__node" style={{transitionDelay: `${0.1 * key}ms`}} x={node.x} y={node.y} width={width} height={width} fill={node.color} fillOpacity={node.opacity} key={key} />
                   : node.shape === 'person' ?
-                    <path style={{transform: `scale(${personShapeScale()}) translateX(${node.x * (personShapeScale() * 512)}px) translateY(${node.y * (personShapeScale() * 512)}px)`}}
+                    <path style={{transform: `translateX(${node.x + width / 4}px) translateY(${node.y}px)`}}
                           fill={node.color} fillOpacity={node.opacity} key={key}
-                          d="M96 0c35.346 0 64 28.654 64 64s-28.654 64-64 64-64-28.654-64-64S60.654 0 96 0m48 144h-11.36c-22.711 10.443-49.59
-                          10.894-73.28 0H48c-26.51 0-48 21.49-48 48v136c0 13.255 10.745 24 24 24h16v136c0 13.255 10.745 24 24 24h64c13.255 0
-                          24-10.745 24-24V352h16c13.255 0 24-10.745 24-24V192c0-26.51-21.49-48-48-48z">
+                          d="M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
+                          0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,
+                          .9375-.9375V13.75h.625A.9375.9375,0,0,0,7.5,12.8125V7.5A1.875,1.875,0,0,0,5.625,5.625Z">
                     </path>
-                    : <Circle cx={node.x} cy={node.y} r={width / 2} fill={node.color} fillOpacity={node.opacity} key={key}/>
+                    : <Circle className="cdc-waffle-chart__node" style={{transitionDelay: `${0.1 * key}ms`}} cx={node.x} cy={node.y} r={width / 2} fill={node.color} fillOpacity={node.opacity} key={key}/>
               ))}
             </Group>
           </svg>
