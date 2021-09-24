@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group';
-import { scaleLinear } from '@visx/scale';
-import { HeatmapCircle } from '@visx/heatmap';
+import { Circle, Bar } from '@visx/shape';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Loading from '@cdc/core/components/Loading'
@@ -26,63 +25,11 @@ const themeColor = {
   'theme-amber': '#fbab18',
 }
 
-const hot1 = '#77312f';
-const hot2 = '#f33d15';
-
-export const background = '#28272c';
-
-const seededRandom = getSeededRandom(0.41);
-
-const binData = genBins(16, 16, idx => 150 * idx, (i, number) => 25 * (number - i) * seededRandom());
-
-function max<Datum>(data: Datum[], value: (d: Datum) => number): number {
-  return Math.max(...data.map(value));
-}
-
-function min<Datum>(data: Datum[], value: (d: Datum) => number): number {
-  return Math.min(...data.map(value));
-}
-
-// accessors
-const bins = (d: Bins) => d.bins;
-const count = (d: Bin) => d.count;
-
-const colorMax = max(binData, d => max(bins(d), count));
-const bucketSizeMax = max(binData, d => bins(d).length);
-
-// scales
-const xScale = scaleLinear({
-  domain: [0, binData.length],
-});
-
-const yScale = scaleLinear({
-  domain: [0, bucketSizeMax],
-});
-
-const circleColorScale = scaleLinear({
-  range: [hot1, hot2],
-  domain: [0, colorMax],
-});
-
-const opacityScale = scaleLinear({
-  range: [0.1, 1],
-  domain: [0, colorMax],
-});
-
-export type HeatmapProps = {
-  width: number;
-  height: number;
-  margin?: { top: number; right: number; bottom: number; left: number };
-  separation?: number;
-  events?: boolean;
-};
-
-const defaultMargin = { top: 10, left: 20, right: 20, bottom: 110 };
-
 const WaffleChart = ({ config }) => {
   let {
     title,
     theme,
+    shape,
     prefix,
     suffix,
     subtext,
@@ -307,18 +254,60 @@ const WaffleChart = ({ config }) => {
 
   const dataPercentage = calculateData()
 
-  useEffect(() => {
+  const width = 20
+  const spacer = 2
 
-  }, [theme, dataPercentage])
+  const buildWaffle = useCallback(() => {
+    let waffleData = []
+
+    const calculatePos = (shape, axis, index) => {
+      let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
+      return shape === 'circle' ? (mod * (width + spacer)) + (width / 2) : mod * (width + spacer)
+    }
+
+    for (let i = 0; i < 100; i++) {
+      let newNode = {
+        shape: shape,
+        x: calculatePos(shape, 'x', i),
+        y: calculatePos(shape, 'y', i),
+        color: themeColor[theme],
+        opacity: i + 1 > (100 - Math.round(dataPercentage)) ? 1 : 0.35
+      }
+      waffleData.push(newNode)
+    }
+    console.log(waffleData)
+    return waffleData
+  },[theme, dataPercentage, shape])
+
+  const setRatio = () => {
+    return (width * 10) + (spacer * 9)
+  }
+
+  const personShapeScale = () => {
+    return width / 512
+  }
 
   return (
     <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
       <div className="cdc-waffle-chart__header">{parse(title)}</div>
       <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
         <div className="cdc-waffle-chart__chart">
-          <Group>
-
-          </Group>
+          <svg width={setRatio()} height={setRatio()}>
+            <Group>
+              {buildWaffle() && buildWaffle().map((node, key) => (
+                node.shape === 'square'
+                  ? <Bar x={node.x} y={node.y} width={width} height={width} fill={node.color} fillOpacity={node.opacity} key={key} />
+                  : node.shape === 'person' ?
+                    <path style={{transform: `scale(${personShapeScale()}) translateX(${node.x * (personShapeScale() * 512)}px) translateY(${node.y * (personShapeScale() * 512)}px)`}}
+                          fill={node.color} fillOpacity={node.opacity} key={key}
+                          d="M96 0c35.346 0 64 28.654 64 64s-28.654 64-64 64-64-28.654-64-64S60.654 0 96 0m48 144h-11.36c-22.711 10.443-49.59
+                          10.894-73.28 0H48c-26.51 0-48 21.49-48 48v136c0 13.255 10.745 24 24 24h16v136c0 13.255 10.745 24 24 24h64c13.255 0
+                          24-10.745 24-24V352h16c13.255 0 24-10.745 24-24V192c0-26.51-21.49-48-48-48z">
+                    </path>
+                    : <Circle cx={node.x} cy={node.y} r={width / 2} fill={node.color} fillOpacity={node.opacity} key={key}/>
+              ))}
+            </Group>
+          </svg>
         </div>
         <div className="cdc-waffle-chart__data">
           <div className="cdc-waffle-chart__data--primary">

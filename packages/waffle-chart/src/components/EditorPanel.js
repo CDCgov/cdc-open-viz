@@ -454,6 +454,8 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   {/*<Select value={config.biteLocation} fieldName="biteLocation" label="Waffle Chart Placement"
                           updateField={updateField} options={BITE_LOCATIONS} initial="Select"/>*/}
+                  <Select value={config.shape} fieldName="shape" label="Shape"
+                          updateField={updateField} options={[ 'circle', 'square', 'person' ]}/>
                   <Select value={config.orientation} fieldName="orientation" label="Layout"
                           updateField={updateField} options={[ 'horizontal', 'vertical' ]}/>
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size"
