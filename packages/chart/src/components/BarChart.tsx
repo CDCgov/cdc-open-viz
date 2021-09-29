@@ -9,7 +9,18 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber, updateConfig } = useContext<any>(Context);
+
+  React.useEffect(() => {
+    if(!config.barHeight) {
+      //config.barWidth = 25;
+      updateConfig({
+        ...config,
+        barHeight: 25
+      })
+    }
+  }, [config, updateConfig]);
+
 
   return (
     <ErrorBoundary component="BarChart">
@@ -79,12 +90,32 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               yScale={config.runtime.horizontal ? xScale : yScale}
               color={() => {return '';}}
             >
-              {(barGroups) => barGroups.map((barGroup) => (
+              {(barGroups) => {
+                
+                if (config.visualizationSubType === "horizontal") {
+                  const barsPerGroup = config.series.length;
+                  const barHeight = config.barHeight ? config.barHeight : 25;
+                  let barPadding = barHeight;
+                  
+                  if(config.yLabelPlacement === "Below Bar") {
+                    if(barHeight < 40) {
+                      config.barPadding = 40;
+                    } else {
+                      config.barPadding = barPadding;
+                    }
+                  } else {
+                    config.barPadding = barPadding / 2;
+                  }
+                  
+                  config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length);
+                }
+
+                return barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
-                    let barHeight = Math.abs(yScale(bar.value) - yScale(0));
+                    let barHeight = config.visualizationSubType === "horizontal" ? config.barHeight : Math.abs(yScale(bar.value) - yScale(0));
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
                     let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                     let offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
@@ -98,6 +129,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let tempValue = yAxisValue;
                       yAxisValue = xAxisValue;
                       xAxisValue = tempValue;
+                      barWidth = config.barHeight
                     }
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
@@ -138,7 +170,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   )}
                   )}
                 </Group>
-              ))}
+              ))}}
             </BarGroup>
             {Object.keys(config.confidenceKeys).length > 0 ? data.map((d) => {
               let xPos = xScale(getXAxisData(d));
