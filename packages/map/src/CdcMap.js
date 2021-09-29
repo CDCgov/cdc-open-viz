@@ -931,9 +931,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Filters
         const hashFilters = hashObj(state.filters)
+        let filters;
 
         if(state.filters && hashFilters !== runtimeFilters.fromHash) {
-            const filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
+            filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
             if(filters) {
                 setRuntimeFilters(filters)
@@ -967,8 +968,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, runtimeFilters, hashData)
-            setRuntimeData(data)
+            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(data) 
         }
     }, [state])
 
