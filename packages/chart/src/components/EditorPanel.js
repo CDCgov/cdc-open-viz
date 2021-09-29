@@ -370,9 +370,17 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
+                  { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") && 
+                    <Select value={config.yLabelPlacement || "Below Bar"} fieldName="yLabelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis']} />
+                  }
+                  { config.visualizationSubType === "horizontal" &&
+                    <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Height" updateField={updateField} />
+                  }
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} />
-                  <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
+                  {config.visualizationSubType !== "horizontal" &&
+                    <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               {config.visualizationType !== "Pie" && <AccordionItem>
@@ -453,7 +461,7 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label="Size (width)" className="number-narrow" updateField={updateField} />
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={ config.visualizationSubType === 'horizontal' ? 'Size (Height)' : 'Size (Width)' } className="number-narrow" updateField={updateField} />
                       {config.visualizationSubType !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
                     </>
                   )}
@@ -487,7 +495,7 @@ const EditorPanel = () => {
                         </>
                       )}
                       {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
-                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label="Size (height)" className="number-narrow" updateField={updateField} />
+                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.visualizationSubType === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
                       {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
                     </>
                   )}

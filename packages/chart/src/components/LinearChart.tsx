@@ -158,8 +158,9 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
-            const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+              const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
+              const belowBarPaddingFromTop = 9;
               return (
                 <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
@@ -182,12 +183,41 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        <Text
-                          x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                          y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
-                          textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                        >{tick.formattedValue}</Text>
+                        
+
+                        { config.visualizationSubType === "horizontal" && ( config.yLabelPlacement === 'Below Bar' || !config.yLabelPlacement ) &&
+                          <Text
+                            x={config.runtime.horizontal ? tick.from.x + 5 : tick.to.x}
+                            y={ (config.barHeight > 40 )
+                              ?  tick.from.y + (config.barPadding / 2) + belowBarPaddingFromTop
+                              // all items / 2 + padding
+                              : tick.from.y + (config.series.length * config.barHeight / 2) - config.barPadding / 2 + belowBarPaddingFromTop
+                            }
+                            verticalAnchor={"start"}
+                            textAnchor={"start"}
+                          >{tick.formattedValue}</Text>
+                        }
+
+                        { config.visualizationSubType === "horizontal" && (config.yLabelPlacement === 'On Y-Axis' ) && 
+                            <Text
+                              x={tick.from.x - 15}
+                              y={ tick.from.y - config.barPadding/2 }
+                              verticalAnchor={"middle"}
+                              textAnchor={"end"}
+                          >{tick.formattedValue}</Text>
+                        }
+
+                        { config.visualizationSubType !== "horizontal" &&
+                            <Text
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                              textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                        }
+
                       </Group>
                     );
                   })}
