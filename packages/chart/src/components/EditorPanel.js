@@ -371,7 +371,7 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") && 
-                    <Select value={config.yLabelPlacement || "Below Bar"} fieldName="yLabelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis']} />
+                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis']} />
                   }
                   { config.visualizationSubType === "horizontal" &&
                     <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Height" updateField={updateField} />
@@ -496,7 +496,9 @@ const EditorPanel = () => {
                       )}
                       {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.visualizationSubType === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
-                      {config.visualizationSubType !== 'horizontal' && <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />}
+                      {config.yAxis.labelPlacement !== 'Below Bar' &&
+                        <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
+                      }
                     </>
                   )}
                 </AccordionItemPanel>
