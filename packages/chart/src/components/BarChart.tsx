@@ -97,7 +97,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   const barHeight = config.barHeight ? config.barHeight : 25;
                   let barPadding = barHeight;
                   
-                  if(config.yLabelPlacement === "Below Bar") {
+                  if(config.yAxis.labelPlacement === "Below Bar" || !config.yAxis.labelPlacement) {
                     if(barHeight < 40) {
                       config.barPadding = 40;
                     } else {

@@ -185,7 +185,7 @@ export default function LinearChart() {
                         }
                         
 
-                        { config.visualizationSubType === "horizontal" && ( config.yLabelPlacement === 'Below Bar' || !config.yLabelPlacement ) &&
+                        { config.visualizationSubType === "horizontal" && ( config.yAxis.labelPlacement === 'Below Bar' || !config.yAxis.labelPlacement ) &&
                           <Text
                             x={config.runtime.horizontal ? tick.from.x + 5 : tick.to.x}
                             y={ (config.barHeight > 40 )
@@ -198,13 +198,12 @@ export default function LinearChart() {
                           >{tick.formattedValue}</Text>
                         }
 
-                        { config.visualizationSubType === "horizontal" && (config.yLabelPlacement === 'On Y-Axis' ) && 
+                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
                             <Text
-                              x={tick.from.x - 15}
-                              y={ tick.from.y - config.barPadding/2 }
+                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={"middle"}
                               textAnchor={"end"}
-                          >{tick.formattedValue}</Text>
+                            >{tick.formattedValue}</Text>
                         }
 
                         { config.visualizationSubType !== "horizontal" &&
