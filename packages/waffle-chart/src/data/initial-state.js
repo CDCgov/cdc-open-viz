@@ -18,6 +18,8 @@ export default {
   "suffix": "%",
   "roundToPlace": "0",
   "shape": "circle",
+  "nodeWidth": "20",
+  "nodeSpacer": "2",
   "theme": "theme-blue",
   "type": "waffle-chart"
 }

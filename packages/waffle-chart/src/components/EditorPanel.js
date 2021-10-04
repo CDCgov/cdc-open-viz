@@ -456,6 +456,16 @@ const EditorPanel = memo(() => {
                           updateField={updateField} options={BITE_LOCATIONS} initial="Select"/>*/}
                   <Select value={config.shape} fieldName="shape" label="Shape"
                           updateField={updateField} options={[ 'circle', 'square', 'person' ]}/>
+
+                  <div className="accordion__panel-row accordion__small-inputs" style={{marginTop: '1em'}}>
+                    <div className="accordion__panel-col">
+                      <TextField type="number" value={config.nodeWidth} fieldName="nodeWidth" label="Width" updateField={updateField}/>
+                    </div>
+                    <div className="accordion__panel-col">
+                      <TextField type="number" value={config.nodeSpacer} fieldName="nodeSpacer" label="Spacer" updateField={updateField}/>
+                    </div>
+                  </div>
+
                   <Select value={config.orientation} fieldName="orientation" label="Layout"
                           updateField={updateField} options={[ 'horizontal', 'vertical' ]}/>
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size"
