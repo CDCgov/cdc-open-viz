@@ -355,7 +355,11 @@
     }
   }
 
-  input[type="text"], input[role="combobox"], input[type="number"], textarea {
+  input[type="text"],
+  input[role="combobox"],
+  input[type="number"],
+  textarea {
+    width: 100%;
     min-width: 100%;
     max-width: 100%; // Doing this prevents width of textarea from being changed
   }
