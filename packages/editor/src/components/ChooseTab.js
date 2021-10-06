@@ -10,6 +10,7 @@ import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import GlobeIcon from '@cdc/core/assets/world-graphic.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
+import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg';
 
 export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
@@ -36,7 +37,7 @@ export default function ChooseTab() {
             isSubType = (subType === config.visualizationType)
         }
 
-        if(type === 'dashboard' || type === 'data-bite') isSubType = true;
+        if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart') isSubType = true;
 
         let classNames = (config.type === type && isSubType) ? 'active' : ''
 
@@ -77,6 +78,7 @@ export default function ChooseTab() {
             <ul className="grid">
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
                 <li><IconButton label="Data Bite" type="data-bite" icon={ <DataBiteIcon /> } /></li>
+                <li><IconButton label="Waffle Chart" type="waffle-chart" icon={ <WaffleChartIcon /> } /></li>
             </ul>
             <div className="heading-2">Charts</div>
             <ul className="grid">

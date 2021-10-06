@@ -17,6 +17,7 @@ import getViewport from '@cdc/core/helpers/getViewport';
 import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
 import CdcDataBite from '@cdc/data-bite';
+import CdcWaffleChart from '@cdc/waffle-chart';
 
 import EditorPanel from './components/EditorPanel';
 import Grid from './components/Grid';
@@ -45,6 +46,9 @@ const addVisualization = (type, subType) => {
       break;
     case 'data-bite':
       newVisualizationConfig.visualizationType = type;
+      break
+    case 'waffle-chart':
+      newVisualizationConfig.visualizationType = type;
       break;
   }
 
@@ -68,6 +72,7 @@ const VisualizationsPanel = () => (
     <span className="subheading-3">Misc.</span>
     <div className="drag-grid">
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
+      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart" />
     </div>
   </div>
 )
@@ -152,7 +157,7 @@ export default function CdcDashboard(
     return values;
   }
 
-  const updateConfig = (newConfig, dataOverride = null) => {    
+  const updateConfig = (newConfig, dataOverride = null) => {
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
       const filterList = [];
@@ -289,12 +294,16 @@ export default function CdcDashboard(
           case 'chart':
             body = <><Header back={back} subEditor="Chart" /><CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>;
             break;
-          case 'map': 
+          case 'map':
             body = <><Header back={back} subEditor="Map" /><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>;
             break;
           case 'data-bite':
             visualizationConfig = {...visualizationConfig, newViz: true}
             body = <><Header back={back} subEditor="Data Bite" /><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
+            break;
+          case 'waffle-chart':
+            visualizationConfig = {...visualizationConfig, newViz: true}
+            body = <><Header back={back} subEditor="Waffle Chart" /><CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
         }
       }
@@ -337,11 +346,12 @@ export default function CdcDashboard(
                     let visualizationConfig = config.visualizations[col.widget];
 
                     visualizationConfig.data = filteredData || data;
-            
+
                     return <div className={`dashboard-col dashboard-col-${col.width}`}>
                       {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                       {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                       {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                      {visualizationConfig.type === 'waffle-chart' && <CdcWaffleChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                     </div>
                   }
                 })}
@@ -369,7 +379,7 @@ export default function CdcDashboard(
     setParentConfig,
     setPreview
   }
-  
+
   return (
     <Context.Provider value={contextValues}>
       <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
