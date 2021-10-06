@@ -1,0 +1,10 @@
+{
+  "type": "waffle-chart",
+  "dataUrl": "/examples/example-data.json",
+  "filters": [],
+  "title": "Waffle Chart",
+  "content": "of cases occurred in the home",
+  "subtext": "Waffle chart subtext or citation",
+  "theme": "theme-blue",
+  "suffix": "%"
+}

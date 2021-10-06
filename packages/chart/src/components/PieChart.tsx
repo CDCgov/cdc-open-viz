@@ -28,7 +28,7 @@ export default function PieChart() {
     getKey: (d: PieArcDatum<Datum>) => string;
     delay?: number;
   };
-  
+
   function AnimatedPie<Datum>({
     arcs,
     path,
@@ -96,7 +96,7 @@ export default function PieChart() {
             return (
               <animated.g key={key}>
                 {hasSpaceForLabel && (
-                  
+
                     <Text
                       fill="white"
                       x={centroidX}
@@ -121,13 +121,13 @@ export default function PieChart() {
   if(config && config.legend && !config.legend.hide && currentViewport === 'lg') {
     width = width * 0.73;
   }
-  
+
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
   const radius = Math.min(width, height) / 2;
   const centerY = height / 2;
   const centerX = width / 2;
-  const donutThickness = radius;
+  const donutThickness = (config.pieType === "Donut") ? 75 : radius;
 
   useEffect(() => {
     if(seriesHighlight.length > 0 && config.legend.behavior !== "highlight"){
