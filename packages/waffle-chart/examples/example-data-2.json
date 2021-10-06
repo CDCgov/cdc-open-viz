@@ -1,0 +1,32 @@
+[
+  {
+    "Resulted in Death": 25,
+    "Number of Overdoses": 600,
+    "state": "Alabama",
+    "Year": "2010"
+  },
+  {
+    "Resulted in Death": 7,
+    "Number of Overdoses": 80,
+    "state": "Alaska",
+    "Year": "2008"
+  },
+  {
+    "Resulted in Death": 14,
+    "Number of Overdoses": 100,
+    "state": "Alaska",
+    "Year": "2010"
+  },
+  {
+    "Resulted in Death": 17,
+    "Number of Overdoses": 400,
+    "state": "Alaska",
+    "Year": "2012"
+  },
+  {
+    "Resulted in Death": 82,
+    "Number of Overdoses": 400,
+    "state": "Arizona",
+    "Year": "2010"
+  }
+]
