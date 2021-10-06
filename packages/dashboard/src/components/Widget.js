@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useDrag } from 'react-dnd';
 import CloseIcon from '../images/icon-close.svg';
+import GridIcon from '../images/icon-grid.svg';
 import EditIcon from '../images/icon-edit.svg';
 import MoveIcon from '../images/icon-move.svg';
 import BiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
@@ -14,6 +15,7 @@ import Context from '../context';
 
 const iconHash = {
   'data-bite' : <BiteIcon />,
+  'waffle-chart' : <GridIcon />,
   'Bar' : <BarIcon />,
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
@@ -23,6 +25,7 @@ const iconHash = {
 
 const labelHash = {
   'data-bite' : 'Data Bite',
+  'waffle-chart' : 'Waffle Chart',
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
