@@ -1,0 +1,42 @@
+{
+  "name": "@cdc/waffle-chart",
+  "version": "1.0.0",
+  "description": "React component for displaying a single piece of data in a card module",
+  "main": "dist/cdcwafflechart",
+  "scripts": {
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
+    "build": "npx webpack --mode production --env packageName=CdcWaffleChart --env folderName=waffle-chart -c ../../webpack.config.js",
+    "prepublishOnly": "lerna run --scope @cdc/waffle-chart build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/waffle-chart"
+  },
+  "author": "rshelnutt <qyu6@cdc.gov>",
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
+  "devDependencies": {
+    "@cdc/core": "^1.0.2",
+    "bootstrap": "^4.3.1",
+    "html-react-parser": "^0.14.0",
+    "react-accessible-accordion": "^3.3.4",
+    "react-beautiful-dnd": "^13.0.0",
+    "react-select": "^3.0.8",
+    "react-tooltip": "4.2.8",
+    "use-debounce": "^6.0.1",
+    "whatwg-fetch": "^3.6.2"
+  },
+  "dependencies": {
+    "@visx/shape": "^2.1.1",
+    "chroma": "0.0.1",
+    "chroma-js": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": ">=16"
+  }
+}
