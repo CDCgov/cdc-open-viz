@@ -338,38 +338,71 @@ const CdcWaffleChart = (
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
-    })
+    });
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {}
-    newConfig.runtime.uniqueId = Date.now()
+    newConfig.runtime = {};
+    newConfig.runtime.uniqueId = Date.now();
 
     //Check things that are needed and set error messages if needed
-    newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    newConfig.runtime.editorErrorMessage = '';
+    setConfig(newConfig);
+  }
+
+  const loadConfig = async () => {
+    let response = configObj || await (await fetch(configUrl)).json();
+
+    // If data is included through a URL, fetch that and store
+    let responseData = response.data ?? {}
+
+    if(response.dataUrl) {
+      const dataString = await fetch(response.dataUrl);
+      responseData = await dataString.json();
+    }
+
+    response.data = responseData;
+
+    updateConfig({ ...defaults, ...response });
+    setLoading(false);
   }
 
   useEffect(() => {
-    const loadData = async () => {
-      let response = configObj || await (await fetch(configUrl)).json()
+    loadConfig();
+  }, [])
 
-      // If data is included through a URL, fetch that and store
-      let responseData = response.data ?? {}
+  if(configObj) {
+    useEffect(() => {
+      loadConfig();
+    }, [configObj.data])
+  }
 
-      if (response.dataUrl) {
-        const dataString = await fetch(response.dataUrl)
-        responseData = await dataString.json()
-      }
 
-      response.data = responseData
+  // useEffect(() => {
 
-      updateConfig({ ...defaults, ...response })
-    }
+  //   console.log('useEffect fired');
+  //   debugger;
+  //   const loadData = async () => {
+  //     let response = configObj || await (await fetch(configUrl)).json()
 
-    loadData().then(r => setLoading(false))
-  }, [ configObj, configUrl ])
+  //     // If data is included through a URL, fetch that and store
+  //     let responseData = response.data ?? {}
+
+  //     if (response.dataUrl) {
+  //       const dataString = await fetch(response.dataUrl)
+  //       responseData = await dataString.json()
+  //     }
+
+  //     response.data = responseData
+
+  //     updateConfig({ ...defaults, ...response })
+  //   }
+
+  //   loadData().then(r => setLoading(false))
+  // }, [ configObj, configUrl ])
 
   let body = (<Loading/>)
+
+  debugger;
 
   if (loading === false) {
     let classList = []
