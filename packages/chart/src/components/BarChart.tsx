@@ -113,6 +113,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 return barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
+
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = config.visualizationSubType === "horizontal" ? config.barHeight : Math.abs(yScale(bar.value) - yScale(0));
@@ -134,7 +135,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-      
+                    
+                    const onBarLabelPadding = 15;
+
+                    const onBarLabel = `<div>${yAxisValue} <br/> ${xAxisValue}</div>`;
+
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
@@ -166,7 +171,28 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
+                      {config.yAxis.labelPlacement === "On Bar" &&
+                        <Group>
+                            <Text
+                              x={ bar.y - onBarLabelPadding }
+                              y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
+                              fill={ "#000" }
+                              textAnchor="end"
+                            >
+                              { yAxisValue }
+                            </Text>
+                            <Text
+                              x={ bar.y - onBarLabelPadding }
+                              y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + 25 }
+                              fill={ "#000" }
+                              textAnchor="end"
+                            >
+                              { xAxisValue }
+                            </Text>
+                        </Group>
+                      }
                     </Group>
+                    
                   )}
                   )}
                 </Group>

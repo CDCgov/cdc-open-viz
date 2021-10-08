@@ -371,7 +371,7 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") && 
-                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis']} />
+                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis', 'On Bar']} />
                   }
                   { config.visualizationSubType === "horizontal" &&
                     <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Height" updateField={updateField} />
@@ -477,6 +477,7 @@ const EditorPanel = () => {
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
+                  {config.visualizationSubType === 'horizontal' && <CheckBox value={config.xAxis.hideAxis || '' } section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
@@ -508,6 +509,7 @@ const EditorPanel = () => {
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
+                      {config.visualizationSubType === 'horizontal' && <CheckBox value={config.yAxis.hideAxis || '' } section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
                     </>
                   )}
                 </AccordionItemPanel>
@@ -643,6 +645,15 @@ const EditorPanel = () => {
                       )
                     })}
                   </ul>
+
+                  {/* label color */}
+                  <span className="h5">Labeled Bar Font Color</span>
+                  <ul className="color-palette">
+                      {headerColors.map( (palette) => (
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, labelBarFontColor: palette})}} className={ config.labelBarFontColor === palette ? "selected " + palette : palette}>
+                        </li>
+                      ))}
+                    </ul>
                   {config.visualizationType !== 'Pie' && (
                     <>
                       {config.visualizationSubType !== 'horizontal' &&
