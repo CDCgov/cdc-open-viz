@@ -25,7 +25,21 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         barPadding: onBarLabelPadding,
       })
     }
+
   }, [onBarLabelHeight, config, updateConfig, onBarLabelPadding, visualizationSubType, isInitialRender]);
+
+  React.useEffect(() => {
+        // if no tick color set to black
+        if(!config.labelColor) {
+          updateConfig({
+            ...config,
+            labelColor: {
+              'name': 'bg-black',
+              'hex':'#000000'
+            }
+          })
+        }
+  }, [config, updateConfig]);
 
 
   return (
@@ -115,6 +129,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                   if(config.yAxis.labelPlacement === "On Bar") {
                     config.barHeight = onBarLabelHeight;
+                  } else {
+                    config.barHeight = barHeight;
                   }
                   
                   config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length);
@@ -204,7 +220,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                               x={ bar.y - onBarLabelPadding }
                               y={ barHeight * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
-                              fill={ config.tickColor.hex }
+                              fill={ config.labelColor ? config.labelColor.hex : "#000" }
                               textAnchor="end"
                             >
                               { yAxisValue }
@@ -212,7 +228,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <Text
                               x={ bar.y - onBarLabelPadding }
                               y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
-                              fill={ config.tickColor.hex }
+                              fill={ config.labelColor ? config.labelColor.hex : "#000" }
                               textAnchor="end"
                             >
                               { xAxisValue }
