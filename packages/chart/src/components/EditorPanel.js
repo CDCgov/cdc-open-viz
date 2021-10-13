@@ -156,7 +156,7 @@ const Regions = memo(({config, updateConfig}) => {
 })
 
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
-const barTickColors = [
+const labelColors = [
   {
     'className': 'bg-black',
     'hex': '#000000'
@@ -166,7 +166,7 @@ const barTickColors = [
     'hex': '#F5F5F5'
   }
 ];
-console.log('bartick', barTickColors)
+console.log('bartick', labelColors)
 
 const EditorPanel = () => {
   const {
@@ -655,15 +655,15 @@ const EditorPanel = () => {
                   </ul>
 
                   {/* label color */}
-                  <span className="h5">Labeled Bar Font Color</span>
+                  <span className="h5">Label Color</span>
                   <ul className="color-palette">
-                      {barTickColors.map( (palette, index) => {
-                        if(!config.tickColor) {
-                          config.tickColor = barTickColors[0];
+                      {labelColors.map( (palette, index) => {
+                        if(!config.labelColor) {
+                          config.labelColor = labelColors[0];
                         }
                         return (
-                          <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, tickColor: palette})}} className={ config.labelBarFontColor === palette.className ? "selected " + palette.className : palette.className}>
-                            <span style={{ backgroundColor: barTickColors[index].hex, width: "100%" }} />
+                          <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, labelColor: palette})}} className={ config.labelColor === palette.className ? "selected " + palette.className : palette.className}>
+                            <span style={{ backgroundColor: labelColors[index].hex, width: "100%" }} />
                           </li>
                         )
                       })}
