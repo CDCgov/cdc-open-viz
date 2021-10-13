@@ -207,15 +207,6 @@ export default function LinearChart() {
                             >{tick.formattedValue}</Text>
                         }
 
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === "On Bar" ) &&
-                            <Text
-                              x={ tick.from.x }
-                              y={ tick.to.y }
-                              //verticalAnchor={"start"}
-                              //textAnchor={"start"}
-                            >{tick.formattedValue}</Text>
-                        }
-
                         { config.visualizationSubType !== "horizontal" &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
