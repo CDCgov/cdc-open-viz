@@ -156,6 +156,17 @@ const Regions = memo(({config, updateConfig}) => {
 })
 
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
+const barTickColors = [
+  {
+    'className': 'bg-black',
+    'hex': '#000000'
+  },
+  {
+    'className': 'bg-white',
+    'hex': '#F5F5F5'
+  }
+];
+console.log('bartick', barTickColors)
 
 const EditorPanel = () => {
   const {
@@ -372,9 +383,6 @@ const EditorPanel = () => {
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") && 
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis', 'On Bar']} />
-                  }
-                  { config.visualizationSubType === "horizontal" &&
-                    <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Height" updateField={updateField} />
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
@@ -649,10 +657,16 @@ const EditorPanel = () => {
                   {/* label color */}
                   <span className="h5">Labeled Bar Font Color</span>
                   <ul className="color-palette">
-                      {headerColors.map( (palette) => (
-                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, labelBarFontColor: palette})}} className={ config.labelBarFontColor === palette ? "selected " + palette : palette}>
-                        </li>
-                      ))}
+                      {barTickColors.map( (palette, index) => {
+                        if(!config.tickColor) {
+                          config.tickColor = barTickColors[0];
+                        }
+                        return (
+                          <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, tickColor: palette})}} className={ config.labelBarFontColor === palette.className ? "selected " + palette.className : palette.className}>
+                            <span style={{ backgroundColor: barTickColors[index].hex, width: "100%" }} />
+                          </li>
+                        )
+                      })}
                     </ul>
                   {config.visualizationType !== 'Pie' && (
                     <>
@@ -662,7 +676,10 @@ const EditorPanel = () => {
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                     </>
                   )}
-                  {( config.visualizationType === "Bar" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
+                  { (config.visualizationSubType === "horizontal" && config.yAxis.labelPlacement !== "On Bar") &&
+                    <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Thickness" updateField={updateField} />
+                  }
+                  {( config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
