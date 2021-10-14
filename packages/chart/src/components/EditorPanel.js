@@ -166,7 +166,6 @@ const labelColors = [
     'hex': '#F5F5F5'
   }
 ];
-console.log('bartick', labelColors)
 
 const EditorPanel = () => {
   const {
@@ -654,20 +653,23 @@ const EditorPanel = () => {
                     })}
                   </ul>
 
-                  {/* label color */}
-                  <span className="h5">Label Color</span>
-                  <ul className="color-palette">
-                      {labelColors.map( (palette, index) => {
-                        if(!config.labelColor) {
-                          config.labelColor = labelColors[0];
-                        }
-                        return (
-                          <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, labelColor: palette})}} className={ config.labelColor === palette.className ? "selected " + palette.className : palette.className}>
-                            <span style={{ backgroundColor: labelColors[index].hex, width: "100%" }} />
-                          </li>
-                        )
-                      })}
-                    </ul>
+                  {config.yAxis.labelPlacement === "On Bar" &&
+                    <>
+                      <span className="h5">Label Color</span>
+                      <ul className="color-palette">
+                        {labelColors.map( (palette, index) => {
+                          if(!config.labelColor) {
+                            config.labelColor = labelColors[0];
+                          }
+                          return (
+                            <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, labelColor: palette})}} className={ config.labelColor === palette.className ? "selected " + palette.className : palette.className}>
+                              <span style={{ backgroundColor: labelColors[index].hex, width: "100%" }} />
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </>
+                  }
                   {config.visualizationType !== 'Pie' && (
                     <>
                       {config.visualizationSubType !== 'horizontal' &&
