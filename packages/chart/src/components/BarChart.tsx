@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
 import { Text } from '@visx/text';
+import chroma from 'chroma-js';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -27,19 +28,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
 
   }, [onBarLabelHeight, config, updateConfig, onBarLabelPadding, visualizationSubType, isInitialRender]);
-
-  React.useEffect(() => {
-        // if no tick color set to black
-        if(!config.labelColor) {
-          updateConfig({
-            ...config,
-            labelColor: {
-              'name': 'bg-black',
-              'hex':'#000000'
-            }
-          })
-        }
-  }, [config, updateConfig]);
 
 
   return (
@@ -162,7 +150,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                     let onBarLabelPadding = null;
-                    
+                    let labelColor = "#000000"; 
+
+                    // Set label color
+                    if (chroma.contrast(labelColor, barColor) < 4.9) {
+                      labelColor = '#FFFFFF';
+                    }
+
                     // font size and text spacing used for centering text on bar
                     if(config.fontSize === "small") {
                       onBarLabelPadding = 16;
@@ -220,7 +214,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                               x={ bar.y - onBarLabelPadding }
                               y={ barHeight * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
-                              fill={ config.labelColor ? config.labelColor.hex : "#000" }
+                              fill={ labelColor }
                               textAnchor="end"
                             >
                               { yAxisValue }
@@ -228,7 +222,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <Text
                               x={ bar.y - onBarLabelPadding }
                               y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
-                              fill={ config.labelColor ? config.labelColor.hex : "#000" }
+                              fill={ labelColor }
                               textAnchor="end"
                             >
                               { xAxisValue }

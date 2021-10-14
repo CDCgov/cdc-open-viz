@@ -156,16 +156,6 @@ const Regions = memo(({config, updateConfig}) => {
 })
 
 const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
-const labelColors = [
-  {
-    'className': 'bg-black',
-    'hex': '#000000'
-  },
-  {
-    'className': 'bg-white',
-    'hex': '#F5F5F5'
-  }
-];
 
 const EditorPanel = () => {
   const {
@@ -653,23 +643,6 @@ const EditorPanel = () => {
                     })}
                   </ul>
 
-                  {config.yAxis.labelPlacement === "On Bar" &&
-                    <>
-                      <span className="h5">Label Color</span>
-                      <ul className="color-palette">
-                        {labelColors.map( (palette, index) => {
-                          if(!config.labelColor) {
-                            config.labelColor = labelColors[0];
-                          }
-                          return (
-                            <li title={ palette.className } key={ palette.className } onClick={ () => { updateConfig({...config, labelColor: palette})}} className={ config.labelColor === palette.className ? "selected " + palette.className : palette.className}>
-                              <span style={{ backgroundColor: labelColors[index].hex, width: "100%" }} />
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </>
-                  }
                   {config.visualizationType !== 'Pie' && (
                     <>
                       {config.visualizationSubType !== 'horizontal' &&
