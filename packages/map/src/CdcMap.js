@@ -16,7 +16,7 @@ import Canvg from 'canvg';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
@@ -39,6 +39,7 @@ import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
@@ -47,6 +48,7 @@ import WorldMap from './components/WorldMap'; // Future: Lazy
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
+const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
 
 const generateColorsArray = (color = '#000000', special = false) => {
@@ -145,6 +147,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 const geoName = row[obj.columns.geo.name]
 
                 uid = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
+            }
+
+            // County Check
+            if("county" === obj.general.geoType) {
+                const fips = row[obj.columns.geo.fips]
+
+                uid = countyKeys.find( (key) => key === fips )
             }
 
             // TODO: Points
@@ -795,6 +804,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = supportedCountries[key][0]
         }
 
+        if(countyKeys.includes(value)) {
+            value = supportedCounties[key]
+        }
+
         const dict = {
             "District of Columbia" : "Washington D.C."
         }
@@ -885,8 +898,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // If there's a name for the geo, add UIDs
-        if(newState.columns.geo.name) {
-            addUIDs(newState, newState.columns.geo.name)
+        if(newState.columns.geo.name || newState.columns.geo.fips) {
+            addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
         }
 
         if(newState.dataTable.forceDisplay === undefined){
@@ -1071,6 +1084,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                             {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                             {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                            {'county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
                             {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
