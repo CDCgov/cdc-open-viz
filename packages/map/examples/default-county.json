@@ -1,0 +1,56 @@
+{
+	"type": "map",
+	"general": {
+		"title": "Default County Map",
+		"subtext": "",
+		"territoriesLabel": "Territories",
+		"type": "data",
+		"geoType": "county",
+		"headerColor": "theme-blue",
+		"showSidebar": true,
+		"showTitle": true,
+		"geoBorderColor": "darkGray",
+		"showDownloadButton": true,
+		"expandDataTable": true
+	},
+	"color": "pinkpurple",
+	"columns": {
+		"geo": {
+			"fips": "county",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"name": "Insured Rate",
+			"label": "Data Label",
+			"prefix": "",
+			"suffix": "%",
+			"dataTable": true,
+			"tooltip": true
+		},
+		"navigate": {
+			"name": "link",
+			"tooltip": false,
+			"dataTable": false
+		}
+	},
+	"legend": {
+		"numberOfItems": 3,
+		"position": "side",
+		"title": "Legend Title",
+		"description": "Legend Text",
+		"type": "equalnumber",
+		"specialClasses": ["N/A"]
+	},
+	"filters": [],
+	"data": [
+		{
+			"Insured Rate": "8",
+			"Coverage Status": "Insured",
+			"county": "06071",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		}
+	]
+}
