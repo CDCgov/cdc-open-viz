@@ -150,7 +150,8 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
-          <AxisLeft
+          {!config.yAxis.hideAxis && (
+            <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
@@ -244,8 +245,10 @@ export default function LinearChart() {
               );
             }}
           </AxisLeft>
+          )}
 
           {/* X axis */}
+          {!config.xAxis.hideAxis && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -255,6 +258,7 @@ export default function LinearChart() {
             stroke="#333"
             tickStroke="#333"
             numTicks={config.runtime.xAxis.numTicks || undefined}
+            
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
@@ -301,6 +305,7 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
+          )}
 
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (
