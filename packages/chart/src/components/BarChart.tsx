@@ -1,25 +1,33 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
 import { Text } from '@visx/text';
+import chroma from 'chroma-js';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber, updateConfig } = useContext<any>(Context);
+  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
+  const { visualizationSubType } = config;
+  const [ isInitialRender, setIsInitialRender ] = useState(true);
+  const [textWidth, setTextWidth] = useState(null);
+  const [onBarLabelHeight, setOnBarLabelHeight] = useState(null);
+  const [onBarLabelPadding, setOnBarLabelPadding] = useState(15);
 
   React.useEffect(() => {
-    if(!config.barHeight) {
-      //config.barWidth = 25;
+    if(visualizationSubType === "horizontal" && config.yAxis.labelPlacement === "On Bar" && isInitialRender) {
+      setIsInitialRender(false)
       updateConfig({
         ...config,
-        barHeight: 25
+        barHeight: onBarLabelHeight,
+        barPadding: onBarLabelPadding,
       })
     }
-  }, [config, updateConfig]);
+
+  }, [onBarLabelHeight, config, updateConfig, onBarLabelPadding, visualizationSubType, isInitialRender]);
 
 
   return (
@@ -91,10 +99,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               color={() => {return '';}}
             >
               {(barGroups) => {
-                
+
                 if (config.visualizationSubType === "horizontal") {
                   const barsPerGroup = config.series.length;
-                  const barHeight = config.barHeight ? config.barHeight : 25;
+                  let barHeight = config.barHeight ? config.barHeight : 25;
                   let barPadding = barHeight;
                   
                   if(config.yAxis.labelPlacement === "Below Bar" || !config.yAxis.labelPlacement) {
@@ -106,6 +114,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   } else {
                     config.barPadding = barPadding / 2;
                   }
+
+                  if(config.yAxis.labelPlacement === "On Bar") {
+                    config.barHeight = onBarLabelHeight;
+                  } else {
+                    config.barHeight = barHeight;
+                  }
                   
                   config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length);
                 }
@@ -113,6 +127,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 return barGroups.map((barGroup) => (
                 <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar) => {
+
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = config.visualizationSubType === "horizontal" ? config.barHeight : Math.abs(yScale(bar.value) - yScale(0));
@@ -134,7 +149,23 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-      
+                    let onBarLabelPadding = null;
+                    let labelColor = "#000000"; 
+
+                    // Set label color
+                    if (chroma.contrast(labelColor, barColor) < 4.9) {
+                      labelColor = '#FFFFFF';
+                    }
+
+                    // font size and text spacing used for centering text on bar
+                    if(config.fontSize === "small") {
+                      onBarLabelPadding = 16;
+                    } else if(config.fontSize === "medium") {
+                      onBarLabelPadding = 18;
+                    } else{
+                      onBarLabelPadding = 20;
+                    }
+                    const onBarTextSpacing = 25;
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
@@ -166,6 +197,58 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
+                      {visualizationSubType === "horizontal" && textWidth + 100 < bar.y ? 
+                      config.yAxis.labelPlacement === "On Bar" &&
+                        <Group>
+                            <Text
+                              innerRef={
+                                (e) => {
+                                  if(e) {
+                                    // use font sizes and padding to set the bar height
+                                    let elem = e.getBBox()
+                                    setTextWidth(elem.width)
+                                    setOnBarLabelHeight( (elem.height * 2) + (onBarLabelPadding * 2) + onBarTextSpacing / 2 )
+                                    setOnBarLabelPadding( onBarLabelHeight / 2 )
+                                  }
+                                }
+                              }
+                              x={ bar.y - onBarLabelPadding }
+                              y={ barHeight * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
+                              fill={ labelColor }
+                              textAnchor="end"
+                            >
+                              { yAxisValue }
+                            </Text>
+                            <Text
+                              x={ bar.y - onBarLabelPadding }
+                              y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
+                              fill={ labelColor }
+                              textAnchor="end"
+                            >
+                              { xAxisValue }
+                            </Text>
+                        </Group>
+                      :
+                      (visualizationSubType === "horizontal" && config.yAxis.labelPlacement === "On Bar") &&
+                        <Group>
+                            <Text
+                                x={ bar.y + onBarLabelPadding }
+                                y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
+                                fill={ "#000" }
+                                textAnchor="start"
+                                verticalAnchor="end"
+                              >{yAxisValue}</Text>
+                            <Text
+                                x={ bar.y + onBarLabelPadding }
+                                y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
+                                fill={ "#000" }
+                                textAnchor="start"
+                                verticalAnchor="end"
+                              >
+                                { xAxisValue }
+                              </Text>
+                        </Group>
+                      }
                     </Group>
                   )}
                   )}
