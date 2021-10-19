@@ -9,11 +9,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@cdc/core@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@cdc/core/-/core-1.1.2.tgz#71ac97d6b86308172b7112a242921f6d0ec2b60f"
-  integrity sha512-pUCrVF2ZsCDWYi9V2EXtR+6NHqfjT/ASv4dhX2sbtVxCwPb24CoV0Q9LT8oAjc/hV5P/vQ28ebpxmF91caFBdA==
-
 "@types/d3-color@^1":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@types/d3-color/-/d3-color-1.4.2.tgz#944f281d04a0f06e134ea96adbb68303515b2784"
