@@ -22,6 +22,7 @@
     "@cdc/core": "^1.1.2",
     "@cdc/dashboard": "^1.1.2",
     "@cdc/data-bite": "^1.1.2",
+    "@cdc/waffle-chart": "^1.0.0",
     "@cdc/map": "^2.6.2",
     "axios": "^0.21.1",
     "d3": "^7.0.0",
