@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group';
 import { Circle, Bar } from '@visx/shape';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Loading from '@cdc/core/components/Loading'
@@ -332,42 +333,74 @@ const CdcWaffleChart = (
   const [ config, setConfig ] = useState({ theme: '', data: {}})
   const [ loading, setLoading ] = useState(true)
 
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  //Observes changes to outermost container and changes viewport size in state
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
+
+        setCurrentViewport(newViewport)
+    }
+  });
+
+  const dave = 'cummo';
+  debugger;
+
   const updateConfig = (newConfig) => {
+    console.log('updateConfig called');
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
-    })
+    });
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {}
-    newConfig.runtime.uniqueId = Date.now()
+    newConfig.runtime = {};
+    newConfig.runtime.uniqueId = Date.now();
 
     //Check things that are needed and set error messages if needed
-    newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    newConfig.runtime.editorErrorMessage = '';
+    setConfig(newConfig);
   }
 
-  useEffect(() => {
-    const loadData = async () => {
-      let response = configObj || await (await fetch(configUrl)).json()
+  const loadConfig = async () => {
+    console.log('loadConfig called');
+    let response = configObj || await (await fetch(configUrl)).json();
 
-      // If data is included through a URL, fetch that and store
-      let responseData = response.data ?? {}
+    // If data is included through a URL, fetch that and store
+    let responseData = response.data ?? {}
 
-      if (response.dataUrl) {
-        const dataString = await fetch(response.dataUrl)
-        responseData = await dataString.json()
-      }
-
-      response.data = responseData
-
-      updateConfig({ ...defaults, ...response })
+    if(response.dataUrl) {
+      const dataString = await fetch(response.dataUrl);
+      responseData = await dataString.json();
     }
 
-    loadData().then(r => setLoading(false))
-  }, [ configObj, configUrl ])
+    response.data = responseData;
+
+    updateConfig({ ...defaults, ...response });
+    setLoading(false);
+  }
+
+  // Load data when component first mounts
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  },[]);
+
+  useEffect(() => {
+    console.log('empty useEffect');
+    loadConfig();
+  }, [])
+
+  if(configObj) {
+    useEffect(() => {
+      console.log('last useEffect called');
+      loadConfig();
+    }, [configObj.data])
+  }
 
   let body = (<Loading/>)
 
@@ -378,7 +411,7 @@ const CdcWaffleChart = (
 
     body = (
       <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' '): ''}`}
-           style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
+           style={isEditor ? { paddingLeft: 350 + 'px' } : null} ref={outerContainerRef}>
         {isEditor && <EditorPanel/>}
         <WaffleChart config={config}/>
       </div>
