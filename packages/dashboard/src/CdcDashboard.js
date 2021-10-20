@@ -48,6 +48,7 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = type;
       break
     case 'waffle-chart':
+      debugger;
       newVisualizationConfig.visualizationType = type;
       break;
   }
@@ -298,11 +299,11 @@ export default function CdcDashboard(
             body = <><Header back={back} subEditor="Map" /><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>;
             break;
           case 'data-bite':
-            visualizationConfig = {...visualizationConfig, newViz: true}
+            //visualizationConfig = {...visualizationConfig, newViz: true}
             body = <><Header back={back} subEditor="Data Bite" /><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
           case 'waffle-chart':
-            visualizationConfig = {...visualizationConfig, newViz: true}
+            //visualizationConfig = {...visualizationConfig, newViz: true}
             body = <><Header back={back} subEditor="Waffle Chart" /><CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
         }
