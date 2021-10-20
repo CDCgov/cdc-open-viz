@@ -190,9 +190,9 @@ const EditorPanel = memo(() => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if(false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
+    //if(false === missingRequiredSections()) {
+      //strippedState.newViz
+    //}
     delete strippedState.runtime
 
     return strippedState
