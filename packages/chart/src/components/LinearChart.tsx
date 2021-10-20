@@ -186,19 +186,6 @@ export default function LinearChart() {
                         }
                         
 
-                        { config.visualizationSubType === "horizontal" && ( config.yAxis.labelPlacement === 'Below Bar' || !config.yAxis.labelPlacement ) &&
-                          <Text
-                            x={config.runtime.horizontal ? tick.from.x + 5 : tick.to.x}
-                            y={ (config.barHeight > 40 )
-                              ?  tick.from.y + (config.barPadding / 2) + belowBarPaddingFromTop
-                              // all items / 2 + padding
-                              : tick.from.y + (config.series.length * config.barHeight / 2) - config.barPadding / 2 + belowBarPaddingFromTop
-                            }
-                            verticalAnchor={"start"}
-                            textAnchor={"start"}
-                          >{tick.formattedValue}</Text>
-                        }
-
                         { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
                             <Text
                               transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
