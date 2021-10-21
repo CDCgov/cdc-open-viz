@@ -150,7 +150,8 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
-          <AxisLeft
+          {!config.yAxis.hideAxis && (
+            <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
@@ -158,8 +159,9 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
-            const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+              const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
+              const belowBarPaddingFromTop = 9;
               return (
                 <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
@@ -182,12 +184,27 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        <Text
-                          x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                          y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
-                          textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                        >{tick.formattedValue}</Text>
+                        
+
+                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
+                            <Text
+                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={"middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                        }
+
+                        { config.visualizationSubType !== "horizontal" &&
+                            <Text
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                              textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                        }
+
                       </Group>
                     );
                   })}
@@ -215,8 +232,10 @@ export default function LinearChart() {
               );
             }}
           </AxisLeft>
+          )}
 
           {/* X axis */}
+          {!config.xAxis.hideAxis && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -226,6 +245,7 @@ export default function LinearChart() {
             stroke="#333"
             tickStroke="#333"
             numTicks={config.runtime.xAxis.numTicks || undefined}
+            
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
@@ -272,6 +292,7 @@ export default function LinearChart() {
               );
             }}
           </AxisBottom>
+          )}
 
           {/* Line chart */}
           { config.visualizationType !== 'Line' && (

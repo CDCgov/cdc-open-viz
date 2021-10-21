@@ -27,15 +27,17 @@ export default function DataTable() {
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
-  const DownloadButton = memo(({ data }: any) => {
+  const DownloadButton = ({ data }: any) => {
     const fileName = `${config.title.substring(0, 50)}.csv`;
 
     const csvData = Papa.unparse(data);
 
     const saveBlob = () => {
-      if (navigator.msSaveBlob) {
-        const dataBlob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
-        navigator.msSaveBlob(dataBlob, fileName);
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        const dataBlob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        //@ts-ignore
+        window.navigator.msSaveBlob(dataBlob, fileName);
       }
     }
 
@@ -50,7 +52,7 @@ export default function DataTable() {
         Download Data (CSV)
       </a>
     )
-  });
+  };
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {

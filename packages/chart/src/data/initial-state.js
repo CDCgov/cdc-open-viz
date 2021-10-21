@@ -3,7 +3,8 @@ export default {
     title: '',
     theme: 'theme-blue',
     fontSize: 'medium',
-    height: 500,
+    lineDatapointStyle: 'hover',
+    barHasBorder: 'false',
     padding: {
         left: 5,
         right: 5

@@ -14,18 +14,12 @@ This project is still under heavy initial development with the roadmap extending
 
 ## Setup <a name="setup"></a>
 
-This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [npm](https://www.npmjs.com/) for package management (as opposed to Yarn.) To work on individual packages you must setup the entire monorepo.
+This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [yarn](https://yarnpkg.com/) for package management. Make sure you have yarn installed before beginning. To work on individual packages you must setup the entire monorepo.
 
-1. Start by cloning this repo and running `npm install` at the root. 
-2. Run `npm i -g lerna` so you will have system wide access to Lerna at the command line.
-3. Run `lerna link --force-local` which will tell Lerna to auto symlink the packages locally with each other (this will let you make a change in one and see it reflected in the others after building.)
-4. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-5. NOTE: To run the **editor** you will also need to build the packages that it consumes:
-  - `lerna run --scope @cdc/map build`
-  - `lerna run --scope @cdc/chart build`
-  - `lerna run --scope @cdc/dashboard build`
-  - `lerna run --scope @cdc/data-bite build`
-6. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's namee (ex: `@cdc/map`).
+1. Start by cloning this repo and running `yarn install` at the root. 
+2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
+3. Run `lerna run build` to build all of the packages in the correct order.
+4. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
 
 ## Development Guidelines
 

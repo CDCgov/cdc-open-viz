@@ -116,17 +116,17 @@ const EditorPanel = (props) => {
 
   const DynamicDesc = ({label, fieldName, value: stateValue, type = "input", helper = null, ...attributes}) => {
     const [ value, setValue ] = useState(stateValue);
-  
+
     const [ debouncedValue ] = useDebounce(value, 500);
-  
+
     useEffect(() => {
       if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
         handleEditorChanges("changeLegendDescription", [String(activeFilterValueForDescription), debouncedValue])
       }
     }, [debouncedValue])
-  
+
     const onChange = (e) => setValue(e.target.value);
-  
+
     return (
       <textarea onChange={onChange} {...attributes} value={value}></textarea>
     )
@@ -589,7 +589,7 @@ const EditorPanel = (props) => {
     const filterName = state.filters[ arr[0] ].label || `Unlabeled Legend`
 
     const filterValue = runtimeFilters[ arr[0] ]
-    
+
     if(filterValue) {
       return filterName + ' - ' + filterValue.values[ arr[1] ]
     }
@@ -655,7 +655,7 @@ const EditorPanel = (props) => {
   }, [runtimeLegend])
 
   const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
-  
+
   columnsInData.map(colName => {
     columnsOptions.push(<option value={colName} key={colName}>{colName}</option>)
   })
@@ -701,7 +701,7 @@ const EditorPanel = (props) => {
 
     setState(updatedState)
   }
-  
+
   const onBackClick = () => {
     setDisplayPanel(!displayPanel);
   }
@@ -739,7 +739,6 @@ const EditorPanel = (props) => {
 
   useEffect(() => {
     const parsedData = convertStateToConfig()
-
     const formattedData = JSON.stringify(parsedData, undefined, 2);
 
     setConfigTextbox(formattedData)
@@ -1077,6 +1076,7 @@ const EditorPanel = (props) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={dataTable.title} updateField={updateField} section="dataTable" fieldName="title" label="Data Table Title" placeholder="Data Table" />
+                  <TextField value={dataTable.indexTitle} updateField={updateField} section="dataTable" fieldName="indexTitle" label="Index Column Title" placeholder="Location" />
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard } onChange={(event) => { handleEditorChanges("showDataTable", event.target.checked) }} />
                     <span className="edit-label">Show Table</span>
