@@ -184,15 +184,6 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        
-
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
-                            <Text
-                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                              verticalAnchor={"middle"}
-                              textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
-                        }
 
                         { config.visualizationSubType !== "horizontal" &&
                             <Text
