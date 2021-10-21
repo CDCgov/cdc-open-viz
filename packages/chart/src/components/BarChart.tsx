@@ -23,6 +23,18 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const [horizBarHeight, setHorizBarHeight] = useState(null);
   const [textWidth, setTextWidth] = useState(null);
 
+  useEffect(() => {
+    if(config.visualizationSubType === "horizontal" && !config.yAxis.labelPlacement) {
+      updateConfig({
+        ...config,
+        yAxis: {
+          ...config,
+          labelPlacement: "On Y-Axis"
+        }
+      })
+    }
+  }, [config, updateConfig]);
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>

@@ -18,7 +18,6 @@
     },
     "yAxis": {
         "label": "Measurement (1000km)",
-        "labelPlacement": "Below Bar",
         "displayNumbersOnBar": true
     },
     "xAxis": {
