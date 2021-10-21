@@ -447,21 +447,21 @@ export default function DataImport() {
                                   <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
                                       <p>Each row contains the data for an individual series in itself.</p>
                                       <table>
-                                          <tbody>
+                                      <tbody>
                                             <tr>
-                                                <th>Virus</th>
-                                                <th>01/01/2020</th>
-                                                <th>02/01/2020</th>
+                                                <th>Date</th>
+                                                <th>Virus 1</th>
+                                                <th>Virus 2</th>
                                                 <th>...</th>
                                             </tr>
                                             <tr>
-                                                <td>Virus 1</td>
+                                                <td>01/01/2020</td>
                                                 <td>100</td>
                                                 <td>150</td>
                                                 <td>...</td>
                                             </tr>
                                             <tr>
-                                                <td>Virus 2</td>
+                                                <td>02/01/2020</td>
                                                 <td>15</td>
                                                 <td>20</td>
                                                 <td>...</td>

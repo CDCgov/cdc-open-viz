@@ -1,0 +1,36 @@
+{
+    "title": "Planet Radius (Combo Example)",
+    "dataUrl":  "/examples/planet-example-data.json",
+    "visualizationType": "Bar",
+    "barHeight": "75",
+	"visualizationSubType": "horizontal",
+    "barHasBorder": "true",
+    "series": [{"dataKey":"Radius", "type":"Line"}, {"dataKey":"Diameter", "type":"Bar"}],
+    "dataFormat": {
+        "roundTo": 1,
+        "commas": false,
+        "prefix": "",
+        "suffix": "km"
+    },
+    "padding": {
+        "left": 0,
+        "right": 0
+    },
+    "yAxis": {
+        "label": "Measurement (1000km)",
+        "displayNumbersOnBar": true
+    },
+    "xAxis": {
+        "label": "Planet",
+        "dataKey": "name",
+        "tickRotation": 30,
+        "size": 75
+    },
+    "legend": {
+        "hide": false
+    },
+    "table": {
+        "label": "Data Table",
+        "expanded": false
+    }
+}

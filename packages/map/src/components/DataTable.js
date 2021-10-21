@@ -13,6 +13,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 const DataTable = (props) => {
   const {
     tableTitle,
+    indexTitle,
     mapTitle,
     rawData,
     showDownloadButton,
@@ -137,7 +138,9 @@ const DataTable = (props) => {
     const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
 
     const saveBlob = () => {
-      if (navigator.msSaveBlob) {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        //@ts-ignore
         navigator.msSaveBlob(blob, fileName);
       }
     }
@@ -176,7 +179,7 @@ const DataTable = (props) => {
         };
 
         if (column === 'geo') {
-          newCol.Header = 'Location';
+          newCol.Header = indexTitle || 'Location';
           newCol.Cell = ({ row, value }) => {
             const rowObj = runtimeData[row.original];
 
@@ -208,7 +211,7 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [columns, runtimeData, runtimeLegend]);
+  }, [indexTitle, columns, runtimeData, runtimeLegend]);
 
   const tableData = useMemo(
     () => Object.keys(runtimeData).filter((key) => applyLegendToRow(runtimeData[key])).sort((a, b) => customSort(a, b)),
@@ -264,10 +267,10 @@ const DataTable = (props) => {
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th tabIndex="0" 
+                  <th tabIndex="0"
                     title={column.Header}
-                    {...column.getHeaderProps(column.getSortByToggleProps())} 
-                    className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}
                     onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
                   >
                     {column.render('Header')}

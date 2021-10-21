@@ -506,8 +506,14 @@ export default function CdcChart(
 
   // Prevent render if loading
   let body = (<Loading />)
+  let lineDatapointClass = ''
+  let barBorderClass = ''
 
   if(false === loading) {
+    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
+    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
+    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -517,7 +523,7 @@ export default function CdcChart(
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
-          <div className={`chart-container ${config.legend.hide ? 'legend-hidden' : ''}`}>
+          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
             {chartComponents[visualizationType]}
             {/* Legend */}
             {!config.legend.hide && <Legend />}
@@ -530,10 +536,10 @@ export default function CdcChart(
       </>
     )
   }
-
+  console.log("unfiltereds", config.unfilteredData);
   const contextValues = {
     config,
-    rawData: config.data,
+    rawData: data ?? {},
     filteredData: filteredData ?? data,
     unfilteredData: data,
     seriesHighlight,

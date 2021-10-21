@@ -109,7 +109,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-    
+
             setCurrentViewport(newViewport)
         }
     });
@@ -136,7 +136,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 // Cities
                 if(!uid) {
-                    uid = cityKeys.find( (key) => key === geoName) 
+                    uid = cityKeys.find( (key) => key === geoName)
                 }
             }
 
@@ -161,22 +161,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     })
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
+
         const newLegendMemo = new Map(); // Reset memoization
-    
+
         const
             primaryCol = obj.columns.primary.name,
             type = obj.legend.type,
             number = obj.legend.numberOfItems,
             result = [];
-    
+
         // Add a hash for what we're working from if passed
         if(hash) {
             result.fromHash = hash
         }
-    
-        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use 
+
+        // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
         let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
-    
+
         const colorDistributions = {
             1: [ 1 ],
             2: [ 1, 3 ],
@@ -188,39 +189,41 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
             9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
         }
-    
+
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
-            let mapColorPalette = colorPalettes[obj.color] || colorPalettes['bluegreen']
-    
+            let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
+
             let colorIdx = legendIdx - specialClasses
-    
+
             // Special Classes (No Data)
             if (result[legendIdx].special) {
                 const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
-    
+
                 return specialClassColors[ legendIdx ]
             }
-    
+
             if ( obj.color.includes( 'qualitative' ) ) return mapColorPalette[colorIdx]
-    
+
             let amt = Math.max( result.length - specialClasses, 1 )
             let distributionArray = colorDistributions[ amt ]
-    
+
             const specificColor = distributionArray[ colorIdx ]
-        
+
             return mapColorPalette[specificColor]
         }
-    
+
         let specialClasses = 0
         let specialClassesHash = {}
-    
+
         // Special classes
         if (obj.legend.specialClasses.length) {
             dataSet = dataSet.filter(row => {
                 const val = row[primaryCol]
-    
+
                 if( obj.legend.specialClasses.includes(val) ) {
+
+                    // apply the special color to the legend
                     if(undefined === specialClassesHash[val]) {
                         specialClassesHash[val] = true
 
@@ -228,47 +231,58 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                             special: true,
                             value: val
                         })
-        
+
                         result[result.length - 1].color = applyColorToLegend(result.length - 1)
-    
+
                         specialClasses += 1
                     }
-    
-                    newLegendMemo.set( hashObj(row), result.length - 1)
-    
+                
+                    let specialColor = '';
+                    
+                    // color the state if val is in row 
+                    if ( Object.values(row).includes(val) ) {
+                        specialColor = result.findIndex(p => p.value === val)
+                    }
+                    newLegendMemo.set( hashObj(row), specialColor)
+
                     return false
                 }
-    
+
                 return true
             })
         }
-    
+
         // Category
         if('category' === type) {
             let uniqueValues = new Map()
             let count = 0
-    
+
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
                 let value = row[primaryCol]
-                
+
                 if(undefined === value) continue
-    
+
                 if(false === uniqueValues.has(value)) {
                     uniqueValues.set(value, [hashObj(row)]);
                     count++
                 } else {
                     uniqueValues.get(value).push(hashObj(row))
                 }
-    
+
                 if(count === 9) break // Can only have 9 categorical items for now
             }
-    
+
             let sorted = [...uniqueValues.keys()]
-    
+
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-    
+
+            // Coerce strings to numbers inside configuredOrder property
+            for(let i = 0; i < configuredOrder.length; i++) {
+                configuredOrder[i] = numberFromString(configuredOrder[i])
+            }
+
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
@@ -276,22 +290,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             } else {
                 sorted.sort((a, b) => a - b)
             }
-    
+
             // Add legend item for each
             sorted.forEach((val) => {
                 result.push({
                     value: val,
                 })
-    
+
                 let lastIdx = result.length - 1
                 let arr = uniqueValues.get(val)
-    
+
                 if(arr) {
                     arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
                 }
             })
-    
-            
+
+
             // Add color to new legend item
             for(let i = 0; i < result.length; i++) {
                 result[i].color = applyColorToLegend(i)
@@ -299,40 +313,40 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             legendMemo.current = newLegendMemo
             return result
         }
-    
+
         let legendNumber = number
-    
+
         // Separate zero
-        if(true === obj.legend.separateZero) {   
-            let addLegendItem = false; 
-       
+        if(true === obj.legend.separateZero) {
+            let addLegendItem = false;
+
             for(let i = 0; i < dataSet.length; i++) {
                 if (dataSet[i][primaryCol] === 0) {
                     addLegendItem = true
-    
+
                     let row = dataSet.splice(i, 1)[0]
-    
+
                     newLegendMemo.set( hashObj(row), result.length)
                     i--
                 }
             }
-    
+
             if(addLegendItem) {
                 legendNumber -= 1 // This zero takes up one legend item
-    
+
                 // Add new legend item
                 result.push({
                     min: 0,
                     max: 0
                 })
-    
+
                 let lastIdx = result.length - 1
-    
+
                 // Add color to new legend item
                 result[lastIdx].color = applyColorToLegend(lastIdx)
             }
         }
-    
+
         // Sort data for use in equalnumber or equalinterval
         dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
             let aNum = a[primaryCol]
@@ -344,77 +358,77 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Equal Number
         if(type === 'equalnumber') {
             let numberOfRows = dataSet.length
-    
+
             let remainder
             let changingNumber = legendNumber
-    
+
             let chunkAmt
-    
+
             // Loop through the array until it has been split into equal subarrays
             while ( numberOfRows > 0 ) {
                 remainder = numberOfRows % changingNumber
-    
+
                 chunkAmt = Math.floor(numberOfRows / changingNumber)
-    
+
                 if (remainder > 0) {
                     chunkAmt += 1
                 }
-                
+
                 let removedRows = dataSet.splice(0, chunkAmt);
-    
+
                 let min = removedRows[0][primaryCol],
                     max = removedRows[removedRows.length - 1][primaryCol]
-    
+
                 removedRows.forEach(row => {
                     newLegendMemo.set( hashObj(row), result.length )
                 })
-    
+
                 result.push({
                     min,
                     max
                 })
-    
+
                 result[result.length - 1].color = applyColorToLegend(result.length - 1)
-    
+
                 changingNumber -= 1
                 numberOfRows -= chunkAmt
             }
         }
-    
+
         // Equal Interval
         if(type === 'equalinterval') {
             dataSet = dataSet.filter(row => row[primaryCol])
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
-    
+
             let pointer = 0 // Start at beginning of dataSet
-    
+
             for (let i = 0; i < legendNumber; i++) {
                 let interval = Math.abs(dataMax - dataMin) / legendNumber
-    
-                let min = dataMin + (interval * i)    
+
+                let min = dataMin + (interval * i)
                 let max = min + interval
-    
+
                 // If this is the last loop, assign actual max of data as the end point
                 if (i === legendNumber - 1) max = dataMax
-    
+
                 // Add rows in dataSet that belong to this new legend item since we've got the data sorted
                 while(pointer < dataSet.length && dataSet[pointer][primaryCol] <= max) {
                     newLegendMemo.set(hashObj(dataSet[pointer]), result.length )
                     pointer += 1
                 }
-    
+
                 let range = {
                     min: Math.round(min * 100) / 100,
                     max: Math.round(max * 100) / 100,
                 }
-    
+
                 result.push(range)
-    
+
                 result[result.length - 1].color = applyColorToLegend(result.length - 1)
             }
         }
-    
+
         result.forEach((legendItem, idx) => {
             legendItem.color = applyColorToLegend(idx, specialClasses, result)
         })
@@ -425,52 +439,50 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
         if(undefined === obj.filters || obj.filters.length === 0) return []
-    
+
         let filters = []
-    
+
         if(hash) filters.fromHash = hash
-    
+
         obj.filters.forEach(({columnName, label}, idx) => {
             if(undefined === columnName) return
-    
+
             let newFilter = runtimeFilters[idx]
             let values = getUniqueValues(state.data, columnName)
 
-            // values = values.map(el => numberFromString(el)) // coerce to pure number if possible
-    
             if(undefined === newFilter) {
                 newFilter = {}
             }
-    
+
             newFilter.label = label ?? ''
             newFilter.columnName = columnName
             newFilter.values = values
             newFilter.active = values[0] // Default to first found value
-    
+
             filters.push(newFilter)
         })
-        
+
         return filters
     })
-    
+
     // Calculates what's going to be displayed on the map and data table at render.
     const generateRuntimeData = useCallback((obj, filters, hash) => {
         const result = {}
-    
+
         if(hash) {
             // Adding property this way prevents it from being enumerated
             Object.defineProperty(result, 'fromHash', {
                 value : hash
             });
         }
-    
+
         obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
-    
+
             if(row[obj.columns.primary.name]) {
                 row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
             }
-    
+
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
@@ -482,7 +494,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     return false
                 }
             }
-    
+
             // Filters
             if(filters.length) {
                 for(let i = 0; i < filters.length; i++) {
@@ -491,13 +503,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     if (row[columnName] != active) return false // Bail out, not part of filter
                 }
             }
-    
+
             // Don't add additional rows with same UID
             if(undefined === result[row.uid]) {
                 result[row.uid] = row
             }
         })
-    
+
         return result
     })
 
@@ -733,9 +745,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         try {
             const urlObj = new URL(url);
             const regex = /(?:\.([^.]+))?$/
-          
+
             let data = []
-          
+
             const ext = (regex.exec(urlObj.pathname)[1])
             if ('csv' === ext) {
                 data = await fetch(url)
@@ -748,7 +760,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         return parsedCsv.data
                     })
             }
-          
+
             if ('json' === ext) {
                 data = await fetch(url)
                     .then(response => response.json())
@@ -919,9 +931,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Filters
         const hashFilters = hashObj(state.filters)
+        let filters;
 
         if(state.filters && hashFilters !== runtimeFilters.fromHash) {
-            const filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
+            filters = generateRuntimeFilters(state, hashFilters, runtimeFilters)
 
             if(filters) {
                 setRuntimeFilters(filters)
@@ -930,6 +943,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const hashLegend = hashObj({
             color: state.color,
+            customColors: state.customColors,
             numberOfItems: state.legend.numberOfItems,
             type: state.legend.type,
             separateZero: state.legend.separateZero ?? false,
@@ -939,9 +953,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Legend
-        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
+        if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-
             setRuntimeLegend(legend)
         }
 
@@ -955,9 +968,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, runtimeFilters, hashData)
-
-            setRuntimeData(data)
+            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(data) 
         }
     }, [state])
 
@@ -1103,6 +1115,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         displayGeoName={displayGeoName}
                         applyLegendToRow={applyLegendToRow}
                         tableTitle={dataTable.title}
+                        indexTitle={dataTable.indexTitle}
                         mapTitle={general.title}
                         viewport={currentViewport}
                     />
