@@ -29,7 +29,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         ...config,
         yAxis: {
           ...config,
-          labelPlacement: "On Y-Axis"
+          labelPlacement: "Below Bar"
         }
       })
     }
