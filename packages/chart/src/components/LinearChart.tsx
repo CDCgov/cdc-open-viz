@@ -184,7 +184,6 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        
 
                         { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
                             <Text
@@ -193,6 +192,7 @@ export default function LinearChart() {
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
                         }
+
 
                         { config.visualizationSubType !== "horizontal" &&
                             <Text
