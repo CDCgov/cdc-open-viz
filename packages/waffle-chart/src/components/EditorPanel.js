@@ -458,8 +458,6 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {/*<Select value={config.biteLocation} fieldName="biteLocation" label="Waffle Chart Placement"
-                          updateField={updateField} options={BITE_LOCATIONS} initial="Select"/>*/}
                   <Select value={config.shape} fieldName="shape" label="Shape"
                           updateField={updateField} options={[ 'circle', 'square', 'person' ]}/>
 
@@ -474,8 +472,20 @@ const EditorPanel = memo(() => {
 
                   <Select value={config.orientation} fieldName="orientation" label="Layout"
                           updateField={updateField} options={[ 'horizontal', 'vertical' ]}/>
-                  <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size"
+
+                  <label><span className="edit-label column-heading">Data Point Font Size</span></label>
+                  <div className="accordion__panel-row accordion__small-inputs align-center">
+                    <div className="accordion__panel-col">
+                      <TextField type="number" value={config.fontSize} fieldName="fontSize" updateField={updateField}/>
+                    </div>
+                    <div className="accordion__panel-col">
+                      <label className={'accordion__panel-label--muted'}>default (50px)</label>
+                    </div>
+                  </div>
+
+                  <Select value={config.overallFontSize} fieldName="overallFontSize" label="Overall Font Size"
                           updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
+
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
