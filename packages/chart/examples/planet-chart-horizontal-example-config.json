@@ -18,7 +18,8 @@
     },
     "yAxis": {
         "label": "Measurement (1000km)",
-        "displayNumbersOnBar": true
+        "displayNumbersOnBar": true,
+        "labelPlacement": "On Y-Axis"
     },
     "xAxis": {
         "label": "Planet",
