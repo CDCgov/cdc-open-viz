@@ -337,7 +337,12 @@ export default function CdcChart(
     let original = num;
     let prefix = config.dataFormat.prefix;
     num = numberFromString(num);
-    if(isNaN(num)) config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
+
+    if(isNaN(num)) {
+      config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
+      return
+    }
+
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
