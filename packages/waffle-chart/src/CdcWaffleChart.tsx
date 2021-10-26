@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
-import { Group } from '@visx/group';
-import { Circle, Bar } from '@visx/shape';
-import ResizeObserver from 'resize-observer-polyfill';
-import getViewport from '@cdc/core/helpers/getViewport';
+import { Group } from '@visx/group'
+import { Circle, Bar } from '@visx/shape'
+import ResizeObserver from 'resize-observer-polyfill'
+import getViewport from '@cdc/core/helpers/getViewport'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
 import EditorPanel from './components/EditorPanel'
@@ -27,7 +27,7 @@ const themeColor = {
   'theme-amber': '#fbab18',
 }
 
-const WaffleChart = ({ config }) => {
+const WaffleChart = ({ config, isEditor }) => {
   let {
     title,
     theme,
@@ -56,26 +56,26 @@ const WaffleChart = ({ config }) => {
 
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return '';
+      return ''
     }
 
     const getColumnSum = (arr) => {
       if (Array.isArray(arr) && arr.length > 0) {
-        const sum = arr.reduce((sum, x) => sum + x);
-        return applyPrecision(sum);
+        const sum = arr.reduce((sum, x) => sum + x)
+        return applyPrecision(sum)
       }
     }
 
     const getColumnMean = (arr) => {
-      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0];
-      return applyPrecision(mean);
+      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0]
+      return applyPrecision(mean)
     }
 
     const getMode = (arr) => {
       let freq = {}
       let max = -Infinity
 
-      for(let i = 0; i < arr.length; i++) {
+      for (let i = 0; i < arr.length; i++) {
         if (freq[arr[i]]) {
           freq[arr[i]] += 1
         } else {
@@ -89,8 +89,8 @@ const WaffleChart = ({ config }) => {
 
       let res = []
 
-      for(let key in freq) {
-        if(freq[key] === max) res.push(key)
+      for (let key in freq) {
+        if (freq[key] === max) res.push(key)
       }
 
       return res
@@ -98,59 +98,59 @@ const WaffleChart = ({ config }) => {
 
     const getMedian = arr => {
       const mid = Math.floor(arr.length / 2),
-        nums = [...arr].sort((a, b) => a - b);
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
-      return applyPrecision(value);
-    };
+        nums = [ ...arr ].sort((a, b) => a - b)
+      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
+      return applyPrecision(value)
+    }
 
     const applyPrecision = (value) => {
-      if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace)>-1) {
-        value = Number(value).toFixed(Number(roundToPlace));
+      if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace) > -1) {
+        value = Number(value).toFixed(Number(roundToPlace))
       }
-      return value;
+      return value
     }
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data
 
     filters.map((filter) => {
-      if ( filter.columnName && filter.columnValue ) {
+      if (filter.columnName && filter.columnValue) {
         filteredData = filteredData.filter(function (e) {
-          return e[filter.columnName] === filter.columnValue;
-        });
+          return e[filter.columnName] === filter.columnValue
+        })
       } else {
-        return false;
+        return false
       }
-    });
+    })
 
     let conditionalData = []
 
     if (dataConditionalColumn !== '' && dataConditionalOperator !== '' && dataConditionalComparate !== '') {
       switch (dataConditionalOperator) {
         case ('<'):
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] < dataConditionalComparate )
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] < dataConditionalComparate)
           break
         case ('>'):
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] > dataConditionalComparate )
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] > dataConditionalComparate)
           break
         case ('<='):
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] <= dataConditionalComparate )
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] <= dataConditionalComparate)
           break
         case ('>='):
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] >= dataConditionalComparate )
+          conditionalData = filteredData.filter(e => e[dataConditionalColumn] >= dataConditionalComparate)
           break
         case ('='):
           if (isNaN(Number(dataConditionalComparate))) {
-            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) === dataConditionalComparate )
+            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) === dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] === dataConditionalComparate )
+            conditionalData = filteredData.filter(e => e[dataConditionalColumn] === dataConditionalComparate)
           }
           break
         case ('≠'):
           if (isNaN(Number(dataConditionalComparate))) {
-            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) !== dataConditionalComparate )
+            conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) !== dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] !== dataConditionalComparate )
+            conditionalData = filteredData.filter(e => e[dataConditionalColumn] !== dataConditionalComparate)
           }
           break
         default:
@@ -164,47 +164,47 @@ const WaffleChart = ({ config }) => {
 
     //Filter the column's data for numerical values only
     let numericalData = columnData.filter((value) => {
-      let include = false;
-      if ( Number(value) || Number.isFinite(Number(value)) ) {
-        include = true;
+      let include = false
+      if (Number(value) || Number.isFinite(Number(value))) {
+        include = true
       }
-      return include;
-    }).map(Number);
+      return include
+    }).map(Number)
 
     let numericalDenomData = denomColumnData.filter((value) => {
-      let include = false;
-      if ( Number(value) || Number.isFinite(Number(value)) ) {
-        include = true;
+      let include = false
+      if (Number(value) || Number.isFinite(Number(value))) {
+        include = true
       }
-      return include;
-    }).map(Number);
+      return include
+    }).map(Number)
 
     let waffleNumerator = ''
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
-        waffleNumerator = String(numericalData.length);
-        break;
+        waffleNumerator = String(numericalData.length)
+        break
       case DATA_FUNCTION_SUM:
-        waffleNumerator = String(getColumnSum(numericalData));
-        break;
+        waffleNumerator = String(getColumnSum(numericalData))
+        break
       case DATA_FUNCTION_MEAN:
-        waffleNumerator = String(getColumnMean(numericalData));
-        break;
+        waffleNumerator = String(getColumnMean(numericalData))
+        break
       case DATA_FUNCTION_MEDIAN:
-        waffleNumerator = getMedian(numericalData).toString();
-        break;
+        waffleNumerator = getMedian(numericalData).toString()
+        break
       case DATA_FUNCTION_MAX:
-        waffleNumerator = Math.max(...numericalData).toString();
-        break;
+        waffleNumerator = Math.max(...numericalData).toString()
+        break
       case DATA_FUNCTION_MIN:
-        waffleNumerator = Math.min(...numericalData).toString();
-        break;
+        waffleNumerator = Math.min(...numericalData).toString()
+        break
       case DATA_FUNCTION_MODE:
-        waffleNumerator = getMode(numericalData).join(', ');
-        break;
+        waffleNumerator = getMode(numericalData).join(', ')
+        break
       default:
-        console.log('Function not recognized: ' + dataFunction);
+        console.log('Function not recognized: ' + dataFunction)
     }
 
     let waffleDenominator = null
@@ -212,35 +212,35 @@ const WaffleChart = ({ config }) => {
     if (customDenom && dataDenomColumn && dataDenomFunction) {
       switch (dataDenomFunction) {
         case DATA_FUNCTION_COUNT:
-          waffleDenominator = String(numericalDenomData.length);
-          break;
+          waffleDenominator = String(numericalDenomData.length)
+          break
         case DATA_FUNCTION_SUM:
-          waffleDenominator = String(getColumnSum(numericalDenomData));
-          break;
+          waffleDenominator = String(getColumnSum(numericalDenomData))
+          break
         case DATA_FUNCTION_MEAN:
-          waffleDenominator = String(getColumnMean(numericalDenomData));
-          break;
+          waffleDenominator = String(getColumnMean(numericalDenomData))
+          break
         case DATA_FUNCTION_MEDIAN:
-          waffleDenominator = getMedian(numericalDenomData).toString();
-          break;
+          waffleDenominator = getMedian(numericalDenomData).toString()
+          break
         case DATA_FUNCTION_MAX:
-          waffleDenominator = Math.max(...numericalDenomData).toString();
-          break;
+          waffleDenominator = Math.max(...numericalDenomData).toString()
+          break
         case DATA_FUNCTION_MIN:
-          waffleDenominator = Math.min(...numericalDenomData).toString();
-          break;
+          waffleDenominator = Math.min(...numericalDenomData).toString()
+          break
         case DATA_FUNCTION_MODE:
-          waffleDenominator = getMode(numericalDenomData).join(', ');
-          break;
+          waffleDenominator = getMode(numericalDenomData).join(', ')
+          break
         default:
-          console.log('Function not recognized: ' + dataFunction);
+          console.log('Function not recognized: ' + dataFunction)
       }
     } else {
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
     }
 
     // @ts-ignore
-    return applyPrecision((waffleNumerator / waffleDenominator) * 100);
+    return applyPrecision((waffleNumerator / waffleDenominator) * 100)
   }, [
     dataColumn,
     dataFunction,
@@ -281,44 +281,64 @@ const WaffleChart = ({ config }) => {
 
     return waffleData.map((node, key) => (
       node.shape === 'square'
-        ? <Bar className="cdc-waffle-chart__node" style={{transitionDelay: `${0.1 * key}ms`}} x={node.x} y={node.y} width={nodeWidthNum} height={nodeWidthNum} fill={node.color} fillOpacity={node.opacity} key={key} />
+        ? <Bar className="cdc-waffle-chart__node" style={{ transitionDelay: `${0.1 * key}ms` }} x={node.x} y={node.y}
+               width={nodeWidthNum} height={nodeWidthNum} fill={node.color} fillOpacity={node.opacity} key={key}/>
         : node.shape === 'person' ?
-        <path style={{transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`}}
-              fill={node.color} fillOpacity={node.opacity} key={key}
-              d="M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
+        <path
+          style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})` }}
+          fill={node.color} fillOpacity={node.opacity} key={key}
+          d="M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
                           0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,
                           .9375-.9375V13.75h.625A.9375.9375,0,0,0,7.5,12.8125V7.5A1.875,1.875,0,0,0,5.625,5.625Z">
         </path>
-        : <Circle className="cdc-waffle-chart__node" style={{transitionDelay: `${0.1 * key}ms`}} cx={node.x} cy={node.y} r={nodeWidthNum / 2} fill={node.color} fillOpacity={node.opacity} key={key}/>
+        :
+        <Circle className="cdc-waffle-chart__node" style={{ transitionDelay: `${0.1 * key}ms` }} cx={node.x} cy={node.y}
+                r={nodeWidthNum / 2} fill={node.color} fillOpacity={node.opacity} key={key}/>
     ))
-  },[theme, dataPercentage, shape, nodeWidth, nodeSpacer])
+  }, [ theme, dataPercentage, shape, nodeWidth, nodeSpacer ])
 
   const setRatio = useCallback(() => {
     return (nodeWidth * 10) + (nodeSpacer * 9)
-  },[nodeWidth, nodeSpacer])
+  }, [ nodeWidth, nodeSpacer ])
+
+  let dataFontSize = config.fontSize ? {fontSize: config.fontSize + 'px'} : null
 
   return (
-    <section className={`cdc-waffle-chart ${theme}${config.fontSize ? ' font-' + config.fontSize : ''}`}>
-      <div className="cdc-waffle-chart__header">{parse(title)}</div>
-      <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
-        <div className="cdc-waffle-chart__chart">
-          <svg width={setRatio()} height={setRatio()}>
-            <Group>
-              {buildWaffle()}
-            </Group>
-          </svg>
-        </div>
-        <div className="cdc-waffle-chart__data">
-          <div className="cdc-waffle-chart__data--primary">
-            {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
+    <div className={isEditor ? 'spacing-wrapper' : ''}>
+      <section className={`cdc-waffle-chart ${theme}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+        <div className="cdc-waffle-chart__container">
+          {title &&
+            <header aria-hidden="true">
+              <div className="cdc-waffle-chart__header">{parse(title)}</div>
+            </header>
+          }
+          <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
+            <div className="cdc-waffle-chart__chart" style={{width: setRatio()}}>
+              <svg width={setRatio()} height={setRatio()}>
+                <Group>
+                  {buildWaffle()}
+                </Group>
+              </svg>
+            </div>
+            { (dataPercentage || content) &&
+              <div className="cdc-waffle-chart__data">
+              {dataPercentage &&
+              <div className="cdc-waffle-chart__data--primary" style={dataFontSize}>
+                {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
+              </div>
+              }
+              <div className="cdc-waffle-chart__data--text">{parse(content)}</div>
+            </div>
+            }
           </div>
-          <div className="cdc-waffle-chart__data--text">{parse(content)}</div>
+          {subtext &&
+            <div className="cdc-waffle-chart__subtext">
+              {parse(subtext)}
+            </div>
+          }
         </div>
-      </div>
-      <div className="cdc-waffle-chart__subtext">
-        {parse(subtext)}
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
 
@@ -331,107 +351,114 @@ const CdcWaffleChart = (
     setConfig: setParentConfig
   }
 ) => {
-  const [ config, setConfig ] = useState({ theme: '', data: {}})
+  const [ config, setConfig ] = useState({ ...defaults })
   const [ loading, setLoading ] = useState(true)
 
-  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+  const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-        let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
+      let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
 
-        setCurrentViewport(newViewport)
+      setCurrentViewport(newViewport)
     }
-  });
+  })
 
   const updateConfig = (newConfig) => {
-
-    console.log('Running updateConfig');
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
-    });
+    })
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {};
-    newConfig.runtime.uniqueId = Date.now();
+    newConfig.runtime = {}
+    newConfig.runtime.uniqueId = Date.now()
 
     //Check things that are needed and set error messages if needed
-    newConfig.runtime.editorErrorMessage = '';
-    setConfig(newConfig);
+    newConfig.runtime.editorErrorMessage = ''
+    setConfig(newConfig)
   }
 
   const loadConfig = async () => {
-
-    console.log('Running loadConfig');
-    debugger;
-    let response = configObj || await (await fetch(configUrl)).json();
+    let response = configObj || await (await fetch(configUrl)).json()
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
-      responseData = await dataString.json();
+    if (response.dataUrl) {
+      const dataString = await fetch(response.dataUrl)
+      responseData = await dataString.json()
     }
 
-    response.data = responseData;
+    response.data = responseData
 
-    updateConfig({ ...defaults, ...response });
-    setLoading(false);
+    updateConfig({ ...defaults, ...response })
+    setLoading(false)
   }
 
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
-        resizeObserver.observe(node);
+      resizeObserver.observe(node)
     }
-  }, []);
-
-  useEffect(() => {
-    console.log('Running empty useEFfect');
-    loadConfig();
   }, [])
 
-  if(configObj) {
+  useEffect(() => {
+    console.log('Running empty useEFfect')
+    loadConfig()
+  }, [])
+
+  if (configObj) {
     useEffect(() => {
-      console.log('Running last useEFfect');
-      loadConfig();
-    }, [configObj.data])
+      console.log('Running last useEFfect')
+      loadConfig()
+    }, [ configObj.data ])
   }
-  
+
   useEffect(() => {
-    loadConfig();
+    loadConfig()
   }, [])
 
-  if(configObj) {
+  if (configObj) {
     useEffect(() => {
-      loadConfig();
-    }, [configObj.data])
+      loadConfig()
+    }, [ configObj.data ])
   }
 
   let body = (<Loading/>)
-  if (loading === false) {
-    let classList = []
 
-    classList.push(config.theme)
+  if (loading === false) {
+    let classNames = [
+      'cdc-open-viz-module',
+      'type-waffle-chart',
+      currentViewport,
+      config.theme,
+      'font-' + config.overallFontSize
+    ]
+
+
+    if (isEditor) {
+      classNames.push('is-editor')
+    }
 
     body = (
-      <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' ') : ''}`}
-        style={isEditor ? { paddingLeft: 350 + 'px' } : null} ref={outerContainerRef}>
-        {isEditor && <EditorPanel/>}
-        <WaffleChart config={config}/>
-      </div>
+      <>
+        <div className={classNames.join(' ')} ref={outerContainerRef}>
+          {isEditor && <EditorPanel/>}
+          <WaffleChart config={config} isEditor={isEditor}/>
+        </div>
+      </>
     )
   }
 
   return (
     <ErrorBoundary component="WaffleChart">
-      <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
+      <Context.Provider
+        value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
         {body}
       </Context.Provider>
     </ErrorBoundary>

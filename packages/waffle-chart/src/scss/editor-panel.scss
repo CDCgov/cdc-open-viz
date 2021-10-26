@@ -1,16 +1,23 @@
+.spacing-wrapper {
+  padding-left: 350px;
+}
+
+.editor-panel.hidden + .spacing-wrapper {
+  padding-left: 0;
+}
+
 .editor-panel {
-  font-size: 17.5px;
-  background: #fff;
-  width: $editorWidth;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: fixed;
-  z-index: 8;
   display: flex;
   flex-direction: column;
-  left: 0;
+  position: fixed;
   top: 0;
   bottom: 0;
+  left: 0;
+  width: $editorWidth;
+  background: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 8;
 
   .heading {
     font-size: 1.2em;
@@ -377,12 +384,12 @@
     flex-wrap: wrap;
 
     li {
-      width: 45px;
-      height: 23px;
+      display: flex;
+      width: 21px;
+      height: 21px;
+      border-radius: 40px;
       margin-right: 4px;
       margin-bottom: 10px;
-      display: flex;
-      border-radius: 5px;
       overflow: hidden;
       cursor: pointer;
       position: relative;

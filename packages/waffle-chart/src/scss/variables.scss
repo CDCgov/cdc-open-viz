@@ -12,4 +12,18 @@ $theme-colors: (
   "amber": $amber-primary
 );
 
+$theme-colors-secondary: (
+  "blue": $secondary,
+  "purple": $purple-secondary,
+  "brown": $brown-secondary,
+  "teal": $teal-secondary,
+  "pink": $pink-secondary,
+  "orange": $orange-secondary,
+  "slate": $slate-secondary,
+  "indigo": $indigo-secondary,
+  "cyan": $cyan-secondary,
+  "green": $green-secondary,
+  "amber": $amber-secondary
+);
+
 $editorWidth: 350px;
