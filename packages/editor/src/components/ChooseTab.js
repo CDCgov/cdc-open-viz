@@ -77,7 +77,7 @@ export default function ChooseTab() {
             <div className="heading-2">General</div>
             <ul className="grid">
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
-                <li><IconButton label="Data Bite" type="data-bite" icon={ <DataBiteIcon /> } /></li>
+                <li><IconButton label="Data Bite" type="data-bite" icon={<DataBiteIcon />} /></li>
                 <li><IconButton label="Waffle Chart" type="waffle-chart" icon={ <WaffleChartIcon /> } /></li>
             </ul>
             <div className="heading-2">Charts</div>

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group';
 import { Circle, Bar } from '@visx/shape';
+import ResizeObserver from 'resize-observer-polyfill';
+import getViewport from '@cdc/core/helpers/getViewport';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Loading from '@cdc/core/components/Loading'
@@ -332,7 +334,19 @@ const CdcWaffleChart = (
   const [ config, setConfig ] = useState({ theme: '', data: {}})
   const [ loading, setLoading ] = useState(true)
 
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  //Observes changes to outermost container and changes viewport size in state
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
+
+        setCurrentViewport(newViewport)
+    }
+  });
+
   const updateConfig = (newConfig) => {
+
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -350,6 +364,9 @@ const CdcWaffleChart = (
   }
 
   const loadConfig = async () => {
+
+    console.log('Running loadConfig');
+    debugger;
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
@@ -366,6 +383,25 @@ const CdcWaffleChart = (
     setLoading(false);
   }
 
+  // Load data when component first mounts
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+        resizeObserver.observe(node);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('Running empty useEFfect');
+    loadConfig();
+  }, [])
+
+  if(configObj) {
+    useEffect(() => {
+      console.log('Running last useEFfect');
+      loadConfig();
+    }, [configObj.data])
+  }
+
   useEffect(() => {
     loadConfig();
   }, [])
@@ -376,42 +412,15 @@ const CdcWaffleChart = (
     }, [configObj.data])
   }
 
-
-  // useEffect(() => {
-
-  //   console.log('useEffect fired');
-  //   debugger;
-  //   const loadData = async () => {
-  //     let response = configObj || await (await fetch(configUrl)).json()
-
-  //     // If data is included through a URL, fetch that and store
-  //     let responseData = response.data ?? {}
-
-  //     if (response.dataUrl) {
-  //       const dataString = await fetch(response.dataUrl)
-  //       responseData = await dataString.json()
-  //     }
-
-  //     response.data = responseData
-
-  //     updateConfig({ ...defaults, ...response })
-  //   }
-
-  //   loadData().then(r => setLoading(false))
-  // }, [ configObj, configUrl ])
-
   let body = (<Loading/>)
-
-  debugger;
-
   if (loading === false) {
     let classList = []
 
     classList.push(config.theme)
 
     body = (
-      <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' '): ''}`}
-           style={isEditor ? { paddingLeft: 350 + 'px' } : null}>
+      <div className={`cdc-open-viz-module type-waffle-chart${classList.length > 0 ? ' ' + classList.join(' ') : ''}`}
+        style={isEditor ? { paddingLeft: 350 + 'px' } : null} ref={outerContainerRef}>
         {isEditor && <EditorPanel/>}
         <WaffleChart config={config}/>
       </div>
@@ -420,7 +429,7 @@ const CdcWaffleChart = (
 
   return (
     <ErrorBoundary component="WaffleChart">
-      <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+      <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
         {body}
       </Context.Provider>
     </ErrorBoundary>

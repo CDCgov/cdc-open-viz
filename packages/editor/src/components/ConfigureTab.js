@@ -43,9 +43,9 @@ export default function ConfigureTab() {
             )
         case 'waffle-chart':
             return (
-              <ErrorBoundary component="CdcDashboard">
-                  <CdcWaffleChart isEditor={true} config={config} setConfig={setTempConfig} />
-              </ErrorBoundary>
+                <ErrorBoundary component="CdcDashboard">
+                    <CdcWaffleChart isEditor={true} config={config} setConfig={setTempConfig} />
+                </ErrorBoundary>
             )
         default:
             return <p>No visualization type selected.</p>

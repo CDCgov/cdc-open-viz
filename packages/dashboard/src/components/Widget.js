@@ -15,8 +15,8 @@ import Context from '../context';
 
 const iconHash = {
   'data-bite' : <BiteIcon />,
+  'Bar': <BarIcon />,
   'waffle-chart' : <GridIcon />,
-  'Bar' : <BarIcon />,
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
   'us' : <UsaIcon />,
@@ -24,7 +24,7 @@ const iconHash = {
 }
 
 const labelHash = {
-  'data-bite' : 'Data Bite',
+  'data-bite': 'Data Bite',
   'waffle-chart' : 'Waffle Chart',
   'Bar' : 'Bar',
   'Line' : 'Line',

@@ -3,6 +3,10 @@
 @import 'mixins';
 @import 'variables';
 
+.form-container {
+  overflow: scroll;
+}
+
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
   @import 'editor-panel';

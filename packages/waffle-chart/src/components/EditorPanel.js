@@ -218,16 +218,22 @@ const EditorPanel = memo(() => {
   }
 
   const Confirm = () => {
+
+    const confirmDone = (e) => {
+      e.preventDefault()
+
+      let newConfig = {...config}
+      delete newConfig.newViz
+
+      updateConfig(newConfig)
+    }
+
     return (
       <section className="waiting">
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className="btn" style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={(e) => {
-            e.preventDefault()
-            updateConfig({ ...config, newViz: false })
-          }}>I'm Done
-          </button>
+          <button className="btn" style={{ margin: '1em auto' }} disabled={missingRequiredSections()} onClick={confirmDone}>I'm Done</button>
         </section>
       </section>
     )
