@@ -11,24 +11,40 @@
       "url": "https://via.placeholder.com/400x200.png/c2c2c2/fff?text=Dynamic+Image+Demo",
       "options": [
         {
-          "threshold": "25",
-          "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ff0028/fff?text=Dynamic+Image+Demo"
+          "source": "https://via.placeholder.com/400x200.png/ff0028/fff?text=Dynamic+Image+Demo",
+          "arguments": [
+            {
+              "threshold": "25",
+              "operator": "<="
+            }
+          ]
         },
         {
-          "threshold": "50",
-          "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ff7100/fff?text=Dynamic+Image+Demo"
+          "source": "https://via.placeholder.com/400x200.png/ff7100/fff?text=Dynamic+Image+Demo",
+          "arguments": [
+            {
+              "threshold": "50",
+              "operator": "<="
+            }
+          ]
         },
         {
-          "threshold": "75",
-          "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ffc000/fff?text=Dynamic+Image+Demo"
+          "source": "https://via.placeholder.com/400x200.png/ffc000/fff?text=Dynamic+Image+Demo",
+          "arguments": [
+            {
+              "threshold": "75",
+              "operator": "<="
+            }
+          ]
         },
         {
-          "threshold": "75",
-          "operator": ">",
-          "source": "https://via.placeholder.com/400x200.png/00c31e/fff?text=Dynamic+Image+Demo"
+          "source": "https://via.placeholder.com/400x200.png/00c31e/fff?text=Dynamic+Image+Demo",
+          "arguments": [
+            {
+              "threshold": "75",
+              "operator": ">"
+            }
+          ]
         }
       ]
     },
