@@ -253,17 +253,39 @@ const EditorPanel = memo(() => {
   }
 
   // Dynamic Images ----------------------------------------
-  const updateDynamicImage = (name, index, value) => {
+  const updateDynamicImage = (name, index, subindex = null, value) => {
     let imageOptions = [...config.imageData.options];
-    imageOptions[index][name] = value;
+    null === subindex ? imageOptions[index][name] = value : imageOptions[index].arguments[subindex][name] = value
 
     let payload = {...config.imageData, options: imageOptions}
     updateConfig({...config, imageData: payload});
   }
 
+  const setDynamicArgument = (optionIndex, name, value) => {
+    let imageArguments = [...config.imageData.options[optionIndex].arguments]
+        imageArguments[1] = {...imageArguments[1], [name]: value }
+    let argumentsPayload = {...config.imageData.options[optionIndex], arguments: imageArguments}
+    let optionsPayload = [...config.imageData.options]
+        optionsPayload[optionIndex] = argumentsPayload
+    let payload = {...config.imageData, options: optionsPayload}
+    updateConfig({...config, imageData: payload})
+  }
+
+  const removeDynamicArgument = (optionIndex) => {
+    if (config.imageData.options[optionIndex].arguments.length > 1) {
+      let imageArguments = [...config.imageData.options[optionIndex].arguments]
+          imageArguments.pop()
+      let argumentsPayload = {...config.imageData.options[optionIndex], arguments: imageArguments}
+      let optionsPayload = [...config.imageData.options]
+          optionsPayload[optionIndex] = argumentsPayload
+      let payload = {...config.imageData, options: optionsPayload}
+      updateConfig({...config, imageData: payload})
+    }
+  }
+
   const addDynamicImage = () => {
     let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []
-    imageOptions.push({})
+    imageOptions.push({ source: '', arguments: [{ operator: '', threshold: ''}], secondArgument: false })
 
     let payload = {...config.imageData, options: imageOptions}
     updateConfig({...config, imageData: payload})
@@ -306,7 +328,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              <AccordionItem>
+              <AccordionItem> {/*Data*/}
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Data {(!config.dataColumn || !config.dataFunction) && <WarningImage width="25" className="warning-icon" />}
@@ -362,7 +384,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              <AccordionItem>
+              <AccordionItem> {/*Visual*/}
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     Visual
@@ -384,7 +406,7 @@ const EditorPanel = memo(() => {
               </AccordionItem>
 
               {['title', 'body'].includes(config.biteStyle) &&
-                <AccordionItem>
+                <AccordionItem> {/*Image & Dynamic Images*/}
                   <AccordionItemHeading>
                     <AccordionItemButton>
                       Image{[ 'dynamic' ].includes(config.imageData.display) && 's'}
@@ -400,7 +422,7 @@ const EditorPanel = memo(() => {
 
                     {[ 'dynamic' ].includes(config.imageData.display) &&
                       <>
-                        <TextField value={config.imageData.url} section="imageData" fieldName="url" label="Default Image URL" updateField={updateField} />
+                        <TextField value={config.imageData.url || ""} section="imageData" fieldName="url" label="Default Image URL" updateField={updateField} />
                         <hr className="accordion__divider" />
                         {(!config.imageData.options || config.imageData.options.length === 0) && <p style={{textAlign: "center"}}>There are currently no dynamic images.</p>}
                         {config.imageData.options && config.imageData.options.length > 0 &&
@@ -411,27 +433,68 @@ const EditorPanel = memo(() => {
                                   <button type="button" className="remove-column" onClick={() => {removeDynamicImage(index)}}>Remove</button>
                                   <label>
                                     <span className="edit-label column-heading"><strong>{'Image #' + (index + 1)}</strong></span>
+
                                     <div className="accordion__panel-row align-center">
                                       <div className="accordion__panel-col flex-auto">
                                         If Value
                                       </div>
                                       <div className="accordion__panel-col flex-auto">
-                                        <select value={option.operator ? option.operator : ''} onChange={(e) => {updateDynamicImage('operator', index, e.target.value)}}>
+                                        <select value={option.arguments[0]?.operator || ""} onChange={(e) => {updateDynamicImage('operator', index, 0, e.target.value)}}>
+                                          <option value="" disabled/>
                                           {DATA_OPERATORS.map((operator, index) => (
                                             <option value={operator} key={index}>{operator}</option>
                                           ))}
                                         </select>
                                       </div>
                                       <div className="accordion__panel-col flex-grow flex-shrink">
-                                        <input type="number" onChange={(e) => {updateDynamicImage('threshold', index, e.target.value)}} value={option.threshold} />
+                                        <input type="number" value={option.arguments[0]?.threshold || ""} onChange={(e) => {updateDynamicImage('threshold', index, 0, e.target.value)}} />
                                       </div>
                                     </div>
+
+                                    <div className="accordion__panel-row mb-2 align-center">
+                                      <div className="accordion__panel-col flex-grow">
+                                        <select className='border-dashed text-center' value={option.secondArgument ? 'and' : 'then'} onChange={(e) => {
+                                          if ('then' === e.target.value) {updateDynamicImage('secondArgument', index, null,false); removeDynamicArgument(index)}
+                                          if ('and' === e.target.value) {updateDynamicImage('secondArgument', index, null,true)}
+                                        }}>
+                                          <option value={'then'}>Then</option>
+                                          <option value={'and'}>And</option>
+                                        </select>
+                                      </div>
+                                    </div>
+
+                                    {option.secondArgument && true === option.secondArgument &&
+                                      <>
+                                        <div className="accordion__panel-row align-center">
+                                          <div className="accordion__panel-col flex-auto">
+                                            If Value
+                                          </div>
+                                          <div className="accordion__panel-col flex-auto">
+                                            <select value={option.arguments[1]?.operator || ""} onChange={(e) => {setDynamicArgument(index, 'operator', e.target.value)}}>
+                                              <option value="" disabled/>
+                                              {DATA_OPERATORS.map((operator, index) => (
+                                                <option value={operator} key={index}>{operator}</option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                          <div className="accordion__panel-col flex-grow flex-shrink">
+                                            <input type="number" value={option.arguments[1]?.threshold || ""} onChange={(e) => {setDynamicArgument(index, 'threshold', e.target.value)}} />
+                                          </div>
+                                        </div>
+                                        <div className="accordion__panel-row mb-2 align-center text-center text-capitalize">
+                                          <div className="accordion__panel-col flex-grow">
+                                            Then
+                                          </div>
+                                        </div>
+                                      </>
+                                    }
+
                                     <div className="accordion__panel-row mb-2 align-center">
                                       <div className="accordion__panel-col flex-auto">
                                         Show
                                       </div>
                                       <div className="accordion__panel-col flex-grow">
-                                        <input type="text" onChange={(e) => {updateDynamicImage('source', index, e.target.value)}} value={option.source} />
+                                        <input type="text" value={option.source || ""} onChange={(e) => {updateDynamicImage('source', index, null, e.target.value)}} />
                                       </div>
                                     </div>
                                   </label>

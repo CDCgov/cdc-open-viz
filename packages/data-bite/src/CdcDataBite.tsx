@@ -241,16 +241,29 @@ const CdcDataBite = (
     }
     let imageSource = imageData.url
 
-    if ('dynamic' === imageData.display && imageData.options?.length > 0) {
-      let target = calculateDataBite()
+    if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
+      let targetVal = calculateDataBite()
       let argumentActive = false
 
       imageData.options.forEach((option, index) => {
-        let { threshold, operator, source } = option
-        if (false === argumentActive) {
-          if (operators[operator](target, threshold)) {
-            imageSource = source
-            argumentActive = true
+        let argumentArr = option.arguments
+        let { source } = option
+
+        if (false === argumentActive && argumentArr.length > 0) {
+          if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
+            if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
+              if (undefined !== argumentArr[1]) {
+                if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
+                  if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
+                    imageSource = source
+                    argumentActive = true
+                  }
+                }
+              } else {
+                imageSource = source
+                argumentActive = true
+              }
+            }
           }
         }
       })

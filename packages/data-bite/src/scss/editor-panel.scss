@@ -7,6 +7,12 @@
 }
 
 .editor-panel {
+  .text-center {
+    text-align: center;
+  }
+  .text-capitalize {
+    text-transform: capitalize;
+  }
   .two-col-inputs {
     display: flex;
     margin-top: 1em;
@@ -160,6 +166,11 @@
 
       select {
         padding: 0.425em 0.5em;
+      }
+
+      select.border-dashed {
+        border: rgba(0, 0, 0, 0.3) 1px dashed !important;
+        border-radius: 0.25rem;
       }
     }
 
