@@ -4,49 +4,12 @@
     "dataBite": "",
     "dataFunction": "Mean (Average)",
     "dataColumn": "Insured Rate",
-    "bitePosition": "Top",
+    "bitePosition": "Left",
     "biteFontSize": "24",
     "imageData": {
-      "display": "dynamic",
-      "url": "https://via.placeholder.com/400x200.png/c2c2c2/fff?text=Dynamic+Image+Demo",
-      "options": [
-        {
-          "source": "https://via.placeholder.com/400x200.png/ff0028/fff?text=Dynamic+Image+Demo",
-          "arguments": [
-            {
-              "threshold": "25",
-              "operator": "<="
-            }
-          ]
-        },
-        {
-          "source": "https://via.placeholder.com/400x200.png/ff7100/fff?text=Dynamic+Image+Demo",
-          "arguments": [
-            {
-              "threshold": "50",
-              "operator": "<="
-            }
-          ]
-        },
-        {
-          "source": "https://via.placeholder.com/400x200.png/ffc000/fff?text=Dynamic+Image+Demo",
-          "arguments": [
-            {
-              "threshold": "75",
-              "operator": "<="
-            }
-          ]
-        },
-        {
-          "source": "https://via.placeholder.com/400x200.png/00c31e/fff?text=Dynamic+Image+Demo",
-          "arguments": [
-            {
-              "threshold": "75",
-              "operator": ">"
-            }
-          ]
-        }
-      ]
+      "display": "none",
+      "url": "",
+      "options": []
     },
     "biteBody": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla mauris, vel gravida libero mollis id. Etiam dignissim nunc ut ante fringilla, sit amet malesuada nibh accumsan.",
     "dataFormat": {
@@ -56,7 +19,7 @@
         "suffix": "%"
     },
     "filters": [],
-    "biteStyle": "title",
+    "biteStyle": "graphic",
     "subtext": "*This is an optional subtext or citation.",
     "title": "Average Insured Rate",
     "theme": "theme-blue"
