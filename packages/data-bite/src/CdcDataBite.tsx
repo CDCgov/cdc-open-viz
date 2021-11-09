@@ -231,33 +231,26 @@ const CdcDataBite = (
   let body = (<Loading />)
 
   const DataImage = useCallback(() => {
+    let operators = {
+      '<': (a, b) => { return a < b },
+      '>': (a, b) => { return a > b },
+      '<=': (a, b) => { return a <= b },
+      '>=': (a, b) => { return a >= b },
+      '≠': (a, b) => { return a !== b },
+      '=': (a, b) => { return a === b }
+    }
     let imageSource = imageData.url
 
     if (imageData.options?.length > 0) {
-      let argument = false
+      let target = calculateDataBite()
+      let argumentActive = false
+
       imageData.options.forEach((option, index) => {
-        if (false === argument) {
-          let operator = option.operator,
-            threshold = option.threshold,
-            source = option.source
-
-          switch (operator) {
-            case "<":
-              argument = calculateDataBite() < threshold
-              break
-            case ">":
-              argument = calculateDataBite() > threshold
-              break
-            case "<=":
-              argument = calculateDataBite() <= threshold
-              break
-            case ">=":
-              argument = calculateDataBite() >= threshold
-              break
-          }
-
-          if (argument) {
+        let { threshold, operator, source } = option
+        if (false === argumentActive) {
+          if (operators[operator](target, threshold)) {
             imageSource = source
+            argumentActive = true
           }
         }
       })

@@ -431,7 +431,7 @@ const EditorPanel = memo(() => {
                                         Show
                                       </div>
                                       <div className="accordion__panel-col flex-grow">
-                                        <input type="text" onChange={(e) => {updateDynamicImage('source', index, e.target.value)}} value={option.threshold} />
+                                        <input type="text" onChange={(e) => {updateDynamicImage('source', index, e.target.value)}} value={option.source} />
                                       </div>
                                     </div>
                                   </label>

@@ -8,27 +8,27 @@
     "biteFontSize": "24",
     "imageData": {
       "display": "dynamic",
-      "url": "https://via.placeholder.com/400x200.png/c2c2c2/fff",
+      "url": "https://via.placeholder.com/400x200.png/c2c2c2/fff?text=Dynamic+Image+Demo",
       "options": [
         {
           "threshold": "25",
           "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ff0028/fff"
+          "source": "https://via.placeholder.com/400x200.png/ff0028/fff?text=Dynamic+Image+Demo"
         },
         {
           "threshold": "50",
           "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ff7100/fff"
+          "source": "https://via.placeholder.com/400x200.png/ff7100/fff?text=Dynamic+Image+Demo"
         },
         {
           "threshold": "75",
           "operator": "<=",
-          "source": "https://via.placeholder.com/400x200.png/ffc000/fff"
+          "source": "https://via.placeholder.com/400x200.png/ffc000/fff?text=Dynamic+Image+Demo"
         },
         {
           "threshold": "75",
           "operator": ">",
-          "source": "https://via.placeholder.com/400x200.png/00c31e/fff"
+          "source": "https://via.placeholder.com/400x200.png/00c31e/fff?text=Dynamic+Image+Demo"
         }
       ]
     },
