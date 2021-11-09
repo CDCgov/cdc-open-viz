@@ -1,18 +1,18 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { memo, useContext, useEffect, useState } from 'react'
 
 import {
   Accordion,
   AccordionItem,
+  AccordionItemButton,
   AccordionItemHeading,
   AccordionItemPanel,
-  AccordionItemButton,
-} from 'react-accessible-accordion';
+} from 'react-accessible-accordion'
 
-import { useDebounce } from 'use-debounce';
-import Context from '../context';
-import WarningImage from '../images/warning.svg';
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import { IMAGE_POSITIONS, BITE_LOCATIONS, DATA_FUNCTIONS } from '../CdcDataBite'
+import { useDebounce } from 'use-debounce'
+import Context from '../context'
+import WarningImage from '../images/warning.svg'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, max = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -53,10 +53,15 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   }
 
   return (
-    <label>
-      <span className="edit-label column-heading">{label}</span>
-      {formElement}
-    </label>
+    <>
+      {label && label.length > 0 &&
+        <label>
+          <span className="edit-label column-heading">{label}</span>
+          {formElement}
+        </label>
+      }
+      {(!label || label.length === 0) && formElement}
+    </>
   )
 })
 
@@ -198,6 +203,7 @@ const EditorPanel = memo(() => {
     return strippedState
   }
 
+  // Filters -----------------------------------------------
   const removeFilter = (index) => {
     let filters = [...config.filters];
 
@@ -246,6 +252,32 @@ const EditorPanel = memo(() => {
     return filterDataOptions;
   }
 
+  // Dynamic Images ----------------------------------------
+  const updateDynamicImage = (name, index, value) => {
+    let imageOptions = [...config.imageData.options];
+    imageOptions[index][name] = value;
+
+    let payload = {...config.imageData, options: imageOptions}
+    updateConfig({...config, imageData: payload});
+  }
+
+  const addDynamicImage = () => {
+    let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []
+    imageOptions.push({})
+
+    let payload = {...config.imageData, options: imageOptions}
+    updateConfig({...config, imageData: payload})
+  }
+
+  const removeDynamicImage = (index) => {
+    let imageOptions = [...config.imageData.options];
+    imageOptions.splice(index, 1);
+
+    let payload = {...config.imageData, options: imageOptions}
+    updateConfig({...config, imageData: payload});
+  }
+
+  // General -----------------------------------------------
   if(loading) {
     return null
   }
@@ -254,7 +286,7 @@ const EditorPanel = memo(() => {
     <ErrorBoundary component="EditorPanel">
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <div className="heading-2">Configure Data Bite</div>
         <section className="form-container">
@@ -305,7 +337,7 @@ const EditorPanel = memo(() => {
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Column</span>
-                            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                            <select value={filter.columnName ? filter.columnName : ''} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
                               {getColumns().map((dataKey) => (
                                 <option value={dataKey}>{dataKey}</option>
@@ -337,11 +369,6 @@ const EditorPanel = memo(() => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-
-                  {['title', 'body'].includes(config.biteStyle) &&
-                    <TextField value={config.imageUrl} fieldName="imageUrl" label="Image URL" updateField={updateField} />
-                  }
-                  <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
@@ -349,13 +376,77 @@ const EditorPanel = memo(() => {
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map( (palette) => (
-                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette}>
-                        </li>
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette} />
                       ))}
                     </ul>
                   </label>
                 </AccordionItemPanel>
               </AccordionItem>
+
+              {['title', 'body'].includes(config.biteStyle) &&
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>
+                      Image{[ 'dynamic' ].includes(config.imageData.display) && 's'}
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+
+                  <AccordionItemPanel>
+                    <Select value={config.imageData.display || ""} section="imageData" fieldName="display" label="Image Display Type" updateField={updateField} options={['none', 'static', 'dynamic']} />
+                    <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
+                    {['static'].includes(config.imageData.display) &&
+                      <TextField value={config.imageData.url} section="imageData" fieldName="url" label="Image URL" updateField={updateField} />
+                    }
+
+                    {[ 'dynamic' ].includes(config.imageData.display) &&
+                      <>
+                        <TextField value={config.imageData.url} section="imageData" fieldName="url" label="Default Image URL" updateField={updateField} />
+                        <hr className="accordion__divider" />
+                        {(!config.imageData.options || config.imageData.options.length === 0) && <p style={{textAlign: "center"}}>There are currently no dynamic images.</p>}
+                        {config.imageData.options && config.imageData.options.length > 0 &&
+                          <>
+                            <ul>
+                              {config.imageData.options.map((option, index) => (
+                                <fieldset className="edit-block" key={index}>
+                                  <button type="button" className="remove-column" onClick={() => {removeDynamicImage(index)}}>Remove</button>
+                                  <label>
+                                    <span className="edit-label column-heading"><strong>{'Image #' + (index + 1)}</strong></span>
+                                    <div className="accordion__panel-row align-center">
+                                      <div className="accordion__panel-col flex-auto">
+                                        If Value
+                                      </div>
+                                      <div className="accordion__panel-col flex-auto">
+                                        <select value={option.operator ? option.operator : ''} onChange={(e) => {updateDynamicImage('operator', index, e.target.value)}}>
+                                          {DATA_OPERATORS.map((operator, index) => (
+                                            <option value={operator} key={index}>{operator}</option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                      <div className="accordion__panel-col flex-grow flex-shrink">
+                                        <input type="number" onChange={(e) => {updateDynamicImage('threshold', index, e.target.value)}} value={option.threshold} />
+                                      </div>
+                                    </div>
+                                    <div className="accordion__panel-row mb-2 align-center">
+                                      <div className="accordion__panel-col flex-auto">
+                                        Show
+                                      </div>
+                                      <div className="accordion__panel-col flex-grow">
+                                        <input type="text" onChange={(e) => {updateDynamicImage('source', index, e.target.value)}} value={option.threshold} />
+                                      </div>
+                                    </div>
+                                  </label>
+                                </fieldset>
+                              ))}
+                            </ul>
+                          </>
+                        }
+                        <button type="button" onClick={addDynamicImage} className="btn full-width">Add Dynamic Image</button>
+                      </>
+                    }
+                  </AccordionItemPanel>
+                </AccordionItem>
+              }
+
             </Accordion>
           </form>
         </section>

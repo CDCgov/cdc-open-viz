@@ -4,9 +4,34 @@
     "dataBite": "",
     "dataFunction": "Mean (Average)",
     "dataColumn": "Insured Rate",
-    "bitePosition": "Left",
+    "bitePosition": "Top",
     "biteFontSize": "24",
-    "imageUrl": "",
+    "imageData": {
+      "display": "dynamic",
+      "url": "https://via.placeholder.com/400x200.png/c2c2c2/fff",
+      "options": [
+        {
+          "threshold": "25",
+          "operator": "<=",
+          "source": "https://via.placeholder.com/400x200.png/ff0028/fff"
+        },
+        {
+          "threshold": "50",
+          "operator": "<=",
+          "source": "https://via.placeholder.com/400x200.png/ff7100/fff"
+        },
+        {
+          "threshold": "75",
+          "operator": "<=",
+          "source": "https://via.placeholder.com/400x200.png/ffc000/fff"
+        },
+        {
+          "threshold": "75",
+          "operator": ">",
+          "source": "https://via.placeholder.com/400x200.png/00c31e/fff"
+        }
+      ]
+    },
     "biteBody": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla mauris, vel gravida libero mollis id. Etiam dignissim nunc ut ante fringilla, sit amet malesuada nibh accumsan.",
     "dataFormat": {
         "roundToPlace": 0,
@@ -15,7 +40,7 @@
         "suffix": "%"
     },
     "filters": [],
-    "biteStyle": "graphic",
+    "biteStyle": "title",
     "subtext": "*This is an optional subtext or citation.",
     "title": "Average Insured Rate",
     "theme": "theme-blue"

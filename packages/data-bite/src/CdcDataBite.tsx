@@ -27,7 +27,7 @@ const CdcDataBite = (
     title,
     dataColumn,
     dataFunction,
-    imageUrl,
+    imageData,
     biteBody,
     biteFontSize,
     biteStyle,
@@ -230,6 +230,42 @@ const CdcDataBite = (
 
   let body = (<Loading />)
 
+  const DataImage = useCallback(() => {
+    let imageSource = imageData.url
+
+    if (imageData.options?.length > 0) {
+      let argument = false
+      imageData.options.forEach((option, index) => {
+        if (false === argument) {
+          let operator = option.operator,
+            threshold = option.threshold,
+            source = option.source
+
+          switch (operator) {
+            case "<":
+              argument = calculateDataBite() < threshold
+              break
+            case ">":
+              argument = calculateDataBite() > threshold
+              break
+            case "<=":
+              argument = calculateDataBite() <= threshold
+              break
+            case ">=":
+              argument = calculateDataBite() >= threshold
+              break
+          }
+
+          if (argument) {
+            imageSource = source
+          }
+        }
+      })
+    }
+
+    return (imageSource.length > 0 && 'graphic' !== biteStyle ? <img src={imageSource} className="bite-image callout" /> : null)
+  }, [ imageData ])
+
   if(false === loading) {
     let biteClasses = [];
 
@@ -258,6 +294,7 @@ const CdcDataBite = (
     if(config.shadow) biteClasses.push('shadow')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
+
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -267,7 +304,7 @@ const CdcDataBite = (
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
-                {imageUrl && 'graphic' !== biteStyle && isTop && <img src={imageUrl} className="bite-image callout" />}
+                {isTop && <DataImage />}
                 <div className="bite-content">
                   {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                   {biteBody &&
@@ -280,7 +317,7 @@ const CdcDataBite = (
                     </>
                   }
                 </div>
-                {imageUrl && 'graphic' !== biteStyle && isBottom && <img src={imageUrl} className="bite-image callout" />}
+                {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
               </div>
             </div>
@@ -337,8 +374,8 @@ export const BITE_LOCATION_BODY = 'body';
 export const BITE_LOCATION_GRAPHIC = 'graphic';
 export const BITE_LOCATIONS = {
   'graphic': 'Graphic',
-  'title': 'Text above body text',
-  'body': 'Inline with body text'
+  'title': 'Value above Message',
+  'body': 'Value before Message'
 };
 
 export const IMAGE_POSITION_LEFT = 'Left';
@@ -351,3 +388,19 @@ export const IMAGE_POSITIONS = [
   IMAGE_POSITION_TOP,
   IMAGE_POSITION_BOTTOM,
 ];
+
+export const DATA_OPERATOR_LESS = '<'
+export const DATA_OPERATOR_GREATER = '>'
+export const DATA_OPERATOR_LESSEQUAL = '<='
+export const DATA_OPERATOR_GREATEREQUAL = '>='
+export const DATA_OPERATOR_EQUAL = '='
+export const DATA_OPERATOR_NOTEQUAL = '≠'
+
+export const DATA_OPERATORS = [
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+]
