@@ -241,7 +241,7 @@ const CdcDataBite = (
     }
     let imageSource = imageData.url
 
-    if (imageData.options?.length > 0) {
+    if ('dynamic' === imageData.display && imageData.options?.length > 0) {
       let target = calculateDataBite()
       let argumentActive = false
 
@@ -256,7 +256,7 @@ const CdcDataBite = (
       })
     }
 
-    return (imageSource.length > 0 && 'graphic' !== biteStyle ? <img src={imageSource} className="bite-image callout" /> : null)
+    return (imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img src={imageSource} className="bite-image callout" /> : null)
   }, [ imageData ])
 
   if(false === loading) {
