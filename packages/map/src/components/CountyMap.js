@@ -5,24 +5,11 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
 import topoJSON from '../data/county-topo.json';
-import hexTopoJSON from '../data/us-hex-topo.json';
-import { AlbersUsa, Mercator } from '@visx/geo';
+import { AlbersUsa } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
 
-const { features: unitedStates } = feature(topoJSON, topoJSON.objects.counties)
-const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
-
-const Hexagon = ({label, text, stroke, strokeWidth, ...props}) => {
-  return (
-    <svg viewBox="0 0 45 51">
-      <g {...props}>
-        <polygon  stroke={stroke} strokeWidth={strokeWidth} points="22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702"/>
-        <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
-      </g>
-    </svg>
-  )
-}
+const { features: unitedStates } = feature(topoJSON, topoJSON.objects.AllCounties)
 
 const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
   return (
@@ -70,8 +57,6 @@ const CountyMap = (props) => {
     rebuildTooltips
   } = props;
 
-  const isHex = state.general.displayAsHex
-
   const [territoriesData, setTerritoriesData] = useState([]);
 
   const territoriesKeys = supportedTerritories ? Object.keys(supportedTerritories) : []; // data will have already mapped abbreviated territories to their full names
@@ -88,7 +73,7 @@ const CountyMap = (props) => {
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
-    const Shape = isHex ? Hexagon : Rect
+    const Shape = Rect
 
     const territoryData = data[territory];
 
@@ -163,12 +148,12 @@ const CountyMap = (props) => {
 
       let x = 0, y = 5
 
-      if(nudges[abbr] && false === isHex) {
+      if(nudges[abbr]) {
         x += nudges[abbr][0]
         y += nudges[abbr][1]
       }
 
-      if( undefined === offsets[abbr] || isHex ) {
+      if( undefined === offsets[abbr]) {
         return (
           <g transform={`translate(${centroid})`}>
             <text x={x} y={y} fontSize={14} strokeWidth="0" style={{fill: textColor}} textAnchor="middle">
@@ -195,7 +180,7 @@ const CountyMap = (props) => {
     let showLabel = state.general.displayStateLabels
 
     const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
-      const key = isHex ? geo.properties.GEOID + '-hex-group' : geo.properties.GEOID + '-group'
+      const key = geo.properties.GEOID + '-group'
 
       let styles = {
         fill: '#E6E6E6',
@@ -204,11 +189,6 @@ const CountyMap = (props) => {
 
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.GEOID;
-
-      // Manually add Washington D.C. in for Hex maps
-      if(isHex && geoKey === 'US-DC') {
-        geoKey = 'District of Columbia'
-      }
 
       if(!geoKey) return
 
@@ -259,7 +239,7 @@ const CountyMap = (props) => {
               strokeWidth={1.3}   
               d={path}
             />
-            {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+            {showLabel && geoLabel(geo, legendColors[0], projection)}
           </g>
         )
       }
@@ -278,12 +258,10 @@ const CountyMap = (props) => {
             strokeWidth={1.3}
             d={path}
           />
-          {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+          {showLabel && geoLabel(geo, styles.fill, projection)}
         </g>
       )
     });
-
-    if(isHex) return geosJsx;
 
     // Cities
     geosJsx.push(<CityList
@@ -303,14 +281,9 @@ const CountyMap = (props) => {
   return (
     <ErrorBoundary component="CountyMap">
       <svg viewBox="0 0 880 500">
-        {state.general.displayAsHex ?
-            (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
-              {({ features, projection }) => constructGeoJsx(features, projection)}
-            </Mercator>) :
-            (<AlbersUsa data={unitedStates} translate={[455, 250]}>
-              {({ features, projection }) => constructGeoJsx(features, projection)}
-            </AlbersUsa>)
-        }
+        <AlbersUsa data={unitedStates} translate={[455, 250]}>
+          {({ features, projection }) => constructGeoJsx(features, projection)}
+        </AlbersUsa>
       </svg>
       {territories.length > 0 && (
         <section className="territories">

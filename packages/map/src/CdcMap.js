@@ -151,7 +151,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // County Check
             if("county" === obj.general.geoType) {
-                const fips = row[obj.columns.geo.fips]
+                const fips = row[obj.columns.geo.name]
 
                 uid = countyKeys.find( (key) => key === fips )
             }
