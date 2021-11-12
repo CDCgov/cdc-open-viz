@@ -344,6 +344,10 @@ const EditorPanel = (props) => {
                 general: {
                     ...state.general,
                     geoType: "us"
+                },
+                dataTable: {
+                  ...state.dataTable,
+                  forceDisplay: true
                 }
               })
               break;
@@ -353,9 +357,26 @@ const EditorPanel = (props) => {
                 general: {
                     ...state.general,
                     geoType: "world"
+                },
+                dataTable: {
+                  ...state.dataTable,
+                  forceDisplay: true
                 }
               })
               break;
+              case 'county':
+                setState({
+                  ...state,
+                  general: {
+                      ...state.general,
+                      geoType: "county"
+                  },
+                  dataTable: {
+                    ...state.dataTable,
+                    forceDisplay: false
+                  }
+                })
+                break;
             default:
                 console.warn("Map type not set.")
             break;
@@ -808,7 +829,11 @@ const EditorPanel = (props) => {
                     <ul className="geo-buttons">
                       <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
                         <UsaGraphic />
-                        <span>United States</span>
+                        <span>State-Level U.S.</span>
+                      </li>
+                      <li className={state.general.geoType === 'county' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "county")}>
+                        <UsaGraphic />
+                        <span>County-Level U.S.</span>
                       </li>
                       <li className={state.general.geoType === 'world' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "world")}>
                         <WorldGraphic />
