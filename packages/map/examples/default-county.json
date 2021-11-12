@@ -16,7 +16,7 @@
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
-			"name": "county",
+			"name": "FIPS Codes",
 			"label": "Location",
 			"tooltip": false,
 			"dataTable": true
@@ -48,35 +48,35 @@
 		{
 			"Insured Rate": "8",
 			"Coverage Status": "Insured",
-			"county": "06071",
+			"FIPS Codes": "06071",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "18",
 			"Coverage Status": "Insured",
-			"county": "06075",
+			"FIPS Codes": "06075",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "3",
 			"Coverage Status": "Insured",
-			"county": "06027",
+			"FIPS Codes": "06027",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
-			"county": "06029",
+			"FIPS Codes": "06029",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "60",
 			"Coverage Status": "Insured",
-			"county": "06065",
+			"FIPS Codes": "06065",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		}
