@@ -16,7 +16,7 @@ import Canvg from 'canvg';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities } from './data/supported-geos';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
@@ -50,6 +50,7 @@ const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
+const stateFipsKeys = Object.keys(supportedStatesFipsCodes);
 
 const generateColorsArray = (color = '#000000', special = false) => {
     let colorObj = chroma(color)
@@ -701,7 +702,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-        let toolTipText = `<strong>${displayGeoName(geoName)}</strong>`
+        let toolTipText = '';
+        if (state.general.geoType === 'county') {
+            const stateName = supportedStatesFipsCodes[row['State FIPS Codes']];
+            
+            //supportedStatesFipsCodes[]
+            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+        }
+        
+        toolTipText += `<strong>County: ${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type) {
             toolTipText += `<dl>`
