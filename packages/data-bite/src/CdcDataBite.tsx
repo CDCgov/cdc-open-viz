@@ -240,6 +240,7 @@ const CdcDataBite = (
       '=': (a, b) => { return a === b }
     }
     let imageSource = imageData.url
+    let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
       let targetVal = calculateDataBite()
@@ -247,7 +248,7 @@ const CdcDataBite = (
 
       imageData.options.forEach((option, index) => {
         let argumentArr = option.arguments
-        let { source } = option
+        let { source, alt } = option
 
         if (false === argumentActive && argumentArr.length > 0) {
           if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
@@ -256,11 +257,13 @@ const CdcDataBite = (
                 if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
                   if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
                     imageSource = source
+                    if (alt !== '' && alt !== undefined) { imageAlt = alt }
                     argumentActive = true
                   }
                 }
               } else {
                 imageSource = source
+                if (alt !== '' && alt !== undefined) { imageAlt = alt }
                 argumentActive = true
               }
             }
@@ -269,7 +272,7 @@ const CdcDataBite = (
       })
     }
 
-    return (imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img src={imageSource} className="bite-image callout" /> : null)
+    return (imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img alt={imageAlt} src={imageSource} className="bite-image callout" /> : null)
   }, [ imageData ])
 
   if(false === loading) {
