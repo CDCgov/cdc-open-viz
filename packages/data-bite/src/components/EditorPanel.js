@@ -285,7 +285,7 @@ const EditorPanel = memo(() => {
 
   const addDynamicImage = () => {
     let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []
-    imageOptions.push({ source: '', arguments: [{ operator: '', threshold: ''}], secondArgument: false })
+    imageOptions.push({ source: '', arguments: [{ operator: '', threshold: ''}], alt: '', secondArgument: false })
 
     let payload = {...config.imageData, options: imageOptions}
     updateConfig({...config, imageData: payload})
@@ -417,13 +417,19 @@ const EditorPanel = memo(() => {
                     <Select value={config.imageData.display || ""} section="imageData" fieldName="display" label="Image Display Type" updateField={updateField} options={['none', 'static', 'dynamic']} />
                     <Select value={config.bitePosition || ""} fieldName="bitePosition" label="Image/Graphic Position" updateField={updateField} initial="Select" options={IMAGE_POSITIONS} />
                     {['static'].includes(config.imageData.display) &&
-                      <TextField value={config.imageData.url} section="imageData" fieldName="url" label="Image URL" updateField={updateField} />
+                      <>
+                        <TextField value={config.imageData.url} section="imageData" fieldName="url" label="Image URL" updateField={updateField} />
+                        <TextField value={config.imageData.alt} section="imageData" fieldName="alt" label="Alt Text" updateField={updateField} />
+                      </>
                     }
 
                     {[ 'dynamic' ].includes(config.imageData.display) &&
                       <>
-                        <TextField value={config.imageData.url || ""} section="imageData" fieldName="url" label="Default Image URL" updateField={updateField} />
+                        <TextField value={config.imageData.url || ""} section="imageData" fieldName="url" label="Image URL (default)" updateField={updateField} />
+                        <TextField value={config.imageData.alt} section="imageData" fieldName="alt" label="Alt Text (default)" updateField={updateField} />
+
                         <hr className="accordion__divider" />
+
                         {(!config.imageData.options || config.imageData.options.length === 0) && <p style={{textAlign: "center"}}>There are currently no dynamic images.</p>}
                         {config.imageData.options && config.imageData.options.length > 0 &&
                           <>
@@ -495,6 +501,15 @@ const EditorPanel = memo(() => {
                                       </div>
                                       <div className="accordion__panel-col flex-grow">
                                         <input type="text" value={option.source || ""} onChange={(e) => {updateDynamicImage('source', index, null, e.target.value)}} />
+                                      </div>
+                                    </div>
+
+                                    <div className="accordion__panel-row mb-2 align-center">
+                                      <div className="accordion__panel-col flex-auto">
+                                        Alt Text
+                                      </div>
+                                      <div className="accordion__panel-col flex-grow">
+                                        <input type="text" value={option.alt || ""} onChange={(e) => {updateDynamicImage('alt', index, null, e.target.value)}} />
                                       </div>
                                     </div>
                                   </label>
