@@ -8,8 +8,6 @@ export default {
     biteFontSize: 24,
     fontSize: "medium",
     biteBody: "",
-    prefix: "",
-    suffix: "",
     imageData: {
       display: "none",
       url: "",
