@@ -13,6 +13,7 @@ export default {
     imageData: {
       display: "none",
       url: "",
+      alt: "",
       options: []
     },
     dataFormat: {
