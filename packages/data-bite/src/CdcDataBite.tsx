@@ -30,6 +30,7 @@ const CdcDataBite = (
     imageData,
     biteBody,
     biteFontSize,
+    dataFormat,
     biteStyle,
     filters,
     subtext
@@ -205,7 +206,8 @@ const CdcDataBite = (
         dataBite = Number(dataBite).toLocaleString('en-US');
       }
 
-      return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+      // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+      return dataBite
     } else { //Rounding and formatting for ranges happens earlier.
       return dataBite;
     }
@@ -243,7 +245,7 @@ const CdcDataBite = (
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = calculateDataBite()
+      let targetVal = Number(calculateDataBite())
       let argumentActive = false
 
       imageData.options.forEach((option, index) => {
@@ -312,14 +314,14 @@ const CdcDataBite = (
             {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
-                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</div>}
                   {biteBody &&
                     <>
                       <p className="bite-text">
-                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
+                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</span>}
                         {parse(biteBody)}
                       </p>
                       {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
@@ -327,7 +329,7 @@ const CdcDataBite = (
                   }
                 </div>
                 {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>
             </div>
           </div>

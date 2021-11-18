@@ -355,14 +355,14 @@ const EditorPanel = memo(() => {
                     config.filters &&
                     <ul className="filters-list">
                       {config.filters.map((filter, index) => (
-                        <fieldset className="edit-block">
+                        <fieldset className="edit-block" key={index}>
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Column</span>
                             <select value={filter.columnName ? filter.columnName : ''} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
-                              {getColumns().map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                              {getColumns().map((dataKey, index) => (
+                                <option value={dataKey} key={index}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
@@ -370,8 +370,8 @@ const EditorPanel = memo(() => {
                             <span className="edit-label column-heading">Column Value</span>
                             <select value={filter.columnValue} onChange={(e) => {updateFilterProp('columnValue', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
-                              {getFilterColumnValues(index).map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                              {getFilterColumnValues(index).map((dataKey, index) => (
+                                <option value={dataKey} key={index}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
