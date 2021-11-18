@@ -1,158 +1,159 @@
 // Map Download UI
 .map-downloads {
-  position: relative;
-  z-index: 3;
+	position: relative;
+	z-index: 3;
 
-  .map-downloads__ui.btn-group {
-    transform: scale(.8);
-  }
+	.map-downloads__ui.btn-group {
+		transform: scale(0.8);
+	}
 
-  .map-downloads__ui {
-    position: absolute;
-    top: .5em;
-    left: .5em;
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 5px 12px -8px rgba(0, 0, 0, .50);
-    user-select: none;
-    height: 42px;
-  }
+	.map-downloads__ui {
+		position: absolute;
+		top: 0.5em;
+		left: 0.5em;
+		transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		box-shadow: 0 5px 12px -8px rgba(0, 0, 0, 0.5);
+		user-select: none;
+		height: 42px;
+	}
 }
 
 .map-container {
-  &.full-border {
-    border: #C2C2C2 1px solid;
-  }
+	&.full-border {
+		border: #c2c2c2 1px solid;
+	}
 }
 
 header + .map-container.full-border {
-  border-top: 0; // When they have a header, don't add a border top
+	border-top: 0; // When they have a header, don't add a border top
 }
 
 // World Specific Styles
 .map-container.world {
-  &.data .geography-container {
-    border-bottom: $lightGray 1px solid;
-  }
-  .geography-container {
-    cursor: move;
-  }
+	&.data .geography-container {
+		border-bottom: $lightGray 1px solid;
+	}
+	.geography-container {
+		cursor: move;
+	}
 }
 
 @include breakpointClass(md) {
-  // US Specific
-  .map-container.us {
-    margin: 0 1em;
-  }
-  // Data Specific
-  .map-container.data {
-    &.side {
-      flex-direction: row;
-    }
-  }
+	// US Specific
+	.map-container.us {
+		margin: 0 1em;
+	}
+	// Data Specific
+	.map-container.data {
+		&.side {
+			flex-direction: row;
+		}
+	}
 }
 
 .geography-container {
-  position: relative;
-  flex-grow: 1;
-  width: 100%;
-  overflow: hidden;
-  .geo-point {
-    transition: .3s all;
-    circle {
-      fill: inherit;
-      transition: .1s transform;
-    }
-    &:hover {
-      transition: .2s all;
-    }
-  }
-  .map-logo {
-    position: absolute;
-    bottom: 2em;
-    right: 1em;
-    z-index: 3;
-    width: 75px;
-  }
+	position: relative;
+	flex-grow: 1;
+	width: 100%;
+	overflow: hidden;
+	.geo-point {
+		transition: 0.3s all;
+		circle {
+			fill: inherit;
+			transition: 0.1s transform;
+		}
+		&:hover {
+			transition: 0.2s all;
+		}
+	}
+	.map-logo {
+		position: absolute;
+		bottom: 2em;
+		right: 1em;
+		z-index: 3;
+		width: 75px;
+	}
 }
 
 .single-geo {
-  transition: .2s fill;
-  &:focus {
-    outline: 0;
-  }
+	transition: 0.2s fill;
+	cursor: pointer;
+	&:focus {
+		outline: 0;
+	}
 }
 
 // Cities and Territories
 .territories {
-  margin: 2em 100px 2em 0;
-  font-size: 1.1em;
-  display: flex;
-  align-items: center;
-  > span {
-    margin-left: 1em;
-    margin-right: .5em;
-  }
-  svg {
-    max-width: 35px;
-    margin-left: .5em;
-    transition: .3s all;
-    text {
-      font-size: .95em;
-    }
-  }
+	margin: 2em 100px 2em 0;
+	font-size: 1.1em;
+	display: flex;
+	align-items: center;
+	> span {
+		margin-left: 1em;
+		margin-right: 0.5em;
+	}
+	svg {
+		max-width: 35px;
+		margin-left: 0.5em;
+		transition: 0.3s all;
+		text {
+			font-size: 0.95em;
+		}
+	}
 }
 
 .zoom-controls {
-  display: flex;
-  position: absolute;
-  bottom: 2em;
-  left: 1em;
-  z-index: 4;
-  > button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: .2em;
-    height: 1.75em;
-    width: 1.75em;
-    background: rgba(0,0,0,.65);
-    transition: .2s all;
-    color: #fff;
-    border-radius: 100%;
-    border: 0;
-    &:hover {
-      background: rgba(0,0,0,.8);
-      transition: .2s all;
-    }
-    &:active {
-      transform:scale(0.9);
-    }
-  }
-  > button:first-child {
-    margin-right: 0.25em;
-  }
+	display: flex;
+	position: absolute;
+	bottom: 2em;
+	left: 1em;
+	z-index: 4;
+	> button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.2em;
+		height: 1.75em;
+		width: 1.75em;
+		background: rgba(0, 0, 0, 0.65);
+		transition: 0.2s all;
+		color: #fff;
+		border-radius: 100%;
+		border: 0;
+		&:hover {
+			background: rgba(0, 0, 0, 0.8);
+			transition: 0.2s all;
+		}
+		&:active {
+			transform: scale(0.9);
+		}
+	}
+	> button:first-child {
+		margin-right: 0.25em;
+	}
 }
 
 @include breakpointClass(sm) {
-  .zoom-controls > button {
-    height: 2.5em;
-    width: 2.5em;
-  }
+	.zoom-controls > button {
+		height: 2.5em;
+		width: 2.5em;
+	}
 }
 
 @include breakpointClass(md) {
-  .map-downloads .map-downloads__ui.btn-group {
-    top: 1em;
-    left: 1em;
-    transform: none;
-  }
-  .territories {
-    font-size: 1em;
-    > span {
-      margin-left: 0;
-    }
-    svg {
-      max-width: 45px;
-    }
-  }
+	.map-downloads .map-downloads__ui.btn-group {
+		top: 1em;
+		left: 1em;
+		transform: none;
+	}
+	.territories {
+		font-size: 1em;
+		> span {
+			margin-left: 0;
+		}
+		svg {
+			max-width: 45px;
+		}
+	}
 }
