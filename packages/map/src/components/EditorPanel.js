@@ -364,19 +364,6 @@ const EditorPanel = (props) => {
                 }
               })
               break;
-              case 'county':
-                setState({
-                  ...state,
-                  general: {
-                      ...state.general,
-                      geoType: "county"
-                  },
-                  dataTable: {
-                    ...state.dataTable,
-                    forceDisplay: false
-                  }
-                })
-                break;
             default:
                 console.warn("Map type not set.")
             break;
@@ -829,11 +816,7 @@ const EditorPanel = (props) => {
                     <ul className="geo-buttons">
                       <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
                         <UsaGraphic />
-                        <span>State-Level U.S.</span>
-                      </li>
-                      <li className={state.general.geoType === 'county' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "county")}>
-                        <UsaGraphic />
-                        <span>County-Level U.S.</span>
+                        <span>United States</span>
                       </li>
                       <li className={state.general.geoType === 'world' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "world")}>
                         <WorldGraphic />

@@ -158,8 +158,8 @@ header + .map-container.full-border {
 	}
 }
 
-.county:hover {
-	transition: 0.4s fill linear;
-	fill: #ccff00;
-	fill-opacity: 1;
+.albersCounty {
+	transition: transform 1s;
+	will-change: transform;
+	transform-origin: center;
 }

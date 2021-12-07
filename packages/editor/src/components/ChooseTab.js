@@ -86,8 +86,7 @@ export default function ChooseTab() {
             </ul>
             <div className="heading-2">Maps</div>
             <ul className="grid">
-                <li><IconButton label="State-Level U.S." type="map" subType="us" icon={ <UsaIcon /> } /></li>
-                <li><IconButton label="County-Level U.S." type="map" subType="us-county" icon={ <UsaIcon /> } /></li>
+                <li><IconButton label="U.S. State- or County-Level" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
             </ul>
         </div>

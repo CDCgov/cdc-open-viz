@@ -64,6 +64,14 @@
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
+			"County FIPS Codes": "12103",
+			"State FIPS Codes": "12",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "25",
+			"Coverage Status": "Insured",
 			"County FIPS Codes": "32005",
 			"State FIPS Codes": "32",
 			"Year (Good filter option)": "2010",
