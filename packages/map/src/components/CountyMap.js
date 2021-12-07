@@ -4,10 +4,11 @@ import * as d3 from 'd3';
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from "d3-geo";
-import { feature, mesh } from "topojson-client";
+import { feature, mesh, border } from "topojson-client";
 import { AlbersUsa } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
+
 
 
 /**
@@ -15,20 +16,23 @@ import CityList from './CityList';
  * Decide on JSON and cleanup
  * Original file was county JSON, testJSON includes both state and county level data
  */
-import topoJSON from '../data/county-topo.json';
-import testJSON from '../data/test.json';
+// import topoJSON from '../data/county-topo.json';
+import testJSON from '../data/newtest.json';
 
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
 const ASPECT_RATIO = 1.55;
-const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
+//const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
+const STARTING_TRANSLATE = [0,0];
 const PADDING = 25;
-const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
+//const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
+const STARTING_SCALE = 1;
 
 // STATE ITEMS
 const STATE_STROKE_WIDTH = 1;
-const STATE_BORDER = 'black';
+const STATE_BORDER = '#c0cad4';
+const STATE_BORDER_COLOR = '#c0cad4';
 const STATE_BORDER_FOCUSED = '#B890BB';
 const STATE_BORDERWIDTH_FOCUSED = 10;
 const STATE_BACKGROUND = '#FFF';
@@ -36,9 +40,9 @@ const STATE_FILLOPACITY = '';
 const STATE_INACTIVE_FILL = '#F4F7FA';
 
 // COUNTY ITEMS
-const COUNTY_BACKGROUND = '';
+const COUNTY_BACKGROUND = '#FFF';
 const COUNTY_FILL = '';
-const COUNTY_FILLOPACITY = '';
+const COUNTY_FILLOPACITY = '1';
 
 // PLACEHOLDERS FOR BG SQUARE
 const BG_COLOR = '#E5F4FF';
@@ -49,17 +53,17 @@ let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states);
 
 const projection = d3.geoAlbersUsa()
-const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], states)
+//const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], states)
 
-const path = geoPath().projection(newProjection)
-const countyLines = path(mesh(testJSON, testJSON.objects.counties))
+const path = geoPath().projection(projection)
+const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
-//console.log('COUNTY LINES', countyLines)
+console.log('STATE LINES', stateLines)
 
 //let { features: counties } = feature(topoJSON, topoJSON.objects.AllCounties);
 
-console.log('US', states);
-console.log('COUNTIES', counties);
+// console.log('US', states);
+// console.log('COUNTIES', counties);
 
 
 const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
@@ -257,10 +261,14 @@ const CountyMap = (props) => {
     const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], myState)
 
     // 3) Gets the new scale
-    const newScale = newProjection.scale()
+    const newScale = newProjection.scale();
+    const hypot = Math.hypot(WIDTH, HEIGHT);
+    const newScaleWithHypot = newScale / 1070;
     
-    // 4) Pull the x & y out
+    // 4) Pull the x & y out, divide by half the viewport for some reason
     let [x, y] = newProjection.translate()
+    x = (x - 440);
+    y = (y - 250);
 
     // 5) Debug if needed
     const debug = {
@@ -268,18 +276,20 @@ const CountyMap = (props) => {
       height: HEIGHT,
       beginX: 0,
       beginY: 0,
+      hypot: hypot,
       x: x,
       y: y,
       newScale: newScale,
+      newScaleWithHypot: newScaleWithHypot,
       geoKey: geoKey,
       geo: geo
     }
 
-    //console.table(debug)
+    console.table(debug)
 
     // 6) Debug
-    setTranslate([x,y])
-    setScale(newScale)
+    setTranslate([x, y])
+    setScale(newScaleWithHypot)
     setFocusedState(geoKey)
   }
 
@@ -321,7 +331,6 @@ const CountyMap = (props) => {
         fill: STATE_BACKGROUND,
         fillOpacity: 1,
         cursor: 'default',
-        stroke: STATE_BORDER_FOCUSED,
         strokeWidth: STATE_BORDERWIDTH_FOCUSED
       }
 
@@ -470,8 +479,38 @@ const CountyMap = (props) => {
       )
     });
 
+    const renderStateLines = () => {
+      return (
+        <g className="stateLines" key="stateLines">
+          <path d={stateLines} strokeWidth="1" stroke={STATE_BORDER_COLOR} fill="none" />
+        </g>
+      )
+    }
+
+    const renderFocusedStateLine = () => {
+
+      if(!focusedState) return;
+      const state = testJSON.objects.states.geometries.filter( (el,index) => {
+        return el.id === focusedState;
+      })
+      console.log('STATE HERE', state);
+      console.log('focused state', focusedState)
+      const focusedStateLine = path(mesh(testJSON, state[0] ))
+      
+
+      console.log('FOCUSED STATE LINE', focusedStateLine)
+
+      return (
+        <g className="focusedBorder" key="focusedStateBorder">
+          <path d={focusedStateLine} strokeWidth="2" stroke={STATE_BORDER_FOCUSED} fill="none" fillOpacity="1" />
+        </g>
+      )
+    }
+
     geosJsx.push(stateOutput);
     geosJsx.push(countyOutput);
+    geosJsx.push(renderStateLines());
+    geosJsx.push(renderFocusedStateLine());
 
     // Cities
     geosJsx.push(<CityList
@@ -492,10 +531,17 @@ const CountyMap = (props) => {
     <ErrorBoundary component="CountyMap">
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container" data-scale={scale} data-translate={translate}>
-        <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={BG_COLOR}  onClick={ (e) => onReset(e) }></rect>
-        <AlbersUsa data={states.concat(counties)} scale={ scale } translate={ translate }>
-          { ({ features, projection }) => constructGeoJsx(features, projection) }
-        </AlbersUsa>
+            <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={BG_COLOR}  onClick={ (e) => onReset(e) }></rect>
+            <g className="albersCounty" transform={`translate(${translate}) scale(${scale})`}>
+              <AlbersUsa data={states.concat(counties)}>
+                { ({ features, projection }) => {
+                  return (
+                      constructGeoJsx(features, projection)
+                      )
+                    }
+                  }
+              </AlbersUsa>
+            </g>
       </svg>
       {territories.length > 0 && (
         <section className="territories">
