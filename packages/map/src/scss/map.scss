@@ -163,3 +163,15 @@ header + .map-container.full-border {
 	will-change: transform;
 	transform-origin: center;
 }
+
+// .state {
+// 	display: none;
+// }
+
+.state {
+	&:not(.state--focused):hover path {
+		fill: #e3d3e4 !important;
+		cursor: pointer;
+		transition: fill 0.65s;
+	}
+}
