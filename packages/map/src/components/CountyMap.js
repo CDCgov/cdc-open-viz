@@ -22,50 +22,35 @@ import testJSON from '../data/newtest.json';
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
-const ASPECT_RATIO = 1.55;
-//const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
 const STARTING_TRANSLATE = [0,0];
 const PADDING = 25;
-//const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
 const STARTING_SCALE = 1;
 
-// STATE ITEMS
+// When using <AlbersUsa> visx attributes, these are needed.
+// I wasn't able to get the transitions working with them.
+// const ASPECT_RATIO = 1.55;
+// const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
+// const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
+
+// DATA
+let { features: counties } = feature(testJSON, testJSON.objects.counties)
+let { features: states } = feature(testJSON, testJSON.objects.states);
+
+// CONSTANTS
 const STATE_STROKE_WIDTH = 1;
 const STATE_BORDER = '#c0cad4';
 const STATE_BORDER_COLOR = '#c0cad4';
 const STATE_BORDER_FOCUSED = '#B890BB';
 const STATE_BORDERWIDTH_FOCUSED = 10;
-const STATE_BACKGROUND = '#FFF';
-const STATE_FILLOPACITY = '';
 const STATE_INACTIVE_FILL = '#F4F7FA';
+const OCEAN_COLOR = '#E5F4FF';
 
-// COUNTY ITEMS
-const COUNTY_BACKGROUND = '#FFF';
-const COUNTY_FILL = '';
-const COUNTY_FILLOPACITY = '1';
-
-// PLACEHOLDERS FOR BG SQUARE
-const BG_COLOR = '#E5F4FF';
-const BG_STROKE = '';
-
-
-let { features: counties } = feature(testJSON, testJSON.objects.counties)
-let { features: states } = feature(testJSON, testJSON.objects.states);
-
+// CREATE STATE LINES
 const projection = d3.geoAlbersUsa()
-//const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], states)
-
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
-console.log('STATE LINES', stateLines)
-
-//let { features: counties } = feature(topoJSON, topoJSON.objects.AllCounties);
-
-// console.log('US', states);
-// console.log('COUNTIES', counties);
-
-
+// SHAPE FOR TERRITORIES.
 const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
   return (
     <svg viewBox="0 0 45 28">
@@ -285,9 +270,9 @@ const CountyMap = (props) => {
       geo: geo
     }
 
-    console.table(debug)
+    //console.table(debug)
 
-    // 6) Debug
+    // 6) Set Scale/Translate of state
     setTranslate([x, y])
     setScale(newScaleWithHypot)
     setFocusedState(geoKey)
@@ -298,7 +283,6 @@ const CountyMap = (props) => {
    * @param {object} e - click event 
    */
   function onReset(e) {
-    console.log( typeof e)
     e.preventDefault();
     setFocusedState(null);
     setScale( STARTING_SCALE );
@@ -308,12 +292,9 @@ const CountyMap = (props) => {
   // Constructs and displays markup for all geos on the map (except territories right now)
   const constructGeoJsx = (geographies, projection) => {
 
-    // get states & counties from geos
     const states = geographies.slice(0, 56);
     const counties = geographies.slice(56)
-    
     let showLabel = state.general.displayStateLabels
-
     let geosJsx = [];
 
     const stateOutput = states.map(( {feature: geo, path = ''}) => {
@@ -328,7 +309,7 @@ const CountyMap = (props) => {
       }
 
       let stateSelectedStyles = {
-        fill: STATE_BACKGROUND,
+        fill: STATE_INACTIVE_FILL,
         fillOpacity: 1,
         cursor: 'default',
         strokeWidth: STATE_BORDERWIDTH_FOCUSED
@@ -352,38 +333,41 @@ const CountyMap = (props) => {
 
 
       // Default return state, just geo with no additional information
-      return (
-        <g
-        key={key}
-          className={`state state--${geo.properties.name} ${focusedState === geo.id ? 'state--focused' : 'state--inactive'}`}
-        >
+      var fillStyle = {};
+        if(!focusedState) {
+          fillStyle = { display : 'none' }
+        }
 
-          {geo.id === focusedState &&
-            <>
-              <clipPath id="mask-state">
-                <path d={path} />
-              </clipPath>
-              <path
-                tabIndex={-1}
-                className='state-path state--focused'
-                clipPath="url(#mask-state)"
-                d={path}
-                css={stateSelectedStyles}
-              />
-            </>
-          }
-          {geo.id !== focusedState &&
-            <path
-              tabIndex={-1}
-              className='state-path state-path--inactive'
-              d={path}
-              css={stateStyles}
-            />
-          }
-          {showLabel && geoLabel(geo, stateStyles.fill, projection)}
-          
-        </g>
-      )
+        if(focusedState && focusedState !== geo.id) {
+          fillStyle = { display : 'block', fill : STATE_INACTIVE_FILL }
+        } else {
+          fillStyle = { display : 'none' }
+        }
+        return (
+          <g
+            key={key}
+            className={`state state--${geo.properties.name}${focusedState === geo.id ? ' state--focused' : '' }`}
+            style={fillStyle}
+          >
+
+            
+              <>
+                <path
+                  tabIndex={-1}
+                  className='state-path'
+                  clipPath="url(#mask-state)"
+                  d={path}
+                  fillOpacity={`${focusedState !== geo.id ? '1' : '0'}`}
+                  css={stateSelectedStyles}
+                  onClick={
+                    () => focusGeo(geo.id, geo)
+                  }
+                />
+              </>
+            {showLabel && geoLabel(geo, stateStyles.fill, projection)}
+            
+          </g>
+        )
     });
 
     const countyOutput = counties.map(( {feature: geo, path = ''}) => {
@@ -391,7 +375,8 @@ const CountyMap = (props) => {
 
       // COUNTY GROUPS
       let styles = {
-        fillOpacity: '0',
+        fillOpacity: '1',
+        fill: '#FFF',
         cursor: 'default'
       }
 
@@ -427,45 +412,57 @@ const CountyMap = (props) => {
         };
 
         // When to add pointer cursor
-        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+        if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'hover') {
           styles.cursor = 'pointer'
         }
-
-        return (
-          <g
-            data-for="tooltip"
-            data-tip={tooltip}
-            key={key}         
-            className={`county county--${geoDisplayName}`}
-            css={styles}
-            onClick={
-                // default
-                (e) => { geoClickHandler(geoDisplayName, geoData);
-                  let stateFipsCode = geoData['State FIPS Codes'];
-                  // update transform/translate
-                  focusGeo(stateFipsCode, geo)
-              
-              }
-            }
-          >
-            <path
-              tabIndex={-1}
+        
+          return (
+            <g
+              data-for="tooltip"
+              data-tip={tooltip}
+              key={key}         
               className={`county county--${geoDisplayName}`}
-              stroke={geoStrokeColor}
-              strokeWidth={1.3}   
-              d={path}
-            />
-            {showLabel && geoLabel(geo, legendColors[0], projection)}
-          </g>
-        )
+              css={styles}
+              onClick={
+                  // default
+                  (e) => { geoClickHandler(geoDisplayName, geoData);
+                    let stateFipsCode = geoData['State FIPS Codes'];
+                    // update transform/translate
+                    focusGeo(stateFipsCode, geo)
+                }
+              }
+            >
+              <path
+                tabIndex={-1}
+                className={`county county--${geoDisplayName}`}
+                stroke={geoStrokeColor}
+                strokeWidth={1.3}   
+                d={path}
+              />
+              {showLabel && geoLabel(geo, legendColors[0], projection)}
+            </g>
+          )
+        
       }
 
-      // Default return state, just geo with no additional information
+      // default county
       return (
         <g
-        key={key}
+          key={key}
           className={`county county--${geoDisplayName}`}
           css={styles}
+          onClick={
+              // default
+              (e) => { 
+                console.log(geo)
+                let countyFipsCode = geo.id;
+                let stateFipsCode = countyFipsCode.substring(0,2);
+                console.log('county', stateFipsCode)
+                // update transform/translate
+                console.log('GEO', geo)
+                focusGeo(stateFipsCode, geo)
+            }
+          }
         >
           <path
             tabIndex={-1}
@@ -482,7 +479,7 @@ const CountyMap = (props) => {
     const renderStateLines = () => {
       return (
         <g className="stateLines" key="stateLines">
-          <path d={stateLines} strokeWidth="1" stroke={STATE_BORDER_COLOR} fill="none" />
+          <path d={stateLines} strokeWidth="2" stroke={STATE_BORDER_COLOR} fill="none" />
         </g>
       )
     }
@@ -493,12 +490,8 @@ const CountyMap = (props) => {
       const state = testJSON.objects.states.geometries.filter( (el,index) => {
         return el.id === focusedState;
       })
-      console.log('STATE HERE', state);
-      console.log('focused state', focusedState)
-      const focusedStateLine = path(mesh(testJSON, state[0] ))
-      
 
-      console.log('FOCUSED STATE LINE', focusedStateLine)
+      const focusedStateLine = path(mesh(testJSON, state[0] ))
 
       return (
         <g className="focusedBorder" key="focusedStateBorder">
@@ -507,22 +500,10 @@ const CountyMap = (props) => {
       )
     }
 
-    geosJsx.push(stateOutput);
     geosJsx.push(countyOutput);
+    geosJsx.push(stateOutput);
     geosJsx.push(renderStateLines());
     geosJsx.push(renderFocusedStateLine());
-
-    // Cities
-    geosJsx.push(<CityList
-      projection={projection}
-      key="cities"
-      data={data}
-      state={state}
-      geoClickHandler={geoClickHandler}
-      applyTooltipsToGeo={applyTooltipsToGeo}
-      displayGeoName={displayGeoName}
-      applyLegendToRow={applyLegendToRow}
-    />)
 
     return geosJsx;
   };
@@ -531,7 +512,7 @@ const CountyMap = (props) => {
     <ErrorBoundary component="CountyMap">
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container" data-scale={scale} data-translate={translate}>
-            <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={BG_COLOR}  onClick={ (e) => onReset(e) }></rect>
+            <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={OCEAN_COLOR}  onClick={ (e) => onReset(e) }></rect>
             <g className="albersCounty" transform={`translate(${translate}) scale(${scale})`}>
               <AlbersUsa data={states.concat(counties)}>
                 { ({ features, projection }) => {
