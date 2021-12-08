@@ -46,7 +46,7 @@ const STATE_INACTIVE_FILL = '#F4F7FA';
 const OCEAN_COLOR = '#E5F4FF';
 
 // CREATE STATE LINES
-const projection = d3.geoAlbersUsa()
+const projection = d3.geoAlbersUsa().translate([WIDTH/2,HEIGHT/2])
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
@@ -242,18 +242,18 @@ const CountyMap = (props) => {
     let myState = states.find(state => state.id === geoKey );
     
     // 2) Set projections translation & scale to the geographic center of the passed geo.
-    const projection = d3.geoAlbersUsa()
+    const projection = d3.geoAlbersUsa().translate([WIDTH/2,HEIGHT/2])
     const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], myState)
 
     // 3) Gets the new scale
     const newScale = newProjection.scale();
-    const hypot = Math.hypot(WIDTH, HEIGHT);
-    const newScaleWithHypot = newScale / 1070;
+    const hypot = Math.hypot(880, 500);
+    const newScaleWithHypot = newScale / hypot;
     
     // 4) Pull the x & y out, divide by half the viewport for some reason
     let [x, y] = newProjection.translate()
-    x = (x - 440);
-    y = (y - 250);
+    x = (x - WIDTH/2);
+    y = (y - HEIGHT/2);
 
     // 5) Debug if needed
     const debug = {
@@ -513,16 +513,16 @@ const CountyMap = (props) => {
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container" data-scale={scale} data-translate={translate}>
             <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={OCEAN_COLOR}  onClick={ (e) => onReset(e) }></rect>
-            <g className="albersCounty" transform={`translate(${translate}) scale(${scale})`}>
-              <AlbersUsa data={states.concat(counties)}>
+              <AlbersUsa data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]}>
                 { ({ features, projection }) => {
                   return (
-                      constructGeoJsx(features, projection)
+                    <g className="albersCounty" transform={`translate(${translate}) scale(${scale})`}>
+                      { constructGeoJsx(features, projection) }
+                    </g>
                       )
                     }
                   }
               </AlbersUsa>
-            </g>
       </svg>
       {territories.length > 0 && (
         <section className="territories">
