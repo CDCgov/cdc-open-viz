@@ -45,5 +45,8 @@
     "react": ">=17",
     "react-dom": ">=17"
   },
-  "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
+  "gitHead": "170845062bcbb93f31270104688f69c4148935d8",
+  "dependencies": {
+    "d3-composite-projections": "^1.4.0"
+  }
 }
