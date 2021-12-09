@@ -162,6 +162,7 @@ header + .map-container.full-border {
 	transition: transform 1s;
 	will-change: transform;
 	transform-origin: center;
+	stroke: none !important;
 }
 
 // .state {
@@ -174,4 +175,8 @@ header + .map-container.full-border {
 		cursor: pointer;
 		transition: fill 0.65s;
 	}
+}
+
+.county--path {
+	fill: white;
 }

@@ -4,11 +4,11 @@ import * as d3 from 'd3';
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from "d3-geo";
-import { feature, mesh, border } from "topojson-client";
-import { AlbersUsa } from '@visx/geo';
+import { feature, mesh } from "topojson-client";
+import { AlbersUsa, CustomProjection } from '@visx/geo';
 import chroma from 'chroma-js';
-import CityList from './CityList';
 
+import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 
 
 /**
@@ -16,15 +16,15 @@ import CityList from './CityList';
  * Decide on JSON and cleanup
  * Original file was county JSON, testJSON includes both state and county level data
  */
-// import topoJSON from '../data/county-topo.json';
-import testJSON from '../data/newtest.json';
+import testJSON from '../data/dfc-map.json';
+// import testJSON from '../data/newtest.json';
+
+console.log('COUNTYJSON', testJSON)
 
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
-const STARTING_TRANSLATE = [0,0];
 const PADDING = 25;
-const STARTING_SCALE = 1;
 
 // When using <AlbersUsa> visx attributes, these are needed.
 // I wasn't able to get the transitions working with them.
@@ -39,14 +39,15 @@ let { features: states } = feature(testJSON, testJSON.objects.states);
 // CONSTANTS
 const STATE_STROKE_WIDTH = 1;
 const STATE_BORDER = '#c0cad4';
-const STATE_BORDER_COLOR = '#c0cad4';
+//const STATE_BORDER_COLOR = '#c0cad4';
+const STATE_BORDER_COLOR = '#000';
 const STATE_BORDER_FOCUSED = '#B890BB';
 const STATE_BORDERWIDTH_FOCUSED = 10;
 const STATE_INACTIVE_FILL = '#F4F7FA';
 const OCEAN_COLOR = '#E5F4FF';
 
 // CREATE STATE LINES
-const projection = d3.geoAlbersUsa().translate([WIDTH/2,HEIGHT/2])
+const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
@@ -101,9 +102,9 @@ const CountyMap = (props) => {
 
   const [focusedState, setFocusedState] = useState(null);
 
-  const [translate, setTranslate] = useState( STARTING_TRANSLATE )
+  const [translate, setTranslate] = useState( [0,0] )
   
-  const [scale, setScale] = useState( STARTING_SCALE )
+  const [scale, setScale] = useState( .85 )
 
   const container = useRef(null)
 
@@ -242,13 +243,13 @@ const CountyMap = (props) => {
     let myState = states.find(state => state.id === geoKey );
     
     // 2) Set projections translation & scale to the geographic center of the passed geo.
-    const projection = d3.geoAlbersUsa().translate([WIDTH/2,HEIGHT/2])
+    const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
     const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], myState)
 
     // 3) Gets the new scale
     const newScale = newProjection.scale();
     const hypot = Math.hypot(880, 500);
-    const newScaleWithHypot = newScale / hypot;
+    const newScaleWithHypot = newScale / 1070;
     
     // 4) Pull the x & y out, divide by half the viewport for some reason
     let [x, y] = newProjection.translate()
@@ -285,8 +286,8 @@ const CountyMap = (props) => {
   function onReset(e) {
     e.preventDefault();
     setFocusedState(null);
-    setScale( STARTING_SCALE );
-    setTranslate( STARTING_TRANSLATE )
+    setScale( .85 );
+    setTranslate( [0,0] )
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -294,7 +295,7 @@ const CountyMap = (props) => {
 
     const states = geographies.slice(0, 56);
     const counties = geographies.slice(56)
-    let showLabel = state.general.displayStateLabels
+    let showLabel = true;
     let geosJsx = [];
 
     const stateOutput = states.map(( {feature: geo, path = ''}) => {
@@ -304,7 +305,7 @@ const CountyMap = (props) => {
       let stateStyles = {
         cursor: 'default',
         stroke: STATE_BORDER,
-        strokeWidth: STATE_STROKE_WIDTH,
+        strokeWidth: 0.75 / scale,
         fill: STATE_INACTIVE_FILL
       }
 
@@ -312,7 +313,7 @@ const CountyMap = (props) => {
         fill: STATE_INACTIVE_FILL,
         fillOpacity: 1,
         cursor: 'default',
-        strokeWidth: STATE_BORDERWIDTH_FOCUSED
+        strokeWidth: 0.75 / scale
       }
 
       // Map the name from the geo data with the appropriate key for the processed data
@@ -349,7 +350,6 @@ const CountyMap = (props) => {
             className={`state state--${geo.properties.name}${focusedState === geo.id ? ' state--focused' : '' }`}
             style={fillStyle}
           >
-
             
               <>
                 <path
@@ -365,12 +365,12 @@ const CountyMap = (props) => {
                 />
               </>
             {showLabel && geoLabel(geo, stateStyles.fill, projection)}
-            
           </g>
         )
     });
 
     const countyOutput = counties.map(( {feature: geo, path = ''}) => {
+      console.log('my geo', geo);
       const key = geo.id + '-group'
 
       // COUNTY GROUPS
@@ -395,6 +395,9 @@ const CountyMap = (props) => {
       }
 
       const geoDisplayName = displayGeoName(geoKey);
+
+      // For some reason, these two geos are breaking the display.
+      if(geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return;
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
@@ -439,7 +442,6 @@ const CountyMap = (props) => {
                 strokeWidth={1.3}   
                 d={path}
               />
-              {showLabel && geoLabel(geo, legendColors[0], projection)}
             </g>
           )
         
@@ -468,10 +470,10 @@ const CountyMap = (props) => {
             tabIndex={-1}
             className='single-geo'
             stroke={geoStrokeColor}
-            strokeWidth={1.3}
+            strokeWidth={ 0.75 / scale}
             d={path}
           />
-          {showLabel && geoLabel(geo, styles.fill, projection)}
+          {showLabel && geoLabel(geo, styles.fill, geoAlbersUsaTerritories)}
         </g>
       )
     });
@@ -479,7 +481,7 @@ const CountyMap = (props) => {
     const renderStateLines = () => {
       return (
         <g className="stateLines" key="stateLines">
-          <path d={stateLines} strokeWidth="2" stroke={STATE_BORDER_COLOR} fill="none" />
+          <path d={stateLines} strokeWidth={ 0.75 / scale} stroke={STATE_BORDER_COLOR} fill="none" />
         </g>
       )
     }
@@ -495,7 +497,7 @@ const CountyMap = (props) => {
 
       return (
         <g className="focusedBorder" key="focusedStateBorder">
-          <path d={focusedStateLine} strokeWidth="2" stroke={STATE_BORDER_FOCUSED} fill="none" fillOpacity="1" />
+          <path d={focusedStateLine} strokeWidth={ 0.75 / scale} stroke={STATE_BORDER_FOCUSED} fill="none" fillOpacity="1" />
         </g>
       )
     }
@@ -513,16 +515,16 @@ const CountyMap = (props) => {
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container" data-scale={scale} data-translate={translate}>
             <rect className="background center-container" width={WIDTH} height={HEIGHT} fillOpacity={1} fill={OCEAN_COLOR}  onClick={ (e) => onReset(e) }></rect>
-              <AlbersUsa data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]}>
+              <CustomProjection data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]} projection={geoAlbersUsaTerritories}>
                 { ({ features, projection }) => {
                   return (
                     <g className="albersCounty" transform={`translate(${translate}) scale(${scale})`}>
-                      { constructGeoJsx(features, projection) }
+                      { constructGeoJsx(features, geoAlbersUsaTerritories) }
                     </g>
                       )
                     }
                   }
-              </AlbersUsa>
+              </CustomProjection>
       </svg>
       {territories.length > 0 && (
         <section className="territories">
