@@ -68,7 +68,7 @@ const hashObj = (row) => {
     let str = JSON.stringify(row)
 
 	let hash = 0;
-	if (str.length == 0) return hash;
+	if (str.length === 0) return hash;
 	for (let i = 0; i < str.length; i++) {
 		let char = str.charCodeAt(i);
 		hash = ((hash<<5)-hash) + char;
@@ -106,6 +106,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
+
+    const [mapToShow, setMapToShow] = useState(null)
 
     let legendMemo = useRef(new Map())
 
@@ -151,7 +153,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // County Check
-            if("county" === obj.general.geoType) {
+            if("us-county" === obj.general.geoType) {
                 const fips = row[obj.columns.geo.name]
 
                 uid = countyKeys.find( (key) => key === fips )
@@ -510,7 +512,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
 
-                    if (row[columnName] != active) return false // Bail out, not part of filter
+                    if (row[columnName] !== active) return false // Bail out, not part of filter
                 }
             }
 
@@ -703,7 +705,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
-        if (state.general.geoType === 'county') {
+        if (state.general.geoType === 'us-county') {
             const stateName = supportedStatesFipsCodes[row['State FIPS Codes']];
             
             //supportedStatesFipsCodes[]
@@ -1041,7 +1043,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         mapContainerClasses.push('full-border')
     }
 
-    if(loading) return <Loading />
 
     // Props passed to all map types
     const mapProps = {
@@ -1055,6 +1056,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         applyLegendToRow,
         displayGeoName
     }
+
+    useEffect(() => {
+        if('us' === state.general.geoType) {
+            setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
+        }
+        if('world' === state.general.geoType) {
+            setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if('us-county' === state.general.geoType) {
+            setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if("data" === state.general.type && logo) {
+            setMapToShow(<img src={logo} alt="" className="map-logo"/>)
+        }
+    }, [state.general.geoType, state.general.type]);
+    
+    if(loading) return <Loading />
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1091,10 +1109,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                         {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                            {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                            {'county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                            {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
+                        {mapToShow}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar

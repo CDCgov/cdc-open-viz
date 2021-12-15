@@ -4,14 +4,14 @@
 		"title": "Default County Map",
 		"subtext": "",
 		"territoriesLabel": "Territories",
-		"type": "data",
-		"geoType": "county",
+		"type": "map",
+		"geoType": "us-county",
 		"headerColor": "theme-blue",
 		"showSidebar": true,
 		"showTitle": true,
 		"geoBorderColor": "darkGray",
 		"showDownloadButton": true,
-		"expandDataTable": true
+		"expandDataTable": false
 	},
 	"color": "pinkpurple",
 	"columns": {
