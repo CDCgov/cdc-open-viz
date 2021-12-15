@@ -158,7 +158,7 @@ header + .map-container.full-border {
 	}
 }
 
-.albersCounty {
+.countyMapGroup {
 	transition: transform 1s;
 	will-change: transform;
 	transform-origin: center;
@@ -170,10 +170,10 @@ header + .map-container.full-border {
 // }
 
 .state {
-	&:not(.state--focused):hover path {
+	&--inactive:hover path {
 		fill: #e3d3e4 !important;
 		cursor: pointer;
-		transition: fill 0.65s;
+		transition: fill 0.25s;
 	}
 }
 

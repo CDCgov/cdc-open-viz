@@ -364,6 +364,20 @@ const EditorPanel = (props) => {
                 }
               })
               break;
+            case 'us-county':
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    expandDataTable: false,
+                    geoType: "us-county"
+                },
+                dataTable: {
+                  ...state.dataTable,
+                  forceDisplay: true
+                }
+              })
+              break;
             default:
                 console.warn("Map type not set.")
             break;
@@ -814,7 +828,7 @@ const EditorPanel = (props) => {
                   <label>
                     <span className="edit-label column-heading"><span>Geography</span></span>
                     <ul className="geo-buttons">
-                      <li className={state.general.geoType === 'us' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
+                      <li className={state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
                         <UsaGraphic />
                         <span>United States</span>
                       </li>
@@ -824,8 +838,16 @@ const EditorPanel = (props) => {
                       </li>
                     </ul>
                   </label>
+                  {/* Select > State or County Map */}
                   <label>
+                  <span className="edit-label column-heading">Map Type</span>
+                  <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
+                    <option value="us">US State-Level</option>
+                    <option value="us-county">US County-Level</option>
+                  </select>
+                  </label>
                   {/* Type */}
+                  <label>
                   <span className="edit-label column-heading">Map Type</span>
                   <select value={state.general.type} onChange={(event) => { handleEditorChanges("editorMapType", event.target.value) }}>
                     <option value="data">Data</option>
