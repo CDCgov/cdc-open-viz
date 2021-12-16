@@ -6,7 +6,7 @@ import { geoCentroid, geoPath } from "d3-geo";
 import { feature, mesh } from "topojson-client";
 import { CustomProjection } from '@visx/geo';
 import chroma from 'chroma-js';
-
+import colorPalettes from '../data/color-palettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 
 const abbrs = {
@@ -93,8 +93,6 @@ import testJSON from '../data/dfc-map.json';
 // import testJSON from '../data/newtest.json';
 import D3Map from './ClassCountyMap';
 
-console.log('COUNTYJSON', testJSON)
-
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
@@ -123,16 +121,16 @@ const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
 // SHAPE FOR TERRITORIES.
-const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
-  return (
-    <svg viewBox="0 0 45 28">
-      <g {...props} strokeLinejoin="round">
-        <path stroke={stroke} strokeWidth={strokeWidth} d="M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z" />
-        <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
-      </g>
-    </svg>
-  )
-}
+// const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
+//   return (
+//     <svg viewBox="0 0 45 28">
+//       <g {...props} strokeLinejoin="round">
+//         <path stroke={stroke} strokeWidth={strokeWidth} d="M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z" />
+//         <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
+//       </g>
+//     </svg>
+//   )
+// }
 
 // const offsets = {
 //   'US-VT': [50, -8],
@@ -159,8 +157,6 @@ const nudges = {
 
 const CountyMap = (props) => {
 
-  console.log('RENDERING')
-
   const {
     state,
     applyTooltipsToGeo,
@@ -169,113 +165,30 @@ const CountyMap = (props) => {
     applyLegendToRow,
     displayGeoName,
     supportedTerritories,
-    rebuildTooltips
+    rebuildTooltips,
+    runtimeLegend,
+    generateColorsArray
   } = props;
-
-
-  const [territoriesData, setTerritoriesData] = useState([]);
-
-  const [focusedState, setFocusedState] = useState(null);
-
-  const [translate, setTranslate] = useState( [0,0] )
   
-  const [scale, setScale] = useState( .85 )
-
-  // Map
-  const container = useRef(null)
-
-  const territoriesKeys = supportedTerritories ? Object.keys(supportedTerritories) : []; // data will have already mapped abbreviated territories to their full names
-
-  // useEffect(() => {
-  //   // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-  //   const territoriesList = territoriesKeys.filter(key => data[key]);
-
-  //   setTerritoriesData(territoriesList);
-  // }, [data]);
-
-  useEffect(() => rebuildTooltips());
-
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+  const focusedState = null;  
+  const translate = [0,0];
+  const scale = .85;
+  const startingLineWidth = .85;
+  const container = useRef(null)
+  useEffect(() => rebuildTooltips());
+  
+  let mapColorPalette = colorPalettes[state.color] || '#fff';
+  let focusedBorderColor = mapColorPalette[3];
 
-  // const territories = territoriesData.map(territory => {
-  //   const Shape = Rect
-
-  //   const territoryData = data[territory];
-
-  //   let toolTip;
-
-  //   let styles = {
-  //     fill: '#E6E6E6',
-  //     color: '#202020',
-  //     fillOpacity: '1'
-  //   };
-
-  //   const label = supportedTerritories[territory][1]
-
-  //   if(!territoryData) return <Shape key={label} label={label} css={styles} text={styles.color} />
-
-  //   toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData);
-
-  //   const legendColors = applyLegendToRow(territoryData);
-
-  //   let textColor = '#FFF';
-
-  //   if (legendColors) {
-  //     // Use white text if the background is dark, and dark grey if it's light
-  //     if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
-  //       textColor = '#202020';
-  //     }
-
-  //     let needsPointer = false;
-
-  //     // If we need to add a pointer cursor
-  //     if ((state.columns.navigate && territoryData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
-  //       needsPointer = true;
-  //     }
-
-  //     styles = {
-  //       color: textColor,
-  //       fill: legendColors[0],
-  //       cursor: needsPointer ? 'pointer' : 'default',
-  //       '&:hover': {
-  //         fill: legendColors[1],
-  //       },
-  //       '&:active': {
-  //         fill: legendColors[2],
-  //       }
-  //     };
-
-  //     return (<Shape
-  //       key={label}
-  //       label={label}
-  //       css={styles}
-  //       text={styles.color}
-  //       data-tip={toolTip}
-  //       data-for="tooltip"
-  //       stroke={geoStrokeColor}
-  //       strokeWidth={1.5}
-  //       onClick={() => geoClickHandler(territory, territoryData)}
-  //     />)
-  //   }
-  // });
 
   const geoLabel = (geo, projection) => {
     //projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
     //const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], geo)
-    console.log('LABELS', {geo, projection})
     let [x, y] = projection( geoCentroid(geo) )
-
-    console.log({x,y})
-  
     let abbr = abbrs[geo.properties.name]
-  
     if(abbr === 'NJ') x += 3
-
-    console.log('ABBR', abbr)
-  
     if(undefined === abbr) return null
-    
-    console.log(geo.properties.name)
     let [dx, dy] = offsets[geo.properties.name]
   
     return (
@@ -288,20 +201,6 @@ const CountyMap = (props) => {
     )
   }
 
-
-	// const [storedMap, setStoredMap] = useState();
-	// const map = useRef();
-
-	// useEffect(() => {
-		
-	// 	if(!map.current.children || map.current.children.length === 0) {
-	// 		setStoredMap( new D3Map(map.current) );
-	// 	}
-
-
-	// }, [map])
-  
-
   /**
    * On state clicks, focus the county
    * @param {string} state fips code 
@@ -310,14 +209,13 @@ const CountyMap = (props) => {
    */
   const focusGeo = (geoKey, geo) => {
 
-    
     if(!geoKey) {
       console.log('County Map: no geoKey provided to focusGeo')
       return;
     }
-    
+
     // 1) Get the state the county is in.
-    let myState = states.find(state => state.id === geoKey );
+    let myState = states.find(s => s.id === geoKey );
     
     // 2) Set projections translation & scale to the geographic center of the passed geo.
     const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
@@ -361,7 +259,6 @@ const CountyMap = (props) => {
     group.setAttribute( 'transform', `translate(${[x,y]}) scale(${newScaleWithHypot})` );
 
     // set the states border
-    console.log(myState)
     let allStates = document.querySelectorAll('.state path');
     let allCounties = document.querySelectorAll('.county path');
     let currentState = document.querySelector(`.state--${myState.id}`);
@@ -373,26 +270,22 @@ const CountyMap = (props) => {
       return el.id === myState.id;
     })
 
-    console.log('STATE', state)
-
     const focusedStateLine = path(mesh(testJSON, state[0] ))
 
-    // console.log('other states', otherStates)
-    // console.log('current', currentState)
-    // console.log('focusedBorderPath', focusedBorder)
-    console.log('CURRENT', currentState)
     currentState.style.display = 'none'
-    allStates.forEach( state => state.style.strokeWidth = .75 / newScaleWithHypot);
+    //allStates.forEach( state => state.style.strokeWidth = .75 / newScaleWithHypot);
+    stateLinesPath.setAttribute('stroke-width', .75 / newScaleWithHypot);
     allCounties.forEach( county => county.style.strokeWidth = .75 / newScaleWithHypot);
     otherStates.forEach( el => el.style.display = 'block' )
-
     
+    // State Line Updates
+    //stateLinesPath.setAttribute('stroke-width', .75 / newScaleWithHypot);
+    stateLinesPath.setAttribute('stroke', geoStrokeColor);
+
     // Set Focus Border
     focusedBorder.setAttribute('d', focusedStateLine);
-    focusedBorder.setAttribute('stroke-width', .75 / newScaleWithHypot);
-
-    // State Line Updates
-    stateLinesPath.setAttribute('stroke-width', .75 / newScaleWithHypot);
+    //focusedBorder.setAttribute('stroke-width', .75 / newScaleWithHypot);
+    focusedBorder.setAttribute('stroke', focusedBorderColor)
   }
 
   /**
@@ -402,17 +295,23 @@ const CountyMap = (props) => {
   function onReset(e) {
     e.preventDefault();
     const group = document.getElementById('mapGroup');
-    const allStates = document.querySelectorAll('.state');
+    const allStates = document.querySelectorAll('.state path');
+    let otherStates = document.querySelectorAll(`.state--inactive`)
     const allCounties = document.querySelectorAll('.county path');
-    const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
+    let stateBorderColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
     let stateLinesPath = document.getElementById('stateLinesPath');
+    let focusedBorder = document.getElementById('focusedBorderPath');
 
-
-    allCounties.forEach( el => el.style.strokeWidth = .2 )
-    allCounties.forEach( el => el.setAttribute('stroke' , geoStrokeColor ) )
-    allStates.forEach( el => el.style.display = 'none' );
+    focusedBorder.style.display = 'none';
+    focusedBorder.setAttribute('stroke', stateBorderColor);
+    focusedBorder.style.strokeWidth = startingLineWidth;
+    //allCounties.forEach( el => el.style.strokeWidth = .2 )
+    stateLinesPath.setAttribute('stroke', stateBorderColor);
+    otherStates.forEach( el => el.style.display = 'none' );
+    allStates.forEach( state => state.setAttribute('stroke-width', .85));
     group.setAttribute( 'transform', `translate(${[0,0]}) scale(${.85})` );
-    stateLinesPath.setAttribute( 'stroke-width', '.2' );
+    stateLinesPath.setAttribute( 'stroke-width', startingLineWidth );
+    focusedBorder.setAttribute( 'stroke-width', startingLineWidth)
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -435,7 +334,6 @@ const CountyMap = (props) => {
       }
 
       let stateSelectedStyles = {
-        fill: STATE_INACTIVE_FILL,
         fillOpacity: 1,
         cursor: 'default',
       }
@@ -481,14 +379,25 @@ const CountyMap = (props) => {
                   className='state-path'
                   d={path}
                   fillOpacity={`${focusedState !== geo.id ? '1' : '0'}`}
+                  fill={STATE_INACTIVE_FILL}
                   css={stateSelectedStyles}
                   onClick={
                     () => focusGeo(geo.id, geo)
                   }
+                  onMouseEnter={
+                    (e) => {
+                      e.target.attributes.fill.value = mapColorPalette[3]
+                    }
+                  }
+                  onMouseLeave={
+                    (e) => {
+                      e.target.attributes.fill.value = STATE_INACTIVE_FILL
+                    }
+                  }
                 />
               </>
           </g>
-          <g>
+          <g key={`label--${geo.properties.name}`}>
             { offsets[geo.properties.name] && geoLabel(geo, geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2]))}
           </g>
           </>
@@ -501,7 +410,7 @@ const CountyMap = (props) => {
       // COUNTY GROUPS
       let styles = {
         fillOpacity: '1',
-        fill: '#FFF',
+        fill: '#f5f5f5',
         cursor: 'default'
       }
 
@@ -553,8 +462,11 @@ const CountyMap = (props) => {
               css={styles}
               onClick={
                   // default
-                  (e) => { geoClickHandler(geoDisplayName, geoData);
-                    let stateFipsCode = geoData['State FIPS Codes'];
+                  (e) => { 
+                    console.log('geo data', geoData)
+                    let stateFipsCode = geoData['FIPS Codes'].substring(0,2);
+                    console.log('STATE FIPS', stateFipsCode)
+                    geoClickHandler(geoDisplayName, geoData);
                     // update transform/translate
                     focusGeo(stateFipsCode, geo)
                 }
@@ -582,11 +494,9 @@ const CountyMap = (props) => {
           onClick={
               // default
               (e) => { 
-                console.log(geo)
                 let countyFipsCode = geo.id;
                 let stateFipsCode = countyFipsCode.substring(0,2);
                 // update transform/translate
-                console.log('GEO', geo)
                 focusGeo(stateFipsCode, geo)
             }
           }
@@ -605,7 +515,7 @@ const CountyMap = (props) => {
     const renderStateLines = () => {
       return (
         <g className="stateLines" key="stateLines">
-          <path id="stateLinesPath" d={stateLines} stroke-width={".2"} stroke={STATE_BORDER_COLOR} fill="none" fillOpacity="1"/>
+          <path id="stateLinesPath" d={stateLines} strokeWidth={startingLineWidth} stroke={geoStrokeColor} fill="none" fillOpacity="1"/>
         </g>
       )
     }
@@ -613,7 +523,7 @@ const CountyMap = (props) => {
     const renderFocusedStateLine = () => {
       return (
         <g id="focusedBorder" key="focusedStateBorder">
-          <path id="focusedBorderPath" d="" stroke-width="" stroke={STATE_BORDER_FOCUSED} fill="none" fillOpacity="1" />
+          <path id="focusedBorderPath" d="" strokeWidth="" stroke={focusedBorderColor} fill="none" fillOpacity="1" />
         </g>
       )
     }
@@ -631,11 +541,16 @@ const CountyMap = (props) => {
       {/* <div className="countyMap" ref={map}></div> */}
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container">
-        <rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="#E5F4FF" onClick={ (e) => onReset(e) }></rect>
+        <rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white" onClick={ (e) => onReset(e) }></rect>
           <CustomProjection data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]} projection={geoAlbersUsaTerritories}>
             { ({ features, projection }) => {
               return (
-                <g id="mapGroup" className="countyMapGroup" transform={`translate(${translate}) scale(${scale})`} data-scale="">
+                <g 
+                  id="mapGroup" 
+                  className="countyMapGroup" 
+                  transform={`translate(${translate}) scale(${scale})`} 
+                  data-scale="" 
+                  key="countyMapGroup">
                   { constructGeoJsx(features, geoAlbersUsaTerritories) }
                 </g>
                   )

@@ -16,6 +16,7 @@ import CloseIcon from '@cdc/core/assets/icon-close.svg';
 
 import validMapData from '../../example/valid-data-map.csv';
 import validChartData from '../../example/valid-data-chart.csv';
+import validCountyMapData from '../../example/valid-county-data.csv';
 
 import { DataTransform } from '@cdc/core/components/DataTransform';
 
@@ -296,6 +297,7 @@ export default function DataImport() {
             <ul className="sample-data-list">
               <li onClick={() => loadData(new Blob([validMapData], {type : 'text/csv'}), 'valid-data-map.csv')}>United States Sample Data #1</li>
               <li onClick={() => loadData(new Blob([validChartData], {type : 'text/csv'}), 'valid-data-chart.csv')}>Chart Sample Data</li>
+              <li onClick={() => loadData(new Blob([validCountyMapData], {type : 'text/csv'}), 'valid-county-data.csv')}>United States Counties Sample Data</li>
             </ul>
             <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank" rel="noopener noreferrer" className="guidance-link">
               <div>

@@ -706,7 +706,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
         if (state.general.geoType === 'us-county') {
-            const stateName = supportedStatesFipsCodes[row['State FIPS Codes']];
+            let stateFipsCode = row['FIPS Codes'].substring(0,2)
+            const stateName = supportedStatesFipsCodes[stateFipsCode];
             
             //supportedStatesFipsCodes[]
             toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
@@ -1043,7 +1044,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         mapContainerClasses.push('full-border')
     }
 
-
     // Props passed to all map types
     const mapProps = {
         state,
@@ -1054,23 +1054,25 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         navigationHandler,
         geoClickHandler,
         applyLegendToRow,
-        displayGeoName
+        displayGeoName,
+        runtimeLegend,
+        generateColorsArray
     }
 
-    useEffect(() => {
-        if('us' === state.general.geoType) {
-            setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
-        }
-        if('world' === state.general.geoType) {
-            setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
-        }
-        if('us-county' === state.general.geoType) {
-            setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
-        }
-        if("data" === state.general.type && logo) {
-            setMapToShow(<img src={logo} alt="" className="map-logo"/>)
-        }
-    }, [state.general.geoType, state.general.type]);
+    // useEffect(() => {
+    //     if('us' === state.general.geoType) {
+    //         setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
+    //     }
+    //     if('world' === state.general.geoType) {
+    //         setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
+    //     }
+    //     if('us-county' === state.general.geoType) {
+    //         setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+    //     }
+    //     if("data" === state.general.type && logo) {
+    //         setMapToShow(<img src={logo} alt="" className="map-logo"/>)
+    //     }
+    // }, [state.general.geoType, state.general.type]);
     
     if(loading) return <Loading />
 
@@ -1109,7 +1111,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                         {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                        {mapToShow}
+                        {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                        {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                        {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                        {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar

@@ -171,9 +171,8 @@ header + .map-container.full-border {
 
 .state {
 	&--inactive:hover path {
-		fill: #e3d3e4 !important;
 		cursor: pointer;
-		transition: fill 0.25s;
+		transition: fill 0.5s;
 	}
 }
 
