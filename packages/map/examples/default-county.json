@@ -16,7 +16,7 @@
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
-			"name": "County FIPS Codes",
+			"name": "FIPS Codes",
 			"label": "Location",
 			"tooltip": false,
 			"dataTable": true
@@ -48,64 +48,56 @@
 		{
 			"Insured Rate": "8",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "06071",
-			"State FIPS Codes": "06",
+			"FIPS Codes": "06071",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "55005",
-			"State FIPS Codes": "55",
+			"FIPS Codes": "55005",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "12103",
-			"State FIPS Codes": "12",
+			"FIPS Codes": "12103",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "32005",
-			"State FIPS Codes": "32",
+			"FIPS Codes": "32005",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "18",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "06075",
-			"State FIPS Codes": "06",
+			"FIPS Codes": "06075",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "3",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "06027",
-			"State FIPS Codes": "06",
+			"FIPS Codes": "06027",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "25",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "06029",
-			"State FIPS Codes": "06",
+			"FIPS Codes": "06029",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
 			"Insured Rate": "60",
 			"Coverage Status": "Insured",
-			"County FIPS Codes": "06065",
-			"State FIPS Codes": "06",
+			"FIPS Codes": "06065",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		}

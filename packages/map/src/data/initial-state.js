@@ -10,7 +10,7 @@ export default {
     displayStateLabels: false,
     territoriesLabel: 'Territories',
     language: 'en',
-    geoType: 'us',
+    geoType: 'us-county',
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
@@ -20,7 +20,7 @@ export default {
   color: 'pinkpurple',
   columns: {
     geo: {
-      name: '',
+      name: 'FIPS Codes',
       label: 'Location',
 			tooltip: false,
       dataTable: true,

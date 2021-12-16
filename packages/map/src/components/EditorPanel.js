@@ -19,6 +19,7 @@ import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
+import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
@@ -331,8 +332,14 @@ const EditorPanel = (props) => {
           break;
         }
 
-        if(true === loadedDefault && 'us' === value) {
+        if( true === loadedDefault && 'us' === value ) {
           loadConfig(usaDefaultConfig)
+          ReactTooltip.rebuild()
+          break;
+        }
+
+        if( true === loadedDefault && 'us-county' === value ) {
+          loadConfig(countyDefaultConfig)
           ReactTooltip.rebuild()
           break;
         }
@@ -828,7 +835,7 @@ const EditorPanel = (props) => {
                   <label>
                     <span className="edit-label column-heading"><span>Geography</span></span>
                     <ul className="geo-buttons">
-                      <li className={state.general.geoType === 'us' || state.general.geoType === 'us-county' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "us")}>
+                      <li className={ (state.general.geoType === 'us' || state.general.geoType === 'us-county') ? 'active' : ''} onClick={() => handleEditorChanges("geoType", 'us' )}>
                         <UsaGraphic />
                         <span>United States</span>
                       </li>
@@ -861,7 +868,7 @@ const EditorPanel = (props) => {
                     <span className="edit-label">Display As Hex Map</span>
                   </label>
                   }
-                  {'us' === state.general.geoType && 'data' === state.general.type && false === state.general.displayAsHex &&
+                  { ('us' === state.general.geoType) && ('data' === state.general.type) && (false === state.general.displayAsHex) &&
                   <label className="checkbox">
                     <input type="checkbox" checked={ state.general.displayStateLabels } onChange={(event) => { handleEditorChanges("displayStateLabels", event.target.checked) }} />
                     <span className="edit-label">Display state labels</span>
