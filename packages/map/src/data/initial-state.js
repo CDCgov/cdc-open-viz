@@ -10,7 +10,7 @@ export default {
     displayStateLabels: false,
     territoriesLabel: 'Territories',
     language: 'en',
-    geoType: 'us-county',
+    geoType: 'us',
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,

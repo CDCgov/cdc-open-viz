@@ -96,8 +96,8 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+    
     const transform = new DataTransform()
-
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [currentViewport, setCurrentViewport] = useState('lg')
@@ -106,15 +106,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
-
-    const [mapToShow, setMapToShow] = useState(null)
-
     let legendMemo = useRef(new Map())
-
+    
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-
+            
             setCurrentViewport(newViewport)
         }
     });
@@ -160,7 +157,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // TODO: Points
-
             if(uid) {
                 Object.defineProperty(row, 'uid', {
                     value: uid,
@@ -1059,21 +1055,25 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray
     }
 
-    // useEffect(() => {
-    //     if('us' === state.general.geoType) {
-    //         setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
-    //     }
-    //     if('world' === state.general.geoType) {
-    //         setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
-    //     }
-    //     if('us-county' === state.general.geoType) {
-    //         setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
-    //     }
-    //     if("data" === state.general.type && logo) {
-    //         setMapToShow(<img src={logo} alt="" className="map-logo"/>)
-    //     }
-    // }, [state.general.geoType, state.general.type]);
-    
+
+    const [mapToShow, setMapToShow] = useState(null)
+
+
+    useEffect(() => {
+        if('us' === state.general.geoType) {
+            setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
+        }
+        if('world' === state.general.geoType) {
+            setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if('us-county' === state.general.geoType) {
+            setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if("data" === state.general.type && logo) {
+            setMapToShow(<img src={logo} alt="" className="map-logo"/>)
+        }
+    }, [state.general.geoBorderColor, state.general.geoType, state.general.type, state.color, mapProps.data, mapProps.runtimeLegend]);
+
     if(loading) return <Loading />
 
     return (
@@ -1111,10 +1111,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                         {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                        {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                        {/* {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                         {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                         {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                        {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
+                        {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
+                        {mapToShow}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
