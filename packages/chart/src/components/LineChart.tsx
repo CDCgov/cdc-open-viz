@@ -10,7 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }) {
-  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
 
   return (
     <ErrorBoundary component="LineChart">
@@ -35,7 +35,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
 
               return (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
-                <Text 
+                <Text
                     display={config.labels ? 'block' : 'none'}
                     x={xScale(getXAxisData(d))}
                     y={yScale(getYAxisData(d, seriesKey))}

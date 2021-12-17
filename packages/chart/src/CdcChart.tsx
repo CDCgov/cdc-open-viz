@@ -42,6 +42,8 @@ export default function CdcChart(
 
   const [data, setData] = useState<Array<Object>>([]);
 
+  const [excludedData, setExcludedData] = useState<Array<Object>>();
+
   const [filteredData, setFilteredData] = useState<Array<Object>>();
 
   const [loading, setLoading] = useState<Boolean>(true);
@@ -79,7 +81,10 @@ export default function CdcChart(
       }
     }
 
-    if(data) setData(data);
+    if(data) {
+      setData(data)
+      setExcludedData(data)
+    }
 
     let newConfig = {...defaults, ...response}
     if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
@@ -94,6 +99,32 @@ export default function CdcChart(
       }
     });
 
+    // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
+    let newExcludedData
+
+    if (newConfig.exclusions && newConfig.exclusions.active) {
+      if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
+        newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
+      } else if (newConfig.xAxis.type === 'date' && (newConfig.exclusions.date.start || newConfig.exclusions.date.end)) {
+        let startDate = newConfig.exclusions.date.start
+        let endDate = newConfig.exclusions.date.end
+
+        if (undefined === typeof startDate) {
+          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] <= endDate)
+        } else if (undefined === typeof endDate) {
+          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] >= startDate)
+        } else {
+          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] >= startDate && e[newConfig.xAxis.dataKey] <= endDate)
+        }
+      } else {
+        newExcludedData = dataOverride || data
+      }
+    } else {
+      newExcludedData = dataOverride || data
+    }
+
+    setExcludedData(newExcludedData)
+
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData;
 
@@ -105,15 +136,14 @@ export default function CdcChart(
       });
 
       filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, (dataOverride || data));
+          const filterValues = generateValuesForFilter(filter, (dataOverride || newExcludedData));
 
           newConfig.filters[index].values = filterValues;
-
           // Initial filter should be active
           newConfig.filters[index].active = filterValues[0];
       });
 
-      currentData = filterData(newConfig.filters, (dataOverride || data));
+      currentData = filterData(newConfig.filters, (dataOverride || newExcludedData));
 
       setFilteredData(currentData);
     }
@@ -161,8 +191,10 @@ export default function CdcChart(
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
     // Check for duplicate x axis values in data
-    if(!currentData) currentData = (dataOverride || data);
+    if(!currentData) currentData = (dataOverride || newExcludedData);
+
     let uniqueXValues = {};
+
     for(let i = 0; i < currentData.length; i++) {
       if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
         newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
@@ -179,16 +211,13 @@ export default function CdcChart(
 
     data.forEach((row) => {
       let add = true;
-
       filters.forEach((filter) => {
-        if(row[filter.columnName] !== filter.active) {
+        if (row[filter.columnName] !== filter.active) {
           add = false;
         }
       });
-
       if(add) filteredData.push(row);
     });
-
     return filteredData;
   }
 
@@ -204,7 +233,7 @@ export default function CdcChart(
     });
 
     return values;
-}
+  }
 
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
@@ -443,7 +472,7 @@ export default function CdcChart(
     )
   }
 
-  const Filters = () => {
+  const Filters = useCallback(() => {
     const changeFilterActive = (index, value) => {
       let newFilters = config.filters;
 
@@ -451,22 +480,20 @@ export default function CdcChart(
 
       setConfig({...config, filters: newFilters});
 
-      setFilteredData(filterData(newFilters, data));
+      setFilteredData(filterData(newFilters, excludedData));
     };
 
-    const announceChange = (text) => {
-
-    };
+    const announceChange = (text) => {};
 
     let filterList = config.filters.map((singleFilter, index) => {
       const values = [];
 
       singleFilter.values.forEach((filterOption, index) => {
-        values.push(<option
-          key={index}
-          value={filterOption}
-        >{filterOption}
-        </option>);
+        values.push(
+          <option key={index} value={filterOption}>
+            {filterOption}
+          </option>
+        );
       });
 
       return (
@@ -489,20 +516,20 @@ export default function CdcChart(
     });
 
     return (<section className="filters-section">{filterList}</section>)
-  }
+  },[excludedData])
 
   const missingRequiredSections = () => {
-    if(config.visualizationType === 'Pie') {
-      if(undefined === config?.yAxis.dataKey){
+    if (config.visualizationType === 'Pie') {
+      if (undefined === config?.yAxis.dataKey) {
         return true;
       }
     } else {
-      if(undefined === config?.series || false === config?.series.length > 0){
+      if (undefined === config?.series || false === config?.series.length > 0) {
         return true;
       }
     }
 
-    if(!config.xAxis.dataKey) {
+    if (!config.xAxis.dataKey) {
       return true;
     }
 
@@ -541,11 +568,12 @@ export default function CdcChart(
       </>
     )
   }
-  console.log("unfiltereds", config.unfilteredData);
+
   const contextValues = {
     config,
     rawData: data ?? {},
-    filteredData: filteredData ?? data,
+    excludedData: excludedData,
+    transformedData: filteredData || excludedData,
     unfilteredData: data,
     seriesHighlight,
     colorScale,
