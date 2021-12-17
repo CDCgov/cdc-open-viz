@@ -8,6 +8,9 @@ import { CustomProjection } from '@visx/geo';
 import chroma from 'chroma-js';
 import colorPalettes from '../data/color-palettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
+import Loading from '@cdc/core/components/Loading';
+import testJSON from '../data/dfc-map.json';
+
 
 const abbrs = {
   Alabama: 'AL',
@@ -83,16 +86,6 @@ const offsets = {
   'American Samoa': [10,0]
 }
 
-
-/**
- * TODO: 
- * Decide on JSON and cleanup
- * Original file was county JSON, testJSON includes both state and county level data
- */
-import testJSON from '../data/dfc-map.json';
-// import testJSON from '../data/newtest.json';
-import D3Map from './ClassCountyMap';
-
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
@@ -110,38 +103,12 @@ let { features: states } = feature(testJSON, testJSON.objects.states);
 
 // CONSTANTS
 const STATE_BORDER = '#c0cad4';
-//const STATE_BORDER_COLOR = '#c0cad4';
-const STATE_BORDER_COLOR = '#000';
-const STATE_BORDER_FOCUSED = '#B890BB';
 const STATE_INACTIVE_FILL = '#F4F7FA';
 
 // CREATE STATE LINES
 const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
-
-// SHAPE FOR TERRITORIES.
-// const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
-//   return (
-//     <svg viewBox="0 0 45 28">
-//       <g {...props} strokeLinejoin="round">
-//         <path stroke={stroke} strokeWidth={strokeWidth} d="M40,0.5 C41.2426407,0.5 42.3676407,1.00367966 43.1819805,1.81801948 C43.9963203,2.63235931 44.5,3.75735931 44.5,5 L44.5,5 L44.5,23 C44.5,24.2426407 43.9963203,25.3676407 43.1819805,26.1819805 C42.3676407,26.9963203 41.2426407,27.5 40,27.5 L40,27.5 L5,27.5 C3.75735931,27.5 2.63235931,26.9963203 1.81801948,26.1819805 C1.00367966,25.3676407 0.5,24.2426407 0.5,23 L0.5,23 L0.5,5 C0.5,3.75735931 1.00367966,2.63235931 1.81801948,1.81801948 C2.63235931,1.00367966 3.75735931,0.5 5,0.5 L5,0.5 Z" />
-//         <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
-//       </g>
-//     </svg>
-//   )
-// }
-
-// const offsets = {
-//   'US-VT': [50, -8],
-//   'US-NH': [34, 2],
-//   'US-MA': [30, -1],
-//   'US-RI': [28, 2],
-//   'US-CT': [35, 10],
-//   'US-NJ': [42, 1],
-//   'US-DE': [33, 0],
-//   'US-MD': [47, 10]
-// };
 
 const nudges = {
   'US-FL': [15, 3],
@@ -174,9 +141,11 @@ const CountyMap = (props) => {
   const focusedState = null;  
   const translate = [0,0];
   const scale = .85;
-  const startingLineWidth = .85;
+  const startingLineWidth = 1.3;
   const container = useRef(null)
   useEffect(() => rebuildTooltips());
+  const [loading, setLoading] = useState(true)
+
   
   let mapColorPalette = colorPalettes[state.color] || '#fff';
   let focusedBorderColor = mapColorPalette[3];
@@ -272,6 +241,7 @@ const CountyMap = (props) => {
 
     const focusedStateLine = path(mesh(testJSON, state[0] ))
 
+
     currentState.style.display = 'none'
     //allStates.forEach( state => state.style.strokeWidth = .75 / newScaleWithHypot);
     stateLinesPath.setAttribute('stroke-width', .75 / newScaleWithHypot);
@@ -283,8 +253,9 @@ const CountyMap = (props) => {
     stateLinesPath.setAttribute('stroke', geoStrokeColor);
 
     // Set Focus Border
+    focusedBorder.style.display = 'block';
     focusedBorder.setAttribute('d', focusedStateLine);
-    //focusedBorder.setAttribute('stroke-width', .75 / newScaleWithHypot);
+    focusedBorder.setAttribute('stroke-width', .75 / newScaleWithHypot);
     focusedBorder.setAttribute('stroke', focusedBorderColor)
   }
 
@@ -305,9 +276,9 @@ const CountyMap = (props) => {
     focusedBorder.style.display = 'none';
     focusedBorder.setAttribute('stroke', stateBorderColor);
     focusedBorder.style.strokeWidth = startingLineWidth;
-    //allCounties.forEach( el => el.style.strokeWidth = .2 )
     stateLinesPath.setAttribute('stroke', stateBorderColor);
     otherStates.forEach( el => el.style.display = 'none' );
+    allCounties.forEach( el => el.style.strokeWidth = .85 )
     allStates.forEach( state => state.setAttribute('stroke-width', .85));
     group.setAttribute( 'transform', `translate(${[0,0]}) scale(${.85})` );
     stateLinesPath.setAttribute( 'stroke-width', startingLineWidth );
@@ -410,7 +381,7 @@ const CountyMap = (props) => {
       // COUNTY GROUPS
       let styles = {
         fillOpacity: '1',
-        fill: '#f5f5f5',
+        fill: '#E6E6E6',
         cursor: 'default'
       }
 
@@ -427,6 +398,8 @@ const CountyMap = (props) => {
       if (geoData !== undefined) {
         legendColors = applyLegendToRow(geoData);
       }
+
+      console.log('LEGEND COLORS', legendColors)
 
       const geoDisplayName = displayGeoName(geoKey);
 
@@ -463,9 +436,7 @@ const CountyMap = (props) => {
               onClick={
                   // default
                   (e) => { 
-                    console.log('geo data', geoData)
                     let stateFipsCode = geoData['FIPS Codes'].substring(0,2);
-                    console.log('STATE FIPS', stateFipsCode)
                     geoClickHandler(geoDisplayName, geoData);
                     // update transform/translate
                     focusGeo(stateFipsCode, geo)
@@ -477,7 +448,7 @@ const CountyMap = (props) => {
                 className={`county county--${geoDisplayName}`}
                 stroke={geoStrokeColor}
                 d={path}
-                strokeWidth=".2"
+                strokeWidth=".5"
               />
             </g>
           )
@@ -506,7 +477,7 @@ const CountyMap = (props) => {
             className='single-geo'
             stroke={geoStrokeColor}
             d={path}
-            strokeWidth=".2"
+            strokeWidth=".85"
           />
         </g>
       )
@@ -535,6 +506,8 @@ const CountyMap = (props) => {
 
     return geosJsx;
   };
+
+  // if(loading) return <Loading />
 
   return (
     <ErrorBoundary component="CountyMap">
