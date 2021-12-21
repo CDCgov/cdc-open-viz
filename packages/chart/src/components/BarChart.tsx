@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
@@ -10,25 +10,30 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
   const { visualizationSubType } = config;
-  const [ isInitialRender, setIsInitialRender ] = useState(true);
-  const [textWidth, setTextWidth] = useState(null);
-  const [onBarLabelHeight, setOnBarLabelHeight] = useState(null);
-  const [onBarLabelPadding, setOnBarLabelPadding] = useState(15);
 
-  React.useEffect(() => {
-    if(visualizationSubType === "horizontal" && config.yAxis.labelPlacement === "On Bar" && isInitialRender) {
-      setIsInitialRender(false)
+  const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
+  const isLabelOnYAxis = config.yAxis.labelPlacement === "On Y-Axis";
+  const isLabelOnBar = config.yAxis.labelPlacement === "On Bar";
+  const isLabelMissing = !config.yAxis.labelPlacement;
+  const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
+
+  // Using State
+  const [horizBarHeight, setHorizBarHeight] = useState(null);
+  const [textWidth, setTextWidth] = useState(null);
+
+  useEffect(() => {
+    if(config.visualizationSubType === "horizontal" && !config.yAxis.labelPlacement) {
       updateConfig({
         ...config,
-        barHeight: onBarLabelHeight,
-        barPadding: onBarLabelPadding,
+        yAxis: {
+          ...config,
+          labelPlacement: "Below Bar"
+        }
       })
     }
-
-  }, [onBarLabelHeight, config, updateConfig, onBarLabelPadding, visualizationSubType, isInitialRender]);
-
+  }, [config, updateConfig]);
 
   return (
     <ErrorBoundary component="BarChart">
@@ -58,7 +63,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-              <Text 
+              <Text
                 display={config.labels && displayBar ? 'block' : 'none'}
                 opacity={transparentBar ? 0.5 : 1}
                 x={barThickness * (bar.index + 0.5) + offset}
@@ -104,8 +109,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   const barsPerGroup = config.series.length;
                   let barHeight = config.barHeight ? config.barHeight : 25;
                   let barPadding = barHeight;
-                  
-                  if(config.yAxis.labelPlacement === "Below Bar" || !config.yAxis.labelPlacement) {
+
+                  if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
                     if(barHeight < 40) {
                       config.barPadding = 40;
                     } else {
@@ -114,13 +119,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   } else {
                     config.barPadding = barPadding / 2;
                   }
-
-                  if(config.yAxis.labelPlacement === "On Bar") {
-                    config.barHeight = onBarLabelHeight;
-                  } else {
-                    config.barHeight = barHeight;
-                  }
-                  
+                  config.barHeight = barHeight;
                   config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length);
                 }
 
@@ -149,8 +148,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                    let onBarLabelPadding = null;
-                    let labelColor = "#000000"; 
+                    let horizBarLabelPadding = null;
+                    let labelColor = "#000000";
 
                     // Set label color
                     if (chroma.contrast(labelColor, barColor) < 4.9) {
@@ -159,11 +158,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     // font size and text spacing used for centering text on bar
                     if(config.fontSize === "small") {
-                      onBarLabelPadding = 16;
+                      horizBarLabelPadding = 16;
                     } else if(config.fontSize === "medium") {
-                      onBarLabelPadding = 18;
+                      horizBarLabelPadding = 18;
                     } else{
-                      onBarLabelPadding = 20;
+                      horizBarLabelPadding = 20;
                     }
                     const onBarTextSpacing = 25;
                     const tooltip = `<div>
@@ -172,8 +171,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
                     return (
-                    <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}`}>
-                      <Text 
+                    <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}`}>
+                      <Text
                         display={config.labels && displayBar ? 'block' : 'none'}
                         opacity={transparentBar ? 0.5 : 1}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
@@ -197,64 +196,136 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
-                      {visualizationSubType === "horizontal" && textWidth + 100 < bar.y ? 
-                      config.yAxis.labelPlacement === "On Bar" &&
-                        <Group>
-                            <Text
-                              innerRef={
-                                (e) => {
-                                  if(e) {
-                                    // use font sizes and padding to set the bar height
-                                    let elem = e.getBBox()
-                                    setTextWidth(elem.width)
-                                    setOnBarLabelHeight( (elem.height * 2) + (onBarLabelPadding * 2) + onBarTextSpacing / 2 )
-                                    setOnBarLabelPadding( onBarLabelHeight / 2 )
+                      {visualizationSubType === "horizontal" && textWidth + 100 < bar.y ?
+                        config.yAxis.labelPlacement === "On Bar" &&
+                          <Group>
+                              <Text
+                                innerRef={
+                                  (e) => {
+                                    if(e) {
+                                      // use font sizes and padding to set the bar height
+                                      let elem = e.getBBox()
+                                        setTextWidth(elem.width)
+                                        config.barHeight = ( (elem.height * 2) + (horizBarLabelPadding * 2) + onBarTextSpacing / 2 )
+                                        config.barPadding = ( horizBarHeight / 2 )
+                                    }
                                   }
                                 }
-                              }
-                              x={ bar.y - onBarLabelPadding }
-                              y={ barHeight * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
-                              fill={ labelColor }
-                              textAnchor="end"
-                            >
-                              { yAxisValue }
-                            </Text>
-                            <Text
-                              x={ bar.y - onBarLabelPadding }
-                              y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
-                              fill={ labelColor }
-                              textAnchor="end"
-                            >
-                              { xAxisValue }
-                            </Text>
-                        </Group>
-                      :
-                      (visualizationSubType === "horizontal" && config.yAxis.labelPlacement === "On Bar") &&
-                        <Group>
-                            <Text
-                                x={ bar.y + onBarLabelPadding }
-                                y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) }
-                                fill={ "#000" }
-                                textAnchor="start"
-                                verticalAnchor="end"
-                              >{yAxisValue}</Text>
-                            <Text
-                                x={ bar.y + onBarLabelPadding }
-                                y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( onBarLabelPadding * 2 ) + onBarTextSpacing }
-                                fill={ "#000" }
-                                textAnchor="start"
-                                verticalAnchor="end"
+                                x={ bar.y - horizBarLabelPadding }
+                                y={ barHeight * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) }
+                                fill={ labelColor }
+                                textAnchor="end"
+                              >
+                                { yAxisValue }
+                              </Text>
+                              <Text
+                                x={ bar.y - horizBarLabelPadding }
+                                y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
+                                fill={ labelColor }
+                                textAnchor="end"
                               >
                                 { xAxisValue }
                               </Text>
-                        </Group>
+                          </Group>
+                        :
+                        (isLabelOnBar) &&
+                          <Group>
+                              {/* hide y label if we're only showing data on bar */}
+                              <Text
+                                  x={ bar.y + horizBarLabelPadding }
+                                  y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) }
+                                  fill={ "#000" }
+                                  textAnchor="start"
+                                  verticalAnchor="end"
+                                >{yAxisValue}</Text>
+                              <Text
+                                  x={ bar.y + horizBarLabelPadding }
+                                  y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
+                                  fill={ "#000" }
+                                  textAnchor="start"
+                                  verticalAnchor="start"
+                                >
+                                  { xAxisValue }
+                                </Text>
+                          </Group>
                       }
+
+                      { config.visualizationSubType === "horizontal" && isLabelBelowBar &&
+                      <>
+                        <Text
+                            x={ 5 } // padding
+                            y={ barWidth * config.series.length + 7  }
+                            verticalAnchor={"start"}
+                            textAnchor={"start"}
+                          >{yAxisValue}
+                        </Text>
+
+                        { displayNumbersOnBar ?
+                           (textWidth + 100 < bar.y) ?
+                            (
+                                <Text
+                                  x={ bar.y - 5 } // padding
+                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) }
+                                  fill={ labelColor }
+                                  textAnchor="end"
+                                  verticalAnchor="middle"
+                                >
+                                  { xAxisValue }
+                                </Text>
+                            )
+                            : (
+                                <Text
+                                  x={ bar.y + 5} // padding
+                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) }
+                                  fill={ '#000000' }
+                                  textAnchor="start"
+                                  verticalAnchor="middle"
+                                >
+                                  { xAxisValue }
+                                </Text>
+                            )
+                          : ""
+                        }
+                      </>
+                      }
+
+                      { (isLabelOnYAxis && visualizationSubType === "horizontal") &&
+                        <>
+                          { displayNumbersOnBar ?
+                            (textWidth + 100 < bar.y) ?
+                              (
+                                  <Text
+                                    x={ bar.y - 5 } // padding
+                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 )}
+                                    fill={ labelColor }
+                                    textAnchor="end"
+                                    verticalAnchor="middle"
+                                  >
+                                    { xAxisValue }
+                                  </Text>
+                              )
+                              : (
+                                  <Text
+                                    x={ bar.y + 5} // padding
+                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 )}
+                                    fill={ '#000000' }
+                                    textAnchor="start"
+                                    verticalAnchor="middle"
+                                  >
+                                    { xAxisValue }
+                                  </Text>
+                              )
+                            : ""
+                          }
+                          </>
+                          }
                     </Group>
                   )}
                   )}
                 </Group>
-              ))}}
+                  ))}}
             </BarGroup>
+
             {Object.keys(config.confidenceKeys).length > 0 ? data.map((d) => {
               let xPos = xScale(getXAxisData(d));
               let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower));

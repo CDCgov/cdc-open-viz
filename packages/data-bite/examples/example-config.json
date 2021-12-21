@@ -6,7 +6,11 @@
     "dataColumn": "Insured Rate",
     "bitePosition": "Left",
     "biteFontSize": "24",
-    "imageUrl": "",
+    "imageData": {
+      "display": "none",
+      "url": "",
+      "options": []
+    },
     "biteBody": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla mauris, vel gravida libero mollis id. Etiam dignissim nunc ut ante fringilla, sit amet malesuada nibh accumsan.",
     "dataFormat": {
         "roundToPlace": 0,

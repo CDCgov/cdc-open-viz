@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "devDependencies": {
-    "@cdc/core": "^1.0.2",
+    "@cdc/core": "^1.1.2",
     "bootstrap": "^4.3.1",
     "html-react-parser": "^0.14.0",
     "react-accessible-accordion": "^3.3.4",

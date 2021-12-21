@@ -7,6 +7,12 @@
 }
 
 .editor-panel {
+  .text-center {
+    text-align: center;
+  }
+  .text-capitalize {
+    text-transform: capitalize;
+  }
   .two-col-inputs {
     display: flex;
     margin-top: 1em;
@@ -144,6 +150,45 @@
     h5 {
       font-size: .8em;
     }
+
+    .accordion__panel-row {
+      display: flex;
+      justify-content: flex-start;
+      margin-left: -4px;
+      margin-right: -4px;
+      margin-bottom: 0.75em
+    }
+
+    .accordion__panel-col {
+      flex: 0 0 0;
+      padding-left: 4px;
+      padding-right: 4px;
+
+      select {
+        padding: 0.425em 0.5em;
+      }
+
+      select.border-dashed {
+        border: rgba(0, 0, 0, 0.3) 1px dashed !important;
+        border-radius: 0.25rem;
+      }
+    }
+
+    .d-flex {
+      display: flex;
+    }
+
+    .align-center {
+      align-items: center;
+    }
+
+    .justify-end {
+      justify-content: flex-end;
+    }
+
+    .flex-grow { flex-grow: 1; }
+    .flex-shrink { flex-shrink: 1; }
+    .flex-auto { flex-basis: auto; }
   }
 
   .advanced {

@@ -1,6 +1,8 @@
 @mixin set-theme($property, $color) {
   @if $property == 'background-color' {
     background-color: $color;
+  } @else if $property == 'border-color' {
+    border-color: $color;
   } @else if $property == 'color' {
     color: $color;
   }
@@ -9,26 +11,46 @@
 .cdc-waffle-chart {
   position: relative;
   border: solid 1px #ccc;
-  border-radius: .3em;
   border-top: none;
   box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px;
   background: $lightestGray;
   overflow: hidden;
 
+  @at-root .is-editor #{&} {
+    margin: 3em auto 0;
+    max-width: 35em;
+  }
+
   .cdc-waffle-chart__inner-container {
     display: flex;
-    padding: 1em;
+    flex-wrap: wrap;
+    padding: 1em 1em 0;
     justify-content: flex-start;
 
     &.cdc-waffle-chart--verical {
       align-items: center;
       flex-flow: column;
 
+      .cdc-waffle-chart__chart {
+        padding-right: 0;
+      }
+
       .cdc-waffle-chart__data {
         text-align: center;
-        margin-top: 1.25em;
       }
     }
+  }
+
+  .cdc-waffle-chart__chart {
+    padding-right: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: content-box;
+  }
+
+  .cdc-waffle-chart__data {
+    flex: 1 1 0;
+    min-width: 175px;
+    margin-bottom: 1rem;
   }
 
   .cdc-waffle-chart__subtext {
@@ -37,29 +59,28 @@
     font-size: 0.75em;
     padding: 0 1em 1em;
   }
-
-  .cdc-waffle-chart__chart {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding-right: 1rem;
-  }
 }
 
 .cdc-waffle-chart__header {
   @at-root {
     .cdc-waffle-chart #{&} {
       width: 100%;
-      padding-left: 0.7em;
-      left: 0;
-      top: 0;
-      line-height: 2.2em;
+      padding: 0.6em 0.8em;
+      margin: 0 !important;
+      border-bottom-width: 3px;
+      border-bottom-style: solid;
+      font-size: 1.1em;
       color: white;
     }
 
     @each $theme, $color in $theme-colors {
       .cdc-waffle-chart.theme-#{$theme} #{&} {
         @include set-theme("background-color", $color);
+      }
+    }
+    @each $theme, $color in $theme-colors-secondary {
+      .cdc-waffle-chart.theme-#{$theme} #{&} {
+        @include set-theme("border-color", $color);
       }
     }
   }

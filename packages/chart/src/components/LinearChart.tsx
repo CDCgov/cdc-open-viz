@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
-import { Text } from '@visx/text'; 
+import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 
@@ -16,7 +16,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  const { filteredData:data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -68,7 +68,7 @@ export default function LinearChart() {
     }
 
     //Adds Y Axis data padding if applicable
-    if(config.runtime.yAxis.paddingPercent) { 
+    if(config.runtime.yAxis.paddingPercent) {
       let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent;
       min -= paddingValue;
       max += paddingValue;
@@ -82,8 +82,8 @@ export default function LinearChart() {
         range: [0, xMax]
       });
 
-      yScale = config.runtime.xAxis.type === 'date' ? 
-        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) : 
+      yScale = config.runtime.xAxis.type === 'date' ?
+        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) :
         scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
 
       seriesScale = scalePoint<string>({
@@ -130,16 +130,16 @@ export default function LinearChart() {
                           L${to} 0
                           M${to} -5
                           L${to} 5`} />
-                <rect 
-                  x={from} 
-                  y={0} 
-                  width={width} 
-                  height={yMax} 
-                  fill={region.background} 
+                <rect
+                  x={from}
+                  y={0}
+                  width={width}
+                  height={yMax}
+                  fill={region.background}
                   opacity={0.3} />
-                <Text 
-                  x={from + (width / 2)} 
-                  y={5} 
+                <Text
+                  x={from + (width / 2)}
+                  y={5}
                   fill={region.color}
                   verticalAnchor="start"
                   textAnchor="middle">
@@ -184,28 +184,15 @@ export default function LinearChart() {
                           />
                           ) : ''
                         }
-                        
 
-                        { config.visualizationSubType === "horizontal" && ( config.yAxis.labelPlacement === 'Below Bar' || !config.yAxis.labelPlacement ) &&
-                          <Text
-                            x={config.runtime.horizontal ? tick.from.x + 5 : tick.to.x}
-                            y={ (config.barHeight > 40 )
-                              ?  tick.from.y + (config.barPadding / 2) + belowBarPaddingFromTop
-                              // all items / 2 + padding
-                              : tick.from.y + (config.series.length * config.barHeight / 2) - config.barPadding / 2 + belowBarPaddingFromTop
-                            }
-                            verticalAnchor={"start"}
-                            textAnchor={"start"}
-                          >{tick.formattedValue}</Text>
-                        }
-
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) && 
+                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) &&
                             <Text
                               transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={"middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
                         }
+
 
                         { config.visualizationSubType !== "horizontal" &&
                             <Text
@@ -221,7 +208,7 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
-                  <Line 
+                  <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
@@ -258,7 +245,6 @@ export default function LinearChart() {
             stroke="#333"
             tickStroke="#333"
             numTicks={config.runtime.xAxis.numTicks || undefined}
-            
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
@@ -287,7 +273,7 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
-                  <Line 
+                  <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
@@ -307,12 +293,12 @@ export default function LinearChart() {
           </AxisBottom>
           )}
 
-          {/* Line chart */}
+          {/* Bar chart */}
           { config.visualizationType !== 'Line' && (
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
-          
-          {/* Bar chart */}
+
+          {/* Line chart */}
           { config.visualizationType !== 'Bar' && (
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}

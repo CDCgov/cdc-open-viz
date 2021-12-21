@@ -27,9 +27,10 @@ const CdcDataBite = (
     title,
     dataColumn,
     dataFunction,
-    imageUrl,
+    imageData,
     biteBody,
     biteFontSize,
+    dataFormat,
     biteStyle,
     filters,
     subtext
@@ -205,7 +206,8 @@ const CdcDataBite = (
         dataBite = Number(dataBite).toLocaleString('en-US');
       }
 
-      return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+      // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+      return dataBite
     } else { //Rounding and formatting for ranges happens earlier.
       return dataBite;
     }
@@ -229,6 +231,51 @@ const CdcDataBite = (
   }
 
   let body = (<Loading />)
+
+  const DataImage = useCallback(() => {
+    let operators = {
+      '<': (a, b) => { return a < b },
+      '>': (a, b) => { return a > b },
+      '<=': (a, b) => { return a <= b },
+      '>=': (a, b) => { return a >= b },
+      '≠': (a, b) => { return a !== b },
+      '=': (a, b) => { return a === b }
+    }
+    let imageSource = imageData.url
+    let imageAlt = imageData.alt
+
+    if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
+      let targetVal = Number(calculateDataBite())
+      let argumentActive = false
+
+      imageData.options.forEach((option, index) => {
+        let argumentArr = option.arguments
+        let { source, alt } = option
+
+        if (false === argumentActive && argumentArr.length > 0) {
+          if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
+            if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
+              if (undefined !== argumentArr[1]) {
+                if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
+                  if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
+                    imageSource = source
+                    if (alt !== '' && alt !== undefined) { imageAlt = alt }
+                    argumentActive = true
+                  }
+                }
+              } else {
+                imageSource = source
+                if (alt !== '' && alt !== undefined) { imageAlt = alt }
+                argumentActive = true
+              }
+            }
+          }
+        }
+      })
+    }
+
+    return (imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img alt={imageAlt} src={imageSource} className="bite-image callout" /> : null)
+  }, [ imageData ])
 
   if(false === loading) {
     let biteClasses = [];
@@ -258,6 +305,7 @@ const CdcDataBite = (
     if(config.shadow) biteClasses.push('shadow')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
+
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -266,22 +314,22 @@ const CdcDataBite = (
             {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
-                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
-                {imageUrl && 'graphic' !== biteStyle && isTop && <img src={imageUrl} className="bite-image callout" />}
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
+                {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</div>}
                   {biteBody &&
                     <>
                       <p className="bite-text">
-                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
+                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</span>}
                         {parse(biteBody)}
                       </p>
                       {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
                     </>
                   }
                 </div>
-                {imageUrl && 'graphic' !== biteStyle && isBottom && <img src={imageUrl} className="bite-image callout" />}
-                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} /> }
+                {isBottom && <DataImage />}
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>
             </div>
           </div>
@@ -337,8 +385,8 @@ export const BITE_LOCATION_BODY = 'body';
 export const BITE_LOCATION_GRAPHIC = 'graphic';
 export const BITE_LOCATIONS = {
   'graphic': 'Graphic',
-  'title': 'Text above body text',
-  'body': 'Inline with body text'
+  'title': 'Value above Message',
+  'body': 'Value before Message'
 };
 
 export const IMAGE_POSITION_LEFT = 'Left';
@@ -351,3 +399,19 @@ export const IMAGE_POSITIONS = [
   IMAGE_POSITION_TOP,
   IMAGE_POSITION_BOTTOM,
 ];
+
+export const DATA_OPERATOR_LESS = '<'
+export const DATA_OPERATOR_GREATER = '>'
+export const DATA_OPERATOR_LESSEQUAL = '<='
+export const DATA_OPERATOR_GREATEREQUAL = '>='
+export const DATA_OPERATOR_EQUAL = '='
+export const DATA_OPERATOR_NOTEQUAL = '≠'
+
+export const DATA_OPERATORS = [
+  DATA_OPERATOR_LESS,
+  DATA_OPERATOR_GREATER,
+  DATA_OPERATOR_LESSEQUAL,
+  DATA_OPERATOR_GREATEREQUAL,
+  DATA_OPERATOR_EQUAL,
+  DATA_OPERATOR_NOTEQUAL
+]

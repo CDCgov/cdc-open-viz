@@ -164,6 +164,8 @@ const EditorPanel = () => {
     loading,
     colorPalettes,
     unfilteredData,
+    excludedData,
+    transformedData,
     isDashboard,
     setParentConfig,
     missingRequiredSections
@@ -214,6 +216,7 @@ const EditorPanel = () => {
   }
 
   const [ addSeries, setAddSeries ] = useState('');
+  const [ addExclusion, setAddExclusion ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true);
 
   if(loading) {
@@ -236,12 +239,28 @@ const EditorPanel = () => {
     updateConfig({...config, filters});
   }
 
+  const updateDateRange = (type, value) => {
+    let date = {...config.exclusions.date}
+    '' === value ? delete date[type] : date[type] = value
+
+    let payload = {...config.exclusions, date: date}
+    updateConfig({...config, exclusions: payload})
+  }
+
   const addNewFilter = () => {
     let filters = config.filters ? [...config.filters] : [];
 
     filters.push({values: []});
 
     updateConfig({...config, filters});
+  }
+
+  const addNewSeries = (seriesKey) => {
+    let newSeries = config.series ? [...config.series] : []
+
+    newSeries.push({dataKey: seriesKey, type: 'Bar'})
+
+    updateConfig({...config, series: newSeries})
   }
 
   const removeSeries = (seriesKey) => {
@@ -268,12 +287,37 @@ const EditorPanel = () => {
     }
   }
 
-  const addNewSeries = (seriesKey) => {
-    let newSeries = config.series ? [...config.series] : []
+  const addNewExclusion = (exclusionKey) => {
+    let newExclusion = [...config.exclusions.keys]
+    newExclusion.push(exclusionKey)
 
-    newSeries.push({dataKey: seriesKey, type: 'Bar'})
+    let payload = {...config.exclusions, keys: newExclusion}
+    updateConfig({...config, exclusions: payload})
+  }
 
-    updateConfig({...config, series: newSeries})
+  const removeExclusion = (excludeValue) => {
+    let exclusionsIndex = -1;
+    let exclusions = [...config.exclusions.keys]
+
+    for(let i = 0; i < exclusions.length; i++){
+      if(exclusions[i] === excludeValue){
+        exclusionsIndex = i;
+        break;
+      }
+    }
+
+    if(exclusionsIndex !== -1){
+      exclusions.splice(exclusionsIndex, 1)
+
+      let newExclusions = {...config.exclusions, keys: exclusions}
+      let newExclusionsPayload = {...config, exclusions: newExclusions}
+
+      if(exclusions.length === 0) {
+        delete newExclusionsPayload.exclusions.keys
+      }
+
+      updateConfig(newExclusionsPayload)
+    }
   }
 
   const getColumns = (filter = true) => {
@@ -292,6 +336,14 @@ const EditorPanel = () => {
     }
 
     return Object.keys(columns)
+  }
+
+  const getDataValues = (dataKey) => {
+    let values = []
+    excludedData.map(e => {
+      values.push(e[dataKey])
+    })
+    return values
   }
 
   const onBackClick = () => {
@@ -351,6 +403,26 @@ const EditorPanel = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
+  const ExclusionsList = useCallback(()=> {
+    const exclusions = [...config.exclusions.keys]
+    return (
+      <ul className="series-list">
+        {exclusions.map((exclusion, index) => {
+          return (
+            <li key={exclusion}>
+              <div className="series-list__name" data-title={exclusion}>
+                <div className="series-list__name--text">
+                  {exclusion}
+                </div>
+              </div>
+              <span className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</span>
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }, [config])
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
@@ -370,8 +442,11 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
-                  { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") && 
-                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis', 'On Bar']} />
+                  { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
+                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis' ]} />
+                  }
+                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
@@ -394,12 +469,11 @@ const EditorPanel = () => {
                       <label><span className="edit-label">Displaying</span></label>
                       <ul className="series-list">
                         {config.series.map((series, i) => {
+
                           if(config.visualizationType === "Combo") {
                             let changeType = (i, value) => {
                                 let series = [...config.series];
-
                                 series[i].type = value;
-
                                 updateConfig({...config, series})
                             }
 
@@ -423,6 +497,7 @@ const EditorPanel = () => {
                               </li>
                             )
                           }
+
                           return (
                             <li key={series.dataKey}>
                               <div className="series-list__name" data-title={series.dataKey}>
@@ -488,24 +563,67 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {config.visualizationType !== 'Pie' &&
+                    <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={[ 'categorical', 'date' ]}/>
+                  }
+
                   <Select value={config.xAxis.dataKey || ""} section="xAxis" fieldName="dataKey" label="Data Key" initial="Select" required={true} updateField={updateField} options={getColumns(false)} />
+
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
-                      <Select value={config.xAxis.type} section="xAxis" fieldName="type" label="Data Type" updateField={updateField} options={['categorical', 'date']} />
-                      {config.xAxis.type === "date" && (
+
+                      <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />
+                      {/* TODO: (Complete?) Need to check why config.xAxis.type is not being set with default value - key/value pair missing until dropdown selection is made */}
+
+                      {config.exclusions.active &&
                         <>
-                          <p style={{padding: '.5em 0', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
+                          {config.xAxis.type === 'categorical' &&
+                            <>
+                              {config.exclusions.keys.length > 0 &&
+                                <>
+                                  <label><span className="edit-label">Excluded Keys</span></label>
+                                  <ExclusionsList />
+                                </>
+                              }
+
+                              <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { setAddExclusion(e.target.value); }} options={getDataValues(config.xAxis.dataKey)} />
+                              <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); if(addExclusion.length > 0) { addNewExclusion(addExclusion); } setAddExclusion(''); }}>Add Exclusion</button>
+                            </>
+                          }
+
+                          {config.xAxis.type === 'date' &&
+                            <>
+                              <label>
+                                <span className="edit-label column-heading">Start Date</span>
+                                <input type="date" name="start-date" value={config.exclusions.date.start || ''} onChange={(e) => {updateDateRange('start', e.target.value)}} />
+                              </label>
+                              <label>
+                                <span className="edit-label column-heading">End Date</span>
+                                <input type="date" name="start-date" value={config.exclusions.date.end || ''} onChange={(e) => {updateDateRange('end', e.target.value)}} />
+                              </label>
+                            </>
+                          }
+                        </>
+                      }
+
+                      {config.xAxis.type === 'date' && (
+                        <>
+                          <p style={{padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
                           <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
                           <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
                           <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                         </>
                       )}
+
                       {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
+
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.visualizationSubType === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
+
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
+
                       {config.visualizationSubType === 'horizontal' && <CheckBox value={config.yAxis.hideAxis || '' } section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
                     </>
                   )}
@@ -543,14 +661,14 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   {config.filters && <ul className="filters-list">
                     {config.filters.map((filter, index) => (
-                        <fieldset className="edit-block">
+                        <fieldset className="edit-block" key={index}>
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Filter</span>
                             <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
-                              {getColumns().map((dataKey) => (
-                                <option value={dataKey}>{dataKey}</option>
+                              {getColumns().map((dataKey, index) => (
+                                <option value={dataKey} key={index}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
@@ -609,14 +727,15 @@ const EditorPanel = () => {
                       }
 
                       return (
-                          <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
-                            <span style={colorOne}></span>
-                            <span  style={colorTwo}></span>
-                            <span  style={colorThree}></span>
-                          </li>
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <span style={colorOne}></span>
+                          <span style={colorTwo}></span>
+                          <span style={colorThree}></span>
+                        </li>
                       )
                     })}
                   </ul>
+
                   <span className="h5">Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('sequential')).map( (palette) => {
@@ -634,11 +753,11 @@ const EditorPanel = () => {
                       }
 
                       return (
-                          <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
-                            <span style={colorOne}></span>
-                            <span  style={colorTwo}></span>
-                            <span  style={colorThree}></span>
-                          </li>
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <span style={colorOne}></span>
+                          <span style={colorTwo}></span>
+                          <span style={colorThree}></span>
+                        </li>
                       )
                     })}
                   </ul>
@@ -652,9 +771,11 @@ const EditorPanel = () => {
                     </>
                   )}
                   { (config.visualizationSubType === "horizontal" && config.yAxis.labelPlacement !== "On Bar") &&
-                    <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Thickness" updateField={updateField} />
+                    <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Thickness" updateField={updateField} min="15"/>
                   }
-                  {( config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal" || config.visualizationType === "Combo" ) && <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />}
+                  { ((config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal") || config.visualizationType === "Combo" ) &&
+                    <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
