@@ -170,6 +170,10 @@
     display: inline-block;
     height: 1em;
     width: 1em;
+    min-width: 1em;
+    min-height: 1em;
+    max-width: 1em;
+    max-height: 1em;
     border: rgba(0,0,0,.3) 1px solid;
   }
 

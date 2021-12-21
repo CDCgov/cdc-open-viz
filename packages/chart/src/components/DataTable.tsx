@@ -19,8 +19,8 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import Context from '../context';
 
 export default function DataTable() {
-  const { rawData, filteredData:data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
-  console.log('rawdata', rawData);
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
+
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
@@ -90,6 +90,8 @@ export default function DataTable() {
     return newTableColumns;
   }, [config]);
 
+
+
   const tableData = useMemo(
     () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
     [config.runtime.seriesKeys]
@@ -148,6 +150,7 @@ export default function DataTable() {
                       <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
                         {index === 0
                           ? config.table.indexLabel
+                            ? config.table.indexLabel : column.render('Header')
                           : column.render('Header')
                         }
                         <div {...column.getResizerProps()} className="resizer" />
