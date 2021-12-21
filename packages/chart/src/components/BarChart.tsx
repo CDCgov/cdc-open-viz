@@ -10,7 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { filteredData:data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
   const { visualizationSubType } = config;
 
   const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
@@ -22,8 +22,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null);
   const [textWidth, setTextWidth] = useState(null);
-
-  console.log('labelPos', isLabelOnYAxis)
 
   useEffect(() => {
     if(config.visualizationSubType === "horizontal" && !config.yAxis.labelPlacement) {
@@ -65,7 +63,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-              <Text 
+              <Text
                 display={config.labels && displayBar ? 'block' : 'none'}
                 opacity={transparentBar ? 0.5 : 1}
                 x={barThickness * (bar.index + 0.5) + offset}
@@ -111,7 +109,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   const barsPerGroup = config.series.length;
                   let barHeight = config.barHeight ? config.barHeight : 25;
                   let barPadding = barHeight;
-                  
+
                   if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
                     if(barHeight < 40) {
                       config.barPadding = 40;
@@ -151,7 +149,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                     let horizBarLabelPadding = null;
-                    let labelColor = "#000000"; 
+                    let labelColor = "#000000";
 
                     // Set label color
                     if (chroma.contrast(labelColor, barColor) < 4.9) {
@@ -174,7 +172,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}`}>
-                      <Text 
+                      <Text
                         display={config.labels && displayBar ? 'block' : 'none'}
                         opacity={transparentBar ? 0.5 : 1}
                         x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset}
@@ -198,7 +196,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
-                      {visualizationSubType === "horizontal" && textWidth + 100 < bar.y ? 
+                      {visualizationSubType === "horizontal" && textWidth + 100 < bar.y ?
                         config.yAxis.labelPlacement === "On Bar" &&
                           <Group>
                               <Text
@@ -251,7 +249,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 </Text>
                           </Group>
                       }
-                      
+
                       { config.visualizationSubType === "horizontal" && isLabelBelowBar &&
                       <>
                         <Text
@@ -262,7 +260,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           >{yAxisValue}
                         </Text>
 
-                        { displayNumbersOnBar ? 
+                        { displayNumbersOnBar ?
                            (textWidth + 100 < bar.y) ?
                             (
                                 <Text
@@ -293,7 +291,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       { (isLabelOnYAxis && visualizationSubType === "horizontal") &&
                         <>
-                          { displayNumbersOnBar ? 
+                          { displayNumbersOnBar ?
                             (textWidth + 100 < bar.y) ?
                               (
                                   <Text

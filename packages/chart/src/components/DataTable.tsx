@@ -19,7 +19,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import Context from '../context';
 
 export default function DataTable() {
-  const { rawData, filteredData:data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
