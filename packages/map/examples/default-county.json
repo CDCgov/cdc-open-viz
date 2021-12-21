@@ -5,7 +5,7 @@
 		"subtext": "",
 		"territoriesLabel": "Territories",
 		"type": "map",
-		"geoType": "us-county",
+		"geoType": "us",
 		"headerColor": "theme-blue",
 		"showSidebar": true,
 		"showTitle": true,

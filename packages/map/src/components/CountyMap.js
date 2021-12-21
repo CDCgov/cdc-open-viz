@@ -137,6 +137,9 @@ const CountyMap = (props) => {
     generateColorsArray
   } = props;
   
+
+  console.table('PROPS', props)
+
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const focusedState = null;  
   const translate = [0,0];
@@ -398,8 +401,6 @@ const CountyMap = (props) => {
       if (geoData !== undefined) {
         legendColors = applyLegendToRow(geoData);
       }
-
-      console.log('LEGEND COLORS', legendColors)
 
       const geoDisplayName = displayGeoName(geoKey);
 

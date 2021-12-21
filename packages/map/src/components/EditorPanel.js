@@ -357,6 +357,7 @@ const EditorPanel = (props) => {
                   forceDisplay: true
                 }
               })
+              ReactTooltip.rebuild()
               break;
             case 'world':
               setState({
@@ -376,18 +377,18 @@ const EditorPanel = (props) => {
                 ...state,
                 general: {
                     ...state.general,
-                    expandDataTable: false,
-                    geoType: "us-county"
+                    geoType: "us-county",
+                    expandDataTable: false
                 },
                 dataTable: {
                   ...state.dataTable,
                   forceDisplay: true
                 }
               })
+              ReactTooltip.rebuild()
               break;
             default:
-                console.warn("Map type not set.")
-            break;
+              break;
         }
 
         ReactTooltip.rebuild()
