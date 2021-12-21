@@ -118,7 +118,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-    const addUIDs = useCallback((obj, fromColumn) => {
+    const addUIDs = (obj, fromColumn) => {
+
         obj.data.forEach(row => {
             let uid = null
 
@@ -152,7 +153,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // County Check
             if("us-county" === obj.general.geoType) {
                 const fips = row[obj.columns.geo.name]
-
                 uid = countyKeys.find( (key) => key === fips )
             }
 
@@ -166,7 +166,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         obj.data.fromColumn = fromColumn
-    })
+    }
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
 
@@ -913,9 +913,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-
         setState(newState)
-
         // Done loading
         setLoading(false)
     }
@@ -944,7 +942,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         init()
     }, [])
 
+
     useEffect(() => {
+            // UID
+            if(state.data && state.columns.geo.name) {
+                addUIDs(state, state.columns.geo.name)
+            }
+    }, [state.general.geoType]);
+
+    useEffect(() => {
+
         // UID
         if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
             addUIDs(state, state.columns.geo.name)
@@ -998,7 +1005,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Legend - Update when runtimeData does
         if(undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
-
             setRuntimeLegend(legend)
         }
     }, [runtimeData])
