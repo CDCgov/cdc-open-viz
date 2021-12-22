@@ -16,7 +16,7 @@ import Canvg from 'canvg';
 
 // Data
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCities } from './data/supported-geos';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
 import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
@@ -39,6 +39,7 @@ import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
@@ -47,7 +48,9 @@ import WorldMap from './components/WorldMap'; // Future: Lazy
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
+const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
+const stateFipsKeys = Object.keys(supportedStatesFipsCodes);
 
 const generateColorsArray = (color = '#000000', special = false) => {
     let colorObj = chroma(color)
@@ -65,7 +68,7 @@ const hashObj = (row) => {
     let str = JSON.stringify(row)
 
 	let hash = 0;
-	if (str.length == 0) return hash;
+	if (str.length === 0) return hash;
 	for (let i = 0; i < str.length; i++) {
 		let char = str.charCodeAt(i);
 		hash = ((hash<<5)-hash) + char;
@@ -93,8 +96,8 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+    
     const transform = new DataTransform()
-
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [currentViewport, setCurrentViewport] = useState('lg')
@@ -103,20 +106,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
-
     let legendMemo = useRef(new Map())
-
+    
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-
+            
             setCurrentViewport(newViewport)
         }
     });
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-    const addUIDs = useCallback((obj, fromColumn) => {
+    const addUIDs = (obj, fromColumn) => {
+
         obj.data.forEach(row => {
             let uid = null
 
@@ -147,8 +150,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 uid = countryKeys.find( (key) => supportedCountries[key].includes(geoName) )
             }
 
-            // TODO: Points
+            // County Check
+            if("us-county" === obj.general.geoType) {
+                const fips = row[obj.columns.geo.name]
+                uid = countyKeys.find( (key) => key === fips )
+            }
 
+            // TODO: Points
             if(uid) {
                 Object.defineProperty(row, 'uid', {
                     value: uid,
@@ -158,7 +166,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         obj.data.fromColumn = fromColumn
-    })
+    }
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
 
@@ -500,7 +508,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
 
-                    if (row[columnName] != active) return false // Bail out, not part of filter
+                    if (row[columnName] !== active) return false // Bail out, not part of filter
                 }
             }
 
@@ -692,7 +700,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-        let toolTipText = `<strong>${displayGeoName(geoName)}</strong>`
+        let toolTipText = '';
+        if (state.general.geoType === 'us-county') {
+            let stateFipsCode = row['FIPS Codes'].substring(0,2)
+            const stateName = supportedStatesFipsCodes[stateFipsCode];
+            
+            //supportedStatesFipsCodes[]
+            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+        }
+        
+        toolTipText += `<strong>County: ${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type) {
             toolTipText += `<dl>`
@@ -795,6 +812,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = supportedCountries[key][0]
         }
 
+        if(countyKeys.includes(value)) {
+            value = supportedCounties[key]
+        }
+
         const dict = {
             "District of Columbia" : "Washington D.C."
         }
@@ -885,16 +906,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // If there's a name for the geo, add UIDs
-        if(newState.columns.geo.name) {
-            addUIDs(newState, newState.columns.geo.name)
+        if(newState.columns.geo.name || newState.columns.geo.fips) {
+            addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
         }
 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-
         setState(newState)
-
         // Done loading
         setLoading(false)
     }
@@ -923,7 +942,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         init()
     }, [])
 
+
     useEffect(() => {
+            // UID
+            if(state.data && state.columns.geo.name) {
+                addUIDs(state, state.columns.geo.name)
+            }
+    }, [state.general.geoType]);
+
+    useEffect(() => {
+
         // UID
         if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
             addUIDs(state, state.columns.geo.name)
@@ -977,7 +1005,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Legend - Update when runtimeData does
         if(undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
-
             setRuntimeLegend(legend)
         }
     }, [runtimeData])
@@ -1019,8 +1046,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         mapContainerClasses.push('full-border')
     }
 
-    if(loading) return <Loading />
-
     // Props passed to all map types
     const mapProps = {
         state,
@@ -1031,8 +1056,31 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         navigationHandler,
         geoClickHandler,
         applyLegendToRow,
-        displayGeoName
+        displayGeoName,
+        runtimeLegend,
+        generateColorsArray
     }
+
+
+    const [mapToShow, setMapToShow] = useState(null)
+
+
+    useEffect(() => {
+        if('us' === state.general.geoType) {
+            setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
+        }
+        if('world' === state.general.geoType) {
+            setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if('us-county' === state.general.geoType) {
+            setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+        }
+        if("data" === state.general.type && logo) {
+            setMapToShow(<img src={logo} alt="" className="map-logo"/>)
+        }
+    }, [state.general.geoBorderColor, state.general.geoType, state.general.type, state.color, mapProps.data, mapProps.runtimeLegend]);
+
+    if(loading) return <Loading />
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1069,9 +1117,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
                     <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                         {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                            {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                            {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                            {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
+                        {/* {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                        {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                        {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                        {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
+                        {mapToShow}
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
