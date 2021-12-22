@@ -91,12 +91,6 @@ const WIDTH = 880;
 const HEIGHT = 500;
 const PADDING = 25;
 
-// When using <AlbersUsa> visx attributes, these are needed.
-// I wasn't able to get the transitions working with them.
-// const ASPECT_RATIO = 1.55;
-// const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
-// const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
-
 // DATA
 let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states);
@@ -124,6 +118,8 @@ const nudges = {
 
 const CountyMap = (props) => {
 
+  console.log('Drawing County Map')
+
   const {
     state,
     applyTooltipsToGeo,
@@ -138,20 +134,15 @@ const CountyMap = (props) => {
   } = props;
   
 
-  console.table('PROPS', props)
-
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const focusedState = null;  
   const translate = [0,0];
   const scale = .85;
   const startingLineWidth = 1.3;
   const container = useRef(null)
-  useEffect(() => rebuildTooltips());
-  const [loading, setLoading] = useState(true)
-
-  
   let mapColorPalette = colorPalettes[state.color] || '#fff';
   let focusedBorderColor = mapColorPalette[3];
+  useEffect(() => rebuildTooltips());
 
 
   const geoLabel = (geo, projection) => {
@@ -508,16 +499,14 @@ const CountyMap = (props) => {
     return geosJsx;
   };
 
-  // if(loading) return <Loading />
-
   return (
     <ErrorBoundary component="CountyMap">
-      {/* <div className="countyMap" ref={map}></div> */}
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container">
         <rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white" onClick={ (e) => onReset(e) }></rect>
           <CustomProjection data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]} projection={geoAlbersUsaTerritories}>
             { ({ features, projection }) => {
+              console.log('running projection')
               return (
                 <g 
                   id="mapGroup" 
@@ -527,11 +516,11 @@ const CountyMap = (props) => {
                   key="countyMapGroup">
                   { constructGeoJsx(features, geoAlbersUsaTerritories) }
                 </g>
-                  )
-                }
-              }
+              )
+            }}
           </CustomProjection>
       </svg>
+      <button className="btn btn--reset" onClick={onReset}>Reset Zoom</button>
       {/* {territories.length > 0 && (
         <section className="territories">
           <span className="label">{state.general.territoriesLabel}</span>
