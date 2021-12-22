@@ -50,7 +50,6 @@ const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
-const stateFipsKeys = Object.keys(supportedStatesFipsCodes);
 
 const generateColorsArray = (color = '#000000', special = false) => {
     let colorObj = chroma(color)
@@ -97,6 +96,8 @@ const getUniqueValues = (data, columnName) => {
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
     
+    console.log('Logging at top of CDCMap')
+
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
@@ -118,7 +119,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
-    const addUIDs = (obj, fromColumn) => {
+    const addUIDs = useCallback((obj, fromColumn) => {
 
         obj.data.forEach(row => {
             let uid = null
@@ -166,7 +167,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         obj.data.fromColumn = fromColumn
-    }
+    })
 
     const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
 
@@ -943,11 +944,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }, [])
 
 
+    // When geotype changes
     useEffect(() => {
-            // UID
-            if(state.data && state.columns.geo.name) {
-                addUIDs(state, state.columns.geo.name)
-            }
+        
+        // UID
+        console.log('running useEffect uid')
+        if(state.data && state.columns.geo.name) {
+            addUIDs(state, state.columns.geo.name)
+        }
+        
     }, [state.general.geoType]);
 
     useEffect(() => {
@@ -1061,9 +1066,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray
     }
 
-
     const [mapToShow, setMapToShow] = useState(null)
-
 
     useEffect(() => {
         if('us' === state.general.geoType) {
@@ -1078,9 +1081,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if("data" === state.general.type && logo) {
             setMapToShow(<img src={logo} alt="" className="map-logo"/>)
         }
-    }, [state.general.geoBorderColor, state.general.geoType, state.general.type, state.color, mapProps.data, mapProps.runtimeLegend]);
+    }, [mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);
 
-    if(loading) return <Loading />
+    if(loading || !mapToShow) return <Loading />
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1121,7 +1124,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                         {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
                         {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
-                        {mapToShow}
+                        { mapToShow }
                     </section>
                     {general.showSidebar && 'navigation' !== general.type && false === loading  &&
                         <Sidebar
