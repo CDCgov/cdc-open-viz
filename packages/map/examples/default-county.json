@@ -1,0 +1,105 @@
+{
+	"type": "map",
+	"general": {
+		"title": "Default County Map",
+		"subtext": "",
+		"territoriesLabel": "Territories",
+		"type": "map",
+		"geoType": "us",
+		"headerColor": "theme-blue",
+		"showSidebar": true,
+		"showTitle": true,
+		"geoBorderColor": "darkGray",
+		"showDownloadButton": true,
+		"expandDataTable": false
+	},
+	"color": "pinkpurple",
+	"columns": {
+		"geo": {
+			"name": "FIPS Codes",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"name": "Insured Rate",
+			"label": "Data Label",
+			"prefix": "",
+			"suffix": "%",
+			"dataTable": true,
+			"tooltip": true
+		},
+		"navigate": {
+			"name": "link",
+			"tooltip": false,
+			"dataTable": false
+		}
+	},
+	"legend": {
+		"numberOfItems": 3,
+		"position": "side",
+		"title": "Legend Title",
+		"description": "Legend Text",
+		"type": "equalnumber",
+		"specialClasses": ["N/A"]
+	},
+	"filters": [],
+	"data": [
+		{
+			"Insured Rate": "8",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "06071",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "25",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "55005",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "25",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "12103",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "25",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "32005",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "18",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "06075",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "3",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "06027",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "25",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "06029",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		},
+		{
+			"Insured Rate": "60",
+			"Coverage Status": "Insured",
+			"FIPS Codes": "06065",
+			"Year (Good filter option)": "2010",
+			"link": ""
+		}
+	]
+}
