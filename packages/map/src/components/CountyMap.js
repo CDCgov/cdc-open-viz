@@ -423,12 +423,12 @@ const CountyMap = (props) => {
               data-for="tooltip"
               data-tip={tooltip}
               key={key}         
-              className={`county county--${geoDisplayName}`}
+              className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
               onClick={
                   // default
                   (e) => { 
-                    let stateFipsCode = geoData['FIPS Codes'].substring(0,2);
+                    let stateFipsCode = geoData[state.columns.geo.name].substring(0,2);
                     geoClickHandler(geoDisplayName, geoData);
                     // update transform/translate
                     focusGeo(stateFipsCode, geo)

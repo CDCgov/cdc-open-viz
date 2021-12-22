@@ -703,7 +703,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
         if (state.general.geoType === 'us-county') {
-            let stateFipsCode = row['FIPS Codes'].substring(0,2)
+            let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
             //supportedStatesFipsCodes[]
