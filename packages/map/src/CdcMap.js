@@ -96,7 +96,6 @@ const getUniqueValues = (data, columnName) => {
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
     
-    console.log('Logging at top of CDCMap')
 
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
@@ -863,6 +862,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
+    const validateFipsCodeLength = (newState) => {
+        let incomingData = newState.data;
+        incomingData.forEach( dataPiece => {
+            if(dataPiece[newState.columns.geo.name].length === 4) {
+                dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+            }
+        })
+        return incomingData;
+    }
+
     const loadConfig = async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
@@ -914,7 +923,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
+
+        // Check FIPS Codes length
+        validateFipsCodeLength(newState);
         setState(newState)
+
         // Done loading
         setLoading(false)
     }
@@ -948,7 +961,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     useEffect(() => {
         
         // UID
-        console.log('running useEffect uid')
         if(state.data && state.columns.geo.name) {
             addUIDs(state, state.columns.geo.name)
         }
