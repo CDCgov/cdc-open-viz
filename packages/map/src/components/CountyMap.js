@@ -104,6 +104,7 @@ const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
 
+
 const nudges = {
   'US-FL': [15, 3],
   'US-AK': [0, -8],
@@ -117,8 +118,6 @@ const nudges = {
 }
 
 const CountyMap = (props) => {
-
-  console.log('Drawing County Map')
 
   const {
     state,
@@ -144,13 +143,12 @@ const CountyMap = (props) => {
   let focusedBorderColor = mapColorPalette[3];
   useEffect(() => rebuildTooltips());
 
-
   const geoLabel = (geo, projection) => {
     //projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
     //const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], geo)
     let [x, y] = projection( geoCentroid(geo) )
     let abbr = abbrs[geo.properties.name]
-    if(abbr === 'NJ') x += 3
+    if (abbr === 'NJ') x += 3
     if(undefined === abbr) return null
     let [dx, dy] = offsets[geo.properties.name]
   
@@ -277,6 +275,28 @@ const CountyMap = (props) => {
     group.setAttribute( 'transform', `translate(${[0,0]}) scale(${.85})` );
     stateLinesPath.setAttribute( 'stroke-width', startingLineWidth );
     focusedBorder.setAttribute( 'stroke-width', startingLineWidth)
+  }
+
+  function setStateLeave() {
+    let focusedBorder = document.getElementById('focusedBorderPath');
+    focusedBorder.setAttribute('d', 'null');
+    focusedBorder.setAttribute('stroke', '#000');
+  }
+
+  function setStateHover(id) {
+
+    let myState = id.substring(0,2)
+
+    const state = testJSON.objects.states.geometries.filter( (el,index) => {
+      return el.id === myState;
+    })
+
+    const focusedStateLine = path(mesh(testJSON, state[0] ))
+
+    let focusedBorder = document.getElementById('focusedBorderPath');
+    focusedBorder.style.display = 'block';
+    focusedBorder.setAttribute('d', focusedStateLine);
+    focusedBorder.setAttribute('stroke', '#000');
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -425,6 +445,12 @@ const CountyMap = (props) => {
               key={key}         
               className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
+              onMouseEnter={ () => {
+                setStateHover(geo.id)
+              }}
+              onMouseLeave={ () => {
+                setStateLeave(geo.id)
+              }}
               onClick={
                   // default
                   (e) => { 
@@ -454,6 +480,12 @@ const CountyMap = (props) => {
           className={`county county--${geoDisplayName}`}
           css={styles}
           strokeWidth=""
+          onMouseEnter={ () => {
+            setStateHover(geo.id)
+          }}
+          onMouseLeave={ () => {
+            setStateLeave(geo.id)
+          }}
           onClick={
               // default
               (e) => { 
@@ -461,6 +493,7 @@ const CountyMap = (props) => {
                 let stateFipsCode = countyFipsCode.substring(0,2);
                 // update transform/translate
                 focusGeo(stateFipsCode, geo)
+                setStateHover(geo.id)
             }
           }
         >
@@ -506,7 +539,6 @@ const CountyMap = (props) => {
         <rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white" onClick={ (e) => onReset(e) }></rect>
           <CustomProjection data={states.concat(counties)} translate={[WIDTH/2,HEIGHT/2]} projection={geoAlbersUsaTerritories}>
             { ({ features, projection }) => {
-              console.log('running projection')
               return (
                 <g 
                   id="mapGroup" 
