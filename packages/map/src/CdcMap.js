@@ -33,6 +33,8 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import Waiting from '@cdc/core/components/Waiting'
+
 
 // Child Components
 import Sidebar from './components/Sidebar';
@@ -95,8 +97,9 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
-    
-
+     
+    const [showLoadingMessage, setShowLoadingMessage] = useState(false)
+    const [loadingMessage, setLoadingMessage] = useState('Loading...')
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
@@ -1080,7 +1083,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const [mapToShow, setMapToShow] = useState(null)
 
+    // const setMapUpdating = (isMapUpdating) => {
+    //     let timeLoading = 3000;
+    //     console.log('progress bar status', isMapUpdating)
+    //     if(isMapUpdating) { setLoading(true) }
+    //     if(!isMapUpdating) { setTimeout( () => setLoading(false), timeLoading ) }
+    // }
+
     useEffect(() => {
+
         if('us' === state.general.geoType) {
             setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
         }
@@ -1088,7 +1099,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
         }
         if('us-county' === state.general.geoType) {
+            setShowLoadingMessage(true)
             setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+            setTimeout(()=>{
+                setShowLoadingMessage(false)
+            },2000);
         }
         if("data" === state.general.type && logo) {
             setMapToShow(<img src={logo} alt="" className="map-logo"/>)
@@ -1101,92 +1116,101 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
             {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}  />}
             <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType &&
-                    <ReactTooltip
-                        id="tooltip"
-                        place="right"
-                        type="light"
-                        html={true}
-                        className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
-                    />
-                }
-                <header className={general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
-                    <div role="heading" className={'map-title ' + general.headerColor}>
-                        { parse(title) }
-                    </div>
-                </header>
-                <section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
-                    {general.showDownloadMediaButton === true &&
-                        <div className="map-downloads" data-html2canvas-ignore>
-                            <div className="map-downloads__ui btn-group">
-                                <button className="btn" title="Download Map as Image"
-                                        onClick={() => generateMedia(outerContainerRef.current, 'image')}>
-                                    <DownloadImg className="btn__icon" title='Download Map as Image'/>
-                                </button>
-                                <button className="btn" title="Download Map as PDF"
-                                        onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
-                                    <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
-                                </button>
-                            </div>
+                    {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType &&
+                        <ReactTooltip
+                            id="tooltip"
+                            place="right"
+                            type="light"
+                            html={true}
+                            className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
+                        />
+                    }
+                    <header className={general.showTitle === true ? '' : 'hidden'} aria-hidden="true">
+                        <div role="heading" className={'map-title ' + general.headerColor}>
+                            { parse(title) }
                         </div>
-                    }
-                    <section className="geography-container" aria-hidden="true" ref={mapSvg}>
-                        {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                        {/* {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                        {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                        {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                        {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
-                        { mapToShow }
+                    </header>
+                    <section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+                        {general.showDownloadMediaButton === true &&
+                            <div className="map-downloads" data-html2canvas-ignore>
+                                <div className="map-downloads__ui btn-group">
+                                    <button className="btn" title="Download Map as Image"
+                                            onClick={() => generateMedia(outerContainerRef.current, 'image')}>
+                                        <DownloadImg className="btn__icon" title='Download Map as Image'/>
+                                    </button>
+                                    <button className="btn" title="Download Map as PDF"
+                                            onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
+                                        <DownloadPdf className="btn__icon" title='Download Map as PDF'/>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        { mapToShow && !showLoadingMessage && 
+                            <section className="geography-container" aria-hidden="true" ref={mapSvg}>
+                                {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                                {/* {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                                {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                                {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                                {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
+                                { mapToShow }
+                            </section>
+                        }
+                        {showLoadingMessage &&
+                            <section className="geography-container" aria-hidden="true" ref={mapSvg}>
+                                    <div className="waiting-container">
+                                        <h3>{loadingMessage}</h3>
+                                    </div>
+                            </section>
+                        }
+                        {general.showSidebar && 'navigation' !== general.type &&
+                            <Sidebar
+                                viewport={currentViewport}
+                                legend={state.legend}
+                                runtimeLegend={runtimeLegend}
+                                setRuntimeLegend={setRuntimeLegend}
+                                runtimeFilters={runtimeFilters}
+                                columns={state.columns}
+                                sharing={state.sharing}
+                                prefix={state.columns.primary.prefix}
+                                suffix={state.columns.primary.suffix}
+                                setState={setState}
+                                resetLegendToggles={resetLegendToggles}
+                                changeFilterActive={changeFilterActive}
+                                setAccessibleStatus={setAccessibleStatus}
+                            />
+                        }
                     </section>
-                    {general.showSidebar && 'navigation' !== general.type && false === loading  &&
-                        <Sidebar
-                            viewport={currentViewport}
-                            legend={state.legend}
+                    {"navigation" === general.type &&
+                            <NavigationMenu
+                                displayGeoName={displayGeoName}
+                                data={runtimeData}
+                                options={general}
+                                columns={state.columns}
+                                navigationHandler={(val) => navigationHandler(val)}
+                            />
+                        }
+                    {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading &&
+                        <DataTable
+                            state={state}
+                            rawData={state.data}
+                            navigationHandler={navigationHandler}
+                            expandDataTable={general.expandDataTable}
+                            headerColor={general.headerColor}
+                            columns={state.columns}
+                            showDownloadButton={general.showDownloadButton}
                             runtimeLegend={runtimeLegend}
-                            setRuntimeLegend={setRuntimeLegend}
-                            runtimeFilters={runtimeFilters}
-                            columns={state.columns}
-                            sharing={state.sharing}
-                            prefix={state.columns.primary.prefix}
-                            suffix={state.columns.primary.suffix}
-                            setState={setState}
-                            resetLegendToggles={resetLegendToggles}
-                            changeFilterActive={changeFilterActive}
-                            setAccessibleStatus={setAccessibleStatus}
-                        />
-                    }
-                </section>
-                {"navigation" === general.type &&
-                        <NavigationMenu
+                            runtimeData={runtimeData}
+                            displayDataAsText={displayDataAsText}
                             displayGeoName={displayGeoName}
-                            data={runtimeData}
-                            options={general}
-                            columns={state.columns}
-                            navigationHandler={(val) => navigationHandler(val)}
+                            applyLegendToRow={applyLegendToRow}
+                            tableTitle={dataTable.title}
+                            indexTitle={dataTable.indexTitle}
+                            mapTitle={general.title}
+                            viewport={currentViewport}
                         />
                     }
-                {true === dataTable.forceDisplay && general.type !== "navigation" && false === loading &&
-                    <DataTable
-                        state={state}
-                        rawData={state.data}
-                        navigationHandler={navigationHandler}
-                        expandDataTable={general.expandDataTable}
-                        headerColor={general.headerColor}
-                        columns={state.columns}
-                        showDownloadButton={general.showDownloadButton}
-                        runtimeLegend={runtimeLegend}
-                        runtimeData={runtimeData}
-                        displayDataAsText={displayDataAsText}
-                        displayGeoName={displayGeoName}
-                        applyLegendToRow={applyLegendToRow}
-                        tableTitle={dataTable.title}
-                        indexTitle={dataTable.indexTitle}
-                        mapTitle={general.title}
-                        viewport={currentViewport}
-                    />
-                }
-                {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
-            </section>
+                    {subtext.length > 0 && <p className="subtext">{ parse(subtext) }</p>}
+                </section>
             <div aria-live="assertive" className="cdcdataviz-sr-only">{ accessibleStatus }</div>
         </div>
     )
