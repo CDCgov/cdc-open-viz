@@ -991,6 +991,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             type: state.general.type,
             geo: state.columns.geo.name,
             primary: state.columns.primary.name,
+            data: state.data,
             ...runtimeFilters
         })
 
@@ -1066,7 +1067,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
     useEffect(() => {
-        if('us' === state.general.geoType) {
+        console.log('Inside the useeffect before re-rendering');
+        if ('us' === state.general.geoType) {
+            console.log('Re-rendering the usamap');
             setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
         }
         if('world' === state.general.geoType) {
@@ -1078,7 +1081,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if("data" === state.general.type && logo) {
             setMapToShow(<img src={logo} alt="" className="map-logo"/>)
         }
-    }, [state.general.geoBorderColor, state.general.geoType, state.general.type, state.color, mapProps.data, mapProps.runtimeLegend]);
+    }, [mapProps.state, mapProps.data, mapProps.runtimeLegend]);
 
     if(loading) return <Loading />
 
