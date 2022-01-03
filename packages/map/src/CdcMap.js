@@ -1067,9 +1067,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
     useEffect(() => {
-        console.log('Inside the useeffect before re-rendering');
         if ('us' === state.general.geoType) {
-            console.log('Re-rendering the usamap');
             setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
         }
         if('world' === state.general.geoType) {
