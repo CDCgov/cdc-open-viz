@@ -1105,9 +1105,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 setShowLoadingMessage(false)
             },2000);
         }
-        if("data" === state.general.type && logo) {
-            setMapToShow(<img src={logo} alt="" className="map-logo"/>)
-        }
+
     }, [mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);
 
     if(loading || !mapToShow) return <Loading />
@@ -1153,6 +1151,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
                                 {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
                                 { mapToShow }
+
+                                { ("data" === state.general.type && logo) &&
+                                    <img src={logo} alt="" className="map-logo"/>
+                                }
                             </section>
                         }
                         {showLoadingMessage &&
