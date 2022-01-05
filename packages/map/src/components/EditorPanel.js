@@ -76,7 +76,7 @@ const EditorPanel = (props) => {
     isDashboard,
     setParentConfig,
     runtimeFilters,
-    runtimeLegend,
+    runtimeLegend
   } = props
 
   const { general, columns, legend, dataTable, tooltips} = state
@@ -356,7 +356,7 @@ const EditorPanel = (props) => {
                   ...state.dataTable,
                   forceDisplay: true
                 }
-              })
+              } )
               ReactTooltip.rebuild()
               break;
             case 'world':
@@ -555,7 +555,7 @@ const EditorPanel = (props) => {
             }
           })
         break;
-    }
+      }
   }
 
   const changeFilter = async (idx, target, value) => {

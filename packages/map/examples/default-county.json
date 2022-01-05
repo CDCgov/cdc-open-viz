@@ -5,7 +5,7 @@
 		"subtext": "",
 		"territoriesLabel": "Territories",
 		"type": "map",
-		"geoType": "us",
+		"geoType": "us-county",
 		"headerColor": "theme-blue",
 		"showSidebar": true,
 		"showTitle": true,
@@ -48,7 +48,7 @@
 		{
 			"Insured Rate": "8",
 			"Coverage Status": "Insured",
-			"FIPS Codes": "06071",
+			"FIPS Codes": "6071",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
@@ -83,7 +83,7 @@
 		{
 			"Insured Rate": "3",
 			"Coverage Status": "Insured",
-			"FIPS Codes": "06027",
+			"FIPS Codes": "6027",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
