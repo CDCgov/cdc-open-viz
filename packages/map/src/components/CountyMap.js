@@ -91,12 +91,6 @@ const WIDTH = 880;
 const HEIGHT = 500;
 const PADDING = 25;
 
-// When using <AlbersUsa> visx attributes, these are needed.
-// I wasn't able to get the transitions working with them.
-// const ASPECT_RATIO = 1.55;
-// const STARTING_SCALE = (WIDTH - PADDING + HEIGHT - PADDING) / ASPECT_RATIO;
-// const STARTING_TRANSLATE = [ WIDTH / 2, HEIGHT / 2];
-
 // DATA
 let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states);
@@ -109,6 +103,7 @@ const STATE_INACTIVE_FILL = '#F4F7FA';
 const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 const path = geoPath().projection(projection)
 const stateLines = path(mesh(testJSON, testJSON.objects.states))
+
 
 const nudges = {
   'US-FL': [15, 3],
@@ -138,28 +133,22 @@ const CountyMap = (props) => {
   } = props;
   
 
-  console.table('PROPS', props)
-
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
   const focusedState = null;  
   const translate = [0,0];
   const scale = .85;
   const startingLineWidth = 1.3;
   const container = useRef(null)
-  useEffect(() => rebuildTooltips());
-  const [loading, setLoading] = useState(true)
-
-  
   let mapColorPalette = colorPalettes[state.color] || '#fff';
   let focusedBorderColor = mapColorPalette[3];
-
+  useEffect(() => rebuildTooltips());
 
   const geoLabel = (geo, projection) => {
     //projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
     //const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], geo)
     let [x, y] = projection( geoCentroid(geo) )
     let abbr = abbrs[geo.properties.name]
-    if(abbr === 'NJ') x += 3
+    if (abbr === 'NJ') x += 3
     if(undefined === abbr) return null
     let [dx, dy] = offsets[geo.properties.name]
   
@@ -286,6 +275,28 @@ const CountyMap = (props) => {
     group.setAttribute( 'transform', `translate(${[0,0]}) scale(${.85})` );
     stateLinesPath.setAttribute( 'stroke-width', startingLineWidth );
     focusedBorder.setAttribute( 'stroke-width', startingLineWidth)
+  }
+
+  function setStateLeave() {
+    let focusedBorder = document.getElementById('focusedBorderPath');
+    focusedBorder.setAttribute('d', 'null');
+    focusedBorder.setAttribute('stroke', '#000');
+  }
+
+  function setStateHover(id) {
+
+    let myState = id.substring(0,2)
+
+    const state = testJSON.objects.states.geometries.filter( (el,index) => {
+      return el.id === myState;
+    })
+
+    const focusedStateLine = path(mesh(testJSON, state[0] ))
+
+    let focusedBorder = document.getElementById('focusedBorderPath');
+    focusedBorder.style.display = 'block';
+    focusedBorder.setAttribute('d', focusedStateLine);
+    focusedBorder.setAttribute('stroke', '#000');
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -432,12 +443,18 @@ const CountyMap = (props) => {
               data-for="tooltip"
               data-tip={tooltip}
               key={key}         
-              className={`county county--${geoDisplayName}`}
+              className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
+              onMouseEnter={ () => {
+                setStateHover(geo.id)
+              }}
+              onMouseLeave={ () => {
+                setStateLeave(geo.id)
+              }}
               onClick={
                   // default
                   (e) => { 
-                    let stateFipsCode = geoData['FIPS Codes'].substring(0,2);
+                    let stateFipsCode = geoData[state.columns.geo.name].substring(0,2);
                     geoClickHandler(geoDisplayName, geoData);
                     // update transform/translate
                     focusGeo(stateFipsCode, geo)
@@ -463,6 +480,12 @@ const CountyMap = (props) => {
           className={`county county--${geoDisplayName}`}
           css={styles}
           strokeWidth=""
+          onMouseEnter={ () => {
+            setStateHover(geo.id)
+          }}
+          onMouseLeave={ () => {
+            setStateLeave(geo.id)
+          }}
           onClick={
               // default
               (e) => { 
@@ -470,6 +493,7 @@ const CountyMap = (props) => {
                 let stateFipsCode = countyFipsCode.substring(0,2);
                 // update transform/translate
                 focusGeo(stateFipsCode, geo)
+                setStateHover(geo.id)
             }
           }
         >
@@ -508,11 +532,8 @@ const CountyMap = (props) => {
     return geosJsx;
   };
 
-  // if(loading) return <Loading />
-
   return (
     <ErrorBoundary component="CountyMap">
-      {/* <div className="countyMap" ref={map}></div> */}
         
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" ref={container} className="svg-container">
         <rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white" onClick={ (e) => onReset(e) }></rect>
@@ -527,11 +548,11 @@ const CountyMap = (props) => {
                   key="countyMapGroup">
                   { constructGeoJsx(features, geoAlbersUsaTerritories) }
                 </g>
-                  )
-                }
-              }
+              )
+            }}
           </CustomProjection>
       </svg>
+      <button className="btn btn--reset" onClick={onReset}>Reset Zoom</button>
       {/* {territories.length > 0 && (
         <section className="territories">
           <span className="label">{state.general.territoriesLabel}</span>
