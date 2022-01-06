@@ -1209,7 +1209,7 @@ const EditorPanel = (props) => {
                   <label>
                     <span className="edit-label">Map Color Palette</span>
                   </label>
-                  <span className="h5">Quantitative</span>
+                  <span className="h5">Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => !name.includes('qualitative')).map( (palette) => {
 
@@ -1234,7 +1234,7 @@ const EditorPanel = (props) => {
                       )
                     })}
                   </ul>
-                  <span className="h5">Qualitative</span>
+                  <span className="h5">Non-Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
 
