@@ -710,7 +710,7 @@ const EditorPanel = () => {
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
-                  <span className="h5">Qualitative</span>
+                  <span className="h5">Non-Sequential</span>
                   <ul className="color-palette">
                     {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
 
