@@ -9,6 +9,7 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
+import { supportedStates, stateToIso  } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -69,6 +70,27 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips
   } = props;
+
+  // "Choose State" options
+  const [extent, setExtent] = useState(null)
+  const [focusedStates, setFocusedStates] = useState(unitedStates)
+
+  // When "Choose State" changes
+  useEffect( () => {
+    if(state.general.hasOwnProperty('statePicked')) {
+
+      if('us' === state.general.statePicked.stateName) {
+        setFocusedStates(unitedStates)
+        setExtent(null) 
+      } else {
+        let foundIso = stateToIso[state.general.statePicked.stateName];
+        let myState = unitedStates.find(s => s.properties.iso === foundIso );
+        setFocusedStates( unitedStates.filter( s => s.properties.iso === foundIso ) );
+        setExtent([ [[0, 0], [880, 500] ], myState])
+      }
+
+    }
+  }, [state.general.statePicked] )
 
   const isHex = state.general.displayAsHex
 
@@ -307,7 +329,11 @@ const UsaMap = (props) => {
             (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
               {({ features, projection }) => constructGeoJsx(features, projection)}
             </Mercator>) :
-            (<AlbersUsa data={unitedStates} translate={[455, 250]}>
+            (<AlbersUsa 
+              data={focusedStates} 
+              translate={[455, 250]} 
+              fitExtent={extent}
+              >
               {({ features, projection }) => constructGeoJsx(features, projection)}
             </AlbersUsa>)
         }
