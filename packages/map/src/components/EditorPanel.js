@@ -22,6 +22,8 @@ import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
+import {supportedStatesFipsCodes} from '../data/supported-geos';
+
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
 const Helper = ({text}) => {
@@ -473,6 +475,19 @@ const EditorPanel = (props) => {
           }
         })
         break;
+      case 'chooseState':
+        let fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === value)
+        let stateName = value
+        let stateData = { fipsCode, stateName }
+        
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            statePicked: stateData
+          }
+        })
+        break;
       default:
           console.warn(`Did not recognize editor property.`)
       break;
@@ -757,6 +772,23 @@ const EditorPanel = (props) => {
     )
   })
 
+  const StateOptionList = () => {
+    
+    const arrOfArrays = Object.entries(supportedStatesFipsCodes);
+
+    let sorted = arrOfArrays.sort((a, b) => {
+      return a[0].localeCompare(b[0]);
+    });
+
+    let options = [];
+    options.push(<option value="us" key={'allStates'}>All States</option>)
+    sorted.forEach( state => {
+      options.push (<option key={state[0]} value={ state[1] } >{state[1]}</option>)
+    })
+    
+    return options;
+  }
+
   const filterValueOptionList = []
 
   if(runtimeFilters.length > 0) {
@@ -854,6 +886,20 @@ const EditorPanel = (props) => {
                     <option value="us-county">US County-Level</option>
                   </select>
                   </label>
+                  {/* Type */}
+                  {/* Select > Filter a state */}
+                  { state.general.geoType === 'us' &&
+                    <label>
+                      <span className="edit-label column-heading">Choose State</span>
+                      <select 
+                        value={state.general.hasOwnProperty('statePicked') ? state.general.statePicked.stateName : 'us' } 
+                        onChange={(event) => { handleEditorChanges("chooseState", event.target.value) }} 
+                      >
+                        <StateOptionList />
+                      </select>
+                    </label>
+                  
+                  }
                   {/* Type */}
                   <label>
                   <span className="edit-label column-heading">Map Type</span>
