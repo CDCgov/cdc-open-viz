@@ -8,7 +8,9 @@ import {
   AccordionItemPanel,
   AccordionItemButton,
 } from 'react-accessible-accordion';
-import { useDebounce } from 'use-debounce';
+
+import { timeParse, timeFormat } from 'd3-time-format';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 
 import Context from '../context';
 import WarningImage from '../images/warning.svg';
@@ -60,6 +62,10 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   if('number' === type) {
     formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
+  }
+
+  if('date' === type) {
+    formElement = <input type="date" name={name} onChange={onChange} {...attributes} value={value} />
   }
 
   return (
@@ -237,14 +243,6 @@ const EditorPanel = () => {
     filters[index][name] = value;
 
     updateConfig({...config, filters});
-  }
-
-  const updateDateRange = (type, value) => {
-    let date = {...config.exclusions.date}
-    '' === value ? delete date[type] : date[type] = value
-
-    let payload = {...config.exclusions, date: date}
-    updateConfig({...config, exclusions: payload})
   }
 
   const addNewFilter = () => {
@@ -573,8 +571,15 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.xAxis.label} section="xAxis" fieldName="label" label="Label" updateField={updateField} />
 
+                      {config.xAxis.type === 'date' && (
+                        <>
+                          <p style={{padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
+                          <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
+                          <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
+                        </>
+                      )}
+
                       <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />
-                      {/* TODO: (Complete?) Need to check why config.xAxis.type is not being set with default value - key/value pair missing until dropdown selection is made */}
 
                       {config.exclusions.active &&
                         <>
@@ -594,29 +599,18 @@ const EditorPanel = () => {
 
                           {config.xAxis.type === 'date' &&
                             <>
-                              <label>
-                                <span className="edit-label column-heading">Start Date</span>
-                                <input type="date" name="start-date" value={config.exclusions.date.start || ''} onChange={(e) => {updateDateRange('start', e.target.value)}} />
-                              </label>
-                              <label>
-                                <span className="edit-label column-heading">End Date</span>
-                                <input type="date" name="start-date" value={config.exclusions.date.end || ''} onChange={(e) => {updateDateRange('end', e.target.value)}} />
-                              </label>
+                              <TextField type="date" section="exclusions" fieldName="dateStart" label="Start Date" updateField={updateField} value={config.exclusions.dateStart || ''} />
+                              <TextField type="date" section="exclusions" fieldName="dateEnd" label="End Date" updateField={updateField} value={config.exclusions.dateEnd || ''} />
                             </>
                           }
                         </>
                       }
 
-                      {config.xAxis.type === 'date' && (
+                      {config.xAxis.type === 'date' &&
                         <>
-                          <p style={{padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
-                          <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
-                          <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
                           <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
                         </>
-                      )}
-
-                      {config.xAxis.numTicks = (config.xAxis.type === 'categorical') ? '' : config.xAxis.numTicks /* remove tick setting for categorical */ }
+                      }
 
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.visualizationSubType === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
 
@@ -692,12 +686,15 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
+
                   {config.series?.some(series => series.type === 'Bar') &&
-                  <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
+                    <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
                   }
-                  {config.series?.some(series => series.type === 'Line') &&
-                  <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />
+
+                  {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
+                    <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />
                   }
+
                   <label className="header">
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">

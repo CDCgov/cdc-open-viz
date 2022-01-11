@@ -30,8 +30,7 @@ export default {
   },
   exclusions: {
     active: false,
-    keys: [],
-    date: {}
+    keys: []
   },
   palette: 'qualitative-bold',
   labels: false,

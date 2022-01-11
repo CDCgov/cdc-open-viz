@@ -1,0 +1,162 @@
+[
+  {
+    "Date": "01-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "6714"
+  },
+  {
+    "Date": "02-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "7260"
+  },
+  {
+    "Date": "03-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "6808"
+  },
+  {
+    "Date": "04-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "6225"
+  },
+  {
+    "Date": "05-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "6633"
+  },
+  {
+    "Date": "06-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "10600"
+  },
+  {
+    "Date": "07-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "11300"
+  },
+  {
+    "Date": "08-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "12450"
+  },
+  {
+    "Date": "09-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "14625"
+  },
+  {
+    "Date": "10-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "18238"
+  },
+  {
+    "Date": "11-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "18214"
+  },
+  {
+    "Date": "12-01-2021",
+    "Sex": "Male",
+    "Cases per 100K": "16411"
+  },
+  {
+    "Date": "01-01-2022",
+    "Sex": "Male",
+    "Cases per 100K": "15808"
+  },
+  {
+    "Date": "02-01-2022",
+    "Sex": "Male",
+    "Cases per 100K": "11210"
+  },
+  {
+    "Date": "03-01-2022",
+    "Sex": "Male",
+    "Cases per 100K": "9660"
+  },
+  {
+    "Date": "04-01-2022",
+    "Sex": "Male",
+    "Cases per 100K": "7325"
+  },
+  {
+    "Date": "01-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "5714"
+  },
+  {
+    "Date": "02-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "6000"
+  },
+  {
+    "Date": "03-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "5808"
+  },
+  {
+    "Date": "04-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "6225"
+  },
+  {
+    "Date": "05-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "5633"
+  },
+  {
+    "Date": "06-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "8600"
+  },
+  {
+    "Date": "07-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "9300"
+  },
+  {
+    "Date": "08-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "9450"
+  },
+  {
+    "Date": "09-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "3625"
+  },
+  {
+    "Date": "10-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "3238"
+  },
+  {
+    "Date": "11-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "2214"
+  },
+  {
+    "Date": "12-01-2021",
+    "Sex": "Female",
+    "Cases per 100K": "2411"
+  },
+  {
+    "Date": "01-01-2022",
+    "Sex": "Female",
+    "Cases per 100K": "2808"
+  },
+  {
+    "Date": "02-01-2022",
+    "Sex": "Female",
+    "Cases per 100K": "3210"
+  },
+  {
+    "Date": "03-01-2022",
+    "Sex": "Female",
+    "Cases per 100K": "2660"
+  },
+  {
+    "Date": "04-01-2022",
+    "Sex": "Female",
+    "Cases per 100K": "2325"
+  }
+]
