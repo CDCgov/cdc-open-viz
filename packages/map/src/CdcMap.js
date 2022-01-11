@@ -45,6 +45,7 @@ import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
+import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -154,7 +155,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // County Check
-            if("us-county" === obj.general.geoType) {
+            if("us-county" === obj.general.geoType || "single-state" === obj.general.geoType) {
                 const fips = row[obj.columns.geo.name]
                 uid = countyKeys.find( (key) => key === fips )
             }
@@ -929,7 +930,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Check FIPS Codes length
-        if(state.general.geoType === 'us-county') {
+        if(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') {
             validateFipsCodeLength(newState);
         }
         setState(newState)
@@ -1101,12 +1102,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if('world' === state.general.geoType) {
             setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
         }
-        if('us-county' === state.general.geoType) {
+        if('us-county' === state.general.geoType ) {
             setShowLoadingMessage(true)
             setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
             setTimeout(()=>{
                 setShowLoadingMessage(false)
             },2000);
+        }
+        if('single-state' === state.general.geoType) {
+            setMapToShow(<SingleStateMap {...mapProps} />)
         }
 
     }, [state.general.statePicked, mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);

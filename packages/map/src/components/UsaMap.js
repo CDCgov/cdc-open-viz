@@ -74,6 +74,13 @@ const UsaMap = (props) => {
   // "Choose State" options
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(unitedStates)
+  const [translate, setTranslate] = useState([455,200])
+
+  // When returning from another map we want to reset the state
+  useEffect(() => {
+    setTranslate( [455,200] )
+    setExtent( null )
+  }, [state.general.geoType]);
 
   // When "Choose State" changes
   useEffect( () => {
@@ -331,7 +338,7 @@ const UsaMap = (props) => {
             </Mercator>) :
             (<AlbersUsa 
               data={focusedStates} 
-              translate={[455, 250]} 
+              translate={translate} 
               fitExtent={extent}
               >
               {({ features, projection }) => constructGeoJsx(features, projection)}
