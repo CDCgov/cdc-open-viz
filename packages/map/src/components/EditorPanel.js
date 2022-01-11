@@ -16,6 +16,7 @@ import Waiting from '@cdc/core/components/Waiting'
 import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
+import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
@@ -387,7 +388,20 @@ const EditorPanel = (props) => {
                   forceDisplay: true
                 }
               })
-              ReactTooltip.rebuild()
+              break;
+            case 'single-state':
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    geoType: "single-state",
+                    expandDataTable: false
+                },
+                dataTable: {
+                  ...state.dataTable,
+                  forceDisplay: true
+                }
+              })
               break;
             default:
               break;
@@ -699,6 +713,23 @@ const EditorPanel = (props) => {
     }
   }, [runtimeLegend])
 
+
+  // if no state choice by default show alabama
+  useEffect(() => {
+    if(!state.general.statePicked) {
+      setState({
+        ...state,
+        general: {
+          ...general,
+          statePicked: {
+            fipsCode: '01',
+            stateName: 'Alabama'
+          }
+        }
+      })
+    }
+  }, []);
+
   const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
 
   columnsInData.map(colName => {
@@ -781,7 +812,6 @@ const EditorPanel = (props) => {
     });
 
     let options = [];
-    options.push(<option value="us" key={'allStates'}>All States</option>)
     sorted.forEach( state => {
       options.push (<option key={state[0]} value={ state[1] } >{state[1]}</option>)
     })
@@ -876,23 +906,29 @@ const EditorPanel = (props) => {
                         <WorldGraphic />
                         <span>World</span>
                       </li>
+                      <li className={state.general.geoType === 'single-state' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "single-state")}>
+                        <AlabamaGraphic />
+                        <span>U.S. State</span>
+                      </li>
                     </ul>
                   </label>
                   {/* Select > State or County Map */}
-                  <label>
-                  <span className="edit-label column-heading">Map Type</span>
-                  <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
-                    <option value="us">US State-Level</option>
-                    <option value="us-county">US County-Level</option>
-                  </select>
-                  </label>
-                  {/* Type */}
-                  {/* Select > Filter a state */}
                   { state.general.geoType === 'us' &&
                     <label>
-                      <span className="edit-label column-heading">Choose State</span>
+                    <span className="edit-label column-heading">Map Type</span>
+                    <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
+                      <option value="us">US State-Level</option>
+                      <option value="us-county">US County-Level</option>
+                    </select>
+                    </label>
+                  }
+                  {/* Type */}
+                  {/* Select > Filter a state */}
+                  { state.general.geoType === 'single-state' &&
+                    <label>
+                      <span className="edit-label column-heading">State Selector</span>
                       <select 
-                        value={state.general.hasOwnProperty('statePicked') ? state.general.statePicked.stateName : 'us' } 
+                        value={state.general.hasOwnProperty('statePicked') ? state.general.statePicked.stateName : { fipsCode: '04', stateName: 'Alabama'} } 
                         onChange={(event) => { handleEditorChanges("chooseState", event.target.value) }} 
                       >
                         <StateOptionList />
