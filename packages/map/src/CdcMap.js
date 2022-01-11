@@ -868,13 +868,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        let incomingData = newState.data;
-        incomingData.forEach( dataPiece => {
-            if(dataPiece[newState.columns.geo.name].length === 4) {
-                dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-            }
-        })
-        return incomingData;
+
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state') {
+
+            newState.data.forEach( dataPiece => {
+                if(dataPiece[newState.columns.geo.name].length === 4) {
+                    dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                }
+            })
+        }
+        return newState;
     }
 
     const loadConfig = async (configObj) => {
@@ -929,10 +932,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             newState.dataTable.forceDisplay = !isDashboard;
         }
 
-        // Check FIPS Codes length
-        if(state.general.geoType === 'us-county' || state.general.geoType === 'single-state') {
-            validateFipsCodeLength(newState);
-        }
+
+        validateFipsCodeLength(newState);
         setState(newState)
 
         // Done loading
@@ -1086,13 +1087,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const [mapToShow, setMapToShow] = useState(null)
-
-    // const setMapUpdating = (isMapUpdating) => {
-    //     let timeLoading = 3000;
-    //     console.log('progress bar status', isMapUpdating)
-    //     if(isMapUpdating) { setLoading(true) }
-    //     if(!isMapUpdating) { setTimeout( () => setLoading(false), timeLoading ) }
-    // }
 
     useEffect(() => {
 

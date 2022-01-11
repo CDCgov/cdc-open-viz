@@ -82,23 +82,6 @@ const UsaMap = (props) => {
     setExtent( null )
   }, [state.general.geoType]);
 
-  // When "Choose State" changes
-  useEffect( () => {
-    if(state.general.hasOwnProperty('statePicked')) {
-
-      if('us' === state.general.statePicked.stateName) {
-        setFocusedStates(unitedStates)
-        setExtent(null) 
-      } else {
-        let foundIso = stateToIso[state.general.statePicked.stateName];
-        let myState = unitedStates.find(s => s.properties.iso === foundIso );
-        setFocusedStates( unitedStates.filter( s => s.properties.iso === foundIso ) );
-        setExtent([ [[0, 0], [880, 500] ], myState])
-      }
-
-    }
-  }, [state.general.statePicked] )
-
   const isHex = state.general.displayAsHex
 
   const [territoriesData, setTerritoriesData] = useState([]);

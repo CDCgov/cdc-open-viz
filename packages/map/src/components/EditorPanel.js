@@ -913,7 +913,7 @@ const EditorPanel = (props) => {
                     </ul>
                   </label>
                   {/* Select > State or County Map */}
-                  { state.general.geoType === 'us' &&
+                  { (state.general.geoType === 'us' || state.general.geoType === 'us-county') &&
                     <label>
                     <span className="edit-label column-heading">Map Type</span>
                     <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
