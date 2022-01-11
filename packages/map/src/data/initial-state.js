@@ -20,7 +20,7 @@ export default {
   color: 'pinkpurple',
   columns: {
     geo: {
-      name: '',
+      name: 'FIPS Codes',
       label: 'Location',
 			tooltip: false,
       dataTable: true,
