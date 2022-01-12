@@ -866,13 +866,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        let incomingData = newState.data;
-        incomingData.forEach( dataPiece => {
-            if(dataPiece[newState.columns.geo.name].length === 4) {
-                dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-            }
-        })
-        return incomingData;
+
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state') {
+
+            newState.data.forEach( dataPiece => {
+                if(dataPiece[newState.columns.geo.name].length === 4) {
+                    dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                }
+            })
+        }
+        return newState;
     }
 
     const loadConfig = async (configObj) => {
