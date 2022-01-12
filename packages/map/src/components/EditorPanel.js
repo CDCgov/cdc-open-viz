@@ -16,11 +16,14 @@ import Waiting from '@cdc/core/components/Waiting'
 import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
+import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
 import colorPalettes from '../data/color-palettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+
+import {supportedStatesFipsCodes} from '../data/supported-geos';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -385,7 +388,20 @@ const EditorPanel = (props) => {
                   forceDisplay: true
                 }
               })
-              ReactTooltip.rebuild()
+              break;
+            case 'single-state':
+              setState({
+                ...state,
+                general: {
+                    ...state.general,
+                    geoType: "single-state",
+                    expandDataTable: false
+                },
+                dataTable: {
+                  ...state.dataTable,
+                  forceDisplay: true
+                }
+              })
               break;
             default:
               break;
@@ -470,6 +486,19 @@ const EditorPanel = (props) => {
           dataTable: {
               ...state.dataTable,
               forceDisplay: value
+          }
+        })
+        break;
+      case 'chooseState':
+        let fipsCode = Object.keys(supportedStatesFipsCodes).find(key => supportedStatesFipsCodes[key] === value)
+        let stateName = value
+        let stateData = { fipsCode, stateName }
+        
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            statePicked: stateData
           }
         })
         break;
@@ -684,6 +713,23 @@ const EditorPanel = (props) => {
     }
   }, [runtimeLegend])
 
+
+  // if no state choice by default show alabama
+  useEffect(() => {
+    if(!state.general.statePicked) {
+      setState({
+        ...state,
+        general: {
+          ...general,
+          statePicked: {
+            fipsCode: '01',
+            stateName: 'Alabama'
+          }
+        }
+      })
+    }
+  }, []);
+
   const columnsOptions = [<option value="" key={"Select Option"}>- Select Option -</option>]
 
   columnsInData.map(colName => {
@@ -756,6 +802,22 @@ const EditorPanel = (props) => {
         </fieldset>
     )
   })
+
+  const StateOptionList = () => {
+    
+    const arrOfArrays = Object.entries(supportedStatesFipsCodes);
+
+    let sorted = arrOfArrays.sort((a, b) => {
+      return a[0].localeCompare(b[0]);
+    });
+
+    let options = [];
+    sorted.forEach( state => {
+      options.push (<option key={state[0]} value={ state[1] } >{state[1]}</option>)
+    })
+    
+    return options;
+  }
 
   const filterValueOptionList = []
 
@@ -844,16 +906,36 @@ const EditorPanel = (props) => {
                         <WorldGraphic />
                         <span>World</span>
                       </li>
+                      <li className={state.general.geoType === 'single-state' ? 'active' : ''} onClick={() => handleEditorChanges("geoType", "single-state")}>
+                        <AlabamaGraphic />
+                        <span>U.S. State</span>
+                      </li>
                     </ul>
                   </label>
                   {/* Select > State or County Map */}
-                  <label>
-                  <span className="edit-label column-heading">Map Type</span>
-                  <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
-                    <option value="us">US State-Level</option>
-                    <option value="us-county">US County-Level</option>
-                  </select>
-                  </label>
+                  { (state.general.geoType === 'us' || state.general.geoType === 'us-county') &&
+                    <label>
+                    <span className="edit-label column-heading">Map Type</span>
+                    <select value={state.general.geoType} onChange={(event) => { handleEditorChanges("geoType", event.target.value) }}>
+                      <option value="us">US State-Level</option>
+                      <option value="us-county">US County-Level</option>
+                    </select>
+                    </label>
+                  }
+                  {/* Type */}
+                  {/* Select > Filter a state */}
+                  { state.general.geoType === 'single-state' &&
+                    <label>
+                      <span className="edit-label column-heading">State Selector</span>
+                      <select 
+                        value={state.general.hasOwnProperty('statePicked') ? state.general.statePicked.stateName : { fipsCode: '04', stateName: 'Alabama'} } 
+                        onChange={(event) => { handleEditorChanges("chooseState", event.target.value) }} 
+                      >
+                        <StateOptionList />
+                      </select>
+                    </label>
+                  
+                  }
                   {/* Type */}
                   <label>
                   <span className="edit-label column-heading">Map Type</span>
