@@ -1090,25 +1090,25 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     //     if(!isMapUpdating) { setTimeout( () => setLoading(false), timeLoading ) }
     // }
 
-    useEffect(() => {
+    //useEffect(() => {
 
-        if('us' === state.general.geoType) {
-            setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
-        }
-        if('world' === state.general.geoType) {
-            setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
-        }
-        if('us-county' === state.general.geoType) {
-            setShowLoadingMessage(true)
-            setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
-            setTimeout(()=>{
-                setShowLoadingMessage(false)
-            },2000);
-        }
+    //     if('us' === state.general.geoType) {
+    //         setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
+    //     }
+    //     if('world' === state.general.geoType) {
+    //         setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
+    //     }
+    //     if('us-county' === state.general.geoType) {
+    //         setShowLoadingMessage(true)
+    //         setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
+    //         setTimeout(()=>{
+    //             setShowLoadingMessage(false)
+    //         },2000);
+    //     }
 
-    }, [mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);
+    // }, [mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);
 
-    if(loading || !mapToShow) return <Loading />
+    if(loading ) return <Loading />
 
     return (
         <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1143,20 +1143,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 </div>
                             </div>
                         }
-                        { mapToShow && !showLoadingMessage && 
+                        
                             <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                                 {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                                {/* {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                                {'us' === general.geoType && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                                 {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                                 {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                                {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>} */}
-                                { mapToShow }
+                                {"data" === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
+                                {/* { mapToShow } */}
 
                                 { ("data" === state.general.type && logo) &&
                                     <img src={logo} alt="" className="map-logo"/>
                                 }
                             </section>
-                        }
+                        
                         {showLoadingMessage &&
                             <section className="geography-container" aria-hidden="true" ref={mapSvg}>
                                     <div className="waiting-container">
@@ -1164,6 +1164,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                     </div>
                             </section>
                         }
+
                         {general.showSidebar && 'navigation' !== general.type &&
                             <Sidebar
                                 viewport={currentViewport}
