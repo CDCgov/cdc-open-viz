@@ -45,6 +45,7 @@ import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
+import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -154,7 +155,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // County Check
-            if("us-county" === obj.general.geoType) {
+            if("us-county" === obj.general.geoType || "single-state" === obj.general.geoType) {
                 const fips = row[obj.columns.geo.name]
                 uid = countyKeys.find( (key) => key === fips )
             }
@@ -704,6 +705,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
+        let stateOrCounty = state.general.geoType === 'us' ? 'State' : 'County';
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
@@ -712,7 +714,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
         }
         
-        toolTipText += `<strong>County: ${displayGeoName(geoName)}</strong>`
+        toolTipText += `<strong>${stateOrCounty}: ${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type) {
             toolTipText += `<dl>`
@@ -866,13 +868,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        let incomingData = newState.data;
-        incomingData.forEach( dataPiece => {
-            if(dataPiece[newState.columns.geo.name].length === 4) {
-                dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-            }
-        })
-        return incomingData;
+
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state') {
+
+            newState.data.forEach( dataPiece => {
+                if(dataPiece[newState.columns.geo.name].length === 4) {
+                    dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                }
+            })
+        }
+        return newState;
     }
 
     const loadConfig = async (configObj) => {
@@ -927,7 +932,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             newState.dataTable.forceDisplay = !isDashboard;
         }
 
-        // Check FIPS Codes length
+
         validateFipsCodeLength(newState);
         setState(newState)
 
@@ -1083,30 +1088,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const [mapToShow, setMapToShow] = useState(null)
 
-    // const setMapUpdating = (isMapUpdating) => {
-    //     let timeLoading = 3000;
-    //     console.log('progress bar status', isMapUpdating)
-    //     if(isMapUpdating) { setLoading(true) }
-    //     if(!isMapUpdating) { setTimeout( () => setLoading(false), timeLoading ) }
-    // }
-
-    //useEffect(() => {
-
-    //     if('us' === state.general.geoType) {
-    //         setMapToShow(<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />)
-    //     }
-    //     if('world' === state.general.geoType) {
-    //         setMapToShow(<WorldMap supportedCountries={supportedCountries} {...mapProps} />)
-    //     }
-    //     if('us-county' === state.general.geoType) {
-    //         setShowLoadingMessage(true)
-    //         setMapToShow(<CountyMap supportedCountries={supportedCountries} {...mapProps} />)
-    //         setTimeout(()=>{
-    //             setShowLoadingMessage(false)
-    //         },2000);
-    //     }
-
-    // }, [mapProps.state.general.geoBorderColor, mapProps.state.general.geoType, mapProps.state.general.type, mapProps.state.color, mapProps.data, mapProps.runtimeLegend]);
 
     if(loading ) return <Loading />
 
