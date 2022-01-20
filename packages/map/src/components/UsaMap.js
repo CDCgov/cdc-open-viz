@@ -9,6 +9,7 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
+import { supportedStates, stateToIso  } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -69,6 +70,17 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips
   } = props;
+
+  // "Choose State" options
+  const [extent, setExtent] = useState(null)
+  const [focusedStates, setFocusedStates] = useState(unitedStates)
+  const [translate, setTranslate] = useState([455,200])
+
+  // When returning from another map we want to reset the state
+  useEffect(() => {
+    setTranslate( [455,200] )
+    setExtent( null )
+  }, [state.general.geoType]);
 
   const isHex = state.general.displayAsHex
 
@@ -307,7 +319,11 @@ const UsaMap = (props) => {
             (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
               {({ features, projection }) => constructGeoJsx(features, projection)}
             </Mercator>) :
-            (<AlbersUsa data={unitedStates} translate={[455, 250]}>
+            (<AlbersUsa 
+              data={focusedStates} 
+              translate={translate} 
+              fitExtent={extent}
+              >
               {({ features, projection }) => constructGeoJsx(features, projection)}
             </AlbersUsa>)
         }

@@ -11,6 +11,7 @@ import GlobeIcon from '@cdc/core/assets/world-graphic.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg';
+import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
 
 export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
@@ -90,6 +91,7 @@ export default function ChooseTab() {
             <ul className="grid">
                 <li><IconButton label="U.S. State- or County-Level" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
+                <li><IconButton label="U.S. State" type="map" subType="single-state" icon={ <AlabamaGraphic /> } /></li>
             </ul>
         </div>
     )

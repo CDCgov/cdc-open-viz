@@ -85,7 +85,7 @@ strong {
       background-color: darken($red, 5%);
     }
   }
-  
+
   &:hover {
     transition: .1s all;
     background: lighten(#005eaa, 5%);
@@ -100,7 +100,7 @@ strong {
   }
 }
 
-input[type="text"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
+input[type="text"], input[type="date"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
   padding: .5em .5em;
   font-size: 1em;
   font-family: sans-serif;

@@ -105,17 +105,32 @@ export default function CdcChart(
     if (newConfig.exclusions && newConfig.exclusions.active) {
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (newConfig.xAxis.type === 'date' && (newConfig.exclusions.date.start || newConfig.exclusions.date.end)) {
-        let startDate = newConfig.exclusions.date.start
-        let endDate = newConfig.exclusions.date.end
+      } else if (
+        newConfig.xAxis.type === 'date' &&
+        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
+        newConfig.xAxis.dateParseFormat
+      ) {
 
-        if (undefined === typeof startDate) {
-          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] <= endDate)
-        } else if (undefined === typeof endDate) {
-          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] >= startDate)
-        } else {
-          newExcludedData = data.filter(e => e[newConfig.xAxis.dataKey] >= startDate && e[newConfig.xAxis.dataKey] <= endDate)
+        // Filter dates
+        const timestamp = (e) => new Date(e).getTime();
+
+        let startDate = timestamp(newConfig.exclusions.dateStart)
+        let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
+
+        let startDateValid = undefined !== typeof startDate && false === isNaN(startDate)
+        let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
+
+        if (startDateValid && endDateValid) {
+          newExcludedData = data.filter(e =>
+            (timestamp(e[newConfig.xAxis.dataKey]) >= startDate) &&
+            (timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
+          )
+        } else if (startDateValid) {
+          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
+        } else if (endDateValid) {
+          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
         }
+
       } else {
         newExcludedData = dataOverride || data
       }
