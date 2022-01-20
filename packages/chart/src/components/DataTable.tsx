@@ -144,10 +144,10 @@ export default function DataTable() {
             <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroups.map((headerGroup,index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
                     {headerGroup.headers.map((column, index) => (
-                      <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
+                      <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header} key={`trth--${index}`}>
                         {index === 0
                           ? config.table.indexLabel
                             ? config.table.indexLabel : column.render('Header')
@@ -160,12 +160,12 @@ export default function DataTable() {
                 ))}
               </thead>
               <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
+                {rows.map((row, index) => {
                   prepareRow(row);
                   return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells.map((cell) => (
-                        <td tabIndex="0" {...cell.getCellProps()}>
+                    <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
+                      {row.cells.map((cell, index) => (
+                        <td tabIndex="0" {...cell.getCellProps()} key={`tbody__tr__td-${index}`}>
                           {cell.render('Cell')}
                         </td>
                       ))}
@@ -185,11 +185,11 @@ export default function DataTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {config.regions.map((region) => {
+                  {config.regions.map((region,index) => {
                     if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
                     return (
-                      <tr key={`row-${region.label}`}>
+                      <tr key={`row-${region.label}--${index}`}>
                         <td>{region.label}</td>
                         <td>{formatDate(parseDate(region.from))}</td>
                         <td>{formatDate(parseDate(region.to))}</td>

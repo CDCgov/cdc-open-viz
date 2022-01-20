@@ -123,9 +123,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length);
                 }
 
-                return barGroups.map((barGroup) => (
-                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
-                  {barGroup.bars.map((bar) => {
+                return barGroups.map((barGroup, index) => (
+                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
+                  {barGroup.bars.map((bar,index) => {
 
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
@@ -171,7 +171,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
                     return (
-                    <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}`}>
+                    <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
                         display={config.labels && displayBar ? 'block' : 'none'}
                         opacity={transparentBar ? 0.5 : 1}
