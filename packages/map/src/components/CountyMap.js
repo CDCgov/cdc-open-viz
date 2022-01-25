@@ -84,10 +84,17 @@ const CountyMap = (props) => {
 	} = props;
 
 	useEffect(() => {
-		if (containerEl.className.indexOf('loaded') === -1) {
-			containerEl.className += ' loaded';
+		console.log('container', containerEl);
+		console.log('containerClassName', containerEl.className)
+		var hasContainerClass = containerEl.className;
+		if(hasContainerClass) {
+			console.log('containerEl', containerEl)
+			if (containerEl.className.indexOf('loaded') === -1) {
+				containerEl.className += ' loaded';
+			}
 		}
-	});
+		return () => { !hasContainer }
+	}, []);
 
 	// Use State
 	const [scale, setScale] = useState(0.85);
@@ -510,35 +517,34 @@ const CountyMap = (props) => {
 	return (
 		<ErrorBoundary component='CountyMap'>
           <Loading />
-					<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
-						<rect
-							className='background center-container ocean'
-							width={WIDTH}
-							height={HEIGHT}
-							fillOpacity={1}
-							fill='white'
-							onClick={(e) => onReset(e)}
-						></rect>
-						<CustomProjection
-							data={mapData}
-							translate={[WIDTH / 2, HEIGHT / 2]}
-							projection={geoAlbersUsaTerritories}
-						>
-							{({ features, projection }) => {
-								return (
-									<g
-										ref={mapGroup}
-										className='countyMapGroup'
-										transform={`translate(${translate}) scale(${scale})`}
-										key='countyMapGroup'
-									>
-										{constructGeoJsx(features, geoAlbersUsaTerritories)}
-									</g>
-								);
-							}}
-						</CustomProjection>
-						}
-					</svg>
+			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
+				<rect
+					className='background center-container ocean'
+					width={WIDTH}
+					height={HEIGHT}
+					fillOpacity={1}
+					fill='white'
+					onClick={(e) => onReset(e)}
+				></rect>
+				<CustomProjection
+					data={mapData}
+					translate={[WIDTH / 2, HEIGHT / 2]}
+					projection={geoAlbersUsaTerritories}
+				>
+					{({ features, projection }) => {
+						return (
+							<g
+								ref={mapGroup}
+								className='countyMapGroup'
+								transform={`translate(${translate}) scale(${scale})`}
+								key='countyMapGroup'
+							>
+								{constructGeoJsx(features, geoAlbersUsaTerritories)}
+							</g>
+						);
+					}}
+				</CustomProjection>
+			</svg>
 			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }}>
 				Reset Zoom
 			</button>
