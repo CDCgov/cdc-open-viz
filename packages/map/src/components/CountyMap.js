@@ -509,6 +509,7 @@ const CountyMap = (props) => {
 
 	return (
 		<ErrorBoundary component='CountyMap'>
+          <Loading />
 					<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
 						<rect
 							className='background center-container ocean'

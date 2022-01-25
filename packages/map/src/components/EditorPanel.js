@@ -146,7 +146,7 @@ const EditorPanel = (props) => {
 
 		setTimeout(() => {
 			setState(updatedState);
-		}, 5000);
+		}, 10);
 	};
 
 	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {
@@ -222,7 +222,7 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'geoBorderColor':
-				setState({
+				setStateWithLoader({
 					...state,
 					general: {
 						...state.general,
