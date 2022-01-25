@@ -217,3 +217,34 @@
     }
   }
 }
+
+@keyframes spin {
+  to {
+      transform: rotate(360deg);
+  }
+}
+
+.react-container .cdc-map-inner-container {
+  visibility: hidden;
+}
+
+.react-container::before {
+  content: ' ';
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  top: 25px;
+  border-radius: 25px;
+  border-left: 3px solid black;
+  margin-left: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.react-container.loaded::before{
+  display: none;
+}
+
+.react-container.loaded .cdc-map-inner-container {
+  visibility: visible;
+}
