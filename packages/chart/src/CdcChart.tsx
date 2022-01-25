@@ -500,35 +500,39 @@ export default function CdcChart(
 
     const announceChange = (text) => {};
 
-    let filterList = config.filters.map((singleFilter, index) => {
-      const values = [];
+    let filterList = '';
+    if (config.filters) {
+      
+      filterList = config.filters.map((singleFilter, index) => {
+        const values = [];
 
-      singleFilter.values.forEach((filterOption, index) => {
-        values.push(
-          <option key={index} value={filterOption}>
-            {filterOption}
-          </option>
+        singleFilter.values.forEach((filterOption, index) => {
+          values.push(
+            <option key={index} value={filterOption}>
+              {filterOption}
+            </option>
+          );
+        });
+
+        return (
+          <div className="single-filter" key={index}>
+            <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
+            <select
+              id={`filter-${index}`}
+              className="filter-select"
+              data-index="0"
+              value={singleFilter.active}
+              onChange={(val) => {
+                changeFilterActive(index, val.target.value);
+                announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
+              }}
+            >
+              {values}
+            </select>
+          </div>
         );
       });
-
-      return (
-        <div className="single-filter" key={index}>
-          <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
-          <select
-            id={`filter-${index}`}
-            className="filter-select"
-            data-index="0"
-            value={singleFilter.active}
-            onChange={(val) => {
-              changeFilterActive(index, val.target.value);
-              announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
-            }}
-          >
-            {values}
-          </select>
-        </div>
-      );
-    });
+    }
 
     return (<section className="filters-section">{filterList}</section>)
   },[excludedData])
