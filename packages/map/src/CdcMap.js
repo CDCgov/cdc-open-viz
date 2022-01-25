@@ -1086,8 +1086,6 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         containerEl
     }
 
-
-
     if (!mapProps.data || !state.data ) return <Loading />;
 
     return (
@@ -1161,7 +1159,6 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
 						)}
 						{'us-county' === general.geoType && (
 							<CountyMap
-								containerEl={containerEl}
 								supportedCountries={supportedCountries}
 								{...mapProps}
 							/>
