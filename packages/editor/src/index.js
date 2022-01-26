@@ -6,10 +6,12 @@ import CdcEditor from './CdcEditor';
 const standaloneParams = new URLSearchParams(window.location.search);
 
 let activeTab = Number.parseInt( standaloneParams.get('active') ) - 1 || null;
+const domContainer = document.querySelector('.react-container')
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <CdcEditor startingTab={activeTab} />
+    <CdcEditor startingTab={activeTab} containerEl={domContainer} />
   </React.StrictMode>,
   document.querySelector('.react-container')
 );

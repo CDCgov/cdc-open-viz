@@ -84,8 +84,6 @@ const CountyMap = (props) => {
 	} = props;
 
 	useEffect(() => {
-		console.log('container', containerEl);
-		console.log('containerClassName', containerEl.className)
 		var hasContainerClass = containerEl.className;
 		if(hasContainerClass) {
 			console.log('containerEl', containerEl)
@@ -93,8 +91,7 @@ const CountyMap = (props) => {
 				containerEl.className += ' loaded';
 			}
 		}
-		return () => { !hasContainer }
-	}, []);
+	});
 
 	// Use State
 	const [scale, setScale] = useState(0.85);
