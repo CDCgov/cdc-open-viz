@@ -487,7 +487,7 @@ export default function CdcChart(
     )
   }
 
-  const Filters = useCallback(() => {
+  const Filters = () => {
     const changeFilterActive = (index, value) => {
       let newFilters = config.filters;
 
@@ -502,7 +502,7 @@ export default function CdcChart(
 
     let filterList = '';
     if (config.filters) {
-      
+
       filterList = config.filters.map((singleFilter, index) => {
         const values = [];
 
@@ -535,7 +535,7 @@ export default function CdcChart(
     }
 
     return (<section className="filters-section">{filterList}</section>)
-  },[excludedData])
+  }
 
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Pie') {
