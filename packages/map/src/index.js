@@ -9,8 +9,12 @@ let isEditor = window.location.href.includes('editor=true');
 const domContainer = document.querySelector('.react-container')
 
 ReactDOM.render(
-  <StrictMode>
-    <CdcMap isEditor={isEditor} configUrl={domContainer.attributes['data-config'].value} />
-  </StrictMode>,
-  domContainer
+	<StrictMode>
+		<CdcMap
+			isEditor={isEditor}
+			configUrl={domContainer.attributes['data-config'].value}
+			containerEl={domContainer}
+		/>
+	</StrictMode>,
+	domContainer
 );

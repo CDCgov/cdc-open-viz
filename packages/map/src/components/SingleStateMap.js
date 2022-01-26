@@ -215,24 +215,20 @@ const SingleStateMap = (props) => {
 		let countyPath = path(county);
     
     let geoData = data[county.id];
-    console.log('geoData', geoData)
     let legendColors;
 
     // Once we receive data for this geographic item, setup variables.
     if (geoData !== undefined ) {
       legendColors = applyLegendToRow(geoData);
-      console.log('legendCOlors', legendColors)
     }
 
     const geoDisplayName = displayGeoName(geoKey);
 
-    console.log('geoDisplayName', geoDisplayName)
 
     const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
     
     if (legendColors && legendColors[0] !== '#000000') {
 
-      console.log('tooltip', tooltip)
 
       let styles = {
         fill: legendColors[0],

@@ -262,7 +262,7 @@ const DataTable = (props) => {
         {tableTitle}
       </div>
       <div className="table-container">
-        <table className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" >
+        <table height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!expanded}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
