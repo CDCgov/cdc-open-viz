@@ -1016,8 +1016,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             type: state.general.type,
             geo: state.columns.geo.name,
             primary: state.columns.primary.name,
+            data: state.data,
             ...runtimeFilters
         })
+
+        console.log('Does hashData === runtimeData.fromHash: ', hashData === runtimeData.fromHash);
 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
