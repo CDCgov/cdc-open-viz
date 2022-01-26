@@ -15,7 +15,7 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ config: configObj = {newViz: true}, hostname }) {
+export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl }) {
   const [config, setConfig] = useState(configObj)
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
@@ -107,7 +107,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
             <ChooseTab />
           </TabPane>
           <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-            <ConfigureTab />
+            <ConfigureTab containerEl={containerEl }/>
           </TabPane>
         </Tabs>
       </div>
