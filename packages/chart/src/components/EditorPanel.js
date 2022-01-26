@@ -579,7 +579,8 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />
+                      {/*TODO: Activate Exclusions after logic tested thoroughly */}
+                      {/*<CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />*/}
 
                       {config.exclusions.active &&
                         <>
