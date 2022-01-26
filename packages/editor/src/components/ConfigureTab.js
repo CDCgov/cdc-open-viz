@@ -11,7 +11,7 @@ import '../scss/configure-tab.scss';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import GlobalState from '../context';
 
-export default function ConfigureTab() {
+export default function ConfigureTab({containerEl}) {
     const { config, setTempConfig, hostname } = useContext(GlobalState);
 
     let { type } = config
@@ -20,7 +20,7 @@ export default function ConfigureTab() {
         case 'map':
             return (
                 <ErrorBoundary component="CdcMap">
-                    <CdcMap isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} />
+                    <CdcMap isEditor={true} config={config} hostname={hostname} setConfig={setTempConfig} containerEl={containerEl} />
                 </ErrorBoundary>
             )
         case 'chart':
