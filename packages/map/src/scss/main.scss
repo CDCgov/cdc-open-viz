@@ -218,14 +218,17 @@
   }
 }
 
+.wcms-viz-container.loaded .loading,
 .react-container.loaded .loading {
   display: none;
 }
 
+.wcms-viz-container:not(.loaded) .loading,
 .react-container:not(.loaded) .loading{
   display: block
 }
 
+.wcms-viz-container.loaded .cdc-map-inner-container,
 .react-container.loaded .cdc-map-inner-container {
   visibility: visible;
 }
