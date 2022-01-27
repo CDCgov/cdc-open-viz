@@ -1153,6 +1153,9 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
 								content={modal}
 							/>
 						)}
+                        {'single-state' === general.geoType && (
+                            <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                        )}
 						{'us' === general.geoType && (
 							<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
 						)}
