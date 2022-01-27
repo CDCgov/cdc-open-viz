@@ -142,11 +142,17 @@ const EditorPanel = (props) => {
 	};
 
 	const setStateWithLoader = (updatedState) => {
-		containerEl.className = containerEl.className.replace(' loaded', '');
 
-		setTimeout(() => {
-			setState(updatedState);
-		}, 10);
+		if(containerEl && containerEl.className) {
+
+			console.log('container El', containerEl)
+			console.log('container El classname', containerEl.className)
+			containerEl.className = containerEl.className.replace(' loaded', '');
+
+			setTimeout(() => {
+				setState(updatedState);
+			}, 10);
+		}
 	};
 
 	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {

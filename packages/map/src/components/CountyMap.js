@@ -84,8 +84,7 @@ const CountyMap = (props) => {
 	} = props;
 
 	useEffect(() => {
-		if(containerEl && containerEl.className) {
-			console.log('containerEl', containerEl)
+		if(containerEl) {
 			if (containerEl.className.indexOf('loaded') === -1) {
 				containerEl.className += ' loaded';
 			}
