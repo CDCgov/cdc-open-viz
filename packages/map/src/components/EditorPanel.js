@@ -989,13 +989,13 @@ const EditorPanel = (props) => {
 												<WorldGraphic />
 												<span>World</span>
 											</li>
-											<li
+											{/* <li
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'single-state')}
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
-											</li>
+											</li> */}
 										</ul>
 									</label>
 									{/* Select > State or County Map */}
