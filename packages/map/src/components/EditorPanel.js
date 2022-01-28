@@ -90,7 +90,6 @@ const EditorPanel = (props) => {
 		setParentConfig,
 		runtimeFilters,
 		runtimeLegend,
-		containerEl,
 	} = props;
 
 	const { general, columns, legend, dataTable, tooltips } = state;
@@ -139,14 +138,6 @@ const EditorPanel = (props) => {
 				categoryValuesOrder,
 			},
 		});
-	};
-
-	const setStateWithLoader = (updatedState) => {
-		containerEl.className = containerEl.className.replace(' loaded', '');
-
-		setTimeout(() => {
-			setState(updatedState);
-		}, 10);
 	};
 
 	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {
@@ -207,7 +198,7 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'color':
-				setStateWithLoader({
+				setState({
 					...state,
 					color: value,
 				});
@@ -222,7 +213,7 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'geoBorderColor':
-				setStateWithLoader({
+				setState({
 					...state,
 					general: {
 						...state.general,
