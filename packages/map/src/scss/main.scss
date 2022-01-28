@@ -217,15 +217,3 @@
     }
   }
 }
-
-.react-container.loaded .loading {
-  display: none;
-}
-
-.react-container:not(.loaded) .loading{
-  display: block
-}
-
-.react-container.loaded .cdc-map-inner-container {
-  visibility: visible;
-}
