@@ -78,7 +78,7 @@ const UsaMap = (props) => {
 
   // When returning from another map we want to reset the state
   useEffect(() => {
-    setTranslate( [455,200] )
+    setTranslate( [455,250] )
     setExtent( null )
   }, [state.general.geoType]);
 
