@@ -97,7 +97,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({containerEl, className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
      
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
@@ -1086,7 +1086,6 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
-        containerEl
     }
 
     if (!mapProps.data || !state.data ) return <Loading />;
@@ -1103,7 +1102,6 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
 					runtimeFilters={runtimeFilters}
 					runtimeLegend={runtimeLegend}
 					columnsInData={Object.keys(state.data[0])}
-					containerEl={containerEl}
 				/>
 			)}
 			<section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
