@@ -923,6 +923,7 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         })
 
         // If there's a name for the geo, add UIDs
+        debugger;
         if(newState.columns.geo.name || newState.columns.geo.fips) {
             addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
         }
