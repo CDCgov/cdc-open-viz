@@ -715,7 +715,7 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         
         toolTipText += `<strong>${stateOrCounty}: ${displayGeoName(geoName)}</strong>`
 
-        if('data' === state.general.type) {
+        if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
 
             Object.keys(state.columns).forEach((columnKey) => {
