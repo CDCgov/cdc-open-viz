@@ -90,7 +90,6 @@ const EditorPanel = (props) => {
 		setParentConfig,
 		runtimeFilters,
 		runtimeLegend,
-		containerEl,
 	} = props;
 
 	const { general, columns, legend, dataTable, tooltips } = state;
@@ -139,20 +138,6 @@ const EditorPanel = (props) => {
 				categoryValuesOrder,
 			},
 		});
-	};
-
-	const setStateWithLoader = (updatedState) => {
-
-		if(containerEl && containerEl.className) {
-
-			console.log('container El', containerEl)
-			console.log('container El classname', containerEl.className)
-			containerEl.className = containerEl.className.replace(' loaded', '');
-
-			setTimeout(() => {
-				setState(updatedState);
-			}, 10);
-		}
 	};
 
 	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {
@@ -213,7 +198,7 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'color':
-				setStateWithLoader({
+				setState({
 					...state,
 					color: value,
 				});
@@ -228,7 +213,7 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'geoBorderColor':
-				setStateWithLoader({
+				setState({
 					...state,
 					general: {
 						...state.general,
@@ -995,13 +980,13 @@ const EditorPanel = (props) => {
 												<WorldGraphic />
 												<span>World</span>
 											</li>
-											<li
+											{/* <li
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'single-state')}
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
-											</li>
+											</li> */}
 										</ul>
 									</label>
 									{/* Select > State or County Map */}
