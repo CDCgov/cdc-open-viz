@@ -877,10 +877,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState.data) {
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
 
-            newState.data.forEach(dataPiece => {
-                debugger;
+            newState?.data.forEach(dataPiece => {
                 if(newState.columns.geo.name in dataPiece && dataPiece[newState.columns.geo.name].length === 4) {
                     dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                 }
@@ -942,7 +941,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
 
-        //validateFipsCodeLength(newState);
+        validateFipsCodeLength(newState);
         setState(newState)
 
         // Done loading
