@@ -725,7 +725,7 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         
         toolTipText += `<strong>${stateOrCounty}: ${displayGeoName(geoName)}</strong>`
 
-        if('data' === state.general.type) {
+        if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
 
             Object.keys(state.columns).forEach((columnKey) => {
@@ -877,11 +877,11 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
     }
 
     const validateFipsCodeLength = (newState) => {
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState.data) {
 
-        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us') {
-
-            newState.data.forEach( dataPiece => {
-                if(dataPiece[newState.columns.geo.name].length === 4) {
+            newState.data.forEach(dataPiece => {
+                debugger;
+                if(newState.columns.geo.name in dataPiece && dataPiece[newState.columns.geo.name].length === 4) {
                     dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                 }
             })
@@ -942,7 +942,7 @@ const CdcMap = ({containerEl, className, config, navigationHandler: customNaviga
         }
 
 
-        validateFipsCodeLength(newState);
+        //validateFipsCodeLength(newState);
         setState(newState)
 
         // Done loading
