@@ -641,6 +641,9 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {config.visualizationSubType === 'horizontal' &&
+                    <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField} />
+                  }
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} />
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={['highlight', 'isolate']} />
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField} />
