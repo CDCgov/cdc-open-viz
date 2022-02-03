@@ -524,7 +524,7 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     { config.visualizationType !== 'Pie'
-                      ? config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'
+                      ? config.visualizationType === 'Bar' && 'Value Axis'
                       : 'Data Series'
                     }
                     { config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -554,8 +554,8 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                        ? config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'
-                        : 'Segments'
+                      ? config.visualizationType === 'Bar' && 'Date/Category Axis'
+                      : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
