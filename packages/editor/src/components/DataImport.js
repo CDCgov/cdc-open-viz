@@ -345,7 +345,7 @@ export default function DataImport() {
               <div className="table-button-container">
                 <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', false)}}>
                   <strong>Vertical</strong>
-                  <p>Geography/X-axis values are contained on a single column.</p>
+                  <p>Geography/Category values are contained on a single column.</p>
                   <table>
                     <tbody>
                       <tr>
@@ -387,7 +387,7 @@ export default function DataImport() {
                 </div>
                 <div className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')} onClick={() => {updateDescriptionProp('horizontal', true)}}>
                   <strong>Horizontal</strong>
-                  <p>Geography/X-axis values are contained on a single row.</p>
+                  <p>Geography/Category values are contained on a single row.</p>
                   <table>
                       <tbody>
                         <tr>
@@ -525,7 +525,7 @@ export default function DataImport() {
                                         </select>
                                     </div>
                                     <div className="question">
-                                        <div className="heading-4 data-question">Which property in the dataset represents the X-axis, or geography value?</div>
+                                        <div className="heading-4 data-question">Which property in the dataset represents the category, or geography value?</div>
                                         <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
                                             <option value="">Choose an option</option>
                                             {Object.keys(config.data[0]).map(key => <option value={key}>{key}</option>)}
