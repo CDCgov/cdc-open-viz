@@ -189,6 +189,8 @@ const CountyMap = (props) => {
 		let allCounties = document.querySelectorAll('.county path');
 		let currentState = document.querySelector(`.state--${myState.id}`);
 		let otherStates = document.querySelectorAll(`.state:not(.state--${myState.id})`);
+		let svgContainer = document.querySelector('.svg-container')
+		svgContainer.setAttribute('data-scaleZoom', newScaleWithHypot)
 
 		const state = testJSON.objects.states.geometries.filter((el, index) => {
 			return el.id === myState.id;
@@ -198,6 +200,7 @@ const CountyMap = (props) => {
 
 		currentState.style.display = 'none';
 
+		allStates.forEach((state) => (state.style.strokeWidth = 0.75 / newScaleWithHypot));
 		allCounties.forEach((county) => (county.style.strokeWidth = 0.75 / newScaleWithHypot));
 		otherStates.forEach((el) => (el.style.display = 'block'));
 
@@ -209,7 +212,7 @@ const CountyMap = (props) => {
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
 		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / newScaleWithHypot);
-		//focusedBorderPath.current.setAttribute('stroke', focusedBorderColor)
+		focusedBorderPath.current.setAttribute('stroke', focusedBorderColor)
 	};
 
 	const onReset = (e) => {
@@ -247,6 +250,8 @@ const CountyMap = (props) => {
 	}
 
 	function setStateEnter(id) {
+		const svg = document.querySelector('.svg-container')
+		const scale = svg.getAttribute('data-scaleZoom');
 		let myState = id.substring(0, 2);
 
 		let state = testJSON.objects.states.geometries.filter((el, index) => {
@@ -257,7 +262,11 @@ const CountyMap = (props) => {
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
 		focusedBorderPath.current.setAttribute('stroke', '#000');
-		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale);
+
+		if(scale) {
+			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale );
+		}
+		
 	}
 
 	const StateLines = memo(({ stateLines, lineWidth, geoStrokeColor }) => {
@@ -513,7 +522,7 @@ const CountyMap = (props) => {
 	return (
 		<ErrorBoundary component='CountyMap'>
       {/* <Loading /> */}
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
+			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
 				<rect
 					className='background center-container ocean'
 					width={WIDTH}
