@@ -455,7 +455,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         if(hash) filters.fromHash = hash
 
-        obj.filters.forEach(({columnName, label}, idx) => {
+        obj.filters.forEach(({columnName, label, active}, idx) => {
             if(undefined === columnName) return
 
             let newFilter = runtimeFilters[idx]
@@ -468,7 +468,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             newFilter.label = label ?? ''
             newFilter.columnName = columnName
             newFilter.values = values
-            newFilter.active = values[0] // Default to first found value
+            newFilter.active = active || values[0] // Default to first found value
 
             filters.push(newFilter)
         })
@@ -511,7 +511,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
 
-                    if (row[columnName] !== active) return false // Bail out, not part of filter
+                    if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
                 }
             }
 
@@ -776,7 +776,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     .then(responseText => {
                         const parsedCsv = Papa.parse(responseText, {
                             header: true,
-                            dynamicTyping: true
+                            dynamicTyping: true,
+                            skipEmptyLines: true
                         })
                         return parsedCsv.data
                     })
