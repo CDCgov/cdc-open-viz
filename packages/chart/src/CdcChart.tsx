@@ -32,30 +32,20 @@ export default function CdcChart(
 
   const transform = new DataTransform();
 
-  const [colorScale, setColorScale] = useState<any>(null);
-
-  interface keyable {
-    [key: string]: any
-  }
-
-  const [config, setConfig] = useState<keyable>({});
-
-  const [data, setData] = useState<Array<Object>>([]);
-
-  const [excludedData, setExcludedData] = useState<Array<Object>>();
-
-  const [filteredData, setFilteredData] = useState<Array<Object>>();
+  interface keyable { [key: string]: any }
 
   const [loading, setLoading] = useState<Boolean>(true);
-
+  const [colorScale, setColorScale] = useState<any>(null);
+  const [config, setConfig] = useState<keyable>({});
+  const [stateData, setStateData] = useState<Array<Object>>(config.data || []);
+  const [excludedData, setExcludedData] = useState<Array<Object>>();
+  const [filteredData, setFilteredData] = useState<Array<Object>>();
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
-
-  const [currentViewport, setCurrentViewport] = useState<String>('lg');
-
-  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
@@ -66,6 +56,7 @@ export default function CdcChart(
   };
 
   const loadConfig = async () => {
+    console.log('Running loadConfig...')
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
@@ -82,7 +73,7 @@ export default function CdcChart(
     }
 
     if(data) {
-      setData(data)
+      setStateData(data)
       setExcludedData(data)
     }
 
@@ -92,6 +83,10 @@ export default function CdcChart(
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
+    console.log('------------------------- Running updateConfig -------------------------')
+
+    let data = dataOverride || stateData
+
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -103,8 +98,14 @@ export default function CdcChart(
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
+      console.log('Detected exclusions...', newConfig.exclusions)
+
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
+        console.log('State data: ', stateData)
+        console.log('Data Override: ', dataOverride)
+        console.log('xAxis is categorical, and newConfig exclusions has keys. Checking data...: ', data)
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
+        console.log('newExcludedData: ', newExcludedData)
       } else if (
         newConfig.xAxis.type === 'date' &&
         (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
@@ -132,10 +133,10 @@ export default function CdcChart(
         }
 
       } else {
-        newExcludedData = dataOverride || data
+        newExcludedData = dataOverride || stateData
       }
     } else {
-      newExcludedData = dataOverride || data
+      newExcludedData = dataOverride || stateData
     }
 
     setExcludedData(newExcludedData)
@@ -151,14 +152,14 @@ export default function CdcChart(
       });
 
       filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, (dataOverride || newExcludedData));
+          const filterValues = generateValuesForFilter(filter, newExcludedData);
 
           newConfig.filters[index].values = filterValues;
           // Initial filter should be active
           newConfig.filters[index].active = filterValues[0];
       });
 
-      currentData = filterData(newConfig.filters, (dataOverride || newExcludedData));
+      currentData = filterData(newConfig.filters, newExcludedData);
 
       setFilteredData(currentData);
     }
@@ -169,7 +170,7 @@ export default function CdcChart(
     newConfig.runtime.seriesLabelsAll = [];
     newConfig.runtime.originalXAxis = newConfig.xAxis;
 
-    if(newConfig.visualizationType === 'Pie') {
+    if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys;
     } else {
@@ -180,7 +181,7 @@ export default function CdcChart(
       }) : [];
     }
 
-    if(newConfig.visualizationType === 'Combo' && newConfig.series){
+    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = [];
       newConfig.runtime.lineSeriesKeys = [];
       newConfig.series.forEach((series) => {
@@ -193,7 +194,7 @@ export default function CdcChart(
       });
     }
 
-    if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
+    if (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -206,7 +207,7 @@ export default function CdcChart(
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
     // Check for duplicate x axis values in data
-    if(!currentData) currentData = (dataOverride || newExcludedData);
+    if(!currentData) currentData = newExcludedData;
 
     let uniqueXValues = {};
 
@@ -218,6 +219,7 @@ export default function CdcChart(
       }
     }
 
+    console.log('Setting newConfig data and pushing...')
     setConfig(newConfig);
   };
 
@@ -292,9 +294,16 @@ export default function CdcChart(
     loadConfig();
   }, []);
 
+  // Load data when configObj data changes
+  if(configObj){
+    useEffect(() => {
+      loadConfig();
+    }, [configObj.data]);
+  }
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if(data && config.xAxis && config.runtime.seriesKeys) {
+    if(stateData && config.xAxis && config.runtime.seriesKeys) {
       let palette = colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
@@ -313,16 +322,10 @@ export default function CdcChart(
       setLoading(false);
     }
 
-    if(config && data && config.sortData){
-      data.sort(sortData);
+    if(config && stateData && config.sortData){
+      stateData.sort(sortData);
     }
-  }, [config, data])
-
-  if(configObj){
-    useEffect(() => {
-      loadConfig();
-    }, [configObj.data]);
-  }
+  }, [config, stateData])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
@@ -590,10 +593,10 @@ export default function CdcChart(
 
   const contextValues = {
     config,
-    rawData: data ?? {},
+    rawData: stateData ?? {},
     excludedData: excludedData,
     transformedData: filteredData || excludedData,
-    unfilteredData: data,
+    unfilteredData: stateData,
     seriesHighlight,
     colorScale,
     dimensions,

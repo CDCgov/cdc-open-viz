@@ -85,7 +85,7 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
 ))
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
+  let optionsJsx = options.map((optionName, index) => <option value={optionName} key={index}>{optionName}</option>)
 
   if(initialValue) {
     optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
@@ -326,8 +326,18 @@ const EditorPanel = () => {
     })
 
     if(filter) {
-      Object.keys(columns).forEach(key => {
-        if((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
+      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== ''
+
+        Object.keys(columns).forEach(key => {
+        if (
+          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
+          /*
+            TODO: Resolve errors when config keys exist, but have no value
+              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
+          */
+        ) {
           delete columns[key]
         }
       })
@@ -336,12 +346,12 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getDataValues = (dataKey) => {
+  const getDataValues = (dataKey, unique = false) => {
     let values = []
     excludedData.map(e => {
       values.push(e[dataKey])
     })
-    return values
+    return unique ? [...new Set(values)] : values
   }
 
   const onBackClick = () => {
@@ -580,7 +590,7 @@ const EditorPanel = () => {
                       )}
 
                       {/*TODO: Activate Exclusions after logic tested thoroughly */}
-                      {/*<CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />*/}
+                      <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />
 
                       {config.exclusions.active &&
                         <>
@@ -593,7 +603,7 @@ const EditorPanel = () => {
                                 </>
                               }
 
-                              <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { setAddExclusion(e.target.value); }} options={getDataValues(config.xAxis.dataKey)} />
+                              <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { setAddExclusion(e.target.value); }} options={getDataValues(config.xAxis.dataKey, true)} />
                               <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); if(addExclusion.length > 0) { addNewExclusion(addExclusion); } setAddExclusion(''); }}>Add Exclusion</button>
                             </>
                           }
