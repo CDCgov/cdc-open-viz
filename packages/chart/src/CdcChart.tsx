@@ -56,7 +56,6 @@ export default function CdcChart(
   };
 
   const loadConfig = async () => {
-    console.log('Running loadConfig...')
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
@@ -83,8 +82,6 @@ export default function CdcChart(
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
-    console.log('------------------------- Running updateConfig -------------------------')
-
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -98,14 +95,9 @@ export default function CdcChart(
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
-      console.log('Detected exclusions...', newConfig.exclusions)
 
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
-        console.log('State data: ', stateData)
-        console.log('Data Override: ', dataOverride)
-        console.log('xAxis is categorical, and newConfig exclusions has keys. Checking data...: ', data)
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-        console.log('newExcludedData: ', newExcludedData)
       } else if (
         newConfig.xAxis.type === 'date' &&
         (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
@@ -219,7 +211,6 @@ export default function CdcChart(
       }
     }
 
-    console.log('Setting newConfig data and pushing...')
     setConfig(newConfig);
   };
 
