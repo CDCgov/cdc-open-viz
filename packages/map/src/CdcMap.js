@@ -1100,6 +1100,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					setState={setState}
 					loadConfig={loadConfig}
 					setParentConfig={setConfig}
+                    setRuntimeFilters={setRuntimeFilters}
 					runtimeFilters={runtimeFilters}
 					runtimeLegend={runtimeLegend}
 					columnsInData={Object.keys(state.data[0])}
