@@ -154,7 +154,10 @@ const EditorPanel = (props) => {
 		filterItem.order = 'cust'
 		filters[filterIndex] = filterItem
 
-		setRuntimeFilters(filters)
+		setState({
+			...state,
+			filters
+		})
 
 	};
 
@@ -634,45 +637,8 @@ const EditorPanel = (props) => {
 		}
 	};
 
-	const updateRunTimeFilters = (idx, value) => {
-		var existingFilters = [...runtimeFilters]
-		var filteredItem = existingFilters[idx];
-		
-		if (value === 'desc') {
-			console.log('reversed', [...filteredItem.values].sort().reverse())
-			let reversedValues = [...filteredItem.values].sort().reverse()
-			console.log('rev', reversedValues)
-			
-			filteredItem.values = reversedValues
-			filteredItem.order = 'desc'
-
-			existingFilters[idx] = filteredItem;
-
-			return setRuntimeFilters(existingFilters)
-		}
-		if (value === 'asc') {
-			let sortedValues = [...runtimeFilters[idx].values].sort()
-
-			// update Editor Panel > runtimeFilters
-			filteredItem.order = 'asc';
-			filteredItem.values = sortedValues
-			existingFilters[idx] = filteredItem
-
-			return setRuntimeFilters(existingFilters)
-		}
-		if (value === 'cust') {
-
-			// this gets updated in the drapdrop handle context
-			filteredItem.order = 'cust'
-			existingFilters[idx] = filteredItem
-			return setRuntimeFilters(existingFilters)
-		}
-
-	}
-
 	const changeFilter = async (idx, target, value) => {
 		let newFilters = [...state.filters];
-		//let existingFilters = [...runtimeFilters]
 
 		switch (target) {
 			case 'addNew':
@@ -692,50 +658,28 @@ const EditorPanel = (props) => {
 			case 'columnName':
 				newFilters[idx] = { ...newFilters[idx] };
 				newFilters[idx].columnName = value;
+				newFilters[idx].values = [] // when a column name changes knock the previous values out
 				break;
 			case 'filterOrder':
 				if(value === 'desc') {
-
 					let reversedValues = [...runtimeFilters[idx].values].sort().reverse()
-					// let filteredItem = existingFilters[idx];
-
 					newFilters[idx] = { ...runtimeFilters[idx] }
-					
-					// updates CdcMap > state.filters
+					delete newFilters[idx].active
 					newFilters[idx] = { ...newFilters[idx] };
 					newFilters[idx].order = 'desc';
 					newFilters[idx].values = reversedValues;
-
-					// update Editor Panel > runtimeFilters
-					// filteredItem.values = reversedValues
-					// existingFilters[idx] = filteredItem
-					// existingFilters[idx].order = 'desc'
-
-					// return setRuntimeFilters(existingFilters)
-
-
 				}
 				if(value === 'asc') {
 					let sortedValues = [...runtimeFilters[idx].values].sort()
-					// let filteredItem = existingFilters[idx];
-
-
-					// updates CdcMap > state.filters
 					newFilters[idx] = { ...newFilters[idx] }
+					delete newFilters[idx].active
 					newFilters[idx].order = 'asc'
 					newFilters[idx].values = sortedValues
-
-					// update Editor Panel > runtimeFilters
-					// filteredItem.values = sortedValues
-					// existingFilters[idx] = filteredItem
-					// existingFilters[idx].order = 'asc'
-					
-					//return setRuntimeFilters(existingFilters)
 				}
 				if(value === 'cust') {
 					newFilters[idx] = { ...newFilters[idx] }
-					//existingFilters[idx].order = 'cust'
-					// return setRuntimeFilters(existingFilters)
+					delete newFilters[idx].active
+					newFilters[idx].order = 'cust'
 				}
 				break;
 			default:
@@ -984,8 +928,7 @@ const EditorPanel = (props) => {
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
-						updateRunTimeFilters(index, e.target.value) 
-						// changeFilter(index, 'filterOrder', e.target.value)
+						changeFilter(index, 'filterOrder', e.target.value)
 					}}>
 						{filterOptions.map( (option, index) => {
 							return <option value={option.value} key={`filter-${index}`}>{option.label}</option>
@@ -993,7 +936,7 @@ const EditorPanel = (props) => {
 					</select>
 				</label>
 
-				{runtimeFilters[index]?.order === 'cust' &&
+				{filter.order === 'cust' &&
 					<DragDropContext
 						onDragEnd={({ source, destination }) =>
 							handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])
