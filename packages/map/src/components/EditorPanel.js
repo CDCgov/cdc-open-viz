@@ -634,9 +634,45 @@ const EditorPanel = (props) => {
 		}
 	};
 
+	const updateRunTimeFilters = (idx, value) => {
+		var existingFilters = [...runtimeFilters]
+		var filteredItem = existingFilters[idx];
+		
+		if (value === 'desc') {
+			console.log('reversed', [...filteredItem.values].sort().reverse())
+			let reversedValues = [...filteredItem.values].sort().reverse()
+			console.log('rev', reversedValues)
+			
+			filteredItem.values = reversedValues
+			filteredItem.order = 'desc'
+
+			existingFilters[idx] = filteredItem;
+
+			return setRuntimeFilters(existingFilters)
+		}
+		if (value === 'asc') {
+			let sortedValues = [...runtimeFilters[idx].values].sort()
+
+			// update Editor Panel > runtimeFilters
+			filteredItem.order = 'asc';
+			filteredItem.values = sortedValues
+			existingFilters[idx] = filteredItem
+
+			return setRuntimeFilters(existingFilters)
+		}
+		if (value === 'cust') {
+
+			// this gets updated in the drapdrop handle context
+			filteredItem.order = 'cust'
+			existingFilters[idx] = filteredItem
+			return setRuntimeFilters(existingFilters)
+		}
+
+	}
+
 	const changeFilter = async (idx, target, value) => {
 		let newFilters = [...state.filters];
-		var existingFilters = [...runtimeFilters]
+		//let existingFilters = [...runtimeFilters]
 
 		switch (target) {
 			case 'addNew':
@@ -646,7 +682,12 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'remove':
-				newFilters.splice(idx, 1);
+
+				if(newFilters.length === 1) {
+					newFilters = []
+				} else {
+					newFilters.splice(idx, 1);
+				}
 				break;
 			case 'columnName':
 				newFilters[idx] = { ...newFilters[idx] };
@@ -656,7 +697,9 @@ const EditorPanel = (props) => {
 				if(value === 'desc') {
 
 					let reversedValues = [...runtimeFilters[idx].values].sort().reverse()
-					let filteredItem = existingFilters[idx];
+					// let filteredItem = existingFilters[idx];
+
+					newFilters[idx] = { ...runtimeFilters[idx] }
 					
 					// updates CdcMap > state.filters
 					newFilters[idx] = { ...newFilters[idx] };
@@ -664,35 +707,35 @@ const EditorPanel = (props) => {
 					newFilters[idx].values = reversedValues;
 
 					// update Editor Panel > runtimeFilters
-					filteredItem.values = reversedValues
-					existingFilters[idx] = filteredItem
-					existingFilters[idx].order = 'desc'
+					// filteredItem.values = reversedValues
+					// existingFilters[idx] = filteredItem
+					// existingFilters[idx].order = 'desc'
 
-					return setRuntimeFilters(existingFilters)
+					// return setRuntimeFilters(existingFilters)
 
 
 				}
 				if(value === 'asc') {
 					let sortedValues = [...runtimeFilters[idx].values].sort()
-					let filteredItem = existingFilters[idx];
+					// let filteredItem = existingFilters[idx];
 
 
 					// updates CdcMap > state.filters
 					newFilters[idx] = { ...newFilters[idx] }
 					newFilters[idx].order = 'asc'
-					newFilters[idx].values = runtimeFilters[idx].values
+					newFilters[idx].values = sortedValues
 
 					// update Editor Panel > runtimeFilters
-					filteredItem.values = sortedValues
-					existingFilters[idx] = filteredItem
-					existingFilters[idx].order = 'asc'
+					// filteredItem.values = sortedValues
+					// existingFilters[idx] = filteredItem
+					// existingFilters[idx].order = 'asc'
 					
-					return setRuntimeFilters(existingFilters)
+					//return setRuntimeFilters(existingFilters)
 				}
 				if(value === 'cust') {
 					newFilters[idx] = { ...newFilters[idx] }
-					existingFilters[idx].order = 'cust'
-					return setRuntimeFilters(existingFilters)
+					//existingFilters[idx].order = 'cust'
+					// return setRuntimeFilters(existingFilters)
 				}
 				break;
 			default:
@@ -805,6 +848,7 @@ const EditorPanel = (props) => {
 		}
 	}, [runtimeLegend]);
 
+
 	// if no state choice by default show alabama
 	useEffect(() => {
 		if (!state.general.statePicked) {
@@ -906,7 +950,8 @@ const EditorPanel = (props) => {
 			<fieldset className='edit-block' key={`filter-${index}`}>
 				<button
 					className='remove-column'
-					onClick={() => {
+					onClick={(e) => {
+						e.preventDefault();
 						changeFilter(index, 'remove');
 					}}
 				>
@@ -938,7 +983,10 @@ const EditorPanel = (props) => {
 				</label>
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
-					<select value={filter.order} onChange={ (e) => { changeFilter(index, 'filterOrder', e.target.value)}}>
+					<select value={filter.order} onChange={ (e) => {
+						updateRunTimeFilters(index, e.target.value) 
+						// changeFilter(index, 'filterOrder', e.target.value)
+					}}>
 						{filterOptions.map( (option, index) => {
 							return <option value={option.value} key={`filter-${index}`}>{option.label}</option>
 						})}
