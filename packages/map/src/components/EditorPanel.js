@@ -949,7 +949,7 @@ const EditorPanel = (props) => {
 									ref={provided.innerRef}
 									style={{ marginTop: '1em' }}
 									>
-									{runtimeFilters[index].values.map( (value, index) => {
+									{runtimeFilters[index]?.values.map( (value, index) => {
 										return (
 											<Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
 												{(provided, snapshot) => (
