@@ -3,25 +3,25 @@
     "name": "Jupiter",
     "Radius": "10.97",
     "Diameter": "22",
-    "distance": "0"
+    "distance": "1000"
   },
   {
     "name": "Saturn",
     "Radius": "9.14",
     "Diameter": "18",
-    "distance": "0"
+    "distance": "2000"
   },
   {
     "name": "Uranus",
     "Radius": "3.98",
     "Diameter": "8",
-    "distance": "0"
+    "distance": "3000"
   },
   {
     "name": "Neptune",
     "Radius": "3.86",
     "Diameter": "7",
-    "distance": "0"
+    "distance": "4000"
   },
   {
     "name": "Earth",

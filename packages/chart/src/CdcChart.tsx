@@ -151,7 +151,14 @@ export default function CdcChart(
       });
 
       filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, (dataOverride || newExcludedData));
+
+          var filterValues = null
+
+          if(newConfig.filters[index].values.length === 0) {
+            filterValues = generateValuesForFilter(filter, (dataOverride || newExcludedData)).sort();
+          } else {
+            filterValues = newConfig.filters[index].values
+          }
 
           newConfig.filters[index].values = filterValues;
           // Initial filter should be active
