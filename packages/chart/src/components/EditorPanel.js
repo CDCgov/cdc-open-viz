@@ -242,15 +242,6 @@ const EditorPanel = () => {
 
     filters[index][name] = value;
 
-    if(name === 'filterOrder') {
-      if(value === 'asc') {
-        filters[index].values.sort()
-      }
-      if(value === 'desc') {
-        filters[index].values.sort().reverse()
-      }
-    }
-
     updateConfig({...config, filters});
   }
 
@@ -429,21 +420,6 @@ const EditorPanel = () => {
       </ul>
     )
   }, [config])
-
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -695,17 +671,6 @@ const EditorPanel = () => {
                             <span className="edit-label column-heading">Label</span>
                             <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
                           </label>
-                          <label>
-                            <span className="edit-filterOrder column-heading">Filter Order</span>
-                            <select value={filter.order} onChange={(e) => {
-                              updateFilterProp('filterOrder', index, e.target.value)
-                            }}>
-                              {filterOptions.map((option, index) => {
-                                return <option value={option.value} key={`filter-${index}`}>{option.label}</option>
-                              })}
-                            </select>
-                          </label>
-
                         </fieldset>
                       )
                     )}
