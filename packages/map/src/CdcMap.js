@@ -486,9 +486,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 value : hash
             });
         }
+        
 
         obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
+
+            // When on a single state map filter runtime data by state
+            if (
+                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                obj.general.geoType === 'single-state'
+            ) {
+                return false;
+            }
+
 
             if(row[obj.columns.primary.name]) {
                 row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
@@ -507,7 +517,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Filters
-            if(filters.length) {
+            if(filters?.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
 
@@ -868,10 +878,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState.data) {
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
 
-            newState.data.forEach(dataPiece => {
-                debugger;
+            newState?.data.forEach(dataPiece => {
                 if(newState.columns.geo.name in dataPiece && dataPiece[newState.columns.geo.name].length === 4) {
                     dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                 }
@@ -933,7 +942,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
 
-        //validateFipsCodeLength(newState);
+        validateFipsCodeLength(newState);
         setState(newState)
 
         // Done loading
@@ -963,6 +972,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        if (state.data) {
+            let newData = generateRuntimeData(state);
+            setRuntimeData(newData);
+        }
+    }, [state.general.statePicked]);
+
 
 
     // When geotype changes
