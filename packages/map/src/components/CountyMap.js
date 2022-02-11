@@ -188,6 +188,8 @@ const CountyMap = (props) => {
 		let allCounties = document.querySelectorAll('.county path');
 		let currentState = document.querySelector(`.state--${myState.id}`);
 		let otherStates = document.querySelectorAll(`.state:not(.state--${myState.id})`);
+		let svgContainer = document.querySelector('.svg-container')
+		svgContainer.setAttribute('data-scaleZoom', newScaleWithHypot)
 
 		const state = testJSON.objects.states.geometries.filter((el, index) => {
 			return el.id === myState.id;
@@ -197,6 +199,7 @@ const CountyMap = (props) => {
 
 		currentState.style.display = 'none';
 
+		allStates.forEach((state) => (state.style.strokeWidth = 0.75 / newScaleWithHypot));
 		allCounties.forEach((county) => (county.style.strokeWidth = 0.75 / newScaleWithHypot));
 		otherStates.forEach((el) => (el.style.display = 'block'));
 
@@ -207,19 +210,16 @@ const CountyMap = (props) => {
 		// Set Focus Border
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
-		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / newScaleWithHypot);
+		//focusedBorderPath.current.setAttribute('stroke-width', 0.75 / newScaleWithHypot);
 		//focusedBorderPath.current.setAttribute('stroke', focusedBorderColor)
 	};
 
 	const onReset = (e) => {
 		e.preventDefault();
+		const svg = document.querySelector('.svg-container')
 
-		const handleBorderPath = () => {
-			focusedBorderPath.current.style.display = 'none';
-			focusedBorderPath.current.setAttribute('stroke', geoStrokeColor);
-			focusedBorderPath.current.style.strokeWidth = startingLineWidth;
-			focusedBorderPath.current.setAttribute('stroke-width', startingLineWidth);
-		};
+		svg.setAttribute('data-scaleZoom', 0)
+
 
 		const allStates = document.querySelectorAll('.state path');
 		const allCounties = document.querySelectorAll('.county path');
@@ -230,11 +230,10 @@ const CountyMap = (props) => {
 		let otherStates = document.querySelectorAll(`.state--inactive`);
 		otherStates.forEach((el) => (el.style.display = 'none'));
 		allCounties.forEach((el) => (el.style.strokeWidth = 0.85));
-		allStates.forEach((state) => state.setAttribute('stroke-width', 0.85));
+		allStates.forEach((state) => state.setAttribute('stroke-width', .75 / .85 ));
 
 		mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`);
 
-		handleBorderPath();
 		// reset button
 		resetButton.current.style.display = 'none';
 	};
@@ -246,7 +245,12 @@ const CountyMap = (props) => {
 	}
 
 	function setStateEnter(id) {
+		const svg = document.querySelector('.svg-container')
+		const scale = svg.getAttribute('data-scaleZoom');
+
 		let myState = id.substring(0, 2);
+		const allStates = document.querySelectorAll('.state path');
+
 
 		let state = testJSON.objects.states.geometries.filter((el, index) => {
 			return el.id === myState;
@@ -256,7 +260,12 @@ const CountyMap = (props) => {
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
 		focusedBorderPath.current.setAttribute('stroke', '#000');
-		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale);
+
+		if(scale) {
+			allStates.forEach( state => state.setAttribute('stroke-width', 0.75 / scale))
+			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale );
+		}
+		
 	}
 
 	const StateLines = memo(({ stateLines, lineWidth, geoStrokeColor }) => {
@@ -512,7 +521,7 @@ const CountyMap = (props) => {
 	return (
 		<ErrorBoundary component='CountyMap'>
       {/* <Loading /> */}
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
+			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
 				<rect
 					className='background center-container ocean'
 					width={WIDTH}
