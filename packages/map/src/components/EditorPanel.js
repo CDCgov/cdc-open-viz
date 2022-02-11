@@ -88,6 +88,7 @@ const EditorPanel = (props) => {
 		setState,
 		isDashboard,
 		setParentConfig,
+		setRuntimeFilters,
 		runtimeFilters,
 		runtimeLegend,
 	} = props;
@@ -139,6 +140,27 @@ const EditorPanel = (props) => {
 			},
 		});
 	};
+
+
+	const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
+
+		let filterOrder = filter.values;
+		let [movedItem] = filterOrder.splice(idx1, 1);
+		filterOrder.splice(idx2, 0, movedItem);
+		let filters = [...runtimeFilters]
+		let filterItem= { ...runtimeFilters[filterIndex] };
+		filterItem.active = filter.values[0]
+		filterItem.values = filterOrder;
+		filterItem.order = 'cust'
+		filters[filterIndex] = filterItem
+
+		setState({
+			...state,
+			filters
+		})
+
+	};
+
 
 	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {
 		const [value, setValue] = useState(stateValue);
@@ -626,11 +648,39 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'remove':
-				newFilters.splice(idx, 1);
+
+				if(newFilters.length === 1) {
+					newFilters = []
+				} else {
+					newFilters.splice(idx, 1);
+				}
 				break;
 			case 'columnName':
 				newFilters[idx] = { ...newFilters[idx] };
 				newFilters[idx].columnName = value;
+				newFilters[idx].values = [] // when a column name changes knock the previous values out
+				break;
+			case 'filterOrder':
+				if(value === 'desc') {
+					let reversedValues = [...runtimeFilters[idx].values].sort().reverse()
+					newFilters[idx] = { ...runtimeFilters[idx] }
+					delete newFilters[idx].active
+					newFilters[idx] = { ...newFilters[idx] };
+					newFilters[idx].order = 'desc';
+					newFilters[idx].values = reversedValues;
+				}
+				if(value === 'asc') {
+					let sortedValues = [...runtimeFilters[idx].values].sort()
+					newFilters[idx] = { ...newFilters[idx] }
+					delete newFilters[idx].active
+					newFilters[idx].order = 'asc'
+					newFilters[idx].values = sortedValues
+				}
+				if(value === 'cust') {
+					newFilters[idx] = { ...newFilters[idx] }
+					delete newFilters[idx].active
+					newFilters[idx].order = 'cust'
+				}
 				break;
 			default:
 				newFilters[idx][target] = value;
@@ -641,6 +691,7 @@ const EditorPanel = (props) => {
 			...state,
 			filters: newFilters,
 		});
+
 	};
 
 	const addAdditionalColumn = (number) => {
@@ -741,6 +792,7 @@ const EditorPanel = (props) => {
 		}
 	}, [runtimeLegend]);
 
+
 	// if no state choice by default show alabama
 	useEffect(() => {
 		if (!state.general.statePicked) {
@@ -823,11 +875,27 @@ const EditorPanel = (props) => {
 			usedFilterColumns[filter.columnName] = true;
 		}
 
+		const filterOptions = [
+			{
+				label: 'Ascending Alphanumeric',
+				value: 'asc'
+			},
+			{
+				label: 'Descending Alphanumeric',
+				value: 'desc'
+			},
+			{
+				label: 'Custom',
+				value: 'cust'
+			}
+		]
+
 		return (
 			<fieldset className='edit-block' key={`filter-${index}`}>
 				<button
 					className='remove-column'
-					onClick={() => {
+					onClick={(e) => {
+						e.preventDefault();
 						changeFilter(index, 'remove');
 					}}
 				>
@@ -857,6 +925,54 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
+				<label>
+					<span className="edit-filterOrder column-heading">Filter Order</span>
+					<select value={filter.order} onChange={ (e) => {
+						changeFilter(index, 'filterOrder', e.target.value)
+					}}>
+						{filterOptions.map( (option, index) => {
+							return <option value={option.value} key={`filter-${index}`}>{option.label}</option>
+						})}
+					</select>
+				</label>
+
+				{filter.order === 'cust' &&
+					<DragDropContext
+						onDragEnd={({ source, destination }) =>
+							handleFilterOrder(source.index, destination.index, index, runtimeFilters[index])
+						}>
+						<Droppable droppableId='filter_order'>
+							{(provided) => (
+								<ul
+									{...provided.droppableProps}
+									className='sort-list'
+									ref={provided.innerRef}
+									style={{ marginTop: '1em' }}
+									>
+									{runtimeFilters[index]?.values.map( (value, index) => {
+										return (
+											<Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+												{(provided, snapshot) => (
+													<li>
+														<div className={snapshot.isDragging ? 'currently-dragging' : ''}
+															style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+															ref={provided.innerRef}
+															{...provided.draggableProps}
+															{...provided.dragHandleProps}>
+															{value}
+														</div>
+													</li>
+												) }
+											</Draggable>
+										)
+									})}
+									{provided.placeholder}
+								</ul>
+							)}
+						</Droppable>
+					</DragDropContext>
+				}
+				
 			</fieldset>
 		);
 	});
