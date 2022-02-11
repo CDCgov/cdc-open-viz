@@ -911,8 +911,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let newData = await fetchRemoteData(newState.dataUrl)
 
             if(newData && newState.dataDescription) {
-                newData = transform.autoStandardize(data);
-                newData = transform.developerStandardize(data, newState.dataDescription);
+                newData = transform.autoStandardize(newData);
+                newData = transform.developerStandardize(newData, newState.dataDescription);
             }
 
             if(newData) {
