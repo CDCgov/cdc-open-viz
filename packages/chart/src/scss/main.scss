@@ -7,6 +7,11 @@
   overflow: scroll;
 }
 
+.d-flex { display: flex; }
+.flex-column-reverse {
+  flex-direction: column-reverse;
+}
+
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
   @import 'editor-panel';

@@ -427,10 +427,17 @@ export default function CdcChart(
 
   // JSX for Legend
   const Legend = () => {
+
     let containerClasses = ['legend-container']
+    let innerClasses = [];
 
     if(config.legend.position === "left") {
       containerClasses.push('left')
+    }
+
+    if(config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
+      innerClasses.push('d-flex')
+      innerClasses.push('flex-column-reverse')
     }
 
     return (
@@ -443,8 +450,9 @@ export default function CdcChart(
         shapeMargin="0 10px 0"
         >
           {labels => (
-            <div>
+            <div className={innerClasses.join(' ')}>
               {labels.map((label, i) => {
+
                 let className = 'legend-item'
 
                 let itemName:any = label.datum
