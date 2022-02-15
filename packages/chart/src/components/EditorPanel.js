@@ -348,6 +348,17 @@ const EditorPanel = () => {
       setDisplayPanel(!displayPanel);
   }
 
+  // when to show lollipop checkbox.
+  // update as the need grows (ie. vertical bars, divergeing, etc.)
+  const showLollipopCheckbox = () => {
+    if (config.visualizationType === 'Bar' && (config.visualizationSubType === 'horizontal' || config.visualizationSubType === 'regular') ) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   const Error = () => {
     return (
       <section className="waiting">
@@ -357,7 +368,17 @@ const EditorPanel = () => {
         </section>
       </section>
     );
+  }
 
+  const ErrorWithLolliopChart = ({message}) => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{message}</p>
+        </section>
+      </section>
+    );
   }
 
   const Confirm = () => {
@@ -401,6 +422,20 @@ const EditorPanel = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
+  useEffect(() => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        hideAxis: true
+      },
+      xAxis: {
+        ...config.xAxis,
+        hideAxis: true
+      },
+    })
+  }, [config.isLollipopChart]);
+
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -425,6 +460,8 @@ const EditorPanel = () => {
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
+      {config.isLollipopChart && ( !config.series || config.series.length > 1) && <ErrorWithLolliopChart message="Lollipop charts must have one data series" />}
+      {config.isLollipopChart && config.yAxis.displayNumbersOnBar && <ErrorWithLolliopChart message="Lollipop charts should not have labels on bars" /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <div className="heading-2">Configure Chart</div>
@@ -440,8 +477,11 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
-                  { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
+                  {(config.visualizationType === "Bar" && (config.visualizationSubType === "horizontal" || config.visualizationSubType === 'lollipop') ) &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis' ]} />
+                  }
+                  { showLollipopCheckbox() &&
+                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="This is a lollipop chart" updateField={updateField} />
                   }
                   {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
@@ -461,7 +501,8 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
+                  {( (!config.series || config.series.length === 0) && config.isLollipopChart) && <p className="warning">Select one data series. (Lollipop-style works only with a single data series.)</p>}
+                  {((!config.series || config.series.length === 0) && !config.isLollipopChart) && <p className="warning">At least one series is required</p>}
                   {config.series && config.series.length !== 0 && (
                     <>
                       <label><span className="edit-label">Displaying</span></label>
@@ -509,8 +550,12 @@ const EditorPanel = () => {
                         })}
                       </ul>
                     </>)}
-                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
-                    <button onClick={(e) => { e.preventDefault(); if(addSeries.length > 0) { addNewSeries(addSeries); } setAddSeries(''); }} className="btn btn-primary">Add Data Series</button>
+                    { ((config.isLollipopChart && !config.series) || (!config.isLollipopChart)) && 
+                      <>
+                        <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
+                        <button onClick={(e) => { e.preventDefault(); if(addSeries.length > 0) { addNewSeries(addSeries); } setAddSeries(''); }} className="btn btn-primary">Add Data Series</button>
+                      </>
+                    }
                     {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                       <>
                         <span className="divider-heading">Confidence Keys</span>
@@ -771,10 +816,10 @@ const EditorPanel = () => {
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                     </>
                   )}
-                  { (config.visualizationSubType === "horizontal" && config.yAxis.labelPlacement !== "On Bar") &&
+                  { ((config.visualizationSubType === "horizontal" && config.yAxis.labelPlacement !== "On Bar") && config.isLollipopChart !== true) &&
                     <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Thickness" updateField={updateField} min="15"/>
                   }
-                  { ((config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal") || config.visualizationType === "Combo" ) &&
+                  { ((config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal") || config.visualizationType === "Combo"  && config.isLollipopChart !== true ) &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />
                   }
                 </AccordionItemPanel>
