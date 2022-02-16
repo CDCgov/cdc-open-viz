@@ -296,7 +296,6 @@ export default function CdcChart(
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    console.log('config changed')
 
     if(config && data && config.sortData){
       data.sort(sortData);
