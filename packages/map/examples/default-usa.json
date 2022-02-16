@@ -942,7 +942,7 @@
 	"fullBorder": false,
 	"color": "pinkpurple",
 	"columns": {
-		"geo": { "name": "State FIPS Codes", "label": "Location", "tooltip": false, "dataTable": true },
+		"geo": { "name": "State", "label": "Location", "tooltip": false, "dataTable": true },
 		"primary": { "dataTable": true, "tooltip": true, "prefix": "", "suffix": "", "name": "Condition", "label": "" },
 		"navigate": { "name": "Condition" }
 	},

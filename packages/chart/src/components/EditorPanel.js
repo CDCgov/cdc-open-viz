@@ -534,7 +534,7 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     { config.visualizationType !== 'Pie'
-                      ? config.visualizationSubType === 'horizontal' ? 'X Axis' : 'Y Axis'
+                      ? config.visualizationType === 'Bar' && 'Value Axis'
                       : 'Data Series'
                     }
                     { config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -564,8 +564,8 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                        ? config.visualizationSubType === 'horizontal' ? 'Y Axis' : 'X Axis'
-                        : 'Segments'
+                      ? config.visualizationType === 'Bar' && 'Date/Category Axis'
+                      : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
                   </AccordionItemButton>
@@ -651,6 +651,9 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                  {config.visualizationSubType === 'horizontal' &&
+                    <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField} />
+                  }
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} />
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={['highlight', 'isolate']} />
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField} />
