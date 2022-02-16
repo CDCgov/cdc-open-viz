@@ -214,7 +214,6 @@ export default function DataImport() {
     let newConfig = { ...config }
     if (tempConfig !== null) {
       newConfig = { ...tempConfig }
-
     }
 
     if (undefined === config.formattedData && config.dataDescription) {
@@ -373,7 +372,7 @@ export default function DataImport() {
                     updateDescriptionProp('horizontal', false)
                   }}>
                   <strong>Vertical</strong>
-                  <p>Geography/X-axis values are contained on a single column.</p>
+                  <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.</p>
                   <table>
                     <tbody>
                     <tr>
@@ -419,22 +418,22 @@ export default function DataImport() {
                     updateDescriptionProp('horizontal', true)
                   }}>
                   <strong>Horizontal</strong>
-                  <p>Geography/X-axis values are contained on a single row.</p>
+                  <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
                   <table>
-                    <tbody>
-                    <tr>
-                      <th>Date</th>
-                      <td>01/01/2020</td>
-                      <td>02/01/2020</td>
-                      <td>...</td>
-                    </tr>
-                    <tr>
-                      <th>Value</th>
-                      <td>100</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    </tbody>
+                      <tbody>
+                        <tr>
+                            <th>Date</th>
+                            <td>01/01/2020</td>
+                            <td>02/01/2020</td>
+                            <td>...</td>
+                        </tr>
+                        <tr>
+                            <th>Value</th>
+                            <td>100</td>
+                            <td>150</td>
+                            <td>...</td>
+                        </tr>
+                      </tbody>
                   </table>
                   <table>
                     <tbody>
@@ -460,45 +459,25 @@ export default function DataImport() {
                 <div className="question">
                   <div className="heading-4 data-question">Are there multiple series represented in your data?</div>
                   <div>
-                    <button
-                      className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'}
-                      style={{ marginRight: '.5em' }} onClick={() => {
-                      updateDescriptionProp('series', true)
-                    }}>Yes
-                    </button>
-                    <button
-                      className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'}
-                      onClick={() => {
-                        updateDescriptionProp('series', false)
-                      }}>No
-                    </button>
+                    <button className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'} style={{ marginRight: '.5em' }} onClick={() => { updateDescriptionProp('series', true) }}>Yes</button>
+                    <button className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'} onClick={() => {updateDescriptionProp('series', false)}}>No</button>
                   </div>
                 </div>
                 {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
                   <div className="question">
-                    <div className="heading-4 data-question">Which property in the dataset represents which series the
-                      row is describing?
-                    </div>
-                    <select onChange={(e) => {
-                      updateDescriptionProp('seriesKey', e.target.value)
-                    }} value={config.dataDescription.seriesKey}>
+                    <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
+                    <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}} value={config.dataDescription.seriesKey}>
                       <option value="">Choose an option</option>
-                      {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                 key={index}>{value}</option>)}
+                      {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                     </select>
                   </div>
                 )}
                 {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
                   <>
                     <div className="question">
-                      <div className="heading-4 data-question">Are the series values in your data represented in a
-                        single row, or across multiple rows?
-                      </div>
+                      <div className="heading-4 data-question">Are the series values in your data represented in a single row, or across multiple rows?</div>
                       <div className="table-button-container">
-                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')}
-                             onClick={() => {
-                               updateDescriptionProp('singleRow', true)
-                             }}>
+                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
                           <p>Each row contains the data for an individual series in itself.</p>
                           <table>
                             <tbody>
@@ -523,10 +502,7 @@ export default function DataImport() {
                             </tbody>
                           </table>
                         </div>
-                        <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')}
-                             onClick={() => {
-                               updateDescriptionProp('singleRow', false)
-                             }}>
+                        <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
                           <p>Each series data is broken out into multiple rows.</p>
                           <table>
                             <tbody>
@@ -573,39 +549,24 @@ export default function DataImport() {
                     {config.dataDescription.singleRow === false && (
                       <>
                         <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents which series
-                            the row is describing?
-                          </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('seriesKey', e.target.value)
-                          }}>
+                          <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
+                          <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                       key={index}>{value}</option>)}
+                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                         <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents the X-axis,
-                            or geography value?
-                          </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('xKey', e.target.value)
-                          }}>
+                          <div className="heading-4 data-question">Which property in the dataset represents the values for the category/date axis or map geography?</div>
+                          <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                       key={index}>{value}</option>)}
+                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                         <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents the numeric
-                            value?
-                          </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('valueKey', e.target.value)
-                          }}>
+                          <div className="heading-4 data-question">Which property in the dataset represents the numeric value?</div>
+                          <select onChange={(e) => {updateDescriptionProp('valueKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                       key={index}>{value}</option>)}
+                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                       </>
