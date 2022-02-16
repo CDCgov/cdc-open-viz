@@ -3,7 +3,7 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
     "barHeight": "75",
-	"visualizationSubType": "horizontal",
+	"visualizationSubType": "regular",
     "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],
@@ -26,7 +26,8 @@
         "label": "Planet",
         "dataKey": "name",
         "tickRotation": 30,
-        "size": 75
+        "size": 75,
+        "hideAxis": false
     },
     "legend": {
         "hide": false
