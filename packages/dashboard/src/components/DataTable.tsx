@@ -17,9 +17,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
 
-export default function DataTable() {
-
-  const { data, config } = useContext<any>(Context);
+export default function DataTable(data, config) {
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');

@@ -97,7 +97,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, hostname}) => {
      
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
@@ -851,6 +851,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const geoClickHandler = (key, value) => {
+        if(state.setsSharedFilter){
+            setSharedFilter(state.setsSharedFilter, value);
+        }
+
         // If modals are set or we are on a mobile viewport, display modal
         if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
             setModal({
