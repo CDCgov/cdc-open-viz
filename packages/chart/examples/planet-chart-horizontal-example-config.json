@@ -3,7 +3,7 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
     "barHeight": "75",
-	"visualizationSubType": "regular",
+	"visualizationSubType": "horizontal",
     "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],
@@ -35,5 +35,6 @@
     "table": {
         "label": "Data Table",
         "expanded": false
-    }
+    },
+    "lollipopShape": "square"
 }

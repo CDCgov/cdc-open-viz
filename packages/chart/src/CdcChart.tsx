@@ -298,7 +298,6 @@ export default function CdcChart(
   useEffect(() => {
     console.log('config changed')
 
-    debugger;
     if(config && data && config.sortData){
       data.sort(sortData);
     }

@@ -224,6 +224,7 @@ const EditorPanel = () => {
   const [ addSeries, setAddSeries ] = useState('');
   const [ addExclusion, setAddExclusion ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true);
+  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
 
   if(loading) {
     return null
@@ -433,8 +434,9 @@ const EditorPanel = () => {
         ...config.xAxis,
         hideAxis: false
       },
+      lollipopShape: lollipopShape
     })
-  }, [config.isLollipopChart]);
+  }, [config.isLollipopChart, lollipopShape]);
 
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
@@ -569,7 +571,7 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     { config.visualizationType !== 'Pie'
-                      ? config.visualizationType === 'Bar' && 'Value Axis'
+                      ? config.visualizationType === 'Bar' ? 'Value Axis' : 'Value Axis'
                       : 'Data Series'
                     }
                     { config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -604,7 +606,7 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                      ? config.visualizationType === 'Bar' && 'Data/Category'
+                      ? config.visualizationType === 'Bar' ? 'Date/Category' : 'Date/Category'
                       : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -743,6 +745,34 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+
+                  {config.isLollipopChart &&
+                  <label className="header">
+                    <span className="edit-label">Lollipop Shape</span>
+                    <div onChange={(e) => { setLollipopShape(e.target.value) } }>
+                        <label>
+                          <input
+                            type="radio"
+                            name="lollipopShape"
+                            value="circle"
+                            checked={lollipopShape === "circle"}
+                          />
+                          Circle
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="lollipopShape"
+                            value="square"
+                            checked={lollipopShape === "square"}
+                          />
+                          Square
+                        </label>
+                    </div>
+
+                  </label>
+                  }
+
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
 
                   {config.series?.some(series => series.type === 'Bar') &&
