@@ -224,7 +224,7 @@ const EditorPanel = () => {
   const [ addSeries, setAddSeries ] = useState('');
   const [ addExclusion, setAddExclusion ] = useState('');
   const [ displayPanel, setDisplayPanel ] = useState(true);
-  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
+  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape ? config.lollipopShape :  'circle')
 
   if(loading) {
     return null
@@ -434,7 +434,11 @@ const EditorPanel = () => {
         ...config.xAxis,
         hideAxis: false
       },
-      lollipopShape: lollipopShape
+      lollipopShape: lollipopShape,
+      legend: {
+        ...config.legend,
+        hide: true
+      }
     })
   }, [config.isLollipopChart, lollipopShape]);
 
