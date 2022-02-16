@@ -25,6 +25,8 @@ import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
+import ReactTooltip from 'react-tooltip';
+
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
@@ -294,6 +296,13 @@ export default function CdcChart(
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
+    console.log('config changed')
+
+    debugger;
+    if(config && data && config.sortData){
+      data.sort(sortData);
+    }
+
     if(data && config.xAxis && config.runtime.seriesKeys) {
       let palette = colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
@@ -313,9 +322,6 @@ export default function CdcChart(
       setLoading(false);
     }
 
-    if(config && data && config.sortData){
-      data.sort(sortData);
-    }
   }, [config, data])
 
   if(configObj){

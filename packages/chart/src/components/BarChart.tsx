@@ -8,6 +8,7 @@ import chroma from 'chroma-js';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
+import ReactTooltip from 'react-tooltip';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
@@ -136,6 +137,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
                     let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                     let offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
+
+                    if(config.isLollipopChart) {
+                      offset = ( (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2) - lollipopBarWidth / 2
+                    }
+
                     let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length;
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
@@ -186,7 +192,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </Text>
                       <rect
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                        x={config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
+                        x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) : barY}
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
@@ -293,6 +299,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ barColor ? barColor : '#000'}
                                   textAnchor="start"
                                   verticalAnchor="middle"
+                                  fontWeight={config.isLollipopChart ? '600' : 'normal'}
                                 >
                                   { xAxisValue }
                                 </Text>
