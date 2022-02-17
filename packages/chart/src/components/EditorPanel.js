@@ -554,7 +554,7 @@ const EditorPanel = () => {
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                      ? config.visualizationType === 'Bar' && 'Date/Category Axis'
+                      ? config.visualizationType === 'Bar' ? 'Date/Category' : 'Date/Category'
                       : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
