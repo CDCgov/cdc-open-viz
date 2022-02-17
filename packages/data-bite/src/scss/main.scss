@@ -39,9 +39,12 @@
   }
 
   .warning-icon {
+    position: relative;
+    top: 2px;
     width: 15px;
     height: 15px;
-    margin-top: 7px;
+    margin-left: 5px;
+
     path {
       fill: #d8000c;
     }
