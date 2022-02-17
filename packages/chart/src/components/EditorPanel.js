@@ -85,7 +85,7 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
 ))
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
+  let optionsJsx = options.map((optionName, index) => <option value={optionName} key={index}>{optionName}</option>)
 
   if(initialValue) {
     optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
@@ -221,9 +221,7 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
-  const [ addSeries, setAddSeries ] = useState('');
-  const [ addExclusion, setAddExclusion ] = useState('');
-  const [ displayPanel, setDisplayPanel ] = useState(true);
+    const [ displayPanel, setDisplayPanel ] = useState(true);
 
   if(loading) {
     return null
@@ -326,8 +324,18 @@ const EditorPanel = () => {
     })
 
     if(filter) {
-      Object.keys(columns).forEach(key => {
-        if((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
+      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
+      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== ''
+
+        Object.keys(columns).forEach(key => {
+        if (
+          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
+          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
+          /*
+            TODO: Resolve errors when config keys exist, but have no value
+              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
+          */
+        ) {
           delete columns[key]
         }
       })
@@ -336,12 +344,12 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
-  const getDataValues = (dataKey) => {
+  const getDataValues = (dataKey, unique = false) => {
     let values = []
     excludedData.map(e => {
       values.push(e[dataKey])
     })
-    return values
+    return unique ? [...new Set(values)] : values
   }
 
   const onBackClick = () => {
@@ -454,72 +462,75 @@ const EditorPanel = () => {
                   }
                 </AccordionItemPanel>
               </AccordionItem>
-              {config.visualizationType !== "Pie" && <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
-                  {config.series && config.series.length !== 0 && (
-                    <>
-                      <label><span className="edit-label">Displaying</span></label>
-                      <ul className="series-list">
-                        {config.series.map((series, i) => {
 
-                          if(config.visualizationType === "Combo") {
-                            let changeType = (i, value) => {
-                                let series = [...config.series];
-                                series[i].type = value;
-                                updateConfig({...config, series})
+              {config.visualizationType !== "Pie" &&
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>
+                      Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
+                    {config.series && config.series.length !== 0 && (
+                      <>
+                        <label><span className="edit-label">Displaying</span></label>
+                        <ul className="series-list">
+                          {config.series.map((series, i) => {
+
+                            if(config.visualizationType === "Combo") {
+                              let changeType = (i, value) => {
+                                  let series = [...config.series];
+                                  series[i].type = value;
+                                  updateConfig({...config, series})
+                              }
+
+                              let typeDropdown = (
+                                <select value={series.type} onChange={(event) => { changeType(i, event.target.value) }} style={{width: "100px", marginRight: "10px"}}>
+                                  <option value="" default>Select</option>
+                                  <option value="Bar">Bar</option>
+                                  <option value="Line">Line</option>
+                                </select>
+                              )
+
+                              return (
+                                <li key={series.dataKey}>
+                                  <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                    <div className="series-list__name-text">{series.dataKey}</div>
+                                  </div>
+                                  <span>
+                                    <span className="series-list__dropdown">{typeDropdown}</span>
+                                    <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                  </span>
+                                </li>
+                              )
                             }
-
-                            let typeDropdown = (
-                              <select value={series.type} onChange={(event) => { changeType(i, event.target.value) }} style={{width: "100px", marginRight: "10px"}}>
-                                <option value="" default>Select</option>
-                                <option value="Bar">Bar</option>
-                                <option value="Line">Line</option>
-                              </select>
-                            )
 
                             return (
                               <li key={series.dataKey}>
-                                <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                  <div className="series-list__name-text">{series.dataKey}</div>
+                                <div className="series-list__name" data-title={series.dataKey}>
+                                  <div className="series-list__name--text">
+                                    {series.dataKey}
+                                  </div>
                                 </div>
-                                <span>
-                                  <span className="series-list__dropdown">{typeDropdown}</span>
-                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
-                                </span>
+                                <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
                               </li>
                             )
-                          }
+                          })}
+                        </ul>
+                      </>)}
+                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { addNewSeries(e.target.value)} } options={getColumns()} />
+                      {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
+                        <>
+                          <span className="divider-heading">Confidence Keys</span>
+                          <Select value={config.confidenceKeys.upper || ""} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()} />
+                          <Select value={config.confidenceKeys.lower || ""} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()} />
+                        </>
+                      )}
+                  </AccordionItemPanel>
+                </AccordionItem>
+              }
 
-                          return (
-                            <li key={series.dataKey}>
-                              <div className="series-list__name" data-title={series.dataKey}>
-                                <div className="series-list__name--text">
-                                  {series.dataKey}
-                                </div>
-                              </div>
-                              <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </>)}
-                    <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { setAddSeries(e.target.value)}} options={getColumns()} />
-                    <button onClick={(e) => { e.preventDefault(); if(addSeries.length > 0) { addNewSeries(addSeries); } setAddSeries(''); }} className="btn btn-primary">Add Data Series</button>
-                    {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
-                      <>
-                        <span className="divider-heading">Confidence Keys</span>
-                        <Select value={config.confidenceKeys.upper || ""} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()} />
-                        <Select value={config.confidenceKeys.lower || ""} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()} />
-                      </>
-                    )}
-                </AccordionItemPanel>
-              </AccordionItem>}
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -555,11 +566,12 @@ const EditorPanel = () => {
                   }
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                      ? config.visualizationType === 'Bar' ? 'Date/Category' : 'Date/Category'
+                      ? config.visualizationType === 'Bar' ? 'Date/Category Axis' : 'Date/Category Axis'
                       : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -584,8 +596,7 @@ const EditorPanel = () => {
                         </>
                       )}
 
-                      {/*TODO: Activate Exclusions after logic tested thoroughly */}
-                      {/*<CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />*/}
+                      <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={config.xAxis.type === 'date' ? "Limit by start and/or end dates" : "Exclude one or more values"} updateField={updateField} />
 
                       {config.exclusions.active &&
                         <>
@@ -598,8 +609,7 @@ const EditorPanel = () => {
                                 </>
                               }
 
-                              <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { setAddExclusion(e.target.value); }} options={getDataValues(config.xAxis.dataKey)} />
-                              <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); if(addExclusion.length > 0) { addNewExclusion(addExclusion); } setAddExclusion(''); }}>Add Exclusion</button>
+                              <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
                             </>
                           }
 
@@ -630,18 +640,40 @@ const EditorPanel = () => {
                       }
                     </>
                   )}
+
+                  {config.visualizationType === "Pie" &&
+                    <>
+                      <CheckBox value={config.exclusions.active} section="exclusions" fieldName="active" label={"Exclude one or more values"} updateField={updateField} />
+                      {config.exclusions.active &&
+                        <>
+                          {config.exclusions.keys.length > 0 &&
+                          <>
+                            <label><span className="edit-label">Excluded Keys</span></label>
+                            <ExclusionsList />
+                          </>
+                          }
+
+                          <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
+                        </>
+                      }
+                    </>
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
-              {config.visualizationType !== 'Pie' && <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Regions
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <Regions config={config} updateConfig={updateConfig} />
-                </AccordionItemPanel>
-              </AccordionItem> }
+
+              {config.visualizationType !== 'Pie' &&
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>
+                      Regions
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <Regions config={config} updateConfig={updateConfig} />
+                  </AccordionItemPanel>
+                </AccordionItem>
+              }
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -658,6 +690,7 @@ const EditorPanel = () => {
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={['right', 'left']} />
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -690,6 +723,7 @@ const EditorPanel = () => {
                   <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
@@ -787,6 +821,7 @@ const EditorPanel = () => {
                   }
                 </AccordionItemPanel>
               </AccordionItem>
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
