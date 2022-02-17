@@ -717,7 +717,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
-        let stateOrCounty = state.general.geoType === 'us' ? 'State' : 'County';
+        let stateOrCounty = 
+            state.general.geoType === 'us' ? 'State: ' : 
+            (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
+            '';
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
@@ -726,7 +729,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
         }
         
-        toolTipText += `<strong>${stateOrCounty}: ${displayGeoName(geoName)}</strong>`
+        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
