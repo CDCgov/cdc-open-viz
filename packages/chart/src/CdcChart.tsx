@@ -446,10 +446,13 @@ export default function CdcChart(
           {labels => (
             <div className={innerClasses.join(' ')}>
               {labels.map((label, i) => {
-
                 let className = 'legend-item'
-
                 let itemName:any = label.datum
+
+                // Filter excluded data keys from legend
+                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                  return
+                }
 
                 if(config.runtime.seriesLabels){
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
@@ -460,26 +463,26 @@ export default function CdcChart(
                   className += ' inactive'
                 }
 
-                  return (
-                    <LegendItem
-                      tabIndex={0}
-                      className={className}
-                      key={`legend-quantile-${i}`}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          highlight(label);
-                        }
-                      }}
-                      onClick={() => {
+                return (
+                  <LegendItem
+                    tabIndex={0}
+                    className={className}
+                    key={`legend-quantile-${i}`}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
                         highlight(label);
-                      }}
-                    >
-                      <LegendCircle fill={label.value} />
-                      <LegendLabel align="left" margin="0 0 0 4px">
-                        {label.text}
-                      </LegendLabel>
-                    </LegendItem>
-                  )
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(label);
+                    }}
+                  >
+                    <LegendCircle fill={label.value} />
+                    <LegendLabel align="left" margin="0 0 0 4px">
+                      {label.text}
+                    </LegendLabel>
+                  </LegendItem>
+                )
               })}
               {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
             </div>
