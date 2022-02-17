@@ -523,8 +523,8 @@ const EditorPanel = () => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    { config.visualizationType !== 'Pie'
-                      ? config.visualizationType === 'Bar' && 'Value Axis'
+                    {config.visualizationType !== 'Pie'
+                      ? config.visualizationType === 'Bar' ? 'Value Axis' : 'Value Axis'
                       : 'Data Series'
                     }
                     { config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -547,14 +547,19 @@ const EditorPanel = () => {
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
-                  {config.visualizationSubType === 'horizontal' && <CheckBox value={config.xAxis.hideAxis || '' } section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
+                  {(config.visualizationSubType === 'horizontal') ?
+                    // horizontal - x is vertical y is horizontal
+                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    :
+                    <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== "Pie"
-                      ? config.visualizationType === 'Bar' && 'Date/Category Axis'
+                      ? config.visualizationType === 'Bar' ? 'Date/Category' : 'Date/Category'
                       : 'Segments'
                     }
                     {!config.xAxis.dataKey && <WarningImage width="25" className="warning-icon" />}
@@ -573,7 +578,7 @@ const EditorPanel = () => {
 
                       {config.xAxis.type === 'date' && (
                         <>
-                          <p style={{padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank">these guidelines</a>.</p>
+                          <p style={{padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem'}}>Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank" rel="noreferrer">these guidelines</a>.</p>
                           <TextField value={config.xAxis.dateParseFormat} section="xAxis" fieldName="dateParseFormat" placeholder="Ex. %Y-%m-%d" label="Date Parse Format" updateField={updateField} />
                           <TextField value={config.xAxis.dateDisplayFormat} section="xAxis" fieldName="dateDisplayFormat" placeholder="Ex. %Y-%m-%d" label="Date Display Format" updateField={updateField} />
                         </>
@@ -618,8 +623,11 @@ const EditorPanel = () => {
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
-
-                      {config.visualizationSubType === 'horizontal' && <CheckBox value={config.yAxis.hideAxis || '' } section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
+                      {(config.visualizationSubType === 'horizontal') ?
+                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        :
+                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      }
                     </>
                   )}
                 </AccordionItemPanel>
