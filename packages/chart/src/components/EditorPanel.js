@@ -547,7 +547,12 @@ const EditorPanel = () => {
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
-                  {config.visualizationSubType === 'horizontal' && <CheckBox value={config.xAxis.hideAxis || '' } section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
+                  {(config.visualizationSubType === 'horizontal') ?
+                    // horizontal - x is vertical y is horizontal
+                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    :
+                    <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                  }
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
