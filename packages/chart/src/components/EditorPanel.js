@@ -221,9 +221,7 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
-  const [ addSeries, setAddSeries ] = useState('');
-  const [ addExclusion, setAddExclusion ] = useState('');
-  const [ displayPanel, setDisplayPanel ] = useState(true);
+    const [ displayPanel, setDisplayPanel ] = useState(true);
 
   if(loading) {
     return null
@@ -521,8 +519,7 @@ const EditorPanel = () => {
                           })}
                         </ul>
                       </>)}
-                      <Select value={addSeries} fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { addNewSeries(e.target.value)} } options={getColumns()} />
-                      {/*<button onClick={(e) => { e.preventDefault(); if(addSeries.length > 0) { addNewSeries(addSeries); } setAddSeries(''); }} className="btn btn-primary">Add Data Series</button>*/}
+                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { addNewSeries(e.target.value)} } options={getColumns()} />
                       {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                         <>
                           <span className="divider-heading">Confidence Keys</span>
@@ -612,8 +609,7 @@ const EditorPanel = () => {
                                 </>
                               }
 
-                              <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
-                              {/*<button className="btn btn-primary" onClick={(e) => { e.preventDefault(); if(addExclusion.length > 0) { addNewExclusion(addExclusion); } setAddExclusion(''); }}>Add Exclusion</button>*/}
+                              <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
                             </>
                           }
 
@@ -657,8 +653,7 @@ const EditorPanel = () => {
                           </>
                           }
 
-                          <Select value={addExclusion} fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
-                          {/*<button className="btn btn-primary" onClick={(e) => { e.preventDefault(); if(addExclusion.length > 0) { addNewExclusion(addExclusion); } setAddExclusion(''); }}>Add Exclusion</button>*/}
+                          <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
                         </>
                       }
                     </>
