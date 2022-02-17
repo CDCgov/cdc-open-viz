@@ -623,8 +623,11 @@ const EditorPanel = () => {
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
-
-                      {config.visualizationSubType === 'horizontal' && <CheckBox value={config.yAxis.hideAxis || '' } section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} /> }
+                      {(config.visualizationSubType === 'horizontal') ?
+                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        :
+                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      }
                     </>
                   )}
                 </AccordionItemPanel>
