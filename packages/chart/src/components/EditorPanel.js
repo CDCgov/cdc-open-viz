@@ -221,7 +221,7 @@ const EditorPanel = () => {
     updateConfig(updatedConfig)
   }
 
-    const [ displayPanel, setDisplayPanel ] = useState(true);
+  const [ displayPanel, setDisplayPanel ] = useState(true);
 
   if(loading) {
     return null
@@ -500,7 +500,9 @@ const EditorPanel = () => {
                                   </div>
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
-                                    <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                    {config.series.length > 1 &&
+                                      <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                    }
                                   </span>
                                 </li>
                               )
@@ -513,13 +515,15 @@ const EditorPanel = () => {
                                     {series.dataKey}
                                   </div>
                                 </div>
-                                <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                {config.series.length > 1 &&
+                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                }
                               </li>
                             )
                           })}
                         </ul>
                       </>)}
-                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { addNewSeries(e.target.value)} } options={getColumns()} />
+                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
                       {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                         <>
                           <span className="divider-heading">Confidence Keys</span>
@@ -609,7 +613,7 @@ const EditorPanel = () => {
                                 </>
                               }
 
-                              <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
+                              <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewExclusion(e.target.value) } e.target.value = '' }} options={getDataValues(config.xAxis.dataKey, true)} />
                             </>
                           }
 
@@ -653,7 +657,7 @@ const EditorPanel = () => {
                           </>
                           }
 
-                          <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { addNewExclusion(e.target.value) }} options={getDataValues(config.xAxis.dataKey, true)} />
+                          <Select fieldName="visualizationType" label="Add Exclusion" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewExclusion(e.target.value) } e.target.value = '' }} options={getDataValues(config.xAxis.dataKey, true)} />
                         </>
                       }
                     </>
