@@ -3364,7 +3364,6 @@ export const supportedCounties = {
   '56041':'Uinta',
   '56043':'Washakie',
   '56045':'Weston',
-  '60010':'Unknown',
   '60020':'Olosega',
   '60050':'Tutuila',
   '66010':'Guam',
@@ -3762,5 +3761,14 @@ export const supportedCounties = {
   '09009':'New Haven',
   '09011':'New London',
   '09013':'Tolland',
-  '09015':'Windham'
+  '09015':'Windham',
+  '46102':'Oglala Lakota County',
+  '02158':'Kusilvak Census Area',
+  '02105':'Hoonah–Angoon Census Area',
+  '02230':'Municipality and Borough of Skagway',
+  '02198':'Prince of Wales – Hyder Census Area',
+  '02275':'City and Borough of Wrangell',
+  '72039':'Ciales Municipality',
+  '72069':'Humacao Municipality',
+  '60010': 'Eastern District',
 }
