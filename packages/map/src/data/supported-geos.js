@@ -3771,4 +3771,5 @@ export const supportedCounties = {
   '72039':'Ciales Municipality',
   '72069':'Humacao Municipality',
   '60010': 'Eastern District',
+  '02195': 'Petersburg Borough'
 }
