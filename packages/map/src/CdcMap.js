@@ -510,7 +510,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
-                if ( undefined !== navigateUrl ) {
+                
+                if ( undefined !== navigateUrl && typeof navigateUrl === "string" ) {
                     // Strip hidden characters before we check length
                     navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
                 }
@@ -1035,6 +1036,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         const hashData = hashObj({
+            columns: state.columns,
             geoType: state.general.geoType,
             type: state.general.type,
             geo: state.columns.geo.name,
