@@ -460,7 +460,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newFilter = runtimeFilters[idx]
 
-            values = getUniqueValues(state.data, columnName)
+            if(values.length === 0) {
+                values = getUniqueValues(state.data, columnName)
+            }
 
             if(undefined === newFilter) {
                 newFilter = {}
@@ -886,8 +888,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
 
             newState?.data.forEach(dataPiece => {
-                if(newState.columns.geo.name in dataPiece && dataPiece[newState.columns.geo.name].length === 4) {
-                    dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                if(dataPiece[newState.columns.geo.name]) {
+                    if(dataPiece[newState.columns.geo.name].length === 4) {
+                        dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                    }
                 }
             })
         }
