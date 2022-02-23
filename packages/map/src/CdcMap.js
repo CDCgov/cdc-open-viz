@@ -460,9 +460,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newFilter = runtimeFilters[idx]
 
-            if(values.length === 0) {
-                values = getUniqueValues(state.data, columnName)
-            }
+            values = getUniqueValues(state.data, columnName)
 
             if(undefined === newFilter) {
                 newFilter = {}
