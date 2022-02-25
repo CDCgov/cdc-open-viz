@@ -30,7 +30,7 @@
 			"tooltip": true
 		},
 		"navigate": {
-			"name": "link",
+			"name": "",
 			"tooltip": false,
 			"dataTable": false
 		}
@@ -57,7 +57,7 @@
 			"Coverage Status": "Insured",
 			"FIPS Codes": "55005",
 			"Year (Good filter option)": "2010",
-			"link": ""
+			"link": "https://cdc.gov"
 		},
 		{
 			"Insured Rate": "25",
