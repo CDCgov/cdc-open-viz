@@ -973,13 +973,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Once we have a config verify that it is an object and load it
         if('object' === typeof configData) {
-            loadConfig(configData)
+            if(configData.general.geoType === 'us-county') {
+                console.log('here')
+                setTimeout( () =>{
+                    loadConfig(configData)
+                }, 5000)
+            } else {
+                loadConfig(configData)
+            }
         }
     }
 
     // Initial load
     useEffect(() => {
         init()
+        //window.addEventListener('load', init)
     }, [])
 
     useEffect(() => {
