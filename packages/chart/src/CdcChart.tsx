@@ -25,8 +25,6 @@ import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
-import ReactTooltip from 'react-tooltip';
-
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
@@ -34,30 +32,20 @@ export default function CdcChart(
 
   const transform = new DataTransform();
 
-  const [colorScale, setColorScale] = useState<any>(null);
-
-  interface keyable {
-    [key: string]: any
-  }
-
-  const [config, setConfig] = useState<keyable>({});
-
-  const [data, setData] = useState<Array<Object>>([]);
-
-  const [excludedData, setExcludedData] = useState<Array<Object>>();
-
-  const [filteredData, setFilteredData] = useState<Array<Object>>();
+  interface keyable { [key: string]: any }
 
   const [loading, setLoading] = useState<Boolean>(true);
-
+  const [colorScale, setColorScale] = useState<any>(null);
+  const [config, setConfig] = useState<keyable>({});
+  const [stateData, setStateData] = useState<Array<Object>>(config.data || []);
+  const [excludedData, setExcludedData] = useState<Array<Object>>();
+  const [filteredData, setFilteredData] = useState<Array<Object>>();
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
+  const [currentViewport, setCurrentViewport] = useState<String>('lg');
+  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
-
-  const [currentViewport, setCurrentViewport] = useState<String>('lg');
-
-  const [dimensions, setDimensions] = useState<Array<Number>>([]);
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
@@ -84,7 +72,7 @@ export default function CdcChart(
     }
 
     if(data) {
-      setData(data)
+      setStateData(data)
       setExcludedData(data)
     }
 
@@ -94,6 +82,8 @@ export default function CdcChart(
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
+    let data = dataOverride || stateData
+
     // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -105,6 +95,7 @@ export default function CdcChart(
     let newExcludedData
 
     if (newConfig.exclusions && newConfig.exclusions.active) {
+
       if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
         newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
       } else if (
@@ -134,10 +125,10 @@ export default function CdcChart(
         }
 
       } else {
-        newExcludedData = dataOverride || data
+        newExcludedData = dataOverride || stateData
       }
     } else {
-      newExcludedData = dataOverride || data
+      newExcludedData = dataOverride || stateData
     }
 
     setExcludedData(newExcludedData)
@@ -153,14 +144,14 @@ export default function CdcChart(
       });
 
       filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, (dataOverride || newExcludedData));
+          const filterValues = generateValuesForFilter(filter, newExcludedData);
 
           newConfig.filters[index].values = filterValues;
           // Initial filter should be active
           newConfig.filters[index].active = filterValues[0];
       });
 
-      currentData = filterData(newConfig.filters, (dataOverride || newExcludedData));
+      currentData = filterData(newConfig.filters, newExcludedData);
 
       setFilteredData(currentData);
     }
@@ -171,7 +162,7 @@ export default function CdcChart(
     newConfig.runtime.seriesLabelsAll = [];
     newConfig.runtime.originalXAxis = newConfig.xAxis;
 
-    if(newConfig.visualizationType === 'Pie') {
+    if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys;
     } else {
@@ -182,7 +173,7 @@ export default function CdcChart(
       }) : [];
     }
 
-    if(newConfig.visualizationType === 'Combo' && newConfig.series){
+    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = [];
       newConfig.runtime.lineSeriesKeys = [];
       newConfig.series.forEach((series) => {
@@ -195,7 +186,7 @@ export default function CdcChart(
       });
     }
 
-    if(newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal'){
+    if (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -208,7 +199,7 @@ export default function CdcChart(
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
     // Check for duplicate x axis values in data
-    if(!currentData) currentData = (dataOverride || newExcludedData);
+    if(!currentData) currentData = newExcludedData;
 
     let uniqueXValues = {};
 
@@ -294,14 +285,16 @@ export default function CdcChart(
     loadConfig();
   }, []);
 
+  // Load data when configObj data changes
+  if(configObj){
+    useEffect(() => {
+      loadConfig();
+    }, [configObj.data]);
+  }
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
-
-    if(config && data && config.sortData){
-      data.sort(sortData);
-    }
-
-    if(data && config.xAxis && config.runtime.seriesKeys) {
+    if(stateData && config.xAxis && config.runtime.seriesKeys) {
       let palette = colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
@@ -320,13 +313,10 @@ export default function CdcChart(
       setLoading(false);
     }
 
-  }, [config, data])
-
-  if(configObj){
-    useEffect(() => {
-      loadConfig();
-    }, [configObj.data]);
-  }
+    if(config && stateData && config.sortData){
+      stateData.sort(sortData);
+    }
+  }, [config, stateData])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
@@ -456,10 +446,13 @@ export default function CdcChart(
           {labels => (
             <div className={innerClasses.join(' ')}>
               {labels.map((label, i) => {
-
                 let className = 'legend-item'
-
                 let itemName:any = label.datum
+
+                // Filter excluded data keys from legend
+                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                  return
+                }
 
                 if(config.runtime.seriesLabels){
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
@@ -470,26 +463,26 @@ export default function CdcChart(
                   className += ' inactive'
                 }
 
-                  return (
-                    <LegendItem
-                      tabIndex={0}
-                      className={className}
-                      key={`legend-quantile-${i}`}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          highlight(label);
-                        }
-                      }}
-                      onClick={() => {
+                return (
+                  <LegendItem
+                    tabIndex={0}
+                    className={className}
+                    key={`legend-quantile-${i}`}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
                         highlight(label);
-                      }}
-                    >
-                      <LegendCircle fill={label.value} />
-                      <LegendLabel align="left" margin="0 0 0 4px">
-                        {label.text}
-                      </LegendLabel>
-                    </LegendItem>
-                  )
+                      }
+                    }}
+                    onClick={() => {
+                      highlight(label);
+                    }}
+                  >
+                    <LegendCircle fill={label.value} />
+                    <LegendLabel align="left" margin="0 0 0 4px">
+                      {label.text}
+                    </LegendLabel>
+                  </LegendItem>
+                )
               })}
               {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
             </div>
@@ -602,10 +595,10 @@ export default function CdcChart(
 
   const contextValues = {
     config,
-    rawData: data ?? {},
+    rawData: stateData ?? {},
     excludedData: excludedData,
     transformedData: filteredData || excludedData,
-    unfilteredData: data,
+    unfilteredData: stateData,
     seriesHighlight,
     colorScale,
     dimensions,

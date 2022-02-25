@@ -92,9 +92,12 @@
   }
 
   .warning-icon {
+    position: relative;
+    top: 2px;
     width: 15px;
     height: 15px;
-    margin-top: 7px;
+    margin-left: 5px;
+
     path {
       fill: #d8000c;
     }
@@ -158,7 +161,7 @@
     .dashboard-col-6 {
       width: 50%;
     }
-  
+
     .dashboard-col-4 {
       width: 33%;
     }
@@ -175,7 +178,7 @@
       margin-bottom: 1em;
     }
   }
-  
+
   .dashboard-filters-section {
     margin: 0 0 1em;
   }
