@@ -305,7 +305,6 @@ const CountyMap = (props) => {
 		let output = [];
 		output.push(
 			counties.map(({ feature: geo, path = '' }) => {
-				console.log('County Maps: this needs improvement.');
 				const key = geo.id + '-group';
 
 				// COUNTY GROUPS
