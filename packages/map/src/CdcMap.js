@@ -455,14 +455,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         if(hash) filters.fromHash = hash
 
-        obj.filters.forEach(({columnName, label, active, values}, idx) => {
+        obj?.filters.forEach(({columnName, label, active, values}, idx) => {
             if(undefined === columnName) return
 
             let newFilter = runtimeFilters[idx]
 
-            if(values.length === 0) {
-                values = getUniqueValues(state.data, columnName)
-            }
+            values = getUniqueValues(state.data, columnName)
 
             if(undefined === newFilter) {
                 newFilter = {}
