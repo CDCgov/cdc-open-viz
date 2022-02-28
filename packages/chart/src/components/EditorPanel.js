@@ -478,8 +478,8 @@ const EditorPanel = () => {
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis' ]} />
                   }
-                  {showLollipopCheckbox() &&
-                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="This is a lollipop chart" updateField={updateField} />
+                  {showLollipopCheckbox &&
+                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
                   {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
