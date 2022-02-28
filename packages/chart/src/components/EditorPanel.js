@@ -222,6 +222,7 @@ const EditorPanel = () => {
   }
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
+  const [lollipopShape, setLollipopShape] = useState(config.lollipopShape || 'circle')
 
   if(loading) {
     return null
@@ -352,6 +353,17 @@ const EditorPanel = () => {
     return unique ? [...new Set(values)] : values
   }
 
+  // when to show lollipop checkbox.
+  // update as the need grows (ie. vertical bars, divergeing, etc.)
+  const showLollipopCheckbox = () => {
+    if (config.visualizationType === 'Bar' && (config.visualizationSubType === 'horizontal' || config.visualizationSubType === 'regular')) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   const onBackClick = () => {
       setDisplayPanel(!displayPanel);
   }
@@ -409,6 +421,21 @@ const EditorPanel = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
+  useEffect(() => {
+    updateConfig({
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        hideAxis: true
+      },
+      xAxis: {
+        ...config.xAxis,
+        hideAxis: false
+      },
+      lollipopShape: lollipopShape
+    })
+  }, [config.isLollipopChart, lollipopShape]);
+
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -450,6 +477,9 @@ const EditorPanel = () => {
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis' ]} />
+                  }
+                  {showLollipopCheckbox() &&
+                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="This is a lollipop chart" updateField={updateField} />
                   }
                   {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
@@ -735,6 +765,34 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+
+                  {config.isLollipopChart &&
+                    <label className="header">
+                      <span className="edit-label">Lollipop Shape</span>
+                      <div onChange={(e) => { setLollipopShape(e.target.value) }}>
+                        <label>
+                          <input
+                            type="radio"
+                            name="lollipopShape"
+                            value="circle"
+                            checked={lollipopShape === "circle"}
+                          />
+                          Circle
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="lollipopShape"
+                            value="square"
+                            checked={lollipopShape === "square"}
+                          />
+                          Square
+                        </label>
+                      </div>
+
+                    </label>
+                  }
+
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
 
                   {config.series?.some(series => series.type === 'Bar') &&
