@@ -4,8 +4,9 @@
     "visualizationType": "Bar",
     "barHeight": "75",
 	"visualizationSubType": "horizontal",
+    "isLollipopChart": true,
     "barHasBorder": "true",
-    "series": [{"dataKey":"Radius", "type":"Line"}, {"dataKey":"Diameter", "type":"Bar"}],
+    "series": [{"dataKey":"Radius", "type":"Line"}],
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -18,14 +19,15 @@
     },
     "yAxis": {
         "label": "Measurement (1000km)",
-        "displayNumbersOnBar": true,
-        "labelPlacement": "On Y-Axis"
+        "displayNumbersOnBar": false,
+        "labelPlacement": "Below Bar"
     },
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
         "tickRotation": 30,
-        "size": 75
+        "size": 75,
+        "hideAxis": false
     },
     "legend": {
         "hide": false
@@ -33,5 +35,6 @@
     "table": {
         "label": "Data Table",
         "expanded": false
-    }
+    },
+    "lollipopShape": "square"
 }
