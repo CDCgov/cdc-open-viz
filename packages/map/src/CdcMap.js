@@ -66,6 +66,10 @@ const generateColorsArray = (color = '#000000', special = false) => {
     ]
 }
 
+const titleCase = (string) => {
+  return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
+}
+
 const hashObj = (row) => {
     let str = JSON.stringify(row)
 
@@ -130,7 +134,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // United States check
             if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name]
+                const geoName = titleCase(row[obj.columns.geo.name])
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -455,14 +459,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         if(hash) filters.fromHash = hash
 
-        obj.filters.forEach(({columnName, label, active, values}, idx) => {
+        obj?.filters.forEach(({columnName, label, active, values}, idx) => {
             if(undefined === columnName) return
 
             let newFilter = runtimeFilters[idx]
 
-            if(values.length === 0) {
-                values = getUniqueValues(state.data, columnName)
-            }
+            values = getUniqueValues(state.data, columnName)
 
             if(undefined === newFilter) {
                 newFilter = {}
@@ -889,7 +891,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             newState?.data.forEach(dataPiece => {
                 if(dataPiece[newState.columns.geo.name]) {
-                    if(dataPiece[newState.columns.geo.name].length === 4) {
+                    if(!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
                         dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                     }
                 }
@@ -1046,8 +1048,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             data: state.data,
             ...runtimeFilters
         })
-
-        console.log('Does hashData === runtimeData.fromHash: ', hashData === runtimeData.fromHash);
 
         // Data
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
