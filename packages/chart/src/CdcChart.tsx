@@ -210,7 +210,7 @@ export default function CdcChart(
         uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
       }
     }
-
+    debugger
     setConfig(newConfig);
   };
 
