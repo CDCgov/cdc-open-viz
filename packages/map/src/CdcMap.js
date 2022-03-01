@@ -67,7 +67,7 @@ const generateColorsArray = (color = '#000000', special = false) => {
 }
 
 const titleCase = (string) => {
-  return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
+  return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
 }
 
 const hashObj = (row) => {
