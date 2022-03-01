@@ -217,7 +217,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
                         <rect 
-                          x={config.visualizationSubType === 'horizontal' ? bar.y - 10 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25}
+                          x={
+                            (config.visualizationSubType === 'horizontal' && bar.y > 10) ? bar.y - (lollipopShapeSize) - lollipopShapeSize / 2 + 1 : (config.visualizationSubType === 'horizontal' && bar.y < 10) ? 0 :
+                            (config.visualizationSubType !== 'horizontal') ? barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25 }
                           y={config.visualizationSubType === 'horizontal' ? lollipopShapeSize - 15.25 : bar.y - 1}
                           width={lollipopShapeSize * 1.5 }
                           height={lollipopShapeSize * 1.5 }
