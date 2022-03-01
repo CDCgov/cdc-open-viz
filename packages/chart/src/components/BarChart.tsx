@@ -39,6 +39,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, [config, updateConfig]);
 
+
+  useEffect(() => {
+    if(config.isLollipopChart === false) {
+      console.log('resetting bar height...')
+      updateConfig({ ...config, barHeight: 25 })
+    }
+  }, [config.isLollipopChart]);
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
@@ -209,7 +217,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         <circle 
                           cx={config.visualizationSubType === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + offset + lollipopShapeSize/3.5}
                           cy={config.visualizationSubType === 'horizontal' ? lollipopShapeSize/3.5 : bar.y}
-                          r={lollipopShapeSize} 
+                          r={lollipopShapeSize/2} 
                           fill={barColor} 
                           key={`circle--${bar.index}`} 
                           style={{ 'opacity': 1, filter: 'unset' }}
@@ -217,10 +225,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
                         <rect 
-                          x={config.visualizationSubType === 'horizontal' ? bar.y - 10 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25}
-                          y={config.visualizationSubType === 'horizontal' ? lollipopShapeSize - 15.25 : bar.y - 1}
-                          width={lollipopShapeSize * 1.5 }
-                          height={lollipopShapeSize * 1.5 }
+                          x={
+                            (config.visualizationSubType === 'horizontal' && bar.y > 10) ? bar.y - lollipopShapeSize / 2 : (config.visualizationSubType === 'horizontal' && bar.y < 10) ? 0 :
+                            (config.visualizationSubType !== 'horizontal') ? offset - lollipopBarWidth / 2 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25
+                          }
+                          y={
+                            config.visualizationSubType === 'horizontal' ? -lollipopBarWidth/2 : config.height - bar.y > 10 ? bar.y - lollipopShapeSize / 2 : 0 }
+                          width={lollipopShapeSize}
+                          height={lollipopShapeSize}
                           fill={barColor} 
                           key={`circle--${bar.index}`} 
                           style={{ 'opacity': 1, filter: 'unset' }}
