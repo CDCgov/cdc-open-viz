@@ -639,14 +639,11 @@
     opacity: 0.5;
     cursor: auto;
   }
-  label + [type="radio"] {
-    cursor: pointer
-  }
+
   [type="radio"] {
     border: 1px solid #8c8f94;
     border-radius: 50%;
     margin-right: 5px;
-    cursor: pointer;
   }
 }
 
