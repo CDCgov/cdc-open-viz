@@ -456,10 +456,23 @@ const EditorPanel = () => {
     )
   }, [config])
 
+  const ErrorWithLolliopChart = ({ message }) => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{message}</p>
+        </section>
+      </section>
+    );
+  }
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
+      {config.isLollipopChart && (!config.series || config.series.length > 1) && <ErrorWithLolliopChart message="Lollipop charts must have one data series" />}
+      {config.isLollipopChart && config.yAxis.displayNumbersOnBar && <ErrorWithLolliopChart message="Lollipop charts should not have labels on bars" />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <div className="heading-2">Configure Chart</div>
