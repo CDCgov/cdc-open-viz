@@ -1030,7 +1030,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             separateZero: state.legend.separateZero ?? false,
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
-            geoType: state.general.geoType
+            geoType: state.general.geoType,
+            data: state.data
         })
 
         const hashData = hashObj({
@@ -1058,8 +1059,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }, [state])
 
     useEffect(() => {
+        const hashLegend = hashObj({
+            color: state.color,
+            customColors: state.customColors,
+            numberOfItems: state.legend.numberOfItems,
+            type: state.legend.type,
+            separateZero: state.legend.separateZero ?? false,
+            categoryValuesOrder: state.legend.categoryValuesOrder,
+            specialClasses: state.legend.specialClasses,
+            geoType: state.general.geoType,
+            data: state.data
+        })
+        
         // Legend - Update when runtimeData does
-        if(undefined === runtimeData.init) {
+        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
             setRuntimeLegend(legend)
         }
