@@ -66,10 +66,6 @@ const generateColorsArray = (color = '#000000', special = false) => {
     ]
 }
 
-const titleCase = (string) => {
-  return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
-}
-
 const hashObj = (row) => {
     let str = JSON.stringify(row)
 
@@ -134,7 +130,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // United States check
             if("us" === obj.general.geoType) {
-                const geoName = titleCase(row[obj.columns.geo.name])
+                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
