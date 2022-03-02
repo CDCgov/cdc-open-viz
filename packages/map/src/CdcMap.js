@@ -1033,12 +1033,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             geoType: state.general.geoType
         })
 
-        // Legend
-        if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-            const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-            setRuntimeLegend(legend)
-        }
-
         const hashData = hashObj({
             columns: state.columns,
             geoType: state.general.geoType,
@@ -1050,9 +1044,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Data
+        let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(newRuntimeData) 
+        }
+
+        // Legend
+        if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
+            const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
+            setRuntimeLegend(legend)
         }
     }, [state])
 
@@ -1133,7 +1134,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{(runtimeData.init || runtimeLegend.length === 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+			{!runtimeData.init && runtimeLegend.length !== 0 && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
 				{['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
