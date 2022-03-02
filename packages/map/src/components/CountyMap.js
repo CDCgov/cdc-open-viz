@@ -70,7 +70,6 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = (props) => {
-	console.log('rendering county map');
 
 	let mapData = states.concat(counties);
 
@@ -517,7 +516,6 @@ const CountyMap = (props) => {
 		geosJsx.push(<FocusedStateBorder />);
 		return geosJsx;
 	};
-
 
 	return (
 		<ErrorBoundary component='CountyMap'>

@@ -107,7 +107,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
-    const [currentViewport, setCurrentViewport] = useState('lg')
+    const [currentViewport, setCurrentViewport] = useState()
     const [runtimeFilters, setRuntimeFilters] = useState([])
     const [runtimeLegend, setRuntimeLegend] = useState([])
     const [runtimeData, setRuntimeData] = useState({init: true})
@@ -1116,7 +1116,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray,
     }
 
-    if (!mapProps.data || !state.data ) return <Loading />;
+    if (!mapProps.data || !state.data || runtimeData.init || runtimeLegend.length === 0) return <Loading />;
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1170,7 +1170,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+					{currentViewport && (<section className='geography-container' aria-hidden='true' ref={mapSvg}>
 						{modal && (
 							<Modal
 								type={general.type}
@@ -1198,7 +1198,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						)}
 						{'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
 						{/* { mapToShow } */}
-					</section>
+					</section>)}
 
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
