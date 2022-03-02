@@ -1116,7 +1116,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray,
     }
 
-    if (!mapProps.data || !state.data || runtimeData.init || runtimeLegend.length === 0) return <Loading />;
+    if (!mapProps.data || !state.data) return <Loading />;
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1133,7 +1133,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			<section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+			{(runtimeData.init || runtimeLegend.length === 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
 				{['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
@@ -1171,7 +1171,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					)}
 
 					{currentViewport && (<section className='geography-container' aria-hidden='true' ref={mapSvg}>
-						{modal && (
+                        {modal && (
 							<Modal
 								type={general.type}
 								viewport={currentViewport}
@@ -1248,7 +1248,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>
+			</section>}
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>
