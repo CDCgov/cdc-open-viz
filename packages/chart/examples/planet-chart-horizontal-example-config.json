@@ -3,7 +3,7 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
 	"visualizationSubType": "horizontal",
-    "isLollipopChart": false,
+    "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],
     "dataFormat": {
@@ -18,8 +18,8 @@
     },
     "yAxis": {
         "label": "Measurement (1000km)",
-        "displayNumbersOnBar": true,
-        "labelPlacement": "On Y-Axis"
+        "displayNumbersOnBar": false,
+        "labelPlacement": "Below Bar"
     },
     "xAxis": {
         "label": "Planet",

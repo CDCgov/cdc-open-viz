@@ -45,6 +45,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       console.log('resetting bar height...')
       updateConfig({ ...config, barHeight: 25 })
     }
+
+    if(config.isLollipopChart === true) {
+      
+    }
   }, [config.isLollipopChart]);
 
   return (
@@ -136,7 +140,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 }
 
                 return barGroups.map((barGroup, index) => (
-                <Group key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
+                <Group 
+                  className={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                  key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} 
+                  top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} 
+                  left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar,index) => {
 
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
@@ -204,10 +212,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) : barY}
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
-                        fill={barColor}
+                        fill={config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : 
+                              config.isLollipopChart && config.lollipopColorStyle === 'saturated' ? chroma(barColor).brighten(1) : barColor }
                         stroke="#333"
                         strokeWidth={config.isLollipopChart ? 0 : config.barBorderThickness || 1}
-                        style={{fill: barColor}}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
                         data-tip={tooltip}
@@ -296,7 +304,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       <>
                         <Text
                             x={ 0 } // padding
-                            y={ config.isLollipopChart ? lollipopShapeSize * config.series.length +7 : barWidth * config.series.length + 7 }
+                            y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 3: barWidth * config.series.length + 7 }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
                           >{yAxisValue}
@@ -322,7 +330,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ barColor ? barColor : '#000'}
                                   textAnchor="start"
                                   verticalAnchor="middle"
-                                  fontWeight={config.isLollipopChart ? '600' : 'normal'}
+                                  fontWeight={'normal'}
                                 >
                                   { xAxisValue }
                                 </Text>

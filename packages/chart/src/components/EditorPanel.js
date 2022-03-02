@@ -222,7 +222,8 @@ const EditorPanel = () => {
   }
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
-  const [lollipopShape, setLollipopShape] = useState(config.lollipopShape || 'circle')
+  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
+  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('saturated')
 
   if(loading) {
     return null
@@ -432,9 +433,22 @@ const EditorPanel = () => {
         ...config.xAxis,
         hideAxis: false
       },
-      lollipopShape: lollipopShape
+      lollipopShape: lollipopShape,
     })
   }, [config.isLollipopChart, lollipopShape]);
+
+  useEffect(() => {
+    if(!config.lollipopColorStyle) {
+      updateConfig({
+        ...config,
+        lollipopColorStyle:'saturated',
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
+    }
+  }, []);
 
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
@@ -780,30 +794,33 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
 
                   {config.isLollipopChart &&
-                    <label className="header">
-                      <span className="edit-label">Lollipop Shape</span>
-                      <div onChange={(e) => { setLollipopShape(e.target.value) }}>
-                        <label>
-                          <input
-                            type="radio"
-                            name="lollipopShape"
-                            value="circle"
-                            checked={lollipopShape === "circle"}
-                          />
-                          Circle
-                        </label>
-                        <label>
-                          <input
-                            type="radio"
-                            name="lollipopShape"
-                            value="square"
-                            checked={lollipopShape === "square"}
-                          />
-                          Square
-                        </label>
-                      </div>
+                    <>
+                      <label className="header">
+                        <span className="edit-label">Lollipop Shape</span>
+                        <div onChange={(e) => { setLollipopShape(e.target.value) }}>
+                          <label>
+                            <input
+                              type="radio"
+                              name="lollipopShape"
+                              value="circle"
+                              checked={lollipopShape === "circle"}
+                            />
+                            Circle
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              name="lollipopShape"
+                              value="square"
+                              checked={lollipopShape === "square"}
+                            />
+                            Square
+                          </label>
+                        </div>
 
-                    </label>
+                      </label>
+                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'saturated' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'saturated']} />
+                    </>
                   }
 
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
