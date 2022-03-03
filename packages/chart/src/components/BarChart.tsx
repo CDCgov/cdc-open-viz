@@ -51,9 +51,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         legend: {
           ...config.legend,
           hide: true
-        }
+        },
+        yAxis: {
+          ...config.yAxis,
+          hideAxis: true
+        },
+        xAxis: {
+          ...config.xAxis,
+          hideAxis: true
+        },
+        lollipopColorStyle: 'saturated'
       })
     }
+
   }, [config.isLollipopChart]);
 
   return (

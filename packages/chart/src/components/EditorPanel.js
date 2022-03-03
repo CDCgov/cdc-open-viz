@@ -429,19 +429,6 @@ const EditorPanel = () => {
     })
   }, [config.isLollipopChart, lollipopShape]);
 
-  useEffect(() => {
-    if(!config.lollipopColorStyle) {
-      updateConfig({
-        ...config,
-        lollipopColorStyle:'saturated',
-        legend: {
-          ...config.legend,
-          hide: true
-        }
-      })
-    }
-  }, []);
-
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
     return (
