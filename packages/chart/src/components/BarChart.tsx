@@ -227,7 +227,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           cy={config.visualizationSubType === 'horizontal' ? lollipopShapeSize/3.5 : bar.y}
                           r={lollipopShapeSize/2} 
                           fill={barColor} 
-                          key={`circle--${bar.index}`} 
+                          key={`circle--${bar.index}`}
+                          data-tip={tooltip}
+                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           style={{ 'opacity': 1, filter: 'unset' }}
                         />
                       }
@@ -242,7 +244,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           width={lollipopShapeSize}
                           height={lollipopShapeSize}
                           fill={barColor} 
-                          key={`circle--${bar.index}`} 
+                          key={`circle--${bar.index}`}
+                          data-tip={tooltip}
+                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           style={{ 'opacity': 1, filter: 'unset' }}
                         />
                       }
