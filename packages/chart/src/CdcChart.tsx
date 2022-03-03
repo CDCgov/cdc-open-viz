@@ -262,12 +262,20 @@ export default function CdcChart(
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(width)
+      let svgMarginWidth = 32;
+      let editorWidth = 350;
 
       setCurrentViewport(newViewport)
 
       if(isEditor) {
-        width = width - 350;
+        width = width - editorWidth;
       }
+
+      if(entry.target.dataset.lollipop === 'true') {
+        width = width - 2.5;
+      }
+
+      width = width - svgMarginWidth;
 
       setDimensions([width, height])
     }
@@ -616,7 +624,7 @@ export default function CdcChart(
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
+      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
         {body}
       </div>
     </Context.Provider>

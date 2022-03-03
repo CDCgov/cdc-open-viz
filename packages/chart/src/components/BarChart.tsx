@@ -42,12 +42,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
   useEffect(() => {
     if(config.isLollipopChart === false) {
-      console.log('resetting bar height...')
       updateConfig({ ...config, barHeight: 25 })
     }
 
     if(config.isLollipopChart === true) {
-      
+      updateConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
     }
   }, [config.isLollipopChart]);
 
