@@ -14,8 +14,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
   const { visualizationSubType } = config;
 
-  const lollipopBarWidth = 5;
-  const lollipopShapeSize = 10;
+  const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5;
+  const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
 
   const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
   const isLabelOnYAxis = config.yAxis.labelPlacement === "On Date/Category Axis";
@@ -255,7 +255,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             (config.visualizationSubType !== 'horizontal') ? offset - lollipopBarWidth / 2 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25
                           }
                           y={
-                            config.visualizationSubType === 'horizontal' ? -lollipopBarWidth/2 : config.height - bar.y > 10 ? bar.y - lollipopShapeSize / 2 : 0 }
+                            config.visualizationSubType === 'horizontal' ? 0 - lollipopBarWidth / 2 : config.height - bar.y > 10 ? bar.y - lollipopShapeSize / 2 : 0 }
                           width={lollipopShapeSize}
                           height={lollipopShapeSize}
                           fill={barColor} 

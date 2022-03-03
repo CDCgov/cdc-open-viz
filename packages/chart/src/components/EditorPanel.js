@@ -799,6 +799,7 @@ const EditorPanel = () => {
 
                       </label>
                       <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'saturated' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'saturated']} />
+                      <Select value={config.lollipopSize ? config.lollipopSize : 'small' } fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={['small', 'medium', 'large']} />
                     </>
                   }
 
