@@ -18,7 +18,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const lollipopShapeSize = 10;
 
   const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
-  const isLabelOnYAxis = config.yAxis.labelPlacement === "On Y-Axis";
+  const isLabelOnYAxis = config.yAxis.labelPlacement === "On Date/Category Axis";
   const isLabelOnBar = config.yAxis.labelPlacement === "On Bar";
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
@@ -310,7 +310,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           >{yAxisValue}
                         </Text>
 
-                        { (displayNumbersOnBar || config.isLollipopChart) ?
+                        { (displayNumbersOnBar) ?
                            (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                             (
                                 <Text
@@ -327,7 +327,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 <Text
                                   x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}`} // padding
                                   y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) }
-                                  fill={ barColor ? barColor : '#000'}
+                                  fill={ '#000000'}
                                   textAnchor="start"
                                   verticalAnchor="middle"
                                   fontWeight={'normal'}
@@ -342,8 +342,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       { (isLabelOnYAxis && visualizationSubType === "horizontal") &&
                         <>
-                          { displayNumbersOnBar ?
-                            (textWidth + 100 < bar.y) ?
+                          { (displayNumbersOnBar) ?
+                            (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                               (
                                   <Text
                                     x={ bar.y - 5 } // padding
@@ -357,7 +357,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               )
                               : (
                                   <Text
-                                    x={ bar.y + 5} // padding
+                                    x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
                                     y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 )}
                                     fill={ '#000000' }
                                     textAnchor="start"
