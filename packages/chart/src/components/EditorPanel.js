@@ -425,14 +425,6 @@ const EditorPanel = () => {
   useEffect(() => {
     updateConfig({
       ...config,
-      yAxis: {
-        ...config.yAxis,
-        hideAxis: true
-      },
-      xAxis: {
-        ...config.xAxis,
-        hideAxis: false
-      },
       lollipopShape: lollipopShape,
     })
   }, [config.isLollipopChart, lollipopShape]);
@@ -486,7 +478,7 @@ const EditorPanel = () => {
       {config.newViz && <Confirm />}
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {config.isLollipopChart && (!config.series || config.series.length > 1) && <ErrorWithLolliopChart message="Lollipop charts must have one data series" />}
-      {config.isLollipopChart && config.yAxis.displayNumbersOnBar && <ErrorWithLolliopChart message="Lollipop charts should not have labels on bars" />}
+      {/* {config.isLollipopChart && config.yAxis.displayNumbersOnBar && <ErrorWithLolliopChart message="Lollipop charts should not have labels on bars" />} */}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <div className="heading-2">Configure Chart</div>
@@ -508,8 +500,8 @@ const EditorPanel = () => {
                   {showLollipopCheckbox &&
                     <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
-                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
-                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
+                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
