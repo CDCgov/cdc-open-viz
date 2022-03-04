@@ -464,14 +464,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newFilter = runtimeFilters[idx]
 
+            const sortAsc = (a, b) => {
+                return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+            };
+
+            const sortDesc = (a, b) => {
+                return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+            };
+
             values = getUniqueValues(state.data, columnName)
 
             if(obj.filters[idx].order === 'asc') {
-                values = values.sort()
+                values = values.sort(sortAsc)
             }
 
             if(obj.filters[idx].order === 'desc') {
-                values = values.sort().reverse()
+                values = values.sort(sortDesc)
             }
 
             if(undefined === newFilter) {
