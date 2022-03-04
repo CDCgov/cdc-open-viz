@@ -1143,8 +1143,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && runtimeLegend.length !== 0 && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-				{['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
 						place='right'
