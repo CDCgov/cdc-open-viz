@@ -510,6 +510,25 @@ export default function CdcChart(
 
       filterList = config.filters.map((singleFilter, index) => {
         const values = [];
+        const sortAsc = (a, b) => {
+          return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+        };
+        
+        const sortDesc = (a, b) => {
+          return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+        };
+
+        if(!singleFilter.order || singleFilter.order === '' ){
+          singleFilter.order = 'asc'
+        }
+
+        if(singleFilter.order === 'desc') {
+          singleFilter.values = singleFilter.values.sort(sortDesc)
+        }
+
+        if(singleFilter.order === 'asc') {
+          singleFilter.values = singleFilter.values.sort(sortAsc)
+        }
 
         singleFilter.values.forEach((filterOption, index) => {
           values.push(

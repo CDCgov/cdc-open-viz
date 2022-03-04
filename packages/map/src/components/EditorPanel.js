@@ -917,6 +917,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
+				
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
