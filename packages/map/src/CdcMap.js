@@ -815,25 +815,29 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
+    const titleCase = (string) => {
+        return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
+    }
+
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
 
         // Map to first item in values array which is the preferred label
         if(stateKeys.includes(value)) {
-            value = supportedStates[key][0]
+            value = titleCase(supportedStates[key][0])
         }
 
         if(territoryKeys.includes(value)) {
-            value = supportedTerritories[key][0]
+            value = titleCase(supportedTerritories[key][0])
         }
 
         if(countryKeys.includes(value)) {
-            value = supportedCountries[key][0]
+            value = titleCase(supportedCountries[key][0])
         }
 
         if(countyKeys.includes(value)) {
-            value = supportedCounties[key]
+            value = titleCase(supportedCounties[key])
         }
 
         const dict = {
