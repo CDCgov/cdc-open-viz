@@ -176,7 +176,8 @@ const EditorPanel = () => {
     transformedData,
     isDashboard,
     setParentConfig,
-    missingRequiredSections
+    missingRequiredSections,
+    setFilteredData
   } = useContext(Context);
 
   const filterOptions = [
@@ -188,19 +189,15 @@ const EditorPanel = () => {
       label: 'Descending Alphanumeric',
       value: 'desc'
     },
-    // {
-    //   label: 'Custom',
-    //   value: 'cust'
-    // }
+    {
+      label: 'Custom',
+      value: 'cust'
+    }
   ]
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle,
   });
-
-  // const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
-  //   filterData(filters)
-  // };
 
   const sortableItemStyles = {
     display: 'block',
@@ -494,6 +491,20 @@ const EditorPanel = () => {
       </ul>
     )
   }, [config])
+
+  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
+
+    let filterOrder = filter.values;
+    let [movedItem] = filterOrder.splice(idx1, 1);
+    filterOrder.splice(idx2, 0, movedItem);
+    let filters = [...config.filters]
+    let filterItem = { ...config.filters[filterIndex] };
+    filterItem.active = filter.values[0]
+    filterItem.values = filterOrder;
+    filterItem.order = 'cust'
+    filters[filterIndex] = filterItem
+    setFilteredData(filters)
+  };
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -800,7 +811,7 @@ const EditorPanel = () => {
                           {filter.order === 'cust' &&
                             <DragDropContext
                               onDragEnd={({ source, destination }) =>
-                                console.log('dnd')
+                                handleFilterChange(source.index, destination.index, index, config.filters[index])
                               }>
                               <Droppable droppableId='filter_order'>
                                 {(provided) => (
