@@ -137,22 +137,19 @@ export default function CdcChart(
     let currentData;
 
     if (newConfig.filters) {
-      const filterList = [];
 
-      newConfig.filters.forEach((filter) => {
-          filterList.push(filter.columnName);
-      });
+      newConfig.filters.forEach((filter, index) => {
+          
+          let filterValues = [];
 
-      filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, newExcludedData);
+          filterValues = generateValuesForFilter(filter.columnName, newExcludedData);
 
           newConfig.filters[index].values = filterValues;
           // Initial filter should be active
           newConfig.filters[index].active = filterValues[0];
+
       });
-
       currentData = filterData(newConfig.filters, newExcludedData);
-
       setFilteredData(currentData);
     }
 
@@ -239,7 +236,7 @@ export default function CdcChart(
             values.push(value)
         }
     });
-
+    
     return values;
   }
 
@@ -631,7 +628,8 @@ export default function CdcChart(
     isDashboard,
     setParentConfig,
     missingRequiredSections,
-    setEditing
+    setEditing,
+    setFilteredData
   }
 
   return (
