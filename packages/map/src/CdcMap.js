@@ -233,38 +233,74 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter(row => {
-                const val = row[primaryCol]
+            if(typeof obj.legend.specialClasses[0] === 'object'){
+                obj.legend.specialClasses.forEach(specialClass => {
+                    dataSet = dataSet.filter(row => {
+                        const val = row[specialClass.key];
 
-                if( obj.legend.specialClasses.includes(val) ) {
+                        if(specialClass.value === val){
+                            if(undefined === specialClassesHash[val]) {
+                                specialClassesHash[val] = true;
 
-                    // apply the special color to the legend
-                    if(undefined === specialClassesHash[val]) {
-                        specialClassesHash[val] = true
+                                result.push({
+                                    special: true,
+                                    value: val,
+                                    label: specialClass.label
+                                });
 
-                        result.push({
-                            special: true,
-                            value: val
-                        })
+                                result[result.length - 1].color = applyColorToLegend(result.length - 1);
 
-                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                                specialClasses += 1;
+                            }
 
-                        specialClasses += 1
-                    }
-                
-                    let specialColor = '';
+                            let specialColor = '';
+                            
+                            // color the state if val is in row 
+                            if ( Object.values(row).includes(val) ) {
+                                specialColor = result.findIndex(p => p.value === val)
+                            }
+                            newLegendMemo.set( hashObj(row), specialColor)
+
+                            return false;
+                        }
+
+                        return true;
+                    });
+                });
+            } else {
+                dataSet = dataSet.filter(row => {
+                    const val = row[primaryCol]
+
+                    if( obj.legend.specialClasses.includes(val) ) {
+
+                        // apply the special color to the legend
+                        if(undefined === specialClassesHash[val]) {
+                            specialClassesHash[val] = true;
+
+                            result.push({
+                                special: true,
+                                value: val
+                            });
+
+                            result[result.length - 1].color = applyColorToLegend(result.length - 1);
+
+                            specialClasses += 1;
+                        }
                     
-                    // color the state if val is in row 
-                    if ( Object.values(row).includes(val) ) {
-                        specialColor = result.findIndex(p => p.value === val)
+                        let specialColor = '';
+                        
+                        // color the state if val is in row 
+                        if ( Object.values(row).includes(val) ) {
+                            specialColor = result.findIndex(p => p.value === val)
+                        }
+                        newLegendMemo.set( hashObj(row), specialColor)
+
+                        return false
                     }
-                    newLegendMemo.set( hashObj(row), specialColor)
 
-                    return false
-                }
-
-                return true
-            })
+                    return true
+                })
+            }
         }
 
         // Category

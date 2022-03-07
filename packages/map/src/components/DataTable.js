@@ -12,6 +12,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 
 const DataTable = (props) => {
   const {
+    state,
     tableTitle,
     indexTitle,
     mapTitle,
@@ -26,7 +27,7 @@ const DataTable = (props) => {
     applyLegendToRow,
     displayGeoName,
     navigationHandler,
-    viewport,
+    viewport
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -170,6 +171,13 @@ const DataTable = (props) => {
           id: column,
           accessor: (row) => {
             if (runtimeData) {
+              if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                for(let i = 0; i < state.legend.specialClasses.length; i++){
+                  if(runtimeData[row][state.legend.specialClasses[i].key] === state.legend.specialClasses[i].value){
+                    return state.legend.specialClasses[i].label;
+                  }
+                }
+              }
               return runtimeData[row][columns[column].name] ?? null;
             }
 
