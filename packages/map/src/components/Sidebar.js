@@ -72,7 +72,7 @@ const Sidebar = (props) => {
     let legendLabel = formattedText;
 
     if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.value;
+      legendLabel = entry.label || entry.value;
     }
 
     return (
