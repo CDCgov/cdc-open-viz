@@ -173,7 +173,7 @@ const DataTable = (props) => {
             if (runtimeData) {
               if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
                 for(let i = 0; i < state.legend.specialClasses.length; i++){
-                  if(runtimeData[row][state.legend.specialClasses[i].key] === state.legend.specialClasses[i].value){
+                  if(String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
                     return state.legend.specialClasses[i].label;
                   }
                 }

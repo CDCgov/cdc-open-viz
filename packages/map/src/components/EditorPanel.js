@@ -1387,7 +1387,7 @@ const EditorPanel = (props) => {
 																<select value={specialClass.value} onChange={(e) => {
 																	editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
 																}}>
-																	{columnsByKey[specialClass.key].sort().map(option => (
+																	{columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
 																		<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
 																	))}
 																</select>
