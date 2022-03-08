@@ -154,10 +154,7 @@ const EditorPanel = (props) => {
 		filterItem.order = 'cust'
 		filters[filterIndex] = filterItem
 
-		setState({
-			...state,
-			filters
-		})
+		setRuntimeFilters(filters)
 
 	};
 
@@ -582,24 +579,39 @@ const EditorPanel = (props) => {
 	}, [state.columns, state.general.type]);
 
 	const editColumn = async (columnName, editTarget, value) => {
-		switch (editTarget) {
-			case 'specialClassDelete':
-				const updatedSpecialClasses = Array.from(legend.specialClasses);
+		let newSpecialClasses;
 
-				updatedSpecialClasses.splice(value, 1);
+		switch (editTarget) {
+			case 'specialClassEdit':
+				newSpecialClasses = Array.from(legend.specialClasses);
+
+				newSpecialClasses[value.index][value.prop] = value.value;
 
 				setState({
 					...state,
 					legend: {
 						...state.legend,
-						specialClasses: updatedSpecialClasses,
+						specialClasses: newSpecialClasses,
+					},
+				});
+				break;
+			case 'specialClassDelete':
+				newSpecialClasses = Array.from(legend.specialClasses);
+
+				newSpecialClasses.splice(value, 1);
+
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						specialClasses: newSpecialClasses,
 					},
 				});
 				break;
 			case 'specialClassAdd':
-				let newSpecialClasses = legend.specialClasses;
+				newSpecialClasses = legend.specialClasses;
 
-				newSpecialClasses.push(value.name);
+				newSpecialClasses.push(value);
 
 				setState({
 					...state,
@@ -638,6 +650,7 @@ const EditorPanel = (props) => {
 	};
 
 	const changeFilter = async (idx, target, value) => {
+
 		let newFilters = [...state.filters];
 
 		switch (target) {
@@ -662,23 +675,17 @@ const EditorPanel = (props) => {
 				break;
 			case 'filterOrder':
 				if(value === 'desc') {
-					let reversedValues = [...runtimeFilters[idx].values].sort().reverse()
-					newFilters[idx] = { ...runtimeFilters[idx] }
-					delete newFilters[idx].active
-					newFilters[idx] = { ...newFilters[idx] };
+					newFilters[idx] = { ...runtimeFilters[idx]}
+					delete newFilters[idx].active;
 					newFilters[idx].order = 'desc';
-					newFilters[idx].values = reversedValues;
 				}
 				if(value === 'asc') {
-					let sortedValues = [...runtimeFilters[idx].values].sort()
-					newFilters[idx] = { ...newFilters[idx] }
-					delete newFilters[idx].active
+					newFilters[idx] = { ...runtimeFilters[idx] }
+					delete newFilters[idx].active;
 					newFilters[idx].order = 'asc'
-					newFilters[idx].values = sortedValues
 				}
 				if(value === 'cust') {
-					newFilters[idx] = { ...newFilters[idx] }
-					delete newFilters[idx].active
+					newFilters[idx] = { ...runtimeFilters[idx] }
 					newFilters[idx].order = 'cust'
 				}
 				break;
@@ -823,12 +830,29 @@ const EditorPanel = (props) => {
 		);
 	});
 
-	const specialClasses = [];
+	let columnsByKey = {};
+	state.data.forEach(datum => {
+		Object.keys(datum).forEach(key => {
+			columnsByKey[key] = columnsByKey[key] || [];
+			const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key];
 
-	if ('' !== legend.specialClasses[0]) {
-		legend.specialClasses.forEach((specialClass, index) => {
-			specialClasses.push({ id: index, name: specialClass });
+			if(columnsByKey[key].indexOf(value) === -1){
+				columnsByKey[key].push(value);
+			}
 		});
+	});
+
+	let specialClasses = [];
+	if(legend.specialClasses && legend.specialClasses.length && typeof legend.specialClasses[0] === 'string'){
+		legend.specialClasses.forEach(specialClass => {
+			specialClasses.push({
+				key: state.columns.primary && state.columns.primary.name ? state.columns.primary.name : columnsInData[0],
+				value: specialClass,
+				label: specialClass
+			});
+		});
+	} else {
+		specialClasses = legend.specialClasses || [];
 	}
 
 	const additionalColumns = Object.keys(state.columns).filter((value) => {
@@ -925,6 +949,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
+				
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
@@ -1340,19 +1365,47 @@ const EditorPanel = (props) => {
 													<label>
 														<span className='edit-label'>Special Classes</span>
 													</label>
-													<ReactTags
-														placeholder='Separate by comma'
-														delimiters={[' ', ',', 'Enter']}
-														allowNew={true}
-														minQueryLength={1}
-														tags={specialClasses}
-														onDelete={(event) => {
-															editColumn('primary', 'specialClassDelete', event);
+													{specialClasses.map((specialClass, i) => (
+														<div className="edit-block" key={`special-class-${i}`}>
+															<button className="remove-column"
+																onClick={(e) => {
+																	e.preventDefault();
+																	editColumn('primary', 'specialClassDelete', i);
+																}}
+															>Remove</button>
+															<p>Special Class {i + 1}</p>
+															<label>
+																<span className="edit-label column-heading">Data Key</span>
+																<select value={specialClass.key} onChange={(e) => {
+																	editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
+																}}>
+																	{columnsOptions}
+																</select>
+															</label>
+															<label>
+																<span className="edit-label column-heading">Value</span>
+																<select value={specialClass.value} onChange={(e) => {
+																	editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
+																}}>
+																	{columnsByKey[specialClass.key].sort().map(option => (
+																		<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
+																	))}
+																</select>
+															</label>
+															<label>
+																<span className="edit-label column-heading">Label</span>
+																<input type="text" value={specialClass.label} onChange={(e) => {
+																	editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
+																}} />
+															</label>
+														</div>
+													))}
+													<button className="btn full-width"
+														onClick={(e) => {
+															e.preventDefault();
+															editColumn('primary', 'specialClassAdd', {});
 														}}
-														onAddition={(value) => {
-															editColumn('primary', 'specialClassAdd', value);
-														}}
-													/>
+													>Add SpecialClass</button>
 												</li>
 											</ul>
 										</fieldset>

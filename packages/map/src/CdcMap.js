@@ -110,7 +110,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
-    
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -229,38 +229,74 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter(row => {
-                const val = row[primaryCol]
+            if(typeof obj.legend.specialClasses[0] === 'object'){
+                obj.legend.specialClasses.forEach(specialClass => {
+                    dataSet = dataSet.filter(row => {
+                        const val = row[specialClass.key];
 
-                if( obj.legend.specialClasses.includes(val) ) {
+                        if(specialClass.value === val){
+                            if(undefined === specialClassesHash[val]) {
+                                specialClassesHash[val] = true;
 
-                    // apply the special color to the legend
-                    if(undefined === specialClassesHash[val]) {
-                        specialClassesHash[val] = true
+                                result.push({
+                                    special: true,
+                                    value: val,
+                                    label: specialClass.label
+                                });
 
-                        result.push({
-                            special: true,
-                            value: val
-                        })
+                                result[result.length - 1].color = applyColorToLegend(result.length - 1);
 
-                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                                specialClasses += 1;
+                            }
 
-                        specialClasses += 1
-                    }
-                
-                    let specialColor = '';
+                            let specialColor = '';
+                            
+                            // color the state if val is in row 
+                            if ( Object.values(row).includes(val) ) {
+                                specialColor = result.findIndex(p => p.value === val)
+                            }
+                            newLegendMemo.set( hashObj(row), specialColor)
+
+                            return false;
+                        }
+
+                        return true;
+                    });
+                });
+            } else {
+                dataSet = dataSet.filter(row => {
+                    const val = row[primaryCol]
+
+                    if( obj.legend.specialClasses.includes(val) ) {
+
+                        // apply the special color to the legend
+                        if(undefined === specialClassesHash[val]) {
+                            specialClassesHash[val] = true;
+
+                            result.push({
+                                special: true,
+                                value: val
+                            });
+
+                            result[result.length - 1].color = applyColorToLegend(result.length - 1);
+
+                            specialClasses += 1;
+                        }
                     
-                    // color the state if val is in row 
-                    if ( Object.values(row).includes(val) ) {
-                        specialColor = result.findIndex(p => p.value === val)
+                        let specialColor = '';
+                        
+                        // color the state if val is in row 
+                        if ( Object.values(row).includes(val) ) {
+                            specialColor = result.findIndex(p => p.value === val)
+                        }
+                        newLegendMemo.set( hashObj(row), specialColor)
+
+                        return false
                     }
-                    newLegendMemo.set( hashObj(row), specialColor)
 
-                    return false
-                }
-
-                return true
-            })
+                    return true
+                })
+            }
         }
 
         // Category
@@ -460,7 +496,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             let newFilter = runtimeFilters[idx]
 
+            const sortAsc = (a, b) => {
+                return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+            };
+
+            const sortDesc = (a, b) => {
+                return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+            };
+
             values = getUniqueValues(state.data, columnName)
+
+            if(obj.filters[idx].order === 'asc') {
+                values = values.sort(sortAsc)
+            }
+
+            if(obj.filters[idx].order === 'desc') {
+                values = values.sort(sortDesc)
+            }
 
             if(undefined === newFilter) {
                 newFilter = {}
@@ -740,7 +792,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     let label = column.label.length > 0 ? column.label : '';
 
-                    let value = displayDataAsText(row[column.name], columnKey);
+                    let value;
+
+                    if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                        for(let i = 0; i < state.legend.specialClasses.length; i++){
+                            if(row[state.legend.specialClasses[i].key] === state.legend.specialClasses[i].value){
+                                value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                            }
+                        }
+                    }
+
+                    if(!value){
+                        value = displayDataAsText(row[column.name], columnKey);
+                    }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
                         toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
