@@ -780,7 +780,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     let label = column.label.length > 0 ? column.label : '';
 
-                    let value = displayDataAsText(row[column.name], columnKey);
+                    let value;
+
+                    if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                        for(let i = 0; i < state.legend.specialClasses.length; i++){
+                            if(row[state.legend.specialClasses[i].key] === state.legend.specialClasses[i].value){
+                                value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                            }
+                        }
+                    }
+
+                    if(!value){
+                        value = displayDataAsText(row[column.name], columnKey);
+                    }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
                         toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
