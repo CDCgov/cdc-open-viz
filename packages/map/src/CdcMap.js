@@ -232,7 +232,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(typeof obj.legend.specialClasses[0] === 'object'){
                 obj.legend.specialClasses.forEach(specialClass => {
                     dataSet = dataSet.filter(row => {
-                        const val = row[specialClass.key];
+                        const val = String(row[specialClass.key]);
 
                         if(specialClass.value === val){
                             if(undefined === specialClassesHash[val]) {
@@ -252,9 +252,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                             let specialColor = '';
                             
                             // color the state if val is in row 
-                            if ( Object.values(row).includes(val) ) {
-                                specialColor = result.findIndex(p => p.value === val)
-                            }
+                            specialColor = result.findIndex(p => p.value === val)
+
                             newLegendMemo.set( hashObj(row), specialColor)
 
                             return false;
@@ -361,7 +360,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             return result
         }
 
-        let legendNumber = number
+        let uniqueValues = {};
+        dataSet.forEach(datum => {
+            uniqueValues[datum[primaryCol]] = true;
+        });
+
+        let legendNumber = Math.min(number, Object.keys(uniqueValues).length);
 
         // Separate zero
         if(true === obj.legend.separateZero) {
@@ -444,7 +448,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Equal Interval
         if(type === 'equalinterval') {
-            dataSet = dataSet.filter(row => row[primaryCol])
+            dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
@@ -736,7 +740,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
-            if (false === state.legend.specialClasses.includes(value)) {
+            if (false === state.legend.specialClasses.includes(String(value))) {
                 formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
             }
         }
@@ -796,7 +800,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
                         for(let i = 0; i < state.legend.specialClasses.length; i++){
-                            if(row[state.legend.specialClasses[i].key] === state.legend.specialClasses[i].value){
+                            if(String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
                                 value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
                             }
                         }
