@@ -154,10 +154,7 @@ const EditorPanel = (props) => {
 		filterItem.order = 'cust'
 		filters[filterIndex] = filterItem
 
-		setState({
-			...state,
-			filters
-		})
+		setRuntimeFilters(filters)
 
 	};
 
@@ -653,6 +650,7 @@ const EditorPanel = (props) => {
 	};
 
 	const changeFilter = async (idx, target, value) => {
+
 		let newFilters = [...state.filters];
 
 		switch (target) {
@@ -677,23 +675,17 @@ const EditorPanel = (props) => {
 				break;
 			case 'filterOrder':
 				if(value === 'desc') {
-					let reversedValues = [...runtimeFilters[idx].values].sort().reverse()
-					newFilters[idx] = { ...runtimeFilters[idx] }
-					delete newFilters[idx].active
-					newFilters[idx] = { ...newFilters[idx] };
+					newFilters[idx] = { ...runtimeFilters[idx]}
+					delete newFilters[idx].active;
 					newFilters[idx].order = 'desc';
-					newFilters[idx].values = reversedValues;
 				}
 				if(value === 'asc') {
-					let sortedValues = [...runtimeFilters[idx].values].sort()
-					newFilters[idx] = { ...newFilters[idx] }
-					delete newFilters[idx].active
+					newFilters[idx] = { ...runtimeFilters[idx] }
+					delete newFilters[idx].active;
 					newFilters[idx].order = 'asc'
-					newFilters[idx].values = sortedValues
 				}
 				if(value === 'cust') {
-					newFilters[idx] = { ...newFilters[idx] }
-					delete newFilters[idx].active
+					newFilters[idx] = { ...runtimeFilters[idx] }
 					newFilters[idx].order = 'cust'
 				}
 				break;
@@ -957,6 +949,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
+				
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
