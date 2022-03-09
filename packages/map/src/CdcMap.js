@@ -806,6 +806,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         for(let i = 0; i < state.legend.specialClasses.length; i++){
                             if(String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
                                 value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                                break;
                             }
                         }
                     }
@@ -835,6 +836,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         return toolTipText
 
+    }
+
+    const titleCase = (string) => {
+        return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
     }
 
     // This resets all active legend toggles.
@@ -916,7 +921,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = dict[value]
         }
 
-        return value
+        return titleCase(value);
     }
 
     const navigationHandler = (urlString) => {
