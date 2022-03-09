@@ -1186,6 +1186,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
+                    <a id='skip-nav' className='cdcdataviz-sr-only' href={`#dataTableSection`}>
+                        Skip geography container
+                    </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
 						{modal && (
 							<Modal
