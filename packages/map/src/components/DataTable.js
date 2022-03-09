@@ -154,18 +154,19 @@ const DataTable = (props) => {
     }
 
     return (
-        <button
+        <a
           download={fileName}
           type="button"
           onClick={saveBlob}
           href={URL.createObjectURL(blob)}
           aria-label="Download this data in a CSV file format."
           className={`${headerColor} btn btn-download no-border`}
-          id={`btn__${mapTitle?.replace(/\s/g, '')}`}
+          id={mapTitle ? `btn__${mapTitle.replace(/\s/g, '')}` : '#!' }
           data-html2canvas-ignore
+          role="button"
         >
           Download Data (CSV)
-        </button>
+        </a>
     )
   }, [rawData]);
 
@@ -267,7 +268,7 @@ const DataTable = (props) => {
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
-  const skipId = mapTitle?.replace(/\s/g, '')
+  const skipId = mapTitle ? mapTitle?.replace(/\s/g, '') : '#!'
 
   if(!state.data) return <Loading />
   return (
