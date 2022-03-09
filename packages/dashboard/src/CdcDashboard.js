@@ -108,11 +108,13 @@ export default function CdcDashboard(
 
       data = await dataString.json();
 
-      try {
-        data = transform.autoStandardize(data);
-        data = transform.developerStandardize(data, response.dataDescription);
-      } catch(e) {
-        //Data not able to be standardized, leave as is
+      if(data && response.dataDescription){
+        try {
+          data = transform.autoStandardize(data);
+          data = transform.developerStandardize(data, response.dataDescription);
+        } catch(e) {
+          //Data not able to be standardized, leave as is
+        }
       }
     }
 
@@ -168,6 +170,13 @@ export default function CdcDashboard(
 
       filterList.forEach((filter, index) => {
           const filterValues = generateValuesForFilter(filter, (dataOverride || data));
+
+          if(newConfig.dashboard.filters[index].order === 'asc'){
+            filterValues.sort();
+          }
+          if(newConfig.dashboard.filters[index].order === 'desc'){
+            filterValues.sort().reverse();
+          }
 
           newConfig.dashboard.filters[index].values = filterValues;
 
