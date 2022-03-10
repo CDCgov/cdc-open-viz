@@ -1201,7 +1201,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-nav' className='cdcdataviz-sr-only' href={`#dataTableSection`}>
+                    <a id='skip-nav' className='cdcdataviz-sr-only' href={state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`}>
                         Skip geography container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
