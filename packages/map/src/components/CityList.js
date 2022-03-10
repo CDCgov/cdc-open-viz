@@ -10,7 +10,8 @@ const CityList = (({
   applyTooltipsToGeo,
   displayGeoName,
   applyLegendToRow,
-  projection
+  projection,
+  titleCase
 }) => {
   const [citiesData, setCitiesData] = useState({});
 
@@ -27,7 +28,7 @@ const CityList = (({
   const cityList = Object.keys(citiesData).filter((c) => undefined !== data[c]);
 
   const cities = cityList.map((city, i) => {
-    const cityDisplayName = displayGeoName(city);
+    const cityDisplayName = titleCase( displayGeoName(city) );
 
     const legendColors = applyLegendToRow(data[city]);
 
