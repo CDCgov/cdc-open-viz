@@ -12,6 +12,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 
 
 import Loading from '@cdc/core/components/Loading';
+import ConfigureTab from '../../../editor/src/components/ConfigureTab';
 
 const DataTable = (props) => {
   const {
@@ -294,7 +295,7 @@ const DataTable = (props) => {
           hidden={!expanded}
           aria-rowcount={state?.data.length ? state.data.length : '-1' }
         >
-          <caption className='cdcdataviz-sr-only'>{`Datatable showing data for the ${mapLookup[state.general.geoType]} figure above.`}</caption>
+          <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ?  state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
           <thead style={{position: 'sticky', top: 0, zIndex: 999}}>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -312,7 +313,7 @@ const DataTable = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()} style={{ width: '100%', display: 'block', maxHeight: '250px' }}>
+          <tbody {...getTableBodyProps()}>
             {rows.map((row) => {
               prepareRow(row);
               return (
