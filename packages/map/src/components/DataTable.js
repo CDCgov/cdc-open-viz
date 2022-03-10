@@ -10,6 +10,9 @@ import ExternalIcon from '../images/external-link.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
+
+import Loading from '@cdc/core/components/Loading';
+
 const DataTable = (props) => {
   const {
     tableTitle,
@@ -27,11 +30,17 @@ const DataTable = (props) => {
     displayGeoName,
     navigationHandler,
     viewport,
+    state
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
+
+  const [ready, setReady] = useState(false)
+
+  const fileName = `${mapTitle}.csv`;
+
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
@@ -132,7 +141,6 @@ const DataTable = (props) => {
   }, [columns.navigate, navigationHandler]);
 
   const DownloadButton = memo(() => {
-    const fileName = `${mapTitle}.csv`;
     const csvData = Papa.unparse(rawData);
 
     const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
@@ -146,16 +154,19 @@ const DataTable = (props) => {
     }
 
     return (
-      <a
-        download={fileName}
-        onClick={saveBlob}
-        href={URL.createObjectURL(blob)}
-        aria-label="Download this data in a CSV file format."
-        className={`${headerColor} btn btn-download no-border`}
-        data-html2canvas-ignore
-      >
-        Download Data (CSV)
-      </a>
+        <a
+          download={fileName}
+          type="button"
+          onClick={saveBlob}
+          href={URL.createObjectURL(blob)}
+          aria-label="Download this data in a CSV file format."
+          className={`${headerColor} btn btn-download no-border`}
+          id={mapTitle ? `btn__${mapTitle.replace(/\s/g, '')}` : '#!' }
+          data-html2canvas-ignore
+          role="button"
+        >
+          Download Data (CSV)
+        </a>
     )
   }, [rawData]);
 
@@ -242,6 +253,13 @@ const DataTable = (props) => {
     []
   );
 
+  const mapLookup = {
+    'us-county': 'United States County Map',
+    'single-state': 'State Map',
+    'us': 'United States Map',
+    'world': 'World Map'
+  }
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -250,20 +268,34 @@ const DataTable = (props) => {
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
+  const skipId = mapTitle ? mapTitle?.replace(/\s/g, '') : '#!'
+
+  if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      <section id="dataTableSection" className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+        <a id='skip-nav' className='cdcdataviz-sr-only' href={`#btn__${skipId}`}>
+          Skip Navigation or Skip to Content
+        </a>
       <div
         className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
         onClick={() => { setExpanded(!expanded); }}
         tabIndex="0"
         onKeyDown={(e) => { if (e.keyCode === 13) { setExpanded(!expanded); } }}
       >
+ 
         {tableTitle}
       </div>
       <div className="table-container">
-        <table height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!expanded}>
-          <thead>
+        <table 
+          height={expanded ? null : 0} {...getTableProps()} 
+          aria-live="assertive" 
+          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
+          hidden={!expanded}
+          aria-rowcount={state?.data.length ? state.data.length : '-1' }
+        >
+          <caption className='cdcdataviz-sr-only'>{`Datatable showing data for the ${mapLookup[state.general.geoType]} figure above.`}</caption>
+          <thead style={{position: 'sticky', top: 0, zIndex: 999}}>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
@@ -280,7 +312,7 @@ const DataTable = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
+          <tbody {...getTableBodyProps()} style={{ width: '100%', display: 'block', maxHeight: '250px' }}>
             {rows.map((row) => {
               prepareRow(row);
               return (

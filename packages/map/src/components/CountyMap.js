@@ -12,6 +12,7 @@ import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
 import ReactTooltip from 'react-tooltip';
 import { abbrs } from '../data/abbreviations';
+import useActiveElement from './../hooks/useActiveElement';
 
 const offsets = {
 	Vermont: [50, -8],
@@ -70,7 +71,6 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = (props) => {
-	console.log('rendering county map');
 
 	let mapData = states.concat(counties);
 
@@ -359,6 +359,7 @@ const CountyMap = (props) => {
 
 					return (
 						<g
+							tabIndex="0"
 							data-for='tooltip'
 							data-tip={tooltip}
 							key={`county--${key}`}
@@ -465,7 +466,7 @@ const CountyMap = (props) => {
 
 				return (
 					<React.Fragment key={`state--${key}`}>
-						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles}>
+						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="0">
 							<>
 								<path
 									tabIndex={-1}
@@ -504,8 +505,8 @@ const CountyMap = (props) => {
 		const states = geographies.slice(0, 56);
 		const counties = geographies.slice(56);
 		let geosJsx = [];
-		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} />);
-		geosJsx.push(<StateOutput geographies={geographies} states={states} />);
+		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		geosJsx.push(<StateOutput geographies={geographies} states={states} key="state-key" />);
 		geosJsx.push(
 			<StateLines
 				key='stateLines'
@@ -514,14 +515,12 @@ const CountyMap = (props) => {
 				stateLines={stateLines}
 			/>
 		);
-		geosJsx.push(<FocusedStateBorder />);
+		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
 		return geosJsx;
 	};
 
-
 	return (
 		<ErrorBoundary component='CountyMap'>
-      {/* <Loading /> */}
 			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
 				<rect
 					className='background center-container ocean'
@@ -530,6 +529,7 @@ const CountyMap = (props) => {
 					fillOpacity={1}
 					fill='white'
 					onClick={(e) => onReset(e)}
+					tabIndex="0"
 				></rect>
 				<CustomProjection
 					data={mapData}
@@ -550,7 +550,7 @@ const CountyMap = (props) => {
 					}}
 				</CustomProjection>
 			</svg>
-			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }}>
+			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }} tabIndex="0">
 				Reset Zoom
 			</button>
 		</ErrorBoundary>
