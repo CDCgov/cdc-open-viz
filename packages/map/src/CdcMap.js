@@ -1144,6 +1144,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
+        titleCase
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
