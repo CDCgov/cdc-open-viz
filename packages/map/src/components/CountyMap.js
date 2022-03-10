@@ -71,7 +71,6 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = (props) => {
-	console.log('rendering county map');
 
 	let mapData = states.concat(counties);
 
@@ -506,8 +505,8 @@ const CountyMap = (props) => {
 		const states = geographies.slice(0, 56);
 		const counties = geographies.slice(56);
 		let geosJsx = [];
-		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} />);
-		geosJsx.push(<StateOutput geographies={geographies} states={states} />);
+		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		geosJsx.push(<StateOutput geographies={geographies} states={states} key="state-key" />);
 		geosJsx.push(
 			<StateLines
 				key='stateLines'
@@ -516,10 +515,9 @@ const CountyMap = (props) => {
 				stateLines={stateLines}
 			/>
 		);
-		geosJsx.push(<FocusedStateBorder />);
+		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
 		return geosJsx;
 	};
-
 
 	return (
 		<ErrorBoundary component='CountyMap'>
