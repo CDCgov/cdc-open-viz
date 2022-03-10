@@ -359,7 +359,7 @@ const CountyMap = (props) => {
 
 					return (
 						<g
-							tabIndex="0"
+							tabIndex="-1"
 							data-for='tooltip'
 							data-tip={tooltip}
 							key={`county--${key}`}
@@ -466,7 +466,7 @@ const CountyMap = (props) => {
 
 				return (
 					<React.Fragment key={`state--${key}`}>
-						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="0">
+						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="-1">
 							<>
 								<path
 									tabIndex={-1}

@@ -1700,6 +1700,16 @@ const EditorPanel = (props) => {
 											label='Index Column Title'
 											placeholder='Location'
 										/>
+										<TextField
+											value={dataTable.caption}
+											updateField={updateField}
+											section='dataTable'
+											fieldName='caption'
+											label='Data Table Caption'
+											placeholder='Data Table'
+											helper='Text that describes the data table for screen'
+											type="textarea"
+										/>
 										<label className='checkbox'>
 											<input
 												type='checkbox'
