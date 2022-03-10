@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
 import ReactTooltip from 'react-tooltip'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 
 import {
   Accordion,
@@ -174,8 +176,42 @@ const EditorPanel = () => {
     transformedData,
     isDashboard,
     setParentConfig,
-    missingRequiredSections
+    missingRequiredSections,
+    setFilteredData
   } = useContext(Context);
+
+  const filterOptions = [
+    {
+      label: 'Ascending Alphanumeric',
+      value: 'asc'
+    },
+    {
+      label: 'Descending Alphanumeric',
+      value: 'desc'
+    },
+    {
+      label: 'Custom',
+      value: 'cust'
+    }
+  ]
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    ...draggableStyle,
+  });
+
+  const sortableItemStyles = {
+    display: 'block',
+    boxSizing: 'border-box',
+    border: '1px solid #D1D1D1',
+    borderRadius: '2px',
+    background: '#F1F1F1',
+    padding: '.4em .6em',
+    fontSize: '.8em',
+    marginRight: '.3em',
+    marginBottom: '.3em',
+    cursor: 'move',
+    zIndex: '999',
+  };
 
   let hasLineChart = false
 
@@ -455,6 +491,20 @@ const EditorPanel = () => {
       </ul>
     )
   }, [config])
+
+  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
+
+    let filterOrder = filter.values;
+    let [movedItem] = filterOrder.splice(idx1, 1);
+    filterOrder.splice(idx2, 0, movedItem);
+    let filters = [...config.filters]
+    let filterItem = { ...config.filters[filterIndex] };
+    filterItem.active = filter.values[0]
+    filterItem.values = filterOrder;
+    filterItem.order = 'cust'
+    filters[filterIndex] = filterItem
+    setFilteredData(filters)
+  };
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -749,6 +799,53 @@ const EditorPanel = () => {
                             <span className="edit-label column-heading">Label</span>
                             <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
                           </label>
+
+                          <label>
+                            <span className="edit-filterOrder column-heading">Filter Order</span>
+                            <select value={filter.order ? filter.order : 'asc'} onChange={ (e) => updateFilterProp('order', index, e.target.value)}>
+                              {filterOptions.map((option, index) => {
+                                return <option value={option.value} key={`filter-${index}`}>{option.label}</option>
+                              })}
+                            </select>
+
+                          {filter.order === 'cust' &&
+                            <DragDropContext
+                              onDragEnd={({ source, destination }) =>
+                                handleFilterChange(source.index, destination.index, index, config.filters[index])
+                              }>
+                              <Droppable droppableId='filter_order'>
+                                {(provided) => (
+                                  <ul
+                                    {...provided.droppableProps}
+                                    className='sort-list'
+                                    ref={provided.innerRef}
+                                    style={{ marginTop: '1em' }}
+                                  >
+                                    {config.filters[index]?.values.map((value, index) => {
+                                      return (
+                                        <Draggable key={value} draggableId={`draggableFilter-${value}`} index={index}>
+                                          {(provided, snapshot) => (
+                                            <li>
+                                              <div className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}>
+                                                {value}
+                                              </div>
+                                            </li>
+                                          )}
+                                        </Draggable>
+                                      )
+                                    })}
+                                    {provided.placeholder}
+                                  </ul>
+                                )}
+                              </Droppable>
+                            </DragDropContext>
+                          }
+                          </label>
+
                         </fieldset>
                       )
                     )}
