@@ -274,7 +274,7 @@ const DataTable = (props) => {
   if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section id="dataTableSection" className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only' href={`#btn__${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
