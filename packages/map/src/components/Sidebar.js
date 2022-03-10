@@ -119,7 +119,7 @@ const Sidebar = (props) => {
 
   return (
     <ErrorBoundary component="Sidebar">
-      <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`}>
+      <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`} role="region" aria-label="Legend">
       <section className="legend-section" aria-label="Map Legend">
         {runtimeLegend.disabledAmt > 0 &&
           (

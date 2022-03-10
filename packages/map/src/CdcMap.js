@@ -1200,35 +1200,42 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-					{currentViewport && (<section className='geography-container' aria-hidden='true' ref={mapSvg}>
-                        {modal && (
-							<Modal
-								type={general.type}
-								viewport={currentViewport}
-								applyTooltipsToGeo={applyTooltipsToGeo}
-								applyLegendToRow={applyLegendToRow}
-								capitalize={state.tooltips.capitalizeLabels}
-								content={modal}
-							/>
-						)}
-                        {'single-state' === general.geoType && (
-                            <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                    <a id='skip-nav' className='cdcdataviz-sr-only' href={`#dataTableSection`}>
+                        Skip geography container
+                    </a>
+					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                        {currentViewport && (
+                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                                {modal && (
+                                    <Modal
+                                        type={general.type}
+                                        viewport={currentViewport}
+                                        applyTooltipsToGeo={applyTooltipsToGeo}
+                                        applyLegendToRow={applyLegendToRow}
+                                        capitalize={state.tooltips.capitalizeLabels}
+                                        content={modal}
+                                    />
+                                )}
+                                {'single-state' === general.geoType && (
+                                    <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'us' === general.geoType && (
+                                    <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'world' === general.geoType && (
+                                    <WorldMap supportedCountries={supportedCountries} {...mapProps} />
+                                )}
+                                {'us-county' === general.geoType && (
+                                    <CountyMap
+                                        supportedCountries={supportedCountries}
+                                        {...mapProps}
+                                    />
+                                )}
+                                {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                            </section>
+                        
                         )}
-						{'us' === general.geoType && (
-							<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
-						)}
-						{'world' === general.geoType && (
-							<WorldMap supportedCountries={supportedCountries} {...mapProps} />
-						)}
-						{'us-county' === general.geoType && (
-							<CountyMap
-								supportedCountries={supportedCountries}
-								{...mapProps}
-							/>
-						)}
-						{'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-						{/* { mapToShow } */}
-					</section>)}
+                        </section>
 
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
