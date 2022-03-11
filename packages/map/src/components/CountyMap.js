@@ -27,6 +27,7 @@ const offsets = {
 	'Puerto Rico': [10, -20],
 	'Virgin Islands': [10, -10],
 	Guam: [10, -5],
+	'Commonwealth of the Northern Mariana Islands': [10, -5],
 	'American Samoa': [10, 0],
 };
 
@@ -130,6 +131,9 @@ const CountyMap = (props) => {
 					style={{ fill: '#202020' }}
 					alignmentBaseline='middle'
 					transform={`translate(${x + dx}, ${y + dy})`}
+					onClick={() => {
+						focusGeo(geo.id, geo);
+					}}
 				>
 					{abbr}
 				</text>

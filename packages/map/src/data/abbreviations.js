@@ -54,4 +54,5 @@ export const abbrs = {
 	'Virgin Islands': 'VI',
 	'Puerto Rico': 'PR',
 	'American Samoa': 'AS',
+	'Commonwealth of the Northern Mariana Islands': 'MP'
 };
