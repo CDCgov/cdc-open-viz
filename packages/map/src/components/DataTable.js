@@ -31,8 +31,7 @@ const DataTable = (props) => {
     applyLegendToRow,
     displayGeoName,
     navigationHandler,
-    viewport,
-    state
+    viewport
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);

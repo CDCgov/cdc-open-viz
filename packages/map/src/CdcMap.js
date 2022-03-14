@@ -888,10 +888,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
-    const titleCase = (string) => {
-        return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
-    }
-
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
