@@ -229,38 +229,73 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter(row => {
-                const val = row[primaryCol]
+            if(typeof obj.legend.specialClasses[0] === 'object'){
+                obj.legend.specialClasses.forEach(specialClass => {
+                    dataSet = dataSet.filter(row => {
+                        const val = String(row[specialClass.key]);
 
-                if( obj.legend.specialClasses.includes(val) ) {
+                        if(specialClass.value === val){
+                            if(undefined === specialClassesHash[val]) {
+                                specialClassesHash[val] = true;
 
-                    // apply the special color to the legend
-                    if(undefined === specialClassesHash[val]) {
-                        specialClassesHash[val] = true
+                                result.push({
+                                    special: true,
+                                    value: val,
+                                    label: specialClass.label
+                                });
 
-                        result.push({
-                            special: true,
-                            value: val
-                        })
+                                result[result.length - 1].color = applyColorToLegend(result.length - 1);
 
-                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                                specialClasses += 1;
+                            }
 
-                        specialClasses += 1
-                    }
-                
-                    let specialColor = '';
+                            let specialColor = '';
+                            
+                            // color the state if val is in row 
+                            specialColor = result.findIndex(p => p.value === val)
+
+                            newLegendMemo.set( hashObj(row), specialColor)
+
+                            return false;
+                        }
+
+                        return true;
+                    });
+                });
+            } else {
+                dataSet = dataSet.filter(row => {
+                    const val = row[primaryCol]
+
+                    if( obj.legend.specialClasses.includes(val) ) {
+
+                        // apply the special color to the legend
+                        if(undefined === specialClassesHash[val]) {
+                            specialClassesHash[val] = true;
+
+                            result.push({
+                                special: true,
+                                value: val
+                            });
+
+                            result[result.length - 1].color = applyColorToLegend(result.length - 1);
+
+                            specialClasses += 1;
+                        }
                     
-                    // color the state if val is in row 
-                    if ( Object.values(row).includes(val) ) {
-                        specialColor = result.findIndex(p => p.value === val)
+                        let specialColor = '';
+                        
+                        // color the state if val is in row 
+                        if ( Object.values(row).includes(val) ) {
+                            specialColor = result.findIndex(p => p.value === val)
+                        }
+                        newLegendMemo.set( hashObj(row), specialColor)
+
+                        return false
                     }
-                    newLegendMemo.set( hashObj(row), specialColor)
 
-                    return false
-                }
-
-                return true
-            })
+                    return true
+                })
+            }
         }
 
         // Category
@@ -325,7 +360,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             return result
         }
 
-        let legendNumber = number
+        let uniqueValues = {};
+        dataSet.forEach(datum => {
+            uniqueValues[datum[primaryCol]] = true;
+        });
+
+        let legendNumber = Math.min(number, Object.keys(uniqueValues).length);
 
         // Separate zero
         if(true === obj.legend.separateZero) {
@@ -408,7 +448,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Equal Interval
         if(type === 'equalinterval') {
-            dataSet = dataSet.filter(row => row[primaryCol])
+            dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
@@ -700,7 +740,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
-            if (false === state.legend.specialClasses.includes(value)) {
+            if (false === state.legend.specialClasses.includes(String(value))) {
                 formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
             }
         }
@@ -756,7 +796,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     let label = column.label.length > 0 ? column.label : '';
 
-                    let value = displayDataAsText(row[column.name], columnKey);
+                    let value;
+
+                    if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                        for(let i = 0; i < state.legend.specialClasses.length; i++){
+                            if(String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
+                                value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!value){
+                        value = displayDataAsText(row[column.name], columnKey);
+                    }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
                         toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
@@ -779,6 +832,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         return toolTipText
 
+    }
+
+    const titleCase = (string) => {
+        return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
     }
 
     // This resets all active legend toggles.
@@ -864,7 +921,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = dict[value]
         }
 
-        return value
+        return titleCase(value);
     }
 
     const navigationHandler = (urlString) => {
