@@ -53,16 +53,7 @@ export default function DataTable() {
   
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
-    const newTableColumns = []/*[{
-      Header: '',
-      Cell: ({ row }) => {
-        return (
-          <>
-          </>
-        )
-      },
-      id: 'series-label'
-    }];*/
+    const newTableColumns = [];
 
     Object.keys(data[0]).map((key) => {
         const newCol = {
@@ -85,7 +76,7 @@ export default function DataTable() {
   }, [config]);
 
   const tableData = useMemo(
-    () => config.data,
+    () => data,
     [config.data]
   );
 

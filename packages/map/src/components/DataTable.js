@@ -16,6 +16,7 @@ import ConfigureTab from '../../../editor/src/components/ConfigureTab';
 
 const DataTable = (props) => {
   const {
+    state,
     tableTitle,
     indexTitle,
     mapTitle,
@@ -182,6 +183,13 @@ const DataTable = (props) => {
           id: column,
           accessor: (row) => {
             if (runtimeData) {
+              if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                for(let i = 0; i < state.legend.specialClasses.length; i++){
+                  if(String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
+                    return state.legend.specialClasses[i].label;
+                  }
+                }
+              }
               return runtimeData[row][columns[column].name] ?? null;
             }
 

@@ -52,7 +52,7 @@ const Sidebar = (props) => {
 
     const entryMin = addCommas(entry.min);
 
-    let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
+    let formattedText = `${prefix + entryMin + suffix}${entryMax !== entryMin ? ` - ${prefix + entryMax + suffix}` : ''}`;
 
     // If interval, add some formatting
     if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
@@ -72,7 +72,7 @@ const Sidebar = (props) => {
     let legendLabel = formattedText;
 
     if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.value;
+      legendLabel = entry.label || entry.value;
     }
 
     return (
