@@ -38,7 +38,7 @@ export default function ChooseTab() {
             isSubType = (subType === config.visualizationType)
         }
 
-        if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart') isSubType = true;
+        if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'html-include') isSubType = true;
 
         let classNames = (config.type === type && isSubType) ? 'active' : ''
 
@@ -81,6 +81,7 @@ export default function ChooseTab() {
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
                 <li><IconButton label="Data Bite" type="data-bite" icon={<DataBiteIcon />} /></li>
                 <li><IconButton label="Waffle Chart" type="waffle-chart" icon={ <WaffleChartIcon /> } /></li>
+                <li><IconButton label="HTML Include" type="html-include" icon={ <WaffleChartIcon /> } /></li>
             </ul>
             <div className="heading-2">Charts</div>
             <ul className="grid">

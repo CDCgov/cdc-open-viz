@@ -17,6 +17,7 @@ const iconHash = {
   'data-bite' : <BiteIcon />,
   'Bar': <BarIcon />,
   'waffle-chart' : <GridIcon />,
+  'html-include' : <GridIcon />,
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
   'us' : <UsaIcon />,
@@ -26,6 +27,7 @@ const iconHash = {
 const labelHash = {
   'data-bite': 'Data Bite',
   'waffle-chart' : 'Waffle Chart',
+  'html-include' : 'HTML Include',
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
