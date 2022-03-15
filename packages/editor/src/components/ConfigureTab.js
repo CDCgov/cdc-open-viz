@@ -5,6 +5,7 @@ import CdcMap from '@cdc/map'; // TODO: Lazy load this
 import CdcChart from '@cdc/chart'; // TODO: Lazy load this
 import CdcDataBite from '@cdc/data-bite';
 import CdcWaffleChart from '@cdc/waffle-chart'
+import CdcHtmlInclude from '@cdc/html-include'
 
 import '../scss/configure-tab.scss';
 
@@ -45,6 +46,12 @@ export default function ConfigureTab({containerEl}) {
             return (
                 <ErrorBoundary component="CdcDashboard">
                     <CdcWaffleChart isEditor={true} config={config} setConfig={setTempConfig} />
+                </ErrorBoundary>
+            )
+        case 'html-include':
+            return (
+                <ErrorBoundary component="CdcDashboard">
+                    <CdcHtmlInclude isEditor={true} config={config} setConfig={setTempConfig} />
                 </ErrorBoundary>
             )
         default:
