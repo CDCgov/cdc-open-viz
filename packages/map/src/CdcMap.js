@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import useActiveElement from './hooks/useActiveElement';
 
 // IE11
 import 'core-js/stable'
@@ -118,6 +119,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
+
+    // *******START SCREEN READER DEBUG*******
+    // const focusedElement = useActiveElement();
+
+    // useEffect(() => {
+    //     if (focusedElement) {
+    //         focusedElement.value && console.log(focusedElement.value);
+    //     }
+    //     console.log(focusedElement);
+    // }, [focusedElement])
+    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -1149,6 +1161,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     if (!mapProps.data || !state.data) return <Loading />;
 
+    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
+    
+
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1175,7 +1190,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor}>
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
 						{parse(title)}
 					</div>
 				</header>
@@ -1201,8 +1216,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-nav' className='cdcdataviz-sr-only' href={state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`}>
-                        Skip geography container
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                        Skip Over Map Container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
                         {currentViewport && (
