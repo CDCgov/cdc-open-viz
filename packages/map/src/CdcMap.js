@@ -103,14 +103,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
-    const [currentViewport, setCurrentViewport] = useState('lg')
+    const [currentViewport, setCurrentViewport] = useState()
     const [runtimeFilters, setRuntimeFilters] = useState([])
     const [runtimeLegend, setRuntimeLegend] = useState([])
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
-    
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -130,7 +130,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // United States check
             if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name]
+                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -455,11 +455,28 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         if(hash) filters.fromHash = hash
 
-        obj.filters.forEach(({columnName, label, active}, idx) => {
+        obj?.filters.forEach(({columnName, label, active, values}, idx) => {
             if(undefined === columnName) return
 
             let newFilter = runtimeFilters[idx]
-            let values = getUniqueValues(state.data, columnName)
+
+            const sortAsc = (a, b) => {
+                return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+            };
+
+            const sortDesc = (a, b) => {
+                return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+            };
+
+            values = getUniqueValues(state.data, columnName)
+
+            if(obj.filters[idx].order === 'asc') {
+                values = values.sort(sortAsc)
+            }
+
+            if(obj.filters[idx].order === 'desc') {
+                values = values.sort(sortDesc)
+            }
 
             if(undefined === newFilter) {
                 newFilter = {}
@@ -486,9 +503,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 value : hash
             });
         }
+        
 
         obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
+
+            // When on a single state map filter runtime data by state
+            if (
+                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                obj.general.geoType === 'single-state'
+            ) {
+                return false;
+            }
+
 
             if(row[obj.columns.primary.name]) {
                 row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
@@ -497,7 +524,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
-                if ( undefined !== navigateUrl ) {
+                
+                if ( undefined !== navigateUrl && typeof navigateUrl === "string" ) {
                     // Strip hidden characters before we check length
                     navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
                 }
@@ -507,7 +535,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Filters
-            if(filters.length) {
+            if(filters?.length) {
                 for(let i = 0; i < filters.length; i++) {
                     const {columnName, active} = filters[i]
 
@@ -704,7 +732,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
-        let stateOrCounty = state.general.geoType === 'us' ? 'State' : 'County';
+        let stateOrCounty = 
+            state.general.geoType === 'us' ? 'State: ' : 
+            (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
+            '';
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
@@ -713,7 +744,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
         }
         
-        toolTipText += `<strong>${stateOrCounty}: ${displayGeoName(geoName)}</strong>`
+        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
@@ -800,25 +831,29 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
+    const titleCase = (string) => {
+        return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
+    }
+
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
 
         // Map to first item in values array which is the preferred label
         if(stateKeys.includes(value)) {
-            value = supportedStates[key][0]
+            value = titleCase(supportedStates[key][0])
         }
 
         if(territoryKeys.includes(value)) {
-            value = supportedTerritories[key][0]
+            value = titleCase(supportedTerritories[key][0])
         }
 
         if(countryKeys.includes(value)) {
-            value = supportedCountries[key][0]
+            value = titleCase(supportedCountries[key][0])
         }
 
         if(countyKeys.includes(value)) {
-            value = supportedCounties[key]
+            value = titleCase(supportedCounties[key])
         }
 
         const dict = {
@@ -872,12 +907,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const validateFipsCodeLength = (newState) => {
-        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState.data) {
+        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
 
-            newState.data.forEach(dataPiece => {
-                debugger;
-                if(newState.columns.geo.name in dataPiece && dataPiece[newState.columns.geo.name].length === 4) {
-                    dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+            newState?.data.forEach(dataPiece => {
+                if(dataPiece[newState.columns.geo.name]) {
+                    if(!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
+                        dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
+                    }
                 }
             })
         }
@@ -903,8 +939,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let newData = await fetchRemoteData(newState.dataUrl)
 
             if(newData && newState.dataDescription) {
-                newData = transform.autoStandardize(data);
-                newData = transform.developerStandardize(data, newState.dataDescription);
+                newData = transform.autoStandardize(newData);
+                newData = transform.developerStandardize(newData, newState.dataDescription);
             }
 
             if(newData) {
@@ -937,7 +973,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
 
-        //validateFipsCodeLength(newState);
+        validateFipsCodeLength(newState);
         setState(newState)
 
         // Done loading
@@ -967,6 +1003,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        if (state.data) {
+            let newData = generateRuntimeData(state);
+            setRuntimeData(newData);
+        }
+    }, [state.general.statePicked]);
+
 
 
     // When geotype changes
@@ -1006,16 +1050,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             separateZero: state.legend.separateZero ?? false,
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
-            geoType: state.general.geoType
+            geoType: state.general.geoType,
+            data: state.data
         })
 
-        // Legend
-        if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-            const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
-            setRuntimeLegend(legend)
-        }
-
         const hashData = hashObj({
+            columns: state.columns,
             geoType: state.general.geoType,
             type: state.general.type,
             geo: state.columns.geo.name,
@@ -1024,18 +1064,35 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...runtimeFilters
         })
 
-        console.log('Does hashData === runtimeData.fromHash: ', hashData === runtimeData.fromHash);
-
         // Data
+        let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(newRuntimeData) 
+        }
+
+        // Legend
+        if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
+            const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
+            setRuntimeLegend(legend)
         }
     }, [state])
 
     useEffect(() => {
+        const hashLegend = hashObj({
+            color: state.color,
+            customColors: state.customColors,
+            numberOfItems: state.legend.numberOfItems,
+            type: state.legend.type,
+            separateZero: state.legend.separateZero ?? false,
+            categoryValuesOrder: state.legend.categoryValuesOrder,
+            specialClasses: state.legend.specialClasses,
+            geoType: state.general.geoType,
+            data: state.data
+        })
+        
         // Legend - Update when runtimeData does
-        if(undefined === runtimeData.init) {
+        if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
             setRuntimeLegend(legend)
         }
@@ -1091,9 +1148,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
+        titleCase
     }
 
-    if (!mapProps.data || !state.data ) return <Loading />;
+    if (!mapProps.data || !state.data) return <Loading />;
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1104,13 +1162,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					setState={setState}
 					loadConfig={loadConfig}
 					setParentConfig={setConfig}
+                    setRuntimeFilters={setRuntimeFilters}
 					runtimeFilters={runtimeFilters}
 					runtimeLegend={runtimeLegend}
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			<section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-				{['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
 						place='right'
@@ -1146,35 +1205,42 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
+                    <a id='skip-nav' className='cdcdataviz-sr-only' href={`#dataTableSection`}>
+                        Skip geography container
+                    </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
-						{modal && (
-							<Modal
-								type={general.type}
-								viewport={currentViewport}
-								applyTooltipsToGeo={applyTooltipsToGeo}
-								applyLegendToRow={applyLegendToRow}
-								capitalize={state.tooltips.capitalizeLabels}
-								content={modal}
-							/>
-						)}
-                        {'single-state' === general.geoType && (
-                            <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                        {currentViewport && (
+                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                                {modal && (
+                                    <Modal
+                                        type={general.type}
+                                        viewport={currentViewport}
+                                        applyTooltipsToGeo={applyTooltipsToGeo}
+                                        applyLegendToRow={applyLegendToRow}
+                                        capitalize={state.tooltips.capitalizeLabels}
+                                        content={modal}
+                                    />
+                                )}
+                                {'single-state' === general.geoType && (
+                                    <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'us' === general.geoType && (
+                                    <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'world' === general.geoType && (
+                                    <WorldMap supportedCountries={supportedCountries} {...mapProps} />
+                                )}
+                                {'us-county' === general.geoType && (
+                                    <CountyMap
+                                        supportedCountries={supportedCountries}
+                                        {...mapProps}
+                                    />
+                                )}
+                                {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                            </section>
+                        
                         )}
-						{'us' === general.geoType && (
-							<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
-						)}
-						{'world' === general.geoType && (
-							<WorldMap supportedCountries={supportedCountries} {...mapProps} />
-						)}
-						{'us-county' === general.geoType && (
-							<CountyMap
-								supportedCountries={supportedCountries}
-								{...mapProps}
-							/>
-						)}
-						{'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-						{/* { mapToShow } */}
-					</section>
+                        </section>
 
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
@@ -1224,7 +1290,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>
+			</section>}
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>

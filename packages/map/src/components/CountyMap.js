@@ -12,6 +12,7 @@ import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
 import ReactTooltip from 'react-tooltip';
 import { abbrs } from '../data/abbreviations';
+import useActiveElement from './../hooks/useActiveElement';
 
 const offsets = {
 	Vermont: [50, -8],
@@ -60,15 +61,16 @@ const nudges = {
 };
 
 function CountyMapChecks(prevState, nextState) {
+	const equalColumnName = prevState.state.general.type && nextState.state.general.type;
+	const equalNavColumn = prevState.state.columns.navigate && nextState.state.columns.navigate;
 	const equalLegend = prevState.runtimeLegend === nextState.runtimeLegend;
 	const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor; // update when geoborder color changes
 	const equalMapColors = prevState.state.color === nextState.state.color; // update when map colors change
 	const equalData = prevState.data === nextState.data; // update when data changes
-	return equalMapColors && equalData && equalBorderColors && equalLegend ? true : false;
+	return equalMapColors && equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn ? true : false;
 }
 
 const CountyMap = (props) => {
-	console.log('rendering county map');
 
 	let mapData = states.concat(counties);
 
@@ -84,8 +86,7 @@ const CountyMap = (props) => {
 	} = props;
 
 	useEffect(() => {
-		if(containerEl && containerEl.className) {
-			console.log('containerEl', containerEl)
+		if(containerEl) {
 			if (containerEl.className.indexOf('loaded') === -1) {
 				containerEl.className += ' loaded';
 			}
@@ -189,6 +190,8 @@ const CountyMap = (props) => {
 		let allCounties = document.querySelectorAll('.county path');
 		let currentState = document.querySelector(`.state--${myState.id}`);
 		let otherStates = document.querySelectorAll(`.state:not(.state--${myState.id})`);
+		let svgContainer = document.querySelector('.svg-container')
+		svgContainer.setAttribute('data-scaleZoom', newScaleWithHypot)
 
 		const state = testJSON.objects.states.geometries.filter((el, index) => {
 			return el.id === myState.id;
@@ -198,6 +201,7 @@ const CountyMap = (props) => {
 
 		currentState.style.display = 'none';
 
+		allStates.forEach((state) => (state.style.strokeWidth = 0.75 / newScaleWithHypot));
 		allCounties.forEach((county) => (county.style.strokeWidth = 0.75 / newScaleWithHypot));
 		otherStates.forEach((el) => (el.style.display = 'block'));
 
@@ -208,19 +212,16 @@ const CountyMap = (props) => {
 		// Set Focus Border
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
-		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / newScaleWithHypot);
+		//focusedBorderPath.current.setAttribute('stroke-width', 0.75 / newScaleWithHypot);
 		//focusedBorderPath.current.setAttribute('stroke', focusedBorderColor)
 	};
 
 	const onReset = (e) => {
 		e.preventDefault();
+		const svg = document.querySelector('.svg-container')
 
-		const handleBorderPath = () => {
-			focusedBorderPath.current.style.display = 'none';
-			focusedBorderPath.current.setAttribute('stroke', geoStrokeColor);
-			focusedBorderPath.current.style.strokeWidth = startingLineWidth;
-			focusedBorderPath.current.setAttribute('stroke-width', startingLineWidth);
-		};
+		svg.setAttribute('data-scaleZoom', 0)
+
 
 		const allStates = document.querySelectorAll('.state path');
 		const allCounties = document.querySelectorAll('.county path');
@@ -231,11 +232,10 @@ const CountyMap = (props) => {
 		let otherStates = document.querySelectorAll(`.state--inactive`);
 		otherStates.forEach((el) => (el.style.display = 'none'));
 		allCounties.forEach((el) => (el.style.strokeWidth = 0.85));
-		allStates.forEach((state) => state.setAttribute('stroke-width', 0.85));
+		allStates.forEach((state) => state.setAttribute('stroke-width', .75 / .85 ));
 
 		mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`);
 
-		handleBorderPath();
 		// reset button
 		resetButton.current.style.display = 'none';
 	};
@@ -247,7 +247,12 @@ const CountyMap = (props) => {
 	}
 
 	function setStateEnter(id) {
+		const svg = document.querySelector('.svg-container')
+		const scale = svg.getAttribute('data-scaleZoom');
+
 		let myState = id.substring(0, 2);
+		const allStates = document.querySelectorAll('.state path');
+
 
 		let state = testJSON.objects.states.geometries.filter((el, index) => {
 			return el.id === myState;
@@ -257,7 +262,12 @@ const CountyMap = (props) => {
 		focusedBorderPath.current.style.display = 'block';
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
 		focusedBorderPath.current.setAttribute('stroke', '#000');
-		focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale);
+
+		if(scale) {
+			allStates.forEach( state => state.setAttribute('stroke-width', 0.75 / scale))
+			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale );
+		}
+		
 	}
 
 	const StateLines = memo(({ stateLines, lineWidth, geoStrokeColor }) => {
@@ -295,7 +305,6 @@ const CountyMap = (props) => {
 		let output = [];
 		output.push(
 			counties.map(({ feature: geo, path = '' }) => {
-				console.log('County Maps: this needs improvement.');
 				const key = geo.id + '-group';
 
 				// COUNTY GROUPS
@@ -350,6 +359,7 @@ const CountyMap = (props) => {
 
 					return (
 						<g
+							tabIndex="0"
 							data-for='tooltip'
 							data-tip={tooltip}
 							key={`county--${key}`}
@@ -456,7 +466,7 @@ const CountyMap = (props) => {
 
 				return (
 					<React.Fragment key={`state--${key}`}>
-						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles}>
+						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="0">
 							<>
 								<path
 									tabIndex={-1}
@@ -495,8 +505,8 @@ const CountyMap = (props) => {
 		const states = geographies.slice(0, 56);
 		const counties = geographies.slice(56);
 		let geosJsx = [];
-		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} />);
-		geosJsx.push(<StateOutput geographies={geographies} states={states} />);
+		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		geosJsx.push(<StateOutput geographies={geographies} states={states} key="state-key" />);
 		geosJsx.push(
 			<StateLines
 				key='stateLines'
@@ -505,15 +515,13 @@ const CountyMap = (props) => {
 				stateLines={stateLines}
 			/>
 		);
-		geosJsx.push(<FocusedStateBorder />);
+		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
 		return geosJsx;
 	};
 
-
 	return (
 		<ErrorBoundary component='CountyMap'>
-      {/* <Loading /> */}
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container'>
+			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
 				<rect
 					className='background center-container ocean'
 					width={WIDTH}
@@ -521,6 +529,7 @@ const CountyMap = (props) => {
 					fillOpacity={1}
 					fill='white'
 					onClick={(e) => onReset(e)}
+					tabIndex="0"
 				></rect>
 				<CustomProjection
 					data={mapData}
@@ -541,7 +550,7 @@ const CountyMap = (props) => {
 					}}
 				</CustomProjection>
 			</svg>
-			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }}>
+			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }} tabIndex="0">
 				Reset Zoom
 			</button>
 		</ErrorBoundary>

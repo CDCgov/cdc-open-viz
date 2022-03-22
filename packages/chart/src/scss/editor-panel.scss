@@ -310,6 +310,7 @@
     display: block;
     font-size: .8em;
     font-weight: 600;
+    user-select: none;
 
     &:not(:first-child) {
       margin-top: 1em;

@@ -206,6 +206,7 @@ const SingleStateMap = (props) => {
     };
 
 	const countyOutput = ( counties.map(( county ) => {
+    
 
     // Map the name from the geo data with the appropriate key for the processed data
     let geoKey = county.id;
@@ -224,6 +225,8 @@ const SingleStateMap = (props) => {
 
     const geoDisplayName = displayGeoName(geoKey);
 
+    // For some reason, these two geos are breaking the display.
+    if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null;
 
     const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
     

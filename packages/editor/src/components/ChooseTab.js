@@ -49,6 +49,7 @@ export default function ChooseTab() {
                 dataFileName: config.dataFileName,
                 dataFileSourceType: config.dataFileSourceType,
                 dataDescription: config.dataDescription,
+                dataUrl: config.dataUrl,
                 newViz: true,
                 type
             }
@@ -91,7 +92,7 @@ export default function ChooseTab() {
             <ul className="grid">
                 <li><IconButton label="U.S. State- or County-Level" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
-                {/* <li><IconButton label="U.S. State" type="map" subType="single-state" icon={ <AlabamaGraphic /> } /></li> */}
+                <li><IconButton label="U.S. State" type="map" subType="single-state" icon={ <AlabamaGraphic /> } /></li>
             </ul>
         </div>
     )

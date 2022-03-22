@@ -18,8 +18,9 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 1. Start by cloning this repo and running `yarn install` at the root. 
 2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-3. Run `lerna run build` to build all of the packages in the correct order.
-4. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
+3. (If using Windows) Change the import from 'react-table' to 'react-table/src' in the DataTable component of these pacakges: Map, Chart, Editor, Dashboard (TODO: fix this)
+4. Run `lerna run build` to build all of the packages in the correct order.
+5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
 
 ## Development Guidelines
 
