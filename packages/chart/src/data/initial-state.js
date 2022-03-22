@@ -5,6 +5,7 @@ export default {
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
   barHasBorder: 'false',
+  isLollipopChart: false,
   padding: {
     left: 5,
     right: 5

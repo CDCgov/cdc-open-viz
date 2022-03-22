@@ -2,7 +2,6 @@
     "title": "Planet Radius (Combo Example)",
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
-    "barHeight": "75",
 	"visualizationSubType": "horizontal",
     "isLollipopChart": true,
     "barHasBorder": "true",
@@ -26,11 +25,7 @@
         "label": "Planet",
         "dataKey": "name",
         "tickRotation": 30,
-        "size": 75,
-        "hideAxis": false
-    },
-    "legend": {
-        "hide": false
+        "size": 75
     },
     "table": {
         "label": "Data Table",
