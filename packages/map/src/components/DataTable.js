@@ -162,9 +162,10 @@ const DataTable = (props) => {
           href={URL.createObjectURL(blob)}
           aria-label="Download this data in a CSV file format."
           className={`${headerColor} btn btn-download no-border`}
-          id={mapTitle ? `btn__${mapTitle.replace(/\s/g, '')}` : '#!' }
+          id={`${skipId}`}
           data-html2canvas-ignore
           role="button"
+          tabIndex="-1"
         >
           Download Data (CSV)
         </a>
@@ -276,13 +277,14 @@ const DataTable = (props) => {
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
-  const skipId = mapTitle ? mapTitle?.replace(/\s/g, '') : '#!'
+  const rand = Math.random().toString(16).substr(2, 8);
+  const skipId = `btn__${rand}`
 
   if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
       <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-        <a id='skip-nav' className='cdcdataviz-sr-only' href={`#btn__${skipId}`}>
+        <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
       <div
@@ -309,12 +311,19 @@ const DataTable = (props) => {
                 {headerGroup.headers.map((column) => (
                   <th tabIndex="0"
                     title={column.Header}
+                    role="columnheader"
+                    scope="col"
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}
                     onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
-                    aria-sort={column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'other' }
+                    //aria-sort={column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'none' }
+                    {...(column.isSorted ? column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' } : null)}
+
                   >
                     {column.render('Header')}
+                    <button>
+                      <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                    </button>
                     <div {...column.getResizerProps()} className="resizer" />
                   </th>
                 ))}
