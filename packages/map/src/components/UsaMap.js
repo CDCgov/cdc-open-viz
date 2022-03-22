@@ -68,7 +68,8 @@ const UsaMap = (props) => {
     applyLegendToRow,
     displayGeoName,
     supportedTerritories,
-    rebuildTooltips
+    rebuildTooltips,
+    titleCase
   } = props;
 
   // "Choose State" options
@@ -307,6 +308,7 @@ const UsaMap = (props) => {
       applyTooltipsToGeo={applyTooltipsToGeo}
       displayGeoName={displayGeoName}
       applyLegendToRow={applyLegendToRow}
+      titleCase={titleCase}
     />)
 
     return geosJsx;

@@ -11,7 +11,11 @@
 		"showTitle": true,
 		"geoBorderColor": "darkGray",
 		"showDownloadButton": true,
-		"expandDataTable": false
+		"expandDataTable": false,
+		"statePicked": {
+			"stateName": "Virginia",
+			"fipsCode": "06"
+		}
 	},
 	"color": "pinkpurple",
 	"columns": {
