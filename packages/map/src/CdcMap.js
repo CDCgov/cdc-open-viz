@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import useActiveElement from './hooks/useActiveElement';
 
 // IE11
 import 'core-js/stable'
@@ -118,6 +119,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
+
+    // *******START SCREEN READER DEBUG*******
+    // const focusedElement = useActiveElement();
+
+    // useEffect(() => {
+    //     if (focusedElement) {
+    //         focusedElement.value && console.log(focusedElement.value);
+    //     }
+    //     console.log(focusedElement);
+    // }, [focusedElement])
+    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -802,6 +814,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         for(let i = 0; i < state.legend.specialClasses.length; i++){
                             if(String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
                                 value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                                break;
                             }
                         }
                     }
@@ -831,6 +844,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         return toolTipText
 
+    }
+
+    const titleCase = (string) => {
+        return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
     }
 
     // This resets all active legend toggles.
@@ -889,19 +906,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Map to first item in values array which is the preferred label
         if(stateKeys.includes(value)) {
-            value = supportedStates[key][0]
+            value = titleCase(supportedStates[key][0])
         }
 
         if(territoryKeys.includes(value)) {
-            value = supportedTerritories[key][0]
+            value = titleCase(supportedTerritories[key][0])
         }
 
         if(countryKeys.includes(value)) {
-            value = supportedCountries[key][0]
+            value = titleCase(supportedCountries[key][0])
         }
 
         if(countyKeys.includes(value)) {
-            value = supportedCounties[key]
+            value = titleCase(supportedCounties[key])
         }
 
         const dict = {
@@ -912,7 +929,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = dict[value]
         }
 
-        return value
+        return titleCase(value);
     }
 
     const navigationHandler = (urlString) => {
@@ -1192,9 +1209,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
+        titleCase
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
+
+    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
+    
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1211,8 +1232,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && runtimeLegend.length !== 0 && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-				{['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
 						place='right'
@@ -1222,7 +1243,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor}>
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
 						{parse(title)}
 					</div>
 				</header>
@@ -1248,35 +1269,42 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-					{currentViewport && (<section className='geography-container' aria-hidden='true' ref={mapSvg}>
-                        {modal && (
-							<Modal
-								type={general.type}
-								viewport={currentViewport}
-								applyTooltipsToGeo={applyTooltipsToGeo}
-								applyLegendToRow={applyLegendToRow}
-								capitalize={state.tooltips.capitalizeLabels}
-								content={modal}
-							/>
-						)}
-                        {'single-state' === general.geoType && (
-                            <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                        Skip Over Map Container
+                    </a>
+					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                        {currentViewport && (
+                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                                {modal && (
+                                    <Modal
+                                        type={general.type}
+                                        viewport={currentViewport}
+                                        applyTooltipsToGeo={applyTooltipsToGeo}
+                                        applyLegendToRow={applyLegendToRow}
+                                        capitalize={state.tooltips.capitalizeLabels}
+                                        content={modal}
+                                    />
+                                )}
+                                {'single-state' === general.geoType && (
+                                    <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'us' === general.geoType && (
+                                    <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'world' === general.geoType && (
+                                    <WorldMap supportedCountries={supportedCountries} {...mapProps} />
+                                )}
+                                {'us-county' === general.geoType && (
+                                    <CountyMap
+                                        supportedCountries={supportedCountries}
+                                        {...mapProps}
+                                    />
+                                )}
+                                {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                            </section>
+                        
                         )}
-						{'us' === general.geoType && (
-							<UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
-						)}
-						{'world' === general.geoType && (
-							<WorldMap supportedCountries={supportedCountries} {...mapProps} />
-						)}
-						{'us-county' === general.geoType && (
-							<CountyMap
-								supportedCountries={supportedCountries}
-								{...mapProps}
-							/>
-						)}
-						{'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-						{/* { mapToShow } */}
-					</section>)}
+                        </section>
 
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar

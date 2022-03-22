@@ -1387,6 +1387,7 @@ const EditorPanel = (props) => {
 																<select value={specialClass.value} onChange={(e) => {
 																	editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
 																}}>
+																	<option value="">- Select Value -</option>
 																	{columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
 																		<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
 																	))}
@@ -1759,6 +1760,16 @@ const EditorPanel = (props) => {
 											fieldName='indexTitle'
 											label='Index Column Title'
 											placeholder='Location'
+										/>
+										<TextField
+											value={dataTable.caption}
+											updateField={updateField}
+											section='dataTable'
+											fieldName='caption'
+											label='Data Table Caption'
+											placeholder='Data Table'
+											helper='Text that describes the data table for screen'
+											type="textarea"
 										/>
 										<label className='checkbox'>
 											<input
