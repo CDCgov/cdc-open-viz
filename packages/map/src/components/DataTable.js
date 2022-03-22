@@ -10,6 +10,10 @@ import ExternalIcon from '../images/external-link.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
+
+import Loading from '@cdc/core/components/Loading';
+import ConfigureTab from '../../../editor/src/components/ConfigureTab';
+
 const DataTable = (props) => {
   const {
     state,
@@ -33,6 +37,11 @@ const DataTable = (props) => {
   const [expanded, setExpanded] = useState(expandDataTable);
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
+
+  const [ready, setReady] = useState(false)
+
+  const fileName = `${mapTitle}.csv`;
+
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
@@ -133,7 +142,6 @@ const DataTable = (props) => {
   }, [columns.navigate, navigationHandler]);
 
   const DownloadButton = memo(() => {
-    const fileName = `${mapTitle}.csv`;
     const csvData = Papa.unparse(rawData);
 
     const blob = new Blob([csvData], {type:  "text/csv;charset=utf-8;"});
@@ -147,16 +155,20 @@ const DataTable = (props) => {
     }
 
     return (
-      <a
-        download={fileName}
-        onClick={saveBlob}
-        href={URL.createObjectURL(blob)}
-        aria-label="Download this data in a CSV file format."
-        className={`${headerColor} btn btn-download no-border`}
-        data-html2canvas-ignore
-      >
-        Download Data (CSV)
-      </a>
+        <a
+          download={fileName}
+          type="button"
+          onClick={saveBlob}
+          href={URL.createObjectURL(blob)}
+          aria-label="Download this data in a CSV file format."
+          className={`${headerColor} btn btn-download no-border`}
+          id={`${skipId}`}
+          data-html2canvas-ignore
+          role="button"
+          tabIndex="-1"
+        >
+          Download Data (CSV)
+        </a>
     )
   }, [rawData]);
 
@@ -250,6 +262,13 @@ const DataTable = (props) => {
     []
   );
 
+  const mapLookup = {
+    'us-county': 'United States County Map',
+    'single-state': 'State Map',
+    'us': 'United States Map',
+    'world': 'World Map'
+  }
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -258,30 +277,53 @@ const DataTable = (props) => {
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
+  const rand = Math.random().toString(16).substr(2, 8);
+  const skipId = `btn__${rand}`
+
+  if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+        <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
+          Skip Navigation or Skip to Content
+        </a>
       <div
         className={expanded ? 'data-table-heading' : 'collapsed data-table-heading'}
         onClick={() => { setExpanded(!expanded); }}
         tabIndex="0"
         onKeyDown={(e) => { if (e.keyCode === 13) { setExpanded(!expanded); } }}
       >
+ 
         {tableTitle}
       </div>
       <div className="table-container">
-        <table height={expanded ? null : 0} {...getTableProps()} aria-live="assertive" className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!expanded}>
-          <thead>
+        <table 
+          height={expanded ? null : 0} {...getTableProps()} 
+          aria-live="assertive" 
+          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
+          hidden={!expanded}
+          aria-rowcount={state?.data.length ? state.data.length : '-1' }
+        >
+          <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ?  state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
+          <thead style={{position: 'sticky', top: 0, zIndex: 999}}>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
                   <th tabIndex="0"
                     title={column.Header}
+                    role="columnheader"
+                    scope="col"
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}
                     onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                    //aria-sort={column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'none' }
+                    {...(column.isSorted ? column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' } : null)}
+
                   >
                     {column.render('Header')}
+                    <button>
+                      <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                    </button>
                     <div {...column.getResizerProps()} className="resizer" />
                   </th>
                 ))}

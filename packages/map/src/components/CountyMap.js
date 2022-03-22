@@ -12,6 +12,7 @@ import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
 import ReactTooltip from 'react-tooltip';
 import { abbrs } from '../data/abbreviations';
+import useActiveElement from './../hooks/useActiveElement';
 
 const offsets = {
 	Vermont: [50, -8],
@@ -358,6 +359,7 @@ const CountyMap = (props) => {
 
 					return (
 						<g
+							tabIndex="-1"
 							data-for='tooltip'
 							data-tip={tooltip}
 							key={`county--${key}`}
@@ -464,7 +466,7 @@ const CountyMap = (props) => {
 
 				return (
 					<React.Fragment key={`state--${key}`}>
-						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles}>
+						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="-1">
 							<>
 								<path
 									tabIndex={-1}
@@ -519,7 +521,6 @@ const CountyMap = (props) => {
 
 	return (
 		<ErrorBoundary component='CountyMap'>
-      {/* <Loading /> */}
 			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
 				<rect
 					className='background center-container ocean'
@@ -528,6 +529,7 @@ const CountyMap = (props) => {
 					fillOpacity={1}
 					fill='white'
 					onClick={(e) => onReset(e)}
+					tabIndex="0"
 				></rect>
 				<CustomProjection
 					data={mapData}
@@ -548,7 +550,7 @@ const CountyMap = (props) => {
 					}}
 				</CustomProjection>
 			</svg>
-			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }}>
+			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }} tabIndex="0">
 				Reset Zoom
 			</button>
 		</ErrorBoundary>

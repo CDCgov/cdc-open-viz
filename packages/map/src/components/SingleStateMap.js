@@ -123,9 +123,8 @@ const SingleStateMap = (props) => {
   let focusedBorderColor = mapColorPalette[3];
   useEffect(() => rebuildTooltips());
 
-  
   const path = geoPath().projection(projection)
-  
+
   // When choosing a state changes...
   useEffect(() => {
 	  if(state.general.hasOwnProperty('statePicked')) {
@@ -136,7 +135,7 @@ const SingleStateMap = (props) => {
 		let countiesFound = counties.filter( c => c.id.substring(0,2) === state.general.statePicked.fipsCode)
 
 		setCountiesToShow(countiesFound)
-		
+    
 		const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 		const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], statePickedData)
 		const newScale = newProjection.scale();
@@ -206,6 +205,7 @@ const SingleStateMap = (props) => {
     };
 
 	const countyOutput = ( counties.map(( county ) => {
+    
 
     // Map the name from the geo data with the appropriate key for the processed data
     let geoKey = county.id;
@@ -224,6 +224,8 @@ const SingleStateMap = (props) => {
 
     const geoDisplayName = displayGeoName(geoKey);
 
+    // For some reason, these two geos are breaking the display.
+    if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null;
 
     const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
     
@@ -253,6 +255,7 @@ const SingleStateMap = (props) => {
               key={`key--${county.id}`}         
               className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
+              onClick={() => geoClickHandler(geoDisplayName, geoData)}
             >
               <path
                 tabIndex={-1}
