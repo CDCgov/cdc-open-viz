@@ -258,7 +258,8 @@ const EditorPanel = () => {
   }
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
-  const [lollipopShape, setLollipopShape] = useState(config.lollipopShape || 'circle')
+  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
+  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('saturated')
 
   if(loading) {
     return null
@@ -460,15 +461,7 @@ const EditorPanel = () => {
   useEffect(() => {
     updateConfig({
       ...config,
-      yAxis: {
-        ...config.yAxis,
-        hideAxis: true
-      },
-      xAxis: {
-        ...config.xAxis,
-        hideAxis: false
-      },
-      lollipopShape: lollipopShape
+      lollipopShape: lollipopShape,
     })
   }, [config.isLollipopChart, lollipopShape]);
 
@@ -492,6 +485,16 @@ const EditorPanel = () => {
     )
   }, [config])
 
+  const ErrorWithLolliopChart = ({ message }) => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{message}</p>
+        </section>
+      </section>
+    );
+  }
   const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
 
     let filterOrder = filter.values;
@@ -510,6 +513,8 @@ const EditorPanel = () => {
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
+      {config.isLollipopChart && (!config.series || config.series.length > 1) && <ErrorWithLolliopChart message="Lollipop charts must have one data series" />}
+      {/* {config.isLollipopChart && config.yAxis.displayNumbersOnBar && <ErrorWithLolliopChart message="Lollipop charts should not have labels on bars" />} */}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
         <div className="heading-2">Configure Chart</div>
@@ -526,13 +531,13 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
-                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Y-Axis' ]} />
+                    <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
                   }
                   {showLollipopCheckbox &&
                     <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
-                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Y-Axis") &&
-                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label="Display Numbers on Bar" updateField={updateField} />
+                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
@@ -864,30 +869,34 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
 
                   {config.isLollipopChart &&
-                    <label className="header">
-                      <span className="edit-label">Lollipop Shape</span>
-                      <div onChange={(e) => { setLollipopShape(e.target.value) }}>
-                        <label>
-                          <input
-                            type="radio"
-                            name="lollipopShape"
-                            value="circle"
-                            checked={lollipopShape === "circle"}
-                          />
-                          Circle
-                        </label>
-                        <label>
-                          <input
-                            type="radio"
-                            name="lollipopShape"
-                            value="square"
-                            checked={lollipopShape === "square"}
-                          />
-                          Square
-                        </label>
-                      </div>
+                    <>
+                      <label className="header">
+                        <span className="edit-label">Lollipop Shape</span>
+                        <div onChange={(e) => { setLollipopShape(e.target.value) }}>
+                          <label>
+                            <input
+                              type="radio"
+                              name="lollipopShape"
+                              value="circle"
+                              checked={lollipopShape === "circle"}
+                            />
+                            Circle
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              name="lollipopShape"
+                              value="square"
+                              checked={lollipopShape === "square"}
+                            />
+                            Square
+                          </label>
+                        </div>
 
-                    </label>
+                      </label>
+                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'saturated' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'saturated']} />
+                      <Select value={config.lollipopSize ? config.lollipopSize : 'small' } fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={['small', 'medium', 'large']} />
+                    </>
                   }
 
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
