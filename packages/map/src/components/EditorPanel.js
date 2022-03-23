@@ -531,6 +531,15 @@ const EditorPanel = (props) => {
 					},
 				});
 				break;
+			case 'limitDataTableHeight':
+				setState({
+					...state,
+					dataTable: {
+						...state.dataTable,
+						limitHeight: value
+					}
+				});
+				break;
 			case 'chooseState':
 				let fipsCode = Object.keys(supportedStatesFipsCodes).find(
 					(key) => supportedStatesFipsCodes[key] === value
@@ -1786,6 +1795,29 @@ const EditorPanel = (props) => {
 											<span className='edit-label'>Show Table</span>
 											<Helper text='Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.' />
 										</label>
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={ state.dataTable.limitHeight }
+												onChange={(event) => {
+													handleEditorChanges('limitDataTableHeight', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Limit Table Height</span>
+										</label>
+										{state.dataTable.limitHeight &&
+											<TextField
+												value={dataTable.height}
+												updateField={updateField}
+												section='dataTable'
+												fieldName='height'
+												label='Data Table Height'
+												placeholder='Height(px)'
+												type="number"
+												min="0"
+												max="500"
+											/>
+										}
 										<label className='checkbox'>
 											<input
 												type='checkbox'

@@ -296,8 +296,11 @@ const DataTable = (props) => {
  
         {tableTitle}
       </div>
-      <div className="table-container">
-        <table 
+      <div 
+        className="table-container"
+        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflow: 'scroll' } } 
+      >
+        <table
           height={expanded ? null : 0} {...getTableProps()} 
           aria-live="assertive" 
           className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
