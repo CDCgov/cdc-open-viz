@@ -337,9 +337,9 @@ const DataTable = (props) => {
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()}>
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell">
                       {cell.render('Cell')}
                     </td>
                   ))}
