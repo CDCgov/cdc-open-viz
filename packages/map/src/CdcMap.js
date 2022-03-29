@@ -110,6 +110,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
 
+
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -520,12 +522,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             values = getUniqueValues(state.data, columnName)
 
+            console.log('obj', obj.filters)
+
             if(obj.filters[idx].order === 'asc') {
                 values = values.sort(sortAsc)
             }
 
             if(obj.filters[idx].order === 'desc') {
                 values = values.sort(sortDesc)
+            }
+
+            if(obj.filters[idx].order === 'cust') {
+                if(obj.filters[idx]?.values.length > 0) {
+                    values = obj.filters[idx].values
+                }
             }
 
             if(undefined === newFilter) {

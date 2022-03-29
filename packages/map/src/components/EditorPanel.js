@@ -154,7 +154,10 @@ const EditorPanel = (props) => {
 		filterItem.order = 'cust'
 		filters[filterIndex] = filterItem
 
-		setRuntimeFilters(filters)
+		setState({
+			...state,
+			filters
+		});
 
 	};
 
