@@ -297,7 +297,7 @@ const DataTable = (props) => {
       </div>
       <div 
         className="table-container"
-        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflow: 'scroll' } } 
+        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } } 
       >
         <table
           height={expanded ? null : 0} {...getTableProps()} 
