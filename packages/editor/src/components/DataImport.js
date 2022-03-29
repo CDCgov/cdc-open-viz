@@ -35,11 +35,11 @@ export default function DataImport() {
 
   const transform = new DataTransform()
 
-  const [ externalURL, setExternalURL ] = useState('')
+  const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
 
-  const [ keepURL, setKeepURL ] = useState(config.dataUrl || false)
+  const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -47,8 +47,12 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    if (true === keepURL) {
-      setConfig({ ...config, dataUrl: debouncedExternalURL })
+    if (false !== keepURL) {
+      setConfig({ ...config, dataUrl: debouncedExternalURL || externalURL })
+    } else {
+      let newConfig = {...config};
+      delete newConfig.dataUrl;
+      setConfig(newConfig);
     }
   }, [ debouncedExternalURL, keepURL ])
 
@@ -249,7 +253,7 @@ export default function DataImport() {
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)}/> Always
+          <input type="checkbox" id="keep-url" defaultChecked={keepURL !== false} onClick={() => setKeepURL(!keepURL)}/> Always
           load from URL (normally will only pull once)
         </label>
       </>
