@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
-import useActiveElement from './hooks/useActiveElement';
 
 // IE11
 import 'core-js/stable'
@@ -34,7 +33,6 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import Waiting from '@cdc/core/components/Waiting'
 
 
 // Child Components

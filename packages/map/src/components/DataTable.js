@@ -12,7 +12,6 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 
 
 import Loading from '@cdc/core/components/Loading';
-import ConfigureTab from '../../../editor/src/components/ConfigureTab';
 
 const DataTable = (props) => {
   const {
