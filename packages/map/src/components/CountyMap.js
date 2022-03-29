@@ -1,18 +1,14 @@
-import React, { useState, useEffect, memo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, memo, useRef } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import { CustomProjection } from '@visx/geo';
-import chroma from 'chroma-js';
 import colorPalettes from '../data/color-palettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
-import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
-import ReactTooltip from 'react-tooltip';
 import { abbrs } from '../data/abbreviations';
-import useActiveElement from './../hooks/useActiveElement';
 
 const offsets = {
 	Vermont: [50, -8],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'

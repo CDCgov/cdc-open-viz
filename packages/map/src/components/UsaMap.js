@@ -9,7 +9,6 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
-import { supportedStates, stateToIso  } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
