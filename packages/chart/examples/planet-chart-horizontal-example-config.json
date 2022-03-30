@@ -6,6 +6,7 @@
     "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],
+    "fontSize": "small",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -19,7 +20,7 @@
     "yAxis": {
         "label": "Measurement (1000km)",
         "displayNumbersOnBar": false,
-        "labelPlacement": "On Date/Category Axis"
+        "labelPlacement": "Below Bar"
     },
     "xAxis": {
         "label": "Planet",

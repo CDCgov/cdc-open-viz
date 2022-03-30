@@ -462,7 +462,7 @@ const EditorPanel = () => {
     if(config.visualizationSubType === 'horizontal') {
       updateConfig({
         ...config,
-        lollipopShape: lollipopShape,
+        lollipopShape: lollipopShape
       })
     }
   }, [config.isLollipopChart, lollipopShape]);
@@ -478,7 +478,8 @@ const EditorPanel = () => {
         xAxis: {
           ...config.xAxis,
           hideAxis: true
-        }
+        },
+        fontSize: "small"
       })
     }
 
@@ -487,11 +488,13 @@ const EditorPanel = () => {
         ...config,
         xAxis: {
           ...config.xAxis,
-          hideAxis: false
+          hideAxis: false,
+          fontSize: "small"
         },
         yAxis: {
           ...config.yAxis,
-          hideAxis: true
+          hideAxis: true,
+          fontSize: "small"
         }
       })
     }
@@ -540,6 +543,10 @@ const EditorPanel = () => {
     filters[filterIndex] = filterItem
     setFilteredData(filters)
   };
+
+  if(config.isLollipopChart && config.series.length > 1) {
+    config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series';
+  }
 
   return (
     <ErrorBoundary component="EditorPanel">
