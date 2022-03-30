@@ -312,7 +312,7 @@ const UsaMap = (props) => {
 
     return geosJsx;
   };
-
+  
   return (
     <ErrorBoundary component="UsaMap">
       <svg viewBox="0 0 880 500">
