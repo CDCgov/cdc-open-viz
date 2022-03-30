@@ -322,7 +322,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       { config.visualizationSubType === "horizontal" && isLabelBelowBar &&
                       <>
                         <Text
-                            x={ 0 } // padding
+                            x={ config.yAxis.hideAxis ? 0 : 5 } // padding
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 3: barWidth * config.series.length + 7 }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
