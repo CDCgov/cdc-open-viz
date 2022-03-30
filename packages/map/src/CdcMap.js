@@ -522,8 +522,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             values = getUniqueValues(state.data, columnName)
 
-            console.log('obj', obj.filters)
-
             if(obj.filters[idx].order === 'asc') {
                 values = values.sort(sortAsc)
             }
