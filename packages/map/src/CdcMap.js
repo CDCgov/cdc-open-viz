@@ -719,16 +719,29 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Reset active legend toggles
         resetLegendToggles()
 
-        let filters = [...runtimeFilters]
+        try {
 
-        filters[idx] = {...filters[idx]}
+            const isEmpty = (obj) => {
+                return Object.keys(obj).length === 0;
+            }
 
-        filters[idx].active = activeValue
+            let filters = [...runtimeFilters]
 
-        const newData = generateRuntimeData(state, filters)
+            filters[idx] = { ...filters[idx] }
 
-        setRuntimeData(newData)
-        setRuntimeFilters(filters)
+            filters[idx].active = activeValue
+            const newData = generateRuntimeData(state, filters)
+            
+            // throw an error if newData is empty
+            if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
+
+            // set the runtime filters and data
+            setRuntimeData(newData)
+            setRuntimeFilters(filters)
+        } catch(e) {
+            console.error(e.message)
+        }
+
     }
 
     const displayDataAsText = (value, columnName) => {
