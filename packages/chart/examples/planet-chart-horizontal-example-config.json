@@ -19,12 +19,11 @@
     "yAxis": {
         "label": "Measurement (1000km)",
         "displayNumbersOnBar": false,
-        "labelPlacement": "Below Bar"
+        "labelPlacement": "On Date/Category Axis"
     },
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
-        "tickRotation": 30,
         "size": 75
     },
     "table": {
