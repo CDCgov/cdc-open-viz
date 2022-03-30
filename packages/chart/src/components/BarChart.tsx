@@ -54,11 +54,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         },
         yAxis: {
           ...config.yAxis,
-          hideAxis: true
+          hideAxis: config.visualizationSubType === 'horizontal' ? false : config.visualizationSubType === 'regular' ? true : null
         },
         xAxis: {
           ...config.xAxis,
-          hideAxis: true
+          hideAxis: config.visualizationSubType === 'horizontal' ? true : config.visualizationSubType === 'regular' ? false : null
         },
         lollipopColorStyle: 'saturated'
       })
