@@ -459,11 +459,46 @@ const EditorPanel = () => {
   }, [config])
 
   useEffect(() => {
-    updateConfig({
-      ...config,
-      lollipopShape: lollipopShape,
-    })
+    if(config.visualizationSubType === 'horizontal') {
+      updateConfig({
+        ...config,
+        lollipopShape: lollipopShape
+      })
+    }
   }, [config.isLollipopChart, lollipopShape]);
+  
+  useEffect(() => {
+    if(config.isLollipopChart && config.visualizationSubType === 'horizontal') {
+      updateConfig({
+        ...config,
+        yAxis: {
+          ...config.yAxis,
+          hideAxis: false
+        },
+        xAxis: {
+          ...config.xAxis,
+          hideAxis: true
+        },
+        fontSize: "small"
+      })
+    }
+
+    if (config.isLollipopChart && config.visualizationSubType === 'regular') {
+      updateConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          hideAxis: false,
+          fontSize: "small"
+        },
+        yAxis: {
+          ...config.yAxis,
+          hideAxis: true,
+          fontSize: "small"
+        }
+      })
+    }
+  }, [config.visualizationSubType]);
 
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
@@ -509,6 +544,10 @@ const EditorPanel = () => {
     setFilteredData(filters)
   };
 
+  if(config.isLollipopChart && config.series.length > 1) {
+    config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series';
+  }
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
@@ -531,7 +570,7 @@ const EditorPanel = () => {
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
                   }
-                  {showLollipopCheckbox &&
+                  {showLollipopCheckbox() &&
                     <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
                   {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&

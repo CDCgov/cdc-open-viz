@@ -958,7 +958,7 @@
 		"position": "side",
 		"title": "Legend"
 	},
-	"filters": [{ "label": "", "values": [], "columnName": "Condition" }],
+	"filters": [{ "label": "", "values": [], "columnName": "Condition" }, { "label": "", "values": [], "columnName": "State" } ],
 	"dataTable": { "title": "Data Table", "forceDisplay": true },
 	"tooltips": {
 		"appearanceType": "hover",
