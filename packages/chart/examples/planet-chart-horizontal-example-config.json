@@ -6,6 +6,7 @@
     "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],
+    "fontSize": "small",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -24,12 +25,11 @@
     "xAxis": {
         "label": "Planet",
         "dataKey": "name",
-        "tickRotation": 30,
         "size": 75
     },
     "table": {
         "label": "Data Table",
         "expanded": false
     },
-    "lollipopShape": "square"
+    "lollipopShape": "circle"
 }
