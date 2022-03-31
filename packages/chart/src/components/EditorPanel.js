@@ -43,6 +43,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
 
   const onChange = (e) => {
+
     if('number' !== type || min === null){
       setValue(e.target.value);
     } else {
@@ -130,6 +131,7 @@ const Regions = memo(({config, updateConfig}) => {
   }
 
   let addColumn = () => {
+
     let regions = []
 
     if(config.regions) {
@@ -158,7 +160,7 @@ const Regions = memo(({config, updateConfig}) => {
         </div>
       ))}
       {!config.regions && <p style={{textAlign: "center"}}>There are currently no regions.</p>}
-      <button className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
+      <button type="button" className="btn full-width" onClick={(e) => {e.preventDefault(); addColumn()}}>Add Region</button>
     </>
   )
 })
