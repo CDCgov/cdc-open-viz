@@ -147,7 +147,7 @@ const Regions = memo(({config, updateConfig}) => {
     <>
       {config.regions && config.regions.map(({label, color, from, to, background}, i) => (
         <div className="edit-block" key={`region-${i}`}>
-          <button className="remove-column" onClick={(event) => { event.preventDefault(); removeColumn(i)}}>Remove</button>
+          <button type="button" className="remove-column" onClick={(event) => { event.preventDefault(); removeColumn(i)}}>Remove</button>
           <TextField value={label} label="Region Label" fieldName="label" i={i} updateField={updateField} />
           <div className="two-col-inputs">
             <TextField value={color} label="Text Color" fieldName="color" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)} />
