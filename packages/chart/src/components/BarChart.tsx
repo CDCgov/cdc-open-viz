@@ -369,7 +369,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               (
                                   <Text
                                     x={ bar.y - 5 } // padding
-                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + config.isLollipopChart ? offset : (config.barHeight / 2 )  }
+                                    y={ 
+                                        config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
+                                        (config.barHeight * (barGroup.bars.length - bar.index - 1) )  + (config.barHeight / 2 )
+                                      }
                                     fill={ labelColor }
                                     textAnchor="end"
                                     verticalAnchor="middle"
@@ -380,7 +383,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               : (
                                   <Text
                                     x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
-                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1)  + config.isLollipopChart ? offset : (config.barHeight / 2 ) }
+                                    y={ 
+                                        config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
+                                        (config.barHeight * (barGroup.bars.length - bar.index - 1) )  + (config.barHeight / 2 )
+                                      }
                                     fill={ '#000000' }
                                     textAnchor="start"
                                     verticalAnchor="middle"
