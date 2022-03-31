@@ -227,7 +227,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       <rect
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
-                        y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + offset : barY }
+                        y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart ? offset : 0) : barY }
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
                         fill={config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : 
@@ -326,7 +326,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       <>
                         <Text
                             x={ config.yAxis.hideAxis ? 0 : 5 } // padding
-                            y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + offset + 7 : barWidth * config.series.length + offset + 7 }
+                            y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + offset + 7 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
                           >{yAxisValue}
@@ -337,7 +337,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             (
                                 <Text
                                   x={ bar.y - 5 } // padding
-                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + offset }
+                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) }
                                   fill={ labelColor }
                                   textAnchor="end"
                                   verticalAnchor="middle"
@@ -348,7 +348,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             : (
                                 <Text
                                   x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}`} // padding
-                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + offset }
+                                  y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + config.isLollipopChart ? offset : 0 }
                                   fill={ '#000000'}
                                   textAnchor="start"
                                   verticalAnchor="middle"
@@ -369,7 +369,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               (
                                   <Text
                                     x={ bar.y - 5 } // padding
-                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + offset }
+                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 )  }
                                     fill={ labelColor }
                                     textAnchor="end"
                                     verticalAnchor="middle"
@@ -380,7 +380,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               : (
                                   <Text
                                     x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
-                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + offset }
+                                    y={ config.barHeight * (barGroup.bars.length - bar.index - 1) + (config.barHeight / 2 ) + config.isLollipopChart ? offset : 0 }
                                     fill={ '#000000' }
                                     textAnchor="start"
                                     verticalAnchor="middle"
