@@ -546,8 +546,12 @@ const EditorPanel = () => {
     setFilteredData(filters)
   };
 
-  if(config.isLollipopChart && config.series.length > 1) {
+  if(config.isLollipopChart && config?.series?.length > 1) {
     config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series';
+  }
+
+  if(config.isLollipopChart && config?.series?.length === 0) {
+    config.runtime.editorErrorMessage = 'Add a data series';
   }
 
   return (
