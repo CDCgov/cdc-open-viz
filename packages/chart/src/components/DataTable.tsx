@@ -174,7 +174,7 @@ export default function DataTable() {
                 })}
               </tbody>
             </table>
-            {config.regions ? (
+            {config.regions && config.regions.length > 0 ? (
               <table className="region-table data-table">
                 <caption className="visually-hidden">Table of the highlighted regions in the visualization</caption>
                 <thead>
