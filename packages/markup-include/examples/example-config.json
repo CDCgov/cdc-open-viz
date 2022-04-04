@@ -1,6 +1,6 @@
 {
-  "type": "html-include",
+  "type": "markup-include",
   "dataUrl": "/examples/example-data.json",
-  "title": "HTML Include",
+  "title": "Markup Include",
   "theme": "theme-blue"
 }
