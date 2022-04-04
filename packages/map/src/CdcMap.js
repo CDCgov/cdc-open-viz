@@ -1156,6 +1156,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
+
+        // Cleanup
+        return () => setRuntimeLegend([])
+
     }, [state])
 
     useEffect(() => {
