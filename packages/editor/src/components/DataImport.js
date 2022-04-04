@@ -577,7 +577,7 @@ export default function DataImport() {
             )}
             {config.formattedData && (
               <button className="btn btn-primary" style={{ float: 'right', marginBottom: '2em' }}
-                      onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
+                      onClick={() => setGlobalActive(2)}>Select your visualization type &raquo;</button>
             )}
           </div>
         )}

@@ -45,17 +45,8 @@ export default function ChooseTab() {
         let setTypes = () => {
             // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
             let newConfig = {
-                data: [...config.data],
-                dataFileName: config.dataFileName,
-                dataFileSourceType: config.dataFileSourceType,
-                dataDescription: config.dataDescription,
-                dataUrl: config.dataUrl,
                 newViz: true,
                 type
-            }
-
-            if(config.formattedData) {
-                newConfig.formattedData = config.formattedData
             }
 
             if(type === 'map') {
@@ -68,7 +59,7 @@ export default function ChooseTab() {
             }
 
             setConfig(newConfig)
-            setGlobalActive(2)
+            setGlobalActive(1)
         }
 
         return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span className="mt-1">{label}</span></button>)
