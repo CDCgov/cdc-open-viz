@@ -79,7 +79,7 @@ module.exports = (env = {}, { mode }) => {
         },
     },
     resolve: {
-      extensions: ['*', '.tsx', '.ts', '.js'],
+      extensions: ['*', '.tsx', '.ts', '.jsx', '.js'],
     },
     target: 'web',
     module: {
@@ -98,6 +98,7 @@ module.exports = (env = {}, { mode }) => {
               'dist/cdceditor.js',
               'dist/cdcdatabite.js',
               'dist/cdcwafflechart.js',
+              'dist/cdcmarkupinclude.js',
             ]
 
             let except = [

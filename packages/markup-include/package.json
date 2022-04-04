@@ -1,17 +1,17 @@
 {
-  "name": "@cdc/html-include",
+  "name": "@cdc/markup-include",
   "version": "1.0.0",
-  "description": "React component for displaying the HTML content from an outside link",
-  "main": "dist/cdchtmlinclude",
+  "description": "React component for displaying HTML content from an outside link",
+  "main": "dist/cdcmarkupinclude",
   "scripts": {
     "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcHtmlInclude --env folderName=html-include -c ../../webpack.config.js",
-    "prepublishOnly": "lerna run --scope @cdc/html-include build"
+    "build": "npx webpack --mode production --env packageName=CdcMarkupInclude --env folderName=markup-include -c ../../webpack.config.js",
+    "prepublishOnly": "lerna run --scope @cdc/markup-include build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/html-include"
+    "directory": "packages/markup-include"
   },
   "author": "rshelnutt <qyu6@cdc.gov>",
   "bugs": {
@@ -25,8 +25,10 @@
     "use-debounce": "^6.0.1"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "chroma": "0.0.1",
-    "chroma-js": "^2.1.0"
+    "chroma-js": "^2.1.0",
+    "html-react-parser": "^1.4.8"
   },
   "peerDependencies": {
     "react": "^17.0.2",
