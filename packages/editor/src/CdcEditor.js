@@ -99,6 +99,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   return (
     <GlobalState.Provider value={state}>
       <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
+        {config.datasets && Object.keys(config.datasets).filter(datasetKey => config.datasets[datasetKey].formattedData !== undefined).length}
         <Tabs className="top-level" startingTab={globalActive}>
           <TabPane title="1. Choose Visualization Type" className="choose-type">
             <ChooseTab />
@@ -107,7 +108,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
             <DataImport />
           </TabPane>
           
-          <TabPane title="3. Configure" className="configure" disableRule={!config.data || !config.type}>
+          <TabPane title="3. Configure" className="configure" disableRule={config.datasets && Object.keys(config.datasets).filter(datasetKey => config.datasets[datasetKey].formattedData !== undefined).length === 0}>
             <ConfigureTab containerEl={containerEl }/>
           </TabPane>
         </Tabs>

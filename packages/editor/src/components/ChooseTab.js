@@ -46,6 +46,7 @@ export default function ChooseTab() {
             // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
             let newConfig = {
                 newViz: true,
+                datasets: {},
                 type
             }
 

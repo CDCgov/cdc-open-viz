@@ -37,20 +37,24 @@ export default function DataImport() {
 
   const [ externalURL, setExternalURL ] = useState('')
 
-  const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
-
-  const [ keepURL, setKeepURL ] = useState(config.dataUrl || false)
+  const [ addingDataset, setAddingDataset ] = useState(true)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
   }
 
-  useEffect(() => {
-    if (true === keepURL) {
-      setConfig({ ...config, dataUrl: debouncedExternalURL })
+  const displaySize = (size) => {
+    if(size > Math.pow(1024, 3)){
+      return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
+    } else if(size > Math.pow(1024, 2)){
+      return Math.round(size / Math.pow(1024, 2) * 100) / 100 + ' MB';
+    } else if(size > 1024){
+      return Math.round(size / 1024 * 100) / 100 + ' KB';
+    } else {
+      return size + ' B'
     }
-  }, [ debouncedExternalURL, keepURL ])
+  }
 
   /**
    * Check to see all series for the viz exists in the new dataset
@@ -134,8 +138,10 @@ export default function DataImport() {
       }
     }
 
+    let fileSize = fileData.size;
+
     // Check if file is too big
-    if (fileData.size > (maxFileSize * 1048576)) {
+    if (fileSize > (maxFileSize * 1048576)) {
       setErrors([ errorMessages.fileTooLarge ])
       return
     }
@@ -185,12 +191,23 @@ export default function DataImport() {
 
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
+            let newDatasets = {...config.datasets};
+
+            Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
+
+            newDatasets[fileSource] = {
+              data: text, // new data
+              dataFileSize: fileSize,
+              dataFileName: fileSource, // new file source
+              dataFileSourceType: fileSourceType,// new file source type
+              dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
+              preview: true
+            }
+
             setConfig({
               ...config,
               ...tempConfig,
-              data: text, // new data
-              dataFileName: fileSource, // new file source
-              dataFileSourceType: fileSourceType,// new file source type
+              dataset: newDatasets
             })
           } else {
             resetEditor({
@@ -200,8 +217,23 @@ export default function DataImport() {
             }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?')
           }
         } else {
-          setConfig({ ...config, data: text, dataFileName: fileSource, dataFileSourceType: fileSourceType })
+          let newDatasets = {...config.datasets};
+
+          Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
+
+          newDatasets[fileSource] = {
+            data: text, // new data
+            dataFileSize: fileSize,
+            dataFileName: fileSource, // new file source
+            dataFileSourceType: fileSourceType,// new file source type
+            dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
+            preview: true
+          }
+
+          setConfig({ ...config, datasets: newDatasets })
         }
+
+        setAddingDataset(false);
       } catch (err) {
         setErrors(err)
       }
@@ -227,11 +259,14 @@ export default function DataImport() {
     setConfig(newConfig)
   }, [])
 
-  const updateDescriptionProp = (key, value) => {
-    let dataDescription = { ...config.dataDescription, [key]: value }
-    let formattedData = transform.developerStandardize(config.data, dataDescription)
+  const updateDescriptionProp = (datasetKey, key, value) => {
+    let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
+    let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
 
-    setConfig({ ...config, formattedData, dataDescription })
+    let newDatasets = {...config.datasets}
+    newDatasets[datasetKey] = {...newDatasets[datasetKey], dataDescription, formattedData};
+
+    setConfig({ ...config, datasets: newDatasets })
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -243,13 +278,13 @@ export default function DataImport() {
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
-                 aria-describedby="load-data" value={extUrl} onChange={(e) => setExternalURL(e.target.value)}/>
+                 aria-describedby="load-data" value={extUrl} onBlur={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
                   onClick={() => loadData(null, externalURL)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)}/> Always
+          <input type="checkbox" id="keep-url"/> Always
           load from URL (normally will only pull once)
         </label>
       </>
@@ -275,101 +310,69 @@ export default function DataImport() {
     )
   }
 
+  const setGlobalDatasetProp = (datasetKey, prop, value) => {
+    let newDatasets = {...config.datasets};
+
+    if(value === true){
+      Object.keys(newDatasets).forEach(datasetKeyIter => {
+        if(datasetKeyIter !== datasetKey){
+          newDatasets[datasetKeyIter][prop] = false;
+        } else {
+          newDatasets[datasetKeyIter][prop] = true;
+        }
+      })
+    } else {
+      newDatasets[datasetKey][prop] = value;
+    }
+
+    setConfig({...config, datasets: newDatasets});
+  };
+
+  let previewData, configureData, readyToConfigure = false;
+  Object.keys(config.datasets).forEach(datasetKey => {
+    if(config.datasets[datasetKey].preview){
+      previewData = config.datasets[datasetKey].data;
+    }
+    if(config.datasets[datasetKey].configure){
+      configureData = config.datasets[datasetKey];
+    }
+    if(config.datasets[datasetKey].formattedData){
+      readyToConfigure = true;
+    }
+  });
+
   return (
     <>
       <div className="left-col">
-        {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
-          <div className="load-data-area">
-            <Tabs>
-              <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
-                <div
-                  className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  {
-                    isDragActive ?
-                      <p>Drop file here</p> :
-                      <p>Drag file to this area, or <span>select a file</span>.</p>
-                  }
-                </div>
-              </TabPane>
-              <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon"/>}>
-                {loadFileFromUrl(externalURL)}
-              </TabPane>
-            </Tabs>
-            {errors && (errors.map ? errors.map((message, index) => (
-              <div className="error-box slim mt-2" key={`error-${message}`}>
-                <span>{message}</span> <CloseIcon className="inline-icon dismiss-error"
-                                                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}/>
-              </div>
-            )) : errors.message)}
-            <p className="footnote">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file
-              size {maxFileSize}MB.</p>
-            {/* TODO: Add more sample data in, but this will do for now. */}
-            <span className="heading-3">Load Sample Data:</span>
-            <ul className="sample-data-list">
-              <li
-                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
-                States Sample Data #1
-              </li>
-              <li
-                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
-                Sample Data
-              </li>
-              <li
-                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
-                States Counties Sample Data
-              </li>
-            </ul>
-            <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
-               rel="noopener noreferrer" className="guidance-link">
-              <div>
-                <h3>Get Help</h3>
-                <p>Documentation and examples on formatting data and configuring visualizations.</p>
-              </div>
-            </a>
-          </div>
-        )}
+        <div class="heading-3">Data Sources</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Size</th><th>Type</th><th colSpan="3">Actions</th>
+            </tr>
+          </thead>
+          {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
+            <tr>
+              <td>{config.datasets[datasetKey].dataFileName}</td>
+              <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
+              <td>{config.datasets[datasetKey].dataFileFormat}</td>
+              <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
+              <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+              <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
+            </tr>
+          ))}
+        </table>
 
-        {config.dataFileSourceType && (
+        {configureData && (
           <div>
-            <div className="heading-3">Data Source</div>
-            <div className="file-loaded-area">
-              {config.dataFileSourceType === 'file' && (
-                <div className="data-source-options">
-                  <div
-                    className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    {
-                      isDragActive ?
-                        <p>Drop file here</p> :
-                        <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
-                    }
-                  </div>
-                  <div>
-                    {resetButton()}
-                  </div>
-                </div>
-              )}
-
-              {config.dataFileSourceType === 'url' && (
-                <div className="url-source-options">
-                  <div>
-                    {loadFileFromUrl(externalURL)}
-                  </div>
-                  <div>
-                    {resetButton()}
-                  </div>
-                </div>
-              )}
-            </div>
             <div className="question">
               <div className="heading-3">Describe Data</div>
               <div className="heading-4 data-question">Data Orientation</div>
               <div className="table-button-container">
                 <div
-                  className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
+                  className={'table-button' + (configureData.dataDescription && configureData.dataDescription.horizontal === false ? ' active' : '')}
                   onClick={() => {
-                    updateDescriptionProp('horizontal', false)
+                    updateDescriptionProp(configureData.dataFileName, 'horizontal', false)
                   }}>
                   <strong>Vertical</strong>
                   <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.</p>
@@ -413,9 +416,9 @@ export default function DataImport() {
                   </table>
                 </div>
                 <div
-                  className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
+                  className={'table-button' + (configureData.dataDescription && configureData.dataDescription.horizontal === true ? ' active' : '')}
                   onClick={() => {
-                    updateDescriptionProp('horizontal', true)
+                    updateDescriptionProp(configureData.dataFileName, 'horizontal', true)
                   }}>
                   <strong>Horizontal</strong>
                   <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
@@ -454,30 +457,30 @@ export default function DataImport() {
                 </div>
               </div>
             </div>
-            {config.dataDescription && (
+            {configureData.dataDescription && (
               <>
                 <div className="question">
                   <div className="heading-4 data-question">Are there multiple series represented in your data?</div>
                   <div>
-                    <button className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'} style={{ marginRight: '.5em' }} onClick={() => { updateDescriptionProp('series', true) }}>Yes</button>
-                    <button className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'} onClick={() => {updateDescriptionProp('series', false)}}>No</button>
+                    <button className={configureData.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'} style={{ marginRight: '.5em' }} onClick={() => { updateDescriptionProp(configureData.dataFileName, 'series', true) }}>Yes</button>
+                    <button className={configureData.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'} onClick={() => {updateDescriptionProp(configureData.dataFileName, 'series', false)}}>No</button>
                   </div>
                 </div>
-                {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
+                {configureData.dataDescription.horizontal === true && configureData.dataDescription.series === true && (
                   <div className="question">
                     <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
-                    <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}} value={config.dataDescription.seriesKey}>
+                    <select onChange={(e) => {updateDescriptionProp(configureData.dataFileName, 'seriesKey', e.target.value)}} value={configureData.dataDescription.seriesKey}>
                       <option value="">Choose an option</option>
-                      {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
+                      {Object.keys(configureData.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                     </select>
                   </div>
                 )}
-                {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
+                {configureData.dataDescription.horizontal === false && configureData.dataDescription.series === true && (
                   <>
                     <div className="question">
                       <div className="heading-4 data-question">Are the series values in your data represented in a single row, or across multiple rows?</div>
                       <div className="table-button-container">
-                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
+                        <div className={'table-button' + (configureData.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {configureData.dataFileName, updateDescriptionProp('singleRow', true)}}>
                           <p>Each row contains the data for an individual series in itself.</p>
                           <table>
                             <tbody>
@@ -502,7 +505,7 @@ export default function DataImport() {
                             </tbody>
                           </table>
                         </div>
-                        <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
+                        <div className={'table-button' + (configureData.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp(configureData.dataFileName, 'singleRow', false)}}>
                           <p>Each series data is broken out into multiple rows.</p>
                           <table>
                             <tbody>
@@ -546,27 +549,27 @@ export default function DataImport() {
                         </div>
                       </div>
                     </div>
-                    {config.dataDescription.singleRow === false && (
+                    {configureData.dataDescription.singleRow === false && (
                       <>
                         <div className="question">
                           <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
-                          <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
+                          <select onChange={(e) => {updateDescriptionProp(configureData.dataFileName, 'seriesKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
+                            {Object.keys(configureData.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                         <div className="question">
                           <div className="heading-4 data-question">Which property in the dataset represents the values for the category/date axis or map geography?</div>
-                          <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
+                          <select onChange={(e) => {updateDescriptionProp(configureData.dataFileName, 'xKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
+                            {Object.keys(configureData.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                         <div className="question">
                           <div className="heading-4 data-question">Which property in the dataset represents the numeric value?</div>
-                          <select onChange={(e) => {updateDescriptionProp('valueKey', e.target.value)}}>
+                          <select onChange={(e) => {updateDescriptionProp(configureData.dataFileName, 'valueKey', e.target.value)}}>
                             <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
+                            {Object.keys(configureData.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
                           </select>
                         </div>
                       </>
@@ -575,15 +578,72 @@ export default function DataImport() {
                 )}
               </>
             )}
-            {config.formattedData && (
-              <button className="btn btn-primary" style={{ float: 'right', marginBottom: '2em' }}
-                      onClick={() => setGlobalActive(2)}>Select your visualization type &raquo;</button>
+            {configureData.formattedData && (
+              <p>Data configured successfully</p>
             )}
           </div>
         )}
+
+        {addingDataset && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+          <div className="load-data-area">
+            <div class="heading-3">Add Dataset</div>
+            <Tabs>
+              <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+                <div
+                  className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  {
+                    isDragActive ?
+                      <p>Drop file here</p> :
+                      <p>Drag file to this area, or <span>select a file</span>.</p>
+                  }
+                </div>
+              </TabPane>
+              <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon"/>}>
+                {loadFileFromUrl(externalURL)}
+              </TabPane>
+            </Tabs>
+            {errors && (errors.map ? errors.map((message, index) => (
+              <div className="error-box slim mt-2" key={`error-${message}`}>
+                <span>{message}</span> <CloseIcon className="inline-icon dismiss-error"
+                                                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}/>
+              </div>
+            )) : errors.message)}
+            <p className="footnote">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file
+              size {maxFileSize}MB.</p>
+            {/* TODO: Add more sample data in, but this will do for now. */}
+            <span className="heading-3">Load Sample Data:</span>
+            <ul className="sample-data-list">
+              <li
+                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
+                States Sample Data #1
+              </li>
+              <li
+                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
+                Sample Data
+              </li>
+              <li
+                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
+                States Counties Sample Data
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {!addingDataset && <p><button onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
+
+        {readyToConfigure && <p><button onClick={() => setGlobalActive(2)}>Configure your visualization</button></p>}
+
+        <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
+            rel="noopener noreferrer" className="guidance-link">
+          <div>
+            <h3>Get Help</h3>
+            <p>Documentation and examples on formatting data and configuring visualizations.</p>
+          </div>
+        </a>
       </div>
       <div className="right-col">
-        <PreviewDataTable data={config.data}/>
+        <PreviewDataTable data={previewData}/>
       </div>
     </>
   )
