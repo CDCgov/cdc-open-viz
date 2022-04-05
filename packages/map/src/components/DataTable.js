@@ -311,7 +311,8 @@ const DataTable = (props) => {
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th tabIndex="0"
+                  <th 
+                    tabIndex="0"
                     title={column.Header}
                     role="columnheader"
                     scope="col"
