@@ -6,7 +6,7 @@
     .left-col {
         background: #fff;
         padding: $gbl-padding;
-        width: 33.333%;
+        width: 50%;
         border-right: $lightGray 1px solid;
         position: fixed;
         bottom: 0;
@@ -18,9 +18,27 @@
         .heading-3 {
             font-weight: 600;
             margin-bottom: .5em;
+            margin-top: 1em;
+            border-top: 1px solid gray;
+            padding-top: .5em;
         }
         .data-question {
             margin-bottom: .5em;
+        }
+        table {
+            width: 100%;
+            border: 1px solid gray;
+            thead {
+                background-color: rgb(220, 220, 200);
+                border-bottom: 1px solid gray;
+            }
+            td {
+                text-align: center;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 30px;
+            }
         }
         .tabs {
             margin-bottom: 2em;
@@ -206,7 +224,7 @@
         position: relative;
         background-color: $lightest-gray;
         padding: $gbl-padding;
-        width: 66.667%;
+        width: 50%;
         @import "data-table";
     }
 }
