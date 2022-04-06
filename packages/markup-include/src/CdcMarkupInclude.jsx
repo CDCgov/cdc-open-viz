@@ -20,16 +20,20 @@ const CdcMarkupInclude = (
   }
 ) => {
 
+  // Default States
   const [ config, setConfig ] = useState({ ...defaults })
   const [ loading, setLoading ] = useState(true)
+
+  // Custom States
+  const [ urlMarkup, setUrlMarkup ] = useState('')
+  const [ markupError, setMarkupError ] = useState(null)
+  const [ errorMessage, setErrorMessage ] = useState(null)
 
   let {
     title
   } = config
 
-  const [ dataSource, setDataSource ] = useState('')
-  const [ urlMarkup, setUrlMarkup ] = useState('')
-
+  // Default Functions
   const updateConfig = (newConfig) => {
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -48,8 +52,8 @@ const CdcMarkupInclude = (
     let response = configObj || await (await fetch(configUrl)).json()
     let responseData = response.data ?? {}
 
-    if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
+    if (response.sourceUrl) {
+      const dataString = await fetch(response.sourceUrl)
       responseData = await dataString.json()
     }
 
@@ -59,22 +63,50 @@ const CdcMarkupInclude = (
     setLoading(false)
   }
 
-  const loadConfigMarkupData = async () => {
-    if (config.data && urlMarkup === '') {
-      setUrlMarkup(config.data)
-    }
-  }
+  // Custom Functions
+  useEffect(() => {
+    if (markupError) {
+      let errorCode = markupError
+      let message = 'There was a problem retrieving the content from ' + config.srcUrl + '. '
+      let protocolCheck = /https?:\/\//g
 
-  const fetchMarkupData = async (src) => {
-    if (src) {
+      if (errorCode === 404 && !config.srcUrl.match(protocolCheck)) {
+        errorCode = 'proto' //Capture 404 caused by missing protocols and adjust message
+      }
+
+      let errorList = {
+        200: 'This is likely due to a CORS restriction policy from the remote origin address.',
+        404: 'The requested source URL cannot be found. Please verify the link address provided.',
+        'proto': 'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
+      }
+
+      message += errorList[errorCode]
+      setErrorMessage(message)
+    } else {
+      setErrorMessage(null)
+    }
+  }, [ markupError ])
+
+  const loadConfigMarkupData = async () => {
+    setMarkupError(null)
+
+    if (config.srcUrl) {
       await axios
-        .get(src)
+        .get(config.srcUrl)
         .then((res) => {
-          console.log('Response: ', res.data)
-          setUrlMarkup(res.data)
+          if (res.data) {
+            setUrlMarkup(res.data)
+          }
         })
         .catch((err) => {
-          console.log('Error: ', err)
+          if (err.response) {
+            // Response with error
+            setMarkupError(err.response.status)
+          } else if (err.request) {
+            // No response received
+            setMarkupError(200)
+          }
+
           setUrlMarkup('')
         })
     } else if (config.data?.length > 0) {
@@ -124,17 +156,8 @@ const CdcMarkupInclude = (
           </header>
           }
           <div className="cove-component__content">
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Data Source </label>
-              <input
-                value={dataSource}
-                onChange={(e) => {
-                  setDataSource(e.target.value)
-                }}
-              />
-            </div>
-            <button onClick={() => fetchMarkupData(dataSource)}>Get HTML</button>
-            {urlMarkup && <div dangerouslySetInnerHTML={{ __html: parseBodyMarkup(urlMarkup) }}/>}
+            {!markupError && urlMarkup && <div className="cove-component__content-wrap" dangerouslySetInnerHTML={{ __html: parseBodyMarkup(urlMarkup) }}/>}
+            {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
         </div>
       </>

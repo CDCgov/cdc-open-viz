@@ -51,10 +51,10 @@ const InputText = memo((
   }
 
   return (
-    <label>
-      {label && <span className="edit-label column-heading">{label}</span>}
+    <div className="input-group">
+      {label && <label>{label}</label>}
       {formElement}
-    </label>
+    </div>
   )
 })
 

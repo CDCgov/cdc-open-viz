@@ -11,7 +11,6 @@ import {
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import InputText from '@cdc/core/components/input/InputText'
-import InputSelect from '@cdc/core/components/input/InputSelect'
 
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
@@ -150,12 +149,12 @@ const EditorPanel = memo((props) => {
                         </AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel>
-                        <InputText value={config.title} fieldName="title" label="Title" placeholder="Waffle Chart Title"
+                        <InputText value={config.title} fieldName="title" label="Title" placeholder="Markup Include Title"
                                    updateField={updateField}/>
-                        <InputText type="textarea" value={config.content} fieldName="content" label="Message"
-                                   updateField={updateField}/>
-                        <InputText value={config.subtext} fieldName="subtext" label="Subtext/Citation"
-                                   placeholder="Waffle Chart Subtext or Citation" updateField={updateField}/>
+
+                        <InputText
+                          value={config.srcUrl} fieldName="srcUrl" label="Source URL" placeholder="https://www.example.com/file.html" updateField={updateField}
+                        />
                       </AccordionItemPanel>
                     </AccordionItem>
                     <AccordionItem>
@@ -165,40 +164,8 @@ const EditorPanel = memo((props) => {
                         </AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel>
-                        <InputSelect value={config.shape} fieldName="shape" label="Shape"
-                                     updateField={updateField} options={[ 'circle', 'square', 'person' ]}/>
-
-                        <div className="accordion__panel-row accordion__small-inputs" style={{ marginTop: '1em' }}>
-                          <div className="accordion__panel-col">
-                            <InputText type="number" value={config.nodeWidth} fieldName="nodeWidth" label="Width"
-                                       updateField={updateField}/>
-                          </div>
-                          <div className="accordion__panel-col">
-                            <InputText type="number" value={config.nodeSpacer} fieldName="nodeSpacer" label="Spacer"
-                                       updateField={updateField}/>
-                          </div>
-                        </div>
-
-                        <InputSelect value={config.orientation} fieldName="orientation" label="Layout"
-                                     updateField={updateField} options={[ 'horizontal', 'vertical' ]}/>
-
-                        <label><span className="edit-label column-heading">Data Point Font Size</span></label>
-                        <div className="accordion__panel-row accordion__small-inputs align-center">
-                          <div className="accordion__panel-col">
-                            <InputText type="number" value={config.fontSize} fieldName="fontSize"
-                                       updateField={updateField}/>
-                          </div>
-                          <div className="accordion__panel-col">
-                            <label className={'accordion__panel-label--muted'}>default (50px)</label>
-                          </div>
-                        </div>
-
-                        <InputSelect value={config.overallFontSize} fieldName="overallFontSize"
-                                     label="Overall Font Size"
-                                     updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
-
-                        <label className="header">
-                          <span className="edit-label">Theme</span>
+                        <div className="input-group">
+                          <label>Theme</label>
                           <ul className="color-palette">
                             {headerColors.map((palette) => (
                               <li title={palette} key={palette} onClick={() => {
@@ -207,7 +174,7 @@ const EditorPanel = memo((props) => {
                               </li>
                             ))}
                           </ul>
-                        </label>
+                        </div>
                       </AccordionItemPanel>
                     </AccordionItem>
                   </Accordion>
