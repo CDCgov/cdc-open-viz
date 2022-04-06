@@ -10,6 +10,7 @@ import { AxisLeft, AxisBottom } from '@visx/axis';
 import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
+import PairedBarChart from './PairedBarChart.js'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -24,7 +25,6 @@ export default function LinearChart() {
   }
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
-
 
   const xMax = width - config.runtime.yAxis.size;
   const yMax = height - config.runtime.xAxis.size;
@@ -111,6 +111,7 @@ export default function LinearChart() {
   useEffect(() => {
     ReactTooltip.rebuild();
   });
+
 
   return (
     <ErrorBoundary component="LinearChart">
@@ -296,13 +297,17 @@ export default function LinearChart() {
           </AxisBottom>
           )}
 
+          { config.visualizationType === 'Paired Bar' && (
+            <PairedBarChart  width={xMax} height={yMax}  />
+          ) }
+          
           {/* Bar chart */}
-          { config.visualizationType !== 'Line' && (
+          { (config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
 
           {/* Line chart */}
-          { config.visualizationType !== 'Bar' && (
+          { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
           )}
       </svg>
