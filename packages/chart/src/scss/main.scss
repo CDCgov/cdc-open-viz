@@ -326,3 +326,20 @@
     }
   }
 }
+
+#paired-bar-legend {
+
+  text-align: center;
+
+  div {
+    margin: 0 0.5em;
+    display: flex;
+  }
+
+  .indicator {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    margin: 0.25em;
+  }
+}

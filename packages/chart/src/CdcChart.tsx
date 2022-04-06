@@ -24,6 +24,7 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
+import PairedBarChart from './components/PairedBarChart';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
@@ -289,6 +290,22 @@ export default function CdcChart(
     loadConfig();
   }, []);
 
+  // useEffect(() => {
+  //   if(config.visualizationType === 'Paired Bar') {
+  //     updateConfig({
+  //       ...config,
+  //       yAxis: {
+  //         ...config.yAxis,
+  //         hideAxis: true
+  //       },
+  //       xAxis: {
+  //         ...config.xAxis,
+  //         hideAxis: true
+  //       }
+  //     })
+  //   }
+  // }, [config.visualizationType]);
+
   // Load data when configObj data changes
   if(configObj){
     useEffect(() => {
@@ -417,6 +434,7 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
+    'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
@@ -610,8 +628,15 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
         </div>}
+
+        {config.visualizationType === 'Paired Bar' &&
+          <div id="paired-bar-legend">
+            <div><svg className="indicator"><rect width="100%" height="100%" fill={'#000'} /></svg>Male</div>
+            <div><svg className="indicator"><rect width="100%" height="100%" fill={'#000'} /></svg>Female</div>
+          </div>
+        }
       </>
     )
   }

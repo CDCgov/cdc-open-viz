@@ -571,7 +571,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
@@ -595,11 +595,12 @@ const EditorPanel = () => {
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>
-                      Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
+                      Data Series {((!config.series || config.series.length === 0) || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width="25" className="warning-icon" />}
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
+                    {((!config.series || config.series.length === 0) && (config.visualizationType !== 'Paired Bar')) && <p className="warning">At least one series is required</p>}
+                    {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
                         <label><span className="edit-label">Displaying</span></label>
@@ -651,7 +652,10 @@ const EditorPanel = () => {
                           })}
                         </ul>
                       </>)}
-                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
+                      
+                      { ( (config.visualizationType === 'Paired Bar' && config.series.length < 2) || (config.visualizationType !== 'Paired Bar') ) &&
+                        <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
+                      }
                       {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                         <>
                           <span className="divider-heading">Confidence Keys</span>
