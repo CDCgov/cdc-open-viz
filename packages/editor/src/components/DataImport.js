@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import { useDebounce } from 'use-debounce'
 import { get } from 'axios'
 
 import GlobalState from '../context'
@@ -37,7 +36,7 @@ export default function DataImport() {
 
   const [ externalURL, setExternalURL ] = useState('')
 
-  const [ addingDataset, setAddingDataset ] = useState(true)
+  const [ addingDataset, setAddingDataset ] = useState(config.type === 'dashboard' ? Object.keys(config.datasets).length === 0 : !config.data)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -191,6 +190,43 @@ export default function DataImport() {
 
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
+            if(config.type === 'dashboard'){
+              let newDatasets = {...config.datasets};
+
+              Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
+
+              newDatasets[fileSource] = {
+                data: text, // new data
+                dataFileSize: fileSize,
+                dataFileName: fileSource, // new file source
+                dataFileSourceType: fileSourceType,// new file source type
+                dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
+                preview: true
+              }
+
+              setConfig({
+                ...config,
+                ...tempConfig,
+                dataset: newDatasets
+              })
+            } else {
+              setConfig({
+                ...config,
+                ...tempConfig,
+                data: text, // new data
+                dataFileName: fileSource, // new file source
+                dataFileSourceType: fileSourceType// new file source type
+              })
+            }
+          } else {
+            resetEditor({
+              data: text,
+              dataFileName: fileSource,
+              dataFileSourceType: fileSourceType
+            }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?')
+          }
+        } else {
+          if(config.type === 'dashboard') {
             let newDatasets = {...config.datasets};
 
             Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
@@ -204,33 +240,16 @@ export default function DataImport() {
               preview: true
             }
 
+            setConfig({ ...config, datasets: newDatasets })
+          } else {
             setConfig({
               ...config,
               ...tempConfig,
-              dataset: newDatasets
+              data: text, // new data
+              dataFileName: fileSource, // new file source
+              dataFileSourceType: fileSourceType// new file source type
             })
-          } else {
-            resetEditor({
-              data: text,
-              dataFileName: fileSource,
-              dataFileSourceType: fileSourceType
-            }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?')
           }
-        } else {
-          let newDatasets = {...config.datasets};
-
-          Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
-
-          newDatasets[fileSource] = {
-            data: text, // new data
-            dataFileSize: fileSize,
-            dataFileName: fileSource, // new file source
-            dataFileSourceType: fileSourceType,// new file source type
-            dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
-            preview: true
-          }
-
-          setConfig({ ...config, datasets: newDatasets })
         }
 
         setAddingDataset(false);
@@ -260,13 +279,20 @@ export default function DataImport() {
   }, [])
 
   const updateDescriptionProp = (datasetKey, key, value) => {
-    let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
-    let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
+    if(config.type === 'dashboard') {
+      let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
+      let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
 
-    let newDatasets = {...config.datasets}
-    newDatasets[datasetKey] = {...newDatasets[datasetKey], dataDescription, formattedData};
+      let newDatasets = {...config.datasets}
+      newDatasets[datasetKey] = {...newDatasets[datasetKey], dataDescription, formattedData};
 
-    setConfig({ ...config, datasets: newDatasets })
+      setConfig({ ...config, datasets: newDatasets })
+    } else {
+      let dataDescription = { ...config.dataDescription, [key]: value }
+      let formattedData = transform.developerStandardize(config.data, dataDescription)
+
+      setConfig({ ...config, formattedData, dataDescription })
+    }
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -298,13 +324,14 @@ export default function DataImport() {
     if (confirmDataReset === true) {
       setTempConfig(null)
       setConfig(config)
+      setAddingDataset(true)
     }
   }
 
   const resetButton = () => {
     return ( //todo convert to modal
       <button className="btn danger"
-              onClick={() => resetEditor({}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
+              onClick={() => resetEditor({type: config.type}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
         <CloseIcon/>
       </button>
     )
@@ -329,42 +356,87 @@ export default function DataImport() {
   };
 
   let previewData, configureData, readyToConfigure = false;
-  Object.keys(config.datasets).forEach(datasetKey => {
-    if(config.datasets[datasetKey].preview){
-      previewData = config.datasets[datasetKey].data;
-    }
-    if(config.datasets[datasetKey].configure){
-      configureData = config.datasets[datasetKey];
-    }
-    if(config.datasets[datasetKey].formattedData){
-      readyToConfigure = true;
-    }
-  });
+  if(config.type === 'dashboard'){
+    Object.keys(config.datasets).forEach(datasetKey => {
+      if(config.datasets[datasetKey].preview){
+        previewData = config.datasets[datasetKey].data;
+      }
+      if(config.datasets[datasetKey].configure){
+        configureData = config.datasets[datasetKey];
+      }
+      if(config.datasets[datasetKey].formattedData){
+        readyToConfigure = true;
+      }
+    });
+  } else {
+    previewData = config.data;
+    configureData = config;
+    readyToConfigure = !!config.formattedData;
+  }
 
   return (
     <>
       <div className="left-col">
-        <div class="heading-3">Data Sources</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th><th>Size</th><th>Type</th><th colSpan="3">Actions</th>
-            </tr>
-          </thead>
-          {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
-            <tr>
-              <td>{config.datasets[datasetKey].dataFileName}</td>
-              <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
-              <td>{config.datasets[datasetKey].dataFileFormat}</td>
-              <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
-              <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
-              <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
-            </tr>
-          ))}
-        </table>
+        {config.type === 'dashboard' && (
+          <>
+            <div className="heading-3">Data Sources</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Size</th><th>Type</th><th colSpan="3">Actions</th>
+                </tr>
+              </thead>
+              {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
+                <tr>
+                  <td>{config.datasets[datasetKey].dataFileName}</td>
+                  <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
+                  <td>{config.datasets[datasetKey].dataFileFormat}</td>
+                  <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
+                  <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+                  <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
+                </tr>
+              ))}
+            </table>
+          </>
+        )}
 
-        {configureData && (
+        {configureData && configureData.data && (
           <div>
+            {config.type !== 'dashboard' && (
+              <>
+                <div className="heading-3">Data Source</div>
+                <div className="file-loaded-area">
+                  {config.dataFileSourceType === 'file' && (
+                    <div className="data-source-options">
+                      <div
+                        className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        {
+                          isDragActive ?
+                            <p>Drop file here</p> :
+                            <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
+                        }
+                      </div>
+                      <div>
+                        {resetButton()}
+                      </div>
+                    </div>
+                  )}
+
+                  {config.dataFileSourceType === 'url' && (
+                    <div className="url-source-options">
+                      <div>
+                        {loadFileFromUrl(externalURL)}
+                      </div>
+                      <div>
+                        {resetButton()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
             <div className="question">
               <div className="heading-3">Describe Data</div>
               <div className="heading-4 data-question">Data Orientation</div>
@@ -586,7 +658,7 @@ export default function DataImport() {
 
         {addingDataset && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
-            <div class="heading-3">Add Dataset</div>
+            <div className="heading-3">Add Dataset</div>
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
                 <div
@@ -630,7 +702,7 @@ export default function DataImport() {
           </div>
         )}
 
-        {!addingDataset && <p><button onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
+        {config.type === 'dashboard' && !addingDataset && <p><button onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
 
         {readyToConfigure && <p><button onClick={() => setGlobalActive(2)}>Configure your visualization</button></p>}
 
