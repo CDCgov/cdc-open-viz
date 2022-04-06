@@ -155,40 +155,6 @@
     z-index: 3;
   }
 
-  label {
-    text-transform: uppercase;
-    display: block;
-    font-size: .8em;
-    font-weight: 600;
-
-    &:not(:first-child) {
-      margin-top: 1em;
-    }
-
-    span.edit-label {
-      margin-bottom: .3em;
-      display: block;
-    }
-
-    span.column-heading {
-      font-size: 1em;
-    }
-
-    &.checkbox {
-      display: flex;
-
-      span {
-        display: inline;
-      }
-
-      input {
-        margin-left: 0;
-        width: inherit;
-        display: inline;
-      }
-    }
-  }
-
   fieldset {
     display: block;
   }
@@ -466,11 +432,10 @@
 
 // -------------------------------------------------------------------------------
 
-.color-palette {
+ul.color-palette {
   display: flex;
   max-width: 100%;
   padding: 0;
-  margin: .5em 0 0 0;
   list-style: none;
   flex-wrap: wrap;
 

@@ -15,6 +15,21 @@
     margin-top: 1em;
   }
 
+  .warning {
+    padding: .75em 1em;
+    margin: 1em 0;
+    background-color: #FFD2D2;
+    color: #D8000C;
+    font-size: .8em;
+    border: #D8000C 1px solid;
+    border-radius: .4em;
+
+    strong {
+      font-weight: 600;
+      display: block;
+    }
+  }
+
   .sr-only,
   .sr-only-focusable:not(:focus) {
     position: absolute !important;
