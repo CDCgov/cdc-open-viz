@@ -304,7 +304,7 @@ export default function DataImport() {
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
-                 aria-describedby="load-data" value={extUrl} onBlur={(e) => setExternalURL(e.target.value)}/>
+                 aria-describedby="load-data" defaultValue={extUrl} onBlur={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
                   onClick={() => loadData(null, externalURL)}>Load
           </button>
@@ -386,16 +386,18 @@ export default function DataImport() {
                   <th>Name</th><th>Size</th><th>Type</th><th colSpan="3">Actions</th>
                 </tr>
               </thead>
-              {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
-                <tr>
-                  <td>{config.datasets[datasetKey].dataFileName}</td>
-                  <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
-                  <td>{config.datasets[datasetKey].dataFileFormat}</td>
-                  <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
-                  <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
-                  <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
-                </tr>
-              ))}
+              <tbody>
+                {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
+                  <tr key={`tr-${datasetKey}`}>
+                    <td>{config.datasets[datasetKey].dataFileName}</td>
+                    <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
+                    <td>{config.datasets[datasetKey].dataFileFormat}</td>
+                    <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
+                    <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+                    <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </>
         )}
