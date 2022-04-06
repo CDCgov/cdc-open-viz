@@ -29,6 +29,26 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     startingTab = 2
   }
 
+  // Legacy support - dashboards using a single dataset
+  if(config.type === 'dashboard' && (config.data || config.dataUrl)){
+    let newConfig = {...config};
+
+    newConfig.datasets = {};
+    newConfig.datasets[config.dataFileName || 'dataset-1'] = {
+      data: config.data,
+      dataUrl: config.dataUrl,
+      dataFileName: config.dataFileName || 'dataset-1',
+      dataFileSourceType: config.dataFileSourceType
+    };
+
+    delete newConfig.data;
+    delete newConfig.dataUrl,
+    delete newConfig.dataFileName;
+    delete connewConfigfig.dataFileSourceType;
+    
+    setConfig(newConfig);
+  }
+
   const [globalActive, setGlobalActive] = useState(startingTab);
 
   const resizeObserver = new ResizeObserver(([ container ]) => {
