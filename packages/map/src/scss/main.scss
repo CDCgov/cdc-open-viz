@@ -216,4 +216,9 @@
       cursor: pointer;
     }
   }
+
+  [tabIndex]:focus {
+    outline-color: rgb(0, 95, 204)
+  }
+  
 }

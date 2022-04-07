@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import parse from 'html-react-parser';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -52,7 +52,7 @@ const Sidebar = (props) => {
 
     const entryMin = addCommas(entry.min);
 
-    let formattedText = `${prefix + entryMin + suffix} - ${prefix + entryMax + suffix}`;
+    let formattedText = `${prefix + entryMin + suffix}${entryMax !== entryMin ? ` - ${prefix + entryMax + suffix}` : ''}`;
 
     // If interval, add some formatting
     if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
@@ -72,7 +72,7 @@ const Sidebar = (props) => {
     let legendLabel = formattedText;
 
     if (entry.hasOwnProperty('special')) {
-      legendLabel = entry.value;
+      legendLabel = entry.label || entry.value;
     }
 
     return (
@@ -119,7 +119,7 @@ const Sidebar = (props) => {
 
   return (
     <ErrorBoundary component="Sidebar">
-      <aside className={`${legend.position} ${legend.singleColumn ? 'single-column' : ''} ${viewport}`} role="region" aria-label="Legend">
+      <aside id="legend" className={`${legend.position} ${legend.singleColumn ? 'single-column cdcdataviz-sr-focusable' : 'cdcdataviz-sr-focusable'} ${viewport}`} role="region" aria-label="Legend" tabIndex="0">
       <section className="legend-section" aria-label="Map Legend">
         {runtimeLegend.disabledAmt > 0 &&
           (

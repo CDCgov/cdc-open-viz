@@ -25,6 +25,7 @@ export default function LinearChart() {
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
+
   const xMax = width - config.runtime.yAxis.size;
   const yMax = height - config.runtime.xAxis.size;
 
@@ -159,6 +160,7 @@ export default function LinearChart() {
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
+              const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               const belowBarPaddingFromTop = 9;
@@ -185,10 +187,11 @@ export default function LinearChart() {
                           ) : ''
                         }
 
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) &&
+                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                            // 17 is a magic number from the offset in barchart.
                             <Text
-                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                              verticalAnchor={"middle"}
+                              transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
                         }
