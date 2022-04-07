@@ -37,7 +37,14 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
-                max-width: 30px;
+                max-width: 40px;
+
+                button {
+                    font-size: 11pt;
+                }
+            }
+            td:last-child {
+                max-width: 10px;
             }
         }
         .tabs {
@@ -110,7 +117,8 @@
             color: $mediumGray;
         }
         .btn {
-            display: inline;
+            display: inline-block;
+            margin: 1em 0;
         }
         .btn.active {
             background: darken($primary, 15%);

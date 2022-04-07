@@ -116,10 +116,26 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     setTempConfig
   }
 
+  let configureDisabled = true;
+
+  if(config.type !== 'dashboard'){
+    if(config.formattedData){
+      configureDisabled = false;
+    }
+  } else {
+    if(Object.keys(config.datasets).length > 0){
+      configureDisabled = false;
+      Object.keys(config.datasets).forEach(datasetKey => {
+        if(!config.datasets[datasetKey].formattedData) {
+          configureDisabled = true;
+        }
+      });
+    }
+  }
+
   return (
     <GlobalState.Provider value={state}>
       <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
-        {config.datasets && Object.keys(config.datasets).filter(datasetKey => config.datasets[datasetKey].formattedData !== undefined).length}
         <Tabs className="top-level" startingTab={globalActive}>
           <TabPane title="1. Choose Visualization Type" className="choose-type">
             <ChooseTab />
@@ -128,7 +144,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
             <DataImport />
           </TabPane>
           
-          <TabPane title="3. Configure" className="configure" disableRule={config.datasets && Object.keys(config.datasets).filter(datasetKey => config.datasets[datasetKey].formattedData !== undefined).length === 0}>
+          <TabPane title="3. Configure" className="configure" disableRule={configureDisabled}>
             <ConfigureTab containerEl={containerEl }/>
           </TabPane>
         </Tabs>

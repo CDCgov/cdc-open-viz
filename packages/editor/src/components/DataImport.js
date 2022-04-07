@@ -55,6 +55,11 @@ export default function DataImport() {
     }
   }
 
+  const displayFileName = (name) => {
+    const nameParts = name.split('/');
+    return nameParts[nameParts.length - 1];
+  }
+
   /**
    * Check to see all series for the viz exists in the new dataset
    */
@@ -355,8 +360,17 @@ export default function DataImport() {
     setConfig({...config, datasets: newDatasets});
   };
 
+  const removeDataset = (datasetKey) => {
+    let newDatasets = {...config.datasets};
+
+    delete newDatasets[datasetKey];
+
+    setConfig({...config, datasets: newDatasets});
+  }
+
   let previewData, configureData, readyToConfigure = false;
   if(config.type === 'dashboard'){
+    readyToConfigure = Object.keys(config.datasets).length > 0;
     Object.keys(config.datasets).forEach(datasetKey => {
       if(config.datasets[datasetKey].preview){
         previewData = config.datasets[datasetKey].data;
@@ -364,8 +378,8 @@ export default function DataImport() {
       if(config.datasets[datasetKey].configure){
         configureData = config.datasets[datasetKey];
       }
-      if(config.datasets[datasetKey].formattedData){
-        readyToConfigure = true;
+      if(!config.datasets[datasetKey].formattedData){
+        readyToConfigure = false;
       }
     });
   } else {
@@ -377,7 +391,7 @@ export default function DataImport() {
   return (
     <>
       <div className="left-col">
-        {config.type === 'dashboard' && (
+        {config.type === 'dashboard' && Object.keys(config.datasets).length > 0 && (
           <>
             <div className="heading-3">Data Sources</div>
             <table>
@@ -389,12 +403,12 @@ export default function DataImport() {
               <tbody>
                 {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
                   <tr key={`tr-${datasetKey}`}>
-                    <td>{config.datasets[datasetKey].dataFileName}</td>
+                    <td>{displayFileName(config.datasets[datasetKey].dataFileName)}</td>
                     <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                     <td>{config.datasets[datasetKey].dataFileFormat}</td>
-                    <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
-                    <td><button onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
-                    <td><button onClick={() => setDatasetProp(datasetKey, 'preview', false)}>X</button></td>
+                    <td><button className="btn btn-primary" onClick={() => setGlobalDatasetProp(datasetKey, 'configure', !config.datasets[datasetKey].configure)}>{config.datasets[datasetKey].formattedData ? '' : '!'}Configure Data</button></td>
+                    <td><button className="btn btn-primary" onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+                    <td><button className="btn btn-primary" onClick={() => removeDataset(datasetKey)}>X</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -704,9 +718,9 @@ export default function DataImport() {
           </div>
         )}
 
-        {config.type === 'dashboard' && !addingDataset && <p><button onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
+        {config.type === 'dashboard' && !addingDataset && <p><button className="btn btn-primary" onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
 
-        {readyToConfigure && <p><button onClick={() => setGlobalActive(2)}>Configure your visualization</button></p>}
+        {readyToConfigure && <p><button className="btn btn-primary" onClick={() => setGlobalActive(2)}>Configure your visualization</button></p>}
 
         <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
             rel="noopener noreferrer" className="guidance-link">
