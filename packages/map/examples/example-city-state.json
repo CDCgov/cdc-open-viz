@@ -15,6 +15,7 @@
     "language": "en",
     "hasRegions": false
   },
+  "filters": [{ "label": "", "values": [], "columnName": "Condition" }],
   "columns": {
     "geo": {
       "dataTable": true,
