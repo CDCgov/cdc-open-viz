@@ -7,6 +7,7 @@ export const supportedStates = {
   'US-CA': ['CALIFORNIA', 'CA'],
   'US-CO': ['COLORADO', 'CO'],
   'US-CT': ['CONNECTICUT', 'CT'],
+  'US-DC': ['District of Columbia', 'DC'],
   'US-DE': ['DELAWARE', 'DE'],
   'US-FL': ['FLORIDA', 'FL'],
   'US-GA': ['GEORGIA', 'GA'],
