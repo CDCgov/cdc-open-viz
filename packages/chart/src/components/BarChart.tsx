@@ -205,8 +205,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
-                    console.log(config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0)
-
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
