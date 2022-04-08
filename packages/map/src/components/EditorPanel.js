@@ -2027,6 +2027,7 @@ const EditorPanel = (props) => {
 									<ul className='color-palette'>
 										{Object.keys(colorPalettes)
 											.filter((name) => name.includes('qualitative'))
+                      .filter((name) => name !== 'qualitative9')
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
