@@ -277,6 +277,10 @@ const CdcDataBite = (
     loadConfig()
   }, [])
 
+  if(configObj && config && configObj.data !== config.data){
+    loadConfig();
+  }
+
   let body = (<Loading />)
 
   const DataImage = useCallback(() => {
