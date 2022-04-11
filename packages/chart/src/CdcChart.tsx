@@ -24,13 +24,11 @@ import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
-import PairedBarChart from './components/PairedBarChart';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
-
   const transform = new DataTransform();
 
   interface keyable { [key: string]: any }
@@ -201,11 +199,13 @@ export default function CdcChart(
 
     let uniqueXValues = {};
 
-    for(let i = 0; i < currentData.length; i++) {
-      if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-        newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-      } else {
-        uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+    if(newConfig.visualizationType !== 'Paired Bar') {
+      for(let i = 0; i < currentData.length; i++) {
+        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+        } else {
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+        }
       }
     }
     setConfig(newConfig);
@@ -630,13 +630,6 @@ export default function CdcChart(
           {/* Data Table */}
           {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
         </div>}
-
-        {config.visualizationType === 'Paired Bar' &&
-          <div id="paired-bar-legend">
-            <div><svg className="indicator"><rect width="100%" height="100%" fill={'#000'} /></svg>Male</div>
-            <div><svg className="indicator"><rect width="100%" height="100%" fill={'#000'} /></svg>Female</div>
-          </div>
-        }
       </>
     )
   }
