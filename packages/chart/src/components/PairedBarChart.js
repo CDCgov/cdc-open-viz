@@ -9,19 +9,14 @@ function PairedBarChart({ width, height }) {
 
 	const { dimensions, config, rawData, colorScale, updateConfig } = useContext(Context);
 
-	const labelPadding = 5;
-
 	const data = rawData
 	const adjustedWidth = width;
 	const adjustedHeight = height;
 	const halfWidth = adjustedWidth / 2;
 	
-	//if(config.series.length < 2) return;
 
 	// get values of series key (ie. male/female)
-	console.log('cheers')
 	const groups = data.map(item => item[config.series[0].dataKey])
-	console.log('groups', groups)
 
 	const groupOne = {
 		parentKey: config.series[0].parentKey,
@@ -44,13 +39,6 @@ function PairedBarChart({ width, height }) {
 		range: [0, halfWidth]
 	});
 
-		
-	// const yScale = scaleBand({
-	// 	range: [0, adjustedHeight],
-	// 	domain: data[groupOne.dataKey].map(d => ageMapping[d.age]),
-	// 	padding: 0.2
-	// });
-	
 	const yScale = scaleBand({
 		range: [0, adjustedHeight],
 		domain: data.filter(item => item[groupOne.parentKey] === groupOne.dataKey).map(d => d['Age Group']),
@@ -64,32 +52,29 @@ function PairedBarChart({ width, height }) {
 				width={width}
 				height={height}>
 				<Group top={0} left={config.yAxis.size}>
-					{/* <AxisLeft
-						scale={yScale}
-						tickLabelProps={() => ({
-							fontSize: config.fontSize,
-							textAnchor: 'start'
-						})}
-						left={config.yAxis.size}
-						hideTicks
-					/> */}
-					{data.filter(item => item['Sex'] === 'Male').map(d => (
-						<Group key={`group-male-${d.age}`}>
+					{data.filter(item => item[groupOne.parentKey] === groupOne.dataKey).map(d => (
+						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
 							<Bar
 								className="bar"
 								key={`bar-${groupOne.dataKey}-${d['Age Group']}`}
-								x={halfWidth - xScale(d['Cases per 100K'])}
-								// y={yScale(ageMapping[d.age])}
+								x={halfWidth - xScale(d[config.xAxis.dataKey])}
 								y={yScale([d['Age Group']])}
 								width={xScale(d[config.xAxis.dataKey])}
 								height={yScale.bandwidth()}
 								fill={groupOne.color}
+								data-tip={
+									`<p>
+										${groupOne.dataKey}<br/>
+										${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}
+									</p>`
+								}
+								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
 							/>
 							<text
-								x={halfWidth - xScale(d[config.xAxis.dataKey]) + (xScale(d[config.xAxis.dataKey]) > 35 ? 5 : -30)}
+								x={halfWidth - xScale(d[config.xAxis.dataKey]) + (xScale(d[config.xAxis.dataKey]) > 45 ? 5 : -50)}
 								// y={yScale(ageMapping[d.age]) + (yScale.bandwidth() / 2)}
 								y={yScale([d['Age Group']]) + (yScale.bandwidth() / 2)}
-								fill={xScale(d.percent) > 30 ? 'white' : 'black'}>
+								fill={xScale(d[config.xAxis.dataKey]) > 30 ? 'white' : 'black'}>
 								{d['Age Group']}
 							</text>
 						</Group>
@@ -101,15 +86,21 @@ function PairedBarChart({ width, height }) {
 								className="bar"
 								key={`bar-${groupTwo.dataKey}-${d['Age Group']}`}
 								x={halfWidth}
-								// y={yScale(ageMapping[d.age])}
 								y={yScale([d['Age Group']])}
 								width={xScale(d[config.xAxis.dataKey])}
 								height={yScale.bandwidth()}
 								fill={groupTwo.color}
+								data-tip={
+									`<p>
+										${groupTwo.dataKey}<br/>
+										${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}
+									</p>`
+								}
+								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+
 							/>
 							<text
 								x={halfWidth + xScale(d[config.xAxis.dataKey]) + 5}
-								// y={yScale(ageMapping[d.age]) + (yScale.bandwidth() / 2)}
 								y={yScale([d['Age Group']]) + (yScale.bandwidth() / 2)}
 								fill={xScale(d.percent) > 30 ? 'white' : 'black'}>
 								{d['Age Group']}
