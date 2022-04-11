@@ -1156,6 +1156,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
+
+        // Cleanup
+        return () => setRuntimeLegend([])
+
     }, [state])
 
     useEffect(() => {
@@ -1262,7 +1266,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="-1">
 						{parse(title)}
 					</div>
 				</header>
