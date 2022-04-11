@@ -260,11 +260,17 @@ const EditorPanel = () => {
   }
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
-  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
-  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('saturated')
+  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('two-tone')
 
   if(loading) {
     return null
+  }
+
+  const setLollipopShape = (shape) => {
+    updateConfig({
+      ...config,
+      lollipopShape: shape
+    })
   }
 
   const removeFilter = (index) => {
@@ -464,10 +470,10 @@ const EditorPanel = () => {
     if(config.visualizationSubType === 'horizontal') {
       updateConfig({
         ...config,
-        lollipopShape: lollipopShape
+        lollipopShape: config.lollipopShape
       })
     }
-  }, [config.isLollipopChart, lollipopShape]);
+  }, [config.isLollipopChart, config.lollipopShape]);
   
   useEffect(() => {
     if(config.isLollipopChart && config.visualizationSubType === 'horizontal') {
@@ -925,7 +931,7 @@ const EditorPanel = () => {
                               type="radio"
                               name="lollipopShape"
                               value="circle"
-                              checked={lollipopShape === "circle"}
+                              checked={config.lollipopShape === "circle"}
                             />
                             Circle
                           </label>
@@ -934,14 +940,14 @@ const EditorPanel = () => {
                               type="radio"
                               name="lollipopShape"
                               value="square"
-                              checked={lollipopShape === "square"}
+                              checked={config.lollipopShape === "square"}
                             />
                             Square
                           </label>
                         </div>
 
                       </label>
-                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'saturated' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'saturated']} />
+                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'two-tone']} />
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small' } fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={['small', 'medium', 'large']} />
                     </>
                   }

@@ -52,15 +52,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           ...config.legend,
           hide: true
         },
-        yAxis: {
-          ...config.yAxis,
-          hideAxis: config.visualizationSubType === 'horizontal' ? false : config.visualizationSubType === 'regular' ? true : null
-        },
-        xAxis: {
-          ...config.xAxis,
-          hideAxis: config.visualizationSubType === 'horizontal' ? true : config.visualizationSubType === 'regular' ? false : null
-        },
-        lollipopColorStyle: 'saturated'
+        lollipopColorStyle: 'two-tone'
       })
     }
 
@@ -231,7 +223,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
                         fill={config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : 
-                              config.isLollipopChart && config.lollipopColorStyle === 'saturated' ? chroma(barColor).brighten(1) : barColor }
+                              config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor }
                         stroke="#333"
                         strokeWidth={config.isLollipopChart ? 0 : config.barBorderThickness || 1}
                         opacity={transparentBar ? 0.5 : 1}
@@ -347,7 +339,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )
                             : (
                                 <Text
-                                  x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}`} // padding
+                                  x={ `${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0 ) }`} // padding
                                   y={ config.isLollipopChart ? offset : (config.barHeight / 2 ) + config.barHeight * (barGroup.bars.length - bar.index - 1)}
                                   fill={ '#000000'}
                                   textAnchor="start"

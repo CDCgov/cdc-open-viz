@@ -141,18 +141,34 @@ export default function DataTable() {
             {config.table.label}
           </div>
           <div className="table-container">
-            <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>
+            <table  
+              className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
+              hidden={!tableExpanded} 
+              {...getTableProps()}
+              aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
+              >
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup,index) => (
                   <tr {...headerGroup.getHeaderGroupProps()} key={`headerGroups--${index}`}>
                     {headerGroup.headers.map((column, index) => (
-                      <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header} key={`trth--${index}`}>
+                      <th 
+                        tabIndex="0" 
+                        title={column.Header} key={`trth--${index}`}
+                        role="columnheader"
+                        scope="col"
+                        {...column.getHeaderProps(column.getSortByToggleProps())} 
+                        className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} 
+                        {...(column.isSorted ? column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' } : null)}
+                        >
                         {index === 0
                           ? config.table.indexLabel
                             ? config.table.indexLabel : column.render('Header')
                           : column.render('Header')
                         }
+                        <button>
+                          <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                        </button>
                         <div {...column.getResizerProps()} className="resizer" />
                       </th>
                     ))}
@@ -165,7 +181,11 @@ export default function DataTable() {
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
                       {row.cells.map((cell, index) => (
-                        <td tabIndex="0" {...cell.getCellProps()} key={`tbody__tr__td-${index}`}>
+                        <td 
+                          tabIndex="0" 
+                          {...cell.getCellProps()} 
+                          key={`tbody__tr__td-${index}`} 
+                          role="gridcell">
                           {cell.render('Cell')}
                         </td>
                       ))}
