@@ -17,7 +17,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import '../scss/LinearChart.scss';
 
 export default function LinearChart() {
-  console.log('testing within Linear Chart')
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
 
@@ -250,15 +249,12 @@ export default function LinearChart() {
             stroke="#333"
             tickStroke="#333"
             numTicks={config.runtime.xAxis.numTicks || undefined}
-            hideZero={false}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
                 <Group className="bottom-axis">
                   {props.ticks.map((tick, i) => {
-                    console.log('tick', tick)
-                    console.log('i', i)
                     const tickWidth = xMax / props.ticks.length;
                     return (
                       <Group
