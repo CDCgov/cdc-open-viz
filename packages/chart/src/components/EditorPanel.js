@@ -300,7 +300,16 @@ const EditorPanel = () => {
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
 
-    newSeries.push({dataKey: seriesKey, type: 'Bar'})
+    if(config.visualizationType === 'Paired Bar') {
+      console.log('filering here', unfilteredData)
+      let keys = new Set(unfilteredData.map( item => item[seriesKey]))
+      keys = [...keys]
+      keys.forEach( key => {
+        newSeries.push({dataKey: key, type: 'Paired Bar', parentKey: seriesKey})
+      })
+    } else {
+      newSeries.push({dataKey: seriesKey, type: 'Bar'})
+    }
 
     updateConfig({...config, series: newSeries})
   }
@@ -365,9 +374,9 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    unfilteredData.map(row => {
-      Object.keys(row).forEach(columnName => columns[columnName] = true)
-    })
+      unfilteredData.map(row => {
+        Object.keys(row).forEach(columnName => columns[columnName] = true)
+      })
 
     if(filter) {
       let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
