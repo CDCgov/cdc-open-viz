@@ -239,8 +239,8 @@ const CdcDataBite = (
         break;
       case DATA_FUNCTION_RANGE:
         numericalData.sort((a, b) => a - b);
-        let rangeMin = applyPrecision(numericalData[0]);
-        let rangeMax = applyPrecision(numericalData[numericalData.length - 1]);
+        let rangeMin:number = applyPrecision(numericalData[0]);
+        let rangeMax:number = applyPrecision(numericalData[numericalData.length - 1]);
 
         if (config.dataFormat.commas) {
           rangeMin = Number(rangeMin).toLocaleString('en-US');
