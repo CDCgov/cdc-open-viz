@@ -15,6 +15,8 @@ import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 
 
+type DefaultsType = typeof defaults;
+
 const CdcDataBite = (
     { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
     { configUrl?: string, config?: any, isDashboard?: boolean, isEditor?: boolean, setConfig? }
