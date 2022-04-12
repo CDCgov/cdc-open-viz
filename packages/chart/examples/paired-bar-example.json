@@ -3,8 +3,8 @@
     "dataUrl":  "/examples/paired-bar-data.json",
     "visualizationType": "Paired Bar",
     "series": [
-        {"dataKey": "Male", "parentKey": "Sex", "type": "Paired Bar"},
-        {"dataKey": "Female", "parentKey": "Sex", "type": "Paired Bar"}
+        {"dataKey": "Male","type": "Paired Bar"},
+        {"dataKey": "Female","type": "Paired Bar"}
     ],
     "dataFormat": {
         "roundTo": 1,
@@ -17,18 +17,32 @@
         "right": 0
     },
     "yAxis": {
-        "label": "Age Group"
+        "label": "Cases per 100K",
+        "tickRotation": 30,
+        "hideAxis": true
     },
     "xAxis": {
-        "label": "Cases per 100K",
-        "dataKey": "Cases per 100K",
-        "tickRotation": 30
+        "label": "Age Group",
+        "dataKey": "Age Group",
+        "tickRotation": 30,
+        "hideAxis": true
     },
     "legend": {
-        "hide": false
+        "hideAxis": false
     },
     "table": {
         "label": "Data Table",
         "expanded": false
+    },
+    "dataDescription": {
+        "horizontal": false,
+        "series": true,
+        "seriesKey": "Sex",
+        "singleRow": false,
+        "xKey": "Age Group",
+        "valueKey": "Cases per 100K"
+    },
+    "runtime": {
+        "horizontal": true
     }
 }
