@@ -243,8 +243,8 @@ const CdcDataBite = (
         let rangeMax:number = applyPrecision(numericalData[numericalData.length - 1]);
 
         if (config.dataFormat.commas) {
-          rangeMin = Number(rangeMin).toLocaleString('en-US');
-          rangeMax = Number(rangeMax).toLocaleString('en-US');
+          rangeMin = Number(rangeMin.toLocaleString('en-US'));
+          rangeMax = Number(rangeMax.toLocaleString('en-US'));
         }
 
         dataBite = config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + applyPrecision(rangeMax) + config.dataFormat.suffix;
