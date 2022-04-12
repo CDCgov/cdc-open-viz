@@ -182,11 +182,14 @@ const CdcDataBite = (
       return applyPrecision(value);
     };
 
-    const applyPrecision = (value) => {
-      if ('' !== config.dataFormat.roundToPlace && !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
-        value = Number(value).toFixed(Number(config.dataFormat.roundToPlace));
+    const applyPrecision = (value:number):number => {
+      const roundedNum:number = Number(config.dataFormat.roundToPlace) // default 0
+      let result:number = 0
+      // resmove roundedNum !== '' condition cause it always returns true
+      if (!isNaN(roundedNum) && roundedNum>-1) {
+        result= Number(value.toFixed(roundedNum));
       }
-      return value;
+      return Number(result)
     }
 
     let dataBite:number = null;
