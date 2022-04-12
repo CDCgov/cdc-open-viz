@@ -36,6 +36,8 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
+
+
   if (data) {
     let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
@@ -106,7 +108,34 @@ export default function LinearChart() {
         range: [0, xMax]
       });
     }
+
+      
+  if(config.visualizationType === 'Paired Bar') {
+
+    console.log('min', 0)
+    console.log('max', xAxisDataMapped)
+    
+    // group one
+    var g1xScale = scaleLinear<number>({
+      domain: [0, Math.max.apply(Math,xAxisDataMapped) ],
+      range: [xMax/2, 0]
+    })
+  
+    // group 2
+    var g2xScale = scaleLinear<number>({
+      domain: g1xScale.domain(),
+      range: [xMax / 2, xMax]
+    })
+
+    // xScale = g => g
+    // .attr("transform", `translate(0,${height - margin.bottom})`)
+    // .call(g => g.append("g").call(d3.axisBottom(xM).ticks(width / 80, ".0%")))
+    // .call(g => g.append("g").call(d3.axisBottom(xF).ticks(width / 80, ".0%")))
+    // .call(g => g.selectAll(".tick:first-of-type").remove())
   }
+  }
+
+  
 
   useEffect(() => {
     ReactTooltip.rebuild();
@@ -239,7 +268,7 @@ export default function LinearChart() {
           )}
 
           {/* X axis */}
-          {!config.xAxis.hideAxis && (
+          {!config.xAxis.hideAxis && config.visualizationType !== 'Paired Bar' && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -251,6 +280,7 @@ export default function LinearChart() {
             numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
+              console.log('props', props)
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
                 <Group className="bottom-axis">
@@ -296,6 +326,105 @@ export default function LinearChart() {
             }}
           </AxisBottom>
           )}
+
+          {config.visualizationType === 'Paired Bar' &&
+          <>
+          <AxisBottom
+            top={yMax}
+            left={config.runtime.yAxis.size}
+            label={config.runtime.xAxis.label}
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
+            scale={g1xScale}
+            stroke="#333"
+            tickStroke="#333"
+            numTicks={config.runtime.xAxis.numTicks || undefined}
+          >
+            {props => {
+              console.log('props', props)
+              const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
+              return (
+                <Group className="bottom-axis">
+                  {props.ticks.map((tick, i) => {
+                    const tickWidth = xMax / props.ticks.length;
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className={'vx-axis-tick'}
+                      >
+                        <Line
+                          from={tick.from}
+                          to={tick.to}
+                          stroke="#333"
+                        />
+                        <Text
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                          verticalAnchor="start"
+                          textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                          width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                        >
+                          {tick.formattedValue}
+                        </Text>
+                      </Group>
+                    );
+                  })}
+                  <Line
+                    from={props.axisFromPoint}
+                    to={props.axisToPoint}
+                    stroke="#333"
+                  />
+                </Group>
+              );
+            }}
+          </AxisBottom>
+          <AxisBottom
+            top={yMax}
+            left={config.runtime.yAxis.size}
+            label={config.runtime.xAxis.label}
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
+            scale={g2xScale}
+            stroke="#333"
+            tickStroke="#333"
+            numTicks={config.runtime.xAxis.numTicks || undefined}
+          >
+            {props => {
+              console.log('props', props)
+              const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
+              return (
+                <Group className="bottom-axis">
+                  {props.ticks.map((tick, i) => {
+                    const tickWidth = xMax / props.ticks.length;
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className={'vx-axis-tick'}
+                      >
+                        <Line
+                          from={tick.from}
+                          to={tick.to}
+                          stroke="#333"
+                        />
+                        <Text
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                          verticalAnchor="start"
+                          textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                          width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                        >
+                          {tick.formattedValue}
+                        </Text>
+                      </Group>
+                    );
+                  })}
+                  <Line
+                    from={props.axisFromPoint}
+                    to={props.axisToPoint}
+                    stroke="#333"
+                  />
+                </Group>
+              );
+            }}
+          </AxisBottom>
+          </>
+          }
           { config.visualizationType === 'Paired Bar' && (
             <PairedBarChart  width={xMax} height={yMax}  />
           ) }

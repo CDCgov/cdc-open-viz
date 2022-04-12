@@ -15,9 +15,6 @@ function PairedBarChart({ width, height }) {
 	const halfWidth = adjustedWidth / 2;
 	
 
-	// get values of series key (ie. male/female)
-	const groups = data.map(item => item[config.series[0].dataKey])
-
 	const groupOne = {
 		parentKey: config.series[0].parentKey,
 		dataKey: config.series[0].dataKey,

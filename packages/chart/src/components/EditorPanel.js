@@ -315,6 +315,8 @@ const EditorPanel = () => {
   }
 
   const removeSeries = (seriesKey) => {
+
+
     let series = [...config.series]
     let seriesIndex = -1;
 
@@ -335,6 +337,13 @@ const EditorPanel = () => {
       }
 
       updateConfig(newConfig)
+    }
+
+    if(config.visualizationType === 'Paired Bar') {
+      updateConfig({
+        ...config,
+        series: []
+      })
     }
   }
 
