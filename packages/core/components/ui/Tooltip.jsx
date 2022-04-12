@@ -5,7 +5,6 @@ const TooltipTarget = () => null
 const TooltipContent = () => null
 
 const Tooltip = ({ position = 'top', trigger = 'hover', float = false, hideOnScroll = true, children }) => {
-
   const tooltipTargetChildren = children.find(el => el.type === TooltipTarget)
   const tooltipContentChildren = children.find(el => el.type === TooltipContent)
 

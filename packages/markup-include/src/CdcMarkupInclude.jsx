@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import axios from 'axios'
 import parse from 'html-react-parser'
 
@@ -8,7 +8,10 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+import Modal from '@cdc/core/components/ui/Modal'
 import './scss/main.scss'
+
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 const CdcMarkupInclude = (
   {
@@ -87,6 +90,8 @@ const CdcMarkupInclude = (
     }
   }, [ markupError ])
 
+  let { modal, globalActions } = useGlobalContext()
+
   const loadConfigMarkupData = async () => {
     setMarkupError(null)
 
@@ -127,6 +132,19 @@ const CdcMarkupInclude = (
     return content
   }
 
+  const testModal = () => {
+    return (
+      <Modal name="test">
+        <Modal.Header>
+          Modal Title
+        </Modal.Header>
+        <Modal.Content>
+          Modal Content displays here
+        </Modal.Content>
+      </Modal>
+    )
+  }
+
   //Load initial config
   useEffect(() => {
     loadConfig()
@@ -156,9 +174,14 @@ const CdcMarkupInclude = (
           </header>
           }
           <div className="cove-component__content">
-            {!markupError && urlMarkup && <div className="cove-component__content-wrap" dangerouslySetInnerHTML={{ __html: parseBodyMarkup(urlMarkup) }}/>}
+            {!markupError && urlMarkup && <div className="cove-component__content-wrap"
+                                               dangerouslySetInnerHTML={{ __html: parseBodyMarkup(urlMarkup) }}/>}
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
+          <button onClick={() => {
+            globalActions.setModalObj(testModal())
+          }}>Test
+          </button>
         </div>
       </>
     )
@@ -168,6 +191,7 @@ const CdcMarkupInclude = (
     <div className={`cove`}>
       {isEditor && <EditorPanel>{body}</EditorPanel>}
       {!isEditor && body}
+      {modal.object ? modal.object : null}
     </div>
   )
 
