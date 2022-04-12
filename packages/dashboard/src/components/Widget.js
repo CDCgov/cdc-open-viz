@@ -79,12 +79,24 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     updateConfig({...config, visualizations});
   }
 
+  const changeDataset = (uid, value) => {
+    visualizations[uid].dataKey = value;
+
+    updateConfig({...config, visualizations});
+  }
+
   return (
     <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
       <MoveIcon className="drag-icon" />
       <div className="widget__content">
         {data.rowIdx !== undefined && (
           <div className="widget-menu">
+            <select defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
+              <option value="">Select a dataset</option>
+              {Object.keys(config.datasets).map(datasetKey => (
+                <option>{datasetKey}</option>
+              ))}
+            </select>
             <div className="widget-menu-item" onClick={editWidget}><EditIcon /></div>
             <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
           </div>

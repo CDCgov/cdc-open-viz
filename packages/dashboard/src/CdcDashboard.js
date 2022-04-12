@@ -345,9 +345,11 @@ export default function CdcDashboard(
     Object.keys(config.visualizations).forEach(visualizationKey => {
       let visualizationConfig = config.visualizations[visualizationKey];
 
-      visualizationConfig.data = filteredData || data;
+      const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
 
-    if(visualizationConfig.editing) {
+      visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
+
+      if(visualizationConfig.editing) {
         subVisualizationEditing = true;
 
         const back = () => {
