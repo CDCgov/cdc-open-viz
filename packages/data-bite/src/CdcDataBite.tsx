@@ -189,7 +189,7 @@ const CdcDataBite = (
       return value;
     }
 
-    let dataBite = null;
+    let dataBite:number = null;
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
@@ -232,7 +232,7 @@ const CdcDataBite = (
         dataBite = Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join(', ');
+        dataBite = Number(getMode(numericalData).join(', '));
         break;
       case DATA_FUNCTION_RANGE:
         numericalData.sort((a, b) => a - b);
@@ -255,7 +255,7 @@ const CdcDataBite = (
       dataBite = applyPrecision(dataBite);
 
       if (config.dataFormat.commas) {
-        dataBite = Number(dataBite).toLocaleString('en-US');
+        dataBite = Number(dataBite.toLocaleString('en-US'));
       }
 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
