@@ -70,7 +70,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
 const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
   <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, value) }} {...attributes}/>
     <span className="edit-label">{label}</span>
   </label>
 ))
