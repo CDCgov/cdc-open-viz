@@ -28,6 +28,8 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
 
   const onChange = (e) => {
+    let value = (e.target.value).toString();
+
     //TODO: This block gives a warning/error in the console, but it still works.
     if('number' !== type || min === null){
       setValue(e.target.value);
