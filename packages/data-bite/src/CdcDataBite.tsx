@@ -23,7 +23,7 @@ const CdcDataBite = (
 ) => {
 
  
-  const [config, setConfig] = useState({...defaults});
+  const [config, setConfig] = useState<DefaultsType>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
 
   const {
