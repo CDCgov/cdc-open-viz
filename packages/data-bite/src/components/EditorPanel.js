@@ -13,6 +13,7 @@ import Context from '../context'
 import WarningImage from '../images/warning.svg'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
+import { Fragment } from 'react'
 
 const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, max = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -55,7 +56,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   }
 
   return (
-    <>
+    <Fragment>
       {label && label.length > 0 &&
         <label>
           <span className="edit-label column-heading">{label}</span>
@@ -63,7 +64,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
         </label>
       }
       {(!label || label.length === 0) && formElement}
-    </>
+    </Fragment>
   )
 })
 
