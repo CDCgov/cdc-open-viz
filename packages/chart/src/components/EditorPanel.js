@@ -299,18 +299,7 @@ const EditorPanel = () => {
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
-
-    if(config.visualizationType === 'Paired Bar') {
-      console.log('filering here', unfilteredData)
-      let keys = new Set(unfilteredData.map( item => item[seriesKey]))
-      keys = [...keys]
-      keys.forEach( key => {
-        newSeries.push({dataKey: key, type: 'Paired Bar', parentKey: seriesKey})
-      })
-    } else {
-      newSeries.push({dataKey: seriesKey, type: 'Bar'})
-    }
-
+    newSeries.push({dataKey: seriesKey, type: 'Bar'})
     updateConfig({...config, series: newSeries})
   }
 
@@ -677,9 +666,7 @@ const EditorPanel = () => {
                         </ul>
                       </>)}
                       
-                      { ( (config.visualizationType === 'Paired Bar' && config.series.length < 2) || (config.visualizationType !== 'Paired Bar') ) &&
-                        <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
-                      }
+                      <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
                       {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                         <>
                           <span className="divider-heading">Confidence Keys</span>

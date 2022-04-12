@@ -112,12 +112,13 @@ export default function LinearChart() {
       
   if(config.visualizationType === 'Paired Bar') {
 
-    console.log('min', 0)
-    console.log('max', xAxisDataMapped)
-    
+
+    let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
+    let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
+
     // group one
     var g1xScale = scaleLinear<number>({
-      domain: [0, Math.max.apply(Math,xAxisDataMapped) ],
+      domain: [0, Math.max(groupOneMax,groupTwoMax) ],
       range: [xMax/2, 0]
     })
   
@@ -127,11 +128,6 @@ export default function LinearChart() {
       range: [xMax / 2, xMax]
     })
 
-    // xScale = g => g
-    // .attr("transform", `translate(0,${height - margin.bottom})`)
-    // .call(g => g.append("g").call(d3.axisBottom(xM).ticks(width / 80, ".0%")))
-    // .call(g => g.append("g").call(d3.axisBottom(xF).ticks(width / 80, ".0%")))
-    // .call(g => g.selectAll(".tick:first-of-type").remove())
   }
   }
 
@@ -227,7 +223,7 @@ export default function LinearChart() {
                         }
 
 
-                        { config.visualizationSubType !== "horizontal" &&
+                        { config.visualizationSubType !== "horizontal" || (config.visualizationType !== 'Paired Bar') &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
@@ -280,7 +276,6 @@ export default function LinearChart() {
             numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
-              console.log('props', props)
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
                 <Group className="bottom-axis">
@@ -357,9 +352,9 @@ export default function LinearChart() {
                           stroke="#333"
                         />
                         <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
                           verticalAnchor="start"
-                          textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                          textAnchor={'end'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
                           {tick.formattedValue}
@@ -404,9 +399,9 @@ export default function LinearChart() {
                           stroke="#333"
                         />
                         <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
+                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
                           verticalAnchor="start"
-                          textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
+                          textAnchor={'end'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
                           {tick.formattedValue}
