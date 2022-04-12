@@ -46,7 +46,7 @@
     cursor: pointer;
     transition: left 400ms ease 65ms, background-color 200ms ease;
     box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
-    z-index: 100;
+    z-index: 10;
 
     &:before {
       top: 43%;
