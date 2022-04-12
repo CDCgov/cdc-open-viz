@@ -12,6 +12,10 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
+  "devDependencies": {
+    "use-debounce": "^6.0.1",
+    "react-tooltip": "4.2.8"
+  },
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },

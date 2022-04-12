@@ -1,0 +1,87 @@
+$cove-tooltip-bg: #fff;
+$cove-tooltip-color: #333;
+$cove-tooltip-timing: 500ms;
+
+.cove-tooltip {
+  display: inline-flex;
+  position: relative;
+  margin-left: 100px;
+  z-index: 2;
+}
+
+.cove-tooltip--target {
+  display: flex;
+  color: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cove-tooltip__content {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 0.875rem;
+  color: $cove-tooltip-color;
+  background-color: $cove-tooltip-bg;
+  border-radius: 5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  cursor: default;
+  //animation: tooltip-btt $cove-tooltip-timing cubic-bezier(0.16, 1, 0.3, 1) 0s 1 forwards;
+  opacity: 1;
+}
+
+.cove-tooltip__content--interactive {
+  a {
+    pointer-events: all;
+  }
+}
+
+@keyframes tooltip-ltr {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(8px);
+  }
+}
+
+@keyframes tooltip-rtl {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes tooltip-ttb {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes tooltip-btt {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+}
