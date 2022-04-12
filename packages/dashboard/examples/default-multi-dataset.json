@@ -376,10 +376,6 @@
 		}
 	},
 	"dashboard": {
-		"filters": [{
-			"label": "Filter 1",
-			"columnName": "filter1"
-		}]
 	},
 	"rows": [
 		[{"width": 12, "widget": "chart1"}, {}, {}],
@@ -392,7 +388,6 @@
 			"dataKey": "data2",
 			"title": "Average Temperature By City (Line Example)",
 			"description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
-			"dataUrl":  "/examples/temp-example-data.json",
 			"visualizationType": "Line",
 			"series": [{"dataKey": "New York", "label": "NY"}, {"dataKey": "San Francisco", "label": "SF"}, {"dataKey":"Austin", "label": "AU"}],
 			"filters":[{
