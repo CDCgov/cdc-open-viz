@@ -21,7 +21,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   useEffect(() => {
     if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
-      updateField(section, subsection, fieldName, debouncedValue, i)
+      updateField(section, subsection, fieldName, debouncedValue)
     }
   }, [debouncedValue, section, subsection, fieldName, i, stateValue, updateField])
 
