@@ -205,7 +205,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(value);
     };
 
-    const applyPrecision = (value) => {
+    const applyPrecision =(value) => {
       if ( !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
         value = Number(value).toFixed(Number(config.dataFormat.roundToPlace));
       }
@@ -227,7 +227,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData = []
+    let numericalData = [config.dataFormat.roundToPlace]
 
    // Get the column's data
      if(filteredData.length){
