@@ -1,4 +1,4 @@
-import React, { useEffect,  useState, useCallback } from 'react';
+import React, { useEffect,  useState, useCallback,FC } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
@@ -15,12 +15,18 @@ import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 
-const CdcDataBite = (
-    { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
-    { configUrl?: string, config?: any, isDashboard?: boolean, isEditor?: boolean, setConfig? }
-) => {
 
-  type DefaultsType = typeof defaults
+type DefaultsType = typeof defaults
+interface Props{
+  configUrl?: string,
+  config?: any
+  isDashboard?: boolean
+  isEditor?: boolean
+  setConfig?:any
+}
+
+const CdcDataBite:FC<Props> = (props) => {
+const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
 
   const [config, setConfig] = useState<DefaultsType>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
