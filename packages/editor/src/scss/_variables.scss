@@ -9,7 +9,7 @@ $lg: 1200px;
 $base-size: 16;
 
 @function size($target, $context: $base-size) {
-  @return ($target / $context) * 1em;
+  @return calc($target / $context) * 1em;
 }
 
 $gbl-padding: size(30);

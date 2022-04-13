@@ -46,11 +46,17 @@ table.data-table {
     user-select: none;
     -moz-user-select: none;
     user-select: none;
+
+    button {
+      background: none;
+      font-size: initial;
+      color: #fff;
+    }
+
     tr {
       background: none;
     }
   }
-  
   thead {
     color: #fff;
     background-color: $mediumGray;

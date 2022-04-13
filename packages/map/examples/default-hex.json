@@ -13,7 +13,8 @@
     "geoBorderColor": "darkGray",
     "territoriesLabel": "Territories",
     "language": "en",
-    "hasRegions": false
+    "hasRegions": false,
+	"displayAsHex": true
   },
   "filters": [{ "label": "", "values": [], "columnName": "Condition" }],
   "columns": {
@@ -119,7 +120,7 @@
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "DC",
+      "STATE": "District of Columbia",
       "Rate": 14,
       "Location": "Home",
       "URL": "https://www.cdc.gov/"
