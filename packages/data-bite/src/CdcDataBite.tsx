@@ -20,11 +20,9 @@ const CdcDataBite = (
     { configUrl?: string, config?: any, isDashboard?: boolean, isEditor?: boolean, setConfig? }
 ) => {
 
-  interface keyable {
-    [key: string]: any
-  }
+  type DefaultsType = typeof defaults
 
-  const [config, setConfig] = useState<keyable>({...defaults});
+  const [config, setConfig] = useState<DefaultsType>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
 
   const {
