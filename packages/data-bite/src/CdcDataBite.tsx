@@ -144,8 +144,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return '';
     }
 
-    const getColumnSum = (arr) => {
-      const sum = arr.reduce((sum, x) => sum + x);
+    const getColumnSum = (arr:number[]):number => {
+      if(!arr || !arr.length || !Array.isArray(arr)){
+        console.error('Enter valid value for getColumnSum function ')
+        return;
+      }
+      let sum = 0
+      if(arr.length > 1){
+       sum = arr.reduce((sum, x) => sum + x);
+
+      }else {
+        sum = arr[0]
+      }
       return applyPrecision(sum);
     }
 
