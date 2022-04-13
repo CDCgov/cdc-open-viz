@@ -13,7 +13,7 @@ import Context from './context';
 import DataTransform from '@cdc/core/components/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
-
+import numberFromString from '@cdc/core/helpers/numberFromString';
 
 const CdcDataBite = (
     { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
@@ -206,12 +206,15 @@ const CdcDataBite = (
 
     let numericalData = []
 
-    //Get the column's data
-    // filteredData.forEach(row => {
-    //   console.log(row)
-    //   let value = numberFromString(row[dataColumn])
-    //   if(typeof value === 'number') numericalData.push(value)
-    // });
+   // Get the column's data
+     if(filteredData.length){
+      filteredData.forEach(row => {
+        let value = numberFromString(row[dataColumn])
+        if(typeof value === 'number') numericalData.push(value)
+      });
+     }
+    
+  
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
