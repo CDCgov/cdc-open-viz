@@ -3,7 +3,7 @@ import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
-import numberFromString from '@cdc/core/helpers/numberFromString'
+
 import ResizeObserver from 'resize-observer-polyfill';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
@@ -196,7 +196,7 @@ const CdcDataBite = (
 
     filters.map((filter) => {
       if ( filter.columnName && filter.columnValue ) {
-        filteredData = filteredData.filter(function (e) {
+      return filteredData = filteredData.filter(function (e) {
           return e[filter.columnName] === filter.columnValue;
         });
       } else {
@@ -207,10 +207,11 @@ const CdcDataBite = (
     let numericalData = []
 
     //Get the column's data
-    filteredData.forEach(row => {
-      let value = numberFromString(row[dataColumn])
-      if(typeof value === 'number') numericalData.push(value)
-    });
+    // filteredData.forEach(row => {
+    //   console.log(row)
+    //   let value = numberFromString(row[dataColumn])
+    //   if(typeof value === 'number') numericalData.push(value)
+    // });
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
