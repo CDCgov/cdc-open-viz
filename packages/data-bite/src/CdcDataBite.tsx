@@ -159,8 +159,17 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(sum);
     }
 
-    const getColumnMean = (arr) => {
-      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0];
+    const getColumnMean = (arr:number[]):number => {
+      if(!arr || !arr.length || !Array.isArray(arr)){
+        console.error('Enter valid value for getColumnMean function ')
+        return;
+      }
+      let mean = 0
+      if(arr.length >1){
+        mean = arr.reduce((a:number, b:number) => a + b) / arr.length
+      }else {
+        mean = arr[0]
+      }
       return applyPrecision(mean);
     }
 
