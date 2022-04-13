@@ -1,0 +1,117 @@
+input, datalist, textarea, select {
+  transition: border-color 200ms $transition-expo-out;
+  font-family: sans-serif;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+datalist, textarea, select {
+  padding: 0.5em 0.5em;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cbcbcb;
+  border-radius: 3px;
+  width: 100%;
+
+  &::placeholder {
+    transition: opacity 400ms $transition-expo-out;
+    color: #b3b3b3;
+    opacity: 1;
+  }
+
+  &:focus {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #4c4c4c;
+    outline: 0;
+
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+}
+
+select {
+  &.input--small {
+    padding: 0;
+  }
+}
+
+input[type="text"] {}
+
+textarea {
+  width: 100%;
+  min-height: 140px;
+  max-width: 100%;
+  line-height: 1.5em;
+}
+
+label {
+  display: block;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  user-select: none;
+
+  &:not(:first-child) {
+    margin-top: 1em;
+  }
+}
+
+.input-group {
+  &:not(:last-child) {
+    margin-bottom: 1.5em;
+  }
+
+  > label {
+    margin-bottom: 0.5rem;
+  }
+
+  .input-group--checkbox:last-of-type,
+  .input-group--radio:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.input-group--checkbox {
+  margin-bottom: 1rem;
+}
+
+.input-group--checkbox,
+.input-group--radio {
+  display: flex;
+  align-items: center;
+
+  label,
+  input[type="checkbox"],
+  input[type="radio"] {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  label {
+    padding-right: 6px;
+
+    + input[type="checkbox"],
+    + input[type="radio"] {
+      margin-left: 0;
+    }
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    display: inline-block;
+    margin-right: 0;
+    margin-left: 0;
+
+    + label {
+      padding-right: 0;
+      padding-left: 6px;
+    }
+  }
+
+  input[type="radio"] {
+    margin-bottom: 5px;
+  }
+}

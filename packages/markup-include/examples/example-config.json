@@ -1,0 +1,6 @@
+{
+  "type": "markup-include",
+  "dataUrl": "/examples/example-data.json",
+  "title": "Markup Include",
+  "theme": "theme-blue"
+}
