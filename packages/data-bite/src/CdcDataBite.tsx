@@ -187,7 +187,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     };
 
     const applyPrecision = (value) => {
-      if ('' !== config.dataFormat.roundToPlace && !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
+      if ( !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
         value = Number(value).toFixed(Number(config.dataFormat.roundToPlace));
       }
       return value;
