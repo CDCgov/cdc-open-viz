@@ -230,10 +230,12 @@ const EditorPanel = memo(() => {
 
   const getColumns = (filter = true) => {
     let columns = {}
-
-    data.map(row => {
-      Object.keys(row).forEach(columnName => columns[columnName] = true)
-    })
+      if(data.length){
+        data.map(row => {
+          return Object.keys(row).forEach(columnName => columns[columnName] = true)
+         })
+      }
+    
 
     return Object.keys(columns)
   }
