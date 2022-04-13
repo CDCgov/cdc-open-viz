@@ -9,7 +9,6 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
-import { supportedStates, stateToIso  } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -219,9 +218,6 @@ const UsaMap = (props) => {
       let geoKey = geo.properties.iso;
 
       // Manually add Washington D.C. in for Hex maps
-      if(isHex && geoKey === 'US-DC') {
-        geoKey = 'District of Columbia'
-      }
 
       if(!geoKey) return
 
@@ -313,7 +309,7 @@ const UsaMap = (props) => {
 
     return geosJsx;
   };
-
+  
   return (
     <ErrorBoundary component="UsaMap">
       <svg viewBox="0 0 880 500">

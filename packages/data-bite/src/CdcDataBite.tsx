@@ -5,11 +5,15 @@ import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import ResizeObserver from 'resize-observer-polyfill';
+import Papa from 'papaparse';
+import parse from 'html-react-parser';
+
 import Context from './context';
 // @ts-ignore
+import DataTransform from '@cdc/core/components/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
-import parse from 'html-react-parser'
+
 
 const CdcDataBite = (
     { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } :
@@ -36,16 +40,55 @@ const CdcDataBite = (
     subtext
   } = config;
 
+  const transform = new DataTransform()
+
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
         let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
-
         setCurrentViewport(newViewport)
     }
   });
+
+  const fetchRemoteData = async (url) => {
+    try {
+        const urlObj = new URL(url);
+        const regex = /(?:\.([^.]+))?$/
+
+        let data = []
+
+        const ext = (regex.exec(urlObj.pathname)[1])
+        if ('csv' === ext) {
+            data = await fetch(url)
+                .then(response => response.text())
+                .then(responseText => {
+                    const parsedCsv = Papa.parse(responseText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    })
+                    return parsedCsv.data
+                })
+        }
+
+        if ('json' === ext) {
+            data = await fetch(url)
+                .then(response => response.json())
+        }
+
+        return data;
+    } catch {
+        // If we can't parse it, still attempt to fetch it
+        try {
+            let response = await (await fetch(configUrl)).json()
+            return response
+        } catch {
+            console.error(`Cannot parse URL: ${url}`);
+        }
+    }
+  }
 
   const updateConfig = (newConfig) => {
     // Deeper copy
@@ -70,14 +113,23 @@ const CdcDataBite = (
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
-      responseData = await dataString.json();
+    if (response.dataUrl) {
+      let newData = await fetchRemoteData(response.dataUrl)
+
+      if(newData && response.dataDescription) {
+          newData = transform.autoStandardize(newData);
+          newData = transform.developerStandardize(newData, response.dataDescription);
+      }
+
+      if(newData) {
+        responseData = newData;
+      }
     }
 
     response.data = responseData;
 
     updateConfig({ ...defaults, ...response });
+
     setLoading(false);
   }
 
@@ -220,14 +272,13 @@ const CdcDataBite = (
       }
   },[]);
 
+  // Initial load
   useEffect(() => {
-    loadConfig();
+    loadConfig()
   }, [])
 
-  if(configObj) {
-    useEffect(() => {
-      loadConfig();
-    }, [configObj.data])
+  if(configObj && config && configObj.data !== config.data){
+    loadConfig();
   }
 
   let body = (<Loading />)
