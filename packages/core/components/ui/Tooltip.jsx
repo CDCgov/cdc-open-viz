@@ -22,7 +22,11 @@ const Tooltip = ({ position = 'top', trigger = 'hover', float = false, hideOnScr
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
-      <ReactTooltip className={'cove-tooltip__content' + (trigger === 'click' ? ' cove-tooltip__content--interactive' : '')} id={uid} type="light" effect="solid" globalEventOff='click'>
+      <ReactTooltip id={uid} className={'cove-tooltip__content' + (trigger === 'click' ? ' cove-tooltip__content--interactive' : '')}
+                    type="light"
+                    effect="solid"
+                    globalEventOff='click'
+                    border borderColor='darkgreen'>
         {tooltipContentChildren ? tooltipContentChildren.props.children : null}
       </ReactTooltip>
     </span>
