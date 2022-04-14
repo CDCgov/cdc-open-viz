@@ -168,6 +168,33 @@ const EditorPanel = memo((props) => {
                           </Tooltip.Content>
                         </Tooltip>
 
+                        <Tooltip position="right" trigger="hover">
+                          <Tooltip.Target>
+                            <Icon display="question" alt="hello"/>
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            Hello world! I have a <a href="#">link</a>.
+                          </Tooltip.Content>
+                        </Tooltip>
+
+                        <Tooltip position="bottom" trigger="click">
+                          <Tooltip.Target>
+                            <Icon display="question" alt="hello"/>
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            Hello world! I have a <a href="#">link</a>.
+                          </Tooltip.Content>
+                        </Tooltip>
+
+                        <Tooltip position="left" trigger="hover">
+                          <Tooltip.Target>
+                            <Icon display="question" alt="hello"/>
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            Hello world! I have a <a href="#">link</a>.
+                          </Tooltip.Content>
+                        </Tooltip>
+
                       </AccordionItemPanel>
                     </AccordionItem>
                     <AccordionItem>

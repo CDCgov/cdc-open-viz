@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import parse from 'html-react-parser'
 
@@ -90,8 +90,6 @@ const CdcMarkupInclude = (
     }
   }, [ markupError ])
 
-  let { modal, globalActions } = useGlobalContext()
-
   const loadConfigMarkupData = async () => {
     setMarkupError(null)
 
@@ -131,6 +129,9 @@ const CdcMarkupInclude = (
     }
     return content
   }
+
+  // Modal
+  let { modal, actions } = useGlobalContext()
 
   const testModal = () => {
     return (
@@ -179,7 +180,8 @@ const CdcMarkupInclude = (
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
           <button onClick={() => {
-            globalActions.setModalObj(testModal())
+            actions.setGlobalContextData(context => ({ ...context, modal: testModal() }))
+            actions.setGlobalContextData(context => ({ ...context, showModal: true }))
           }}>Test
           </button>
         </div>
@@ -191,7 +193,7 @@ const CdcMarkupInclude = (
     <div className={`cove`}>
       {isEditor && <EditorPanel>{body}</EditorPanel>}
       {!isEditor && body}
-      {modal.object ? modal.object : null}
+      {modal || null}
     </div>
   )
 

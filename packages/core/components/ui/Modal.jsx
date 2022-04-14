@@ -8,45 +8,59 @@ const ModalContent = () => null
 
 const Modal = ({ children }) => {
   const [ displayModal, setDisplayModal ] = useState(false)
-  const [ modalState, setModalState ] = useState(null)
+  const [ modalAnimationState, setModalAnimationState ] = useState(null)
+  const [ isAnimating, setIsAnimating ] = useState(false)
 
   const modalHeaderChildren = children.find(el => el.type === ModalHeader)
   const modalContentChildren = children.find(el => el.type === ModalContent)
 
-  let { modal, globalActions } = useGlobalContext()
+  let { showModal, actions } = useGlobalContext()
 
-  const toggleModal = () => {
-    globalActions.setModalDisplay(!modal.show)
+  const toggleModal = (display = false) => {
+    actions.setGlobalContextData(context => ({ ...context, showModal: display }))
   }
 
+  let timeoutShow = undefined
+  let timeoutAnimateOut = undefined
 
   useEffect(() => {
-    if (modal.show === true) {
+    console.log(isAnimating)
+    if (showModal === true) {
+      if (isAnimating) {
+        clearTimeout(timeoutAnimateOut)
+      }
+      setIsAnimating(true)
       setDisplayModal(true)
-      setModalState('animating')
+      setModalAnimationState('animate-in')
+      timeoutShow = setTimeout(() => {
+        setModalAnimationState('show')
+        setIsAnimating(false)
+      }, 750)
 
-      setTimeout(() => {
-        setModalState(null)
-      }, 500)
-    } else if (modal.show === false) {
+    } else {
       if (setDisplayModal) {
-        setModalState('animating')
-        setTimeout(() => {
-          setModalState(null)
+        if (isAnimating) {
+          clearTimeout(timeoutShow)
+        }
+        setIsAnimating(true)
+        setModalAnimationState('animate-out')
+        timeoutAnimateOut = setTimeout(() => {
+          setModalAnimationState(null)
           setDisplayModal(false)
-        }, 500)
+          setIsAnimating(false)
+        }, 400)
       }
     }
-  }, [ modal?.show ])
+  }, [ showModal ])
 
   return (
     <>
       {displayModal &&
-      <div className={'cove-modal' + (modalState ? ' ' + modalState : '') + (modal.show ? ' show' : '')}>
-        <div className="cove-modal__bg"/>
+      <div className={'cove-modal' + (modalAnimationState ? (' ' + modalAnimationState) : '')}>
+        <div className="cove-modal__bg" onClick={() => toggleModal(false)}/>
         <div className="cove-modal__wrapper">
           <div className="cove-modal__container">
-            <span onClick={() => toggleModal()}>
+            <span className="cove-modal--close" onClick={() => toggleModal(false)}>
               <Icon display="close"/>
             </span>
             {modalHeaderChildren &&
