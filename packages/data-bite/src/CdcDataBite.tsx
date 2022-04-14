@@ -141,7 +141,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return '';
+      return '';  
     }
 
     const getColumnSum = (arr:number[]):number => {
@@ -247,7 +247,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData = [0]  
+    let numericalData = []  
 
    // Get the column's data
      if(filteredData.length){
@@ -282,9 +282,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite = parseFloat(getMode(numericalData).join(', '));
         break;
       case DATA_FUNCTION_RANGE:
-        numericalData.sort((a, b) => a - b);
-        let rangeMin = applyPrecision(numericalData[0]);
-        let rangeMax = applyPrecision(numericalData[numericalData.length - 1]);
+        const sortedNumArr = [...numericalData].sort((a, b) => a - b);
+        let rangeMin = applyPrecision(sortedNumArr[0]);
+        let rangeMax = applyPrecision(sortedNumArr[sortedNumArr.length - 1]);
 
         if (config.dataFormat.commas) {
           rangeMin = parseFloat(Number(rangeMin).toLocaleString('en-US'));
