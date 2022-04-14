@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
+  "devDependencies": {
+    "use-debounce": "^6.0.1"
+  },
   "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
 }
