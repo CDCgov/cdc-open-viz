@@ -145,7 +145,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     const getColumnSum = (arr:number[]):number => {
-      if(!arr || !arr.length || !Array.isArray(arr)){
+      if(arr===undefined || arr===null){
+        console.error('Enter valid value')
+        return 
+      }
+      if(!arr.length || !Array.isArray(arr)){
         console.error('Enter valid value for getColumnSum function ')
         return;
       }
@@ -160,7 +164,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     const getColumnMean = (arr:number[]):number => {
-      if(!arr || !arr.length || !Array.isArray(arr)){
+      if(arr===undefined || arr===null){
+        console.error('Enter valid parameter')
+        return 
+      }
+      else if(arr.length===0 || !Array.isArray(arr)){
         console.error('Enter valid value for getColumnMean function ')
         return;
       }
@@ -205,11 +213,23 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(value);
     };
 
-    const applyPrecision =(value) => {
-      if ( !isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
-        value = Number(value).toFixed(Number(config.dataFormat.roundToPlace));
-      }
-      return value;
+    const applyPrecision =(value:number=0) => {
+      // this func returns number always
+      // add default parameter to escape errors on runtime
+      if(value ===undefined || value===null){
+        // valiattion =1
+       console.error('Enter correct val')
+      return ;
+    } else if(typeof value !== 'number'){
+        // valiattion =2
+      console.error('Value is not a number type')
+        return
+    }  
+    let result:number = 0
+    if (!isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
+      result = Number(value.toFixed(Number(config.dataFormat.roundToPlace)));
+    }
+        return Number(result);   // update type to number to escape erors in runtime
     }
 
     let dataBite = null;
@@ -227,7 +247,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData = [config.dataFormat.roundToPlace]
+    let numericalData = [0]  
 
    // Get the column's data
      if(filteredData.length){
@@ -259,7 +279,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite = Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join(', ');
+        dataBite = parseFloat(getMode(numericalData).join(', '));
         break;
       case DATA_FUNCTION_RANGE:
         numericalData.sort((a, b) => a - b);
@@ -267,11 +287,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         let rangeMax = applyPrecision(numericalData[numericalData.length - 1]);
 
         if (config.dataFormat.commas) {
-          rangeMin = Number(rangeMin).toLocaleString('en-US');
-          rangeMax = Number(rangeMax).toLocaleString('en-US');
+          rangeMin = parseFloat(Number(rangeMin).toLocaleString('en-US'));
+          rangeMax = parseFloat(Number(rangeMax).toLocaleString('en-US'));
         }
 
-        dataBite = config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + applyPrecision(rangeMax) + config.dataFormat.suffix;
+        dataBite = parseFloat(config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + applyPrecision(rangeMax) + config.dataFormat.suffix);
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
@@ -282,7 +302,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       dataBite = applyPrecision(dataBite);
 
       if (config.dataFormat.commas) {
-        dataBite = Number(dataBite).toLocaleString('en-US');
+        dataBite = parseFloat(Number(dataBite).toLocaleString('en-US'))
       }
 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
@@ -392,14 +412,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
             {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
-                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={Number(calculateDataBite())} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + Number(calculateDataBite()) + dataFormat.suffix}</div>}
                   {biteBody &&
                     <>
                       <p className="bite-text">
-                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</span>}
+                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + Number(calculateDataBite()) + dataFormat.suffix}</span>}
                         {parse(biteBody)}
                       </p>
                       {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
@@ -407,7 +427,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                   }
                 </div>
                 {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={Number(calculateDataBite())} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>
             </div>
           </div>
