@@ -137,25 +137,47 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     setLoading(false);
   }
 
-  const calculateDataBite = () => {
-
+  const calculateDataBite = ():string => {
+  
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
       return '';  
     }
 
-    const getColumnSum = (arr:number[]):number => {
+
+    const applyPrecision =(value:number|string=0) => { // add default params to escape errors on runtime
+      // first validation
+      if(value ===undefined || value===null){
+       console.error('Enter correct val')
+      return ;
+    }  
+  // second validation 
+    if(Number.isNaN(value)){
+      console.error('isNaN argunment')
+      return;
+    }
+    let result:number|string=Number(value)
+    let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
+    if(typeof roundToPlace ==='number'  && roundToPlace > -1 ){
+      result = Number(result).toFixed(roundToPlace);   // returns STRING
+    }
+        return result 
+    }
+
+    const getColumnSum = (arr:number[]=[]) => { // add default params to escape errors on runtime
+      // first validation
       if(arr===undefined || arr===null){
-        console.error('Enter valid value')
-        return 
-      }
-      if(!arr.length || !Array.isArray(arr)){
         console.error('Enter valid value for getColumnSum function ')
         return;
       }
-      let sum = 0
+      // second validation
+      if(arr.length ===0 || !Array.isArray(arr)){
+        console.error('Arguments are not valid getColumnSum function ')
+        return;
+      }
+      let sum:number = 0
       if(arr.length > 1){
-       sum = arr.reduce((sum, x) => sum + x);
+       sum = arr.reduce((sum:number, x:number) => sum + x);
 
       }else {
         sum = arr[0]
@@ -163,17 +185,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(sum);
     }
 
-    const getColumnMean = (arr:number[]):number => {
-      if(arr===undefined || arr===null){
-        console.error('Enter valid parameter')
+    const getColumnMean = (arr:number[]=[]) => { // add default params to escape errors on runtime
+      // first validation
+      if(arr===undefined || arr===null ||!Array.isArray(arr)){
+        console.error('Enter valid parameter getColumnMean function')
         return 
       }
-      else if(arr.length===0 || !Array.isArray(arr)){
-        console.error('Enter valid value for getColumnMean function ')
-        return;
-      }
-      let mean = 0
-      if(arr.length >1){
+     
+      let mean:number = 0
+      if(arr.length > 1){
         mean = arr.reduce((a:number, b:number) => a + b) / arr.length
       }else {
         mean = arr[0]
@@ -181,7 +201,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(mean);
     }
 
-    const getMode = (arr) => {
+    const getMode = (arr:any[]=[]):string[] => { // add default params to escape errors on runtime
+    // this function accepts any array and returns array of strings
       let freq = {}
       let max = -Infinity
 
@@ -213,26 +234,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(value);
     };
 
-    const applyPrecision =(value:number=0) => {
-      // this func returns number always
-      // add default parameter to escape errors on runtime
-      if(value ===undefined || value===null){
-        // valiattion =1
-       console.error('Enter correct val')
-      return ;
-    } else if(typeof value !== 'number'){
-        // valiattion =2
-      console.error('Value is not a number type')
-        return
-    }  
-    let result:number = 0
-    if (!isNaN(config.dataFormat.roundToPlace) && Number(config.dataFormat.roundToPlace)>-1) {
-      result = Number(value.toFixed(Number(config.dataFormat.roundToPlace)));
-    }
-        return Number(result);   // update type to number to escape erors in runtime
-    }
+  
 
-    let dataBite = null;
+    let dataBite:any = '';
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
@@ -250,7 +254,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     let numericalData = []  
 
    // Get the column's data
-     if(filteredData.length){
+   // ! this  conde line probably will not work properly. Need to be tested
+     if(filteredData.length){   
       filteredData.forEach(row => {
         let value = numberFromString(row[dataColumn])
         if(typeof value === 'number') numericalData.push(value)
@@ -276,22 +281,23 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite = Math.max(...numericalData);
         break;
       case DATA_FUNCTION_MIN:
-        dataBite = Math.min(...numericalData);
+        dataBite =Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = parseFloat(getMode(numericalData).join(', '));
+        dataBite = getMode(numericalData).join(',');  //!returns NaN Probably has mistale on this line.Needs to be tested
         break;
       case DATA_FUNCTION_RANGE:
-        const sortedNumArr = [...numericalData].sort((a, b) => a - b);
-        let rangeMin = applyPrecision(sortedNumArr[0]);
-        let rangeMax = applyPrecision(sortedNumArr[sortedNumArr.length - 1]);
+        const sortedNumArr = [...numericalData].sort((a, b) => a - b);  // create shallow copy and sort
+        let rangeMin:number |string= applyPrecision(sortedNumArr[0]);
+        let rangeMax:number | string  = applyPrecision(sortedNumArr[sortedNumArr.length - 1]);
 
         if (config.dataFormat.commas) {
-          rangeMin = parseFloat(Number(rangeMin).toLocaleString('en-US'));
-          rangeMax = parseFloat(Number(rangeMax).toLocaleString('en-US'));
+          rangeMin = rangeMin.toLocaleString('en-US')
+          rangeMax = rangeMax.toLocaleString('en-US')
         }
 
-        dataBite = parseFloat(config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + applyPrecision(rangeMax) + config.dataFormat.suffix);
+      dataBite =  config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +applyPrecision(rangeMax);
+  
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
@@ -302,7 +308,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       dataBite = applyPrecision(dataBite);
 
       if (config.dataFormat.commas) {
-        dataBite = parseFloat(Number(dataBite).toLocaleString('en-US'))
+        dataBite = dataBite.toLocaleString('en-US')
       }
 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
@@ -412,10 +418,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
             {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container">
-                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={Number(calculateDataBite())} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
+                {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + Number(calculateDataBite()) + dataFormat.suffix}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</div>}
                   {biteBody &&
                     <>
                       <p className="bite-text">
@@ -427,7 +433,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                   }
                 </div>
                 {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={Number(calculateDataBite())} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
+                {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>
             </div>
           </div>
