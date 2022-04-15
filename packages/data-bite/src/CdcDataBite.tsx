@@ -3,7 +3,6 @@ import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
-
 import ResizeObserver from 'resize-observer-polyfill';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
@@ -164,7 +163,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return result 
     }
 
-    const getColumnSum = (arr:any[]=[]) => { // add default params to escape errors on runtime
+    const getColumnSum = (arr:any[]) => { // add default params to escape errors on runtime
       // first validation
       if(arr===undefined || arr===null){
         console.error('Enter valid value for getColumnSum function ')
@@ -228,11 +227,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     const getMedian = arr => {
+      if(!arr.length) return ;
       const mid = Math.floor(arr.length / 2),
         nums = [...arr].sort((a, b) => a - b);
       const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
       return applyPrecision(value);
     };
+  
+  
 
   
 
@@ -283,7 +285,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite =Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join(',');  //!returns NaN Probably has mistale on this line.Needs to be tested
+        dataBite = getMode(numericalData).join(',');
         break;
       case DATA_FUNCTION_RANGE:
         const sortedNumArr = [...numericalData].sort((a, b) => a - b);  // create shallow copy and sort
@@ -291,11 +293,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         let rangeMax:number | string  = applyPrecision(sortedNumArr[sortedNumArr.length - 1]);
 
         if (config.dataFormat.commas) {
+
           rangeMin = rangeMin.toLocaleString('en-US')
           rangeMax = rangeMax.toLocaleString('en-US')
+          
         }
 
-      dataBite =  config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +applyPrecision(rangeMax);
+      dataBite =  config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +applyPrecision(rangeMax)+config.dataFormat.suffix;
+      console.log(dataBite)
   
         break;
       default:
@@ -420,7 +425,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + calculateDataBite() + dataFormat.suffix}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite() }</div>}
                   {biteBody &&
                     <>
                       <p className="bite-text">
