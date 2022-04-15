@@ -141,8 +141,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(row.uid) row.uid = null // Wipe existing UIDs
 
             // United States check
-            if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
+            if("us" === obj.general.geoType && obj.columns.geo.name) {
+
+                const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -991,16 +992,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             newState?.data.forEach(dataPiece => {
                 if(dataPiece[newState.columns.geo.name]) {
+
                     if(!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
                         dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                     }
+                    dataPiece[newState.columns.geo.name] = dataPiece[newState.columns.geo.name].toString()
                 }
             })
         }
         return newState;
     }
 
-    const loadConfig = async (configObj) => {
+    const loadConfig = async (configObj) => { 
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1055,8 +1058,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         validateFipsCodeLength(newState);
         setState(newState)
-
-        // Done loading
         setLoading(false)
     }
 
@@ -1092,19 +1093,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }, [state.general.statePicked]);
 
 
-
     // When geotype changes
     useEffect(() => {
-        
         // UID
         if(state.data && state.columns.geo.name) {
             addUIDs(state, state.columns.geo.name)
         }
-        
-    }, [state.general.geoType]);
+
+    }, [state]);
 
     useEffect(() => {
-
         // UID
         if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
             addUIDs(state, state.columns.geo.name)
