@@ -1145,8 +1145,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Data
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(newRuntimeData) 
+            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(data) 
         }
 
         // Legend
@@ -1154,6 +1154,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
+        
     }, [state])
 
     useEffect(() => {
