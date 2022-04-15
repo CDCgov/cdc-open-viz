@@ -250,8 +250,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return false;
       }
     });
-
-    let numericalData = []  
+    let numericalData:any[] = []  
 
    // Get the column's data
    // ! this  conde line probably will not work properly. Need to be tested
