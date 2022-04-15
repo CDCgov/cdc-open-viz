@@ -252,7 +252,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return false;
       }
     });
-    let numericalData:any[] = []  
+    let numericalData:any[] = [10000,400000]  
 
    // Get the column's data
    // ! this  conde line probably will not work properly. Need to be tested
@@ -429,7 +429,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                   {biteBody &&
                     <>
                       <p className="bite-text">
-                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{dataFormat.prefix + Number(calculateDataBite()) + dataFormat.suffix}</span>}
+                        {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                         {parse(biteBody)}
                       </p>
                       {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
