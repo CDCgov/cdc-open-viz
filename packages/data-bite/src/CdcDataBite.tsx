@@ -164,7 +164,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return result 
     }
 
-    const getColumnSum = (arr:number[]=[]) => { // add default params to escape errors on runtime
+    const getColumnSum = (arr:any[]=[]) => { // add default params to escape errors on runtime
       // first validation
       if(arr===undefined || arr===null){
         console.error('Enter valid value for getColumnSum function ')
@@ -185,7 +185,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(sum);
     }
 
-    const getColumnMean = (arr:number[]=[]) => { // add default params to escape errors on runtime
+    const getColumnMean = (arr:any[]=[]) => { // add default params to escape errors on runtime
       // first validation
       if(arr===undefined || arr===null ||!Array.isArray(arr)){
         console.error('Enter valid parameter getColumnMean function')
@@ -194,7 +194,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
      
       let mean:number = 0
       if(arr.length > 1){
-        mean = arr.reduce((a:number, b:number) => a + b) / arr.length
+        mean = arr.reduce((a, b) => a + b) / arr.length
       }else {
         mean = arr[0]
       }
