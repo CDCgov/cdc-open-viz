@@ -144,23 +144,28 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
 
-    const applyPrecision =(value:number|string=0) => { // add default params to escape errors on runtime
+    const applyPrecision =(value:number|string=0):string => { // add default params to escape errors on runtime
       // first validation
-      if(value ===undefined || value===null){
-       console.error('Enter correct val')
+      if(value === undefined || value===null){
+       console.error('Enter correct value to "applyPrecision()" function ')
       return ;
     }  
   // second validation 
     if(Number.isNaN(value)){
-      console.error('isNaN argunment')
+      console.error(' Argunment isNaN, "applyPrecision()" function ')
       return;
     }
-    let result:number|string=Number(value)
+    let result:number|string = value
     let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
+    //  ROUND FIELD  going -1,-2,-3 numbers
+    if(roundToPlace<0) {
+      console.error(' ROUND field is below "0", "applyPrecision()" function ')
+      return;
+    }
     if(typeof roundToPlace ==='number'  && roundToPlace > -1 ){
       result = Number(result).toFixed(roundToPlace);   // returns STRING
     }
-        return result 
+        return String(result)
     }
 
     const getColumnSum = (arr:any[]) => { // add default params to escape errors on runtime
