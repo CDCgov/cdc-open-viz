@@ -15,7 +15,6 @@ import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import { Fragment } from 'react';
 
-
 type DefaultsType = typeof defaults
 interface Props{
   configUrl?: string,
@@ -43,7 +42,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     filters,
     subtext
   } = config;
-  console.log(biteBody,typeof biteBody,Boolean(biteBody))
+
+
 
   const transform = new DataTransform()
 
@@ -241,7 +241,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       return applyPrecision(value);
     };
 
-    const applyLocaleString = (value:string):string=>{
+      const applyLocaleString = (value:string):string=>{
       if(value===undefined || value===null) return ;
       if(!Number.isNaN(value)) {
         value = String(value)
@@ -279,11 +279,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData:any = [100000,"600000"]
+    let numericalData = []
 
 
    // Get the column's data
-   // ! this  conde line probably will not work properly. Need to be tested
+   // TODO: this  conde line probably will not work properly. Need to be tested
      if(filteredData.length){   
       filteredData.forEach(row => {
         let value = numberFromString(row[dataColumn])
