@@ -310,7 +310,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite =Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join(',');
+        dataBite = getMode(numericalData).join(''); // Needs to be properly tested !!!
         break;
       case DATA_FUNCTION_RANGE:
         const sortedNumArr = [...numericalData].sort((a, b) => a - b);  // create shallow copy and sort
