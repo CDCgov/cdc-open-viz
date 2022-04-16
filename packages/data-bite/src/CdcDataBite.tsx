@@ -13,6 +13,7 @@ import DataTransform from '@cdc/core/components/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
+import { Fragment } from 'react';
 
 
 type DefaultsType = typeof defaults
@@ -42,6 +43,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     filters,
     subtext
   } = config;
+  console.log(biteBody,typeof biteBody,Boolean(biteBody))
 
   const transform = new DataTransform()
 
@@ -263,7 +265,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   
 
     let dataBite:string|number = '';
-    let numericalData:any = []
     
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
@@ -277,7 +278,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return false;
       }
     });
-    let numericalData:any[] = [10000,400000]  
+
+    let numericalData:any = [100000,"600000"]
+
 
    // Get the column's data
    // ! this  conde line probably will not work properly. Need to be tested
@@ -405,7 +408,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     return (imageSource.length > 0 && 'graphic' !== biteStyle && 'none' !== imageData.display ? <img alt={imageAlt} src={imageSource} className="bite-image callout" /> : null)
-  }, [ imageData ])
+  }, [ imageData])
 
   if(false === loading) {
     let biteClasses = [];
@@ -447,16 +450,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite() }</div>}
-                  {biteBody &&
-                    <>
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                    <Fragment>
                       <p className="bite-text">
                         {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                         {parse(biteBody)}
                       </p>
                       {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
-                    </>
-                  }
+                    </Fragment>
                 </div>
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
