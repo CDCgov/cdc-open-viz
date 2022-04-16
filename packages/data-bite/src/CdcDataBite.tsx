@@ -329,15 +329,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     // If not the range, then round and format here
     if (dataFunction !== DATA_FUNCTION_RANGE) {
       dataBite = applyPrecision(dataBite);
-
+  
       if (config.dataFormat.commas) {
-        dataBite = dataBite.toLocaleString('en-US')
+       dataBite = applyLocaleString(dataBite)
       }
-
+          // Optional 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
+
+     return dataBite
+    } else { 
+      //Rounding and formatting for ranges happens earlier.
+
       return dataBite
-    } else { //Rounding and formatting for ranges happens earlier.
-      return dataBite;
     }
   }
 
