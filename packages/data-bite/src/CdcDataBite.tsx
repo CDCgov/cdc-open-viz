@@ -238,13 +238,33 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
       return applyPrecision(value);
     };
+
+    const applyLocaleString = (value:string):string=>{
+      if(value===undefined || value===null) return ;
+      if(!Number.isNaN(value)) {
+        value = String(value)
+      }
+      const language = 'en-US'
+      let formattedValue = parseFloat(value).toLocaleString(language, {
+        useGrouping: true,
+        maximumFractionDigits: 6
+      })
+        // Add back missing .0 in e.g. 12.0
+    const match = value.match(/\.\d*?(0*)$/)
+
+      if (match){
+     formattedValue += (/[1-9]/).test(match[0]) ? match[1] : match[0]
+      }
+      return formattedValue
+    }
   
   
 
   
 
-    let dataBite:any = '';
-
+    let dataBite:string|number = '';
+    let numericalData:any = []
+    
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
 
