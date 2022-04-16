@@ -136,7 +136,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     setLoading(false);
   }
 
-  const calculateDataBite = ():string => {
+  const calculateDataBite = ():string|number => {
   
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
