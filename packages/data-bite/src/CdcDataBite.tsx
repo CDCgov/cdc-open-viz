@@ -314,19 +314,13 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         break;
       case DATA_FUNCTION_RANGE:
         const sortedNumArr = [...numericalData].sort((a, b) => a - b);  // create shallow copy and sort
-        let rangeMin:number |string= applyPrecision(sortedNumArr[0]);
-        let rangeMax:number | string  = applyPrecision(sortedNumArr[sortedNumArr.length - 1]);
-
-        if (config.dataFormat.commas) {
-
-          rangeMin = rangeMin.toLocaleString('en-US')
-          rangeMax = rangeMax.toLocaleString('en-US')
-          
-        }
-
-      dataBite =  config.dataFormat.prefix + applyPrecision(rangeMin) + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +applyPrecision(rangeMax)+config.dataFormat.suffix;
-      console.log(dataBite)
-  
+        let rangeMin =  applyPrecision((sortedNumArr[0]))
+        let rangeMax = applyPrecision(sortedNumArr[sortedNumArr.length - 1])
+           if (config.dataFormat.commas) {
+          rangeMin = applyLocaleString(rangeMin)
+          rangeMax = applyLocaleString(rangeMax)
+          }
+      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +rangeMax+config.dataFormat.suffix;  
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
