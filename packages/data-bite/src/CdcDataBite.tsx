@@ -146,17 +146,17 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
 
-    const applyPrecision =(value:number|string=0):string => { // add default params to escape errors on runtime
+    const applyPrecision =(value:number|string):string => {
       // first validation
       if(value === undefined || value===null){
        console.error('Enter correct value to "applyPrecision()" function ')
       return ;
     }  
   // second validation 
-    if(Number.isNaN(value)){
-      console.error(' Argunment isNaN, "applyPrecision()" function ')
-      return;
-    }
+  if(Number.isNaN(value)){
+    console.error(' Argunment isNaN, "applyPrecision()" function ')
+    return;
+  }
     let result:number|string = value
     let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
     //  ROUND FIELD  going -1,-2,-3 numbers
@@ -170,28 +170,28 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return String(result)
     }
 
-    const getColumnSum = (arr:any[]) => { // add default params to escape errors on runtime
+    const getColumnSum = (arr:(string|number)[]) => {
       // first validation
       if(arr===undefined || arr===null){
         console.error('Enter valid value for getColumnSum function ')
         return;
       }
       // second validation
-      if(arr.length ===0 || !Array.isArray(arr)){
+      if(arr.length === 0 || !Array.isArray(arr)){
         console.error('Arguments are not valid getColumnSum function ')
         return;
       }
       let sum:number = 0
       if(arr.length > 1){
-       sum = arr.reduce((sum:number, x:number) => sum + x);
-
+        /// first convert each element to number then add using reduce method to escape string concatination.
+       sum = arr.map(el=>Number(el)).reduce((sum:number, x:number) => sum + x);
       }else {
-        sum = arr[0]
+        sum = Number(arr[0])
       }
       return applyPrecision(sum);
     }
 
-    const getColumnMean = (arr:any[]=[]) => { // add default params to escape errors on runtime
+    const getColumnMean=(arr:(string|number)[]) => { // add default params to escape errors on runtime
       // first validation
       if(arr===undefined || arr===null ||!Array.isArray(arr)){
         console.error('Enter valid parameter getColumnMean function')
@@ -200,9 +200,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
      
       let mean:number = 0
       if(arr.length > 1){
-        mean = arr.reduce((a, b) => a + b) / arr.length
+       /// first convert each element to number then add using reduce method to escape string concatination.
+        mean = arr.map(el=>Number(el)).reduce((a, b) => a + b) / arr.length
       }else {
-        mean = arr[0]
+        mean = Number(arr[0])
       }
       return applyPrecision(mean);
     }
@@ -242,9 +243,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     };
 
       const applyLocaleString = (value:string):string=>{
-      if(value===undefined || value===null) return ;
-      if(!Number.isNaN(value)) {
+        if(value===undefined || value===null) return ;
+        if(Number.isNaN(value)|| typeof value ==='number') {
         value = String(value)
+
       }
       const language = 'en-US'
       let formattedValue = parseFloat(value).toLocaleString(language, {
@@ -279,11 +281,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData = []
+    let numericalData:any[] = []
 
 
    // Get the column's data
-   // TODO: this  conde line probably will not work properly. Need to be tested
      if(filteredData.length){   
       filteredData.forEach(row => {
         let value = numberFromString(row[dataColumn])
@@ -313,17 +314,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite =Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join(''); // Needs to be properly tested !!!
+        dataBite = getMode(numericalData).join('');
         break;
       case DATA_FUNCTION_RANGE:
-        const sortedNumArr = [...numericalData].sort((a, b) => a - b);  // create shallow copy and sort
-        let rangeMin =  applyPrecision((sortedNumArr[0]))
-        let rangeMax = applyPrecision(sortedNumArr[sortedNumArr.length - 1])
+        let rangeMin :number|string = Math.min(...numericalData)
+        let rangeMax :number|string = Math.max(...numericalData)
+          rangeMin =  applyPrecision(rangeMin)
+          rangeMax =  applyPrecision(rangeMax)
            if (config.dataFormat.commas) {
           rangeMin = applyLocaleString(rangeMin)
           rangeMax = applyLocaleString(rangeMax)
           }
-      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix +rangeMax+config.dataFormat.suffix;  
+      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax+config.dataFormat.suffix;  
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
