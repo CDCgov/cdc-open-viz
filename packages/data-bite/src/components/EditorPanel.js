@@ -32,7 +32,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
     if('number' !== type || min === null){
       setValue(e.target.value);
     } else {
-      if(!e.target.value || ( parseFloat(min) <= parseFloat(e.target.value ) && parseFloat(max) >= parseFloat(e.target.value))) {
+      if(!e.target.value || ( parseFloat(min) <= parseFloat(e.target.value ) & parseFloat(max) >= parseFloat(e.target.value))) {
         setValue(e.target.value);
       } else {
         setValue(min.toString());
