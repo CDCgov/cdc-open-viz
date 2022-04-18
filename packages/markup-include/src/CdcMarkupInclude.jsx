@@ -90,30 +90,35 @@ const CdcMarkupInclude = (
   const loadConfigMarkupData = async () => {
     setMarkupError(null)
 
+    console.log('attempting to load the markup data')
     if (config.srcUrl) {
-      await axios
-        .get(config.srcUrl)
-        .then((res) => {
-          if (res.data) {
-            setUrlMarkup(res.data)
-          }
-        })
-        .catch((err) => {
-          if (err.response) {
-            // Response with error
-            setMarkupError(err.response.status)
-          } else if (err.request) {
-            // No response received
-            setMarkupError(200)
-          }
+      if (config.srcUrl === '#example') {
+        setUrlMarkup("<!doctype html><html lang=\"en\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"> <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>")
+      } else {
+        await axios
+          .get(config.srcUrl)
+          .then((res) => {
+            if (res.data) {
+              setUrlMarkup(res.data)
+            }
+          })
+          .catch((err) => {
+            if (err.response) {
+              // Response with error
+              setMarkupError(err.response.status)
+            } else if (err.request) {
+              // No response received
+              setMarkupError(200)
+            }
 
-          setUrlMarkup('')
-        })
-    } else if (config.data?.markup?.length > 0) {
-      setUrlMarkup(config.data.markup)
+            setUrlMarkup('')
+          })
+      }
     } else {
+      console.log('srcUrl doesnt exist, no data found, setting to empty')
       setUrlMarkup('')
     }
+    console.log('config:', config)
   }
 
   const parseBodyMarkup = (markup) => {
@@ -129,18 +134,21 @@ const CdcMarkupInclude = (
 
   //Load initial config
   useEffect(() => {
+    console.log('Loading initial config')
     loadConfig()
   }, [])
 
   //Reload config if config object provided
   useEffect(() => {
     if (configObj) {
+      console.log('ConfigObj found, reloading loadConfig')
       loadConfig()
     }
   }, [ configObj ])
 
   //Reload any functions when config is updated
   useEffect(() => {
+    console.log('Loading config markup data')
     loadConfigMarkupData()
   }, [ config ])
 
