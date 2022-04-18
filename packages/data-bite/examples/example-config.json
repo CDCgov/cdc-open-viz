@@ -1,6 +1,6 @@
 {
     "type": "data-bite",
-    "dataUrl": "https://localhost:8080/examples/example-data.json",
+    "dataUrl": "http://localhost:8080/examples/example-data.json",
     "dataBite": "",
     "dataFunction": "Mean (Average)",
     "dataColumn": "Insured Rate",
