@@ -109,8 +109,8 @@ const CdcMarkupInclude = (
 
           setUrlMarkup('')
         })
-    } else if (config.data?.length > 0) {
-      setUrlMarkup(config.data)
+    } else if (config.data?.markup?.length > 0) {
+      setUrlMarkup(config.data.markup)
     } else {
       setUrlMarkup('')
     }
