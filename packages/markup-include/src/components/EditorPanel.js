@@ -149,11 +149,11 @@ const EditorPanel = memo((props) => {
                         </AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel>
-                        <InputText value={config.title} fieldName="title" label="Title" placeholder="Markup Include Title"
+                        <InputText value={config.title || ''} fieldName="title" label="Title" placeholder="Markup Include Title"
                                    updateField={updateField}/>
 
                         <InputText
-                          value={config.srcUrl} fieldName="srcUrl" label="Source URL" placeholder="https://www.example.com/file.html" updateField={updateField}
+                          value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL" placeholder="https://www.example.com/file.html" updateField={updateField}
                         />
                       </AccordionItemPanel>
                     </AccordionItem>
