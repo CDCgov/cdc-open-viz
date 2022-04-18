@@ -167,7 +167,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     // ! Unsure if this should go back.
                     if(config.isLollipopChart) {
-                      //offset = ( (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2) - lollipopBarWidth / 2
+                      offset = ( (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2) - lollipopBarWidth / 2
                     }
 
                     let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length;
@@ -206,7 +206,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
-
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
@@ -235,8 +234,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       />
                       {config.isLollipopChart && config.lollipopShape === 'circle' &&
                         <circle 
-                          cx={config.visualizationSubType === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar ? 0: offset) + lollipopShapeSize/3.5}
-                          cy={config.visualizationSubType === 'horizontal' ? lollipopShapeSize/3.5 + (isLabelBelowBar ? 0: offset) : bar.y}
+                          cx={config.visualizationSubType === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && config.visualizationSubType === 'horizontal' ? 0 : offset) + lollipopShapeSize/3.5}
+                          cy={config.visualizationSubType === 'horizontal' ? lollipopShapeSize/3.5 + (isLabelBelowBar && config.visualizationSubType === 'horizontal' ? 0: offset) : bar.y}
                           r={lollipopShapeSize/2} 
                           fill={barColor} 
                           key={`circle--${bar.index}`}
