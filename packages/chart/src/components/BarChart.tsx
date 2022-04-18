@@ -44,18 +44,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if(config.isLollipopChart === false) {
       updateConfig({ ...config, barHeight: 25 })
     }
-
-    if(config.isLollipopChart === true) {
-      updateConfig({
-        ...config,
-        legend: {
-          ...config.legend,
-          hide: true
-        },
-        lollipopColorStyle: 'two-tone'
-      })
-    }
-
   }, [config.isLollipopChart]);
 
   return (
