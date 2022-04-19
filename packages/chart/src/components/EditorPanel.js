@@ -475,39 +475,6 @@ const EditorPanel = () => {
     }
   }, [config.isLollipopChart, config.lollipopShape]);
   
-  useEffect(() => {
-    if(config.isLollipopChart && config.visualizationSubType === 'horizontal') {
-      updateConfig({
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          hideAxis: false
-        },
-        xAxis: {
-          ...config.xAxis,
-          hideAxis: true
-        },
-        fontSize: "small"
-      })
-    }
-
-    if (config.isLollipopChart && config.visualizationSubType === 'regular') {
-      updateConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          hideAxis: false,
-          fontSize: "small"
-        },
-        yAxis: {
-          ...config.yAxis,
-          hideAxis: true,
-          fontSize: "small"
-        }
-      })
-    }
-  }, [config.visualizationSubType]);
-
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
     return (
