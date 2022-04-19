@@ -47,6 +47,8 @@ export default function CdcChart(
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
+  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
+
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
     'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
@@ -427,7 +429,7 @@ export default function CdcChart(
   const Legend = () => {
 
     let containerClasses = ['legend-container']
-    let innerClasses = [];
+    let innerClasses = ['legend-container__inner'];
 
     if(config.legend.position === "left") {
       containerClasses.push('left')
@@ -439,7 +441,7 @@ export default function CdcChart(
     }
 
     return (
-      <div className={containerClasses.join(' ')}>
+      <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
         {legend.label && <h2>{legend.label}</h2>}
         <LegendOrdinal
         scale={colorScale}
@@ -469,8 +471,8 @@ export default function CdcChart(
 
                 return (
                   <LegendItem
-                    tabIndex={0}
                     className={className}
+                    tabIndex={0}
                     key={`legend-quantile-${i}`}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
@@ -492,7 +494,7 @@ export default function CdcChart(
             </div>
           )}
         </LegendOrdinal>
-      </div>
+      </aside>
     )
   }
 
@@ -598,7 +600,10 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+            Skip Over Chart Container
+          </a>
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
