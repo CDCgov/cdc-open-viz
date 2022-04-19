@@ -26,6 +26,7 @@ const EditorPanel = memo((props) => {
   } = useContext(ConfigContext)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
+  const [ showConfigConfirm, setShowConfigConfirm ] = useState(true)
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -74,12 +75,22 @@ const EditorPanel = memo((props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
 
-  const onBackClick = () => {
-    if (isDashboard) {
-      updateConfig({ ...config, editing: false })
-    } else {
-      setDisplayPanel(!displayPanel)
+  useEffect(()=> {
+    if (!showConfigConfirm) {
+      let newConfig = { ...config }
+      delete newConfig.newViz
+      updateConfig(newConfig)
     }
+  }, [])
+
+  const onBackClick = () => {
+    setDisplayPanel(!displayPanel)
+
+    // if (isDashboard) {
+    //   updateConfig({ ...config, editing: false })
+    // } else {
+    //   setDisplayPanel(!displayPanel)
+    // }
   }
 
   const Error = () => {
@@ -105,7 +116,7 @@ const EditorPanel = memo((props) => {
       <section className="waiting">
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+          <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
           <button className="btn" style={{ margin: '1em auto' }} disabled={missingRequiredSections()}
                   onClick={confirmDone}>I'm Done
           </button>
@@ -130,65 +141,65 @@ const EditorPanel = memo((props) => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      <>
-        <div className="cove-editor">
-          <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)}
-                  title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
-          {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error/>}
-          {config.newViz && <Confirm/>}
-          <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
-            <div className="cove-editor__panel-container">
-              <h2 className="cove-editor__heading">Configure Markup Include</h2>
-              <section className="form-container">
-                <form>
-                  <Accordion allowZeroExpanded={true}>
-                    <AccordionItem> {/* General */}
-                      <AccordionItemHeading>
-                        <AccordionItemButton>
-                          General
-                        </AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        <InputText value={config.title || ''} fieldName="title" label="Title" placeholder="Markup Include Title"
-                                   updateField={updateField}/>
+      <div className="cove-editor">
+        {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error/>}
+        {config.newViz && showConfigConfirm && <Confirm/>}
+        <button className={`cove-editor--toggle` + (!displayPanel ? ` collapsed` : ``)}
+                title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
+        <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
+          <div className="cove-editor__panel-container">
+            <h2 className="cove-editor__heading">Configure Markup Include</h2>
+            <section className="form-container">
+              <form>
+                <Accordion allowZeroExpanded={true}>
+                  <AccordionItem> {/* General */}
+                    <AccordionItemHeading>
+                      <AccordionItemButton>
+                        General
+                      </AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <InputText value={config.title || ''} fieldName="title" label="Title"
+                                 placeholder="Markup Include Title"
+                                 updateField={updateField}/>
 
-                        <InputText
-                          value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL" placeholder="https://www.example.com/file.html" updateField={updateField}
-                        />
-                      </AccordionItemPanel>
-                    </AccordionItem>
-                    <AccordionItem>
-                      <AccordionItemHeading>
-                        <AccordionItemButton>
-                          Visual
-                        </AccordionItemButton>
-                      </AccordionItemHeading>
-                      <AccordionItemPanel>
-                        <div className="input-group">
-                          <label>Theme</label>
-                          <ul className="color-palette">
-                            {headerColors.map((palette) => (
-                              <li title={palette} key={palette} onClick={() => {
-                                updateConfig({ ...config, theme: palette })
-                              }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </AccordionItemPanel>
-                    </AccordionItem>
-                  </Accordion>
-                </form>
-              </section>
-            </div>
-          </section>
-          <div className="cove-editor__content">
-            <div className="cove-editor__content-wrap">
-              {props.children}
-            </div>
+                      <InputText
+                        value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
+                        placeholder="https://www.example.com/file.html" updateField={updateField}
+                      />
+                    </AccordionItemPanel>
+                  </AccordionItem>
+                  <AccordionItem>
+                    <AccordionItemHeading>
+                      <AccordionItemButton>
+                        Visual
+                      </AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <div className="input-group">
+                        <label>Theme</label>
+                        <ul className="color-palette">
+                          {headerColors.map((palette) => (
+                            <li title={palette} key={palette} onClick={() => {
+                              updateConfig({ ...config, theme: palette })
+                            }} className={config.theme === palette ? 'selected ' + palette : palette}>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </AccordionItemPanel>
+                  </AccordionItem>
+                </Accordion>
+              </form>
+            </section>
+          </div>
+        </section>
+        <div className="cove-editor__content">
+          <div className="cove-editor__content-wrap">
+            {props.children}
           </div>
         </div>
-      </>
+      </div>
     </ErrorBoundary>
   )
 })
