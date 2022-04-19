@@ -128,10 +128,9 @@ export default function DataTable() {
     rows,
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
-
   return (
     <ErrorBoundary component="DataTable">
-      <section className={`data-table-container`} aria-label={accessibilityLabel}>
+      <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`}  className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
             className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
             onClick={() => { setTableExpanded(!tableExpanded); }}
@@ -154,7 +153,8 @@ export default function DataTable() {
                     {headerGroup.headers.map((column, index) => (
                       <th 
                         tabIndex="0" 
-                        title={column.Header} key={`trth--${index}`}
+                        title={column.Header} 
+                        key={`trth--${index}`}
                         role="columnheader"
                         scope="col"
                         {...column.getHeaderProps(column.getSortByToggleProps())} 
