@@ -592,6 +592,11 @@ const EditorPanel = () => {
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
+                  <div className="three-hide-inputs">
+                    <CheckBox value={config.xAxis.hideTicks} label="HIDE TICKS" section="xAxis" fieldName="hideTicks" updateField={updateField} hideTicks={null} />
+                    <CheckBox value={config.xAxis.hideTicks} label="HIDE TICK LABEL" section="xAxis" fieldName="hideTicks" updateField={updateField} hideZero={null} />
+                    <CheckBox value={config.xAxis.hideTicks} label="HIDE AXIS" section="xAxis" fieldName="hideTicks" updateField={updateField} hideAxisLine={null} />
+                  </div>
                   {(config.visualizationSubType === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
                     <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
