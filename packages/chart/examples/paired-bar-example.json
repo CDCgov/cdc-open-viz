@@ -1,8 +1,11 @@
 {
     "title": "Paired Bar Chart Example",
-    "dataUrl":  "/examples/age-adjusted-rates.json",
+    "dataUrl":  "/examples/paired-bar-data.json",
     "visualizationType": "Paired Bar",
-    "series": [{"dataKey":"male"}, {"dataKey":"female"}],
+    "series": [
+        {"dataKey": "Male","type": "Paired Bar"},
+        {"dataKey": "Female","type": "Paired Bar"}
+    ],
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -14,18 +17,32 @@
         "right": 0
     },
     "yAxis": {
-        "label": "Percentage"
+        "label": "Cases per 100K",
+        "tickRotation": 30,
+        "hideAxis": true
     },
     "xAxis": {
-        "label": "State",
-        "dataKey": "Alaska",
-        "tickRotation": 30
+        "label": "Age Group",
+        "dataKey": "Age Group",
+        "tickRotation": 30,
+        "hideAxis": true
     },
     "legend": {
-        "hide": false
+        "hideAxis": false
     },
     "table": {
         "label": "Data Table",
         "expanded": false
+    },
+    "dataDescription": {
+        "horizontal": false,
+        "series": true,
+        "seriesKey": "Sex",
+        "singleRow": false,
+        "xKey": "Age Group",
+        "valueKey": "Cases per 100K"
+    },
+    "runtime": {
+        "horizontal": true
     }
 }
