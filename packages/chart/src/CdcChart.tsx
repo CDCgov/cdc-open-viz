@@ -29,7 +29,6 @@ export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
-
   const transform = new DataTransform();
 
   interface keyable { [key: string]: any }
@@ -185,7 +184,7 @@ export default function CdcChart(
       });
     }
 
-    if (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -202,11 +201,13 @@ export default function CdcChart(
 
     let uniqueXValues = {};
 
-    for(let i = 0; i < currentData.length; i++) {
-      if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-        newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-      } else {
-        uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+    if(newConfig.visualizationType !== 'Paired Bar') {
+      for(let i = 0; i < currentData.length; i++) {
+        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+        } else {
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+        }
       }
     }
     setConfig(newConfig);
@@ -290,6 +291,22 @@ export default function CdcChart(
   useEffect(() => {
     loadConfig();
   }, []);
+
+  // useEffect(() => {
+  //   if(config.visualizationType === 'Paired Bar') {
+  //     updateConfig({
+  //       ...config,
+  //       yAxis: {
+  //         ...config.yAxis,
+  //         hideAxis: true
+  //       },
+  //       xAxis: {
+  //         ...config.xAxis,
+  //         hideAxis: true
+  //       }
+  //     })
+  //   }
+  // }, [config.visualizationType]);
 
   // Load data when configObj data changes
   if(configObj){
@@ -419,6 +436,7 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
+    'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
@@ -615,7 +633,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
         </div>}
       </>
     )

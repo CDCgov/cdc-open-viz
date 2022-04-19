@@ -13,6 +13,7 @@ import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg';
 import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
+import PairedBarIcon from '@cdc/core/assets/paired-bar.svg';
 
 export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
@@ -27,7 +28,7 @@ export default function ChooseTab() {
     /**
      * IconButton component
      */
-    const IconButton = ({icon, label, type, subType}) => {
+    const IconButton = ({icon, label, type, subType, barType}) => {
         let isSubType = false
 
         if(type === 'map' && config.general) {
@@ -89,6 +90,7 @@ export default function ChooseTab() {
                 <li><IconButton label="Bar" type="chart" subType="Bar" icon={ <BarIcon /> } /></li>
                 <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
                 <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
+                <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={ <PairedBarIcon /> } /></li>
             </ul>
             <div className="heading-2">Maps</div>
             <ul className="grid">
