@@ -1,6 +1,7 @@
 export default {
   "title": "Markup Include",
-  "srcUrl": "/examples/example-data.json",
   "showHeader": false,
-  "type": "markup-include"
+  "type": "markup-include",
+  "srcUrl": "#example",
+  "theme": "theme-blue"
 }
