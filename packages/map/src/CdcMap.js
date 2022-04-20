@@ -1178,11 +1178,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
+    useEffect(() => {
     if(config) {
-        useEffect(() => {
-            loadConfig(config)
-        }, [config.data])
-    }
+    loadConfig(config)
+        }
+    },[config,loadConfig])
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
