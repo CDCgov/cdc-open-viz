@@ -10,8 +10,9 @@
     transition: width 500ms ease;
     background: #fff;
     border-right: 1px solid #c2c2c2;
-    overflow: hidden;
-    z-index: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 7;
   }
 
   .cove-editor__heading {
@@ -33,7 +34,7 @@
   }
 
   .cove-editor--toggle {
-    position: fixed;
+    position: absolute;
     top: 10px;
     left: 307px;
     width: 25px;
@@ -46,7 +47,7 @@
     cursor: pointer;
     transition: left 400ms ease 65ms, background-color 200ms ease;
     box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
-    z-index: 10;
+    z-index: 8;
 
     &:before {
       top: 43%;

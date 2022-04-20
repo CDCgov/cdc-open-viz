@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React from 'react'
 import themes from '@cdc/core/data/themes';
 import chroma from 'chroma-js';
 
