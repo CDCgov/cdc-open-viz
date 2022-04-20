@@ -142,7 +142,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // United States check
             if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
+                let geoName = '';
+                if(row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null ){
+
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
