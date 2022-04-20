@@ -825,8 +825,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 if (true === column.tooltip) {
 
-                    let label = column.label.length > 0 ? column.label : '';
-
+                    let label = '';
+                    if(column.label !== undefined && column.lebel !==null){
+                        // column.label could be : Number || String || undefined types
+                        label = String(column.label)
+                    }
+                    
+                    
                     let value;
 
                     if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
