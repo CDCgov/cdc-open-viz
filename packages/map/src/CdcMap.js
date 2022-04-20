@@ -568,7 +568,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // When on a single state map filter runtime data by state
             if (
-                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
                 obj.general.geoType === 'single-state'
             ) {
                 return false;
