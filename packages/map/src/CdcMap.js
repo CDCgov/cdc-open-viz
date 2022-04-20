@@ -1192,7 +1192,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     if(config) {
     loadConfig(config)
         }
-    },[config,loadConfig])
+    },[config])
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
