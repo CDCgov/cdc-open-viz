@@ -1068,7 +1068,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Done loading
         setLoading(false)
-    }
+    },[])
 
     const init = async () => {
         let configData = null
