@@ -176,9 +176,9 @@ const DataTable = (props) => {
     const newTableColumns = [];
 
     Object.keys(columns).forEach((column) => {
-      if (columns[column].dataTable === true && '' !== columns[column].name) {
+      if (columns[column].dataTable === true && columns[column].name) {
         const newCol = {
-          Header: columns[column].label || columns[column].name,
+          Header: columns[column].label ? columns[column].label : columns[column].name,
           id: column,
           accessor: (row) => {
             if (runtimeData) {
