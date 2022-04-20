@@ -1010,7 +1010,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = async (configObj) => {
+    const loadConfig = useCallback(async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
 
