@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, FC } from 'react';
+import React, { useContext } from 'react';
 import { Group } from '@visx/group';
 import { Bar } from '@visx/shape';
 import { scaleLinear, scaleBand } from '@visx/scale';
@@ -16,9 +16,6 @@ interface PairedBarChartProps {
 const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
 	const { config, colorScale, transformedData } = useContext<any>(Context);
-	const [textWidth, setTextWidth] = useState(null);
-	let parentTextElement = useRef();
-
 
 	if(!config || config?.series?.length < 2) return;
 
@@ -66,9 +63,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 		groupTwo.labelColor = '#FFFFFF';
 	}
 
-	console.log('textWidth', textWidth)
-
-
 	return (width > 0) && (
 		<>
 			<svg
@@ -98,15 +92,8 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
 							/>
 							<Text
-								innerRef={(node) => {
-									if(node) {
-										let elem = node.getBBox().width
-										console.log('elem', elem)
-										setTextWidth(elem)
-									}
-								}}
-								//innerRef={ parentTextElement} 
-								x={halfWidth - (barWidth < 100 ? barWidth + textWidth + 10 : barWidth - 5)}
+								textAnchor={barWidth < 100 ? 'end' : 'start' }
+								x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
 								y={yScale([d[config.dataDescription.xKey]]) + yScale.bandwidth() / 1.5}
 								fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
 								{d[config.dataDescription.xKey]}
@@ -138,12 +125,8 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
 								/>
 								<Text
-									innerRef={(node) => {
-										if(node) {
-											setTextWidth(node.getBBox().width)
-										}
-									}}
-									x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - textWidth - 10 )}
+									textAnchor={barWidth < 100 ? 'start' : 'end' }
+									x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
 									y={yScale([d[config.dataDescription.xKey]]) + (yScale.bandwidth() / 1.5)}
 									fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
 									{d[config.dataDescription.xKey]}
