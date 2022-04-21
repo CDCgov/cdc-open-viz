@@ -10,7 +10,7 @@ import { AxisLeft, AxisBottom } from '@visx/axis';
 import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
-import PairedBarChart from './PairedBarChart.js'
+import PairedBarChart from './PairedBarChart';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -335,7 +335,6 @@ export default function LinearChart() {
             numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
-              console.log('props', props)
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
                 <Group className="bottom-axis">
@@ -382,7 +381,6 @@ export default function LinearChart() {
             numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
-              console.log('props', props)
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
                 <Group className="bottom-axis">
@@ -421,7 +419,7 @@ export default function LinearChart() {
           </>
           }
           { config.visualizationType === 'Paired Bar' && (
-            <PairedBarChart  width={xMax} height={yMax}  />
+            <PairedBarChart  width={xMax} height={yMax} />
           ) }
           
           {/* Bar chart */}

@@ -775,7 +775,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {config.visualizationType !== 'Pie' &&
+              { (config.visualizationType !== 'Pie' && config.visualizationType !== 'Paired Bar') &&
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>
