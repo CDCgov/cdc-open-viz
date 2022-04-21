@@ -1,78 +1,102 @@
-import React, { useEffect, useState } from 'react'
+import React, { Children, useEffect, useState } from 'react'
 
 import { useGlobalContext } from '../GlobalContext'
 import Icon from './Icon'
 
+//Define the "slots" to be populated by subcomponents
 const ModalHeader = () => null
 const ModalContent = () => null
+const ModalFooter = () => null
 
-const Modal = ({ children }) => {
+const Modal = ({ fontTheme = 'dark', backgroundColor = '#fff', showDividerTop = true, showDividerBottom = true, showClose = true, children }) => {
+  //Access global modal state
+  let { modal } = useGlobalContext()
+
+  //Set local states
   const [ displayModal, setDisplayModal ] = useState(false)
   const [ modalAnimationState, setModalAnimationState ] = useState(null)
-  const [ isAnimating, setIsAnimating ] = useState(false)
 
-  const modalHeaderChildren = children.find(el => el.type === ModalHeader)
-  const modalContentChildren = children.find(el => el.type === ModalContent)
+  //Parse, organize, and pull "slotted" children data from subcomponents
+  const childNodes = Children.toArray(children)
+  const modalHeaderChildren = childNodes.find(child => child.type === ModalHeader)
+  const modalContentChildren = childNodes.find(child => child.type === ModalContent)
+  const modalFooterChildren = childNodes.find(child => child.type === ModalFooter)
 
-  let { showModal, actions } = useGlobalContext()
-
-  const toggleModal = (display = false) => {
-    actions.setGlobalContextData(context => ({ ...context, showModal: display }))
+  //Modal computed style options
+  const fontThemeColor = () => {
+    return fontTheme === 'light' ? '#fff' : null
   }
 
-  let timeoutShow = undefined
-  let timeoutAnimateOut = undefined
+  const dividerBorder = (position) => {
+    return !position ? 'none' : null
+  }
 
+  //Animate In effect
   useEffect(() => {
-    console.log(isAnimating)
-    if (showModal === true) {
-      if (isAnimating) {
-        clearTimeout(timeoutAnimateOut)
-      }
-      setIsAnimating(true)
-      setDisplayModal(true)
-      setModalAnimationState('animate-in')
-      timeoutShow = setTimeout(() => {
-        setModalAnimationState('show')
-        setIsAnimating(false)
-      }, 750)
+    if (modal.showModal === false) return //Reject
 
-    } else {
-      if (setDisplayModal) {
-        if (isAnimating) {
-          clearTimeout(timeoutShow)
-        }
-        setIsAnimating(true)
-        setModalAnimationState('animate-out')
-        timeoutAnimateOut = setTimeout(() => {
-          setModalAnimationState(null)
-          setDisplayModal(false)
-          setIsAnimating(false)
-        }, 400)
-      }
-    }
-  }, [ showModal ])
+    setDisplayModal(true)
+    setModalAnimationState('animate-in')
 
+    const timeoutShow = setTimeout(() => {
+      setModalAnimationState('show')
+    }, 750)
+
+    return () => clearTimeout(timeoutShow)
+  }, [ modal.showModal ])
+
+  //Animate Out effect
+  useEffect(() => {
+    if (modal.showModal === true) return //Reject
+
+    setModalAnimationState('animate-out')
+
+    const timeoutHide = setTimeout(() => {
+      setModalAnimationState(null)
+      setDisplayModal(false)
+    }, 400)
+
+    return () => clearTimeout(timeoutHide)
+  }, [ modal.showModal ])
+
+  //Render output
   return (
     <>
       {displayModal &&
       <div className={'cove-modal' + (modalAnimationState ? (' ' + modalAnimationState) : '')}>
-        <div className="cove-modal__bg" onClick={() => toggleModal(false)}/>
+        <div className="cove-modal__bg" onClick={() => modal.actions.toggleModal(false)}/>
         <div className="cove-modal__wrapper">
           <div className="cove-modal__container">
-            <span className="cove-modal--close" onClick={() => toggleModal(false)}>
-              <Icon display="close"/>
-            </span>
-            {modalHeaderChildren &&
-            <div className="cove-modal__header">
-              {modalHeaderChildren.props.children}
+
+            {(showClose || modalHeaderChildren) &&
+            < div className="cove-modal__header" style={{
+              color: fontThemeColor(),
+              backgroundColor: backgroundColor,
+              boxShadow: dividerBorder(showDividerTop),
+              padding: !modalHeaderChildren ? '0' : null
+            }}>
+              {modalHeaderChildren && modalHeaderChildren.props.children}
+              {showClose &&
+              <button className="cove-modal--close" onClick={() => modal.actions.toggleModal(false)}>
+                <Icon display="close"/>
+              </button>
+              }
             </div>
             }
-            {modalContentChildren &&
+
             <div className="cove-modal__content">
-              {modalContentChildren.props.children}
+              {modalContentChildren && modalContentChildren.props.children}
             </div>
+
+            {modalFooterChildren &&
+              <div className="cove-modal__footer" style={{
+                boxShadow: dividerBorder(showDividerBottom),
+                paddingTop: showDividerBottom ? '1rem' : null
+              }}>
+                {modalFooterChildren.props.children}
+              </div>
             }
+
           </div>
         </div>
       </div>
@@ -81,7 +105,9 @@ const Modal = ({ children }) => {
   )
 }
 
+//Create subcomponents as "slots" within component namespace
 Modal.Header = ModalHeader
 Modal.Content = ModalContent
+Modal.Footer = ModalFooter
 
 export default Modal
