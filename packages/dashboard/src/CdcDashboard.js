@@ -18,6 +18,7 @@ import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
 import CdcDataBite from '@cdc/data-bite';
 import CdcWaffleChart from '@cdc/waffle-chart';
+import CdcMarkupInclude from '@cdc/markup-include';
 
 import EditorPanel from './components/EditorPanel';
 import Grid from './components/Grid';
@@ -50,6 +51,9 @@ const addVisualization = (type, subType) => {
     case 'waffle-chart':
       newVisualizationConfig.visualizationType = type;
       break;
+    case 'markup-include':
+      newVisualizationConfig.visualizationType = type;
+      break;
   }
 
   return newVisualizationConfig
@@ -73,6 +77,7 @@ const VisualizationsPanel = () => (
     <div className="drag-grid">
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart" />
+      <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include" />
     </div>
   </div>
 )
@@ -313,6 +318,9 @@ export default function CdcDashboard(
           case 'waffle-chart':
             body = <><Header back={back} subEditor="Waffle Chart" /><CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
+          case 'markup-include':
+            body = <><Header back={back} subEditor="Markup Include" /><CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
+            break;
         }
       }
     });
@@ -360,6 +368,7 @@ export default function CdcDashboard(
                       {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                       {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => { updateChildConfig(col.widget, newConfig) }} isDashboard={true} />}
                       {visualizationConfig.type === 'waffle-chart' && <CdcWaffleChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                      {visualizationConfig.type === 'markup-include' && <CdcMarkupInclude key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                     </div>
                   }
                 })}
