@@ -594,8 +594,7 @@ const EditorPanel = () => {
                   </div>
                   <div className="three-hide-inputs">
                     <CheckBox value={config.xAxis.hideTicks} label="HIDE TICKS" section="xAxis" fieldName="hideTicks" updateField={updateField} hideTicks={null} />
-                    <CheckBox value={config.xAxis.hideTicks} label="HIDE TICK LABEL" section="xAxis" fieldName="hideTicks" updateField={updateField} hideZero={null} />
-                    <CheckBox value={config.xAxis.hideTicks} label="HIDE AXIS" section="xAxis" fieldName="hideTicks" updateField={updateField} hideAxisLine={null} />
+                    <CheckBox value={config.xAxis.hideTickLabel} label="HIDE TICK LABEL" section="xAxis" fieldName="hideTickLabel" updateField={updateField} hideZero={null} />
                   </div>
                   {(config.visualizationSubType === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
