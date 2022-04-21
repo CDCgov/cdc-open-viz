@@ -22,7 +22,6 @@ const CdcMarkupInclude = (
 
   // Default States
   const [ config, setConfig ] = useState({ ...defaults })
-  const [ isPendingUpdate, setIsPendingUpdate ] = useState(false)
   const [ loading, setLoading ] = useState(true)
 
   // Custom States
@@ -96,40 +95,50 @@ const CdcMarkupInclude = (
       if (config.srcUrl === '#example') {
         setUrlMarkup("<!doctype html><html lang=\"en\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"> <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>")
       } else {
+        console.log('srcUrl exists but is not an example')
         try {
+          console.log('attempting to retrieve content from', config.srcUrl)
           await axios
             .get(config.srcUrl)
             .then((res) => {
               if (res.data) {
                 setUrlMarkup(res.data)
+                console.log('set markup to', res.data)
               }
             })
         } catch (err) {
+          console.log('could not retrieve content from', config.srcUrl)
           if (err.response) {
             // Response with error
             setMarkupError(err.response.status)
+            console.log('got an error response', err.response)
+            console.log('error response status', err.response.status)
           } else if (err.request) {
             // No response received
             setMarkupError(200)
+            console.log('error response not received')
           }
 
           setUrlMarkup('')
         }
       }
     } else {
+      console.log('config.srcUrl value not found or is empty', config.srcUrl)
       setUrlMarkup('')
     }
   }, [ config.srcUrl])
 
   const parseBodyMarkup = (markup) => {
-    let content = ''
+    let parse
     if (markup && markup !== '' && markup !== null) {
-      let parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
-      if (parse) {
-        content = parse[1]
+      if (markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)) {
+        parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
+      } else {
+        parse = markup.toString()
       }
     }
-    return content
+
+    return parse[1] || parse
   }
 
   //Load initial config
