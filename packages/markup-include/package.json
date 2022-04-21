@@ -21,6 +21,8 @@
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "devDependencies": {
     "@cdc/core": "^1.1.2",
+    "interweave": "^13.0.0",
+    "react": "^18.0.0",
     "react-accessible-accordion": "^3.3.4",
     "use-debounce": "^6.0.1"
   },
