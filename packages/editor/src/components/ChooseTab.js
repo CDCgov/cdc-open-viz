@@ -11,6 +11,7 @@ import GlobeIcon from '@cdc/core/assets/world-graphic.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg';
+import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
 import PairedBarIcon from '@cdc/core/assets/paired-bar.svg';
 
@@ -39,7 +40,7 @@ export default function ChooseTab() {
             isSubType = (subType === config.visualizationType)
         }
 
-        if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart') isSubType = true;
+        if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true;
 
         let classNames = (config.type === type && isSubType) ? 'active' : ''
 
@@ -82,6 +83,7 @@ export default function ChooseTab() {
                 <li><IconButton label="Dashboard" type="dashboard" icon={ <DashboardIcon /> } /></li>
                 <li><IconButton label="Data Bite" type="data-bite" icon={<DataBiteIcon />} /></li>
                 <li><IconButton label="Waffle Chart" type="waffle-chart" icon={ <WaffleChartIcon /> } /></li>
+                <li><IconButton label="Markup Include" type="markup-include" icon={ <MarkupIncludeIcon /> } /></li>
             </ul>
             <div className="heading-2">Charts</div>
             <ul className="grid">
