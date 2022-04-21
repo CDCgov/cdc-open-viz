@@ -223,14 +223,14 @@ export default function LinearChart() {
                         }
 
 
-                        { config.isLollipop && (config.visualizationSubType !== "horizontal" || config.visualizationType !== 'Paired Bar' ) &&
+                        { config.visualizationSubType !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {tick.formattedValue + 'test'}
+                              {tick.formattedValue}
                             </Text>
                         }
 
@@ -250,6 +250,7 @@ export default function LinearChart() {
                     />
                   )}
                   <Text
+                    className="y-label"
                     textAnchor="middle"
                     verticalAnchor="start"
                     transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
