@@ -6,19 +6,23 @@ export const useGlobalContext = () => useContext(GlobalContext)
 export const GlobalContextProvider = ({ children }) => {
   const [ globalContextData, setGlobalContextData ] = useState({})
 
-  const setGlobalModalObj = (obj) => {
-    setGlobalContextData(prevState => ({ ...prevState, modal: obj }))
+  const openModal = (modal) => {
+    let payload = { object: modal, showModal: true }
+    setGlobalContextData(context => ({ ...context, modal: { ...payload } }))
   }
 
-  const setGlobalModalDisplay = (display) => {
-    setGlobalContextData(prevState => ({ ...prevState, showModal: display }))
+  const toggleModal = (display = false) => {
+    setGlobalContextData(context => ({ ...context, modal: {...context.modal, showModal: display } }))
   }
 
   const globalSettings = {
-    modal: globalContextData.modal,
-    showModal: globalContextData.showModal,
-    actions: {
-      setGlobalContextData
+    modal: {
+      object: globalContextData.modal?.object || null,
+      showModal: globalContextData.modal?.showModal || false,
+      actions: {
+        openModal,
+        toggleModal
+      }
     }
   }
 

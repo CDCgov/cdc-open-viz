@@ -17,6 +17,7 @@
 
   .cove-editor__heading {
     font-size: 1.2em;
+    user-select: none;
   }
 
   .cove-editor__panel-container {
@@ -47,6 +48,7 @@
     cursor: pointer;
     transition: left 400ms ease 65ms, background-color 200ms ease;
     box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+    user-select: none;
     z-index: 8;
 
     &:before {
