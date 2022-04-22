@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import { colorPalettes } from '../data/color-palettes';
 
 // create constants 
@@ -80,6 +80,13 @@ const handleSwitch2 = ():void => {
     dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
   };
 };
+
+  /// useEffect will run when page render first time and provide default filtered colors
+
+  useEffect(() => {
+    dispatch({ type: ON_SEQUENTIAL, payload: colorPalettes });
+    dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
+  }, []);
 
     return { state,handleSwitch,handleSwitch2}
 }
