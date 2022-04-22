@@ -85,6 +85,8 @@ interface State {
         }
       };
     
-   
+    
+      // when importing state destructure  all states from it.
+      return { state, handleSwitch };
   };
   export default useColorPallete;
