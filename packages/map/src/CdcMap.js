@@ -128,9 +128,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(row.uid) row.uid = null // Wipe existing UIDs
 
             // United States check
-            if("us" === obj.general.geoType && obj.columns.geo.name) {
+            if("us" === obj.general.geoType) {
+                let geoName = '';
+                if(row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null ){
 
-                const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -556,7 +560,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // When on a single state map filter runtime data by state
             if (
-                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
                 obj.general.geoType === 'single-state'
             ) {
                 return false;
@@ -812,8 +816,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 if (true === column.tooltip) {
 
-                    let label = column.label.length > 0 ? column.label : '';
-
+                    let label = '';
+                    if(column.label !== undefined && column.lebel !==null){
+                        // column.label could be : Number || String || undefined types
+                        label = String(column.label)
+                    }
+                    
+                    
                     let value;
 
                     if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
@@ -989,7 +998,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = async (configObj) => { 
+    const loadConfig = useCallback(async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1045,7 +1054,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         validateFipsCodeLength(newState);
         setState(newState)
         setLoading(false)
-    }
+    },[])
 
     const init = async () => {
         let configData = null
@@ -1167,11 +1176,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
+    useEffect(() => {
     if(config) {
-        useEffect(() => {
-            loadConfig(config)
-        }, [config.data])
-    }
+    loadConfig(config)
+        }
+    },[config])
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
@@ -1251,7 +1260,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="-1">
 						{parse(title)}
 					</div>
 				</header>
