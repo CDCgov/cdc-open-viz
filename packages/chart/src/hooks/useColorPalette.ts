@@ -57,4 +57,8 @@ interface State {
     }
   }
   
-
+  const useColorPallete = <T>(colorPalettes:T) => {
+   
+    
+  };
+  export default useColorPallete;
