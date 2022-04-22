@@ -241,19 +241,20 @@ export default function DataImport() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const loadFileFromUrl = (url) => {
-    const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+    // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+    
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
-                 aria-describedby="load-data" value={extUrl} onChange={(e) => setExternalURL(e.target.value)}/>
+                 aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
                   onClick={() => loadData(null, externalURL)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" defaultChecked={keepURL !== false} onClick={() => setKeepURL(!keepURL)}/> Always
+          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/> Always
           load from URL (normally will only pull once)
         </label>
       </>
