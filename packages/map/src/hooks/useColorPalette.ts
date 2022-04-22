@@ -11,8 +11,8 @@ export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
 // type PalletTypes = typeof colorPalettes;
 // type PalletType = keyof PalletTypes;
 interface State {
-    readonly filteredPallets:any[]
-    readonly filteredQualitative:any[]
+    readonly filteredPallets:string[]
+    readonly filteredQualitative:string[]
     readonly isSwitched: boolean;
     readonly isSwitched2: boolean;
    }
