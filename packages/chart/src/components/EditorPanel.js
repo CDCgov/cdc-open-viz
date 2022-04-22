@@ -970,7 +970,7 @@ const EditorPanel = () => {
                   </label>
                   <span className="h5">Non-Sequential</span>
                   <ul className="color-palette">
-                    {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
+                    {filteredQualitative.map( (palette) => {
 
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
@@ -996,7 +996,7 @@ const EditorPanel = () => {
 
                   <span className="h5">Sequential</span>
                   <ul className="color-palette">
-                    {Object.keys(colorPalettes).filter((name) => name.includes('sequential')).map( (palette) => {
+                    {filteredSequential.map( (palette) => {
 
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
