@@ -39,6 +39,9 @@ function reducer (state:State,action:Action){
   let reverseRegex = new RegExp('reverse$'); // matches a string that ends in with "reverse".
   let qualitativeRegex = new RegExp('^qualitative'); //matches any string that starts with "qualitative".
 
+  switch(action.type){
+      default : return state;
+  }
 }
 // create custon hook and export
 export function useColorPalette(){
