@@ -2027,8 +2027,7 @@ const EditorPanel = (props) => {
 									</ul>
 									<span className='h5'>Non-Sequential</span>
 									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => name.includes('qualitative'))
+										{filteredQualitative
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
