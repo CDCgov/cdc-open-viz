@@ -123,15 +123,17 @@ const CdcMarkupInclude = (
 
   const parseBodyMarkup = (markup) => {
     let parse
+    let hasBody = false
     if (markup && markup !== '' && markup !== null) {
       if (markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)) {
+        hasBody = true
         parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
       } else {
         parse = markup.toString()
       }
     }
 
-    return parse[1] || parse
+    return hasBody ? parse[1] : parse
   }
 
   //Load initial config
