@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react';
-import { colorPalettes } from '../data/color-palettes';
+import colorPalettes  from '../data/color-palettes';
 
 // create constants 
 export const ON_SEQUENTIAL = 'ON_SEQUENTIAL';
