@@ -50,19 +50,19 @@ const CdcMarkupInclude = (
   }
 
   const loadConfig = useCallback(async () => {
-      let response = configObj || await (await fetch(configUrl)).json()
-      let responseData = response.data ?? {}
+    let response = configObj || await (await fetch(configUrl)).json()
+    let responseData = response.data ?? {}
 
-      if (response.dataUrl) {
-        const dataString = await fetch(response.dataUrl)
-        responseData = await dataString.json()
-      }
+    if (response.dataUrl) {
+      const dataString = await fetch(response.dataUrl)
+      responseData = await dataString.json()
+    }
 
-      response.data = responseData
+    response.data = responseData
 
-      updateConfig({ ...defaults, ...response })
-      setLoading(false)
-    }, []);
+    updateConfig({ ...defaults, ...response })
+    setLoading(false)
+  }, [])
 
 
   // Custom Functions
@@ -94,7 +94,7 @@ const CdcMarkupInclude = (
 
     if (config.srcUrl) {
       if (config.srcUrl === '#example') {
-        setUrlMarkup("<!doctype html><html lang=\"en\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"> <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>")
+        setUrlMarkup('<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>')
       } else {
         try {
           await axios
@@ -119,7 +119,7 @@ const CdcMarkupInclude = (
     } else {
       setUrlMarkup('')
     }
-  }, [ config.srcUrl])
+  }, [ config.srcUrl ])
 
   const parseBodyMarkup = (markup) => {
     let parse
@@ -138,17 +138,17 @@ const CdcMarkupInclude = (
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch((err)=> console.log(err))
+    loadConfig().catch((err) => console.log(err))
   }, [])
 
   //Reload config if config object provided/updated
   useEffect(() => {
-    loadConfig().catch((err)=> console.log(err))
+    loadConfig().catch((err) => console.log(err))
   }, [ configObj?.data ])
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch((err)=>console.log(err))
+    loadConfigMarkupData().catch((err) => console.log(err))
   }, [ loadConfigMarkupData ])
 
   let content = (<Loading/>)
@@ -164,9 +164,9 @@ const CdcMarkupInclude = (
           }
           <div className="cove-component__content">
             {!markupError && urlMarkup &&
-              <div className="cove-component__content-wrap">
-                <Markup content={parseBodyMarkup(urlMarkup)}/>
-              </div>
+            <div className="cove-component__content-wrap">
+              <Markup content={parseBodyMarkup(urlMarkup)}/>
+            </div>
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
@@ -175,7 +175,7 @@ const CdcMarkupInclude = (
     )
 
     content = (
-      <div className={`cove`} style={ isDashboard ? { marginTop: '3rem'} : null }>
+      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>
