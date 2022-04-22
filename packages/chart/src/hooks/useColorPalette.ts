@@ -61,6 +61,30 @@ interface State {
    
     const [state, dispatch] = useReducer(reducer, initialState);
   
+    const handleSwitch = (caseValue: Case): void => {
+        // this function will hand;le 4 state changes and ll be mounted in 2 different switch toogle bar. 
+        if(caseValue === undefined || caseValue === null ){
+            console.error('Enter valid arguments to handleSwitch function')
+            return ;
+        };
     
+        if(caseValue === "SEQUENTIAL_REVERSE"){
+            if (state.isSequentialReversed) {
+                dispatch({ type: SEQUENTIAL, payload: colorPalettes });
+            } else {
+                dispatch({ type: SEQUENTIAL_REVERSE, payload: colorPalettes });
+              };
+          }
+    
+        if (caseValue === "NON_SEQUENTIAL_REVERSE") {
+          if (state.isNonSequentialReversed) {
+              
+            } else {
+            dispatch({type: NON_SEQUENTIAL_REVERSE, payload: colorPalettes});
+          }
+        }
+      };
+    
+   
   };
   export default useColorPallete;
