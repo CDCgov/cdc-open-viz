@@ -176,9 +176,9 @@ const DataTable = (props) => {
     const newTableColumns = [];
 
     Object.keys(columns).forEach((column) => {
-      if (columns[column].dataTable === true && '' !== columns[column].name) {
+      if (columns[column].dataTable === true && columns[column].name) {
         const newCol = {
-          Header: columns[column].label || columns[column].name,
+          Header: columns[column].label ? columns[column].label : columns[column].name,
           id: column,
           accessor: (row) => {
             if (runtimeData) {
@@ -230,11 +230,11 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [indexTitle, columns, runtimeData, runtimeLegend]);
+  }, [indexTitle, columns, runtimeData,getCellAnchor,displayDataAsText,applyLegendToRow,customSort,displayGeoName,state.legend.specialClasses]);
 
   const tableData = useMemo(
     () => Object.keys(runtimeData).filter((key) => applyLegendToRow(runtimeData[key])).sort((a, b) => customSort(a, b)),
-    [runtimeLegend, runtimeData, applyLegendToRow, customSort]
+    [ runtimeData, applyLegendToRow, customSort]
   );
 
   // Change accessibility label depending on expanded status
