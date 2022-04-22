@@ -100,5 +100,5 @@ export function useColorPalette(){
     dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
   }, []);
 
-    return { state,handleSwitch,handleSwitch2}
+    return { state,handleSwitch}
 }
