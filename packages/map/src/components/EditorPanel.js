@@ -24,6 +24,7 @@ import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { useColorPalette } from '../hooks/useColorPalette';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -92,6 +93,7 @@ const EditorPanel = (props) => {
 		runtimeFilters,
 		runtimeLegend,
 	} = props;
+	const {state:colorState,handleSwitch,handleSwitch2} = useColorPalette();
 
 	const { general, columns, legend, dataTable, tooltips } = state;
 
