@@ -85,7 +85,12 @@ interface State {
         }
       };
     
+      // effect ll run on first render off the page
     
+      useEffect(() => {
+        dispatch({ type: SEQUENTIAL, payload: colorPalettes });
+        dispatch({ type: NON_SEQUENTIAL, payload: colorPalettes });
+      }, [colorPalettes]);
       // when importing state destructure  all states from it.
       return { state, handleSwitch };
   };
