@@ -49,10 +49,13 @@ export default function CdcChart(
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
+    'qualitative-bold-reverse': ['#377eb8', '#ff7f00','#a65628','#984ea3','#e41a1c','#ffff33','#4daf4a','#f781bf', '#3399CC'],
     'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
+    'qualitative-soft-reverse': ['#A6CEE3', '#1F78B4',  '#FDBF6F','#33A02C','#FB9A99','#E31A1C','#B2DF8A',  '#FF7F00', '#ACA9EB'],
     'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
-    'sequential-blue-reverse': ['#084594', '#2171B5', '#4292C6', '#6BAED6', '#9ECAE1', '#C6DBEF'],
-    'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
+    'sequential-blue-reverse': [ '#2171B5','#9ECAE1', '#084594',  '#4292C6', '#C6DBEF','#6BAED6'],
+    'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32'],
+    'sequential-green-reverse': [ '#238B45','#A1D99B','#005A32','#41AB5D','#41AB5D','#74C476','#C7E9C0']
   };
 
   const loadConfig = async () => {
