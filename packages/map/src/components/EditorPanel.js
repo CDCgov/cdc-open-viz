@@ -94,7 +94,7 @@ const EditorPanel = (props) => {
 		runtimeLegend,
 	} = props;
 	const {state:colorState,handleSwitch} = useColorPalette();
-	const {filteredPallets,filteredQualitative,isSequential,isNonSequential} =  colorState
+	const {filteredPallets,filteredQualitative,isSequentialReversed,isNonSequentialReversed} =  colorState
 
 	const { general, columns, legend, dataTable, tooltips } = state;
 

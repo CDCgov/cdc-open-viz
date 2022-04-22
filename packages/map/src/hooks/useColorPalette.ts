@@ -12,8 +12,8 @@ export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
 interface State {
     readonly filteredPallets:string[]
     readonly filteredQualitative:string[]
-    readonly isSequential: boolean;
-    readonly isNonSequential: boolean;
+    readonly isSequentialReversed: boolean;
+    readonly isNonSequentialReversed: boolean;
    }
    interface Action {
     type:
@@ -30,8 +30,8 @@ interface State {
 const initialState:State = {
     filteredPallets: [],
     filteredQualitative: [],
-    isSequential: false,
-    isNonSequential: false,
+    isSequentialReversed: false,
+    isNonSequentialReversed: false,
   };
 
 // create reducer function to handle multiple states & manupilate with each state
@@ -44,18 +44,18 @@ function reducer (state:State,action:Action):State{
     case ON_SEQUENTIAL:
       const sequential = palletNamesArr.filter((name: string) => !name.match(qualitativeRegex) && !name.match(reverseRegex));
   
-      return { ...state, isSequential: false, filteredPallets: sequential };
+      return { ...state, isSequentialReversed: false, filteredPallets: sequential };
      case ON_SEQUENTIAL_REVERSE:
         const sequentialReverse = palletNamesArr.filter((name: string) => !name.match(qualitativeRegex) && name.match(reverseRegex));
-        return { ...state, isSequential: true, filteredPallets: sequentialReverse };
+        return { ...state, isSequentialReversed: true, filteredPallets: sequentialReverse };
   
      case ON_NON_SEQUENTIAL:
         const qualitative = palletNamesArr.filter((name: string) => name.match(qualitativeRegex) && (!name.match(reverseRegex) && !name.includes('qualitative9')));
-        return { ...state, isNonSequential: false, filteredQualitative: qualitative };
+        return { ...state, isNonSequentialReversed: false, filteredQualitative: qualitative };
       
     case ON_NON_SEQUENTIAL_REVERSE:
         const qualitativeReverse = palletNamesArr.filter((name: string) => name.match(qualitativeRegex) && name.match(reverseRegex));
-        return { ...state,isNonSequential: true,filteredQualitative: qualitativeReverse};
+        return { ...state,isNonSequentialReversed: true,filteredQualitative: qualitativeReverse};
       default : return state;
   }
 }
@@ -72,7 +72,7 @@ export function useColorPalette(){
       };
 
       if(caseValue === Case.ON_SEQUENTIAL){
-        if (state.isSequential) {
+        if (state.isSequentialReversed) {
             dispatch({ type: ON_SEQUENTIAL, payload: colorPalettes });
           } else {
             dispatch({ type: ON_SEQUENTIAL_REVERSE, payload: colorPalettes });
@@ -81,7 +81,7 @@ export function useColorPalette(){
 
 
       if(caseValue === Case.ON_NON_SEQUENTIAL){
-        if (state.isNonSequential) {
+        if (state.isNonSequentialReversed) {
             dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
           } else {
             dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
