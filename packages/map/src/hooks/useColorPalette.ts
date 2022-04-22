@@ -7,7 +7,23 @@ export const ON_SEQUENTIAL_REVERSE = 'ON_SEQUENTIAL_REVERSE';
 export const ON_NON_SEQUENTIAL = 'ON_NON_SEQUENTIAL';
 export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
 
-
+// create types & interfaces 
+// type PalletTypes = typeof colorPalettes;
+// type PalletType = keyof PalletTypes;
+interface State {
+    readonly filteredPallets:any[]
+    readonly filteredQualitative:any[]
+    readonly isSwitched: boolean;
+    readonly isSwitched2: boolean;
+   }
+   interface Action {
+    type:
+      | 'ON_SEQUENTIAL_REVERSE'
+      | 'ON_SEQUENTIAL'
+      | 'ON_NON_SEQUENTIAL'
+      | 'ON_NON_SEQUENTIAL_REVERSE';
+    payload: typeof colorPalettes;
+  }
 
 // create initial state
 const initialState = {
