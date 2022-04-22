@@ -23,14 +23,16 @@ interface State {
       | 'ON_NON_SEQUENTIAL'
       | 'ON_NON_SEQUENTIAL_REVERSE';
     payload: typeof colorPalettes;
-  }
+  };
+  enum Case {ON_SEQUENTIAL="ON_SEQUENTIAL",ON_NON_SEQUENTIAL="ON_NON_SEQUENTIAL"}
+  type CaseValue = "ON_NON_SEQUENTIAL"| "ON_SEQUENTIAL";
 
 // create initial state
 const initialState:State = {
     filteredPallets: [],
     filteredQualitative: [],
-    isSwitched: false,
-    isSwitched2: false,
+    isSequential: false,
+    isNonSequential: false,
   };
 
 // create reducer function to handle multiple states & manupilate with each state
