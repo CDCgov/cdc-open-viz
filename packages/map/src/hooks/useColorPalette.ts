@@ -40,6 +40,10 @@ function reducer (state:State,action:Action){
   let qualitativeRegex = new RegExp('^qualitative'); //matches any string that starts with "qualitative".
 
   switch(action.type){
+    case ON_SEQUENTIAL:
+      const sequential = palletNamesArr.filter((name: string) =>!name.match(qualitativeRegex) && !name.match(reverseRegex));
+  
+     return { ...state, isSwitched: false, filteredPallets: sequential };
       default : return state;
   }
 }
