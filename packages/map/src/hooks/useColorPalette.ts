@@ -13,8 +13,8 @@ export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
 interface State {
     readonly filteredPallets:string[]
     readonly filteredQualitative:string[]
-    readonly isSwitched: boolean;
-    readonly isSwitched2: boolean;
+    readonly isSequential: boolean;
+    readonly isNonSequential: boolean;
    }
    interface Action {
     type:
