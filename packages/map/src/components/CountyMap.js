@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo, useRef } from 'react';
+import Loading from '@cdc/core/components/Loading';
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -514,7 +515,7 @@ const CountyMap = (props) => {
 		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
 		return geosJsx;
 	};
-
+	if(!data) <Loading />
 	return (
 		<ErrorBoundary component='CountyMap'>
 			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
