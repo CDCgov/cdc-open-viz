@@ -1,6 +1,14 @@
 import { useReducer } from 'react';
 import { colorPalettes } from '../data/color-palettes';
 
+// create constants 
+export const ON_SEQUENTIAL = 'ON_SEQUENTIAL';
+export const ON_SEQUENTIAL_REVERSE = 'ON_SEQUENTIAL_REVERSE';
+export const ON_NON_SEQUENTIAL = 'ON_NON_SEQUENTIAL';
+export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
+
+
+
 // create initial state
 const initialState = {
     filteredPallets: [],
