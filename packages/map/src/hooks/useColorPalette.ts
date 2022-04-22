@@ -15,16 +15,14 @@ interface State {
     readonly isSequentialReversed: boolean;
     readonly isNonSequentialReversed: boolean;
    }
-   interface Action {
+   interface Action<Palettes> {
     type:
-      | 'ON_SEQUENTIAL_REVERSE'
-      | 'ON_SEQUENTIAL'
-      | 'ON_NON_SEQUENTIAL'
-      | 'ON_NON_SEQUENTIAL_REVERSE';
-    payload: typeof colorPalettes;
+      | 'SEQUENTIAL_REVERSE'
+      | 'SEQUENTIAL'
+      | 'NON_SEQUENTIAL'
+      | 'NON_SEQUENTIAL_REVERSE';
+    payload: Palettes;
   };
-  enum Case {ON_SEQUENTIAL="ON_SEQUENTIAL",ON_NON_SEQUENTIAL="ON_NON_SEQUENTIAL"}
-  type CaseValue = "ON_NON_SEQUENTIAL"| "ON_SEQUENTIAL";
 
 // create initial state
 const initialState:State = {
