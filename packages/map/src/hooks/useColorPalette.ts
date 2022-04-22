@@ -34,7 +34,7 @@ const initialState:State = {
   };
 
 // create reducer function to handle multiple states & manupilate with each state
-function reducer (state:State,action:Action){
+function reducer (state:State,action:Action):State{
   const palletNamesArr:string[] = Object.keys(action.payload); // action.payload === colorPalettes object
   let reverseRegex = new RegExp('reverse$'); // matches a string that ends in with "reverse".
   let qualitativeRegex = new RegExp('^qualitative'); //matches any string that starts with "qualitative".
