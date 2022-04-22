@@ -1,13 +1,13 @@
 import { useEffect, useReducer } from 'react';
-import colorPalettes  from '../data/color-palettes';
 
 // create constants 
-export const ON_SEQUENTIAL = 'ON_SEQUENTIAL';
-export const ON_SEQUENTIAL_REVERSE = 'ON_SEQUENTIAL_REVERSE';
-export const ON_NON_SEQUENTIAL = 'ON_NON_SEQUENTIAL';
-export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
+export const SEQUENTIAL = 'SEQUENTIAL';
+export const SEQUENTIAL_REVERSE = 'SEQUENTIAL_REVERSE';
+export const NON_SEQUENTIAL = 'NON_SEQUENTIAL';
+export const NON_SEQUENTIAL_REVERSE = 'NON_SEQUENTIAL_REVERSE';
 
 // create types & interfaces 
+type Case = "SEQUENTIAL_REVERSE"|"NON_SEQUENTIAL_REVERSE";
 
 interface State {
     readonly filteredPallets:string[]
