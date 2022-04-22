@@ -110,8 +110,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
 
-
-
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -119,17 +117,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
-
-    // *******START SCREEN READER DEBUG*******
-    // const focusedElement = useActiveElement();
-
-    // useEffect(() => {
-    //     if (focusedElement) {
-    //         focusedElement.value && console.log(focusedElement.value);
-    //     }
-    //     console.log(focusedElement);
-    // }, [focusedElement])
-    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -563,8 +550,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             });
         }
         
-
         obj.data.forEach(row => {
+
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
             // When on a single state map filter runtime data by state
@@ -607,7 +594,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 result[row.uid] = row
             }
         })
-
         return result
     })
 
@@ -1096,15 +1082,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // When geotype changes
     useEffect(() => {
         // UID
-        if(state.data && state.columns.geo.name) {
+        if (state.data && state.columns.geo.name) {
             addUIDs(state, state.columns.geo.name)
         }
 
     }, [state]);
 
+
     useEffect(() => {
+
         // UID
-        if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
+        // Append fips code to front of runtime data as key.
+        if(state.data && state.columns.geo.name ) {
             addUIDs(state, state.columns.geo.name)
         }
 
@@ -1129,7 +1118,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
             geoType: state.general.geoType,
-            data: state.data
+            data: runtimeData || state.data
         })
 
         const hashData = hashObj({
@@ -1144,9 +1133,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Data
         let newRuntimeData;
-        if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+        //console.table({hashData, runtimeData, state })
+        if( (hashData !== runtimeData.fromHash) && state.data?.fromColumn) {
+            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(newRuntimeData) 
         }
 
         // Legend
