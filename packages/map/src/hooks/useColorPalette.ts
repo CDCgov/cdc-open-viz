@@ -63,5 +63,14 @@ export function useColorPalette(){
     // register reducer hook to handle multiple states at a time
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const handleSwitch = ():void => {
+    // this func will handle sequantial & sequatial-reverse colors and ll be mounted to switch toogle bar.
+  if (state.isSwitched) {
+    dispatch({ type: ON_SEQUENTIAL, payload: colorPalettes });
+  } else {
+    dispatch({ type: ON_SEQUENTIAL_REVERSE, payload: colorPalettes });
+  };
+};
+
     return;
 }
