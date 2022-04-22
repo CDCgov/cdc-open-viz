@@ -59,6 +59,8 @@ interface State {
   
   const useColorPallete = <T>(colorPalettes:T) => {
    
+    const [state, dispatch] = useReducer(reducer, initialState);
+  
     
   };
   export default useColorPallete;
