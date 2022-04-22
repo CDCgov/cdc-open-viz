@@ -44,6 +44,10 @@ function reducer (state:State,action:Action){
       const sequential = palletNamesArr.filter((name: string) =>!name.match(qualitativeRegex) && !name.match(reverseRegex));
   
      return { ...state, isSwitched: false, filteredPallets: sequential };
+     case ON_SEQUENTIAL_REVERSE:
+        const sequentialReverse = palletNamesArr.filter((name: string) =>!name.match(qualitativeRegex) && name.match(reverseRegex));
+        return { ...state, isSwitched: true, filteredPallets: sequentialReverse };
+  
       default : return state;
   }
 }
