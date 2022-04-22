@@ -81,5 +81,5 @@ const handleSwitch2 = ():void => {
   };
 };
 
-    return;
+    return { state,handleSwitch,handleSwitch2}
 }
