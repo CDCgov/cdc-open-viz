@@ -85,6 +85,12 @@
   box-shadow: inset 0 -1px 0 0 rgb(0 0 0 / 10%);
 }
 
+.cove-modal__theme--light {
+  .cove-modal__header {
+    color: #fff;
+  }
+}
+
 .cove-modal__content {
   padding: 1rem;
 }

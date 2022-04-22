@@ -8,7 +8,15 @@ const ModalHeader = () => null
 const ModalContent = () => null
 const ModalFooter = () => null
 
-const Modal = ({ fontTheme = 'dark', backgroundColor = '#fff', showDividerTop = true, showDividerBottom = true, showClose = true, children }) => {
+const Modal = ({
+                 fontTheme = 'dark',
+                 headerBgColor = '#fff',
+                 showDividerTop = true,
+                 showDividerBottom = true,
+                 showClose = true,
+                 disableBgClose = false,
+                 children
+               }) => {
   //Access global modal state
   let { modal } = useGlobalContext()
 
@@ -23,10 +31,6 @@ const Modal = ({ fontTheme = 'dark', backgroundColor = '#fff', showDividerTop = 
   const modalFooterChildren = childNodes.find(child => child.type === ModalFooter)
 
   //Modal computed style options
-  const fontThemeColor = () => {
-    return fontTheme === 'light' ? '#fff' : null
-  }
-
   const dividerBorder = (position) => {
     return !position ? 'none' : null
   }
@@ -63,15 +67,15 @@ const Modal = ({ fontTheme = 'dark', backgroundColor = '#fff', showDividerTop = 
   return (
     <>
       {displayModal &&
-      <div className={'cove-modal' + (modalAnimationState ? (' ' + modalAnimationState) : '')}>
-        <div className="cove-modal__bg" onClick={() => modal.actions.toggleModal(false)}/>
+      <div className={`cove-modal cove-modal__theme--${fontTheme}${modalAnimationState ? (' ' + modalAnimationState) : ''}`}>
+        <div className="cove-modal__bg" style={{ cursor: disableBgClose ? 'default' : null }}
+             onClick={() => disableBgClose ? null : modal.actions.toggleModal(false)}/>
         <div className="cove-modal__wrapper">
           <div className="cove-modal__container">
 
             {(showClose || modalHeaderChildren) &&
             < div className="cove-modal__header" style={{
-              color: fontThemeColor(),
-              backgroundColor: backgroundColor,
+              backgroundColor: headerBgColor,
               boxShadow: dividerBorder(showDividerTop),
               padding: !modalHeaderChildren ? '0' : null
             }}>
@@ -84,17 +88,17 @@ const Modal = ({ fontTheme = 'dark', backgroundColor = '#fff', showDividerTop = 
             </div>
             }
 
-            <div className="cove-modal__content">
+            <div className="cove-modal__content" style={{ paddingTop: modalHeaderChildren ? null : '0'}}>
               {modalContentChildren && modalContentChildren.props.children}
             </div>
 
             {modalFooterChildren &&
-              <div className="cove-modal__footer" style={{
-                boxShadow: dividerBorder(showDividerBottom),
-                paddingTop: showDividerBottom ? '1rem' : null
-              }}>
-                {modalFooterChildren.props.children}
-              </div>
+            <div className="cove-modal__footer" style={{
+              boxShadow: dividerBorder(showDividerBottom),
+              paddingTop: showDividerBottom ? '1rem' : null
+            }}>
+              {modalFooterChildren.props.children}
+            </div>
             }
 
           </div>
