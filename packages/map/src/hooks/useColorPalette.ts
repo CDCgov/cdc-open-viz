@@ -8,8 +8,7 @@ export const ON_NON_SEQUENTIAL = 'ON_NON_SEQUENTIAL';
 export const ON_NON_SEQUENTIAL_REVERSE = 'ON_NON_SEQUENTIAL_REVERSE';
 
 // create types & interfaces 
-// type PalletTypes = typeof colorPalettes;
-// type PalletType = keyof PalletTypes;
+
 interface State {
     readonly filteredPallets:string[]
     readonly filteredQualitative:string[]
@@ -88,9 +87,6 @@ export function useColorPalette(){
             dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
           };
       }
-
-
- 
 };
 
   /// useEffect will run when page render first time and provide default filtered colors
