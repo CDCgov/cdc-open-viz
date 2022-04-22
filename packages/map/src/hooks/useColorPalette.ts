@@ -26,7 +26,7 @@ interface State {
   }
 
 // create initial state
-const initialState = {
+const initialState:State = {
     filteredPallets: [],
     filteredQualitative: [],
     isSwitched: false,
@@ -34,7 +34,10 @@ const initialState = {
   };
 
 // create reducer function to handle multiple states & manupilate with each state
-function reducer (state,action){}
+function reducer (state:State,action:Action){
+  const palletNamesArr:string[] = Object.keys(action.payload); // action.payload === colorPalettes object
+
+}
 // create custon hook and export
 export function useColorPalette(){
     // register reducer hook to handle multiple states at a time
