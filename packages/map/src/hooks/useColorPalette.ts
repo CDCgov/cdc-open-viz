@@ -72,5 +72,14 @@ export function useColorPalette(){
   };
 };
 
+const handleSwitch2 = ():void => {
+    // this func will handle non-sequantial & non-sequatial-reverse colors and ll be mounted to switch toogle bar.
+  if (state.isSwitched2) {
+    dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
+  } else {
+    dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
+  };
+};
+
     return;
 }
