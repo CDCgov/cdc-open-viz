@@ -65,22 +65,32 @@ export function useColorPalette(){
     // register reducer hook to handle multiple states at a time
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleSwitch = ():void => {
-    // this func will handle sequantial & sequatial-reverse colors and ll be mounted to switch toogle bar.
-  if (state.isSwitched) {
-    dispatch({ type: ON_SEQUENTIAL, payload: colorPalettes });
-  } else {
-    dispatch({ type: ON_SEQUENTIAL_REVERSE, payload: colorPalettes });
-  };
-};
+  const handleSwitch = (caseValue:CaseValue) => {
+   // this func will handle sequantial & sequatial-reverse colors and ll be mounted to switch toogle bar.
+      if((caseValue !== Case.ON_NON_SEQUENTIAL  && caseValue !== Case.ON_SEQUENTIAL)  || caseValue === undefined ){
+          console.error('Enter valid arguments to handleSwitch function')
+          return ;
+      };
 
-const handleSwitch2 = ():void => {
-    // this func will handle non-sequantial & non-sequatial-reverse colors and ll be mounted to switch toogle bar.
-  if (state.isSwitched2) {
-    dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
-  } else {
-    dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
-  };
+      if(caseValue === Case.ON_SEQUENTIAL){
+        if (state.isSequential) {
+            dispatch({ type: ON_SEQUENTIAL, payload: colorPalettes });
+          } else {
+            dispatch({ type: ON_SEQUENTIAL_REVERSE, payload: colorPalettes });
+          };
+      }
+
+
+      if(caseValue === Case.ON_NON_SEQUENTIAL){
+        if (state.isNonSequential) {
+            dispatch({ type: ON_NON_SEQUENTIAL, payload: colorPalettes });
+          } else {
+            dispatch({ type: ON_NON_SEQUENTIAL_REVERSE, payload: colorPalettes });
+          };
+      }
+
+
+ 
 };
 
   /// useEffect will run when page render first time and provide default filtered colors
