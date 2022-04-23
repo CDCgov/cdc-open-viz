@@ -78,19 +78,23 @@ interface State {
     
         if (caseValue === "NON_SEQUENTIAL_REVERSE") {
           if (state.isNonSequentialReversed) {
+            dispatch({type: NON_SEQUENTIAL, payload: colorPalettes});
+
               
             } else {
             dispatch({type: NON_SEQUENTIAL_REVERSE, payload: colorPalettes});
           }
         }
+        
       };
+      
     
       // effect ll run on first render off the page
     
       useEffect(() => {
         dispatch({ type: SEQUENTIAL, payload: colorPalettes });
         dispatch({ type: NON_SEQUENTIAL, payload: colorPalettes });
-      }, [colorPalettes]);
+      }, []);
       // when importing state destructure  all states from it.
       return { state, handleSwitch };
   };
