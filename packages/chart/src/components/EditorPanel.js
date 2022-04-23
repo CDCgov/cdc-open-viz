@@ -183,9 +183,8 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context);
 
-  const {state:colorState} = useColorPallete(colorPalettes);
-  const {filteredQualitative,filteredSequential} = colorState
-
+  const {state:colorState,handleSwitch} = useColorPallete(colorPalettes);
+  const {filteredQualitative,filteredSequential,isSequentialReversed,isNonSequentialReversed} = colorState
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
