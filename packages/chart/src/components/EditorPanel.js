@@ -20,7 +20,7 @@ import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
-import useColorPallete from '../hooks/useColorPalette';
+import useColorPallete, { NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE } from '../hooks/useColorPalette';
 
 const Helper = ({text}) => {
   return (
