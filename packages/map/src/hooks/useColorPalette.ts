@@ -92,7 +92,7 @@ export function useColorPalette<T>(colorPalettes:T){
   useEffect(() => {
     dispatch({ type: SEQUENTIAL, payload: colorPalettes });
     dispatch({ type: NON_SEQUENTIAL, payload: colorPalettes });
-  }, [colorPalettes]);
+  }, []);
 
     return { state,handleSwitch}
 }
