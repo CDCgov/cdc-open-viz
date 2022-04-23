@@ -1993,7 +1993,7 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<span className='h5'>Sequential</span>
+									<label> <span>Sequential</span> <input onChange={()=>handleSwitch('SEQUENTIAL_REVERSE')} type='checkbox' checked={isSequentialReversed} /> <span>reverse Sequential</span>  </label>
 									<ul className='color-palette'>
 										{filteredPallets
 											.map((palette) => {
@@ -2025,7 +2025,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<span className='h5'>Non-Sequential</span>
+									<label> <span>Non Sequential</span> <input onChange={()=>handleSwitch("NON_SEQUENTIAL_REVERSE")} type='checkbox' checked={isNonSequentialReversed} /> <span>reverse non Sequential</span>  </label>
 									<ul className='color-palette'>
 										{filteredQualitative
 											.map((palette) => {
