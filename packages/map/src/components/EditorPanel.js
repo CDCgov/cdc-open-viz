@@ -24,7 +24,7 @@ import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { useColorPalette } from '../hooks/useColorPalette';
+import { NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE, useColorPalette } from '../hooks/useColorPalette';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -1993,7 +1993,7 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<label> <span style= { !isSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >Sequential</span> <input onChange={()=>handleSwitch('SEQUENTIAL_REVERSE')} type='checkbox' checked={isSequentialReversed} /> <span style={isSequentialReversed ? {color:"red",fontWeight:600 }:{color:'black',fontWeight:400} } >reverse Sequential</span>  </label>
+									<label> <span style= { !isSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >Sequential</span> <input onChange={()=>handleSwitch(SEQUENTIAL_REVERSE)} type='checkbox' checked={isSequentialReversed} /> <span style={isSequentialReversed ? {color:"red",fontWeight:600 }:{color:'black',fontWeight:400} } >reverse Sequential</span>  </label>
 									<ul className='color-palette'>
 										{filteredPallets
 											.map((palette) => {
@@ -2025,7 +2025,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<label> <span style= { !isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}>Non Sequential</span> <input onChange={()=>handleSwitch("NON_SEQUENTIAL_REVERSE")} type='checkbox' checked={isNonSequentialReversed} /> <span  style= { isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >reverse non Sequential</span>  </label>
+									<label> <span style= { !isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}>Non Sequential</span> <input onChange={()=>handleSwitch(NON_SEQUENTIAL_REVERSE)} type='checkbox' checked={isNonSequentialReversed} /> <span  style= { isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >reverse non Sequential</span>  </label>
 									<ul className='color-palette'>
 										{filteredQualitative
 											.map((palette) => {
