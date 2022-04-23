@@ -79,6 +79,7 @@ export function useColorPalette<T>(colorPalettes:T){
 
     if (caseValue === "NON_SEQUENTIAL_REVERSE") {
       if (state.isNonSequentialReversed) {
+    dispatch({ type: NON_SEQUENTIAL, payload: colorPalettes });
           
         } else {
         dispatch({type: NON_SEQUENTIAL_REVERSE, payload: colorPalettes});
