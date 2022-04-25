@@ -1,13 +1,23 @@
-.inline-icon {
-  width: 1em !important;
-  height: auto !important;
-  @media all and (-ms-high-contrast: none) {
-    height: 30px !important;
-  }
-  font-size: 1rem;
-  color: inherit;
+.cove-icon {
+  display: inline-flex;
+  width: 1em;
+  height: auto;
+  justify-content: center;
+  align-items: center;
 
-  path {
-    fill: currentColor;
+  @media all and (-ms-high-contrast: none) {
+    height: 30px;
+  }
+
+  > svg {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    pointer-events: none;
+
+    path {
+      fill: currentColor;
+    }
   }
 }
