@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import axios from 'axios'
 import parse from 'html-react-parser'
+import { Markup } from 'interweave'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
@@ -48,12 +49,12 @@ const CdcMarkupInclude = (
     setConfig(newConfig)
   }
 
-  const loadConfig = async () => {
+  const loadConfig = useCallback(async () => {
     let response = configObj || await (await fetch(configUrl)).json()
     let responseData = response.data ?? {}
 
-    if (response.sourceUrl) {
-      const dataString = await fetch(response.sourceUrl)
+    if (response.dataUrl) {
+      const dataString = await fetch(response.dataUrl)
       responseData = await dataString.json()
     }
 
@@ -61,7 +62,8 @@ const CdcMarkupInclude = (
 
     updateConfig({ ...defaults, ...response })
     setLoading(false)
-  }
+  }, [])
+
 
   // Custom Functions
   useEffect(() => {
@@ -87,18 +89,22 @@ const CdcMarkupInclude = (
     }
   }, [ markupError ])
 
-  const loadConfigMarkupData = async () => {
+  const loadConfigMarkupData = useCallback(async () => {
     setMarkupError(null)
 
     if (config.srcUrl) {
-      await axios
-        .get(config.srcUrl)
-        .then((res) => {
-          if (res.data) {
-            setUrlMarkup(res.data)
-          }
-        })
-        .catch((err) => {
+      if (config.srcUrl === '#example') {
+        setUrlMarkup('<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>')
+      } else {
+        try {
+          await axios
+            .get(config.srcUrl)
+            .then((res) => {
+              if (res.data) {
+                setUrlMarkup(res.data)
+              }
+            })
+        } catch (err) {
           if (err.response) {
             // Response with error
             setMarkupError(err.response.status)
@@ -108,68 +114,73 @@ const CdcMarkupInclude = (
           }
 
           setUrlMarkup('')
-        })
-    } else if (config.data?.length > 0) {
-      setUrlMarkup(config.data)
+        }
+      }
     } else {
       setUrlMarkup('')
     }
-  }
+  }, [ config.srcUrl ])
 
   const parseBodyMarkup = (markup) => {
-    let content = ''
+    let parse
+    let hasBody = false
     if (markup && markup !== '' && markup !== null) {
-      let parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
-      if (parse) {
-        content = parse[1]
+      if (markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)) {
+        hasBody = true
+        parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
+      } else {
+        parse = markup.toString()
       }
     }
-    return content
+
+    return hasBody ? parse[1] : parse
   }
 
   //Load initial config
   useEffect(() => {
-    loadConfig()
+    loadConfig().catch((err) => console.log(err))
   }, [])
 
-  //Reload config if config object provided
+  //Reload config if config object provided/updated
   useEffect(() => {
-    if (configObj) {
-      loadConfig()
-    }
-  }, [ configObj ])
+    loadConfig().catch((err) => console.log(err))
+  }, [ configObj?.data ])
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData()
-  }, [ config ])
+    loadConfigMarkupData().catch((err) => console.log(err))
+  }, [ loadConfigMarkupData ])
 
-  let body = (<Loading/>)
+  let content = (<Loading/>)
 
   if (loading === false) {
-    body = (
+    let body = (
       <>
         <div className="cove-component markup-include">
           {title &&
           <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-            {parse(title)}
+            {parse(title)} {isDashboard}
           </header>
           }
           <div className="cove-component__content">
-            {!markupError && urlMarkup && <div className="cove-component__content-wrap" dangerouslySetInnerHTML={{ __html: parseBodyMarkup(urlMarkup) }}/>}
+            {!markupError && urlMarkup &&
+            <div className="cove-component__content-wrap">
+              <Markup content={parseBodyMarkup(urlMarkup)}/>
+            </div>
+            }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
         </div>
       </>
     )
-  }
 
-  let content = (
-    <div className={`cove`}>
-      {isEditor && <EditorPanel>{body}</EditorPanel>}
-      {!isEditor && body}
-    </div>
-  )
+    content = (
+      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {!isEditor && body}
+      </div>
+    )
+  }
 
   return (
     <ErrorBoundary component="CdcMarkupInclude">

@@ -1,7 +1,6 @@
 .waiting {
-  align-items: flex-start;
-  padding-top: 250px;
   @include emptyState;
+  padding-top: 0;
 
   &.collapsed {
     padding: 2em !important;

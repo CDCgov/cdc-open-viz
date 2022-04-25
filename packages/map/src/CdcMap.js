@@ -33,7 +33,6 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import Waiting from '@cdc/core/components/Waiting'
 
 
 // Child Components
@@ -111,6 +110,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
 
+
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -118,6 +119,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
+
+    // *******START SCREEN READER DEBUG*******
+    // const focusedElement = useActiveElement();
+
+    // useEffect(() => {
+    //     if (focusedElement) {
+    //         focusedElement.value && console.log(focusedElement.value);
+    //     }
+    //     console.log(focusedElement);
+    // }, [focusedElement])
+    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -130,7 +142,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // United States check
             if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
+                let geoName = '';
+                if(row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null ){
+
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -229,38 +246,73 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Special classes
         if (obj.legend.specialClasses.length) {
-            dataSet = dataSet.filter(row => {
-                const val = row[primaryCol]
+            if(typeof obj.legend.specialClasses[0] === 'object'){
+                obj.legend.specialClasses.forEach(specialClass => {
+                    dataSet = dataSet.filter(row => {
+                        const val = String(row[specialClass.key]);
 
-                if( obj.legend.specialClasses.includes(val) ) {
+                        if(specialClass.value === val){
+                            if(undefined === specialClassesHash[val]) {
+                                specialClassesHash[val] = true;
 
-                    // apply the special color to the legend
-                    if(undefined === specialClassesHash[val]) {
-                        specialClassesHash[val] = true
+                                result.push({
+                                    special: true,
+                                    value: val,
+                                    label: specialClass.label
+                                });
 
-                        result.push({
-                            special: true,
-                            value: val
-                        })
+                                result[result.length - 1].color = applyColorToLegend(result.length - 1);
 
-                        result[result.length - 1].color = applyColorToLegend(result.length - 1)
+                                specialClasses += 1;
+                            }
 
-                        specialClasses += 1
-                    }
-                
-                    let specialColor = '';
+                            let specialColor = '';
+                            
+                            // color the state if val is in row 
+                            specialColor = result.findIndex(p => p.value === val)
+
+                            newLegendMemo.set( hashObj(row), specialColor)
+
+                            return false;
+                        }
+
+                        return true;
+                    });
+                });
+            } else {
+                dataSet = dataSet.filter(row => {
+                    const val = row[primaryCol]
+
+                    if( obj.legend.specialClasses.includes(val) ) {
+
+                        // apply the special color to the legend
+                        if(undefined === specialClassesHash[val]) {
+                            specialClassesHash[val] = true;
+
+                            result.push({
+                                special: true,
+                                value: val
+                            });
+
+                            result[result.length - 1].color = applyColorToLegend(result.length - 1);
+
+                            specialClasses += 1;
+                        }
                     
-                    // color the state if val is in row 
-                    if ( Object.values(row).includes(val) ) {
-                        specialColor = result.findIndex(p => p.value === val)
+                        let specialColor = '';
+                        
+                        // color the state if val is in row 
+                        if ( Object.values(row).includes(val) ) {
+                            specialColor = result.findIndex(p => p.value === val)
+                        }
+                        newLegendMemo.set( hashObj(row), specialColor)
+
+                        return false
                     }
-                    newLegendMemo.set( hashObj(row), specialColor)
 
-                    return false
-                }
-
-                return true
-            })
+                    return true
+                })
+            }
         }
 
         // Category
@@ -325,7 +377,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             return result
         }
 
-        let legendNumber = number
+        let uniqueValues = {};
+        dataSet.forEach(datum => {
+            uniqueValues[datum[primaryCol]] = true;
+        });
+
+        let legendNumber = Math.min(number, Object.keys(uniqueValues).length);
 
         // Separate zero
         if(true === obj.legend.separateZero) {
@@ -408,7 +465,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Equal Interval
         if(type === 'equalinterval') {
-            dataSet = dataSet.filter(row => row[primaryCol])
+            dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
@@ -478,6 +535,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 values = values.sort(sortDesc)
             }
 
+            if(obj.filters[idx].order === 'cust') {
+                if(obj.filters[idx]?.values.length > 0) {
+                    values = obj.filters[idx].values
+                }
+            }
+
             if(undefined === newFilter) {
                 newFilter = {}
             }
@@ -510,7 +573,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // When on a single state map filter runtime data by state
             if (
-                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
                 obj.general.geoType === 'single-state'
             ) {
                 return false;
@@ -659,16 +722,29 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Reset active legend toggles
         resetLegendToggles()
 
-        let filters = [...runtimeFilters]
+        try {
 
-        filters[idx] = {...filters[idx]}
+            const isEmpty = (obj) => {
+                return Object.keys(obj).length === 0;
+            }
 
-        filters[idx].active = activeValue
+            let filters = [...runtimeFilters]
 
-        const newData = generateRuntimeData(state, filters)
+            filters[idx] = { ...filters[idx] }
 
-        setRuntimeData(newData)
-        setRuntimeFilters(filters)
+            filters[idx].active = activeValue
+            const newData = generateRuntimeData(state, filters)
+            
+            // throw an error if newData is empty
+            if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
+
+            // set the runtime filters and data
+            setRuntimeData(newData)
+            setRuntimeFilters(filters)
+        } catch(e) {
+            console.error(e.message)
+        }
+
     }
 
     const displayDataAsText = (value, columnName) => {
@@ -700,7 +776,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
-            if (false === state.legend.specialClasses.includes(value)) {
+            if (false === state.legend.specialClasses.includes(String(value))) {
                 formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
             }
         }
@@ -754,9 +830,27 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 if (true === column.tooltip) {
 
-                    let label = column.label.length > 0 ? column.label : '';
+                    let label = '';
+                    if(column.label !== undefined && column.lebel !==null){
+                        // column.label could be : Number || String || undefined types
+                        label = String(column.label)
+                    }
+                    
+                    
+                    let value;
 
-                    let value = displayDataAsText(row[column.name], columnKey);
+                    if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                        for(let i = 0; i < state.legend.specialClasses.length; i++){
+                            if(String(row[state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
+                                value = displayDataAsText(state.legend.specialClasses[i].label, columnKey);
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!value){
+                        value = displayDataAsText(row[column.name], columnKey);
+                    }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
                         toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
@@ -779,6 +873,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         return toolTipText
 
+    }
+
+    const titleCase = (string) => {
+        return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
     }
 
     // This resets all active legend toggles.
@@ -831,10 +929,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
-    const titleCase = (string) => {
-        return string?.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ');
-    }
-
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
@@ -864,7 +958,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             value = dict[value]
         }
 
-        return value
+        return titleCase(value);
     }
 
     const navigationHandler = (urlString) => {
@@ -916,7 +1010,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = async (configObj) => {
+    const loadConfig = useCallback(async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -974,7 +1068,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Done loading
         setLoading(false)
-    }
+    },[])
 
     const init = async () => {
         let configData = null
@@ -1072,6 +1166,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
+
+        // Cleanup
+        return () => setRuntimeLegend([])
+
     }, [state])
 
     useEffect(() => {
@@ -1094,11 +1192,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
+    useEffect(() => {
     if(config) {
-        useEffect(() => {
-            loadConfig(config)
-        }, [config.data])
-    }
+    loadConfig(config)
+        }
+    },[config])
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
@@ -1149,6 +1247,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     if (!mapProps.data || !state.data) return <Loading />;
 
+    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
+    
+
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1175,7 +1276,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor}>
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="-1">
 						{parse(title)}
 					</div>
 				</header>
@@ -1201,8 +1302,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-nav' className='cdcdataviz-sr-only' href={`#dataTableSection`}>
-                        Skip geography container
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                        Skip Over Map Container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
                         {currentViewport && (
