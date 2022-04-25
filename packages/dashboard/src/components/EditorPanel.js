@@ -270,7 +270,7 @@ const EditorPanel = memo(() => {
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => {console.log(config);updateConfig({...config, editing: false}); setDisplayPanel(!displayPanel)} }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <div className="heading-2">Configure</div>
         <section className="form-container">

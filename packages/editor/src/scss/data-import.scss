@@ -22,31 +22,6 @@
             border-top: 1px solid gray;
             padding-top: .5em;
         }
-        .data-question {
-            margin-bottom: .5em;
-        }
-        table {
-            width: 100%;
-            border: 1px solid gray;
-            thead {
-                background-color: rgb(220, 220, 200);
-                border-bottom: 1px solid gray;
-            }
-            td {
-                text-align: center;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                max-width: 40px;
-
-                button {
-                    font-size: 11pt;
-                }
-            }
-            td:last-child {
-                max-width: 10px;
-            }
-        }
         .tabs {
             margin-bottom: 2em;
             > ul.nav {
@@ -77,6 +52,28 @@
             .tab-content {
                 padding-top: $gbl-padding;
                 border-top: 1px solid $baseColor;
+            }
+        }
+        table {
+            width: 100%;
+            border: 1px solid gray;
+            thead {
+                background-color: rgb(220, 220, 200);
+                border-bottom: 1px solid gray;
+            }
+            td {
+                text-align: center;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 40px;
+        
+                button {
+                    font-size: 11pt;
+                }
+            }
+            td:last-child {
+                max-width: 10px;
             }
         }
         .cdcdataviz-file-selector {
@@ -122,55 +119,6 @@
         }
         .btn.active {
             background: darken($primary, 15%);
-        }
-        .question {
-            margin-bottom: 1em;
-        }
-        .table-button-container {
-            display: flex;
-            justify-content: space-between;
-
-        }
-        .table-button {
-            width: 49%;
-            border: 1px solid $lightGray;
-            border-radius: .3em;
-            background-color: $lightest-gray;
-            padding: .75em;
-            cursor: pointer;
-            strong {
-                font-weight: bold;
-            }
-            &.active {
-                border: 2px solid #005eaa;
-            }
-
-            p {
-                font-size: .8em;
-                margin-bottom: 1em;
-            }
-
-            table + table {
-                margin-top: 1em;
-            }
-
-            table {
-                font-size: .8em;
-                background-color: #fff;
-                border: 1px solid $lightGray;
-                border-collapse: collapse;
-                margin: auto;
-                th {
-                    background-color: $primary;
-                    color: white;
-                    text-align: left;
-                }
-                th, td {
-                    border-top: 1px solid $lightGray;
-                    border-bottom: 1px solid $lightGray;
-                    padding: 0 5px;
-                }
-            }
         }
         .input-group {
             display: flex;
