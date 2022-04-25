@@ -4,7 +4,16 @@ import ReactTooltip from 'react-tooltip'
 const TooltipTarget = () => null
 const TooltipContent = () => null
 
-const Tooltip = ({ position = 'top', trigger = 'hover', float = false, hideOnScroll = true, children }) => {
+const Tooltip = ({
+                   position = 'top',
+                   trigger = 'hover',
+                   float = false,
+                   border = null,
+                   borderColor = '#bdbdbd',
+                   hideOnScroll = true,
+                   children
+                 }) => {
+
   const tooltipTargetChildren = children.find(el => el.type === TooltipTarget)
   const tooltipContentChildren = children.find(el => el.type === TooltipContent)
 
@@ -13,20 +22,24 @@ const Tooltip = ({ position = 'top', trigger = 'hover', float = false, hideOnScr
   return (
     <span className="cove-tooltip">
       <a className="cove-tooltip--target"
+         data-for={uid}
          data-place={position}
          data-event={trigger !== 'click' ? null : 'click focus'}
          data-effect={float ? 'float' : 'solid'}
          data-scroll-hide={hideOnScroll}
-         data-for={uid}
          data-tip
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
-      <ReactTooltip id={uid} className={'cove-tooltip__content' + (trigger === 'click' ? ' cove-tooltip__content--interactive' : '')}
-                    type="light"
-                    effect="solid"
-                    globalEventOff='click'
-                    border borderColor='darkgreen'>
+      <ReactTooltip
+        id={uid}
+        className={'cove-tooltip__content' + (trigger === 'click' ? ' cove-tooltip__content--interactive' : '') + (border ? (' cove-tooltip--border-' + border) : null)}
+        type="light"
+        effect="solid"
+        border={!!border}
+        borderColor={borderColor}
+        globalEventOff="click"
+      >
         {tooltipContentChildren ? tooltipContentChildren.props.children : null}
       </ReactTooltip>
     </span>
