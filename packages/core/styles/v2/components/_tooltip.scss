@@ -25,21 +25,26 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   color: $cove-tooltip-color;
   background-color: $cove-tooltip-bg;
   border-radius: 5px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
   user-select: none;
   cursor: default;
   opacity: 0;
 
-  &.place-right {
-    box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
-  }
+  &.has-shadow {
+    &.place-top {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-  &.place-bottom {
-    box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
-  }
+    &.place-right {
+      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-  &.place-left {
-    box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+    &.place-bottom {
+      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.place-left {
+      box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 
   &.show {
@@ -59,7 +64,7 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   }
 }
 
-.cove-tooltip__content--interactive {
+.interactive {
   a {
     pointer-events: all;
   }
