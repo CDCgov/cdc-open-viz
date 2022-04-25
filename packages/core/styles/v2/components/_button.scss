@@ -1,10 +1,67 @@
-.btn {
-  background: #005eaa;
+.cove__btn {
+  display: inline-block;
+  min-width: 6.5rem;
+  padding: 0.75em 1.125em 0.875em;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-size: 1rem;
   color: #fff;
-  border: 0;
+  background-color: $primary;
+  border-radius: .3125em;
+  box-shadow: inset 0 -3px 0 0 lighten($primary, 40%);
+  transition: all 500ms $transition-expo-out;
+  transition-property: background-color, box-shadow;
+  user-select: none;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  &:hover {
+    background-color: lighten($primary, 5%);
+  }
+
+  &.success {
+    background-color: #44aa41;
+    box-shadow: inset 0 -3px 0 0 lighten(#44aa41, 25%);
+
+    &:hover {
+      background-color: lighten(#44aa41, 5%);
+    }
+  }
+
+  &.warn {
+    background-color: #d73636;
+    box-shadow: inset 0 -3px 0 0 lighten(#d73636, 22%);
+
+    &:hover {
+      background-color: darken(#d73636, 5%);
+      box-shadow: inset 0 -3px 0 0 lighten(#d73636, 15%);
+    }
+  }
+
+
+  &.muted {
+    background-color: #a0a0a0;
+    box-shadow: inset 0 -3px 0 0 lighten(#a0a0a0, 20%);
+
+    &:hover {
+      background-color: darken(#a0a0a0, 5%);
+      box-shadow: inset 0 -3px 0 0 lighten(#a0a0a0, 10%);
+    }
+  }
+}
+
+/* Old Styles ------------------------------------------
+*/
+
+.btn {
+  display: block;
   padding: .4em .8em;
   font-size: 1em;
-  display: block;
+  color: #fff;
+  background: #005eaa;
+  border: 0;
   border-radius: .3em;
   transition: .1s background-color;
   cursor: pointer;
