@@ -349,13 +349,13 @@ export default function CdcDashboard(
           {config.dashboard.filters && <Filters />}
 
           {/* Visualizations */}
-          {config.rows && config.rows.map(row => {
+          {config.rows && config.rows.map((row,index) => {
             // Empty check
             if(row.filter(col => col.widget).length === 0) return null
 
             return (
-              <div className="dashboard-row">
-                {row.map(col => {
+              <div className="dashboard-row" key={`row__${index}`}>
+                {row.map( (col,index) => {
                   if(col.width) {
                     if(!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
 
@@ -363,7 +363,7 @@ export default function CdcDashboard(
 
                     visualizationConfig.data = filteredData || data;
 
-                    return <div className={`dashboard-col dashboard-col-${col.width}`}>
+                    return <div className={`dashboard-col dashboard-col-${col.width}`} key={`vis__${index}`}>
                       {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                       {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
                       {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => { updateChildConfig(col.widget, newConfig) }} isDashboard={true} />}
