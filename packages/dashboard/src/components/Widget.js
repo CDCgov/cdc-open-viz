@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import CloseIcon from '../images/icon-close.svg';
 import GridIcon from '../images/icon-grid.svg';
@@ -12,6 +12,11 @@ import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import WorldIcon from '@cdc/core/assets/world-graphic.svg';
 
 import Context from '../context';
+
+import DataTransform from '@cdc/core/components/DataTransform';
+import DataQuestionnaire from '@cdc/core/components/DataQuestionnaire';
+
+import '@cdc/core/styles/dataquestionnaire.scss'
 
 const iconHash = {
   'data-bite' : <BiteIcon />,
@@ -35,6 +40,10 @@ const labelHash = {
 
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { rows, visualizations, config, updateConfig } = useContext(Context)
+
+  const [ modal, setModal ] = useState(false);
+
+  const transform = new DataTransform();
 
   const handleWidgetMove = (item, monitor) => {
       let result = monitor.getDropResult()
@@ -65,6 +74,43 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     })
   })
 
+  const fetchRemoteData = async (url) => {
+    try {
+        const regex = /(?:\.([^.]+))?$/
+
+        let data = []
+
+        const ext = (regex.exec(url)[1])
+        if ('csv' === ext) {
+            data = await fetch(url)
+                .then(response => response.text())
+                .then(responseText => {
+                    const parsedCsv = Papa.parse(responseText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    })
+                    return parsedCsv.data
+                })
+        }
+
+        if ('json' === ext) {
+            data = await fetch(url)
+                .then(response => response.json())
+        }
+
+        return data;
+    } catch {
+        // If we can't parse it, still attempt to fetch it
+        try {
+            let response = await (await fetch(configUrl)).json()
+            return response
+        } catch {
+            console.error(`Cannot parse URL: ${url}`);
+        }
+    }
+  }
+
   const deleteWidget = () => {
     rows[data.rowIdx][data.colIdx].widget = null
 
@@ -80,24 +126,55 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const changeDataset = (uid, value) => {
+    delete visualizations[uid].dataDescription;
+    delete visualizations[uid].formattedData;
+
     visualizations[uid].dataKey = value;
 
     updateConfig({...config, visualizations});
   }
 
+  const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
+    let dataDescription = { ...config.visualizations[visualizationKey].dataDescription, [key]: value }
+
+    let data
+    if(!config.datasets[datasetKey].data && config.datasets[datasetKey].dataUrl) {
+      data = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
+      data = transform.autoStandardize(data);
+    } else {
+      data = config.datasets[datasetKey].data;
+    }
+
+    let formattedData = transform.developerStandardize(data, dataDescription)
+
+    let newVisualizations = {...config.visualizations}
+    newVisualizations[visualizationKey] = {...newVisualizations[visualizationKey], data, dataDescription, formattedData};
+
+    updateConfig({ ...config, visualizations: newVisualizations })
+  }
+
   return (
     <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+      {modal && (
+        <div className="data-questionnaire-modal">
+          <div className="data-questionnaire-modal-content">
+            <button className="close-button" onClick={() => setModal(false)}>X</button>
+            <DataQuestionnaire visualizationKey={data.uid} dataKey={data.dataKey} configureData={data} updateDescriptionProp={updateDescriptionProp} />
+          </div>
+        </div>
+      )}
       <MoveIcon className="drag-icon" />
       <div className="widget__content">
         {data.rowIdx !== undefined && (
           <div className="widget-menu">
-            <select defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
+            {data.dataKey && !data.formattedData && <button className="btn btn-configure" onClick={() => setModal(true)}>Configure Data</button>}
+            {data.dataKey && data.formattedData && <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>}
+            <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
               <option value="">Select a dataset</option>
               {Object.keys(config.datasets).map(datasetKey => (
                 <option>{datasetKey}</option>
               ))}
             </select>
-            <div className="widget-menu-item" onClick={editWidget}><EditIcon /></div>
             <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
           </div>
         )}

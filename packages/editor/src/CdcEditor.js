@@ -125,11 +125,6 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   } else {
     if(Object.keys(config.datasets).length > 0){
       configureDisabled = false;
-      Object.keys(config.datasets).forEach(datasetKey => {
-        if(!config.datasets[datasetKey].formattedData) {
-          configureDisabled = true;
-        }
-      });
     }
   }
 
