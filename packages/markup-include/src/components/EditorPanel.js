@@ -188,7 +188,7 @@ const EditorPanel = memo((props) => {
                         </Tooltip.Content>
                       </Tooltip>
 
-                      <Tooltip position="bottom" trigger="click" border={'2'}>
+                      <Tooltip position="bottom" trigger="click" shadow={false} border={'2'}>
                         <Tooltip.Target>
                           <Icon display="question" alt="hello"/>
                         </Tooltip.Target>
