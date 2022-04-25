@@ -15,7 +15,6 @@ import InputText from '@cdc/core/components/input/InputText'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
 const EditorPanel = memo((props) => {
@@ -170,6 +169,43 @@ const EditorPanel = memo((props) => {
                         value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
+
+                      <Tooltip position="top" trigger="click" border={false}>
+                        <Tooltip.Target>
+                          <Icon display="question" alt="hello"/>
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          Hello world! I have a <a href="#">link</a>.
+                        </Tooltip.Content>
+                      </Tooltip>
+
+                      <Tooltip position="right" trigger="click" border={'1'} borderColor={'red'}>
+                        <Tooltip.Target>
+                          <Icon display="question" alt="hello"/>
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          Hello world! I have a <a href="#">link</a>.
+                        </Tooltip.Content>
+                      </Tooltip>
+
+                      <Tooltip position="bottom" trigger="click" border={'2'}>
+                        <Tooltip.Target>
+                          <Icon display="question" alt="hello"/>
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          Hello world! I have a <a href="#">link</a>.
+                        </Tooltip.Content>
+                      </Tooltip>
+
+                      <Tooltip position="left" trigger="click" border={'2'} borderColor={'blue'}>
+                        <Tooltip.Target>
+                          <Icon display="question" alt="hello"/>
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          Hello world! I have a <a href="#">link</a>.
+                        </Tooltip.Content>
+                      </Tooltip>
+
                     </AccordionItemPanel>
                   </AccordionItem>
                   <AccordionItem>
