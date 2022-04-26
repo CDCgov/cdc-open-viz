@@ -15,9 +15,9 @@ import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
 
 // Data
+import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
-import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
 // Sass
