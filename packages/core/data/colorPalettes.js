@@ -252,20 +252,6 @@ const colorPalettes2 = {
   ],
 };
 
-// this function will auto add REVERSE keyword for each palette.Note it doest reverse QUALATITIVE pallets
-function updatePaletteNames(colorPalettes) {
-  let sequentialReversed = {};
-
-  for (const [paletteName, hexCodeArr] of Object.entries(colorPalettes)) {
-    if (!String(paletteName).startsWith('qualitative') && String(paletteName.endsWith('reverse'))){
-      let reverse = String(paletteName).concat('reverse'); // add to the end of the string "reverse"
-      sequentialReversed[reverse] = [...hexCodeArr].reverse(); // reverses arrays elements and create new keys on object
-    }
-  }
-
-  return sequentialReversed;
-}
-
 export const colorPalettesChart = Object.assign(updatePaletteNames(colorPalettes2),colorPalettes2);
 const colorPalettes = Object.assign( updatePaletteNames(colorPalettesMap),colorPalettesMap);
 export default colorPalettes;
