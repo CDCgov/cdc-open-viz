@@ -184,10 +184,9 @@ const colorPalettesMap = {
   ],
 };
 
-
 // * ============= Palettes for Chart project ==========  * //
 
-export const colorPalettes = {
+const colorPalettes2 = {
   'qualitative-bold': [
     '#377eb8',
     '#ff7f00',
@@ -249,13 +248,22 @@ export const colorPalettes = {
     '#238B45',
     '#005A32',
   ],
-  'sequential-green-reverse': [
-    '#238B45',
-    '#A1D99B',
-    '#005A32',
-    '#41AB5D',
-    '#41AB5D',
-    '#74C476',
-    '#C7E9C0',
-  ],
 };
+
+// this function will auto add REVERSE keyword for each palette.Note it doest reverse QUALATITIVE pallets
+function updatePaletteNames(colorPalettes) {
+  let sequentialReversed = {};
+
+  for (const [paletteName, hexCodeArr] of Object.entries(colorPalettes)) {
+    if (!String(paletteName).startsWith('qualitative') && String(paletteName.endsWith('reverse'))){
+      let reverse = String(paletteName).concat('reverse'); // add to the end of the string "reverse"
+      sequentialReversed[reverse] = [...hexCodeArr].reverse(); // reverses arrays elements and create new keys on object
+    }
+  }
+
+  return sequentialReversed;
+}
+
+export const colorPalettesChart = Object.assign(updatePaletteNames(colorPalettes2),colorPalettes2);
+const colorPalettes = Object.assign( updatePaletteNames(colorPalettesMap),colorPalettesMap);
+export default colorPalettes;
