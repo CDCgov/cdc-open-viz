@@ -3,8 +3,10 @@ export function updatePaletteNames(colorPalettes) {
     let sequentialReversed = {};
   
     for (const [paletteName, hexCodeArr] of Object.entries(colorPalettes)) {
-      if (!String(paletteName).startsWith('qualitative') && String(paletteName.endsWith('reverse'))){
-        let reverse = String(paletteName).concat('reverse'); // add to the end of the string "reverse"
+       const paletteNameStr = String(paletteName);
+
+      if (!paletteNameStr.startsWith('qualitative') && !paletteNameStr.endsWith('reverse')){
+        let reverse = paletteNameStr.concat('reverse'); // add to the end of the string "reverse"
         sequentialReversed[reverse] = [...hexCodeArr].reverse(); // reverses arrays elements and create new keys on object
       }
     }
