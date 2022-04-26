@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import {colorPalettes} from '../../core/data/colorPalettes';
 // IE11
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
