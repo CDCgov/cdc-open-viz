@@ -218,9 +218,6 @@ const UsaMap = (props) => {
       let geoKey = geo.properties.iso;
 
       // Manually add Washington D.C. in for Hex maps
-      if(isHex && geoKey === 'US-DC') {
-        geoKey = 'District of Columbia'
-      }
 
       if(!geoKey) return
 
