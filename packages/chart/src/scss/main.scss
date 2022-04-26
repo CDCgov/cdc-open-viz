@@ -325,4 +325,44 @@
       }
     }
   }
+
+  // animations
+  .animated-pie path,
+  .animated-pie text {
+
+    border: rgba(0,0,0,.3) 1px solid !important;
+    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+    opacity: 1;
+    line-height: 1.4em;
+    font-size: 1em;
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+
+  .animated-pie {
+    transition: all .4s ease-in-out;
+    opacity: 0;
+    transform-origin: center;
+    transform: scale(0, 0);
+  }
+
+  .animated-pie.animated {
+    opacity: 1;
+    transform-origin: center;
+    transform: scale(1, 1);
+  }
+
+  .animated-pie .animated-pie-text {
+    opacity: 0;
+    transition: opacity .5s ease-in-out;
+    transition-delay: .4s;
+  }
+
+  .animated-pie .animated-pie-text.animated {
+    opacity: 1;
+  }
+
+  .cdc-chart-inner-container {
+    padding-top: 1000px
+  }
 }
