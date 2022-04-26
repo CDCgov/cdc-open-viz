@@ -2,7 +2,7 @@
     "title": "Planet Radius (Combo Example)",
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
-	"visualizationSubType": "horizontal",
+	"visualizationSubType": "regular",
     "isLollipopChart": true,
     "barHasBorder": "true",
     "series": [{"dataKey":"Radius", "type":"Line"}],

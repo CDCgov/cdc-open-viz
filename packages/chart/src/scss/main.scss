@@ -326,6 +326,10 @@
     }
   }
 
+  [tabindex]:focus-visible {
+    outline: 2px solid rgb(0, 95, 204) !important;
+  }
+
   // animations
   .animated-pie path,
   .animated-pie text {
@@ -364,5 +368,22 @@
 
   .cdc-chart-inner-container {
     padding-top: 1000px
+  }
+}
+
+#paired-bar-legend {
+
+  text-align: center;
+
+  div {
+    margin: 0 0.5em;
+    display: flex;
+  }
+
+  .indicator {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    margin: 0.25em;
   }
 }

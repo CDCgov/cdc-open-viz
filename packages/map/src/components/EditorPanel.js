@@ -1349,7 +1349,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.dataTable || false}
+															checked={state.columns.primary.dataTable ||false}
 															onChange={(event) => {
 																editColumn(
 																	'primary',
@@ -1365,7 +1365,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.tooltip || false}
+															checked={state.columns.primary.tooltip ||false}
 															onChange={(event) => {
 																editColumn('primary', 'tooltip', event.target.checked);
 															}}
@@ -2027,6 +2027,7 @@ const EditorPanel = (props) => {
 									<ul className='color-palette'>
 										{Object.keys(colorPalettes)
 											.filter((name) => name.includes('qualitative'))
+                      .filter((name) => name !== 'qualitative9')
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
