@@ -1,4 +1,4 @@
-export default {
+const colorPalettesMap = {
   yelloworangered: [
     '#ffffcc',
     '#ffeda0',
