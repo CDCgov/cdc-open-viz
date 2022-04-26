@@ -17,7 +17,7 @@ import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '../../../core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
