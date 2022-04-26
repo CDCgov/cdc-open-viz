@@ -202,6 +202,7 @@ const EditorPanel = () => {
   });
 
   const sortableItemStyles = {
+    animate: false,
     display: 'block',
     boxSizing: 'border-box',
     border: '1px solid #D1D1D1',
@@ -947,6 +948,8 @@ const EditorPanel = () => {
                   {config.series?.some(series => series.type === 'Bar') &&
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={['true', 'false']} />
                   }
+
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization In" updateField={updateField} />
 
                   {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
                     <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={['hidden', 'hover', 'always show']} />

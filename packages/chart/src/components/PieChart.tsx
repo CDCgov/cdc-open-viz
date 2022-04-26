@@ -5,6 +5,7 @@ import ReactTooltip from 'react-tooltip';
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import { Group } from '@visx/group';
 import { Text } from '@visx/text';
+import useIntersectionObserver from "./useIntersectionObserver";
 
 import Context from '../context';
 
@@ -22,6 +23,18 @@ export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
+  const [animatedPie, setAnimatePie] = useState<boolean>((!config.animate));
+
+  const triggerRef = useRef();
+  const dataRef = useIntersectionObserver(triggerRef, {
+    freezeOnceVisible: false
+  });
+
+  if( dataRef?.isIntersecting && config.animate && ! animatedPie ) {
+    setTimeout(() => {
+      setAnimatePie(true);
+    }, 500);
+  }
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
@@ -151,7 +164,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height}>
+      <svg width={width} height={height} className={`animated-pie group ${animatedPie ? 'animated' : ''}`} >
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
@@ -169,6 +182,7 @@ export default function PieChart() {
           </Pie>
         </Group>
       </svg>
+      <div ref={triggerRef} />
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )

@@ -2,6 +2,7 @@ export default {
   type: 'chart',
   title: '',
   theme: 'theme-blue',
+  animate: false,
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
   barHasBorder: 'false',
