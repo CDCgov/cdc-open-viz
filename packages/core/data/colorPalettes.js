@@ -1,3 +1,5 @@
+import { updatePaletteNames } from "../helpers/updatePaletteNames";
+
 const colorPalettesMap = {
   yelloworangered: [
     '#ffffcc',
