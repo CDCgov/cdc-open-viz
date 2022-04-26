@@ -9,7 +9,11 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+
+import InputToggle from '@cdc/core/components/input/InputToggle'
+import Overlay from '@cdc/core/components/layout/Overlay'
 import Modal from '@cdc/core/components/ui/Modal'
+
 import './scss/main.scss'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -138,101 +142,111 @@ const CdcMarkupInclude = (
     return hasBody ? parse[1] : parse
   }
 
-  // Modal
-  let { modal } = useGlobalContext()
+  // Overlay & Modal
+  let { overlay } = useGlobalContext()
 
   const callTest = () => {
-    modal.actions.toggleModal(false)
+    overlay.actions.toggleOverlay(false)
     alert('Called the function')
   }
 
   const testModal1 = () => {
     return (
-      <Modal showClose={false}>
-        <Modal.Header>
-          Modal Title 1
-        </Modal.Header>
-        <Modal.Content>
-          This is a modal without a close button. There could be a lot of content to display but we're not sure how much
-          is
-          going to show in such a small area. This is why we need to test the length of the text that we're putting
-          inside of each modal.
-        </Modal.Content>
-        <Modal.Footer>
-          <div style={{ textAlign: 'right' }}>
-            <button className="cove__btn muted" onClick={() => modal.actions.toggleModal(false)}>Cancel</button>
-            <button className="cove__btn success" onClick={() => callTest()}>Submit</button>
-          </div>
-        </Modal.Footer>
-      </Modal>
+      <Overlay>
+        <Modal showClose={false}>
+          <Modal.Header>
+            Modal Title 1
+          </Modal.Header>
+          <Modal.Content>
+            This is a modal without a close button. There could be a lot of content to display but we're not sure how much
+            is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'right' }}>
+              <button className="cove__btn muted" onClick={() => overlay.actions.toggleOverlay(false)}>Cancel</button>
+              <button className="cove__btn success" onClick={() => callTest()}>Submit</button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
     )
   }
 
   const testModal2 = () => {
     return (
-      <Modal showDividerTop={false}>
-        <Modal.Content>
-          This is a modal without a header or a top divider. There could be a lot of content to display, but we're not
-          sure how much is
-          going to show in such a small area. This is why we need to test the length of the text that we're putting
-          inside of
-          each modal.
-        </Modal.Content>
-        <Modal.Footer>
-          <button className="cove__btn" onClick={() => callTest()}>Trigger an Action</button>
-        </Modal.Footer>
-      </Modal>
+      <Overlay>
+        <Modal showDividerTop={false}>
+          <Modal.Content>
+            This is a modal without a header or a top divider. There could be a lot of content to display, but we're not
+            sure how much is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of
+            each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <button className="cove__btn" onClick={() => callTest()}>Trigger an Action</button>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
     )
   }
 
   const testModal3 = () => {
     return (
-      <Modal fontTheme={'light'} headerBgColor={'#d9006e'} disableBgClose={true}>
-        <Modal.Header>
-          Disable Background Close
-        </Modal.Header>
-        <Modal.Content>
-          <p>This is a modal where the background close is disabled. Either the default close button, or an action
-            button <b><i>must</i></b> be available to the user in order to close the modal.</p>
-        </Modal.Content>
-      </Modal>
+      <Overlay disableBgClose={true}>
+        <Modal fontTheme={'light'} headerBgColor={'#d9006e'}>
+          <Modal.Header>
+            Disable Background Close
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal where the background close is disabled. Either the default close button, or an action
+              button <b><i>must</i></b> be available to the user in order to close the modal.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
     )
   }
 
   const testModal4 = () => {
     return (
-      <Modal fontTheme={'light'} headerBgColor={'#363955'}>
-        <Modal.Header>
-          General Information Modal
-        </Modal.Header>
-        <Modal.Content>
-          <p>This is a modal with some general information. Anything can go here to give details or explain some
-            information further. This can contain as much information as is needed in order to provide the proper
-            context for the content.</p>
-        </Modal.Content>
-      </Modal>
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#363955'}>
+          <Modal.Header>
+            General Information Modal
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal with some general information. Anything can go here to give details or explain some
+              information further. This can contain as much information as is needed in order to provide the proper
+              context for the content.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
     )
   }
 
   const testModal5 = () => {
     return (
-      <Modal fontTheme={'light'} headerBgColor={'#d73636'}>
-        <Modal.Header>
-          Warning Modal
-        </Modal.Header>
-        <Modal.Content>
-          Making these changes will perform an unreversible action.
-        </Modal.Content>
-        <Modal.Footer>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ marginBottom: '1rem', fontSize: '1rem' }}>Are you sure you want to continue?</p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <button className="cove__btn warn" onClick={() => modal.actions.toggleModal(false)}>No, Cancel</button>
-            <button className="cove__btn success" onClick={() => callTest()}>Yes, Continue</button>
-          </div>
-        </Modal.Footer>
-      </Modal>
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#d73636'}>
+          <Modal.Header>
+            Warning Modal
+          </Modal.Header>
+          <Modal.Content>
+            Making these changes will perform an unreversible action.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '1rem' }}>Are you sure you want to continue?</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <button className="cove__btn warn" onClick={() => overlay.actions.toggleOverlay(false)}>No, Cancel</button>
+              <button className="cove__btn success" onClick={() => callTest()}>Yes, Continue</button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
     )
   }
 
@@ -270,28 +284,40 @@ const CdcMarkupInclude = (
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
+
+          <Modal fontTheme={'light'} headerBgColor={'#363955'}>
+            <Modal.Header>
+              General Information Modal
+            </Modal.Header>
+            <Modal.Content>
+              <p>This is a modal with some general information. Anything can go here to give details or explain some
+                information further. This can contain as much information as is needed in order to provide the proper
+                context for the content.</p>
+            </Modal.Content>
+          </Modal>
+
           <button className="cove__btn" onClick={() => {
-            modal.actions.openModal(testModal1())
+            overlay.actions.openOverlay(testModal1())
           }}>Test 1
           </button>
           <br/><br/>
           <button className="cove__btn" onClick={() => {
-            modal.actions.openModal(testModal2())
+            overlay.actions.openOverlay(testModal2())
           }}>Test 2
           </button>
           <br/><br/>
           <button className="cove__btn" onClick={() => {
-            modal.actions.openModal(testModal3())
+            overlay.actions.openOverlay(testModal3())
           }}>Test 3
           </button>
           <br/><br/>
           <button className="cove__btn" onClick={() => {
-            modal.actions.openModal(testModal4())
+            overlay.actions.openOverlay(testModal4())
           }}>Test 4
           </button>
           <br/><br/>
           <button className="cove__btn" onClick={() => {
-            modal.actions.openModal(testModal5())
+            overlay.actions.openOverlay(testModal5())
           }}>Test 5
           </button>
         </div>
@@ -302,7 +328,7 @@ const CdcMarkupInclude = (
       <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
-        {modal.object || null}
+        {overlay.object || null}
       </div>
     )
   }
