@@ -14,6 +14,7 @@ import InputText from '@cdc/core/components/input/InputText'
 
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import InputToggle from '@cdc/core/components/input/InputToggle'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
@@ -169,6 +170,12 @@ const EditorPanel = memo((props) => {
                         value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
+
+                      <InputToggle fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
+                      <InputToggle size="small" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
+                      <InputToggle size="medium" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
+                      <InputToggle size="large" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
+
 
                       <Tooltip position="top" trigger="click" border={false}>
                         <Tooltip.Target>

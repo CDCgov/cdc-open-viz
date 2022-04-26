@@ -6,22 +6,22 @@ export const useGlobalContext = () => useContext(GlobalContext)
 export const GlobalContextProvider = ({ children }) => {
   const [ globalContextData, setGlobalContextData ] = useState({})
 
-  const openModal = (modal) => {
-    let payload = { object: modal, showModal: true }
-    setGlobalContextData(context => ({ ...context, modal: { ...payload } }))
+  const openOverlay = (obj) => {
+    let payload = { object: obj, show: true }
+    setGlobalContextData(context => ({ ...context, overlay: { ...payload } }))
   }
 
-  const toggleModal = (display = false) => {
-    setGlobalContextData(context => ({ ...context, modal: {...context.modal, showModal: display } }))
+  const toggleOverlay = (display = false) => {
+    setGlobalContextData(context => ({ ...context, overlay: {...context.overlay, show: display } }))
   }
 
   const globalSettings = {
-    modal: {
-      object: globalContextData.modal?.object || null,
-      showModal: globalContextData.modal?.showModal || false,
+    overlay: {
+      object: globalContextData.overlay?.object || null,
+      show: globalContextData.overlay?.show || false,
       actions: {
-        openModal,
-        toggleModal
+        openOverlay,
+        toggleOverlay
       }
     }
   }
