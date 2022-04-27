@@ -284,7 +284,7 @@ const CdcMarkupInclude = (
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
-
+          <br/><br/>
           <Modal fontTheme={'light'} headerBgColor={'#363955'}>
             <Modal.Header>
               General Information Modal
@@ -295,7 +295,7 @@ const CdcMarkupInclude = (
                 context for the content.</p>
             </Modal.Content>
           </Modal>
-
+          <br/><br/>
           <button className="cove__btn" onClick={() => {
             overlay.actions.openOverlay(testModal1())
           }}>Test 1
@@ -320,6 +320,7 @@ const CdcMarkupInclude = (
             overlay.actions.openOverlay(testModal5())
           }}>Test 5
           </button>
+          <br/><br/>
         </div>
       </>
     )

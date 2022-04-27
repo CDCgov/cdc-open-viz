@@ -124,25 +124,156 @@ label {
   height: 26px;
   padding: 3px;
 
-  &--small {
-    @extend .cove-input__toggle;
-    width: 40px;
-    height: 20px;
-  }
-
-  &--large {
-    @extend .cove-input__toggle;
-    width: 80px;
-    height: 35px;
-  }
-
   &.active {
     .cove-input__toggle-button {
       left: 100%;
       transform: translateX(-100%);
     }
+
     .cove-input__toggle-track {
       background-color: #75b936;
+    }
+  }
+
+  &.toggle--block {
+    width: unset;
+    aspect-ratio: 1.85/1;
+    padding: 4px;
+
+    .cove-input__toggle-button {
+      border-radius: 10%;
+      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+    }
+
+    .cove-input__toggle-track {
+      border-radius: 4px;
+      box-shadow: 0 0 0 transparent;
+    }
+
+    &.active {
+      .cove-input__toggle-track {
+        box-shadow: inset -40px 0 10px -10px rgb(0 0 0 / 15%);
+      }
+    }
+  }
+
+  &.toggle--pill {
+    width: 60px;
+    height: 25px;
+
+    .cove-input__toggle-button {
+      border-radius: 999px;
+      aspect-ratio: 1.75/1;
+
+      &::before,
+      &::after {
+        content: '';
+        display: block;
+        width: 1px;
+        height: calc(100% - 10px);
+        background-color: #dcdcdc;
+        position: absolute;
+        top: 5px;
+      }
+
+      &::before {
+        left: 42%;
+      }
+
+      &::after {
+        right: 42%;
+      }
+    }
+  }
+
+  &.toggle--3d {
+    .cove-input__toggle-button {
+      background: radial-gradient(circle at 100% 0%, rgba(255,255,255,1) 45%, rgb(200 200 200) 100%);
+      box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;
+      height: 160%;
+      top: -30%;
+      transform: translateX(-20%);
+
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: calc(100% - 8px);
+        height: calc(100% - 8px);
+        border: 1px solid #ececec;
+        border-radius: 999px;
+        margin: 3px;
+      }
+    }
+
+    .cove-input__toggle-track {
+      box-shadow: inset 1px 1px 3px rgb(0 0 0 / 40%)
+    }
+
+    &.active {
+      .cove-input__toggle-button {
+        transform: translateX(-80%);
+      }
+
+      .cove-input__toggle-track {
+        box-shadow: inset 1px 1px 3px rgb(0 0 0 / 60%)
+      }
+    }
+  }
+}
+
+.cove-input__toggle--small {
+  @extend .cove-input__toggle;
+  width: 40px;
+  height: 20px;
+
+  &.toggle--pill {
+    width: 45px;
+    height: 20px;
+
+    .cove-input__toggle-button {
+      aspect-ratio: 1.5/1;
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  &.toggle--3d {
+    .cove-input__toggle-button {
+      box-shadow: 0 1px 2px 2px rgb(0 0 0 / 22%), inset 0 0 3px 2px #fff;
+
+      &:after {
+        width: calc(100% - 6px);
+        height: calc(100% - 6px);
+        margin: 2px;
+      }
+    }
+  }
+}
+
+.cove-input__toggle--large {
+  @extend .cove-input__toggle;
+  width: 80px;
+  height: 35px;
+
+  &.toggle--pill {
+    width: 80px;
+    height: 30px;
+  }
+
+  &.toggle--3d {
+    .cove-input__toggle-button {
+
+      &:after {
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        margin: 4px;
+      }
     }
   }
 }
@@ -167,7 +298,7 @@ label {
   height: 100%;
   background-color: #ccc;
   border-radius: 999px;
-  transition: color 200ms $transition-expo-out;
+  transition: all 200ms $transition-expo-out;
 }
 
 .cove-input__toggle-input {

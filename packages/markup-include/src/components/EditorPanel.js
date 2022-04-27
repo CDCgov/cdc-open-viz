@@ -171,10 +171,28 @@ const EditorPanel = memo((props) => {
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
 
-                      <InputToggle fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
-                      <InputToggle size="small" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
-                      <InputToggle size="medium" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
-                      <InputToggle size="large" fieldName="isToggled" label="Test Toggle" updateField={updateField} value={config.isToggled}/>
+                      <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRows: "repeat(2, 1fr)", gridColumnGap: "28px", gridRowGap: "28px", marginBottom: "2rem"}}>
+                        <div>
+                          <InputToggle label="Toggle Flat" size="small" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="medium" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="large" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                        </div>
+                        <div>
+                          <InputToggle label="Toggle Block" size="small" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="medium" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="large" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                        </div>
+                        <div>
+                          <InputToggle label="Toggle Pill" size="small" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="medium" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="large" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                        </div>
+                        <div>
+                          <InputToggle label="Toggle 3D"  size="small" toggleType="3d" fieldName="isToggled"updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="medium" toggleType="3d" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                          <InputToggle size="large" toggleType="3d" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
+                        </div>
+                      </div>
 
 
                       <Tooltip position="top" trigger="click" border={false}>
