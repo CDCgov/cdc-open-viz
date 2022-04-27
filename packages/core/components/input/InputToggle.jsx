@@ -3,19 +3,33 @@ import React, { useState, useEffect, memo } from 'react'
 const InputToggle = memo((
   {
     label,
+    type = 'input',
+    toggleType = null,
     size = 'medium',
+    activeColor = null,
     section = null,
     subsection = null,
     fieldName,
     updateField,
     value: stateValue,
-    type = 'input',
+
     i = null, min = null, max = null,
     ...attributes
   }
 ) => {
 
   const [ value, setValue ] = useState(stateValue)
+
+  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+
+  const toggleTypeClass = () => {
+    const typeArr = {
+      'block': ' toggle--block',
+      'pill': ' toggle--pill',
+      '3d': ' toggle--3d'
+    }
+    return typeArr[toggleType] || ''
+  }
 
   useEffect(() => {
     if (stateValue !== undefined && stateValue !== value) {
@@ -29,14 +43,12 @@ const InputToggle = memo((
     }
   }, [ value ])
 
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-
   return (
     <div className="input-group">
       {label && <label>{label}</label>}
-      <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')} onClick={() => setValue(!value)}>
+      <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (toggleTypeClass()) + (value ? ' active' : '')} onClick={() => setValue(!value)}>
         <div className="cove-input__toggle-button"/>
-        <div className="cove-input__toggle-track"/>
+        <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
         <input className="cove-input__toggle-input" type="checkbox" name={name} checked={value || false} readOnly/>
       </div>
     </div>
