@@ -71,7 +71,7 @@ export default function DataTable() {
       id: 'series-label'
     }];
 
-    data.map((d) => {
+    data.forEach((d) => {
         const newCol = {
           Header: config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
