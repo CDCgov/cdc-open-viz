@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  memo } from 'react';
+  memo, 
+  Fragment} from 'react';
 import {
   useTable,
   useSortBy,
@@ -61,10 +62,10 @@ export default function DataTable() {
       Cell: ({ row }) => {
         const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original;
         return (
-          <>
+          <Fragment>
             {config.visualizationType !== 'Pie' && <LegendCircle fill={colorScale(seriesLabel)} />}
             <span>{seriesLabel}</span>
-          </>
+          </Fragment>
         )
       },
       id: 'series-label'
