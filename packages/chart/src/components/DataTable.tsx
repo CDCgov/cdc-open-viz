@@ -89,13 +89,13 @@ export default function DataTable() {
     });
 
     return newTableColumns;
-  }, [config]);
+  }, [config,colorScale,data,formatDate,parseDate,numberFormatter]);
 
 
 
   const tableData = useMemo(
-    () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
-    [config.runtime.seriesKeys]
+ () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
+    [config.runtime.seriesKeys,config.visualizationType,config.yAxis.dataKey]
   );
 
   // Change accessibility label depending on expanded status
