@@ -69,3 +69,9 @@
   opacity: 0;
   z-index: 1;
 }
+
+.overlay-error {
+  .cove-overlay__container {
+    animation: shake-horizontal 400ms 1 ease-in-out;
+  }
+}

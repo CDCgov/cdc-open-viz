@@ -3,6 +3,7 @@ export default {
   "showHeader": false,
   "type": "markup-include",
   "srcUrl": "#example",
-  "isToggled": true,
+  "isToggled": false,
+  "isCheckToggled": false,
   "theme": "theme-blue"
 }

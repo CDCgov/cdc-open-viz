@@ -1,5 +1,6 @@
 .cove__btn {
   display: inline-block;
+  position: relative;
   min-width: 6rem;
   padding: 0.75em 1.125em;
   margin-left: 0.5rem;
@@ -18,6 +19,21 @@
 
   &:hover {
     background-color: lighten($primary, 5%);
+  }
+
+  &:active,
+  &:focus {
+    background-color: lighten($primary, 5%);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      outline: 2px solid rgba(161, 161, 161, 0.6);
+      border-radius: .3125em;
+      margin: -2px;
+      pointer-events: none;
+    }
   }
 
   &.success {

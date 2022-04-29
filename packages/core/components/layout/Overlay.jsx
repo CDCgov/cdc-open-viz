@@ -9,6 +9,7 @@ const Overlay = ({ disableBgClose, children }) => {
   //Set local states
   const [ displayOverlay, setDisplayOverlay ] = useState(false)
   const [ overlayAnimationState, setOverlayAnimationState ] = useState(null)
+  const [ overlayErrorState, setOverlayErrorState ] = useState(false)
 
   //Animate In effect
   useEffect(() => {
@@ -38,13 +39,24 @@ const Overlay = ({ disableBgClose, children }) => {
     return () => clearTimeout(timeoutHide)
   }, [ overlay.show ])
 
+  //Error animate effect
+  useEffect(() => {
+    if (overlayErrorState === false) return //Reject
+
+    const timeoutHide = setTimeout(() => {
+      setOverlayErrorState(false)
+    }, 400)
+
+    return () => clearTimeout(timeoutHide)
+  }, [ overlayErrorState ])
+
   //Render output
   return (
     <>
       {displayOverlay &&
-      <div className={`cove-overlay ${overlayAnimationState ? (' ' + overlayAnimationState) : ''}`}>
+      <div className={`cove-overlay ${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
         <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
-             onClick={() => disableBgClose ? null : overlay.actions.toggleOverlay(false)}/>
+             onClick={() => disableBgClose ? setOverlayErrorState(true) : overlay.actions.toggleOverlay(false)}/>
         <div className="cove-overlay__wrapper">
           <div className="cove-overlay__container">
             {children}
