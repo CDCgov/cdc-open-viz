@@ -1,6 +1,8 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
+import '../../styles/v2/components/input.scss'
+
 const InputText = memo((
   {
     label,

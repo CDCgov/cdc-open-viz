@@ -3,6 +3,8 @@ import React from 'react'
 import iconClose from '../../assets/icon-close.svg'
 import iconQuestion from '../../assets/question-circle.svg'
 
+import '../../styles/v2/components/icon.scss'
+
 const Icon = (props) => {
   const { display, alt = '', size } = props
 

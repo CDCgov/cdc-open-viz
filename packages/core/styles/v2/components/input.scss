@@ -1,3 +1,5 @@
+@import '../utils/_variables.scss';
+
 input, datalist, textarea, select {
   transition: border-color 200ms $transition-expo-out;
   font-family: sans-serif;
@@ -182,7 +184,7 @@ label {
         display: block;
         width: 1px;
         height: calc(100% - 10px);
-        background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(227,227,227,1) 30%, rgba(227,227,227,1) 70%, rgba(255,255,255,1) 100%);
+        background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(227, 227, 227, 1) 30%, rgba(227, 227, 227, 1) 70%, rgba(255, 255, 255, 1) 100%);
         position: absolute;
         top: 5px;
       }
@@ -199,7 +201,7 @@ label {
 
   &.toggle--3d {
     .cove-input__toggle-button {
-      background: radial-gradient(circle at 100% 0%, rgba(255,255,255,1) 45%, rgb(200 200 200) 100%);
+      background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 1) 45%, rgb(200 200 200) 100%);
       box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;
       height: 160%;
       top: -30%;

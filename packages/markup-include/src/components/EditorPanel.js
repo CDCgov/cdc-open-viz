@@ -10,12 +10,15 @@ import {
 
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import InputText from '@cdc/core/components/input/InputText'
+import InputText from '@cdc/core/components/inputs/InputText'
 
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import InputToggle from '@cdc/core/components/input/InputToggle'
-import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
+import InputToggle from '@cdc/core/components/inputs/InputToggle'
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+
+import '@cdc/core/styles/v2/components/accordion.scss'
+import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
@@ -204,7 +207,6 @@ const EditorPanel = memo((props) => {
                           <InputCheckbox size="large" activeColor="#025eaa" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
                         </div>
                       </div>
-
 
                       <Tooltip position="top" trigger="click" border={false}>
                         <Tooltip.Target>

@@ -1,3 +1,5 @@
+@import "../utils/variables";
+
 .cove-modal {
   background-color: #fff;
   border-radius: 5px;
@@ -45,6 +47,7 @@
   font-size: 1.25rem;
   background-color: transparent;
   border-radius: 0 5px 0 0;
+  border: 0;
   cursor: pointer;
   color: inherit;
 

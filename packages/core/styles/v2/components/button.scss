@@ -1,4 +1,6 @@
-.cove__btn {
+@import "../utils/variables";
+
+.cove-button {
   display: inline-block;
   position: relative;
   min-width: 6rem;
@@ -9,9 +11,11 @@
   color: #fff;
   background-color: $primary;
   border-radius: .3125em;
+  border: 0;
   transition: all 500ms $transition-expo-out;
   transition-property: background-color, box-shadow;
   user-select: none;
+  cursor: pointer;
 
   &.full-width {
     width: 100%;

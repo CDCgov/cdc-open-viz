@@ -1,6 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 
 import Check from '../../assets/check.svg'
+import '../../styles/v2/components/input.scss'
 
 const InputCheckbox = memo((
   {
