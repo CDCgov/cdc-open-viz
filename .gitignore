@@ -21,6 +21,8 @@ composer.lock
 *.swo
 
 # Project Specific
+/packages/**/examples/private
+/packages/**/example/private
 /node_modules
 /docs
 /**/**/node_modules

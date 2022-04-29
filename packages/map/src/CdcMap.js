@@ -33,6 +33,7 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
 
 // Child Components
@@ -982,22 +983,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }
 
-    const validateFipsCodeLength = (newState) => {
-        if(newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
-
-            newState?.data.forEach(dataPiece => {
-                if(dataPiece[newState.columns.geo.name]) {
-
-                    if(!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
-                        dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
-                    }
-                    dataPiece[newState.columns.geo.name] = dataPiece[newState.columns.geo.name].toString()
-                }
-            })
-        }
-        return newState;
-    }
-
     const loadConfig = useCallback(async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
@@ -1049,7 +1034,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-
 
         validateFipsCodeLength(newState);
         setState(newState)
