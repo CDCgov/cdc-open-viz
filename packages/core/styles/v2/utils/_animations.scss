@@ -40,3 +40,24 @@
     transform: scale(1);
   }
 }
+
+@keyframes shake-horizontal {
+  0% {
+    transform: translate(20px);
+  }
+  20% {
+    transform: translate(-20px);
+  }
+  40% {
+    transform: translate(10px);
+  }
+  60% {
+    transform: translate(-10px);
+  }
+  80% {
+    transform: translate(4px);
+  }
+  100% {
+    transform: translate(0px);
+  }
+}
