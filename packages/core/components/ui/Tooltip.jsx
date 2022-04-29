@@ -34,7 +34,7 @@ const Tooltip = ({
       </a>
       <ReactTooltip
         id={uid}
-        className={'cove-tooltip__content' + (trigger === 'click' ? ' interactive' : null) + (border ? (' cove-tooltip--border-' + null) : null) + (shadow ? ' has-shadow' : null)}
+        className={'cove-tooltip__content' + (trigger === 'click' ? ' interactive' : '') + (border ? (' cove-tooltip--border-' + border) : '') + (shadow ? ' has-shadow' : '')}
         type="light"
         effect="solid"
         border={!!border}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 
+import '../../styles/v2/components/input.scss'
+
 const InputToggle = memo((
   {
     label,

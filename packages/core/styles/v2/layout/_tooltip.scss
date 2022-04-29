@@ -1,3 +1,5 @@
+//# Must be loaded outside of Tooltip component for animation availability
+
 $cove-tooltip-bg: #fff;
 $cove-tooltip-color: #333;
 $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
@@ -29,36 +31,42 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   cursor: default;
   opacity: 0;
 
-  &.has-shadow {
-    &.place-top {
+  &.place-top {
+    &.has-shadow {
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.place-right {
-      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    &.place-bottom {
-      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    &.place-left {
-      box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+    &.show {
+      animation: tooltip-btt $cove-tooltip-animation;
     }
   }
 
-  &.show {
-    animation: tooltip-btt $cove-tooltip-animation;
+  &.place-right {
+    &.has-shadow {
+      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-    &.place-right {
+    &.show {
       animation: tooltip-ltr $cove-tooltip-animation;
     }
+  }
 
-    &.place-bottom {
-      animation: tooltip-ttb $cove-tooltip-animation;
+  &.place-bottom {
+    &.has-shadow {
+      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
     }
 
-    &.place-left {
+    &.show {
+      animation: tooltip-ttb $cove-tooltip-animation;
+    }
+  }
+
+  &.place-left {
+    &.has-shadow {
+      box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.show {
       animation: tooltip-rtl $cove-tooltip-animation;
     }
   }
@@ -70,9 +78,17 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   }
 }
 
-.cove-tooltip--border-0 { border-width: 0; }
-.cove-tooltip--border-1 { border-width: 1px; }
-.cove-tooltip--border-2 { border-width: 2px; }
+.cove-tooltip--border-0 {
+  border-width: 0;
+}
+
+.cove-tooltip--border-1 {
+  border-width: 1px;
+}
+
+.cove-tooltip--border-2 {
+  border-width: 2px;
+}
 
 @keyframes tooltip-ltr {
   0% {

@@ -10,9 +10,9 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
-import InputToggle from '@cdc/core/components/input/InputToggle'
-import Overlay from '@cdc/core/components/layout/Overlay'
+import Overlay from '@cdc/core/components/ui/Overlay'
 import Modal from '@cdc/core/components/ui/Modal'
+import Button from '@cdc/core/components/elements/Button'
 
 import './scss/main.scss'
 
@@ -165,8 +165,8 @@ const CdcMarkupInclude = (
           </Modal.Content>
           <Modal.Footer>
             <div style={{ textAlign: 'right' }}>
-              <button className="cove__btn muted" onClick={() => overlay.actions.toggleOverlay(false)}>Cancel</button>
-              <button className="cove__btn success" onClick={() => callTest()}>Submit</button>
+              <Button className="muted" onClick={() => overlay.actions.toggleOverlay(false)}>Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Submit</Button>
             </div>
           </Modal.Footer>
         </Modal>
@@ -186,7 +186,7 @@ const CdcMarkupInclude = (
             each modal.
           </Modal.Content>
           <Modal.Footer>
-            <button className="cove__btn" onClick={() => callTest()}>Trigger an Action</button>
+            <Button onClick={() => callTest()}>Trigger an Action</Button>
           </Modal.Footer>
         </Modal>
       </Overlay>
@@ -241,8 +241,8 @@ const CdcMarkupInclude = (
               <p style={{ marginBottom: '1rem', fontSize: '1rem' }}>Are you sure you want to continue?</p>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <button className="cove__btn warn" onClick={() => overlay.actions.toggleOverlay(false)}>No, Cancel</button>
-              <button className="cove__btn success" onClick={() => callTest()}>Yes, Continue</button>
+              <Button className="warn" onClick={() => overlay.actions.toggleOverlay(false)}>No, Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Yes, Continue</Button>
             </div>
           </Modal.Footer>
         </Modal>
@@ -296,30 +296,15 @@ const CdcMarkupInclude = (
             </Modal.Content>
           </Modal>
           <br/><br/>
-          <button className="cove__btn" onClick={() => {
-            overlay.actions.openOverlay(testModal1())
-          }}>Test 1
-          </button>
+          <Button onClick={() => {overlay.actions.openOverlay(testModal1())}}>Test 1</Button>
           <br/><br/>
-          <button className="cove__btn" onClick={() => {
-            overlay.actions.openOverlay(testModal2())
-          }}>Test 2
-          </button>
+          <Button onClick={() => {overlay.actions.openOverlay(testModal2())}}>Test 2</Button>
           <br/><br/>
-          <button className="cove__btn" onClick={() => {
-            overlay.actions.openOverlay(testModal3())
-          }}>Test 3
-          </button>
+          <Button onClick={() => {overlay.actions.openOverlay(testModal3())}}>Test 3</Button>
           <br/><br/>
-          <button className="cove__btn" onClick={() => {
-            overlay.actions.openOverlay(testModal4())
-          }}>Test 4
-          </button>
+          <Button onClick={() => {overlay.actions.openOverlay(testModal4())}}>Test 4</Button>
           <br/><br/>
-          <button className="cove__btn" onClick={() => {
-            overlay.actions.openOverlay(testModal5())
-          }}>Test 5
-          </button>
+          <Button onClick={() => {overlay.actions.openOverlay(testModal5())}}>Test 5</Button>
           <br/><br/>
         </div>
       </>
