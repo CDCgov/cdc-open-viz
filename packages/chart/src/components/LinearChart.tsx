@@ -150,7 +150,7 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
-          {!config.yAxis.hideAxis && (
+          {!config.runtime.yAxis.hideAxis && (
             <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
