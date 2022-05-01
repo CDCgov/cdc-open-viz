@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext, Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -718,7 +718,10 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.visualizationSubType === 'horizontal') ?
+                       <Fragment> 
                         <CheckBox value={config.yAxis.hideAxis || false} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel || false} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        </Fragment>
                         :
                         <CheckBox value={config.xAxis.hideAxis || false} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       }
