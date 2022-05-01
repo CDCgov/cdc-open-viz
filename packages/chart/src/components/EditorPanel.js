@@ -718,9 +718,9 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.visualizationSubType === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideAxis || false} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideAxis || false} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       }
                     </>
                   )}
