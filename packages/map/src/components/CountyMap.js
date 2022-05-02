@@ -1,18 +1,15 @@
-import React, { useState, useEffect, memo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, memo, useRef } from 'react';
+import Loading from '@cdc/core/components/Loading';
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import { CustomProjection } from '@visx/geo';
-import chroma from 'chroma-js';
 import colorPalettes from '../data/color-palettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
-import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
-import ReactTooltip from 'react-tooltip';
 import { abbrs } from '../data/abbreviations';
-import useActiveElement from './../hooks/useActiveElement';
 
 const offsets = {
 	Vermont: [50, -8],
@@ -359,7 +356,7 @@ const CountyMap = (props) => {
 
 					return (
 						<g
-							tabIndex="0"
+							tabIndex="-1"
 							data-for='tooltip'
 							data-tip={tooltip}
 							key={`county--${key}`}
@@ -466,7 +463,7 @@ const CountyMap = (props) => {
 
 				return (
 					<React.Fragment key={`state--${key}`}>
-						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="0">
+						<g key={`state--${key}`} className={stateClasses.join(' ')} style={stateStyles} tabIndex="-1">
 							<>
 								<path
 									tabIndex={-1}
@@ -518,7 +515,7 @@ const CountyMap = (props) => {
 		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
 		return geosJsx;
 	};
-
+	if(!data) <Loading />
 	return (
 		<ErrorBoundary component='CountyMap'>
 			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>

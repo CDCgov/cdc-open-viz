@@ -29,7 +29,6 @@ export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
-
   const transform = new DataTransform();
 
   interface keyable { [key: string]: any }
@@ -46,6 +45,8 @@ export default function CdcChart(
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
+
+  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
   const colorPalettes = {
     'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
@@ -183,7 +184,7 @@ export default function CdcChart(
       });
     }
 
-    if (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -200,14 +201,15 @@ export default function CdcChart(
 
     let uniqueXValues = {};
 
-    for(let i = 0; i < currentData.length; i++) {
-      if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-        newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-      } else {
-        uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+    if(newConfig.visualizationType !== 'Paired Bar') {
+      for(let i = 0; i < currentData.length; i++) {
+        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+        } else {
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+        }
       }
     }
-
     setConfig(newConfig);
   };
 
@@ -260,12 +262,20 @@ export default function CdcChart(
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(width)
+      let svgMarginWidth = 32;
+      let editorWidth = 350;
 
       setCurrentViewport(newViewport)
 
       if(isEditor) {
-        width = width - 350;
+        width = width - editorWidth;
       }
+
+      if(entry.target.dataset.lollipop === 'true') {
+        width = width - 2.5;
+      }
+
+      width = width - svgMarginWidth;
 
       setDimensions([width, height])
     }
@@ -281,6 +291,22 @@ export default function CdcChart(
   useEffect(() => {
     loadConfig();
   }, []);
+
+  // useEffect(() => {
+  //   if(config.visualizationType === 'Paired Bar') {
+  //     updateConfig({
+  //       ...config,
+  //       yAxis: {
+  //         ...config.yAxis,
+  //         hideAxis: true
+  //       },
+  //       xAxis: {
+  //         ...config.xAxis,
+  //         hideAxis: true
+  //       }
+  //     })
+  //   }
+  // }, [config.visualizationType]);
 
   // Load data when configObj data changes
   if(configObj){
@@ -410,6 +436,7 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
+    'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
@@ -420,7 +447,7 @@ export default function CdcChart(
   const Legend = () => {
 
     let containerClasses = ['legend-container']
-    let innerClasses = [];
+    let innerClasses = ['legend-container__inner'];
 
     if(config.legend.position === "left") {
       containerClasses.push('left')
@@ -432,7 +459,7 @@ export default function CdcChart(
     }
 
     return (
-      <div className={containerClasses.join(' ')}>
+      <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
         {legend.label && <h2>{legend.label}</h2>}
         <LegendOrdinal
         scale={colorScale}
@@ -462,8 +489,8 @@ export default function CdcChart(
 
                 return (
                   <LegendItem
-                    tabIndex={0}
                     className={className}
+                    tabIndex={0}
                     key={`legend-quantile-${i}`}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
@@ -485,7 +512,7 @@ export default function CdcChart(
             </div>
           )}
         </LegendOrdinal>
-      </div>
+      </aside>
     )
   }
 
@@ -591,7 +618,10 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+            Skip Over Chart Container
+          </a>
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
@@ -603,7 +633,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
         </div>}
       </>
     )
@@ -634,7 +664,7 @@ export default function CdcChart(
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef}>
+      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
         {body}
       </div>
     </Context.Provider>

@@ -1,0 +1,13 @@
+.header {
+  position: relative;
+  padding: 0.6em 0.8em;
+  margin: 0;
+  color: #fff;
+  font-size: 1.1em;
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+
+  &:not(:empty) {
+    margin: 0 0 1rem 0;
+  }
+}
