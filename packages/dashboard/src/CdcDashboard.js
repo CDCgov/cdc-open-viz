@@ -18,6 +18,7 @@ import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
 import CdcDataBite from '@cdc/data-bite';
 import CdcWaffleChart from '@cdc/waffle-chart';
+import CdcMarkupInclude from '@cdc/markup-include';
 
 import EditorPanel from './components/EditorPanel';
 import Grid from './components/Grid';
@@ -50,6 +51,9 @@ const addVisualization = (type, subType) => {
     case 'waffle-chart':
       newVisualizationConfig.visualizationType = type;
       break;
+    case 'markup-include':
+      newVisualizationConfig.visualizationType = type;
+      break;
   }
 
   return newVisualizationConfig
@@ -73,6 +77,7 @@ const VisualizationsPanel = () => (
     <div className="drag-grid">
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart" />
+      <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include" />
     </div>
   </div>
 )
@@ -105,11 +110,13 @@ export default function CdcDashboard(
 
       dataset = await dataString.json();
 
-      try {
-        dataset = transform.autoStandardize(dataset);
-        dataset = transform.developerStandardize(dataset, response.dataDescription);
-      } catch(e) {
-        //Data not able to be standardized, leave as is
+      if(data && config.dataDescription){
+        try {
+          data = transform.autoStandardize(data);
+          data = transform.developerStandardize(data, config.dataDescription);
+        } catch(e) {
+          //Data not able to be standardized, leave as is
+        }
       }
     }
 
@@ -207,6 +214,13 @@ export default function CdcDashboard(
 
       filterList.forEach((filter, index) => {
           const filterValues = generateValuesForFilter(filter, (dataOverride || data));
+
+          if(newConfig.dashboard.filters[index].order === 'asc'){
+            filterValues.sort();
+          }
+          if(newConfig.dashboard.filters[index].order === 'desc'){
+            filterValues.sort().reverse();
+          }
 
           newConfig.dashboard.filters[index].values = filterValues;
 
@@ -376,6 +390,9 @@ export default function CdcDashboard(
           case 'waffle-chart':
             body = <><Header back={back} subEditor="Waffle Chart" /><CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
             break;
+          case 'markup-include':
+            body = <><Header back={back} subEditor="Markup Include" /><CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
+            break;
         }
       }
     });
@@ -404,24 +421,25 @@ export default function CdcDashboard(
           {config.dashboard.filters && <Filters />}
 
           {/* Visualizations */}
-          {config.rows && config.rows.map(row => {
+          {config.rows && config.rows.map((row,index) => {
             // Empty check
             if(row.filter(col => col.widget).length === 0) return null
 
             return (
-              <div className="dashboard-row">
-                {row.map(col => {
+              <div className="dashboard-row" key={`row__${index}`}>
+                {row.map( (col,index) => {
                   if(col.width) {
                     if(!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
 
                     let visualizationConfig = config.visualizations[col.widget];
+
                     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
                     
                     visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
 
                     return (
                       <>
-                        <div className={`dashboard-col dashboard-col-${col.width}`}>
+                        <div className={`dashboard-col dashboard-col-${col.width}`} key={`vis__${index}`}>
                           {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setSharedFilter} isDashboard={true} />}
                           {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setSharedFilter} isDashboard={true} />}
                           {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => { updateChildConfig(col.widget, newConfig) }} isDashboard={true} />}

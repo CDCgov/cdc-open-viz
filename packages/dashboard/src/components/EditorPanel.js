@@ -108,16 +108,12 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
   )
 })
 
-const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
-
 const EditorPanel = memo(() => {
   const {
     config,
     updateConfig,
     loading,
-    rawData,
-    setParentConfig,
-    setEditing
+    setParentConfig
   } = useContext(Context);
 
   const enforceRestrictions = (updatedConfig) => {
@@ -176,22 +172,10 @@ const EditorPanel = memo(() => {
     return null
   }
 
-  const getColumns = (filter = true) => {
-    let columns = {}
+  const getColumns = () => {
+    console.log(config);
 
-    rawData.map(row => {
-      Object.keys(row).forEach(columnName => columns[columnName] = true)
-    })
-
-    if(filter) {
-      Object.keys(columns).forEach(key => {
-        if((config.series && config.series.filter(series => series.dataKey === key).length > 0) || (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key)) ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
+    return []
   }
 
   const Error = () => {

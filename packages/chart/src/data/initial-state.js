@@ -5,6 +5,10 @@ export default {
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
   barHasBorder: 'false',
+  isLollipopChart: false,
+  lollipopShape: "circle",
+  lollipopColorStyle: 'two-tone',
+  visualizationSubType: "regular",
   padding: {
     left: 5,
     right: 5

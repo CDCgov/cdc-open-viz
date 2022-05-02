@@ -37,25 +37,15 @@ export default function DataImport() {
 
   const transform = new DataTransform()
 
-  const [ externalURL, setExternalURL ] = useState('')
+  const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
-  const [ addingDataset, setAddingDataset ] = useState(config.type === 'dashboard' ? Object.keys(config.datasets).length === 0 : !config.data)
+  const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
+
+  const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
-  }
-
-  const displaySize = (size) => {
-    if(size > Math.pow(1024, 3)){
-      return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
-    } else if(size > Math.pow(1024, 2)){
-      return Math.round(size / Math.pow(1024, 2) * 100) / 100 + ' MB';
-    } else if(size > 1024){
-      return Math.round(size / 1024 * 100) / 100 + ' KB';
-    } else {
-      return size + ' B'
-    }
   }
 
   const displayFileName = (name) => {
@@ -307,19 +297,20 @@ export default function DataImport() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const loadFileFromUrl = (url) => {
-    const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+    // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+    
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
-                 aria-describedby="load-data" defaultValue={extUrl} onBlur={(e) => setExternalURL(e.target.value)}/>
+                 aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
                   onClick={() => loadData(null, externalURL)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url"/> Always
+          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/> Always
           load from URL (normally will only pull once)
         </label>
       </>
