@@ -17,7 +17,7 @@ $theme: (
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
-    .theme-#{$theme-name} {
+    .theme-#{$theme-name}:not(.cdc-open-viz-module) {
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
     }
