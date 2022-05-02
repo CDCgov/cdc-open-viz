@@ -1,4 +1,5 @@
 import React, { Children } from 'react'
+import PropTypes from 'prop-types'
 
 import { useGlobalContext } from '../GlobalContext'
 import Icon from './Icon'
@@ -72,5 +73,13 @@ const Modal = ({
 Modal.Header = ModalHeader
 Modal.Content = ModalContent
 Modal.Footer = ModalFooter
+
+Modal.propTypes = {
+  fontTheme: PropTypes.oneOf(['dark', 'light']),
+  headerBgColor: PropTypes.string,
+  showDividerTop: PropTypes.bool,
+  showDividerBottom: PropTypes.bool,
+  showClose: PropTypes.bool
+}
 
 export default Modal
