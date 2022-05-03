@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -218,11 +218,16 @@ export default function LinearChart() {
 
                         { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
                             // 17 is a magic number from the offset in barchart.
+                            <Fragment> 
+                              {!config.runtime.yAxis.hideLabel && (
                             <Text
-                              transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal && config.runtime.yAxis.tickRotation ? config.runtime.yAxis.tickRotation: 0})`}  // TODO : on yAxis tickRotaion doesnt exist
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{tick.formattedValue}
+                            </Text>
+                              )}
+                             </Fragment>
                         }
 
 
