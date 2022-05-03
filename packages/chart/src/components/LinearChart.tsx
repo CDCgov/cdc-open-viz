@@ -153,6 +153,7 @@ export default function LinearChart() {
           {!config.runtime.yAxis.hideAxis && (
             <AxisLeft
             scale={yScale}
+            hideTicks={config.runtime.yAxis.hideTicks}
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
             stroke="#333"
@@ -170,31 +171,40 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!props.hideTicks &&(
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                           display={config.runtime.horizontal ? 'none' : 'block'}
                         />
-                        { config.runtime.yAxis.gridLines ? (
+                        )}
+                        { config.runtime.yAxis.gridLines && (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
                             to={tick.from}
                             stroke="rgba(0,0,0,0.3)"
                           />
-                          ) : ''
-                        }
+                          )}
 
                         { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Y-Axis' ) &&
+                        <> 
+                        {!config.runtime.yAxis.hideLabel && (
                             <Text
-                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              transform={`translate(${tick.to.x - 15}, ${ tick.from.y - config.barPadding/2}) rotate(-${config.runtime.horizontal ? Number(config.runtime.yAxis.tickRotation) : 0})`}
                               verticalAnchor={"middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{tick.formattedValue}
+                            </Text>
+                        )}
+                            </>
                         }
 
 
                         { config.visualizationSubType !== "horizontal" &&
+                        <>  
+                        {!config.runtime.yAxis.hideLabel && (
+
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
@@ -203,6 +213,8 @@ export default function LinearChart() {
                             >
                               {tick.formattedValue}
                             </Text>
+                        )}
+                            </>
                         }
 
                       </Group>
@@ -235,7 +247,7 @@ export default function LinearChart() {
           )}
 
           {/* X axis */}
-          {!config.xAxis.hideAxis && (
+          {!config.runtime.xAxis.hideAxis && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -244,6 +256,7 @@ export default function LinearChart() {
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
+            hideTicks={config.runtime.xAxis.hideTicks}
             numTicks={config.runtime.xAxis.numTicks || undefined}
           >
             {props => {
@@ -257,11 +270,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!props.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                         />
+                        )}
+                        {!config.runtime.xAxis.hideLabel &&(
                         <Text
                           transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
@@ -270,6 +286,7 @@ export default function LinearChart() {
                         >
                           {tick.formattedValue}
                         </Text>
+                        )}
                       </Group>
                     );
                   })}
