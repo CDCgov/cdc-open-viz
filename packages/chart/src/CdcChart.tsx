@@ -184,9 +184,9 @@ export default function CdcChart(
       });
     }
 
-    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
-      newConfig.runtime.xAxis = newConfig.xAxis;
-      newConfig.runtime.yAxis = newConfig.yAxis;
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar'   ) {
+      newConfig.runtime.xAxis = newConfig.yAxis;
+      newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
     } else {
       newConfig.runtime.xAxis = newConfig.xAxis;
