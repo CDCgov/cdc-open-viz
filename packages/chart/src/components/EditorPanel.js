@@ -756,9 +756,17 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.visualizationSubType === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      <Fragment> 
+                        <CheckBox value={config.yAxis.hideAxis || false} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel || false} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideTicks || false} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </Fragment>
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <Fragment> 
+                        <CheckBox value={config.xAxis.hideAxis  ||false} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideLabel || false} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideTicks || false} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </Fragment>
                       }
                     </>
                   )}
