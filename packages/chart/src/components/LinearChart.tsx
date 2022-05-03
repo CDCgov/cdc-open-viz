@@ -177,9 +177,10 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
-          {!config.yAxis.hideAxis && (
+          {!config.runtime.yAxis.hideAxis && (
             <AxisLeft
             scale={yScale}
+            hideTicks={config.runtime.yAxis.hideTicks}
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
             stroke="#333"
@@ -198,12 +199,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!props.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                           display={config.runtime.horizontal ? 'none' : 'block'}
                         />
+                        )}
                         { config.runtime.yAxis.gridLines ? (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
