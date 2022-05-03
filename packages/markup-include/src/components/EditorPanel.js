@@ -15,8 +15,6 @@ import InputText from '@cdc/core/components/inputs/InputText'
 
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 
 import '@cdc/core/styles/v2/components/accordion.scss'
 import '@cdc/core/styles/v2/components/editor.scss'
@@ -175,39 +173,6 @@ const EditorPanel = memo((props) => {
                         value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
-
-                      <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gridTemplateRows: "repeat(3, 1fr)", gridColumnGap: "28px", gridRowGap: "28px", marginBottom: "2rem"}}>
-                        <div>
-                          <InputToggle label="Toggle Flat" size="small" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="medium" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="large" activeColor="#46c3d1" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                        </div>
-                        <div>
-                          <InputToggle label="Toggle Block" size="small" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="medium" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="large" toggleType="block" activeColor="#025eaa" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                        </div>
-                        <div>
-                          <InputToggle label="Toggle Pill" size="small" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="medium" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="large" toggleType="pill" activeColor="#f22d70" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                        </div>
-                        <div>
-                          <InputToggle label="Toggle 3D" size="small" toggleType="3d" fieldName="isToggled"updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="medium" toggleType="3d" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                          <InputToggle size="large" toggleType="3d" fieldName="isToggled" updateField={updateField} value={config.isToggled}/>
-                        </div>
-                        <div>
-                          <InputCheckbox label="Checkbox Green" size="small" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                          <InputCheckbox fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                          <InputCheckbox size="large" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                        </div>
-                        <div>
-                          <InputCheckbox label="Checkbox Blue" size="small" activeColor="#025eaa" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                          <InputCheckbox activeColor="#025eaa" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                          <InputCheckbox size="large" activeColor="#025eaa" fieldName="isCheckToggled" updateField={updateField} value={config.isCheckToggled}/>
-                        </div>
-                      </div>
 
                       <Tooltip position="top" trigger="click" border={false}>
                         <Tooltip.Target>
