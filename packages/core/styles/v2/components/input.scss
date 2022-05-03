@@ -332,8 +332,11 @@ label {
 
   &.active {
     .cove-input__checkbox-box {
-      background-color: #75b936;
-      box-shadow: none;
+      background-color: #fff;
+
+      &.custom-color {
+        box-shadow: none;
+      }
     }
 
     .cove-input__checkbox-check {

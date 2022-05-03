@@ -1,12 +1,23 @@
 .cove-component {
-  .cove-component__header {
-    width: 100%;
-    padding: 0.6em 0.8em;
-    margin-bottom: 1em;
-    border-bottom-width: 3px;
-    border-bottom-style: solid;
-    font-size: 1.1em;
-    transition: background-color 200ms ease, border-color 200ms ease;
-    color: #fff;
-  }
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px;
+}
+
+.cove-component__header {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+  border-radius: 3px 3px 0 0;
+  font-size: 1.1rem;
+  transition: background-color 200ms ease, border-color 200ms ease;
+  color: #fff;
+}
+
+.cove-component__content {
+  padding-top: 1rem;
+  background: $lightestGray;
+  border: solid 1px #ccc;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
 }

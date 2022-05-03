@@ -8,8 +8,9 @@ import {
   AccordionItemButton,
 } from 'react-accessible-accordion'
 
-import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+import ConfigContext from '../ConfigContext'
 import InputText from '@cdc/core/components/inputs/InputText'
 
 import Icon from '@cdc/core/components/ui/Icon'
