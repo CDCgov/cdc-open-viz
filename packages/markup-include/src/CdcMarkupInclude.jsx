@@ -284,28 +284,6 @@ const CdcMarkupInclude = (
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
-          <br/><br/>
-          <Modal fontTheme={'light'} headerBgColor={'#363955'}>
-            <Modal.Header>
-              General Information Modal
-            </Modal.Header>
-            <Modal.Content>
-              <p>This is a modal with some general information. Anything can go here to give details or explain some
-                information further. This can contain as much information as is needed in order to provide the proper
-                context for the content.</p>
-            </Modal.Content>
-          </Modal>
-          <br/><br/>
-          <Button onClick={() => {overlay.actions.openOverlay(testModal1())}}>Test 1</Button>
-          <br/><br/>
-          <Button onClick={() => {overlay.actions.openOverlay(testModal2())}}>Test 2</Button>
-          <br/><br/>
-          <Button onClick={() => {overlay.actions.openOverlay(testModal3())}}>Test 3</Button>
-          <br/><br/>
-          <Button onClick={() => {overlay.actions.openOverlay(testModal4())}}>Test 4</Button>
-          <br/><br/>
-          <Button onClick={() => {overlay.actions.openOverlay(testModal5())}}>Test 5</Button>
-          <br/><br/>
         </div>
       </>
     )

@@ -45,7 +45,7 @@ const Modal = ({
       }}>
         {modalHeaderChildren && modalHeaderChildren.props.children}
         {showClose &&
-        <button className="cove-modal--close" onClick={() => overlay.actions.toggleOverlay(false)}>
+        <button className="cove-modal--close" onClick={(e) => overlay.actions.toggleOverlay(false) || e.preventDefault()}>
           <Icon display="close"/>
         </button>
         }
