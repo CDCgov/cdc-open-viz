@@ -85,7 +85,7 @@ InputToggle.propTypes = {
    * (optional, requires `section` value)*/
   subsection: PropTypes.string,
   /** Key value of targeted config option */
-  fieldName: PropTypes.string.isRequired,
+  fieldName: PropTypes.string,
   /** Prop drill down of the updateField function */
   updateField: 'updateField',
   /** Current value of the input, usually the current config option value */
