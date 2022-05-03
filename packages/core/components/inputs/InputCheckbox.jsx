@@ -8,6 +8,7 @@ const InputCheckbox = memo((
     label,
     size = 'medium',
     activeColor = null,
+    activeCheckColor = null,
     section = null,
     subsection = null,
     fieldName,
@@ -41,9 +42,9 @@ const InputCheckbox = memo((
       <div
         className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')}
         onClick={() => setValue(!value)}>
-        <div className="cove-input__checkbox-box"
+        <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
              style={value && activeColor ? { backgroundColor: activeColor } : null}>
-          <Check className="cove-input__checkbox-check"/>
+          <Check className="cove-input__checkbox-check" style={{fill: activeCheckColor || '#025eaa'}}/>
         </div>
         <input className="cove-input--hidden" type="checkbox" name={name} checked={value || false} readOnly/>
       </div>
