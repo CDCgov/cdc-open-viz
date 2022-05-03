@@ -6,7 +6,7 @@ import '../../styles/v2/components/input.scss'
 const InputToggle = (
   {
     label,
-    toggleType = 'default',
+    toggleType = 'flat',
     size = 'medium',
     activeColor = null,
     section = null,
@@ -35,6 +35,7 @@ const InputToggle = (
 
   const toggleTypeClass = () => {
     const typeArr = {
+      'flat': ' toggle--flat',
       'block': ' toggle--block',
       'pill': ' toggle--pill',
       '3d': ' toggle--3d'
