@@ -1,4 +1,5 @@
-@import '../utils/_variables.scss';
+@import "../utils/variables";
+@import "../themes/index";
 
 input, datalist, textarea, select {
   transition: border-color 200ms $transition-expo-out;
