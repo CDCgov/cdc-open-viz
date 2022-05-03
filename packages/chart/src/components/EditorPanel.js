@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext, Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -674,9 +674,17 @@ const EditorPanel = () => {
                   </div>
                   {(config.visualizationSubType === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
-                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <Fragment> 
+                    <CheckBox value={config.xAxis.hideAxis || false} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hideLabel || false} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hideTicks || false} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </Fragment>
                     :
-                    <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <Fragment>
+                    <CheckBox value={config.yAxis.hideAxis || false} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hideLabel || false} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hideTicks || false} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </Fragment>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
