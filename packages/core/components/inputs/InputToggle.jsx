@@ -71,7 +71,7 @@ InputToggle.propTypes = {
   /** Add label to the input field */
   label: PropTypes.string,
   /** Select the preferred display style of the toggle slider */
-  toggleType: PropTypes.oneOf(['default', 'block', 'pill', '3d']),
+  toggleType: PropTypes.oneOf(['flat', 'block', 'pill', '3d']),
   /** Select the preferred size of the toggle slider */
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   /** Select the preferred color for the toggle slider when active */
