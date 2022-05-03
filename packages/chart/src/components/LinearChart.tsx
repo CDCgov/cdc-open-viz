@@ -232,6 +232,8 @@ export default function LinearChart() {
 
 
                         { config.visualizationSubType !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
+                        <Fragment> 
+                          {!config.runtime.yAxis.hideLabel && (
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
@@ -240,6 +242,8 @@ export default function LinearChart() {
                             >
                               {tick.formattedValue}
                             </Text>
+                          ) }
+                            </Fragment>
                         }
 
                       </Group>
@@ -276,6 +280,7 @@ export default function LinearChart() {
           {!config.xAxis.hideAxis && config.visualizationType !== 'Paired Bar' && (
           <AxisBottom
             top={yMax}
+            hideTicks={config.runtime.xAxis.hideTicks}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
             tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
@@ -295,11 +300,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!props.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                         />
+                        )}
+                        {!config.runtime.xAxis.hideLabel && (
                         <Text
                           transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
@@ -308,6 +316,7 @@ export default function LinearChart() {
                         >
                           {tick.formattedValue}
                         </Text>
+                        )}
                       </Group>
                     );
                   })}
