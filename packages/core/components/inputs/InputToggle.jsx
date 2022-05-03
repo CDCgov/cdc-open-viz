@@ -40,7 +40,7 @@ const InputToggle = memo((
   }, [ stateValue ])
 
   useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value) {
+    if (stateValue !== undefined && stateValue !== value && updateField) {
       updateField(section, subsection, fieldName, value, i)
     }
   }, [ value ])
