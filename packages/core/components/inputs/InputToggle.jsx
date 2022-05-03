@@ -1,12 +1,12 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import '../../styles/v2/components/input.scss'
 
-const InputToggle = memo((
+const InputToggle = (
   {
     label,
-    toggleType = null,
+    toggleType = 'default',
     size = 'medium',
     activeColor = null,
     section = null,
@@ -64,7 +64,7 @@ const InputToggle = memo((
       </div>
     </div>
   )
-})
+}
 
 InputToggle.propTypes = {
   /** Add label to the input field */
