@@ -87,7 +87,7 @@ InputToggle.propTypes = {
   /** Key value of targeted config option */
   fieldName: PropTypes.string,
   /** Prop drill down of the updateField function */
-  updateField: 'updateField',
+  updateField: PropTypes.func,
   /** Current value of the input, usually the current config option value */
   stateValue: PropTypes.object
 }
