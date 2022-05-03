@@ -214,8 +214,8 @@ label {
         position: absolute;
         top: 0;
         left: 0;
-        width: calc(100% - 8px);
-        height: calc(100% - 8px);
+        width: calc(100% - 6px);
+        height: calc(100% - 6px);
         border: 1px solid #ececec;
         border-radius: 999px;
         margin: 3px;
@@ -284,8 +284,8 @@ label {
     .cove-input__toggle-button {
 
       &:after {
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
+        width: calc(100% - 8px);
+        height: calc(100% - 8px);
         margin: 4px;
       }
     }
