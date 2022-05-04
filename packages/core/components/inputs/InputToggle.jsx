@@ -25,11 +25,11 @@ const InputToggle = (
   let name = () => {
     let str = ''
     if (section)
-      str += `${section}-`
+      str += section + '-'
     if (subsection)
-      str += `${subsection}-`
+      str += subsection + '-'
     if (fieldName)
-      str += `${fieldName}`
+      str += fieldName
     return str
   }
 
@@ -61,7 +61,7 @@ const InputToggle = (
       <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (toggleTypeClass()) + (value ? ' active' : '')} onClick={() => setValue(!value)}>
         <div className="cove-input__toggle-button"/>
         <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
-        <input className="cove-input--hidden" type="checkbox" name={name} checked={value || false} readOnly/>
+        <input className="cove-input--hidden" type="checkbox" name={name()} checked={value || false} readOnly/>
       </div>
     </div>
   )
