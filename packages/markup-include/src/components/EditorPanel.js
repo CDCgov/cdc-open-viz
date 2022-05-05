@@ -173,43 +173,6 @@ const EditorPanel = memo((props) => {
                         value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
-
-                      <Tooltip position="top" trigger="click" border={false}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="right" trigger="click" border={'1'} borderColor={'red'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="bottom" trigger="click" shadow={false} border={'2'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="left" trigger="click" border={'2'} borderColor={'blue'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
                     </AccordionItemPanel>
                   </AccordionItem>
                   <AccordionItem>
