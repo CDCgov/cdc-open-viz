@@ -39,9 +39,9 @@ export default function DataImport() {
 
   const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
-  const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
-
   const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
+
+  const [ addingDataset, setAddingDataset ] = useState(true);
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -51,6 +51,18 @@ export default function DataImport() {
   const displayFileName = (name) => {
     const nameParts = name.split('/');
     return nameParts[nameParts.length - 1];
+  }
+
+  const displaySize = (size) => {
+    if(size > Math.pow(1024, 3)){
+      return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
+    } else if(size > Math.pow(1024, 2)){
+      return Math.round(size / Math.pow(1024, 2) * 100) / 100 + ' MB';
+    } else if(size > 1024){
+      return Math.round(size / 1024 * 100) / 100 + ' KB';
+    } else {
+      return size + ' B'
+    }
   }
 
   /**
