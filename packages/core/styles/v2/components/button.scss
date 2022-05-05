@@ -19,10 +19,6 @@
   user-select: none;
   cursor: pointer;
 
-  &.full-width {
-    width: 100%;
-  }
-
   &:hover {
     background-color: lighten($primary, 5%);
   }
@@ -42,6 +38,10 @@
     }
   }
 
+  &.fluid {
+    width: 100%;
+  }
+
   &.success {
     background-color: #44aa41;
 
@@ -58,7 +58,6 @@
     }
   }
 
-
   &.muted {
     background-color: #a0a0a0;
 
@@ -69,8 +68,6 @@
 }
 
 /* Old Styles ------------------------------------------
-*/
-
 .btn {
   display: block;
   padding: .4em .8em;
@@ -123,4 +120,4 @@
     top: 2px;
     margin-left: 5px;
   }
-}
+}*/
