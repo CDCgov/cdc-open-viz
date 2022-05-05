@@ -13,6 +13,7 @@ import parse from 'html-react-parser';
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -63,9 +64,8 @@ export default function CdcChart(
     let data = response.formattedData || response.data || {};
 
     if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
+      data = await fetchRemoteData(response.dataUrl);
 
-      data = await dataString.json();
       if(response.dataDescription) {
         data = transform.autoStandardize(data);
         data = transform.developerStandardize(data, response.dataDescription);

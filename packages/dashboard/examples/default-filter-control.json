@@ -70,7 +70,9 @@
 	"dashboard": {
 		"sharedFilters": [{
 			"key": "sharedFilter1",
-			"columnName": "state"
+			"columnName": "state",
+			"setBy": "map1",
+			"usedBy": ["chart1"]
 		}]
 	},
 	"rows": [

@@ -13,6 +13,7 @@ import parse from 'html-react-parser';
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 import CdcMap from '@cdc/map';
 import CdcChart from '@cdc/chart';
@@ -106,9 +107,7 @@ export default function CdcDashboard(
     let dataset = config.formattedData || config.data;
 
     if(!dataset && config.dataUrl) {
-      const dataString = await fetch(config.dataUrl);
-
-      dataset = await dataString.json();
+      dataset = await fetchRemoteData(config.dataUrl);
 
       if(data && config.dataDescription){
         try {
@@ -204,46 +203,27 @@ export default function CdcDashboard(
   const updateConfig = (newConfig, dataOverride = null) => {
     let newFilteredData = {};
 
-    // After data is grabbed, loop through and generate filter column values if there are any
-    if (newConfig.dashboard.filters) {
-      const filterList = [];
-
-      newConfig.dashboard.filters.forEach((filter) => {
-          filterList.push(filter.columnName);
-      });
-
-      filterList.forEach((filter, index) => {
-          const filterValues = generateValuesForFilter(filter, (dataOverride || data));
-
-          if(newConfig.dashboard.filters[index].order === 'asc'){
-            filterValues.sort();
-          }
-          if(newConfig.dashboard.filters[index].order === 'desc'){
-            filterValues.sort().reverse();
-          }
-
-          newConfig.dashboard.filters[index].values = filterValues;
-
-          // Initial filter should be active
-          newConfig.dashboard.filters[index].active = filterValues[0];
-      });
-
-      Object.keys(dataOverride || data).forEach(key => {
-        newFilteredData[key] = filterData(newConfig.dashboard.filters, (dataOverride || data)[key]);
-      });
-    }
-
-
     let visualizationKeys = Object.keys(newConfig.visualizations);
 
     if(newConfig.dashboard.sharedFilters) {
       newConfig.dashboard.sharedFilters.forEach((filter, i) => {
         for(let j = 0; j < visualizationKeys.length; j++){
           if(newConfig.visualizations[visualizationKeys[j]].setsSharedFilter === filter.key){
+            const filterValues = generateValuesForFilter(filter.columnName, (dataOverride || data));
+
+            if(newConfig.dashboard.sharedFilters[i].order === 'asc'){
+              filterValues.sort();
+            }
+            if(newConfig.dashboard.sharedFilters[i].order === 'desc'){
+              filterValues.sort().reverse();
+            }
+
+            newConfig.dashboard.sharedFilters[i].values = filterValues;
+
             newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName];
             break;
           }
-        }        
+        }    
       });
 
       visualizationKeys.forEach(visualizationKey => {
@@ -254,6 +234,7 @@ export default function CdcDashboard(
     }
 
     if(Object.keys(newFilteredData).length > 0) {
+
       setFilteredData(newFilteredData);
     }
 
@@ -279,6 +260,7 @@ export default function CdcDashboard(
     let updatedConfig = {...config}
 
     updatedConfig.visualizations[visualizationKey] = newConfig;
+    console.log('setConfig 3')
     setConfig(updatedConfig);
   };
 
@@ -286,13 +268,13 @@ export default function CdcDashboard(
     const changeFilterActive = (index, value) => {
       let dashboardConfig = {...config.dashboard};
 
-      dashboardConfig.filters[index].active = value;
+      dashboardConfig.sharedFilters[index].active = value;
 
       setConfig({...config, dashboard: dashboardConfig});
 
       let newFilteredData = {};
       Object.keys(data).forEach(key => {
-        newFilteredData[key] = filterData(dashboardConfig.filters, data[key]);
+        newFilteredData[key] = filterData(dashboardConfig.sharedFilters, data[key]);
       });
 
       setFilteredData(newFilteredData);
@@ -302,7 +284,9 @@ export default function CdcDashboard(
 
     };
 
-    return config.dashboard.filters.map((singleFilter, index) => {
+    return config.dashboard.sharedFilters.map((singleFilter, index) => {
+      if(!singleFilter.showDropdown) return;
+
       const values = [];
 
       singleFilter.values.forEach((filterOption, index) => {
@@ -315,7 +299,7 @@ export default function CdcDashboard(
 
       return (
         <section className="dashboard-filters-section" key={index}>
-          <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
+          <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
           <select
             id={`filter-${index}`}
             className="filter-select"
@@ -323,7 +307,7 @@ export default function CdcDashboard(
             value={singleFilter.active}
             onChange={(val) => {
               changeFilterActive(index, val.target.value);
-              announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
+              announceChange(`Filter ${singleFilter.key} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
             }}
           >
             {values}
@@ -418,7 +402,7 @@ export default function CdcDashboard(
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
-          {config.dashboard.filters && <Filters />}
+          {config.dashboard.sharedFilters && <Filters />}
 
           {/* Visualizations */}
           {config.rows && config.rows.map((row,index) => {

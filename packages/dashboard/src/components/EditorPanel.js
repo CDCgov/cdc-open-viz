@@ -14,6 +14,7 @@ import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 const Helper = ({text}) => {
   return (
@@ -164,6 +165,7 @@ const EditorPanel = memo(() => {
   };
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
+  const [ columns, setColumns ] = useState([]);
 
   // Used to pipe a JSON version of the config you are creating out
   const [ configData, setConfigData ] = useState({})
@@ -172,11 +174,33 @@ const EditorPanel = memo(() => {
     return null
   }
 
-  const getColumns = () => {
-    console.log(config);
+  useEffect(async () => {
+    let columns = {};
+    let dataKeys = Object.keys(config.datasets);
 
-    return []
-  }
+    for(let i = 0; i < dataKeys.length; i++){
+      if(!config.datasets[dataKeys[i]].data && config.datasets[dataKeys[i]].dataUrl){
+        console.log('here1');
+        config.datasets[dataKeys[i]].data = await fetchRemoteData(config.datasets[dataKeys[i]].dataUrl);
+        if(config.datasets[dataKeys[i]].dataDescription) {
+          try {
+            config.datasets[dataKeys[i]].data = transform.autoStandardize(config.datasets[dataKeys[i]].data);
+            config.datasets[dataKeys[i]].data = transform.developerStandardize(config.datasets[dataKeys[i]].data, config.datasets[dataKey].dataDescription);
+          } catch(e) {
+            //Data not able to be standardized, leave as is
+          }
+        }
+      }
+
+      if(config.datasets[dataKeys[i]].data) {
+        config.datasets[dataKeys[i]].data.map(row => {
+          Object.keys(row).forEach(columnName => columns[columnName] = true)
+        })
+      }
+    }
+
+    setColumns(Object.keys(columns))
+  }, [config.datasets]);
 
   const Error = () => {
     return (
@@ -228,7 +252,7 @@ const EditorPanel = memo(() => {
   const removeFilter = (index) => {
     let dashboardConfig = config.dashboard;
 
-    dashboardConfig.filters.splice(index, 1);
+    dashboardConfig.sharedFilters.splice(index, 1);
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
@@ -236,17 +260,60 @@ const EditorPanel = memo(() => {
   const updateFilterProp = (name, index, value) => {
     let dashboardConfig = config.dashboard;
 
-    dashboardConfig.filters[index][name] = value;
+    dashboardConfig.sharedFilters[index][name] = value;
 
     updateConfig({...config, dashboard: dashboardConfig});
+  }
+
+  const updateFilterSetBy = (filter, index, value) => {
+    let newVisualizations = {...config.visualizations};
+    Object.keys(newVisualizations).forEach(vizKey => {
+      if(newVisualizations[vizKey].setsSharedFilter === filter.key){
+        delete newVisualizations[vizKey].setsSharedFilter;
+      }
+    });
+
+    if(value) {
+      newVisualizations[value].setsSharedFilter = filter.key;
+    }
+
+    updateConfig({...config, visualizations: newVisualizations})
+    updateFilterProp('setBy', index, value)
+  }
+
+  const addFilterUsedBy = (filter, index, value) => {
+    let newVisualizations = {...config.visualizations};
+
+    newVisualizations[value].usesSharedFilter = filter.key;
+
+    updateConfig({...config, visualizations: newVisualizations});
+
+    if(!filter.usedBy) filter.usedBy = [];
+    filter.usedBy.push(value);
+    updateFilterProp('usedBy', index, filter.usedBy);
+  }
+
+  const removeFilterUsedBy = (filter, index, value) => {
+    let newVisualizations = {...config.visualizations};
+
+    delete newVisualizations[value].usesSharedFilter;
+
+    updateConfig({...config, visualizations: newVisualizations});
+    
+    let usedByIndex = filter.usedBy.indexOf(value);
+    if(usedByIndex !== -1){
+      filter.usedBy.splice(usedByIndex, 1);
+      updateFilterProp('usedBy', index, filter.usedBy);
+    }
+    
   }
 
   const addNewFilter = () => {
     let dashboardConfig = config.dashboard;
 
-    dashboardConfig.filters = dashboardConfig.filters || [];
+    dashboardConfig.sharedFilters = dashboardConfig.sharedFilters || [];
 
-    dashboardConfig.filters.push({values: []});
+    dashboardConfig.sharedFilters.push({key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1), values: []});
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
@@ -279,21 +346,48 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <ul className="filters-list">
-                    {config.dashboard.filters && config.dashboard.filters.map((filter, index) => (
+                    {config.dashboard.sharedFilters && config.dashboard.sharedFilters.map((filter, index) => (
                         <fieldset className="edit-block" key={filter.columnName + index}>
                           <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
                           <label>
                             <span className="edit-label column-heading">Filter</span>
                             <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
-                              {getColumns().map((dataKey) => (
+                              {columns.map((dataKey) => (
                                 <option value={dataKey} key={dataKey}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
                           <label>
                             <span className="edit-label column-heading">Label</span>
-                            <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
+                            <input type="text" value={filter.key} onChange={(e) => {updateFilterProp('key', index, e.target.value)}}/>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Show Dropdown</span>
+                            <input type="checkbox" value={filter.showDropdown === true} onChange={(e) => {updateFilterProp('showDropdown', index, !filter.showDropdown)}}/>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Set By:</span>
+                            <select value={filter.setBy} onChange={e => updateFilterSetBy(filter, index, e.target.value)}>
+                              <option value="">- Select Option -</option>
+                              {Object.keys(config.visualizations).map((vizKey) => (
+                                <option value={vizKey} key={vizKey}>{vizKey}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            <span className="edit-label column-heading">Used By:</span>
+                            <ul>
+                              {filter.usedBy && filter.usedBy.map(vizKey => (
+                                <li><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
+                              ))}
+                            </ul>
+                            <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
+                              <option value="">- Select Option -</option>
+                              {Object.keys(config.visualizations).map((vizKey) => config.visualizations[vizKey].usesSharedFilter ? <></> : (
+                                <option value={vizKey} key={vizKey}>{vizKey}</option>
+                              ))}
+                            </select>
                           </label>
                         </fieldset>
                       )

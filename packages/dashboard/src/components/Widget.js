@@ -175,7 +175,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
             <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
               <option value="">Select a dataset</option>
               {Object.keys(config.datasets).map(datasetKey => (
-                <option>{datasetKey}</option>
+                <option key={datasetKey}>{datasetKey}</option>
               ))}
             </select>
             <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
