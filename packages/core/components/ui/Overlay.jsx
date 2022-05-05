@@ -13,9 +13,11 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
   const [ overlayAnimationState, setOverlayAnimationState ] = useState(null)
   const [ overlayErrorState, setOverlayErrorState ] = useState(false)
 
+  const overlayDisplay = overlay?.show || override?.show
+
   //Animate In effect
   useEffect(() => {
-    if ((overlay && (overlay?.show === false)) || override?.showModal === false) return //Reject
+    if (overlayDisplay === false) return //Reject
 
     setDisplayOverlay(true)
     setOverlayAnimationState('animate-in')
@@ -25,12 +27,11 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
     }, 750)
 
     return () => clearTimeout(timeoutShow)
-  }, [ overlay?.show, override?.showModal ])
+  }, [ overlayDisplay ])
 
   //Animate Out effect
   useEffect(() => {
-    if ((overlay && (overlay?.show === true)) || override?.showModal === true) return //Reject
-    console.log('animate out')
+    if (overlayDisplay === true) return //Reject
 
     setOverlayAnimationState('animate-out')
 
@@ -40,11 +41,10 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
     }, 400)
 
     return () => clearTimeout(timeoutHide)
-  }, [ overlay?.show, override?.showModal ])
+  }, [ overlayDisplay ])
 
   //Error animate effect
   useEffect(() => {
-    console.log('animate in')
     if (overlayErrorState === false) return //Reject
 
     const timeoutHide = setTimeout(() => {
@@ -61,7 +61,10 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
       <div className={`cove-overlay ${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
         <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
              onClick={(e) =>
-               disableBgClose ? setOverlayErrorState(true) : overlay ? overlay.actions.toggleOverlay(false) : override ? override.toggleModal(false) : e.preventDefault()
+               disableBgClose ? setOverlayErrorState(true) :
+                 overlay ? overlay.actions.toggleOverlay(false) :
+                   override ? override.actions.toggleOverlay(false) :
+                     e.preventDefault()
              }
         />
         <div className="cove-overlay__wrapper">
