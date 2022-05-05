@@ -31,8 +31,8 @@ const Modal = ({
   const modalFooterChildren = childNodes.find(child => child?.type === ModalFooter)
 
   //Modal computed style options
-  const dividerBorder = (position) => {
-    return !position ? 'none' : null
+  const dividerBorder = (bool) => {
+    return !bool ? 'none' : null
   }
 
   //Render output
@@ -41,7 +41,7 @@ const Modal = ({
       {(showClose || modalHeaderChildren) &&
       <div className="cove-modal__header" style={{
         backgroundColor: headerBgColor,
-        boxShadow: dividerBorder(showDividerTop),
+        boxShadow: dividerBorder(modalHeaderChildren && showDividerTop),
         padding: !modalHeaderChildren ? '0' : null
       }}>
         {modalHeaderChildren && modalHeaderChildren.props.children}
