@@ -2,9 +2,12 @@ import React from 'react'
 
 import '../../styles/v2/components/button.scss'
 
-const Button = ({children, ...attributes}) => {
+const Button = ({ fullwidth, children, ...attributes }) => {
 
-  let attributesObj = {...attributes, className: 'cove-button ' + attributes.className }
+  let attributesObj = {
+    ...attributes,
+    className: 'cove-button' + (fullwidth ? ' full-width' : '') + (attributes.className ? ' ' + attributes.className : '')
+  }
 
   return (
     <button {...attributesObj}>{children}</button>
