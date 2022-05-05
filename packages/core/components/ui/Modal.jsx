@@ -18,7 +18,7 @@ const Modal = ({
                  showDividerBottom = true,
                  showClose = true,
                  children,
-                 overrideClose = null
+                 override = null
                }) => {
 
   //Access global overlay state
@@ -47,7 +47,7 @@ const Modal = ({
         {modalHeaderChildren && modalHeaderChildren.props.children}
         {showClose &&
         <button className="cove-modal--close"
-                onClick={(e) => overrideClose ? overrideClose : overlay ? overlay.actions.toggleOverlay(false) : e.preventDefault()}>
+                onClick={(e) => override ? override.actions.toggleOverlay(false) : overlay ? overlay?.actions.toggleOverlay(false) : e.preventDefault()}>
           <Icon display="close"/>
         </button>
         }
