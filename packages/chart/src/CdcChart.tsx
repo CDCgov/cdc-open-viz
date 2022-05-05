@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
 // IE11
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
@@ -20,10 +20,12 @@ import DataTable from './components/DataTable';
 import Context from './context';
 import defaults from './data/initial-state';
 
-import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
+import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
+import './scss/main.scss';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
@@ -47,7 +49,7 @@ export default function CdcChart(
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
- 
+  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
@@ -133,7 +135,7 @@ export default function CdcChart(
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
-          
+
           let filterValues = [];
 
           filterValues = generateValuesForFilter(filter.columnName, newExcludedData);
@@ -177,7 +179,7 @@ export default function CdcChart(
       });
     }
 
-    if (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -194,11 +196,13 @@ export default function CdcChart(
 
     let uniqueXValues = {};
 
-    for(let i = 0; i < currentData.length; i++) {
-      if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-        newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-      } else {
-        uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+    if(newConfig.visualizationType !== 'Paired Bar') {
+      for(let i = 0; i < currentData.length; i++) {
+        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+        } else {
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+        }
       }
     }
     setConfig(newConfig);
@@ -229,7 +233,7 @@ export default function CdcChart(
             values.push(value)
         }
     });
-    
+
     return values;
   }
 
@@ -282,6 +286,22 @@ export default function CdcChart(
   useEffect(() => {
     loadConfig();
   }, []);
+
+  // useEffect(() => {
+  //   if(config.visualizationType === 'Paired Bar') {
+  //     updateConfig({
+  //       ...config,
+  //       yAxis: {
+  //         ...config.yAxis,
+  //         hideAxis: true
+  //       },
+  //       xAxis: {
+  //         ...config.xAxis,
+  //         hideAxis: true
+  //       }
+  //     })
+  //   }
+  // }, [config.visualizationType]);
 
   // Load data when configObj data changes
   if(configObj){
@@ -411,6 +431,7 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
+    'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
@@ -421,7 +442,7 @@ export default function CdcChart(
   const Legend = () => {
 
     let containerClasses = ['legend-container']
-    let innerClasses = [];
+    let innerClasses = ['legend-container__inner'];
 
     if(config.legend.position === "left") {
       containerClasses.push('left')
@@ -433,7 +454,7 @@ export default function CdcChart(
     }
 
     return (
-      <div className={containerClasses.join(' ')}>
+      <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
         {legend.label && <h2>{legend.label}</h2>}
         <LegendOrdinal
         scale={colorScale}
@@ -463,8 +484,8 @@ export default function CdcChart(
 
                 return (
                   <LegendItem
-                    tabIndex={0}
                     className={className}
+                    tabIndex={0}
                     key={`legend-quantile-${i}`}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
@@ -486,7 +507,7 @@ export default function CdcChart(
             </div>
           )}
         </LegendOrdinal>
-      </div>
+      </aside>
     )
   }
 
@@ -511,7 +532,7 @@ export default function CdcChart(
         const sortAsc = (a, b) => {
           return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
         };
-        
+
         const sortDesc = (a, b) => {
           return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
         };
@@ -592,7 +613,10 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+            Skip Over Chart Container
+          </a>
           {/* Filters */}
           {config.filters && <Filters />}
           {/* Visualization */}
@@ -604,7 +628,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
         </div>}
       </>
     )

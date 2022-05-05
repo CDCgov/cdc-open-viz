@@ -263,11 +263,17 @@ const EditorPanel = () => {
   }
 
   const [ displayPanel, setDisplayPanel ] = useState(true);
-  const [ lollipopShape, setLollipopShape ] = useState(config.lollipopShape || 'circle')
-  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('saturated')
+  const [ lollipopColorStyle, setLollipopColorStyle ] = useState('two-tone')
 
   if(loading) {
     return null
+  }
+
+  const setLollipopShape = (shape) => {
+    updateConfig({
+      ...config,
+      lollipopShape: shape
+    })
   }
 
   const removeFilter = (index) => {
@@ -296,13 +302,13 @@ const EditorPanel = () => {
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [...config.series] : []
-
     newSeries.push({dataKey: seriesKey, type: 'Bar'})
-
     updateConfig({...config, series: newSeries})
   }
 
   const removeSeries = (seriesKey) => {
+
+
     let series = [...config.series]
     let seriesIndex = -1;
 
@@ -323,6 +329,13 @@ const EditorPanel = () => {
       }
 
       updateConfig(newConfig)
+    }
+
+    if(config.visualizationType === 'Paired Bar') {
+      updateConfig({
+        ...config,
+        series: []
+      })
     }
   }
 
@@ -362,9 +375,9 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    unfilteredData.map(row => {
-      Object.keys(row).forEach(columnName => columns[columnName] = true)
-    })
+      unfilteredData.map(row => {
+        Object.keys(row).forEach(columnName => columns[columnName] = true)
+      })
 
     if(filter) {
       let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
@@ -467,44 +480,11 @@ const EditorPanel = () => {
     if(config.visualizationSubType === 'horizontal') {
       updateConfig({
         ...config,
-        lollipopShape: lollipopShape
+        lollipopShape: config.lollipopShape
       })
     }
-  }, [config.isLollipopChart, lollipopShape]);
+  }, [config.isLollipopChart, config.lollipopShape]);
   
-  useEffect(() => {
-    if(config.isLollipopChart && config.visualizationSubType === 'horizontal') {
-      updateConfig({
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          hideAxis: false
-        },
-        xAxis: {
-          ...config.xAxis,
-          hideAxis: true
-        },
-        fontSize: "small"
-      })
-    }
-
-    if (config.isLollipopChart && config.visualizationSubType === 'regular') {
-      updateConfig({
-        ...config,
-        xAxis: {
-          ...config.xAxis,
-          hideAxis: false,
-          fontSize: "small"
-        },
-        yAxis: {
-          ...config.yAxis,
-          hideAxis: true,
-          fontSize: "small"
-        }
-      })
-    }
-  }, [config.visualizationSubType]);
-
   const ExclusionsList = useCallback(()=> {
     const exclusions = [...config.exclusions.keys]
     return (
@@ -574,12 +554,12 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo']} />
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
                   }
-                  { (showLollipopCheckbox() && false) &&
+                  { (showLollipopCheckbox()) &&
                     <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
                   {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&
@@ -598,11 +578,12 @@ const EditorPanel = () => {
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>
-                      Data Series {(!config.series || config.series.length === 0) && <WarningImage width="25" className="warning-icon" />}
+                      Data Series {((!config.series || config.series.length === 0) || (config.visualizationType === 'Paired Bar' && config.series.length < 2)) && <WarningImage width="25" className="warning-icon" />}
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {(!config.series || config.series.length === 0) && <p className="warning">At least one series is required</p>}
+                    {((!config.series || config.series.length === 0) && (config.visualizationType !== 'Paired Bar')) && <p className="warning">At least one series is required</p>}
+                    {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
                         <label><span className="edit-label">Displaying</span></label>
@@ -654,6 +635,7 @@ const EditorPanel = () => {
                           })}
                         </ul>
                       </>)}
+                      
                       <Select fieldName="visualizationType" label="Add Data Series" initial="Select" onChange={(e) => { if(e.target.value !== '' && e.target.value !== 'Select') { addNewSeries(e.target.value) } e.target.value = '' }} options={getColumns()} />
                       {config.series && config.series.length <= 1 && config.visualizationType === "Bar" && (
                         <>
@@ -796,7 +778,7 @@ const EditorPanel = () => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {config.visualizationType !== 'Pie' &&
+              { (config.visualizationType !== 'Pie' && config.visualizationType !== 'Paired Bar') &&
                 <AccordionItem>
                   <AccordionItemHeading>
                     <AccordionItemButton>
@@ -924,7 +906,7 @@ const EditorPanel = () => {
                               type="radio"
                               name="lollipopShape"
                               value="circle"
-                              checked={lollipopShape === "circle"}
+                              checked={config.lollipopShape === "circle"}
                             />
                             Circle
                           </label>
@@ -933,14 +915,14 @@ const EditorPanel = () => {
                               type="radio"
                               name="lollipopShape"
                               value="square"
-                              checked={lollipopShape === "square"}
+                              checked={config.lollipopShape === "square"}
                             />
                             Square
                           </label>
                         </div>
 
                       </label>
-                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'saturated' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'saturated']} />
+                      <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone' } fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={['regular', 'two-tone']} />
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small' } fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={['small', 'medium', 'large']} />
                     </>
                   }
