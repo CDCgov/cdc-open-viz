@@ -4,7 +4,6 @@ import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
 import ResizeObserver from 'resize-observer-polyfill';
-import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Context from './context';
@@ -13,6 +12,7 @@ import DataTransform from '@cdc/core/components/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 import { Fragment } from 'react';
 
 type DefaultsType = typeof defaults
@@ -56,44 +56,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         setCurrentViewport(newViewport)
     }
   });
-
-  const fetchRemoteData = async (url) => {
-    try {
-        const urlObj = new URL(url);
-        const regex = /(?:\.([^.]+))?$/
-
-        let data = []
-
-        const ext = (regex.exec(urlObj.pathname)[1])
-        if ('csv' === ext) {
-            data = await fetch(url)
-                .then(response => response.text())
-                .then(responseText => {
-                    const parsedCsv = Papa.parse(responseText, {
-                        header: true,
-                        dynamicTyping: true,
-                        skipEmptyLines: true
-                    })
-                    return parsedCsv.data
-                })
-        }
-
-        if ('json' === ext) {
-            data = await fetch(url)
-                .then(response => response.json())
-        }
-
-        return data;
-    } catch {
-        // If we can't parse it, still attempt to fetch it
-        try {
-            let response = await (await fetch(configUrl)).json()
-            return response
-        } catch {
-            console.error(`Cannot parse URL: ${url}`);
-        }
-    }
-  }
 
   const updateConfig = (newConfig) => {
     // Deeper copy

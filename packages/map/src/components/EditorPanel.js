@@ -1047,14 +1047,9 @@ const EditorPanel = (props) => {
 		const parsedData = convertStateToConfig();
 		const formattedData = JSON.stringify(parsedData, undefined, 2);
 
-		setConfigTextbox(formattedData);
-
-		// Pass up to Editor if needed
-		if (setParentConfig) {
-			const newConfig = convertStateToConfig();
-			setParentConfig(newConfig);
+		if(formattedData !== configTextboxValue) {
+			setConfigTextbox(formattedData);
 		}
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state]);
 

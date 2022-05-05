@@ -8,7 +8,6 @@ import ResizeObserver from 'resize-observer-polyfill';
 // Third party
 import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
-import Papa from 'papaparse';
 import parse from 'html-react-parser';
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas';
@@ -32,7 +31,8 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
-import numberFromString from '@cdc/core/helpers/numberFromString'
+import numberFromString from '@cdc/core/helpers/numberFromString';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 
 // Child Components
@@ -876,45 +876,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         setRuntimeLegend(newLegend)
     }
 
-    // Supports JSON or CSV
-    const fetchRemoteData = async (url) => {
-        try {
-            const urlObj = new URL(url);
-            const regex = /(?:\.([^.]+))?$/
-
-            let data = []
-
-            const ext = (regex.exec(urlObj.pathname)[1])
-            if ('csv' === ext) {
-                data = await fetch(url)
-                    .then(response => response.text())
-                    .then(responseText => {
-                        const parsedCsv = Papa.parse(responseText, {
-                            header: true,
-                            dynamicTyping: true,
-                            skipEmptyLines: true
-                        })
-                        return parsedCsv.data
-                    })
-            }
-
-            if ('json' === ext) {
-                data = await fetch(url)
-                    .then(response => response.json())
-            }
-
-            return data;
-        } catch {
-            // If we can't parse it, still attempt to fetch it
-            try {
-                let response = await (await fetch(configUrl)).json()
-                return response
-            } catch {
-                console.error(`Cannot parse URL: ${url}`);
-            }
-        }
-    }
-
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
@@ -966,7 +927,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const geoClickHandler = (key, value) => {
-        if(state.setsSharedFilter){
+        if(setSharedFilter && state.setsSharedFilter){
             setSharedFilter(state.setsSharedFilter, value);
         }
 
