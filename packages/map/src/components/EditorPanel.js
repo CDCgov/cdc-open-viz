@@ -24,7 +24,7 @@ import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE, useColorPalette } from '../hooks/useColorPalette';
+import { GET_PALETTE, NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE, useColorPalette } from '../hooks/useColorPalette';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -93,9 +93,7 @@ const EditorPanel = (props) => {
 		runtimeFilters,
 		runtimeLegend,
 	} = props;
-	const {state:colorState,handleSwitch} = useColorPalette(colorPalettes);
-	const {filteredPallets,filteredQualitative,isSequentialReversed,isNonSequentialReversed} =  colorState
-
+	
 	const { general, columns, legend, dataTable, tooltips } = state;
 
 	const [requiredColumns, setRequiredColumns] = useState(null); // Simple state so we know if we need more information before parsing the map
@@ -566,6 +564,25 @@ const EditorPanel = (props) => {
 				break;
 		}
 	};
+
+	
+	/// * ===============COLOR_PALETTS EDITOR ===========>
+	
+		const {state:colorState,handleSwitch,dispatch} = useColorPalette(colorPalettes);
+		const {filteredPallets,filteredQualitative,isSequentialReversed,isNonSequentialReversed} =  colorState
+	
+	useEffect(()=>{
+		if(state.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:state.color})
+	},[dispatch,state.color])
+
+	useEffect(()=>{
+		if(colorState.palletName) handleEditorChanges('color',colorState.palletName)
+	},[colorState.palletName])  // dont add handleEditorChanges as a dependency even if it requires
+
+	/// * ====================END-COLOR_PALLETS================================>
+
+
+	
 
 	const columnsRequiredChecker = useCallback(() => {
 		let columnList = [];
