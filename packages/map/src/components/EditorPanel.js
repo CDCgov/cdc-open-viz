@@ -93,7 +93,7 @@ const EditorPanel = (props) => {
 		runtimeFilters,
 		runtimeLegend,
 	} = props;
-	
+
 	const { general, columns, legend, dataTable, tooltips } = state;
 
 	const [requiredColumns, setRequiredColumns] = useState(null); // Simple state so we know if we need more information before parsing the map
@@ -565,12 +565,12 @@ const EditorPanel = (props) => {
 		}
 	};
 
-	
+
 	/// * ===============COLOR_PALETTS EDITOR ===========>
-	
+
 		const {state:colorState,handleSwitch,dispatch} = useColorPalette(colorPalettes);
 		const {filteredPallets,filteredQualitative,isSequentialReversed,isNonSequentialReversed} =  colorState
-	
+
 	useEffect(()=>{
 		if(state.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:state.color})
 	},[dispatch,state.color])
@@ -582,7 +582,7 @@ const EditorPanel = (props) => {
 	/// * ====================END-COLOR_PALLETS================================>
 
 
-	
+
 
 	const columnsRequiredChecker = useCallback(() => {
 		let columnList = [];
@@ -981,7 +981,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
-				
+
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
@@ -1029,7 +1029,7 @@ const EditorPanel = (props) => {
 						</Droppable>
 					</DragDropContext>
 				}
-				
+
 			</fieldset>
 		);
 	});
