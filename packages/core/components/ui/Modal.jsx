@@ -54,7 +54,7 @@ const Modal = ({
       </div>
       }
 
-      <div className="cove-modal__content" style={{ paddingTop: modalHeaderChildren ? null : '0' }}>
+      <div className="cove-modal__content">
         {modalContentChildren && modalContentChildren.props.children}
       </div>
 
