@@ -58,14 +58,22 @@ function reducer<T> (state:State,action:Action<T>):State{     // <T> refers to g
   }
 };
 
+interface Keyable {
+  color:string
+  general:{
+    palette:{
+      isReversed:boolean
+    }
+  }
+}
 
-
-export function useColorPalette<T>(colorPalettes:T){
+export function useColorPalette<T,Y extends Keyable>(colorPalettes:T,configState:Y){
   const [state, dispatch] = useReducer(reducer, initialState);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative} = state
 
-const handleSwitch = () => {
-    if(!state.isPaletteReversed){
+const handleSwitch = (isReversed:boolean) => {
+  console.log(isReversed,'JKHSKLJDNLKD')
+    if(isReversed){
       dispatch({ type: SEQUENTIAL_REVERSE, payload: colorPalettes });
      
     }else{
@@ -77,6 +85,20 @@ const handleSwitch = () => {
   useEffect(() => {
    dispatch({ type: SEQUENTIAL, payload: colorPalettes });
   }, []);
+
+
+  useEffect(()=>{
+		if(configState.general.palette.isReversed){
+			dispatch({ type: "SEQUENTIAL_REVERSE", payload: colorPalettes });
+		}
+    return ()=>	dispatch({ type: "SEQUENTIAL", payload: colorPalettes });
+	
+	},[configState.general.palette.isReversed,dispatch,colorPalettes])
+
+	useEffect(()=>{
+		if(configState.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:configState.color})
+	},[dispatch,configState.color])
+
 
     return {paletteName,isPaletteReversed,filteredPallets,filteredQualitative, handleSwitch,dispatch}
 }
