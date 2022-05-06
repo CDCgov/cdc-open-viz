@@ -26,6 +26,7 @@ import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 import { supportedStatesFipsCodes } from '../data/supported-geos';
 import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+import InputToggle from '@cdc/core/components/inputs/InputToggle';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -2006,7 +2007,8 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<InputCheckbox section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+									{/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
+									<InputToggle type='3d' section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
 										<span>Sequential</span>
 									<ul className='color-palette'>
 										{filteredPallets
