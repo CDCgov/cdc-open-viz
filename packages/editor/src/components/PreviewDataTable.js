@@ -10,8 +10,11 @@ import {
 import GlobalState from '../context';
 import { useDebounce } from 'use-debounce';
 
+// Core
+import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength';
+
 const TableFilter = memo(({globalFilter, setGlobalFilter, disabled = false}) => {
-  const [filterValue, setFilterValue] = useState(globalFilter);
+  const [filterValue, setFilterValue ] = useState(globalFilter);
 
   const [ debouncedValue ] = useDebounce(filterValue, 200);
 
@@ -62,7 +65,7 @@ const Footer = memo(({previousPage, nextPage, canPreviousPage, canNextPage, page
 
 const PreviewDataTable = ({ data }) => {
   const [tableData, setTableData] = useState(data ?? []);
-  const {setErrors, errorMessages} = useContext(GlobalState);
+  const {setErrors, errorMessages, config} = useContext(GlobalState);
 
   const tableColumns = useMemo(() => {
     const columns = tableData.columns ?? [];
@@ -113,7 +116,7 @@ const PreviewDataTable = ({ data }) => {
     let newData = [...data];
 
     newData = generateColumns(newData);
-
+    validateFipsCodeLength(newData)
     setTableData(newData)
   }, [data, generateColumns])
 

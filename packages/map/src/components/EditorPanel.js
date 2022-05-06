@@ -1043,16 +1043,6 @@ const EditorPanel = (props) => {
 		});
 	}
 
-	useEffect(() => {
-		const parsedData = convertStateToConfig();
-		const formattedData = JSON.stringify(parsedData, undefined, 2);
-
-		if(formattedData !== configTextboxValue) {
-			setConfigTextbox(formattedData);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [state]);
-
 	let numberOfItemsLimit = 8;
 
 	const getItemStyle = (isDragging, draggableStyle) => ({
