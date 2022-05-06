@@ -180,7 +180,6 @@ const EditorPanel = memo(() => {
 
     for(let i = 0; i < dataKeys.length; i++){
       if(!config.datasets[dataKeys[i]].data && config.datasets[dataKeys[i]].dataUrl){
-        console.log('here1');
         config.datasets[dataKeys[i]].data = await fetchRemoteData(config.datasets[dataKeys[i]].dataUrl);
         if(config.datasets[dataKeys[i]].dataDescription) {
           try {
@@ -321,7 +320,7 @@ const EditorPanel = memo(() => {
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => {console.log(config);updateConfig({...config, editing: false}); setDisplayPanel(!displayPanel)} }></button>
+      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => {updateConfig({...config, editing: false}); setDisplayPanel(!displayPanel)} }></button>
       <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
         <div className="heading-2">Configure</div>
         <section className="form-container">
