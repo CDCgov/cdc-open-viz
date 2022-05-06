@@ -2011,7 +2011,7 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<InputCheckbox section='palette'  size='small' label='Use selected palette in reverse order' handleSwitch={()=>handleSwitch()}  updateField={updateField}  value={isPaletteReversed} />
+									<InputCheckbox section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
 										<span>Sequential</span>
 									<ul className='color-palette'>
 										{filteredPallets
