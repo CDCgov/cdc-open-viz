@@ -109,7 +109,7 @@ const EditorPanel = (props) => {
 
 	const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0]);
 
-	const {handleSwitch,dispatch,filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes);
+	const {handleSwitch,dispatch,filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
 
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
