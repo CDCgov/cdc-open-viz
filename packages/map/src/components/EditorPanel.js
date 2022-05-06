@@ -109,6 +109,9 @@ const EditorPanel = (props) => {
 
 	const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0]);
 
+	const {handleSwitch,dispatch,filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes);
+
+
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
 	const headerColors = [
@@ -567,20 +570,6 @@ const EditorPanel = (props) => {
 	};
 
 
-	/// * ===============COLOR_PALETTS EDITOR ===========>
-
-		const {state:colorState,handleSwitch,dispatch} = useColorPalette(colorPalettes);
-		const {filteredPallets,filteredQualitative,isSequentialReversed,isNonSequentialReversed} =  colorState
-
-	useEffect(()=>{
-		if(state.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:state.color})
-	},[dispatch,state.color])
-
-	useEffect(()=>{
-		if(colorState.palletName) handleEditorChanges('color',colorState.palletName)
-	},[colorState.palletName])  // dont add handleEditorChanges as a dependency even if it requires
-
-	/// * ====================END-COLOR_PALLETS================================>
 
 
 
@@ -1063,6 +1052,17 @@ const EditorPanel = (props) => {
 			});
 		});
 	}
+
+
+
+
+	useEffect(()=>{
+		if(paletteName) handleEditorChanges('color',paletteName)
+	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
+
+	useEffect(()=>{
+		if(state.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:state.color})
+	},[dispatch,state.color])
 
 	// useEffect(() => {
 	// 	const parsedData = convertStateToConfig();
@@ -2011,7 +2011,8 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<label> <span style= { !isSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >Sequential</span> <input onChange={()=>handleSwitch(SEQUENTIAL_REVERSE)} type='checkbox' checked={isSequentialReversed} /> <span style={isSequentialReversed ? {color:"red",fontWeight:600 }:{color:'black',fontWeight:400} } >reverse Sequential</span>  </label>
+									<InputCheckbox section='palette'  size='small' label='Use selected palette in reverse order' handleSwitch={()=>handleSwitch()}  updateField={updateField}  value={isPaletteReversed} />
+										<span>Sequential</span>
 									<ul className='color-palette'>
 										{filteredPallets
 											.map((palette) => {
@@ -2043,7 +2044,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<label> <span style= { !isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}>Non Sequential</span> <input onChange={()=>handleSwitch(NON_SEQUENTIAL_REVERSE)} type='checkbox' checked={isNonSequentialReversed} /> <span  style= { isNonSequentialReversed ? { color:'red',fontWeight:600 } :{color:"black",fontWeight:400 }}   >reverse non Sequential</span>  </label>
+									<span>Non-Sequential</span>
 									<ul className='color-palette'>
 										{filteredQualitative
 											.map((palette) => {
