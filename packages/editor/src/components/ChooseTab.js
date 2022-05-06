@@ -82,11 +82,11 @@ export default function ChooseTab() {
                 <li><IconButton label="Bar" type="chart" subType="Bar" icon={ <BarIcon /> } /></li>
                 <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
                 <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
-                {/* <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={ <PairedBarIcon /> } /></li> */}
+                <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={ <PairedBarIcon /> } /></li>
             </ul>
             <div className="heading-2">Maps</div>
             <ul className="grid">
-                <li><IconButton label="U.S. State- or County-Level" type="map" subType="us" icon={ <UsaIcon /> } /></li>
+                <li><IconButton label="United States (State- or County-Level)" type="map" subType="us" icon={ <UsaIcon /> } /></li>
                 <li><IconButton label="World" type="map" subType="world" icon={ <GlobeIcon /> } /></li>
                 <li><IconButton label="U.S. State" type="map" subType="single-state" icon={ <AlabamaGraphic /> } /></li>
             </ul>
