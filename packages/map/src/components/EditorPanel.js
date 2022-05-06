@@ -1054,15 +1054,10 @@ const EditorPanel = (props) => {
 	}
 
 
-
-
 	useEffect(()=>{
 		if(paletteName) handleEditorChanges('color',paletteName)
 	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
-
-	useEffect(()=>{
-		if(state.color) dispatch({type:GET_PALETTE,payload:colorPalettes,paletteName:state.color})
-	},[dispatch,state.color])
+	
 
 	// useEffect(() => {
 	// 	const parsedData = convertStateToConfig();
