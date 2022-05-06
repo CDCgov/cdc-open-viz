@@ -130,7 +130,7 @@ label {
   pointer-events: none;
 }
 
-.cove-input__toggle {
+.cove-input__slider {
   display: inline-block;
   position: relative;
   width: 60px;
@@ -139,43 +139,43 @@ label {
   cursor: pointer;
 
   &.active {
-    .cove-input__toggle-button {
+    .cove-input__slider-button {
       left: 100%;
       transform: translateX(-100%);
     }
 
-    .cove-input__toggle-track {
+    .cove-input__slider-track {
       background-color: #75b936;
     }
   }
 
-  &.toggle--block {
+  &.slider--block {
     width: unset;
     aspect-ratio: 1.85/1;
     padding: 4px;
 
-    .cove-input__toggle-button {
+    .cove-input__slider-button {
       border-radius: 10%;
       box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
     }
 
-    .cove-input__toggle-track {
+    .cove-input__slider-track {
       border-radius: 4px;
       box-shadow: 0 0 0 transparent;
     }
 
     &.active {
-      .cove-input__toggle-track {
+      .cove-input__slider-track {
         box-shadow: inset -40px 0 10px -10px rgb(0 0 0 / 15%);
       }
     }
   }
 
-  &.toggle--pill {
+  &.slider--pill {
     width: 60px;
     height: 25px;
 
-    .cove-input__toggle-button {
+    .cove-input__slider-button {
       border-radius: 999px;
       aspect-ratio: 1.75/1;
 
@@ -200,8 +200,8 @@ label {
     }
   }
 
-  &.toggle--3d {
-    .cove-input__toggle-button {
+  &.slider--3d {
+    .cove-input__slider-button {
       background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 1) 45%, rgb(200 200 200) 100%);
       box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;
       height: 160%;
@@ -222,32 +222,32 @@ label {
       }
     }
 
-    .cove-input__toggle-track {
+    .cove-input__slider-track {
       box-shadow: inset 1px 1px 3px rgb(0 0 0 / 40%)
     }
 
     &.active {
-      .cove-input__toggle-button {
+      .cove-input__slider-button {
         transform: translateX(-80%);
       }
 
-      .cove-input__toggle-track {
+      .cove-input__slider-track {
         box-shadow: inset 1px 1px 3px rgb(0 0 0 / 60%)
       }
     }
   }
 }
 
-.cove-input__toggle--small {
-  @extend .cove-input__toggle;
+.cove-input__slider--small {
+  @extend .cove-input__slider;
   width: 40px;
   height: 20px;
 
-  &.toggle--pill {
+  &.slider--pill {
     width: 45px;
     height: 20px;
 
-    .cove-input__toggle-button {
+    .cove-input__slider-button {
       aspect-ratio: 1.5/1;
 
       &:before,
@@ -257,8 +257,8 @@ label {
     }
   }
 
-  &.toggle--3d {
-    .cove-input__toggle-button {
+  &.slider--3d {
+    .cove-input__slider-button {
       box-shadow: 0 1px 2px 2px rgb(0 0 0 / 22%), inset 0 0 3px 2px #fff;
 
       &:after {
@@ -270,18 +270,18 @@ label {
   }
 }
 
-.cove-input__toggle--large {
-  @extend .cove-input__toggle;
+.cove-input__slider--large {
+  @extend .cove-input__slider;
   width: 80px;
   height: 35px;
 
-  &.toggle--pill {
+  &.slider--pill {
     width: 80px;
     height: 30px;
   }
 
-  &.toggle--3d {
-    .cove-input__toggle-button {
+  &.slider--3d {
+    .cove-input__slider-button {
 
       &:after {
         width: calc(100% - 8px);
@@ -292,7 +292,7 @@ label {
   }
 }
 
-.cove-input__toggle-button {
+.cove-input__slider-button {
   position: relative;
   left: 0;
   height: 100%;
@@ -304,7 +304,7 @@ label {
   z-index: 2;
 }
 
-.cove-input__toggle-track {
+.cove-input__slider-track {
   position: absolute;
   top: 0;
   left: 0;
