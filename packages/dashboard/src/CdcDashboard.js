@@ -260,7 +260,7 @@ export default function CdcDashboard(
     let updatedConfig = {...config}
 
     updatedConfig.visualizations[visualizationKey] = newConfig;
-    console.log('setConfig 3')
+    
     setConfig(updatedConfig);
   };
 
