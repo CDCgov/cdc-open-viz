@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import LoadSpin from '../ui/LoadSpin'
 
 import '../../styles/v2/components/button.scss'
 
-const Button = ({ fluid = false, hoverStyle = {}, children, ...attributes }) => {
+const Button = ({ fluid = false, hoverStyle = {}, loading = false, children, ...attributes }) => {
   const [ customStyles, setCustomStyles ] = useState({...attributes.style})
 
   let attributesObj = {
@@ -24,7 +25,7 @@ const Button = ({ fluid = false, hoverStyle = {}, children, ...attributes }) => 
             style={customStyles}
             onMouseOver={()=>setStyles('in')}
             onMouseOut={()=>setStyles('out')}>
-      {children}
+      {loading ? <LoadSpin opacity={80} size={20}/> : children}
     </button>
   )
 }
