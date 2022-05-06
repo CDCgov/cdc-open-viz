@@ -24,7 +24,8 @@ import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE, NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE, useColorPalette } from '../hooks/useColorPalette';
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
