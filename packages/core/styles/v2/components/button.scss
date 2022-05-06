@@ -5,11 +5,14 @@
   display: inline-block;
   position: relative;
   min-width: 6rem;
-  padding: 0.75em 1.125em;
+  padding: 0.375rem 0.75rem;
   margin-right: 0.5rem;
   margin-bottom: 1rem;
   margin-left: 0.5rem;
   font-size: 1rem;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
   color: #fff;
   background-color: $primary;
   border-radius: .3125em;
@@ -17,7 +20,10 @@
   transition: all 500ms $transition-expo-out;
   transition-property: background-color, box-shadow;
   user-select: none;
-  cursor: pointer;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
 
   &:hover {
     background-color: lighten($primary, 5%);
@@ -40,6 +46,8 @@
 
   &.fluid {
     width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   &.success {
