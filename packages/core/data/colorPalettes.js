@@ -1,4 +1,4 @@
-import { updatePaletteNames } from "../helpers/updatePaletteNames";
+import { updatePaletteNames} from "../helpers/updatePaletteNames";
 
 const colorPalettesMap = {
   yelloworangered: [
@@ -102,19 +102,7 @@ const colorPalettesMap = {
     '#15017A',
     '#C2C0FC',
   ],
-  qualitative1reverse: [
-    '#C2C0FC',
-    '#15017A',
-    '#6a3d9a',
-    '#cab2d6',
-    '#fb9a99',
-    '#e31a1c',
-    '#b2df8a',
-    '#33a02c',
-    '#6a3d9a',
-    '#1f78b4',
-    '#a6cee3',
-  ],
+ 
   qualitative2: [
     '#7fc97f',
     '#beaed4',
@@ -125,16 +113,7 @@ const colorPalettesMap = {
     '#666',
     '#fedab8',
   ],
-  qualitative2reverse: [
-    '#fedab8',
-    '#bf5b17',
-    '#666',
-    '#386cb0',
-    '#f0027f',
-    '#beaed4',
-    '#ff9',
-    '#7fc97f',
-  ],
+ 
   qualitative3: [
     '#1b9e77',
     '#d95f02',
@@ -145,16 +124,7 @@ const colorPalettesMap = {
     '#a6761d',
     '#666',
   ],
-  qualitative3reverse: [
-    '#d95f02',
-    '#e7298a',
-    '#a6761d',
-    '#e6ab02',
-    '#66a61e',
-    '#1b9e77',
-    '#7570b3',
-    '#666',
-  ],
+ 
   qualitative4: [
     '#e41a1c',
     '#377eb8',
@@ -165,16 +135,7 @@ const colorPalettesMap = {
     '#a65628',
     '#f781bf',
   ],
-  qualitative4reverse: [
-    '#e41a1c',
-    '#377eb8',
-    '#a65628',
-    '#984ea3',
-    '#ff7f00',
-    '#ff3',
-    '#4daf4a',
-    '#f781bf',
-  ],
+ 
   qualitative9: [
     '#497d0c',
     '#84BC49',
@@ -200,17 +161,7 @@ const colorPalettes2 = {
     '#f781bf',
     '#3399CC',
   ],
-  'qualitative-bold-reverse': [
-    '#377eb8',
-    '#ff7f00',
-    '#a65628',
-    '#984ea3',
-    '#e41a1c',
-    '#ffff33',
-    '#4daf4a',
-    '#f781bf',
-    '#3399CC',
-  ],
+ 
   'qualitative-soft': [
     '#A6CEE3',
     '#1F78B4',
@@ -222,17 +173,7 @@ const colorPalettes2 = {
     '#FF7F00',
     '#ACA9EB',
   ],
-  'qualitative-soft-reverse': [
-    '#A6CEE3',
-    '#1F78B4',
-    '#FDBF6F',
-    '#33A02C',
-    '#FB9A99',
-    '#E31A1C',
-    '#B2DF8A',
-    '#FF7F00',
-    '#ACA9EB',
-  ],
+
   'sequential-blue': [
     '#C6DBEF',
     '#9ECAE1',
@@ -252,6 +193,6 @@ const colorPalettes2 = {
   ],
 };
 
-export const colorPalettesChart = Object.assign(updatePaletteNames(colorPalettes2),colorPalettes2);
-const colorPalettes = Object.assign( updatePaletteNames(colorPalettesMap),colorPalettesMap);
+export const colorPalettesChart = updatePaletteNames(colorPalettes2)  // adds reverse keyword to eact palette
+const colorPalettes = updatePaletteNames(colorPalettesMap)   // adds reverse keyword to eact palette
 export default colorPalettes;
