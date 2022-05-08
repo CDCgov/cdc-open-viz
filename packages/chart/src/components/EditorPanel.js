@@ -20,7 +20,9 @@ import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
-import useColorPallete, { NON_SEQUENTIAL_REVERSE, SEQUENTIAL_REVERSE } from '../hooks/useColorPalette';
+import {useColorPalette} from '../hooks/useColorPalette';
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+import InputToggle from '@cdc/core/components/inputs/InputToggle';
 
 const Helper = ({text}) => {
   return (
@@ -949,11 +951,34 @@ const EditorPanel = () => {
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
-                  <label>  
-                  <span >Non-Sequential</span>
-                  <input type='checkbox' checked={isNonSequentialReversed} onChange={()=>handleSwitch(NON_SEQUENTIAL_REVERSE)} />
-                  <span >Non-Sequential-reverse</span>
-                  </label>
+                  {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
+                  <InputToggle fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+                  <span>Sequential</span>
+                  <ul className="color-palette">
+                    {filteredPallets.map( (palette) => {
+
+                      const colorOne = {
+                        backgroundColor: colorPalettes[palette][2]
+                      }
+
+                      const colorTwo = {
+                        backgroundColor: colorPalettes[palette][3]
+                      }
+
+                      const colorThree = {
+                        backgroundColor: colorPalettes[palette][5]
+                      }
+
+                      return (
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <span style={colorOne}></span>
+                          <span style={colorTwo}></span>
+                          <span style={colorThree}></span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <span>Non-Sequential</span>
                   <ul className="color-palette">
                     {filteredQualitative.map( (palette) => {
 
@@ -969,34 +994,6 @@ const EditorPanel = () => {
                         backgroundColor: colorPalettes[palette][6]
                       }
 
-                      return (
-                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                  <label>  
-                  <span >Sequential</span>
-                  <input type='checkbox' checked={isSequentialReversed} onChange={()=>handleSwitch(SEQUENTIAL_REVERSE)} />
-                  <span >Sequential-reverse</span>
-                  </label>
-                  <ul className="color-palette">
-                    {filteredSequential.map( (palette) => {
-
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
-
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][3]
-                      }
-
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][5]
-                      }
 
                       return (
                         <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
