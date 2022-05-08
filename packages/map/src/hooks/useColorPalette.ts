@@ -92,5 +92,5 @@ export function useColorPalette<T,Y extends Keyable>(colorPalettes:T,configState
 	},[dispatch,configState.color])
 
 
-    return {paletteName,isPaletteReversed,filteredPallets,filteredQualitative, handleSwitch,dispatch}
+    return {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch}
 }
