@@ -71,15 +71,7 @@ export function useColorPalette<T,Y extends Keyable>(colorPalettes:T,configState
   const [state, dispatch] = useReducer(reducer, initialState);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative} = state
 
-const handleSwitch = (isReversed:boolean) => {
-  console.log(isReversed,'JKHSKLJDNLKD')
-    if(isReversed){
-      dispatch({ type: SEQUENTIAL_REVERSE, payload: colorPalettes });
-     
-    }else{
-      dispatch({ type: SEQUENTIAL, payload: colorPalettes });
-    }
-};
+
 
 
   useEffect(() => {
