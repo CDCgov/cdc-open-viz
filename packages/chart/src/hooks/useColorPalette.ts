@@ -1,101 +1,83 @@
 import { useEffect, useReducer } from 'react';
-// create constants 
-const SEQUENTIAL = "SEQUENTIAL";
-export const SEQUENTIAL_REVERSE ='SEQUENTIAL_REVERSE';
-const NON_SEQUENTIAL = "NON_SEQUENTIAL";
-export const NON_SEQUENTIAL_REVERSE = "NON_SEQUENTIAL_REVERSE";
 
-// state interface
+// constants 
+const SEQUENTIAL = 'SEQUENTIAL';
+const SEQUENTIAL_REVERSE = 'SEQUENTIAL_REVERSE';  
+export const GET_PALETTE = 'GET_PALETTE';
+
+
+//  types & interfaces 
 interface State {
-    readonly isSequentialReversed: boolean;
-     readonly isNonSequentialReversed: boolean;
-     readonly filteredSequential:any[];
-     readonly filteredQualitative: any[];
-  }
-  // custom type
-  type Case = "SEQUENTIAL_REVERSE"|"NON_SEQUENTIAL_REVERSE";
-  // action type
-  interface Action<Pallets> {
-   readonly type:
-      | "SEQUENTIAL" 
-      | "SEQUENTIAL_REVERSE"
-      | "NON_SEQUENTIAL"
-      | "NON_SEQUENTIAL_REVERSE"
-    payload: Pallets ;
-  }
-  
-  const initialState: State = {
-    isNonSequentialReversed: false,
-    isSequentialReversed: false,
-    filteredSequential: [],
-    filteredQualitative: [],
+    readonly filteredPallets:string[]
+    readonly filteredQualitative:string[]
+    readonly isPaletteReversed:boolean;
+    paletteName:string|undefined
+   }
+   interface Action<Palettes> {
+    type:
+      | 'SEQUENTIAL'
+      | 'SEQUENTIAL_REVERSE'
+      | 'GET_PALETTE'
+    payload: Palettes;
+    paletteName?:string
   };
-  
-  // reducer func ll handle 4 different state changes
-  function reducer<T>(state: State, action: Action<T>): State {
-    const colorNamesArr = Object.keys(action.payload); // action.payload ===colorPalletes object;
-    let reverseRegex = new RegExp('reverse$'); // matches a string that ends in with "reverse".
-    let sequentialRegex = new RegExp('^sequential'); //matches any string that starts with "sequential".
-    let qualitativeRegex = new RegExp('^qualitative'); //matches any string that starts with "qualitative".
-       
-    switch (action.type) {
-      case SEQUENTIAL:
-        const sequential: string[] = colorNamesArr.filter((name: string) =>name.match(sequentialRegex) && !name.match(reverseRegex));
-        return {...state,filteredSequential: sequential,isSequentialReversed:false};
-      case SEQUENTIAL_REVERSE:
-        const sequantialReversed: string[] = colorNamesArr.filter((name: string) =>!name.match(qualitativeRegex) && name.match(reverseRegex));
-        return {...state,isSequentialReversed: true,filteredSequential: sequantialReversed};
-      case NON_SEQUENTIAL:
-          const qualitative = colorNamesArr.filter((name:string)=>name.match(qualitativeRegex) && !name.match(reverseRegex) )
-        return { ...state, isNonSequentialReversed: false,filteredQualitative:qualitative };
-      case NON_SEQUENTIAL_REVERSE:
-          const qualitativeReverse = colorNamesArr.filter((name:string)=>!name.match(sequentialRegex) && name.match(reverseRegex) )
-  
-        return { ...state, isNonSequentialReversed: true,filteredQualitative:qualitativeReverse };
-      default:
-        return state;
-    }
-  }
-  
-  const useColorPallete = <T>(colorPalettes:T) => {
-   
-    const [state, dispatch] = useReducer(reducer, initialState);
-  
-    const handleSwitch = (caseValue: Case): void => {
-        // this function will hand;le 4 state changes and ll be mounted in 2 different switch toogle bar. 
-        if(caseValue === undefined || caseValue === null ){
-            console.error('Enter valid arguments to handleSwitch function')
-            return ;
-        };
-    
-        if(caseValue === "SEQUENTIAL_REVERSE"){
-            if (state.isSequentialReversed) {
-                dispatch({ type: SEQUENTIAL, payload: colorPalettes });
-            } else {
-                dispatch({ type: SEQUENTIAL_REVERSE, payload: colorPalettes });
-              };
-          }
-    
-        if (caseValue === "NON_SEQUENTIAL_REVERSE") {
-          if (state.isNonSequentialReversed) {
-            dispatch({type: NON_SEQUENTIAL, payload: colorPalettes});
 
-              
-            } else {
-            dispatch({type: NON_SEQUENTIAL_REVERSE, payload: colorPalettes});
-          }
-        }
-        
-      };
-      
-    
-      // effect ll run on first render off the page
-    
-      useEffect(() => {
-        dispatch({ type: SEQUENTIAL, payload: colorPalettes });
-        dispatch({ type: NON_SEQUENTIAL, payload: colorPalettes });
-      }, []);
-      // when importing state destructure  all states from it.
-      return { state, handleSwitch };
+// create initial state
+const initialState:State = {
+    filteredPallets: [],
+    isPaletteReversed:false,
+    filteredQualitative: [],
+    paletteName:undefined
   };
-  export default useColorPallete;
+
+function reducer<T> (state:State,action:Action<T>):State{     // <T> refers to generic type
+  const palletNamesArr:string[] = Object.keys(action.payload); // action.payload === colorPalettes object
+  let paletteName:string ='';
+  switch(action.type){
+    case GET_PALETTE:
+    
+      return {...state,paletteName:action.paletteName}
+      case SEQUENTIAL:
+        paletteName = state.paletteName &&  state.paletteName.endsWith('reverse') ? String(state.paletteName).substring(0,state.paletteName.length-7) :String(state.paletteName)
+        const qualitative = palletNamesArr.filter((name:string)=>String(name).startsWith('qualitative') && !String(name).endsWith('reverse'))
+        const sequential = palletNamesArr.filter((name:string)=>String(name).startsWith('sequential') && !String(name).endsWith('reverse'))
+       return { ...state, filteredPallets: sequential,filteredQualitative:qualitative, paletteName:paletteName,isPaletteReversed:false};
+
+     case SEQUENTIAL_REVERSE:
+        paletteName = palletNamesArr.find((name:string)=> name === String(state.paletteName).concat('reverse') || name === String(state.paletteName).concat('-reverse') )
+        const qualitativeReverse:string[] = palletNamesArr.filter((name:string)=>String(name).startsWith('qualitative') && String(name).endsWith('reverse'));
+        const sequentialReverse:string[] = palletNamesArr.filter((name:string)=>String(name).startsWith('sequential')  && String(name).endsWith('reverse'));
+        return { ...state, filteredQualitative:qualitativeReverse, filteredPallets: sequentialReverse ,paletteName:paletteName,isPaletteReversed:true};
+      default : return state;
+  }
+};
+
+interface Keyable {
+  palette:string
+  isPaletteReversed:boolean
+}
+function init(initialState){
+  return initialState
+}
+
+export function useColorPalette<T,Y extends Keyable>(colorPalettes:T,configState:Y){
+  const [state, dispatch] = useReducer(reducer, initialState,init);
+  const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative} = state
+
+
+
+
+  useEffect(() => {
+    dispatch({ type: SEQUENTIAL, payload: colorPalettes });
+   }, []);
+
+
+  useEffect(()=>{
+		if(configState.isPaletteReversed){
+			dispatch({ type: "SEQUENTIAL_REVERSE", payload: colorPalettes });
+     return ()=> dispatch({ type: "SEQUENTIAL", payload: colorPalettes });
+    }
+	},[configState.isPaletteReversed,dispatch,colorPalettes])
+
+    return {paletteName,isPaletteReversed,filteredPallets,filteredQualitative, dispatch}
+}
