@@ -27,7 +27,7 @@
     "@cdc/map": "^2.6.2",
     "axios": "^0.21.1",
     "d3": "^7.0.0",
-    "html-react-parser": "^0.14.0",
+    "html-react-parser": "1.4.9",
     "react-dropzone": "^11.2.4",
     "react-table": "^7.6.2",
     "use-debounce": "^5.2.0",
