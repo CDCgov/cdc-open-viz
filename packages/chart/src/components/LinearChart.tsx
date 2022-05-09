@@ -137,8 +137,7 @@ export default function LinearChart() {
     ReactTooltip.rebuild();
   });
 
-
-  return (
+  return isNaN(width) ? <></> : (
     <ErrorBoundary component="LinearChart">
       <svg width={width} height={height} className="linear">
           {/* Higlighted regions */}
