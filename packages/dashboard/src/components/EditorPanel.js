@@ -92,23 +92,6 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   </label>
 ))
 
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
-
-  if(initialValue) {
-    optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
-  }
-
-  return (
-    <label>
-      <span className="edit-label">{label}</span>
-      <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
-        {optionsJsx}
-      </select>
-    </label>
-  )
-})
-
 const EditorPanel = memo(() => {
   const {
     config,
@@ -336,7 +319,7 @@ const EditorPanel = memo(() => {
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* General */}
+              <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     General
@@ -363,7 +346,7 @@ const EditorPanel = memo(() => {
                             <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
                               <option value="">- Select Option -</option>
                               {columns.map((dataKey) => (
-                                <option value={dataKey} key={dataKey}>{dataKey}</option>
+                                <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>{dataKey}</option>
                               ))}
                             </select>
                           </label>
@@ -380,7 +363,7 @@ const EditorPanel = memo(() => {
                             <select value={filter.setBy} onChange={e => updateFilterSetBy(filter, index, e.target.value)}>
                               <option value="">- Select Option -</option>
                               {Object.keys(config.visualizations).map((vizKey) => (
-                                <option value={vizKey} key={vizKey}>{vizKey}</option>
+                                <option value={vizKey} key={`set-by-select-item-${vizKey}`}>{vizKey}</option>
                               ))}
                             </select>
                           </label>
@@ -388,13 +371,13 @@ const EditorPanel = memo(() => {
                             <span className="edit-label column-heading">Used By:</span>
                             <ul>
                               {filter.usedBy && filter.usedBy.map(vizKey => (
-                                <li><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
+                                <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
                               ))}
                             </ul>
                             <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
                               <option value="">- Select Option -</option>
-                              {Object.keys(config.visualizations).map((vizKey) => config.visualizations[vizKey].usesSharedFilter ? <></> : (
-                                <option value={vizKey} key={vizKey}>{vizKey}</option>
+                              {Object.keys(config.visualizations).filter(vizKey => !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
+                                <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{vizKey}</option>
                               ))}
                             </select>
                           </label>

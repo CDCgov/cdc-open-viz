@@ -405,9 +405,7 @@ export default function CdcDashboard(
           {config.dashboard.sharedFilters && <Filters />}
 
           {/* Visualizations */}
-          {config.rows && config.rows.map((row,index) => {
-            // Empty check
-            if(row.filter(col => col.widget).length === 0) return null
+          {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row,index) => {
 
             return (
               <div className="dashboard-row" key={`row__${index}`}>
@@ -422,8 +420,8 @@ export default function CdcDashboard(
                     visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
 
                     return (
-                      <>
-                        <div className={`dashboard-col dashboard-col-${col.width}`} key={`vis__${index}`}>
+                      <React.Fragment key={`vis__${index}`}>
+                        <div className={`dashboard-col dashboard-col-${col.width}`}>
                           {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setSharedFilter} isDashboard={true} />}
                           {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setSharedFilter} isDashboard={true} />}
                           {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => { updateChildConfig(col.widget, newConfig) }} isDashboard={true} />}
@@ -432,7 +430,7 @@ export default function CdcDashboard(
                         
                         {/* Data Table */}
                         {visualizationConfig.table && visualizationConfig.table.show && <DataTable data={visualizationConfig.data} config={visualizationConfig} />}
-                      </>
+                      </React.Fragment>
                     )
                   }
                 })}
