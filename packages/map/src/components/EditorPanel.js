@@ -173,7 +173,7 @@ const EditorPanel = (props) => {
 					String(activeFilterValueForDescription),
 					debouncedValue,
 				]);
-			}
+      }
 		}, [debouncedValue]);
 
 		const onChange = (e) => setValue(e.target.value);
@@ -181,7 +181,7 @@ const EditorPanel = (props) => {
 		return <textarea onChange={onChange} {...attributes} value={value}></textarea>;
 	};
 
-	const handleEditorChanges = async (property, value) => {
+  const handleEditorChanges = async (property, value) => {
 		switch (property) {
 			case 'showTitle':
 				setState({
@@ -557,7 +557,16 @@ const EditorPanel = (props) => {
 						statePicked: stateData,
 					},
 				});
-				break;
+        break;
+      case 'classificationType':
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            type: value,
+          },
+        });
+        break;
 			default:
 				console.warn(`Did not recognize editor property.`);
 				break;
@@ -806,7 +815,6 @@ const EditorPanel = (props) => {
 	useEffect(() => {
 		if ('category' === state.legend.type && editorCatOrder.length === 0) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
-
 			setEditorCatOrder(arr);
 		}
 	}, [runtimeLegend]);
@@ -1085,1028 +1093,1251 @@ const EditorPanel = (props) => {
 	};
 
 	return (
-		<ErrorBoundary component='EditorPanel'>
-			{requiredColumns && (
-				<Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
-			)}
-			<button
-				className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`}
-				title={displayPanel ? `Collapse Editor` : `Expand Editor`}
-				onClick={onBackClick}
-				data-html2canvas-ignore
-			></button>
-			<section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
-				<ReactTooltip html={true} multiline={true} />
-				<span className='base-label'>Configure Map</span>
-				<section className='form-container'>
-					<form>
-						<Accordion allowZeroExpanded={true}>
-							<AccordionItem>
-								{' '}
-								{/* Type */}
-								<AccordionItemHeading>
-									<AccordionItemButton>Type</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									{/* Geography */}
-									<label>
-										<span className='edit-label column-heading'>
-											<span>Geography</span>
-										</span>
-										<ul className='geo-buttons'>
-											<li
-												className={
-													state.general.geoType === 'us' ||
-													state.general.geoType === 'us-county'
-														? 'active'
-														: ''
-												}
-												onClick={() => handleEditorChanges('geoType', 'us')}
-											>
-												<UsaGraphic />
-												<span>United States</span>
-											</li>
-											<li
-												className={state.general.geoType === 'world' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'world')}
-											>
-												<WorldGraphic />
-												<span>World</span>
-											</li>
-											<li
-												className={state.general.geoType === 'single-state' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'single-state')}
-											>
-												<AlabamaGraphic />
-												<span>U.S. State</span>
-											</li>
-										</ul>
-									</label>
-									{/* Select > State or County Map */}
-									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
-										<label>
-											<span className='edit-label column-heading'>Map Type</span>
-											<select
-												value={state.general.geoType}
-												onChange={(event) => {
-													handleEditorChanges('geoType', event.target.value);
-												}}
-											>
-												<option value='us'>US State-Level</option>
-												<option value='us-county'>US County-Level</option>
-											</select>
-										</label>
-									)}
-									{/* Type */}
-									{/* Select > Filter a state */}
-									{state.general.geoType === 'single-state' && (
-										<label>
-											<span className='edit-label column-heading'>State Selector</span>
-											<select
-												value={
-													state.general.hasOwnProperty('statePicked')
-														? state.general.statePicked.stateName
-														: { fipsCode: '04', stateName: 'Alabama' }
-												}
-												onChange={(event) => {
-													handleEditorChanges('chooseState', event.target.value);
-												}}
-											>
-												<StateOptionList />
-											</select>
-										</label>
-									)}
-									{/* Type */}
-									<label>
-										<span className='edit-label column-heading'>Map Type</span>
-										<select
-											value={state.general.type}
-											onChange={(event) => {
-												handleEditorChanges('editorMapType', event.target.value);
-											}}
-										>
-											<option value='data'>Data</option>
-											<option value='navigation'>Navigation</option>
-										</select>
-									</label>
-									{/* SubType */}
-									{'us' === state.general.geoType && 'data' === state.general.type && (
-										<label className='checkbox mt-4'>
-											<input
-												type='checkbox'
-												checked={state.general.displayAsHex}
-												onChange={(event) => {
-													handleEditorChanges('displayAsHex', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Display As Hex Map</span>
-										</label>
-									)}
-									{'us' === state.general.geoType &&
-										'data' === state.general.type &&
-										false === state.general.displayAsHex && (
-											<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={state.general.displayStateLabels}
-													onChange={(event) => {
-														handleEditorChanges('displayStateLabels', event.target.checked);
-													}}
-												/>
-												<span className='edit-label'>Display state labels</span>
-											</label>
-										)}
-								</AccordionItemPanel>
-							</AccordionItem>
-							<AccordionItem>
-								{' '}
-								{/* General */}
-								<AccordionItemHeading>
-									<AccordionItemButton>General</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									<TextField
-										value={state.general.title}
-										updateField={updateField}
-										section='general'
-										fieldName='title'
-										label='Title'
-										placeholder='Map Title'
-										helper='For accessibility reasons, you should enter a title even if you are not planning on displaying it.'
-									/>
-									<TextField
-										type='textarea'
-										value={general.subtext}
-										updateField={updateField}
-										section='general'
-										fieldName='subtext'
-										label='Subtext'
-									/>
-									{'us' === state.general.geoType && (
-										<TextField
-											value={general.territoriesLabel}
-											updateField={updateField}
-											section='general'
-											fieldName='territoriesLabel'
-											label='Territories Label'
-											placeholder='Territories'
-										/>
-									)}
-									{/* <label className="checkbox mt-4">
+    <ErrorBoundary component="EditorPanel">
+      {requiredColumns && (
+        <Waiting
+          requiredColumns={requiredColumns}
+          className={displayPanel ? `waiting` : `waiting collapsed`}
+        />
+      )}
+      <button
+        className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`}
+        title={displayPanel ? `Collapse Editor` : `Expand Editor`}
+        onClick={onBackClick}
+        data-html2canvas-ignore
+      ></button>
+      <section
+        className={displayPanel ? "editor-panel" : "hidden editor-panel"}
+        data-html2canvas-ignore
+      >
+        <ReactTooltip html={true} multiline={true} />
+        <span className="base-label">Configure Map</span>
+        <section className="form-container">
+          <form>
+            <Accordion allowZeroExpanded={true}>
+              <AccordionItem>
+                {" "}
+                {/* Type */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Type</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  {/* Geography */}
+                  <label>
+                    <span className="edit-label column-heading">
+                      <span>Geography</span>
+                    </span>
+                    <ul className="geo-buttons">
+                      <li
+                        className={
+                          state.general.geoType === "us" ||
+                          state.general.geoType === "us-county"
+                            ? "active"
+                            : ""
+                        }
+                        onClick={() => handleEditorChanges("geoType", "us")}
+                      >
+                        <UsaGraphic />
+                        <span>United States</span>
+                      </li>
+                      <li
+                        className={
+                          state.general.geoType === "world" ? "active" : ""
+                        }
+                        onClick={() => handleEditorChanges("geoType", "world")}
+                      >
+                        <WorldGraphic />
+                        <span>World</span>
+                      </li>
+                      <li
+                        className={
+                          state.general.geoType === "single-state"
+                            ? "active"
+                            : ""
+                        }
+                        onClick={() =>
+                          handleEditorChanges("geoType", "single-state")
+                        }
+                      >
+                        <AlabamaGraphic />
+                        <span>U.S. State</span>
+                      </li>
+                    </ul>
+                  </label>
+                  {/* Select > State or County Map */}
+                  {(state.general.geoType === "us" ||
+                    state.general.geoType === "us-county") && (
+                    <label>
+                      <span className="edit-label column-heading">
+                        Map Type
+                      </span>
+                      <select
+                        value={state.general.geoType}
+                        onChange={(event) => {
+                          handleEditorChanges("geoType", event.target.value);
+                        }}
+                      >
+                        <option value="us">US State-Level</option>
+                        <option value="us-county">US County-Level</option>
+                      </select>
+                    </label>
+                  )}
+                  {/* Type */}
+                  {/* Select > Filter a state */}
+                  {state.general.geoType === "single-state" && (
+                    <label>
+                      <span className="edit-label column-heading">
+                        State Selector
+                      </span>
+                      <select
+                        value={
+                          state.general.hasOwnProperty("statePicked")
+                            ? state.general.statePicked.stateName
+                            : { fipsCode: "04", stateName: "Alabama" }
+                        }
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "chooseState",
+                            event.target.value
+                          );
+                        }}
+                      >
+                        <StateOptionList />
+                      </select>
+                    </label>
+                  )}
+                  {/* Type */}
+                  <label>
+                    <span className="edit-label column-heading">Map Type</span>
+                    <select
+                      value={state.general.type}
+                      onChange={(event) => {
+                        handleEditorChanges(
+                          "editorMapType",
+                          event.target.value
+                        );
+                      }}
+                    >
+                      <option value="data">Data</option>
+                      <option value="navigation">Navigation</option>
+                    </select>
+                  </label>
+                  {/* SubType */}
+                  {"us" === state.general.geoType &&
+                    "data" === state.general.type && (
+                      <label className="checkbox mt-4">
+                        <input
+                          type="checkbox"
+                          checked={state.general.displayAsHex}
+                          onChange={(event) => {
+                            handleEditorChanges(
+                              "displayAsHex",
+                              event.target.checked
+                            );
+                          }}
+                        />
+                        <span className="edit-label">Display As Hex Map</span>
+                      </label>
+                    )}
+                  {"us" === state.general.geoType &&
+                    "data" === state.general.type &&
+                    false === state.general.displayAsHex && (
+                      <label className="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={state.general.displayStateLabels}
+                          onChange={(event) => {
+                            handleEditorChanges(
+                              "displayStateLabels",
+                              event.target.checked
+                            );
+                          }}
+                        />
+                        <span className="edit-label">Display state labels</span>
+                      </label>
+                    )}
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                {" "}
+                {/* General */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>General</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <TextField
+                    value={state.general.title}
+                    updateField={updateField}
+                    section="general"
+                    fieldName="title"
+                    label="Title"
+                    placeholder="Map Title"
+                    helper="For accessibility reasons, you should enter a title even if you are not planning on displaying it."
+                  />
+                  <TextField
+                    type="textarea"
+                    value={general.subtext}
+                    updateField={updateField}
+                    section="general"
+                    fieldName="subtext"
+                    label="Subtext"
+                  />
+                  {"us" === state.general.geoType && (
+                    <TextField
+                      value={general.territoriesLabel}
+                      updateField={updateField}
+                      section="general"
+                      fieldName="territoriesLabel"
+                      label="Te
+                      +rritories Label"
+                      placeholder="Territories"
+                    />
+                  )}
+                  <label className="header">
+                    <span className="edit-label">Data Classification Type</span>
+                    <div>
+                      <label>
+                        <input
+                          type="radio"
+                          name="category"
+                          value="numeric"
+                          checked={state.legend.type === "equalnumber"}
+                          onChange={(e) =>
+                            handleEditorChanges(
+                              "classificationType",
+                              e.target.value
+                            )
+                          }
+                        />
+                        Numeric/Quantitative
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="category"
+                          value="category"
+                          checked={state.legend.type === "category"}
+                          onChange={(e) =>
+                            handleEditorChanges(
+                              "classificationType",
+                              e.target.value
+                            )
+                          }
+                        />
+                        Categorical
+                      </label>
+                    </div>
+                  </label>
+                  {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
                   </label> */}
-								</AccordionItemPanel>
-							</AccordionItem>
-							<AccordionItem>
-								{' '}
-								{/* Columns */}
-								<AccordionItemHeading>
-									<AccordionItemButton>Columns</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									<label className='edit-block geo'>
-										<span className='edit-label column-heading'>Geography</span>
-										<select
-											value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
-											onChange={(event) => {
-												editColumn('geo', 'name', event.target.value);
-											}}
-										>
-											{columnsOptions}
-										</select>
-									</label>
-									{'navigation' !== state.general.type && (
-										<fieldset className='primary-fieldset edit-block'>
-											<label>
-												<span className='edit-label column-heading'>Primary</span>
-												<select
-													value={
-														state.columns.primary
-															? state.columns.primary.name
-															: columnsOptions[0]
-													}
-													onChange={(event) => {
-														editColumn('primary', 'name', event.target.value);
-													}}
-												>
-													{columnsOptions}
-												</select>
-											</label>
-											<TextField
-												value={columns.primary.label}
-												section='columns'
-												subsection='primary'
-												fieldName='label'
-												label='Label'
-												updateField={updateField}
-											/>
-											<ul className='column-edit'>
-												<li className='three-col'>
-													<TextField
-														value={columns.primary.prefix}
-														section='columns'
-														subsection='primary'
-														fieldName='prefix'
-														label='Prefix'
-														updateField={updateField}
-													/>
-													<TextField
-														value={columns.primary.suffix}
-														section='columns'
-														subsection='primary'
-														fieldName='suffix'
-														label='Suffix'
-														updateField={updateField}
-													/>
-													<TextField
-														type='number'
-														value={columns.primary.roundToPlace}
-														section='columns'
-														subsection='primary'
-														fieldName='roundToPlace'
-														label='Round'
-														updateField={updateField}
-													/>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.useCommas}
-															onChange={(event) => {
-																editColumn(
-																	'primary',
-																	'useCommas',
-																	event.target.checked
-																);
-															}}
-														/>
-														<span className='edit-label'>Add Commas to Numbers</span>
-													</label>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.dataTable ||false}
-															onChange={(event) => {
-																editColumn(
-																	'primary',
-																	'dataTable',
-																	event.target.checked
-																);
-															}}
-														/>
-														<span className='edit-label'>Display in Data Table</span>
-													</label>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.tooltip ||false}
-															onChange={(event) => {
-																editColumn('primary', 'tooltip', event.target.checked);
-															}}
-														/>
-														<span className='edit-label'>Display in Tooltips</span>
-													</label>
-												</li>
-												<li>
-													<label>
-														<span className='edit-label'>Special Classes</span>
-													</label>
-													{specialClasses.map((specialClass, i) => (
-														<div className="edit-block" key={`special-class-${i}`}>
-															<button className="remove-column"
-																onClick={(e) => {
-																	e.preventDefault();
-																	editColumn('primary', 'specialClassDelete', i);
-																}}
-															>Remove</button>
-															<p>Special Class {i + 1}</p>
-															<label>
-																<span className="edit-label column-heading">Data Key</span>
-																<select value={specialClass.key} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
-																}}>
-																	{columnsOptions}
-																</select>
-															</label>
-															<label>
-																<span className="edit-label column-heading">Value</span>
-																<select value={specialClass.value} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
-																}}>
-																	<option value="">- Select Value -</option>
-																	{columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
-																		<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-																	))}
-																</select>
-															</label>
-															<label>
-																<span className="edit-label column-heading">Label</span>
-																<input type="text" value={specialClass.label} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
-																}} />
-															</label>
-														</div>
-													))}
-													<button className="btn full-width"
-														onClick={(e) => {
-															e.preventDefault();
-															editColumn('primary', 'specialClassAdd', {});
-														}}
-													>Add SpecialClass</button>
-												</li>
-											</ul>
-										</fieldset>
-									)}
-									<label className='edit-block navigate column-heading'>
-										<span className='edit-label column-heading'>Navigation</span>
-										<select
-											value={
-												state.columns.navigate ? state.columns.navigate.name : columnsOptions[0]
-											}
-											onChange={(event) => {
-												editColumn('navigate', 'name', event.target.value);
-											}}
-										>
-											{columnsOptions}
-										</select>
-									</label>
-									{'navigation' !== state.general.type &&
-										additionalColumns.map((val) => (
-											<fieldset className='edit-block' key={val}>
-												<button
-													className='remove-column'
-													onClick={(event) => {
-														event.preventDefault();
-														removeAdditionalColumn(val);
-													}}
-												>
-													Remove
-												</button>
-												<label>
-													<span className='edit-label column-heading'>Column</span>
-													<select
-														value={
-															state.columns[val]
-																? state.columns[val].name
-																: columnsOptions[0]
-														}
-														onChange={(event) => {
-															editColumn(val, 'name', event.target.value);
-														}}
-													>
-														{columnsOptions}
-													</select>
-												</label>
-												<TextField
-													value={columns[val].label}
-													section='columns'
-													subsection={val}
-													fieldName='label'
-													label='Label'
-													updateField={updateField}
-												/>
-												<ul className='column-edit'>
-													<li className='three-col'>
-														<TextField
-															value={columns[val].prefix}
-															section='columns'
-															subsection={val}
-															fieldName='prefix'
-															label='Prefix'
-															updateField={updateField}
-														/>
-														<TextField
-															value={columns[val].suffix}
-															section='columns'
-															subsection={val}
-															fieldName='suffix'
-															label='Suffix'
-															updateField={updateField}
-														/>
-														<TextField
-															type='number'
-															value={columns[val].roundToPlace}
-															section='columns'
-															subsection={val}
-															fieldName='roundToPlace'
-															label='Round'
-															updateField={updateField}
-														/>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].useCommas}
-																onChange={(event) => {
-																	editColumn(val, 'useCommas', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Add Commas to Numbers</span>
-														</label>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].dataTable}
-																onChange={(event) => {
-																	editColumn(val, 'dataTable', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Display in Data Table</span>
-														</label>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].tooltip}
-																onChange={(event) => {
-																	editColumn(val, 'tooltip', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Display in Tooltips</span>
-														</label>
-													</li>
-												</ul>
-											</fieldset>
-										))}
-									{'navigation' !== state.general.type && (
-										<button
-											className={'btn full-width'}
-											onClick={(event) => {
-												event.preventDefault();
-												addAdditionalColumn(additionalColumns.length + 1);
-											}}
-										>
-											Add Column
-										</button>
-									)}
-								</AccordionItemPanel>
-							</AccordionItem>{' '}
-							{/* Columns */}
-							{'navigation' !== state.general.type && (
-								<AccordionItem>
-									{' '}
-									{/* Legend */}
-									<AccordionItemHeading>
-										<AccordionItemButton>Legend</AccordionItemButton>
-									</AccordionItemHeading>
-									<AccordionItemPanel>
-										<label>
-											<span className='edit-label'>Legend Type</span>
-											<select
-												value={legend.type}
-												onChange={(event) => {
-													handleEditorChanges('legendType', event.target.value);
-												}}
-											>
-												<option value='equalnumber'>Equal Number</option>
-												<option value='equalinterval'>Equal Interval</option>
-												<option value='category'>Categorical</option>
-											</select>
-										</label>
-										{'category' !== legend.type && (
-											<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={legend.separateZero || false}
-													onChange={(event) =>
-														handleEditorChanges('separateZero', event.target.checked)
-													}
-												/>
-												<span className='edit-label'>Separate Zero</span>
-											</label>
-										)}
-										{'category' !== legend.type && (
-											<label>
-												<span className='edit-label'>Number of Items</span>
-												<select
-													value={legend.numberOfItems}
-													onChange={(event) => {
-														handleEditorChanges('legendNumber', event.target.value);
-													}}
-												>
-													{[...Array(numberOfItemsLimit).keys()].map((num) => {
-														return (
-															<option value={num + 1} key={num + 1}>
-																{num + 1}
-															</option>
-														);
-													})}
-												</select>
-											</label>
-										)}
-										{'category' === legend.type && (
-											<React.Fragment>
-												<label>
-													<span className='edit-label'>Category Order</span>
-												</label>
-												{/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-												<DragDropContext
-													onDragEnd={({ source, destination }) =>
-														categoryMove(source.index, destination.index)
-													}
-												>
-													<Droppable droppableId='category_order'>
-														{(provided) => (
-															<ul
-																{...provided.droppableProps}
-																className='sort-list'
-																ref={provided.innerRef}
-															>
-																<CategoryList />
-																{provided.placeholder}
-															</ul>
-														)}
-													</Droppable>
-												</DragDropContext>
-												{editorCatOrder.length >= 9 && (
-													<section className='error-box my-2'>
-														<div>
-															<strong className='pt-1'>Warning</strong>
-															<p>
-																The maximum number of categorical legend items is 9. If
-																your data has more than 9 categories your map will not
-																display properly.
-															</p>
-														</div>
-													</section>
-												)}
-											</React.Fragment>
-										)}
-										<TextField
-											value={legend.title}
-											updateField={updateField}
-											section='legend'
-											fieldName='title'
-											label='Legend Title'
-											placeholder='Legend Title'
-										/>
-										{false === legend.dynamicDescription && (
-											<TextField
-												type='textarea'
-												value={legend.description}
-												updateField={updateField}
-												section='legend'
-												fieldName='description'
-												label='Legend Description'
-											/>
-										)}
-										{true === legend.dynamicDescription && (
-											<React.Fragment>
-												<label>
-													<span>Legend Description</span>
-													<span className='subtext'>
-														For {displayFilterLegendValue(activeFilterValueForDescription)}
-													</span>
-													<DynamicDesc
-														value={
-															legend.descriptions[String(activeFilterValueForDescription)]
-														}
-													/>
-												</label>
-												<label>
-													<select
-														value={String(activeFilterValueForDescription)}
-														onChange={(event) => {
-															handleEditorChanges(
-																'changeActiveFilterValue',
-																event.target.value
-															);
-														}}
-													>
-														{filterValueOptionList.map((arr, i) => {
-															return (
-																<option value={arr} key={i}>
-																	{displayFilterLegendValue(arr)}
-																</option>
-															);
-														})}
-													</select>
-												</label>
-											</React.Fragment>
-										)}
-										{filtersJSX.length > 0 && (
-											<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={legend.dynamicDescription}
-													onChange={() => {
-														handleEditorChanges(
-															'dynamicDescription',
-															filterValueOptionList[0]
-														);
-													}}
-												/>
-												<span className='edit-label'>Dynamic Legend Description</span>
-											</label>
-										)}
-										{filtersJSX.length > 0 && (
-											<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={legend.unified}
-													onChange={(event) =>
-														handleEditorChanges('unifiedLegend', event.target.checked)
-													}
-												/>
-												<span className='edit-label'>Unified Legend</span>
-											</label>
-										)}
-									</AccordionItemPanel>
-								</AccordionItem>
-							)}
-							{'navigation' !== state.general.type && (
-								<AccordionItem>
-									{' '}
-									{/* Filters */}
-									<AccordionItemHeading>
-										<AccordionItemButton>Filters</AccordionItemButton>
-									</AccordionItemHeading>
-									<AccordionItemPanel>
-										{filtersJSX.length > 0 ? (
-											filtersJSX
-										) : (
-											<p style={{ textAlign: 'center' }}>There are currently no filters.</p>
-										)}
-										<button
-											className={'btn full-width'}
-											onClick={(event) => {
-												event.preventDefault();
-												changeFilter(null, 'addNew');
-											}}
-										>
-											Add Filter
-										</button>
-									</AccordionItemPanel>
-								</AccordionItem>
-							)}
-							{'navigation' !== state.general.type && (
-								<AccordionItem>
-									{' '}
-									{/* Data Table */}
-									<AccordionItemHeading>
-										<AccordionItemButton>Data Table</AccordionItemButton>
-									</AccordionItemHeading>
-									<AccordionItemPanel>
-										<TextField
-											value={dataTable.title}
-											updateField={updateField}
-											section='dataTable'
-											fieldName='title'
-											label='Data Table Title'
-											placeholder='Data Table'
-										/>
-										<TextField
-											value={dataTable.indexTitle}
-											updateField={updateField}
-											section='dataTable'
-											fieldName='indexTitle'
-											label='Index Column Title'
-											placeholder='Location'
-										/>
-										<TextField
-											value={dataTable.caption}
-											updateField={updateField}
-											section='dataTable'
-											fieldName='caption'
-											label='Data Table Caption'
-											placeholder='Data Table'
-											helper='Text that describes the data table for screen'
-											type="textarea"
-										/>
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={
-													state.dataTable.forceDisplay !== undefined
-														? state.dataTable.forceDisplay
-														: !isDashboard
-												}
-												onChange={(event) => {
-													handleEditorChanges('showDataTable', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Show Table</span>
-											<Helper text='Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.' />
-										</label>
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={ state.dataTable.limitHeight }
-												onChange={(event) => {
-													handleEditorChanges('limitDataTableHeight', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Limit Table Height</span>
-										</label>
-										{state.dataTable.limitHeight &&
-											<TextField
-												value={dataTable.height}
-												updateField={updateField}
-												section='dataTable'
-												fieldName='height'
-												label='Data Table Height'
-												placeholder='Height(px)'
-												type="number"
-												min="0"
-												max="500"
-											/>
-										}
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.expandDataTable || false}
-												onChange={(event) => {
-													handleEditorChanges('expandDataTable', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Map loads with data table expanded</span>
-										</label>
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.showDownloadButton}
-												onChange={(event) => {
-													handleEditorChanges('toggleDownloadButton', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Enable Download CSV Button</span>
-										</label>
-									</AccordionItemPanel>
-								</AccordionItem>
-							)}
-							<AccordionItem>
-								{' '}
-								{/* Tooltips */}
-								<AccordionItemHeading>
-									<AccordionItemButton>Interactivity</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									<label>
-										<span className='edit-label'>
-											Detail displays on{' '}
-											<Helper text='At mobile sizes, information always appears in a popover modal when a user taps on an item.' />
-										</span>
-										<select
-											value={state.tooltips.appearanceType}
-											onChange={(event) => {
-												handleEditorChanges('appearanceType', event.target.value);
-											}}
-										>
-											<option value='hover'>Hover - Tooltip</option>
-											<option value='click'>Click - Popover Modal</option>
-										</select>
-									</label>
-									{'click' === state.tooltips.appearanceType && (
-										<TextField
-											value={tooltips.linkLabel}
-											section='tooltips'
-											fieldName='linkLabel'
-											label='Tooltips Link Label'
-											updateField={updateField}
-										/>
-									)}
-									<label className='checkbox'>
-										<input
-											type='checkbox'
-											checked={state.tooltips.capitalizeLabels}
-											onChange={(event) => {
-												handleEditorChanges('capitalizeLabels', event.target.checked);
-											}}
-										/>
-										<span className='edit-label'>Capitalize text inside tooltip</span>
-									</label>
-								</AccordionItemPanel>
-							</AccordionItem>
-							<AccordionItem>
-								{' '}
-								{/* Visual */}
-								<AccordionItemHeading>
-									<AccordionItemButton>Visual</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									<label className='header'>
-										<span className='edit-label'>Header Theme</span>
-										<ul className='color-palette'>
-											{headerColors.map((palette) => {
-												return (
-													<li
-														title={palette}
-														key={palette}
-														onClick={() => {
-															handleEditorChanges('headerColor', palette);
-														}}
-														className={
-															state.general.headerColor === palette
-																? 'selected ' + palette
-																: palette
-														}
-													></li>
-												);
-											})}
-										</ul>
-									</label>
-									<label className='checkbox'>
-										<input
-											type='checkbox'
-											checked={state.general.showTitle || false}
-											onChange={(event) => {
-												handleEditorChanges('showTitle', event.target.checked);
-											}}
-										/>
-										<span className='edit-label'>Show Title</span>
-									</label>
-									{'navigation' !== state.general.type && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.showSidebar || false}
-												onChange={(event) => {
-													handleEditorChanges('showSidebar', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Show Legend</span>
-										</label>
-									)}
-									{'navigation' !== state.general.type && (
-										<label>
-											<span className='edit-label'>Legend Position</span>
-											<select
-												value={legend.position || false}
-												onChange={(event) => {
-													handleEditorChanges('sidebarPosition', event.target.value);
-												}}
-											>
-												<option value='side'>Side</option>
-												<option value='bottom'>Bottom</option>
-											</select>
-										</label>
-									)}
-									{'side' === legend.position && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={legend.singleColumn}
-												onChange={(event) => {
-													handleEditorChanges('singleColumnLegend', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Single Column Legend</span>
-										</label>
-									)}
-									{'navigation' === state.general.type && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.fullBorder || false}
-												onChange={(event) => {
-													handleEditorChanges('fullBorder', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Add border around map</span>
-										</label>
-									)}
-									<label>
-										<span className='edit-label'>Geo Border Color</span>
-										<select
-											value={state.general.geoBorderColor || false}
-											onChange={(event) => {
-												handleEditorChanges('geoBorderColor', event.target.value);
-											}}
-										>
-											<option value='darkGray'>Dark Gray (Default)</option>
-											<option value='sameAsBackground'>White</option>
-										</select>
-									</label>
-									<label>
-										<span className='edit-label'>Map Color Palette</span>
-									</label>
-									<span className='h5'>Sequential</span>
-									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => !name.includes('qualitative'))
-											.map((palette) => {
-												const colorOne = {
-													backgroundColor: colorPalettes[palette][2],
-												};
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                {" "}
+                {/* Columns */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Columns</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <label className="edit-block geo">
+                    <span className="edit-label column-heading">Geography</span>
+                    <select
+                      value={
+                        state.columns.geo
+                          ? state.columns.geo.name
+                          : columnsOptions[0]
+                      }
+                      onChange={(event) => {
+                        editColumn("geo", "name", event.target.value);
+                      }}
+                    >
+                      {columnsOptions}
+                    </select>
+                  </label>
+                  {"navigation" !== state.general.type && (
+                    <fieldset className="primary-fieldset edit-block">
+                      <label>
+                        <span className="edit-label column-heading">
+                          Primary
+                        </span>
+                        <select
+                          value={
+                            state.columns.primary
+                              ? state.columns.primary.name
+                              : columnsOptions[0]
+                          }
+                          onChange={(event) => {
+                            editColumn("primary", "name", event.target.value);
+                          }}
+                        >
+                          {columnsOptions}
+                        </select>
+                      </label>
+                      <TextField
+                        value={columns.primary.label}
+                        section="columns"
+                        subsection="primary"
+                        fieldName="label"
+                        label="Label"
+                        updateField={updateField}
+                      />
+                      <ul className="column-edit">
+                        <li className="three-col">
+                          <TextField
+                            value={columns.primary.prefix}
+                            section="columns"
+                            subsection="primary"
+                            fieldName="prefix"
+                            label="Prefix"
+                            updateField={updateField}
+                          />
+                          <TextField
+                            value={columns.primary.suffix}
+                            section="columns"
+                            subsection="primary"
+                            fieldName="suffix"
+                            label="Suffix"
+                            updateField={updateField}
+                          />
+                          <TextField
+                            type="number"
+                            value={columns.primary.roundToPlace}
+                            section="columns"
+                            subsection="primary"
+                            fieldName="roundToPlace"
+                            label="Round"
+                            updateField={updateField}
+                          />
+                        </li>
+                        <li>
+                          <label className="checkbox">
+                            <input
+                              type="checkbox"
+                              checked={state.columns.primary.useCommas}
+                              onChange={(event) => {
+                                editColumn(
+                                  "primary",
+                                  "useCommas",
+                                  event.target.checked
+                                );
+                              }}
+                            />
+                            <span className="edit-label">
+                              Add Commas to Numbers
+                            </span>
+                          </label>
+                        </li>
+                        <li>
+                          <label className="checkbox">
+                            <input
+                              type="checkbox"
+                              checked={state.columns.primary.dataTable || false}
+                              onChange={(event) => {
+                                editColumn(
+                                  "primary",
+                                  "dataTable",
+                                  event.target.checked
+                                );
+                              }}
+                            />
+                            <span className="edit-label">
+                              Display in Data Table
+                            </span>
+                          </label>
+                        </li>
+                        <li>
+                          <label className="checkbox">
+                            <input
+                              type="checkbox"
+                              checked={state.columns.primary.tooltip || false}
+                              onChange={(event) => {
+                                editColumn(
+                                  "primary",
+                                  "tooltip",
+                                  event.target.checked
+                                );
+                              }}
+                            />
+                            <span className="edit-label">
+                              Display in Tooltips
+                            </span>
+                          </label>
+                        </li>
+                        <li>
+                          <label>
+                            <span className="edit-label">Special Classes</span>
+                          </label>
+                          {specialClasses.map((specialClass, i) => (
+                            <div
+                              className="edit-block"
+                              key={`special-class-${i}`}
+                            >
+                              <button
+                                className="remove-column"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  editColumn(
+                                    "primary",
+                                    "specialClassDelete",
+                                    i
+                                  );
+                                }}
+                              >
+                                Remove
+                              </button>
+                              <p>Special Class {i + 1}</p>
+                              <label>
+                                <span className="edit-label column-heading">
+                                  Data Key
+                                </span>
+                                <select
+                                  value={specialClass.key}
+                                  onChange={(e) => {
+                                    editColumn("primary", "specialClassEdit", {
+                                      prop: "key",
+                                      index: i,
+                                      value: e.target.value,
+                                    });
+                                  }}
+                                >
+                                  {columnsOptions}
+                                </select>
+                              </label>
+                              <label>
+                                <span className="edit-label column-heading">
+                                  Value
+                                </span>
+                                <select
+                                  value={specialClass.value}
+                                  onChange={(e) => {
+                                    editColumn("primary", "specialClassEdit", {
+                                      prop: "value",
+                                      index: i,
+                                      value: e.target.value,
+                                    });
+                                  }}
+                                >
+                                  <option value="">- Select Value -</option>
+                                  {columnsByKey[specialClass.key] &&
+                                    columnsByKey[specialClass.key]
+                                      .sort()
+                                      .map((option) => (
+                                        <option
+                                          key={`special-class-value-option-${i}-${option}`}
+                                        >
+                                          {option}
+                                        </option>
+                                      ))}
+                                </select>
+                              </label>
+                              <label>
+                                <span className="edit-label column-heading">
+                                  Label
+                                </span>
+                                <input
+                                  type="text"
+                                  value={specialClass.label}
+                                  onChange={(e) => {
+                                    editColumn("primary", "specialClassEdit", {
+                                      prop: "label",
+                                      index: i,
+                                      value: e.target.value,
+                                    });
+                                  }}
+                                />
+                              </label>
+                            </div>
+                          ))}
+                          <button
+                            className="btn full-width"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              editColumn("primary", "specialClassAdd", {});
+                            }}
+                          >
+                            Add SpecialClass
+                          </button>
+                        </li>
+                      </ul>
+                    </fieldset>
+                  )}
+                  <label className="edit-block navigate column-heading">
+                    <span className="edit-label column-heading">
+                      Navigation
+                    </span>
+                    <select
+                      value={
+                        state.columns.navigate
+                          ? state.columns.navigate.name
+                          : columnsOptions[0]
+                      }
+                      onChange={(event) => {
+                        editColumn("navigate", "name", event.target.value);
+                      }}
+                    >
+                      {columnsOptions}
+                    </select>
+                  </label>
+                  {"navigation" !== state.general.type &&
+                    additionalColumns.map((val) => (
+                      <fieldset className="edit-block" key={val}>
+                        <button
+                          className="remove-column"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            removeAdditionalColumn(val);
+                          }}
+                        >
+                          Remove
+                        </button>
+                        <label>
+                          <span className="edit-label column-heading">
+                            Column
+                          </span>
+                          <select
+                            value={
+                              state.columns[val]
+                                ? state.columns[val].name
+                                : columnsOptions[0]
+                            }
+                            onChange={(event) => {
+                              editColumn(val, "name", event.target.value);
+                            }}
+                          >
+                            {columnsOptions}
+                          </select>
+                        </label>
+                        <TextField
+                          value={columns[val].label}
+                          section="columns"
+                          subsection={val}
+                          fieldName="label"
+                          label="Label"
+                          updateField={updateField}
+                        />
+                        <ul className="column-edit">
+                          <li className="three-col">
+                            <TextField
+                              value={columns[val].prefix}
+                              section="columns"
+                              subsection={val}
+                              fieldName="prefix"
+                              label="Prefix"
+                              updateField={updateField}
+                            />
+                            <TextField
+                              value={columns[val].suffix}
+                              section="columns"
+                              subsection={val}
+                              fieldName="suffix"
+                              label="Suffix"
+                              updateField={updateField}
+                            />
+                            <TextField
+                              type="number"
+                              value={columns[val].roundToPlace}
+                              section="columns"
+                              subsection={val}
+                              fieldName="roundToPlace"
+                              label="Round"
+                              updateField={updateField}
+                            />
+                          </li>
+                          <li>
+                            <label className="checkbox">
+                              <input
+                                type="checkbox"
+                                checked={state.columns[val].useCommas}
+                                onChange={(event) => {
+                                  editColumn(
+                                    val,
+                                    "useCommas",
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className="edit-label">
+                                Add Commas to Numbers
+                              </span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className="checkbox">
+                              <input
+                                type="checkbox"
+                                checked={state.columns[val].dataTable}
+                                onChange={(event) => {
+                                  editColumn(
+                                    val,
+                                    "dataTable",
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className="edit-label">
+                                Display in Data Table
+                              </span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className="checkbox">
+                              <input
+                                type="checkbox"
+                                checked={state.columns[val].tooltip}
+                                onChange={(event) => {
+                                  editColumn(
+                                    val,
+                                    "tooltip",
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className="edit-label">
+                                Display in Tooltips
+                              </span>
+                            </label>
+                          </li>
+                        </ul>
+                      </fieldset>
+                    ))}
+                  {"navigation" !== state.general.type && (
+                    <button
+                      className={"btn full-width"}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        addAdditionalColumn(additionalColumns.length + 1);
+                      }}
+                    >
+                      Add Column
+                    </button>
+                  )}
+                </AccordionItemPanel>
+              </AccordionItem>{" "}
+              {/* Columns */}
+              {"navigation" !== state.general.type && (
+                <AccordionItem>
+                  {" "}
+                  {/* Legend */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Legend</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    {state.legend.type === 'equalnumber' &&
+                      <label>
+                      <span className="edit-label">Legend Type</span>
+                      <select
+                        value={legend.type}
+                        onChange={(event) => {
+                          handleEditorChanges("legendType", event.target.value);
+                        }}
+                      >
+                        <option value="equalnumber">Equal Number</option>
+                        <option value="equalinterval">Equal Interval</option>
+                        <option value="category">Categorical</option>
+                      </select>
+                    </label>
+                    }
+                    {"category" !== legend.type && (
+                      <label className="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={legend.separateZero || false}
+                          onChange={(event) =>
+                            handleEditorChanges(
+                              "separateZero",
+                              event.target.checked
+                            )
+                          }
+                        />
+                        <span className="edit-label">Separate Zero</span>
+                      </label>
+                    )}
+                    {"category" !== legend.type && (
+                      <label>
+                        <span className="edit-label">Number of Items</span>
+                        <select
+                          value={legend.numberOfItems}
+                          onChange={(event) => {
+                            handleEditorChanges(
+                              "legendNumber",
+                              event.target.value
+                            );
+                          }}
+                        >
+                          {[...Array(numberOfItemsLimit).keys()].map((num) => {
+                            return (
+                              <option value={num + 1} key={num + 1}>
+                                {num + 1}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </label>
+                    )}
+                    {"category" === legend.type && (
+                      <React.Fragment>
+                        <label>
+                          <span className="edit-label">Category Order</span>
+                        </label>
+                        {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
+                        <DragDropContext
+                          onDragEnd={({ source, destination }) =>
+                            categoryMove(source.index, destination.index)
+                          }
+                        >
+                          <Droppable droppableId="category_order">
+                            {(provided) => (
+                              <ul
+                                {...provided.droppableProps}
+                                className="sort-list"
+                                ref={provided.innerRef}
+                              >
+                                <CategoryList />
+                                {provided.placeholder}
+                              </ul>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
+                        {editorCatOrder.length >= 9 && (
+                          <section className="error-box my-2">
+                            <div>
+                              <strong className="pt-1">Warning</strong>
+                              <p>
+                                The maximum number of categorical legend items
+                                is 9. If your data has more than 9 categories
+                                your map will not display properly.
+                              </p>
+                            </div>
+                          </section>
+                        )}
+                      </React.Fragment>
+                    )}
+                    <TextField
+                      value={legend.title}
+                      updateField={updateField}
+                      section="legend"
+                      fieldName="title"
+                      label="Legend Title"
+                      placeholder="Legend Title"
+                    />
+                    {false === legend.dynamicDescription && (
+                      <TextField
+                        type="textarea"
+                        value={legend.description}
+                        updateField={updateField}
+                        section="legend"
+                        fieldName="description"
+                        label="Legend Description"
+                      />
+                    )}
+                    {true === legend.dynamicDescription && (
+                      <React.Fragment>
+                        <label>
+                          <span>Legend Description</span>
+                          <span className="subtext">
+                            For{" "}
+                            {displayFilterLegendValue(
+                              activeFilterValueForDescription
+                            )}
+                          </span>
+                          <DynamicDesc
+                            value={
+                              legend.descriptions[
+                                String(activeFilterValueForDescription)
+                              ]
+                            }
+                          />
+                        </label>
+                        <label>
+                          <select
+                            value={String(activeFilterValueForDescription)}
+                            onChange={(event) => {
+                              handleEditorChanges(
+                                "changeActiveFilterValue",
+                                event.target.value
+                              );
+                            }}
+                          >
+                            {filterValueOptionList.map((arr, i) => {
+                              return (
+                                <option value={arr} key={i}>
+                                  {displayFilterLegendValue(arr)}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </label>
+                      </React.Fragment>
+                    )}
+                    {filtersJSX.length > 0 && (
+                      <label className="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={legend.dynamicDescription}
+                          onChange={() => {
+                            handleEditorChanges(
+                              "dynamicDescription",
+                              filterValueOptionList[0]
+                            );
+                          }}
+                        />
+                        <span className="edit-label">
+                          Dynamic Legend Description
+                        </span>
+                      </label>
+                    )}
+                    {filtersJSX.length > 0 && (
+                      <label className="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={legend.unified}
+                          onChange={(event) =>
+                            handleEditorChanges(
+                              "unifiedLegend",
+                              event.target.checked
+                            )
+                          }
+                        />
+                        <span className="edit-label">Unified Legend</span>
+                      </label>
+                    )}
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
+              {"navigation" !== state.general.type && (
+                <AccordionItem>
+                  {" "}
+                  {/* Filters */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Filters</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    {filtersJSX.length > 0 ? (
+                      filtersJSX
+                    ) : (
+                      <p style={{ textAlign: "center" }}>
+                        There are currently no filters.
+                      </p>
+                    )}
+                    <button
+                      className={"btn full-width"}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        changeFilter(null, "addNew");
+                      }}
+                    >
+                      Add Filter
+                    </button>
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
+              {"navigation" !== state.general.type && (
+                <AccordionItem>
+                  {" "}
+                  {/* Data Table */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Data Table</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <TextField
+                      value={dataTable.title}
+                      updateField={updateField}
+                      section="dataTable"
+                      fieldName="title"
+                      label="Data Table Title"
+                      placeholder="Data Table"
+                    />
+                    <TextField
+                      value={dataTable.indexTitle}
+                      updateField={updateField}
+                      section="dataTable"
+                      fieldName="indexTitle"
+                      label="Index Column Title"
+                      placeholder="Location"
+                    />
+                    <TextField
+                      value={dataTable.caption}
+                      updateField={updateField}
+                      section="dataTable"
+                      fieldName="caption"
+                      label="Data Table Caption"
+                      placeholder="Data Table"
+                      helper="Text that describes the data table for screen"
+                      type="textarea"
+                    />
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={
+                          state.dataTable.forceDisplay !== undefined
+                            ? state.dataTable.forceDisplay
+                            : !isDashboard
+                        }
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "showDataTable",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">Show Table</span>
+                      <Helper text="Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version." />
+                    </label>
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={state.dataTable.limitHeight}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "limitDataTableHeight",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">Limit Table Height</span>
+                    </label>
+                    {state.dataTable.limitHeight && (
+                      <TextField
+                        value={dataTable.height}
+                        updateField={updateField}
+                        section="dataTable"
+                        fieldName="height"
+                        label="Data Table Height"
+                        placeholder="Height(px)"
+                        type="number"
+                        min="0"
+                        max="500"
+                      />
+                    )}
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={state.general.expandDataTable || false}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "expandDataTable",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">
+                        Map loads with data table expanded
+                      </span>
+                    </label>
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={state.general.showDownloadButton}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "toggleDownloadButton",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">
+                        Enable Download CSV Button
+                      </span>
+                    </label>
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
+              <AccordionItem>
+                {" "}
+                {/* Tooltips */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Interactivity</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <label>
+                    <span className="edit-label">
+                      Detail displays on{" "}
+                      <Helper text="At mobile sizes, information always appears in a popover modal when a user taps on an item." />
+                    </span>
+                    <select
+                      value={state.tooltips.appearanceType}
+                      onChange={(event) => {
+                        handleEditorChanges(
+                          "appearanceType",
+                          event.target.value
+                        );
+                      }}
+                    >
+                      <option value="hover">Hover - Tooltip</option>
+                      <option value="click">Click - Popover Modal</option>
+                    </select>
+                  </label>
+                  {"click" === state.tooltips.appearanceType && (
+                    <TextField
+                      value={tooltips.linkLabel}
+                      section="tooltips"
+                      fieldName="linkLabel"
+                      label="Tooltips Link Label"
+                      updateField={updateField}
+                    />
+                  )}
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={state.tooltips.capitalizeLabels}
+                      onChange={(event) => {
+                        handleEditorChanges(
+                          "capitalizeLabels",
+                          event.target.checked
+                        );
+                      }}
+                    />
+                    <span className="edit-label">
+                      Capitalize text inside tooltip
+                    </span>
+                  </label>
+                </AccordionItemPanel>
+              </AccordionItem>
+              <AccordionItem>
+                {" "}
+                {/* Visual */}
+                <AccordionItemHeading>
+                  <AccordionItemButton>Visual</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <label className="header">
+                    <span className="edit-label">Header Theme</span>
+                    <ul className="color-palette">
+                      {headerColors.map((palette) => {
+                        return (
+                          <li
+                            title={palette}
+                            key={palette}
+                            onClick={() => {
+                              handleEditorChanges("headerColor", palette);
+                            }}
+                            className={
+                              state.general.headerColor === palette
+                                ? "selected " + palette
+                                : palette
+                            }
+                          ></li>
+                        );
+                      })}
+                    </ul>
+                  </label>
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={state.general.showTitle || false}
+                      onChange={(event) => {
+                        handleEditorChanges("showTitle", event.target.checked);
+                      }}
+                    />
+                    <span className="edit-label">Show Title</span>
+                  </label>
+                  {"navigation" !== state.general.type && (
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={state.general.showSidebar || false}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "showSidebar",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">Show Legend</span>
+                    </label>
+                  )}
+                  {"navigation" !== state.general.type && (
+                    <label>
+                      <span className="edit-label">Legend Position</span>
+                      <select
+                        value={legend.position || false}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "sidebarPosition",
+                            event.target.value
+                          );
+                        }}
+                      >
+                        <option value="side">Side</option>
+                        <option value="bottom">Bottom</option>
+                      </select>
+                    </label>
+                  )}
+                  {"side" === legend.position && (
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={legend.singleColumn}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "singleColumnLegend",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">Single Column Legend</span>
+                    </label>
+                  )}
+                  {"navigation" === state.general.type && (
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        checked={state.general.fullBorder || false}
+                        onChange={(event) => {
+                          handleEditorChanges(
+                            "fullBorder",
+                            event.target.checked
+                          );
+                        }}
+                      />
+                      <span className="edit-label">Add border around map</span>
+                    </label>
+                  )}
+                  <label>
+                    <span className="edit-label">Geo Border Color</span>
+                    <select
+                      value={state.general.geoBorderColor || false}
+                      onChange={(event) => {
+                        handleEditorChanges(
+                          "geoBorderColor",
+                          event.target.value
+                        );
+                      }}
+                    >
+                      <option value="darkGray">Dark Gray (Default)</option>
+                      <option value="sameAsBackground">White</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span className="edit-label">Map Color Palette</span>
+                  </label>
+                  <span className="h5">Sequential</span>
+                  <ul className="color-palette">
+                    {Object.keys(colorPalettes)
+                      .filter((name) => !name.includes("qualitative"))
+                      .map((palette) => {
+                        const colorOne = {
+                          backgroundColor: colorPalettes[palette][2],
+                        };
 
-												const colorTwo = {
-													backgroundColor: colorPalettes[palette][4],
-												};
+                        const colorTwo = {
+                          backgroundColor: colorPalettes[palette][4],
+                        };
 
-												const colorThree = {
-													backgroundColor: colorPalettes[palette][6],
-												};
+                        const colorThree = {
+                          backgroundColor: colorPalettes[palette][6],
+                        };
 
-												return (
-													<li
-														title={palette}
-														key={palette}
-														onClick={() => {
-															handleEditorChanges('color', palette);
-														}}
-														className={state.color === palette ? 'selected' : ''}
-													>
-														<span style={colorOne}></span>
-														<span style={colorTwo}></span>
-														<span style={colorThree}></span>
-													</li>
-												);
-											})}
-									</ul>
-									<span className='h5'>Non-Sequential</span>
-									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => name.includes('qualitative'))
-                      .filter((name) => name !== 'qualitative9')
-											.map((palette) => {
-												const colorOne = {
-													backgroundColor: colorPalettes[palette][2],
-												};
+                        return (
+                          <li
+                            title={palette}
+                            key={palette}
+                            onClick={() => {
+                              handleEditorChanges("color", palette);
+                            }}
+                            className={
+                              state.color === palette ? "selected" : ""
+                            }
+                          >
+                            <span style={colorOne}></span>
+                            <span style={colorTwo}></span>
+                            <span style={colorThree}></span>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                  <span className="h5">Non-Sequential</span>
+                  <ul className="color-palette">
+                    {Object.keys(colorPalettes)
+                      .filter((name) => name.includes("qualitative"))
+                      .filter((name) => name !== "qualitative9")
+                      .map((palette) => {
+                        const colorOne = {
+                          backgroundColor: colorPalettes[palette][2],
+                        };
 
-												const colorTwo = {
-													backgroundColor: colorPalettes[palette][4],
-												};
+                        const colorTwo = {
+                          backgroundColor: colorPalettes[palette][4],
+                        };
 
-												const colorThree = {
-													backgroundColor: colorPalettes[palette][6],
-												};
+                        const colorThree = {
+                          backgroundColor: colorPalettes[palette][6],
+                        };
 
-												return (
-													<li
-														title={palette}
-														key={palette}
-														onClick={() => {
-															handleEditorChanges('color', palette);
-														}}
-														className={state.color === palette ? 'selected' : ''}
-													>
-														<span style={colorOne}></span>
-														<span style={colorTwo}></span>
-														<span style={colorThree}></span>
-													</li>
-												);
-											})}
-									</ul>
-								</AccordionItemPanel>
-							</AccordionItem>
-						</Accordion>
-					</form>
-					<a
-						href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
-						target='_blank'
-						rel='noopener noreferrer'
-						className='guidance-link'
-					>
-						<MapIcon />
-						<div>
-							<span className='heading-3'>Get Maps Help</span>
-							<p>Examples and documentation</p>
-						</div>
-					</a>
-					<div className='advanced'>
-						<span className='advanced-toggle-link' onClick={() => setAdvancedToggle(!advancedToggle)}>
-							<span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options
-						</span>
-						{advancedToggle && (
-							<React.Fragment>
-								<section className='error-box py-2 px-3 my-2'>
-									<div>
-										<strong className='pt-1'>Warning</strong>
-										<p>This can cause serious errors in your map.</p>
-									</div>
-								</section>
-								<p className='pb-2'>
-									This tool displays the actual map configuration{' '}
-									<acronym title='JavaScript Object Notation'>JSON</acronym> that is generated by this
-									editor and allows you to edit properties directly and apply them.
-								</p>
-								<textarea
-									value={configTextboxValue}
-									onChange={(event) => setConfigTextbox(event.target.value)}
-								/>
-								<button
-									className='btn full-width'
-									onClick={() => loadConfig(JSON.parse(configTextboxValue))}
-								>
-									Apply
-								</button>
-							</React.Fragment>
-						)}
-					</div>
-				</section>
-			</section>
-		</ErrorBoundary>
-	);
+                        return (
+                          <li
+                            title={palette}
+                            key={palette}
+                            onClick={() => {
+                              handleEditorChanges("color", palette);
+                            }}
+                            className={
+                              state.color === palette ? "selected" : ""
+                            }
+                          >
+                            <span style={colorOne}></span>
+                            <span style={colorTwo}></span>
+                            <span style={colorThree}></span>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                </AccordionItemPanel>
+              </AccordionItem>
+            </Accordion>
+          </form>
+          <a
+            href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="guidance-link"
+          >
+            <MapIcon />
+            <div>
+              <span className="heading-3">Get Maps Help</span>
+              <p>Examples and documentation</p>
+            </div>
+          </a>
+          <div className="advanced">
+            <span
+              className="advanced-toggle-link"
+              onClick={() => setAdvancedToggle(!advancedToggle)}
+            >
+              <span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options
+            </span>
+            {advancedToggle && (
+              <React.Fragment>
+                <section className="error-box py-2 px-3 my-2">
+                  <div>
+                    <strong className="pt-1">Warning</strong>
+                    <p>This can cause serious errors in your map.</p>
+                  </div>
+                </section>
+                <p className="pb-2">
+                  This tool displays the actual map configuration{" "}
+                  <acronym title="JavaScript Object Notation">JSON</acronym>{" "}
+                  that is generated by this editor and allows you to edit
+                  properties directly and apply them.
+                </p>
+                <textarea
+                  value={configTextboxValue}
+                  onChange={(event) => setConfigTextbox(event.target.value)}
+                />
+                <button
+                  className="btn full-width"
+                  onClick={() => loadConfig(JSON.parse(configTextboxValue))}
+                >
+                  Apply
+                </button>
+              </React.Fragment>
+            )}
+          </div>
+        </section>
+      </section>
+    </ErrorBoundary>
+  );
 };
 
 export default EditorPanel;
