@@ -6,6 +6,7 @@
     "series": [{"dataKey": "Radius"}, {"dataKey": "Diameter"}],
     "fontSize": "medium",
     "dataCutoff": "0.5",
+    "orientation": "horizontal",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
