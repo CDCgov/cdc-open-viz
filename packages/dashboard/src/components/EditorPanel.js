@@ -250,10 +250,20 @@ const EditorPanel = memo(() => {
 
   const removeFilter = (index) => {
     let dashboardConfig = config.dashboard;
+    let visualizationConfig = config.visualizations;
+
+    Object.keys(visualizationConfig).forEach(vizKey => {
+      if(visualizationConfig[vizKey].setsSharedFilter === dashboardConfig.sharedFilters[index].key){
+        delete visualizationConfig[vizKey].setsSharedFilter;
+      }
+      if(visualizationConfig[vizKey].usesSharedFilter === dashboardConfig.sharedFilters[index].key){
+        delete visualizationConfig[vizKey].usesSharedFilter;
+      }
+    });
 
     dashboardConfig.sharedFilters.splice(index, 1);
 
-    updateConfig({...config, dashboard: dashboardConfig});
+    updateConfig({...config, dashboard: dashboardConfig, visualizations: visualizationConfig});
   }
 
   const updateFilterProp = (name, index, value) => {
