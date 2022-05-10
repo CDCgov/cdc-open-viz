@@ -813,7 +813,6 @@ const EditorPanel = (props) => {
 	}, [state]);
 
   useEffect(() => {
-    console.log("data", state);
 		if ('category' === state.legend.type && editorCatOrder.length === 0) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
       

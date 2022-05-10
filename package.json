@@ -67,8 +67,5 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
-  },
-  "dependencies": {
-    "yarn": "^1.22.18"
   }
 }
