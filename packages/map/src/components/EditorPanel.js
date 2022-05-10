@@ -183,373 +183,374 @@ const EditorPanel = (props) => {
 
   const handleEditorChanges = async (property, value) => {
 		switch (property) {
-			case 'showTitle':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						showTitle: value,
-					},
-				});
-				break;
-			case 'showSidebar':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						showSidebar: value,
-					},
-				});
-				break;
-			case 'fullBorder':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						fullBorder: value,
-					},
-				});
-				break;
-			case 'expandDataTable':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						expandDataTable: value,
-					},
-				});
-				break;
-			case 'color':
-				setState({
-					...state,
-					color: value,
-				});
-				break;
-			case 'sidebarPosition':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						position: value,
-					},
-				});
-				break;
-			case 'geoBorderColor':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						geoBorderColor: value,
-					},
-				});
-				break;
-			case 'headerColor':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						headerColor: value,
-					},
-				});
-				break;
-			case 'navigateColumn':
-				setState({
-					...state,
-					columns: {
-						...state.columns,
-						navigate: {
-							...state.columns.navigate,
-							name: value,
-						},
-					},
-				});
-				break;
-			case 'legendDescription':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						description: value,
-					},
-				});
-				break;
-			case 'legendType':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						type: value,
-					},
-				});
-				break;
-			case 'legendNumber':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						numberOfItems: parseInt(value),
-					},
-				});
-				break;
-			case 'changeActiveFilterValue':
-				const arrVal = value.split(',');
+      case "showTitle":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showTitle: value,
+          },
+        });
+        break;
+      case "showSidebar":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showSidebar: value,
+          },
+        });
+        break;
+      case "fullBorder":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            fullBorder: value,
+          },
+        });
+        break;
+      case "expandDataTable":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            expandDataTable: value,
+          },
+        });
+        break;
+      case "color":
+        setState({
+          ...state,
+          color: value,
+        });
+        break;
+      case "sidebarPosition":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            position: value,
+          },
+        });
+        break;
+      case "geoBorderColor":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            geoBorderColor: value,
+          },
+        });
+        break;
+      case "headerColor":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            headerColor: value,
+          },
+        });
+        break;
+      case "navigateColumn":
+        setState({
+          ...state,
+          columns: {
+            ...state.columns,
+            navigate: {
+              ...state.columns.navigate,
+              name: value,
+            },
+          },
+        });
+        break;
+      case "legendDescription":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            description: value,
+          },
+        });
+        break;
+      case "legendType":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            type: value,
+          },
+        });
+        break;
+      case "legendNumber":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            numberOfItems: parseInt(value),
+          },
+        });
+        break;
+      case "changeActiveFilterValue":
+        const arrVal = value.split(",");
 
-				setActiveFilterValueForDescription(arrVal);
-				break;
-			case 'unifiedLegend':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						unified: value,
-					},
-				});
-				break;
-			case 'separateZero':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						separateZero: value,
-					},
-				});
-				break;
-			case 'toggleDownloadButton':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						showDownloadButton: !state.general.showDownloadButton,
-					},
-				});
-				break;
-			case 'toggleDownloadMediaButton':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						showDownloadMediaButton: !state.general.showDownloadMediaButton,
-					},
-				});
-				break;
-			case 'displayAsHex':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						displayAsHex: value,
-					},
-				});
-				break;
-			case 'editorMapType':
-				switch (value) {
-					case 'data':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								showSidebar: true,
-								type: 'data',
-							},
-						});
-						break;
-					case 'navigation':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								showSidebar: false,
-								type: 'navigation',
-							},
-							tooltips: {
-								...state.tooltips,
-								appearanceType: 'hover',
-							},
-						});
-						break;
-					default:
-						console.warn('Map type not set');
-						break;
-				}
-				break;
-			case 'geoType':
-				// If we're still working with default data, switch to the world default to show it as an example
-				if (true === loadedDefault && 'world' === value) {
-					loadConfig(worldDefaultConfig);
-					ReactTooltip.rebuild();
-					break;
-				}
+        setActiveFilterValueForDescription(arrVal);
+        break;
+      case "unifiedLegend":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            unified: value,
+          },
+        });
+        break;
+      case "separateZero":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            separateZero: value,
+          },
+        });
+        break;
+      case "toggleDownloadButton":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showDownloadButton: !state.general.showDownloadButton,
+          },
+        });
+        break;
+      case "toggleDownloadMediaButton":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showDownloadMediaButton: !state.general.showDownloadMediaButton,
+          },
+        });
+        break;
+      case "displayAsHex":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            displayAsHex: value,
+          },
+        });
+        break;
+      case "editorMapType":
+        switch (value) {
+          case "data":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                showSidebar: true,
+                type: "data",
+              },
+            });
+            break;
+          case "navigation":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                showSidebar: false,
+                type: "navigation",
+              },
+              tooltips: {
+                ...state.tooltips,
+                appearanceType: "hover",
+              },
+            });
+            break;
+          default:
+            console.warn("Map type not set");
+            break;
+        }
+        break;
+      case "geoType":
+        // If we're still working with default data, switch to the world default to show it as an example
+        if (true === loadedDefault && "world" === value) {
+          loadConfig(worldDefaultConfig);
+          ReactTooltip.rebuild();
+          break;
+        }
 
-				if (true === loadedDefault && 'us' === value) {
-					loadConfig(usaDefaultConfig);
-					ReactTooltip.rebuild();
-					break;
-				}
+        if (true === loadedDefault && "us" === value) {
+          loadConfig(usaDefaultConfig);
+          ReactTooltip.rebuild();
+          break;
+        }
 
-				if (true === loadedDefault && 'us-county' === value) {
-					loadConfig(countyDefaultConfig);
-					ReactTooltip.rebuild();
-					break;
-				}
+        if (true === loadedDefault && "us-county" === value) {
+          loadConfig(countyDefaultConfig);
+          ReactTooltip.rebuild();
+          break;
+        }
 
-				switch (value) {
-					case 'us':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								geoType: 'us',
-							},
-							dataTable: {
-								...state.dataTable,
-								forceDisplay: true,
-							},
-						});
-						ReactTooltip.rebuild();
-						break;
-					case 'world':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								geoType: 'world',
-							},
-							dataTable: {
-								...state.dataTable,
-								forceDisplay: true,
-							},
-						});
-						break;
-					case 'us-county':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								geoType: 'us-county',
-								expandDataTable: false,
-							},
-							dataTable: {
-								...state.dataTable,
-								forceDisplay: true,
-							},
-						});
-						break;
-					case 'single-state':
-						setState({
-							...state,
-							general: {
-								...state.general,
-								geoType: 'single-state',
-								expandDataTable: false,
-							},
-							dataTable: {
-								...state.dataTable,
-								forceDisplay: true,
-							},
-						});
-						break;
-					default:
-						break;
-				}
+        switch (value) {
+          case "us":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: "us",
+              },
+              dataTable: {
+                ...state.dataTable,
+                forceDisplay: true,
+              },
+            });
+            ReactTooltip.rebuild();
+            break;
+          case "world":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: "world",
+              },
+              dataTable: {
+                ...state.dataTable,
+                forceDisplay: true,
+              },
+            });
+            break;
+          case "us-county":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: "us-county",
+                expandDataTable: false,
+              },
+              dataTable: {
+                ...state.dataTable,
+                forceDisplay: true,
+              },
+            });
+            break;
+          case "single-state":
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                geoType: "single-state",
+                expandDataTable: false,
+              },
+              dataTable: {
+                ...state.dataTable,
+                forceDisplay: true,
+              },
+            });
+            break;
+          default:
+            break;
+        }
 
-				ReactTooltip.rebuild();
-				break;
-			case 'singleColumnLegend':
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						singleColumn: !state.legend.singleColumn,
-					},
-				});
-				break;
-			case 'dynamicDescription':
-				setState({
-					...state,
-					editor: {
-						...state.editor,
-						activeFilterValueForDescription: value,
-					},
-					legend: {
-						...state.legend,
-						dynamicDescription: !state.legend.dynamicDescription,
-					},
-				});
-				break;
-			case 'changeLegendDescription':
-				const [filterValKey, filterValDesc] = value;
-				setState({
-					...state,
-					legend: {
-						...state.legend,
-						descriptions: {
-							...state.legend.descriptions,
-							[filterValKey]: [filterValDesc],
-						},
-					},
-				});
-				break;
-			case 'appearanceType':
-				setState({
-					...state,
-					tooltips: {
-						...state.tooltips,
-						appearanceType: value,
-					},
-				});
-				break;
-			case 'linkLabel':
-				setState({
-					...state,
-					tooltips: {
-						...state.tooltips,
-						linkLabel: value,
-					},
-				});
-				break;
-			case 'displayStateLabels':
-				setState({
-					...state,
-					general: {
-						...state.general,
-						displayStateLabels: !state.general.displayStateLabels,
-					},
-				});
-				break;
-			case 'capitalizeLabels':
-				setState({
-					...state,
-					tooltips: {
-						...state.tooltips,
-						capitalizeLabels: value,
-					},
-				});
-				break;
-			case 'showDataTable':
-				setState({
-					...state,
-					dataTable: {
-						...state.dataTable,
-						forceDisplay: value,
-					},
-				});
-				break;
-			case 'limitDataTableHeight':
-				setState({
-					...state,
-					dataTable: {
-						...state.dataTable,
-						limitHeight: value
-					}
-				});
-				break;
-			case 'chooseState':
-				let fipsCode = Object.keys(supportedStatesFipsCodes).find(
-					(key) => supportedStatesFipsCodes[key] === value
-				);
-				let stateName = value;
-				let stateData = { fipsCode, stateName };
+        ReactTooltip.rebuild();
+        break;
+      case "singleColumnLegend":
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            singleColumn: !state.legend.singleColumn,
+          },
+        });
+        break;
+      case "dynamicDescription":
+        setState({
+          ...state,
+          editor: {
+            ...state.editor,
+            activeFilterValueForDescription: value,
+          },
+          legend: {
+            ...state.legend,
+            dynamicDescription: !state.legend.dynamicDescription,
+          },
+        });
+        break;
+      case "changeLegendDescription":
+        const [filterValKey, filterValDesc] = value;
+        setState({
+          ...state,
+          legend: {
+            ...state.legend,
+            descriptions: {
+              ...state.legend.descriptions,
+              [filterValKey]: [filterValDesc],
+            },
+          },
+        });
+        break;
+      case "appearanceType":
+        setState({
+          ...state,
+          tooltips: {
+            ...state.tooltips,
+            appearanceType: value,
+          },
+        });
+        break;
+      case "linkLabel":
+        setState({
+          ...state,
+          tooltips: {
+            ...state.tooltips,
+            linkLabel: value,
+          },
+        });
+        break;
+      case "displayStateLabels":
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            displayStateLabels: !state.general.displayStateLabels,
+          },
+        });
+        break;
+      case "capitalizeLabels":
+        setState({
+          ...state,
+          tooltips: {
+            ...state.tooltips,
+            capitalizeLabels: value,
+          },
+        });
+        break;
+      case "showDataTable":
+        setState({
+          ...state,
+          dataTable: {
+            ...state.dataTable,
+            forceDisplay: value,
+          },
+        });
+        break;
+      case "limitDataTableHeight":
+        setState({
+          ...state,
+          dataTable: {
+            ...state.dataTable,
+            limitHeight: value,
+          },
+        });
+        break;
+      case "chooseState":
+        let fipsCode = Object.keys(supportedStatesFipsCodes).find(
+          (key) => supportedStatesFipsCodes[key] === value
+        );
+        let stateName = value;
+        let stateData = { fipsCode, stateName };
 
+<<<<<<< HEAD
 				setState({
 					...state,
 					general: {
@@ -559,6 +560,17 @@ const EditorPanel = (props) => {
 				});
         break;
       case 'classificationType':
+=======
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            statePicked: stateData,
+          },
+        });
+        break;
+      case "classificationType":
+>>>>>>> 2cad416 (fixed formatting issues from last commit)
         setState({
           ...state,
           legend: {
@@ -567,10 +579,17 @@ const EditorPanel = (props) => {
           },
         });
         break;
+<<<<<<< HEAD
 			default:
 				console.warn(`Did not recognize editor property.`);
 				break;
 		}
+=======
+      default:
+        console.warn(`Did not recognize editor property.`);
+        break;
+    }
+>>>>>>> 2cad416 (fixed formatting issues from last commit)
 	};
 
 	const columnsRequiredChecker = useCallback(() => {
@@ -1289,8 +1308,12 @@ const EditorPanel = (props) => {
                       updateField={updateField}
                       section="general"
                       fieldName="territoriesLabel"
+<<<<<<< HEAD
                       label="Te
                       +rritories Label"
+=======
+                      label="Territories Label"
+>>>>>>> 2cad416 (fixed formatting issues from last commit)
                       placeholder="Territories"
                     />
                   )}
@@ -1725,8 +1748,12 @@ const EditorPanel = (props) => {
                     <AccordionItemButton>Legend</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
+<<<<<<< HEAD
                     {state.legend.type === 'equalnumber' &&
                       <label>
+=======
+                    {state.legend.type === 'equalnumber' && <label>
+>>>>>>> 2cad416 (fixed formatting issues from last commit)
                       <span className="edit-label">Legend Type</span>
                       <select
                         value={legend.type}
