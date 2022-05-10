@@ -1,52 +1,53 @@
 {
-	"name": "@cdc/map",
-	"version": "2.6.2",
-	"description": "React component for visualizing tabular data on a map of the United States or the world.",
-	"main": "dist/cdcmap",
-	"scripts": {
-		"start": "npx webpack serve --mode development -c ../../webpack.config.js",
-		"build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
-		"prepublishOnly": "lerna run --scope @cdc/map build"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CDCgov/cdc-open-viz",
-		"directory": "packages/map"
-	},
-	"author": "Daniel Immke <npm@daniel.do>",
-	"bugs": {
-		"url": "https://github.com/CDCgov/cdc-open-viz/issues"
-	},
-	"license": "Apache-2.0",
-	"devDependencies": {
-		"@babel/runtime": "^7.12.5",
-		"@cdc/core": "^1.1.2",
-		"@emotion/core": "^10.0.28",
-		"@emotion/react": "^11.1.5",
-		"@visx/geo": "^1.13.0",
-		"canvg": "^3.0.7",
-		"chroma": "0.0.1",
-		"chroma-js": "^2.1.0",
-		"d3": "^6.6.0",
-		"html-react-parser": "1.4.9",
-		"html2canvas": "^1.0.0-rc.7",
-		"html2pdf.js": "^0.9.2",
-		"papaparse": "^5.3.0",
-		"react-accessible-accordion": "^3.0.1",
-		"react-beautiful-dnd": "^13.0.0",
-		"react-table": "^7.5.0",
-		"react-tag-autocomplete": "^6.0.0",
-		"react-tooltip": "4.2.8",
-		"topojson-client": "^3.1.0",
-		"use-debounce": "^5.2.0",
-		"whatwg-fetch": "^3.6.2"
-	},
-	"peerDependencies": {
-		"react": ">=16.8",
-		"react-dom": ">=16"
-	},
-	"gitHead": "170845062bcbb93f31270104688f69c4148935d8",
-	"dependencies": {
-		"d3-composite-projections": "^1.4.0"
-	}
+  "name": "@cdc/map",
+  "version": "2.6.2",
+  "description": "React component for visualizing tabular data on a map of the United States or the world.",
+  "main": "dist/cdcmap",
+  "scripts": {
+    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
+    "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
+    "prepublishOnly": "lerna run --scope @cdc/map build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/map"
+  },
+  "author": "Daniel Immke <npm@daniel.do>",
+  "bugs": {
+    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@babel/runtime": "^7.12.5",
+    "@cdc/core": "^1.1.2",
+    "@emotion/core": "^10.0.28",
+    "@emotion/react": "^11.1.5",
+    "@visx/geo": "^1.13.0",
+    "canvg": "^3.0.7",
+    "chroma": "0.0.1",
+    "chroma-js": "^2.1.0",
+    "d3": "^6.6.0",
+    "d3-composite-projections": "^1.4.0",
+    "html-react-parser": "1.4.9",
+    "html2canvas": "^1.0.0-rc.7",
+    "html2pdf.js": "^0.9.2",
+    "papaparse": "^5.3.0",
+    "react-accessible-accordion": "^3.0.1",
+    "react-beautiful-dnd": "^13.0.0",
+    "react-table": "^7.5.0",
+    "react-tag-autocomplete": "^6.0.0",
+    "react-tooltip": "4.2.8",
+    "topojson-client": "^3.1.0",
+    "use-debounce": "^5.2.0",
+    "whatwg-fetch": "^3.6.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8",
+    "react-dom": ">=16"
+  },
+  "resolutions": {
+    "@types/react": "17.x"
+  },
+  "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
 }
