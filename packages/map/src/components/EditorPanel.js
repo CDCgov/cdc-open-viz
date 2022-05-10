@@ -831,9 +831,14 @@ const EditorPanel = (props) => {
 		columnsRequiredChecker();
 	}, [state]);
 
-	useEffect(() => {
+  useEffect(() => {
+    console.log("data", state);
 		if ('category' === state.legend.type && editorCatOrder.length === 0) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+<<<<<<< HEAD
+=======
+      
+>>>>>>> e167127 (breaking changes)
 			setEditorCatOrder(arr);
 		}
 	}, [runtimeLegend]);
@@ -1070,21 +1075,20 @@ const EditorPanel = (props) => {
 		});
 	}
 
-	useEffect(() => {
-		const parsedData = convertStateToConfig();
-		const formattedData = JSON.stringify(parsedData, undefined, 2);
+	// useEffect(() => {
+	// 	const parsedData = convertStateToConfig();
+	// 	const formattedData = JSON.stringify(parsedData, undefined, 2);
 
-		setConfigTextbox(formattedData);
-	}, [state]);
+	// 	setConfigTextbox(formattedData);
 
-	useEffect(() => {
-		// Pass up to Editor if needed
-		if (setParentConfig) {
-			const newConfig = convertStateToConfig();
-			setParentConfig(newConfig);
-		}
+	// 	// Pass up to Editor if needed
+	// 	if (setParentConfig) {
+	// 		const newConfig = convertStateToConfig();
+	// 		setParentConfig(newConfig);
+	// 	}
 
-	}, [state]);
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [state]);
 
 	let numberOfItemsLimit = 8;
 
@@ -1317,41 +1321,43 @@ const EditorPanel = (props) => {
                       placeholder="Territories"
                     />
                   )}
-                  <label className="header">
-                    <span className="edit-label">Data Classification Type</span>
-                    <div>
-                      <label>
-                        <input
-                          type="radio"
-                          name="category"
-                          value="numeric"
-                          checked={state.legend.type === "equalnumber"}
-                          onChange={(e) =>
-                            handleEditorChanges(
-                              "classificationType",
-                              e.target.value
-                            )
-                          }
-                        />
-                        Numeric/Quantitative
-                      </label>
-                      <label>
-                        <input
-                          type="radio"
-                          name="category"
-                          value="category"
-                          checked={state.legend.type === "category"}
-                          onChange={(e) =>
-                            handleEditorChanges(
-                              "classificationType",
-                              e.target.value
-                            )
-                          }
-                        />
-                        Categorical
-                      </label>
-                    </div>
-                  </label>
+                    <label className="header">
+                      <span className="edit-label">
+                        Data Classification Type
+                      </span>
+                      <div>
+                        <label>
+                          <input
+                            type="radio"
+                            name="equalnumber"
+                            value="equalnumber"
+                            checked={state.legend.type === "equalnumber"}
+                            onChange={(e) =>
+                              handleEditorChanges(
+                                "classificationType",
+                                e.target.value
+                              )
+                            }
+                          />
+                          Numeric/Quantitative
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="category"
+                            value="category"
+                            checked={state.legend.type === "category"}
+                            onChange={(e) =>
+                              handleEditorChanges(
+                                "classificationType",
+                                e.target.value
+                              )
+                            }
+                          />
+                          Categorical
+                        </label>
+                      </div>
+                    </label>
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1749,11 +1755,15 @@ const EditorPanel = (props) => {
                   </AccordionItemHeading>
                   <AccordionItemPanel>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     {state.legend.type === 'equalnumber' &&
                       <label>
 =======
                     {state.legend.type === 'equalnumber' && <label>
 >>>>>>> 2cad416 (fixed formatting issues from last commit)
+=======
+                    <label>
+>>>>>>> e167127 (breaking changes)
                       <span className="edit-label">Legend Type</span>
                       <select
                         value={legend.type}
@@ -1766,7 +1776,7 @@ const EditorPanel = (props) => {
                         <option value="category">Categorical</option>
                       </select>
                     </label>
-                    }
+
                     {"category" !== legend.type && (
                       <label className="checkbox">
                         <input
