@@ -69,6 +69,7 @@ function CountyMapChecks(prevState, nextState) {
 
 const CountyMap = (props) => {
 
+	console.log('runtimeLegend', props.runtimeLegend)
 	let mapData = states.concat(counties);
 
 	const {

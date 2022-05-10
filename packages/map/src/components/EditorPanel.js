@@ -550,17 +550,6 @@ const EditorPanel = (props) => {
         let stateName = value;
         let stateData = { fipsCode, stateName };
 
-<<<<<<< HEAD
-				setState({
-					...state,
-					general: {
-						...state.general,
-						statePicked: stateData,
-					},
-				});
-        break;
-      case 'classificationType':
-=======
         setState({
           ...state,
           general: {
@@ -570,7 +559,6 @@ const EditorPanel = (props) => {
         });
         break;
       case "classificationType":
->>>>>>> 2cad416 (fixed formatting issues from last commit)
         setState({
           ...state,
           legend: {
@@ -579,17 +567,10 @@ const EditorPanel = (props) => {
           },
         });
         break;
-<<<<<<< HEAD
-			default:
-				console.warn(`Did not recognize editor property.`);
-				break;
-		}
-=======
       default:
         console.warn(`Did not recognize editor property.`);
         break;
     }
->>>>>>> 2cad416 (fixed formatting issues from last commit)
 	};
 
 	const columnsRequiredChecker = useCallback(() => {
@@ -835,10 +816,7 @@ const EditorPanel = (props) => {
     console.log("data", state);
 		if ('category' === state.legend.type && editorCatOrder.length === 0) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
-<<<<<<< HEAD
-=======
       
->>>>>>> e167127 (breaking changes)
 			setEditorCatOrder(arr);
 		}
 	}, [runtimeLegend]);
@@ -1312,12 +1290,7 @@ const EditorPanel = (props) => {
                       updateField={updateField}
                       section="general"
                       fieldName="territoriesLabel"
-<<<<<<< HEAD
-                      label="Te
-                      +rritories Label"
-=======
                       label="Territories Label"
->>>>>>> 2cad416 (fixed formatting issues from last commit)
                       placeholder="Territories"
                     />
                   )}
@@ -1754,16 +1727,10 @@ const EditorPanel = (props) => {
                     <AccordionItemButton>Legend</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-<<<<<<< HEAD
-<<<<<<< HEAD
+
                     {state.legend.type === 'equalnumber' &&
                       <label>
-=======
-                    {state.legend.type === 'equalnumber' && <label>
->>>>>>> 2cad416 (fixed formatting issues from last commit)
-=======
-                    <label>
->>>>>>> e167127 (breaking changes)
+
                       <span className="edit-label">Legend Type</span>
                       <select
                         value={legend.type}
@@ -1776,7 +1743,7 @@ const EditorPanel = (props) => {
                         <option value="category">Categorical</option>
                       </select>
                     </label>
-
+                    }
                     {"category" !== legend.type && (
                       <label className="checkbox">
                         <input
