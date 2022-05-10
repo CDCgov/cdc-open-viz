@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
   },
   extends: [
-    'react-app'
+    'react-app', 'plugin:jsx-a11y/recommended'
   ],
   parserOptions: {
     es2021: true,
