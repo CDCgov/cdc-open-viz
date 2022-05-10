@@ -157,7 +157,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   return (
-    <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+    <>
       {modal && (
         <div className="data-questionnaire-modal">
           <div className="data-questionnaire-modal-content">
@@ -166,26 +166,28 @@ const Widget = ({ data = {}, addVisualization, type }) => {
           </div>
         </div>
       )}
-      <MoveIcon className="drag-icon" />
-      <div className="widget__content">
-        {data.rowIdx !== undefined && (
-          <div className="widget-menu">
-            {data.dataKey && data.dataDescription && data.formattedData && <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>}
-            {data.dataKey && <button className="btn btn-configure" onClick={() => setModal(true)}>Configure Data</button>}
-            <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
-              <option value="">Select a dataset</option>
-              {Object.keys(config.datasets).map(datasetKey => (
-                <option key={datasetKey}>{datasetKey}</option>
-              ))}
-            </select>
-            <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
-          </div>
-        )}
-        {iconHash[type]}
-        <span>{labelHash[type]}</span>
-        {data.newViz && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
+      <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+        <MoveIcon className="drag-icon" />
+        <div className="widget__content">
+          {data.rowIdx !== undefined && (
+            <div className="widget-menu">
+              {data.dataKey && data.dataDescription && data.formattedData && <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>}
+              {data.dataKey && <button className="btn btn-configure" onClick={() => setModal(true)}>Configure Data</button>}
+              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
+                <option value="">Select a dataset</option>
+                {Object.keys(config.datasets).map(datasetKey => (
+                  <option key={datasetKey}>{datasetKey}</option>
+                ))}
+              </select>
+              <div className="widget-menu-item" onClick={deleteWidget}><CloseIcon /></div>
+            </div>
+          )}
+          {iconHash[type]}
+          <span>{labelHash[type]}</span>
+          {data.newViz && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
