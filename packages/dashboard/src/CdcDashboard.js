@@ -346,6 +346,7 @@ export default function CdcDashboard(
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
 
       visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
+      visualizationConfig.formattedData = visualizationConfig.data;
 
       if(visualizationConfig.editing) {
         subVisualizationEditing = true;
@@ -418,6 +419,7 @@ export default function CdcDashboard(
                     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
                     
                     visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
+                    visualizationConfig.formattedData = visualizationConfig.data;
 
                     return (
                       <React.Fragment key={`vis__${index}`}>

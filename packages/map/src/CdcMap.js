@@ -1152,7 +1152,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     if(config) {
         useEffect(() => {
             loadConfig(config)
-        }, [config.data])
+        }, [config.data, config.setsSharedFilter, config.usesSharedFilter])
     }
 
     // Destructuring for more readable JSX
@@ -1205,7 +1205,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     if (!mapProps.data || !state.data) return <Loading />;
 
     const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
-    
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
