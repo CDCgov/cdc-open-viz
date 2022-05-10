@@ -1101,6 +1101,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
             geoType: state.general.geoType,
+            primary: state.columns.primary.name,
             data: state.data
         })
 
@@ -1117,8 +1118,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Data
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+            const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(newRuntimeData) 
         }
 
         // Legend

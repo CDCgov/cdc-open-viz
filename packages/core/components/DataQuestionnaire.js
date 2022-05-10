@@ -219,7 +219,7 @@ export default function DataImport(props) {
           )}
         </>
       )}
-      {configureData.formattedData && (
+      {configureData.dataDescription && configureData.formattedData && (
         <p>Data configured successfully</p>
       )}
     </>
