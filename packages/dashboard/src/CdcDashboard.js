@@ -176,7 +176,7 @@ export default function CdcDashboard(
     Object.keys(newConfig.visualizations).forEach(visualizationKey => {
       const visualization = newConfig.visualizations[visualizationKey];
       if(visualization.usesSharedFilter) {
-        newFilteredData[visualization.dataKey] = filterData(newConfig.dashboard.sharedFilters, data[visualization.dataKey]);
+        newFilteredData[visualizationKey] = filterData(newConfig.dashboard.sharedFilters, visualization.formattedData || data[visualization.dataKey]);
       }
     });
 
@@ -228,7 +228,7 @@ export default function CdcDashboard(
 
       visualizationKeys.forEach(visualizationKey => {
         if(newConfig.visualizations[visualizationKey].usesSharedFilter) {
-          newFilteredData[newConfig.visualizations[visualizationKey].dataKey] = filterData(newConfig.dashboard.sharedFilters, (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey]);
+          newFilteredData[visualizationKey] = filterData(newConfig.dashboard.sharedFilters, newConfig.visualizations[visualizationKey].formattedData || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey]);
         }
       });
     }
@@ -260,6 +260,8 @@ export default function CdcDashboard(
     let updatedConfig = {...config}
 
     updatedConfig.visualizations[visualizationKey] = newConfig;
+
+    updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData;
     
     setConfig(updatedConfig);
   };
@@ -273,8 +275,8 @@ export default function CdcDashboard(
       setConfig({...config, dashboard: dashboardConfig});
 
       let newFilteredData = {};
-      Object.keys(data).forEach(key => {
-        newFilteredData[key] = filterData(dashboardConfig.sharedFilters, data[key]);
+      Object.keys(config.visualizations).forEach(key => {
+        newFilteredData[key] = filterData(dashboardConfig.sharedFilters, config.visualizations[key].formattedData || data[config.visualizations[key].dataKey]);
       });
 
       setFilteredData(newFilteredData);
@@ -341,12 +343,14 @@ export default function CdcDashboard(
     let subVisualizationEditing = false;
 
     Object.keys(config.visualizations).forEach(visualizationKey => {
-      let visualizationConfig = config.visualizations[visualizationKey];
+      let visualizationConfig = {...config.visualizations[visualizationKey]};
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
 
-      visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
-      visualizationConfig.formattedData = visualizationConfig.data;
+      visualizationConfig.data = filteredData && filteredData[visualizationKey] ? filteredData[visualizationKey] : data[dataKey];
+      if(visualizationConfig.formattedData){
+        visualizationConfig.formattedData = visualizationConfig.data;
+      }
 
       if(visualizationConfig.editing) {
         subVisualizationEditing = true;
@@ -414,12 +418,14 @@ export default function CdcDashboard(
                   if(col.width) {
                     if(!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
 
-                    let visualizationConfig = config.visualizations[col.widget];
+                    let visualizationConfig = {...config.visualizations[col.widget]};
 
                     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility';
                     
-                    visualizationConfig.data = filteredData && filteredData[dataKey] ? filteredData[dataKey] : data[dataKey];
-                    visualizationConfig.formattedData = visualizationConfig.data;
+                    visualizationConfig.data = filteredData && filteredData[col.widget] ? filteredData[col.widget] : data[dataKey];
+                    if(visualizationConfig.formattedData){
+                      visualizationConfig.formattedData = visualizationConfig.data;
+                    }
 
                     return (
                       <React.Fragment key={`vis__${index}`}>
