@@ -1052,20 +1052,21 @@ const EditorPanel = (props) => {
 		});
 	}
 
-	// useEffect(() => {
-	// 	const parsedData = convertStateToConfig();
-	// 	const formattedData = JSON.stringify(parsedData, undefined, 2);
+	useEffect(() => {
+		const parsedData = convertStateToConfig();
+		const formattedData = JSON.stringify(parsedData, undefined, 2);
 
-	// 	setConfigTextbox(formattedData);
+		setConfigTextbox(formattedData);
+	}, [state]);
 
-	// 	// Pass up to Editor if needed
-	// 	if (setParentConfig) {
-	// 		const newConfig = convertStateToConfig();
-	// 		setParentConfig(newConfig);
-	// 	}
+	useEffect(() => {
+		// Pass up to Editor if needed
+		if (setParentConfig) {
+			const newConfig = convertStateToConfig();
+			setParentConfig(newConfig);
+		}
 
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [state]);
+	}, [state]);
 
 	let numberOfItemsLimit = 8;
 
