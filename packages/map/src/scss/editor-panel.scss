@@ -286,6 +286,11 @@
         }
       }
     }
+    [type="radio"] {
+      border: 1px solid #8c8f94;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
     input[type="text"], input[role="combobox"], input[type="number"], textarea {
       min-width: 100%;
       max-width: 100%; // Doing this prevents width of textarea from being changed
