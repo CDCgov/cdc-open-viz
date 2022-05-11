@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
+import '../styles/v2/main.scss'
 
 export const GlobalContext = createContext({})
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -28,7 +29,9 @@ export const GlobalContextProvider = ({ children }) => {
 
   return (
     <GlobalContext.Provider value={globalSettings}>
-      {children}
+      <div className="cove">
+        {children}
+      </div>
     </GlobalContext.Provider>
   )
 }

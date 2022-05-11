@@ -1,6 +1,6 @@
-# @cdc/editor
+# @cdc/wizard
 
-[![npm](https://img.shields.io/npm/v/@cdc/editor)](https://www.npmjs.com/package/@cdc/editor)
+[![npm](https://img.shields.io/npm/v/@cdc/wizard)](https://www.npmjs.com/package/@cdc/wizard)
 
 React component for creating configurations for the [dashboard](https://github.com/CDCgov/cdc-open-viz/tree/integration/main/dashboard), [map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map), [chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) and [data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) packages. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 
@@ -12,17 +12,17 @@ React component for creating configurations for the [dashboard](https://github.c
 
 ### Installation and Usage
 
-1. Install the package in your React project `npm install @cdc/editor`
+1. Install the package in your React project `npm install @cdc/wizard`
 2. Import the component and begin using in your code.
 
 ```JSX
-import CdcEditor from '@cdc/editor'
+import CdcEditor from '@cdc/wizard'
 
 function App() {
 
   return (
     <div className="App">
-      <CdcEditor />
+      <CdcWizard />
     </div>
   );
 }

@@ -13,8 +13,6 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
-import './scss/main.scss'
-
 const themeColor = {
   'theme-blue': '#005eaa',
   'theme-purple': '#712177',

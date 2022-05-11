@@ -1,0 +1,32 @@
+@import "~@cdc/core/styles/v2/themes/color-definitions";
+
+.cove-tabs {
+  z-index: 10;
+
+  .cove-tabs__list {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+
+  .cove-tabs__tab {
+    flex: 1 1 0;
+    height: 3rem;
+    text-align: center;
+    line-height: 1.5em;
+    color: #333;
+    background: #F2F2F2;
+    border: 0;
+    border-right: 1px solid $lightGray;
+    border-bottom: 1px solid $lightGray;
+    outline: 0;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &.active {
+      background-color: #565656;
+      color: #fff;
+    }
+  }
+}

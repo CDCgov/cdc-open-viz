@@ -95,7 +95,7 @@ module.exports = (env = {}, { mode }) => {
               'dist/cdcdashboard.js',
               'dist/cdcchart.js',
               'dist/cdcmap.js',
-              'dist/cdceditor.js',
+              'dist/cdcwizard.js',
               'dist/cdcdatabite.js',
               'dist/cdcwafflechart.js',
               'dist/cdcmarkupinclude.js',

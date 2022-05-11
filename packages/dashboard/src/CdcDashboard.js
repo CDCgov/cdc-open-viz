@@ -203,7 +203,7 @@ export default function CdcDashboard(
     loadConfig();
   }, []);
 
-  // Pass up to <CdcEditor /> if it exists when config state changes
+  // Pass up to <CdcWizard /> if it exists when config state changes
   useEffect(() => {
     if(setParentConfig && isEditor) {
       setParentConfig(config);
