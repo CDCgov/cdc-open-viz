@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, Fragment } from 'react';
 
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
@@ -304,7 +304,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       { config.visualizationSubType === "horizontal" && isLabelBelowBar &&
-                      <>
+                      <Fragment>
+                        {!config.runtime.yAxis.hideLabel && (
+
                         <Text
                             x={ config.yAxis.hideAxis ? 0 : 5 } // padding
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
@@ -312,6 +314,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor={"start"}
                           >{yAxisValue}
                         </Text>
+                        )}
+
 
                         { (displayNumbersOnBar) ?
                            (textWidth + 100 < bar.y && !config.isLollipopChart) ?
@@ -340,7 +344,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )
                           : ""
                         }
-                      </>
+                      </Fragment>
                       }
 
                       { (isLabelOnYAxis && visualizationSubType === "horizontal") &&
