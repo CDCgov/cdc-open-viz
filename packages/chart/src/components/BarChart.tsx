@@ -9,11 +9,14 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
 import ReactTooltip from 'react-tooltip';
+import { BarStackHorizontal } from '@visx/shape';
+
 
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
   const { orientation } = config;
+  const isHorizontal = orientation === 'horizontal';
 
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5;
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
@@ -50,7 +53,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
-        { config.visualizationSubType === 'stacked' && orientation === "vertical" ? (
+        
+        {/* Stacked Vertical */}
+        { config.visualizationSubType === 'stacked' && !isHorizontal && (
           <BarStack
             data={data}
             keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
@@ -103,7 +108,42 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             ))
             }
           </BarStack>
-        ) : (
+        )}
+
+        {/* Stacked Horizontal */}
+        { config.visualizationSubType === 'stacked' && isHorizontal && (
+          <>
+          <BarStackHorizontal
+              data={data}
+              keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
+              height={yMax}
+              y={(d: any) => d[config.runtime.yAxis.dataKey]}
+              xScale={xScale}
+              yScale={yScale}
+              color={colorScale}
+            >
+              {(barStacks) =>
+                barStacks.map((barStack) =>
+                  barStack.bars.map((bar) => {
+                    return (
+                    <rect
+                      key={`barstack-horizontal-${barStack.index}-${bar.index}`}
+                      x={bar.x}
+                      y={bar.y}
+                      width={bar.width}
+                      height={bar.height}
+                      fill={bar.color}
+                    />
+                    )
+                  }
+                ))
+              }
+            </BarStackHorizontal>
+          </>
+        )}
+
+        {/* Bar Groups: Not Stacked */}
+        { config.visualizationSubType !== 'stacked' && (
           <Group>
             <BarGroup
               data={data}
