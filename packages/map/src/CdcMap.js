@@ -33,6 +33,7 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
 
 // Child Components
@@ -141,8 +142,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(row.uid) row.uid = null // Wipe existing UIDs
 
             // United States check
-            if("us" === obj.general.geoType) {
-                const geoName = row[obj.columns.geo.name] ? row[obj.columns.geo.name].toUpperCase() : '';
+            if("us" === obj.general.geoType && obj.columns.geo.name) {
+
+                // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+
+                let geoName = '';
+                if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
+
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
 
                 // States
                 uid = stateKeys.find( (key) => supportedStates[key].includes(geoName) )
@@ -568,7 +577,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // When on a single state map filter runtime data by state
             if (
-                !(row[obj.columns.geo.name].substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
                 obj.general.geoType === 'single-state'
             ) {
                 return false;
@@ -991,16 +1000,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             newState?.data.forEach(dataPiece => {
                 if(dataPiece[newState.columns.geo.name]) {
+
                     if(!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
                         dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
                     }
+                    dataPiece[newState.columns.geo.name] = dataPiece[newState.columns.geo.name].toString()
                 }
             })
         }
         return newState;
     }
 
-    const loadConfig = async (configObj) => {
+    const loadConfig = async (configObj) => { 
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1052,11 +1063,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             newState.dataTable.forceDisplay = !isDashboard;
         }
 
-
         validateFipsCodeLength(newState);
         setState(newState)
-
-        // Done loading
         setLoading(false)
     }
 
@@ -1092,19 +1100,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }, [state.general.statePicked]);
 
 
-
     // When geotype changes
     useEffect(() => {
-        
         // UID
         if(state.data && state.columns.geo.name) {
             addUIDs(state, state.columns.geo.name)
         }
-        
-    }, [state.general.geoType]);
+
+    }, [state]);
 
     useEffect(() => {
-
         // UID
         if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
             addUIDs(state, state.columns.geo.name)
@@ -1147,8 +1152,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Data
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(newRuntimeData) 
+            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(data) 
         }
 
         // Legend
@@ -1156,6 +1161,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
+        
     }, [state])
 
     useEffect(() => {

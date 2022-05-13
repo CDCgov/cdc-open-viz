@@ -230,10 +230,12 @@ const EditorPanel = memo(() => {
 
   const getColumns = (filter = true) => {
     let columns = {}
-
-    data.map(row => {
-      Object.keys(row).forEach(columnName => columns[columnName] = true)
-    })
+      if(data.length){
+        data.map(row => {
+          return Object.keys(row).forEach(columnName => columns[columnName] = true)
+         })
+      }
+    
 
     return Object.keys(columns)
   }
@@ -346,7 +348,7 @@ const EditorPanel = memo(() => {
                     <li className="three-col">
                       <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                       <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
-                      <TextField type="number" value={config.dataFormat.roundToPlace} section="dataFormat" fieldName="roundToPlace" label="Round" updateField={updateField} />
+                      <TextField  type="number" value={config.dataFormat.roundToPlace} section="dataFormat" fieldName="roundToPlace" label="Round" updateField={updateField} min='0' max='99'  />
                     </li>
                   </ul>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />

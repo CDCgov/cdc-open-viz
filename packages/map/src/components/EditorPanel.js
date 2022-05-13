@@ -1048,14 +1048,15 @@ const EditorPanel = (props) => {
 		const formattedData = JSON.stringify(parsedData, undefined, 2);
 
 		setConfigTextbox(formattedData);
+	}, [state]);
 
+	useEffect(() => {
 		// Pass up to Editor if needed
 		if (setParentConfig) {
 			const newConfig = convertStateToConfig();
 			setParentConfig(newConfig);
 		}
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state]);
 
 	let numberOfItemsLimit = 8;
@@ -1349,7 +1350,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.dataTable || false}
+															checked={state.columns.primary.dataTable ||false}
 															onChange={(event) => {
 																editColumn(
 																	'primary',
@@ -1365,7 +1366,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.tooltip || false}
+															checked={state.columns.primary.tooltip ||false}
 															onChange={(event) => {
 																editColumn('primary', 'tooltip', event.target.checked);
 															}}
@@ -2027,6 +2028,7 @@ const EditorPanel = (props) => {
 									<ul className='color-palette'>
 										{Object.keys(colorPalettes)
 											.filter((name) => name.includes('qualitative'))
+                      .filter((name) => name !== 'qualitative9')
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
