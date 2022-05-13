@@ -1,21 +1,14 @@
 @import "../utils/variables";
 @import "../themes/index";
 
-input, datalist, textarea, select {
-  transition: border-color 200ms $transition-expo-out;
-  font-family: sans-serif;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="search"],
-datalist, textarea, select {
+.cove-input {
   padding: 0.5em 0.5em;
   border-width: 1px;
   border-style: solid;
   border-color: #cbcbcb;
-  border-radius: 3px;
+  border-radius: 0.1875rem;
+  transition: border-color 200ms $transition-expo-out;
+  font-family: sans-serif;
   width: 100%;
 
   &::placeholder {
@@ -38,22 +31,20 @@ datalist, textarea, select {
   &[disabled] {
     background-color: #e4e4e4;
   }
-}
 
-select {
   &.input--small {
     padding: 0;
   }
 }
 
-textarea {
+.cove-input__textarea {
   width: 100%;
   min-height: 140px;
   max-width: 100%;
   line-height: 1.5em;
 }
 
-label {
+.cove-input__label {
   display: block;
   font-size: 0.8em;
   text-transform: uppercase;

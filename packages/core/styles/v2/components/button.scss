@@ -21,7 +21,7 @@
   vertical-align: middle;
   color: #fff;
   background-color: $primary;
-  border-radius: .3125em;
+  border-radius: 0.1875rem;
   border: 0;
   transition: all 500ms $transition-expo-out;
   user-select: none;
@@ -75,6 +75,11 @@
     &:hover {
       background-color: darken(#a0a0a0, 5%);
     }
+  }
+
+  &.cove-button--has-icon {
+    display: inline-flex;
+    align-items: center;
   }
 }
 

@@ -29,3 +29,38 @@
     overflow-x: auto;
   }
 }
+
+
+.cove-wizard__file-selector {
+  padding: 1rem 3rem;
+  text-align: center;
+  font-size: 1em;
+  color: $mediumGray;
+  border: $lightGray 2px dashed;
+  border-radius: .2rem;
+  cursor: pointer;
+  transition: .1s all;
+
+  &.drag-active {
+    background-color: $lightestGray;
+  }
+
+  span {
+    white-space: pre;
+    color: $blue;
+    text-decoration: underline;
+  }
+}
+
+.cove-wizard__sample-data {
+  padding-left: 0;
+  font-size: .8rem;
+  list-style: none;
+
+  li {
+    margin-bottom: 0.25rem;
+    color: $blue;
+    text-decoration: underline;
+    cursor: pointer
+  }
+}

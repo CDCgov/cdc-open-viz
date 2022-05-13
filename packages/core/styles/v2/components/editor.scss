@@ -82,6 +82,7 @@
     width: 0;
   }
 
+  // TODO: What is this stuff? -----------------------------------------------
   .two-col-inputs {
     display: flex;
     margin-top: 1em;
@@ -235,17 +236,6 @@
       border-left: rgba(0, 0, 0, 0.7) 4px solid;
       transition: .2s all;
     }
-  }
-
-  span.subtext {
-    display: block;
-    color: rgba(0, 0, 0, .5);
-    text-transform: none;
-    font-weight: normal;
-  }
-
-  .btn {
-    margin-top: 1em;
   }
 
   .sort-list {
@@ -437,7 +427,7 @@
 }
 
 // -------------------------------------------------------------------------------
-
+// TODO: Refactor the palette
 ul.color-palette {
   display: flex;
   max-width: 100%;

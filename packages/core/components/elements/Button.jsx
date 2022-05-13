@@ -5,17 +5,23 @@ import LoadSpin from '../ui/LoadSpin'
 
 import '../../styles/v2/components/button.scss'
 
-const Button = ({ fluid = false, hoverStyle = {}, loading = false, children, ...attributes }) => {
-  const [ customStyles, setCustomStyles ] = useState({...attributes.style})
+const Button = ({
+                  fluid = false,
+                  hoverStyle = {},
+                  loading = false,
+                  hasIcon,
+                  children, ...attributes
+                }) => {
+  const [ customStyles, setCustomStyles ] = useState({ ...attributes.style })
 
   let attributesObj = {
     ...attributes,
-    className: 'cove-button' + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : '')
+    className: 'cove-button' + (hasIcon ? ' cove-button--has-icon' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : '')
   }
 
   const setStyles = (direction) => {
     return direction === 'in'
-      ? setCustomStyles(style => ({...style, ...hoverStyle}))
+      ? setCustomStyles(style => ({ ...style, ...hoverStyle }))
       : direction === 'out'
         ? setCustomStyles({ ...attributes.style })
         : false
@@ -24,8 +30,8 @@ const Button = ({ fluid = false, hoverStyle = {}, loading = false, children, ...
   return (
     <button {...attributesObj}
             style={customStyles}
-            onMouseOver={()=>setStyles('in')}
-            onMouseOut={()=>setStyles('out')}>
+            onMouseOver={() => setStyles('in')}
+            onMouseOut={() => setStyles('out')}>
       {loading ? <LoadSpin opacity={80} size={20}/> : children}
     </button>
   )

@@ -58,7 +58,7 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
   return (
     <>
       {displayOverlay &&
-      <div className={`cove-overlay ${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
+      <div className={`cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
         <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
              onClick={(e) =>
                disableBgClose ? setOverlayErrorState(true) :

@@ -1,16 +1,18 @@
-.guidance-link {
+@import "../utils/variables";
+@import "../themes/color-definitions";
+
+.cove-guidance-block {
   display: flex;
   position: relative;
-  padding: .75em 1em;
-  margin: 2em 0 1em;
-  text-decoration: none;
-  font-size: 1em;
-  border: $lightGray 1px solid;
+  padding: .75rem 1rem;
+  font-size: 1rem;
   color: #444;
-  transition: .2s all;
+  text-decoration: none;
+  border: $lightGray 1px solid;
+  transition: all 200ms $transition-expo-out;
 
   &:before {
-    content: " ";
+    content: "";
     position: absolute;
     top: -1px;
     left: -1px;
@@ -25,10 +27,6 @@
     transition: .2s all;
   }
 
-  > div {
-    font-size: .9em;
-  }
-
   svg {
     width: 60px;
     color: $blue;
@@ -38,9 +36,13 @@
       fill: currentColor;
     }
   }
+}
 
-  h3 {
-    font-weight: 600;
-    font-size: 1.2rem;
-  }
+.cove-guidance-block__header {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.cove-guidance-block__content {
+  font-size: .875rem;
 }

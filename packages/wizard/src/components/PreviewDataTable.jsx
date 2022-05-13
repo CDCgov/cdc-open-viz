@@ -31,17 +31,16 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
     setFilterValue(e.target.value)
   }
 
+  {/* filter */}
   return (
-    <div className="input-group">
-      <input
-        className="filter"
-        value={filterValue}
-        onChange={onChange}
-        type="search"
-        placeholder="Filter..."
-        disabled={disabled}
-      />
-    </div>
+    <input
+      type="search"
+      className="cove-input"
+      placeholder="Filter..."
+      onChange={onChange}
+      value={filterValue}
+      disabled={disabled}
+    />
   )
 })
 
