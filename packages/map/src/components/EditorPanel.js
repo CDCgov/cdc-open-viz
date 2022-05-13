@@ -17,13 +17,16 @@ import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '../../../core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+import InputToggle from '@cdc/core/components/inputs/InputToggle';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -106,6 +109,9 @@ const EditorPanel = (props) => {
 	const [advancedToggle, setAdvancedToggle] = useState(false);
 
 	const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0]);
+
+	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
+
 
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
@@ -564,6 +570,11 @@ const EditorPanel = (props) => {
 		}
 	};
 
+
+
+
+
+
 	const columnsRequiredChecker = useCallback(() => {
 		let columnList = [];
 
@@ -961,7 +972,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
-				
+
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
@@ -1009,7 +1020,7 @@ const EditorPanel = (props) => {
 						</Droppable>
 					</DragDropContext>
 				}
-				
+
 			</fieldset>
 		);
 	});
@@ -1043,6 +1054,11 @@ const EditorPanel = (props) => {
 		});
 	}
 
+
+	useEffect(()=>{
+		if(paletteName) handleEditorChanges('color',paletteName)
+	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
+	
 	useEffect(() => {
 		const parsedData = convertStateToConfig();
 		const formattedData = JSON.stringify(parsedData, undefined, 2);
@@ -1350,7 +1366,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.dataTable ||false}
+															checked={state.columns.primary.dataTable || false}
 															onChange={(event) => {
 																editColumn(
 																	'primary',
@@ -1366,7 +1382,7 @@ const EditorPanel = (props) => {
 													<label className='checkbox'>
 														<input
 															type='checkbox'
-															checked={state.columns.primary.tooltip ||false}
+															checked={state.columns.primary.tooltip || false}
 															onChange={(event) => {
 																editColumn('primary', 'tooltip', event.target.checked);
 															}}
@@ -1991,10 +2007,11 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<span className='h5'>Sequential</span>
+									{/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
+									<InputToggle type='3d' section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+										<span>Sequential</span>
 									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => !name.includes('qualitative'))
+										{filteredPallets
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
@@ -2024,11 +2041,9 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<span className='h5'>Non-Sequential</span>
+									<span>Non-Sequential</span>
 									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => name.includes('qualitative'))
-                      .filter((name) => name !== 'qualitative9')
+										{filteredQualitative
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],

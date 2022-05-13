@@ -37,6 +37,7 @@ export default {
     keys: []
   },
   palette: 'qualitative-bold',
+  isPaletteReversed:false,
   labels: false,
   dataFormat: {},
   confidenceKeys: {}

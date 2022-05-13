@@ -2,15 +2,17 @@ import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
+
 import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
+import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
-import Context from './context'
+
 import './scss/main.scss'
 
 const themeColor = {
@@ -179,62 +181,36 @@ const WaffleChart = ({ config, isEditor }) => {
       return include
     }).map(Number)
 
+    // Calculate numerator  ------------------
     let waffleNumerator = ''
 
-    switch (dataFunction) {
-      case DATA_FUNCTION_COUNT:
-        waffleNumerator = String(numericalData.length)
-        break
-      case DATA_FUNCTION_SUM:
-        waffleNumerator = String(getColumnSum(numericalData))
-        break
-      case DATA_FUNCTION_MEAN:
-        waffleNumerator = String(getColumnMean(numericalData))
-        break
-      case DATA_FUNCTION_MEDIAN:
-        waffleNumerator = getMedian(numericalData).toString()
-        break
-      case DATA_FUNCTION_MAX:
-        waffleNumerator = Math.max(...numericalData).toString()
-        break
-      case DATA_FUNCTION_MIN:
-        waffleNumerator = Math.min(...numericalData).toString()
-        break
-      case DATA_FUNCTION_MODE:
-        waffleNumerator = getMode(numericalData).join(', ')
-        break
-      default:
-        console.log('Function not recognized: ' + dataFunction)
+    const numerFunctionList = {
+      [DATA_FUNCTION_COUNT]: String(numericalData.length),
+      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalData)),
+      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalData)),
+      [DATA_FUNCTION_MEDIAN]: getMedian(numericalData).toString(),
+      [DATA_FUNCTION_MAX]: Math.max(...numericalData).toString(),
+      [DATA_FUNCTION_MIN]: Math.min(...numericalData).toString(),
+      [DATA_FUNCTION_MODE]: getMode(numericalData).join(', ')
     }
 
+    waffleNumerator = numerFunctionList[dataFunction]
+
+    // Calculate denominator ------------------
     let waffleDenominator = null
 
+    const denomFunctionList = {
+      [DATA_FUNCTION_COUNT]: String(numericalDenomData.length),
+      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalDenomData)),
+      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalDenomData)),
+      [DATA_FUNCTION_MEDIAN]: getMedian(numericalDenomData).toString(),
+      [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
+      [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
+      [DATA_FUNCTION_MODE]: getMode(numericalDenomData).join(', '),
+    }
+
     if (customDenom && dataDenomColumn && dataDenomFunction) {
-      switch (dataDenomFunction) {
-        case DATA_FUNCTION_COUNT:
-          waffleDenominator = String(numericalDenomData.length)
-          break
-        case DATA_FUNCTION_SUM:
-          waffleDenominator = String(getColumnSum(numericalDenomData))
-          break
-        case DATA_FUNCTION_MEAN:
-          waffleDenominator = String(getColumnMean(numericalDenomData))
-          break
-        case DATA_FUNCTION_MEDIAN:
-          waffleDenominator = getMedian(numericalDenomData).toString()
-          break
-        case DATA_FUNCTION_MAX:
-          waffleDenominator = Math.max(...numericalDenomData).toString()
-          break
-        case DATA_FUNCTION_MIN:
-          waffleDenominator = Math.min(...numericalDenomData).toString()
-          break
-        case DATA_FUNCTION_MODE:
-          waffleDenominator = getMode(numericalDenomData).join(', ')
-          break
-        default:
-          console.log('Function not recognized: ' + dataFunction)
-      }
+      waffleDenominator = denomFunctionList[dataDenomFunction]
     } else {
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
     }
@@ -301,44 +277,45 @@ const WaffleChart = ({ config, isEditor }) => {
     return (nodeWidth * 10) + (nodeSpacer * 9)
   }, [ nodeWidth, nodeSpacer ])
 
-  let dataFontSize = config.fontSize ? {fontSize: config.fontSize + 'px'} : null
+  let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   return (
-    <div className={isEditor ? 'spacing-wrapper' : ''}>
-      <section className={`cdc-waffle-chart ${theme}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-        <div className="cdc-waffle-chart__container">
-          {title &&
-            <header aria-hidden="true">
-              <div className="cdc-waffle-chart__header">{parse(title)}</div>
-            </header>
-          }
-          <div className={`cdc-waffle-chart__inner-container${orientation === 'vertical' ? ' cdc-waffle-chart--verical' : ''}`}>
-            <div className="cdc-waffle-chart__chart" style={{width: setRatio()}}>
+    <>
+      {title &&
+      <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+        {parse(title)}
+      </header>
+      }
+      <div className="cove-component__content">
+        <div className="cove-component__content-wrap">
+          <div
+            className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+            <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
               <svg width={setRatio()} height={setRatio()}>
                 <Group>
                   {buildWaffle()}
                 </Group>
               </svg>
             </div>
-            { (dataPercentage || content) &&
-              <div className="cdc-waffle-chart__data">
+            {(dataPercentage || content) &&
+            <div className="cove-waffle-chart__data">
               {dataPercentage &&
-              <div className="cdc-waffle-chart__data--primary" style={dataFontSize}>
+              <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
                 {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
               </div>
               }
-              <div className="cdc-waffle-chart__data--text">{parse(content)}</div>
+              <div className="cove-waffle-chart__data--text">{parse(content)}</div>
             </div>
             }
           </div>
           {subtext &&
-            <div className="cdc-waffle-chart__subtext">
-              {parse(subtext)}
-            </div>
+          <div className="cove-waffle-chart__subtext">
+            {parse(subtext)}
+          </div>
           }
         </div>
-      </section>
-    </div>
+      </div>
+    </>
   )
 }
 
@@ -351,42 +328,30 @@ const CdcWaffleChart = (
     setConfig: setParentConfig
   }
 ) => {
+
+  // Default States
   const [ config, setConfig ] = useState({ ...defaults })
   const [ loading, setLoading ] = useState(true)
 
   const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
 
-  //Observes changes to outermost container and changes viewport size in state
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
-
-      setCurrentViewport(newViewport)
-    }
-  })
-
+  // Default Functions
   const updateConfig = (newConfig) => {
-
-    // Deeper copy
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
     })
 
-    //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.uniqueId = Date.now()
 
-    //Check things that are needed and set error messages if needed
     newConfig.runtime.editorErrorMessage = ''
     setConfig(newConfig)
   }
 
-  const loadConfig = async () => {
+  const loadConfig = useCallback(async () => {
     let response = configObj || await (await fetch(configUrl)).json()
-
-    // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
@@ -398,38 +363,36 @@ const CdcWaffleChart = (
 
     updateConfig({ ...defaults, ...response })
     setLoading(false)
-  }
+  }, [])
 
-  // Load data when component first mounts
+  // Custom Functions
+
+  // --Observes changes to outermost container and changes viewport size in state
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      let newViewport = getViewport(entry.contentRect.width * 2) // Data bite is usually presented as small, so we scale it up for responsive calculations
+
+      setCurrentViewport(newViewport)
+    }
+  })
+
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
       resizeObserver.observe(node)
     }
   }, [])
 
+  //Load initial config
   useEffect(() => {
-    console.log('Running empty useEFfect')
-    loadConfig()
+    loadConfig().catch((err) => console.log(err))
   }, [])
 
-  if (configObj) {
-    useEffect(() => {
-      console.log('Running last useEFfect')
-      loadConfig()
-    }, [ configObj.data ])
-  }
-
+  //Reload config if config object provided/updated
   useEffect(() => {
-    loadConfig()
-  }, [])
+    loadConfig().catch((err) => console.log(err))
+  }, [ configObj?.data ])
 
-  if (configObj) {
-    useEffect(() => {
-      loadConfig()
-    }, [ configObj.data ])
-  }
-
-  let body = (<Loading/>)
+  let content = (<Loading/>)
 
   if (loading === false) {
     let classNames = [
@@ -440,27 +403,30 @@ const CdcWaffleChart = (
       'font-' + config.overallFontSize
     ]
 
-
     if (isEditor) {
       classNames.push('is-editor')
     }
 
-    body = (
-      <>
-        <div className={classNames.join(' ')} ref={outerContainerRef}>
-          {isEditor && <EditorPanel/>}
-          <WaffleChart config={config} isEditor={isEditor}/>
-        </div>
-      </>
+    let body = (
+      <div className="cove-component waffle-chart" ref={outerContainerRef}>
+        <WaffleChart config={config} isEditor={isEditor}/>
+      </div>
+    )
+
+    content = (
+      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {!isEditor && body}
+      </div>
     )
   }
 
   return (
     <ErrorBoundary component="WaffleChart">
-      <Context.Provider
+      <ConfigContext.Provider
         value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}>
-        {body}
-      </Context.Provider>
+        {content}
+      </ConfigContext.Provider>
     </ErrorBoundary>
   )
 }

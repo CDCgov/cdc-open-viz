@@ -1,0 +1,125 @@
+@import "../utils/variables";
+@import "../themes/index";
+
+.cove-button {
+  display: inline-block;
+  position: relative;
+  min-width: 6rem;
+  padding: 0.75em 1.125em;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: $primary;
+  border-radius: .3125em;
+  border: 0;
+  transition: all 500ms $transition-expo-out;
+  transition-property: background-color, box-shadow;
+  user-select: none;
+  cursor: pointer;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  &:hover {
+    background-color: lighten($primary, 5%);
+  }
+
+  &:active,
+  &:focus {
+    background-color: lighten($primary, 5%);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      outline: 2px solid rgba(161, 161, 161, 0.6);
+      border-radius: .3125em;
+      margin: -2px;
+      pointer-events: none;
+    }
+  }
+
+  &.success {
+    background-color: #44aa41;
+
+    &:hover {
+      background-color: lighten(#44aa41, 5%);
+    }
+  }
+
+  &.warn {
+    background-color: #d73636;
+
+    &:hover {
+      background-color: darken(#d73636, 5%);
+    }
+  }
+
+
+  &.muted {
+    background-color: #a0a0a0;
+
+    &:hover {
+      background-color: darken(#a0a0a0, 5%);
+    }
+  }
+}
+
+/* Old Styles ------------------------------------------
+*/
+
+.btn {
+  display: block;
+  padding: .4em .8em;
+  font-size: 1em;
+  color: #fff;
+  background: #005eaa;
+  border: 0;
+  border-radius: .3em;
+  transition: .1s background-color;
+  cursor: pointer;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  &:hover {
+    transition: .1s background-color;
+  }
+
+  &.secondary {
+    font-size: .8em;
+    padding: .3em 1em;
+    background: rgba(0, 0, 0, 0.3);
+    display: inline-block;
+    margin-bottom: 1em;
+
+    &:hover {
+      background: rgba(0, 0, 0, .5);
+    }
+  }
+
+  &.danger {
+    background-color: $red;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($red, 5%);
+    }
+  }
+
+  &:hover {
+    transition: .1s all;
+    background: lighten(#005eaa, 5%);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 2px;
+    margin-left: 5px;
+  }
+}
