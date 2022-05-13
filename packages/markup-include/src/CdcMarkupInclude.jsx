@@ -9,7 +9,14 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+
+import Overlay from '@cdc/core/components/ui/Overlay'
+import Modal from '@cdc/core/components/ui/Modal'
+import Button from '@cdc/core/components/elements/Button'
+
 import './scss/main.scss'
+
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 const CdcMarkupInclude = (
   {
@@ -63,7 +70,6 @@ const CdcMarkupInclude = (
     updateConfig({ ...defaults, ...response })
     setLoading(false)
   }, [])
-
 
   // Custom Functions
   useEffect(() => {
@@ -136,6 +142,114 @@ const CdcMarkupInclude = (
     return hasBody ? parse[1] : parse
   }
 
+  // Overlay & Modal
+  let { overlay } = useGlobalContext()
+
+  const callTest = () => {
+    overlay.actions.toggleOverlay(false)
+    alert('Called the function')
+  }
+
+  const testModal1 = () => {
+    return (
+      <Overlay>
+        <Modal showClose={false}>
+          <Modal.Header>
+            Modal Title 1
+          </Modal.Header>
+          <Modal.Content>
+            This is a modal without a close button. There could be a lot of content to display but we're not sure how much
+            is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'right' }}>
+              <Button className="muted" onClick={() => overlay.actions.toggleOverlay(false)}>Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Submit</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal2 = () => {
+    return (
+      <Overlay>
+        <Modal showDividerTop={false}>
+          <Modal.Content>
+            This is a modal without a header or a top divider. There could be a lot of content to display, but we're not
+            sure how much is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of
+            each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <Button onClick={() => callTest()}>Trigger an Action</Button>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal3 = () => {
+    return (
+      <Overlay disableBgClose={true}>
+        <Modal fontTheme={'light'} headerBgColor={'#d9006e'}>
+          <Modal.Header>
+            Disable Background Close
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal where the background close is disabled. Either the default close button, or an action
+              button <b><i>must</i></b> be available to the user in order to close the modal.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal4 = () => {
+    return (
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#363955'}>
+          <Modal.Header>
+            General Information Modal
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal with some general information. Anything can go here to give details or explain some
+              information further. This can contain as much information as is needed in order to provide the proper
+              context for the content.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal5 = () => {
+    return (
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#d73636'}>
+          <Modal.Header>
+            Warning Modal
+          </Modal.Header>
+          <Modal.Content>
+            Making these changes will perform an unreversible action.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '1rem' }}>Are you sure you want to continue?</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Button className="warn" onClick={() => overlay.actions.toggleOverlay(false)}>No, Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Yes, Continue</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
@@ -164,9 +278,9 @@ const CdcMarkupInclude = (
           }
           <div className="cove-component__content">
             {!markupError && urlMarkup &&
-            <div className="cove-component__content-wrap">
-              <Markup content={parseBodyMarkup(urlMarkup)}/>
-            </div>
+              <div className="cove-component__content-wrap">
+                <Markup content={parseBodyMarkup(urlMarkup)}/>
+              </div>
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
@@ -178,6 +292,7 @@ const CdcMarkupInclude = (
       <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
+        {overlay.object || null}
       </div>
     )
   }
