@@ -66,6 +66,7 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
                    override ? override.actions.toggleOverlay(false) :
                      e.preventDefault()
              }
+             role="alert"
         />
         <div className="cove-overlay__wrapper">
           <div className="cove-overlay__container">

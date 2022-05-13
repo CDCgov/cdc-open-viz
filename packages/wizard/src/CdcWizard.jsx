@@ -6,12 +6,12 @@ import ResizeObserver from 'resize-observer-polyfill'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import WizardContext from './WizardContext'
+
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import DataImport from './components/DataImport'
 import ChooseTab from './components/ChooseTab'
 import ConfigureTab from './components/ConfigureTab'
-import TabPane from './components/TabPane'
 import Tabs from './components/Tabs'
 
 import './scss/cove-wizard.scss'
@@ -99,24 +99,24 @@ const CdcWizard = ({ config: configObj = { newViz: true }, hostname, containerEl
 
   return (
     <GlobalContextProvider>
-      <WizardContext.Provider value={state}>
-        <div className={`cove-wizard ${currentViewport}`} ref={outerContainerRef}>
-          {/* cdc-open-viz-module cdc-editor*/}
-          <Tabs startingTab={globalActive}>
-            {/* top-level */}
-            <TabPane title="1. Import Data" className="data-designer">
-              <DataImport/>
-            </TabPane>
-            <TabPane title="2. Choose Visualization Type" className="choose-type"
-                     disableRule={!config.data && !config.formattedData}>
-              <ChooseTab/>
-            </TabPane>
-            <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-              <ConfigureTab containerEl={containerEl}/>
-            </TabPane>
-          </Tabs>
-        </div>
-      </WizardContext.Provider>
+        <WizardContext.Provider value={state}>
+          <div className={`cove-wizard ${currentViewport}`} ref={outerContainerRef}>
+            {/* cdc-open-viz-module cdc-editor*/}
+            <Tabs startingTab={globalActive} fullsize>
+              {/* top-level */}
+              <Tabs.Pane title="1. Import Data" className="data-designer">
+                <DataImport/>
+              </Tabs.Pane>
+              <Tabs.Pane title="2. Choose Visualization Type" className="choose-type"
+                         disableRule={!config.data && !config.formattedData}>
+                <ChooseTab/>
+              </Tabs.Pane>
+              <Tabs.Pane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
+                <ConfigureTab containerEl={containerEl}/>
+              </Tabs.Pane>
+            </Tabs>
+          </div>
+        </WizardContext.Provider>
     </GlobalContextProvider>
   )
 }

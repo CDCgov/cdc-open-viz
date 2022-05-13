@@ -6,13 +6,9 @@ import axios from 'axios'
 
 import WizardContext from '../WizardContext'
 
-import TabPane from './TabPane'
+import Icon from '@cdc/core/components/ui/Icon'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-
-import LinkIcon from '../assets/icons/link.svg'
-import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
-import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
 import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
@@ -21,6 +17,7 @@ import validCountyMapData from '../../example/valid-county-data.csv'
 import { DataTransform } from '@cdc/core/components/DataTransform'
 
 export default function DataImport() {
+
   const {
     config,
     setConfig,
@@ -33,13 +30,11 @@ export default function DataImport() {
     setTempConfig
   } = useContext(WizardContext)
 
-  const transform = new DataTransform()
-
   const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
-
+  const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
 
-  const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
+  const transform = new DataTransform()
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -276,18 +271,19 @@ export default function DataImport() {
     return ( //todo convert to modal
       <button className="btn danger"
               onClick={() => resetEditor({}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
-        <CloseIcon/>
+        <Icon display="close"/>
       </button>
     )
   }
 
   return (
-    <>
-      <div className="left-col">
+    <div className="cove-wizard__grid">
+      <div className="cove-wizard__grid--left">
+        {/* left-col */}
         {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
-            <Tabs>
-              <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+            <Tabs className="cove-tabs--alternate" style={{marginBottom: '2rem'}}>
+              <Tabs.Pane title="Upload File" icon={<Icon display="fileUpload"/>}>
                 <div
                   className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
                   <input {...getInputProps()} />
@@ -297,19 +293,21 @@ export default function DataImport() {
                       <p>Drag file to this area, or <span>select a file</span>.</p>
                   }
                 </div>
-              </TabPane>
-              <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon"/>}>
+              </Tabs.Pane>
+              <Tabs.Pane title="Load from URL" icon={<Icon display="link"/>}>
                 {loadFileFromUrl(externalURL)}
-              </TabPane>
+              </Tabs.Pane>
             </Tabs>
+
             {errors && (errors.map ? errors.map((message, index) => (
               <div className="error-box slim mt-2" key={`error-${message}`}>
-                <span>{message}</span> <CloseIcon className="inline-icon dismiss-error"
-                                                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}/>
+                <span>{message}</span> <Icon display="close" onClick={() => setErrors(errors.filter((val, i) => i !== index))}/>
               </div>
             )) : errors.message)}
+
             <p className="footnote">Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file
               size {maxFileSize}MB.</p>
+
             {/* TODO: Add more sample data in, but this will do for now. */}
             <span className="heading-3">Load Sample Data:</span>
             <ul className="sample-data-list">
@@ -326,6 +324,7 @@ export default function DataImport() {
                 States Counties Sample Data
               </li>
             </ul>
+
             <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
                rel="noopener noreferrer" className="guidance-link">
               <div>
@@ -348,7 +347,7 @@ export default function DataImport() {
                     {
                       isDragActive ?
                         <p>Drop file here</p> :
-                        <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
+                        <p><Icon display="fileUpload"/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
                     }
                   </div>
                   <div>
@@ -488,8 +487,9 @@ export default function DataImport() {
                       updateDescriptionProp('seriesKey', e.target.value)
                     }} value={config.dataDescription.seriesKey}>
                       <option value="">Choose an option</option>
-                      {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                 key={index}>{value}</option>)}
+                      {Object.keys(config.data[0]).map((value, index) => (
+                        <option value={value} key={index}>{value}</option>
+                      ))}
                     </select>
                   </div>
                 )}
@@ -626,9 +626,10 @@ export default function DataImport() {
           </div>
         )}
       </div>
-      <div className="right-col">
+      <div className="cove-wizard__grid--right">
+        {/* right-col */}
         <PreviewDataTable data={config.data}/>
       </div>
-    </>
+    </div>
   )
 }

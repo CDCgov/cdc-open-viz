@@ -11,7 +11,10 @@ import {
 
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
+import InputText from '@cdc/core/components/inputs/InputText'
+
 import WizardContext from '../WizardContext'
+import '../scss/cove-data-table.scss'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [ filterValue, setFilterValue ] = useState(globalFilter)
@@ -29,23 +32,27 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
   }
 
   return (
-    <input
-      className="filter"
-      value={filterValue}
-      onChange={onChange}
-      type="search"
-      placeholder="Filter..."
-      disabled={disabled}
-    />
+    <div className="input-group">
+      <input
+        className="filter"
+        value={filterValue}
+        onChange={onChange}
+        type="search"
+        placeholder="Filter..."
+        disabled={disabled}
+      />
+    </div>
   )
 })
 
-const Header = memo(({ globalFilter, data, setGlobalFilter }) => (
-  <header className="data-table-header">
-    <h2>Data Preview</h2>
-    <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
-  </header>
-))
+const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => {
+  return (
+    <header className="cove-data-table__header">
+      <h2>Data Preview</h2>
+      <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
+    </header>
+  )
+})
 
 const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }) => (
   <footer className="data-table-pagination">

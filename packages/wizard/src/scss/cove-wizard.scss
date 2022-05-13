@@ -1,5 +1,31 @@
 @import "~@cdc/core/styles/v2/themes/color-definitions";
 
 .cove-wizard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
+.cove-wizard__grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  height: 100%;
+
+  .cove-wizard__grid--left {
+    background: #fff;
+    padding: 3rem 1.875em 1.875em;
+    border-right: #C7C7C7 1px solid;
+    z-index: 1;
+    overflow-y: auto;
+  }
+
+  .cove-wizard__grid--right {
+    position: relative;
+    background-color: #f5f5f5;
+    padding: 1.875em;
+    overflow-x: auto;
+  }
 }

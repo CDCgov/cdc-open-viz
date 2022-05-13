@@ -34,15 +34,16 @@ datalist, textarea, select {
       opacity: 0;
     }
   }
+
+  &[disabled] {
+    background-color: #e4e4e4;
+  }
 }
 
 select {
   &.input--small {
     padding: 0;
   }
-}
-
-input[type="text"] {
 }
 
 textarea {

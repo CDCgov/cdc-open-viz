@@ -1,32 +1,80 @@
+@import "~@cdc/core/styles/v2/utils/variables";
 @import "~@cdc/core/styles/v2/themes/color-definitions";
 
 .cove-tabs {
   z-index: 10;
+}
 
-  .cove-tabs__list {
-    display: flex;
-    flex-wrap: nowrap;
+.cove-tabs__list {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.cove-tabs__tab {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0 0.75rem;
+  height: 3rem;
+  text-align: center;
+  line-height: 1.5em;
+  color: #565656;
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  flex: 1 1 0;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #c7c7c7;
+    transition: all 400ms $transition-expo-out;
   }
 
-  .cove-tabs__tab {
-    flex: 1 1 0;
-    height: 3rem;
-    text-align: center;
-    line-height: 1.5em;
+  &:last-child {
+    border-right: none;
+  }
+
+  &.active {
     color: #333;
-    background: #F2F2F2;
-    border: 0;
+
+    &::after {
+      height: 5px;
+      background-color: #565656;
+      top: calc(100% - 5px);
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  &.cove-tabs__tab--fullsize {
+    color: #333;
     border-right: 1px solid $lightGray;
     border-bottom: 1px solid $lightGray;
-    outline: 0;
+    background-color: #F2F2F2;
 
-    &:last-child {
-      border-right: none;
+    &::after {
+      display: none;
     }
 
     &.active {
-      background-color: #565656;
       color: #fff;
+      background-color: #565656;
     }
   }
+}
+
+.cove-tabs-content {
+  height: 100%;
+  flex: 1 0 auto;
 }
