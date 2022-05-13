@@ -19,19 +19,20 @@
   },
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
-  "devDependencies": {
-    "@cdc/core": "^1.1.2",
-    "interweave": "^13.0.0",
-    "react-accessible-accordion": "^3.3.4"
-  },
   "dependencies": {
+    "@cdc/core": "^1.1.2",
     "axios": "^0.26.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
-    "html-react-parser": "^1.4.8"
+    "html-react-parser": "1.4.9",
+    "interweave": "^13.0.0",
+    "react-accessible-accordion": "^3.3.4"
   },
   "peerDependencies": {
     "react": "^17.0.2",
     "react-dom": ">=16"
+  },
+  "resolutions": {
+    "@types/react": "17.x"
   }
 }

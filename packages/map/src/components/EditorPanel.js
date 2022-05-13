@@ -1059,21 +1059,21 @@ const EditorPanel = (props) => {
 		if(paletteName) handleEditorChanges('color',paletteName)
 	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
 	
+	useEffect(() => {
+		const parsedData = convertStateToConfig();
+		const formattedData = JSON.stringify(parsedData, undefined, 2);
 
-	// useEffect(() => {
-	// 	const parsedData = convertStateToConfig();
-	// 	const formattedData = JSON.stringify(parsedData, undefined, 2);
+		setConfigTextbox(formattedData);
+	}, [state]);
 
-	// 	setConfigTextbox(formattedData);
+	useEffect(() => {
+		// Pass up to Editor if needed
+		if (setParentConfig) {
+			const newConfig = convertStateToConfig();
+			setParentConfig(newConfig);
+		}
 
-	// 	// Pass up to Editor if needed
-	// 	if (setParentConfig) {
-	// 		const newConfig = convertStateToConfig();
-	// 		setParentConfig(newConfig);
-	// 	}
-
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [state]);
+	}, [state]);
 
 	let numberOfItemsLimit = 8;
 
