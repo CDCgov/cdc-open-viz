@@ -288,6 +288,11 @@ export default function DataImport() {
           <div className="load-data-area">
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+                {sharepath &&
+                  <p className="alert--info">
+                    The share path set for this website is: {sharepath}
+                  </p>
+                }
                 <div
                   className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
                   <input {...getInputProps()} />
