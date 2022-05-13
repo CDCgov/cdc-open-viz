@@ -30,7 +30,8 @@ export default function DataImport() {
     maxFileSize,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   } = useContext(GlobalState)
 
   const transform = new DataTransform()

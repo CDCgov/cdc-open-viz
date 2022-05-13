@@ -11,7 +11,7 @@ const domContainer = document.querySelector('.react-container')
 
 ReactDOM.render(
   <React.StrictMode>
-    <CdcEditor startingTab={activeTab} containerEl={domContainer} />
+    <CdcEditor startingTab={activeTab} containerEl={domContainer} sharepath="/my/share/path"/>
   </React.StrictMode>,
   document.querySelector('.react-container')
 );
