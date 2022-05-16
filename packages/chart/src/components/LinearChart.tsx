@@ -213,10 +213,20 @@ export default function LinearChart() {
                           ) : ''
                         }
 
-                        { config.orientation === "horizontal" && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                        { config.orientation === "horizontal" && config.visualizationSubType !== 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
                             // 17 is a magic number from the offset in barchart.
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                        }
+
+
+                        { config.orientation === "horizontal" && config.visualizationSubType === 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>

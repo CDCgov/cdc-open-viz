@@ -116,7 +116,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           <BarStackHorizontal
               data={data}
               keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
-              height={yMax}
+              height={config.barHeight * data.length}
               y={(d: any) => d[config.runtime.yAxis.dataKey]}
               xScale={xScale}
               yScale={yScale}
@@ -125,15 +125,56 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barStacks) =>
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar) => {
+                    
+                    console.log('data', data)
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${bar.bar.data.name}` :`${data[bar.index].name}`
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : `${bar.key}: ${data[bar.index][bar.key]}`
+                    const tooltip = `<div>
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
+                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
+                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
+                    let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barStacks.length * (config.barThickness || 0.8);
+                    let offset = (config.runtime.horizontal ? yMax : xMax) / barStacks.length * (1 - (config.barThickness || 0.8)) / 2;
+
+                    let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barStack.bars.length;
+
+                    config.height = data.length * (config.barHeight + 40)
+
+                    console.log('bar', bar)
                     return (
-                    <rect
-                      key={`barstack-horizontal-${barStack.index}-${bar.index}`}
-                      x={bar.x}
-                      y={bar.y}
-                      width={bar.width}
-                      height={bar.height}
-                      fill={bar.color}
-                    />
+                      <>
+                        <rect
+                          key={`barstack-horizontal-${barStack.index}-${bar.index}`}
+                          x={bar.x}
+                          y={bar.y - 25/2}
+                          width={bar.width}
+                          height={config.barHeight}
+                          fill={bar.color}
+                          stroke="#333"
+                          strokeWidth={config.barBorderThickness || 1}
+                          opacity={transparentBar ? 0.5 : 1}
+                          display={displayBar ? 'block' : 'none'}
+                          data-tip={tooltip}
+                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        />
+
+                      {orientation === 'horizontal' && config.visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
+
+                          <>
+                                  <Text
+                                    x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
+                                    y={ bar.y + config.barHeight }
+                                    fill={ '#000000' }
+                                    textAnchor="start"
+                                    verticalAnchor="middle"
+                                  >
+                                    {data[bar.index].name}
+                                  </Text>
+                          </>
+                      }
+                      </>
                     )
                   }
                 ))
