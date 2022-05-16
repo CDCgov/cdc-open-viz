@@ -15,7 +15,7 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl }) {
+export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl, sharepath }) {
   const [config, setConfig] = useState(configObj)
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
@@ -93,12 +93,13 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     globalActive,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   }
 
   return (
     <GlobalState.Provider value={state}>
-      <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
+      <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef} >
         <Tabs className="top-level" startingTab={globalActive}>
           <TabPane title="1. Import Data" className="data-designer">
             <DataImport />
