@@ -554,7 +554,7 @@ const EditorPanel = () => {
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
-        <div className="heading-2">Configure Chart</div>
+        <div role="heading" className="heading-2">Configure Chart</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -578,7 +578,7 @@ const EditorPanel = () => {
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} fieldName="subtext" label="Subtext" updateField={updateField} />
                   {config.visualizationSubType !== "horizontal" &&
                     <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                   }
