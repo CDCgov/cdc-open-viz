@@ -15,7 +15,7 @@ import { BarStackHorizontal } from '@visx/shape';
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
-  const { orientation } = config;
+  const { orientation, visualizationSubType } = config;
   const isHorizontal = orientation === 'horizontal';
 
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5;
@@ -116,7 +116,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           <BarStackHorizontal
               data={data}
               keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
-              height={config.barHeight * data.length}
+              height={yMax }
               y={(d: any) => d[config.runtime.yAxis.dataKey]}
               xScale={xScale}
               yScale={yScale}
@@ -124,9 +124,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             >
               {(barStacks) =>
                 barStacks.map((barStack) =>
-                  barStack.bars.map((bar) => {
+                  barStack.bars.map((bar, index) => {
                     
-                    console.log('data', data)
                     let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${bar.bar.data.name}` :`${data[bar.index].name}`
                     let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : `${bar.key}: ${data[bar.index][bar.key]}`
                     const tooltip = `<div>
@@ -140,13 +139,41 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barStack.bars.length;
 
-                    config.height = data.length * (config.barHeight + 40)
+                    //config.height = data.length * (config.barHeight + 40)
+
+                    
+                    const barsPerGroup = config.series.length;
+                    let barHeight = config.barHeight ? config.barHeight : 25;
+                    
+                    if (orientation=== "horizontal") {
+                      let barHeight = config.barHeight ? config.barHeight : 25;
+                      let barPadding = barHeight;
+  
+                      if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+                        if(barHeight < 40) {
+                          config.barPadding = 40;
+                        } else {
+                          config.barPadding = barPadding;
+                        }
+                      } else {
+                        config.barPadding = barPadding / 2;
+                      }
+                    }
+                    config.height = (barsPerGroup * barHeight) * data.length + (config.barPadding * barStacks.length);
 
                     console.log('bar', bar)
+
+                    let tmp = {
+                      orientation, 
+                      visualizationSubType, 
+                      isLabelBelowBar
+                    }
+
+                    console.table(tmp)
                     return (
-                      <>
+                      <Group key={index}>
                         <rect
-                          key={`barstack-horizontal-${barStack.index}-${bar.index}`}
+                          key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
                           y={bar.y - 25/2}
                           width={bar.width}
@@ -160,21 +187,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         />
 
-                      {orientation === 'horizontal' && config.visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
+                      {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
 
-                          <>
-                                  <Text
-                                    x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
-                                    y={ bar.y + config.barHeight }
-                                    fill={ '#000000' }
-                                    textAnchor="start"
-                                    verticalAnchor="middle"
-                                  >
-                                    {data[bar.index].name}
-                                  </Text>
-                          </>
+                          <Text
+                            x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
+                            y={ bar.y + Number(config.barHeight) }
+                            fill={ '#000000' }
+                            textAnchor="start"
+                            verticalAnchor="middle"
+                          >
+                            {data[bar.index].name}
+                          </Text>
                       }
-                      </>
+                      </Group>
                     )
                   }
                 ))
