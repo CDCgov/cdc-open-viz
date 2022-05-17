@@ -100,8 +100,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 />
               </Group>
             )}
-            ))
-            }
+            ))}
           </BarStack>
         ) : (
           <Group>
