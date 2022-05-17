@@ -4,14 +4,18 @@ import Context from '../context'
 import CloseIcon from '../images/icon-close.svg'
 import RowUp from '../images/icon-up.svg'
 import RowDown from '../images/icon-down.svg'
+import RowSettings from '../images/icon-edit.svg'
 import OneColIcon from '../images/icon-col-12.svg'
 import TwoColIcon from '../images/icon-col-6.svg'
 import ThreeColIcon from '../images/icon-col-4.svg'
 import FourEightColIcon from '../images/icon-col-4-8.svg'
 import EightFourColIcon from '../images/icon-col-8-4.svg'
+import {useGlobalContext} from '@cdc/core/components/GlobalContext'
+import Modal from "@cdc/core/components/ui/Modal";
 
 const RowMenu = ({ rowIdx, row }) => {
   const { rows, config, updateConfig } = useContext(Context)
+  const {overlay} = useGlobalContext()
 
   const getCurr = () => {
     let res = []
@@ -102,6 +106,21 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>
   ]
 
+  const rowSettings = () => (
+      <Modal>
+        <Modal.Header>
+          Header
+        </Modal.Header>
+        <Modal.Content>
+          Test
+        </Modal.Content>
+        <Modal.Footer>
+          Footer
+        </Modal.Footer>
+      </Modal>
+  )
+
+
   return (
     <nav className="row-menu">
       <div className="row-menu__btn">
@@ -110,6 +129,9 @@ const RowMenu = ({ rowIdx, row }) => {
         </ul>
       </div>
       <div className="spacer"></div>
+      <button className={'row-menu__btn'} title="Row Settings" onClick={() => overlay?.actions.openOverlay( rowSettings ) }>
+        <RowSettings />
+      </button>
       <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title="Move Row Up" onClick={() => moveRow('up')}>
         <RowUp />
       </button>
