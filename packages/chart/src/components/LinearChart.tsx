@@ -222,11 +222,10 @@ export default function LinearChart() {
                             >{tick.formattedValue}</Text>
                         }
 
-
                         { config.orientation === "horizontal" && config.visualizationSubType === 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
                             // 17 is a magic number from the offset in barchart.
                             <Text
-                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>

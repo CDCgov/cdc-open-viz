@@ -121,6 +121,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               xScale={xScale}
               yScale={yScale}
               color={colorScale}
+              offset="none"
             >
               {(barStacks) =>
                 barStacks.map((barStack) =>
@@ -134,14 +135,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
-                    let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barStacks.length * (config.barThickness || 0.8);
-                    let offset = (config.runtime.horizontal ? yMax : xMax) / barStacks.length * (1 - (config.barThickness || 0.8)) / 2;
-
-                    let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barStack.bars.length;
-
-                    //config.height = data.length * (config.barHeight + 40)
-
-                    
                     const barsPerGroup = config.series.length;
                     let barHeight = config.barHeight ? config.barHeight : 25;
                     
@@ -159,23 +152,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         config.barPadding = barPadding / 2;
                       }
                     }
+
                     config.height = (barsPerGroup * barHeight) * data.length + (config.barPadding * barStacks.length);
-
-                    console.log('bar', bar)
-
-                    let tmp = {
-                      orientation, 
-                      visualizationSubType, 
-                      isLabelBelowBar
+                    let labelColor = "#000000";
+                    // Set label color
+                    if (chroma.contrast(labelColor, bar.color) < 4.9) {
+                      labelColor = '#FFFFFF';
                     }
-
-                    console.table(tmp)
                     return (
                       <Group key={index}>
                         <rect
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
-                          y={bar.y - 25/2}
+                          y={bar.y - config.barHeight - 3}
                           width={bar.width}
                           height={config.barHeight}
                           fill={bar.color}
@@ -188,15 +177,35 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         />
 
                       {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
-
                           <Text
                             x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
-                            y={ bar.y + Number(config.barHeight) }
+                            y={ bar.y + 10 }
                             fill={ '#000000' }
                             textAnchor="start"
                             verticalAnchor="middle"
                           >
                             {data[bar.index].name}
+                          </Text>
+                      }
+
+                      { displayNumbersOnBar && textWidth + 50 < bar.width &&
+                          <Text
+                            x={ bar.x + barStack.bars[bar.index].width / 2 } // padding
+                            y={ bar.y - config.barHeight / 2 - 3 }
+                            fill={ labelColor }
+                            textAnchor="middle"
+                            verticalAnchor="middle"
+                            innerRef={
+                              (e) => {
+                                if(e) {
+                                  // use font sizes and padding to set the bar height
+                                  let elem = e.getBBox()
+                                    setTextWidth(elem.width)
+                                }
+                              }
+                            }
+                          >
+                            {  data[bar.index][bar.key]}
                           </Text>
                       }
                       </Group>

@@ -408,7 +408,7 @@ const EditorPanel = () => {
   // when to show lollipop checkbox.
   // update as the need grows (ie. vertical bars, divergeing, etc.)
   const showLollipopCheckbox = () => {
-    if (config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular')) {
+    if (config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular') && config.visualizationSubType !== 'stacked') {
       return true;
     }
     else {
