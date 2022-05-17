@@ -542,18 +542,23 @@ const DataImport = () => {
                     <Button
                       style={{backgroundColor: '#00345d'}}
                       hoverStyle={{backgroundColor: '#015daa'}}
-                      className={`mr-1${config.dataDescription.series === true ? ' active' : ''}`}
+                      className="mr-1"
                       onClick={() => {
-                      updateDescriptionProp('series', true)
-                    }}>Yes
+                        updateDescriptionProp('series', true)
+                      }}
+                      active={config.dataDescription.series === true}
+                    >
+                      Yes
                     </Button>
                     <Button
                       style={{backgroundColor: '#00345d'}}
                       hoverStyle={{backgroundColor: '#015daa'}}
-                      className={config.dataDescription.series === false ? 'active' : ''}
                       onClick={() => {
                         updateDescriptionProp('series', false)
-                      }}>No
+                      }}
+                      active={config.dataDescription.series === false}
+                    >
+                      No
                     </Button>
                   </div>
                 </div>

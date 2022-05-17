@@ -10,28 +10,32 @@ const Button = ({
                   hoverStyle = {},
                   loading = false,
                   flexCenter,
+                  active = false,
                   children, ...attributes
                 }) => {
   const [ customStyles, setCustomStyles ] = useState({ ...attributes.style })
+  const [ isActive, setIsActive ] = useState()
 
   let attributesObj = {
     ...attributes,
-    className: 'cove-button' + (flexCenter ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : '')
+    style: customStyles,
+    className: 'cove-button' + (flexCenter ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : ''),
+    onMouseOver: () => setStyles('in'),
+    onMouseOut: () => setStyles('out'),
+    onFocus: () => setStyles('in'),
+    onBlur: () => setStyles('out')
   }
 
   const setStyles = (direction) => {
     return direction === 'in'
       ? setCustomStyles(style => ({ ...style, ...hoverStyle }))
       : direction === 'out'
-        ? setCustomStyles({ ...attributes.style })
+        ? active ? null : setCustomStyles({ ...attributes.style })
         : false
   }
 
   return (
-    <button {...attributesObj}
-            style={customStyles}
-            onMouseOver={() => setStyles('in')}
-            onMouseOut={() => setStyles('out')}>
+    <button {...attributesObj}>
       {loading ? <LoadSpin opacity={80} size={20}/> : children}
     </button>
   )
