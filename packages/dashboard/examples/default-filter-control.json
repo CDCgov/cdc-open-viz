@@ -85,7 +85,6 @@
 			"type": "map",
 			"defaultData": false,
 			"dataKey": "data2",
-			"setsSharedFilter": "sharedFilter1",
 			"general": {
 				"title": "Map Example",
 				"subtext": "",
@@ -137,7 +136,6 @@
 			"title": "Test",
 			"description": "<p>Test</p>",
 			"visualizationType": "Line",
-			"usesSharedFilter": "sharedFilter1",
 			"series": [{"dataKey": "Insured Rate", "label": "Insured Rate"}],
 			"fontSize": "large",
 			"dataFormat": {

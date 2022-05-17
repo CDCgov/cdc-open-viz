@@ -940,8 +940,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const geoClickHandler = (key, value) => {
-        if(setSharedFilter && state.setsSharedFilter){
-            setSharedFilter(state.setsSharedFilter, value);
+        if(setSharedFilter){
+            setSharedFilter(state.uid, value);
         }
 
         // If modals are set or we are on a mobile viewport, display modal
@@ -1153,7 +1153,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     if(config) {
         useEffect(() => {
             loadConfig(config)
-        }, [config.data, config.setsSharedFilter, config.usesSharedFilter])
+        }, [config.data])
     }
 
     // Destructuring for more readable JSX
