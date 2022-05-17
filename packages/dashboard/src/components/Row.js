@@ -106,7 +106,7 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>
   ]
 
-  const rowSettings = () => (
+  const rowSettings = (
       <Modal>
         <Modal.Header>
           Header
