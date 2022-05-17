@@ -47,7 +47,7 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
 const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => {
   return (
     <header className="cove-data-table__header">
-      <h2>Data Preview</h2>
+      <h2 className="cove-heading--2 align-self-center mb-0">Data Preview</h2>
       <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
     </header>
   )
@@ -163,13 +163,11 @@ const PreviewDataTable = ({ data }) => {
               <tr role="row">
                 <th scope="col" colSpan="1" role="columnheader"/>
                 <th scope="col" colSpan="1" role="columnheader"/>
-                <th scope="col" colSpan="1" role="columnheader"/>
               </tr>
             </thead>
             <tbody>
               {[...Array(10)].map((e, i) => (
                 <tr role="row" key={i}>
-                  <td role="cell"/>
                   <td role="cell"/>
                   <td role="cell"/>
                 </tr>

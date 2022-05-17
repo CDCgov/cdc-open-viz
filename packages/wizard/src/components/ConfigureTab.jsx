@@ -10,7 +10,7 @@ const CdcDataBite = lazy(() => import('@cdc/data-bite'))
 const CdcWaffleChart = lazy(() => import('@cdc/waffle-chart'))
 const CdcMarkupInclude = lazy(() => import('@cdc/markup-include'))
 
-export default function ConfigureTab({ containerEl }) {
+const ConfigureTab = ({ containerEl }) => {
   const { config, setTempConfig, hostname } = useContext(WizardContext)
 
   let { type } = config
@@ -57,3 +57,5 @@ export default function ConfigureTab({ containerEl }) {
     </ErrorBoundary>
   ) : <p>No visualization type selected.</p>
 }
+
+export default ConfigureTab

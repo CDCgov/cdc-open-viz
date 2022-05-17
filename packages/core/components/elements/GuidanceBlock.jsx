@@ -14,10 +14,20 @@ const GuidanceBlock = ({linkTo, target = "_blank", children, ...attributes}) => 
   const guidanceTitleChildren = childNodes.find(child => child?.type === GuidanceTitle)
   const guidanceContentChildren = childNodes.find(child => child?.type === GuidanceContent)
 
+  const filteredAttrs = { ...attributes }
+  delete filteredAttrs.className //Remove classes from object, spread without conflicting with hardcoded classNames
+
   return (
-    <a className="cove-guidance-block" {...attributes} href={linkTo} target={target}>
+    <a
+      className={`cove-guidance-block${(attributes.className.length > 0) ? (' ' + attributes.className) : ''}`}
+      href={linkTo}
+      target={target}
+      {...filteredAttrs}
+    >
       {guidanceTitleChildren && (
-        <h3 className="cove-guidance-block__header">{guidanceTitleChildren.props.children}</h3>
+        <h3 className="cove-guidance-block__header">
+          {guidanceTitleChildren.props.children}
+        </h3>
       )}
       {guidanceContentChildren && (
         <div className="cove-guidance-block__content">
@@ -29,7 +39,7 @@ const GuidanceBlock = ({linkTo, target = "_blank", children, ...attributes}) => 
 }
 
 //Create subcomponents as "slots" within component namespace
-GuidanceBlock.Header = GuidanceTitle
+GuidanceBlock.Title = GuidanceTitle
 GuidanceBlock.Content = GuidanceContent
 
 GuidanceBlock.propTypes = {

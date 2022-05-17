@@ -12,6 +12,7 @@
   z-index: 7;
 }
 
+// Breakpoint Classes
 @mixin breakpoint($class) {
   @if $class == xs {@media (max-width: 767px) { @content; }}
   @else if $class == sm {@media (min-width: 768px) { @content; }}
@@ -27,3 +28,53 @@
   @else if $class == lg { &.lg {@content;} }
   @else {@warn "Breakpoint Class mixin supports: xs, sm, md, lg";}
 }
+
+// Content Spacer Classes
+$spacers-offset: 8;
+$spacers-max: 64;
+
+@mixin spacers($className, $styleNameCollection) {
+  $i: 0;
+  @while ($i * $spacers-offset) <= $spacers-max {
+    #{$className + $i} {
+      @each $styleName in $styleNameCollection {
+        #{$styleName}: #{($i * $spacers-offset) + 'px'} !important;
+      }
+    }
+    $i: $i + 1;
+  }
+}
+
+@include spacers('.p-', 'padding');
+@include spacers('.pt-', 'padding-top');
+@include spacers('.pr-', 'padding-right');
+@include spacers('.pb-', 'padding-bottom');
+@include spacers('.pl-', 'padding-left');
+@include spacers('.px-', ('padding-left', 'padding-right'));
+@include spacers('.py-', ('padding-top', 'padding-bottom'));
+
+@include spacers('.m-', 'margin');
+@include spacers('.mt-', 'margin-top');
+@include spacers('.mr-', 'margin-right');
+@include spacers('.mb-', 'margin-bottom');
+@include spacers('.ml-', 'margin-left');
+@include spacers('.mx-', ('margin-left', 'margin-right'));
+@include spacers('.mx-', ('margin-top', 'margin-bottom'));
+
+// Content Align Classes
+@mixin align($propNames, $className, $valueName) {
+  @each $propName in $propNames {
+    #{'.align-' + $propName + '-' + $className} {
+      #{'align-' + $propName}: #{$valueName} !important;
+    }
+  }
+}
+
+@include align(('content', 'items', 'self'), 'start', 'flex-start');
+@include align(('content', 'items', 'self'), 'end', 'flex-end');
+@include align(('content', 'items', 'self'), 'center', 'center');
+@include align(('content', 'items', 'self'), 'stretch', 'stretch');
+
+@include align(('items', 'self'), 'baseline', 'baseline');
+@include align('content', 'around', 'space-around');
+@include align('content', 'between', 'space-between');

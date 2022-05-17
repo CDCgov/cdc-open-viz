@@ -1,0 +1,63 @@
+.cove-input {
+  padding: 0.5em 0.5em;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #cbcbcb;
+  border-radius: 0.1875rem;
+  transition: border-color 200ms $transition-expo-out;
+  font-family: sans-serif;
+  width: 100%;
+
+  &::placeholder {
+    transition: opacity 400ms $transition-expo-out;
+    color: #b3b3b3;
+    opacity: 1;
+  }
+
+  &:focus {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #4c4c4c;
+    outline: 0;
+
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+
+  &[disabled] {
+    background-color: #e4e4e4;
+  }
+
+  &.input--small {
+    padding: 0;
+  }
+}
+
+.cove-input__textarea {
+  width: 100%;
+  min-height: 140px;
+  max-width: 100%;
+  line-height: 1.5em;
+}
+
+.cove-input__label {
+  display: block;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  user-select: none;
+
+  &:not(:first-child) {
+    margin-top: 1em;
+  }
+}
+
+.cove-input--hidden {
+  position: absolute;
+  z-index: -999;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}

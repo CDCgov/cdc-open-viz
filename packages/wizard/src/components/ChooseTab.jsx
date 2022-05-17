@@ -14,7 +14,7 @@ import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg'
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg'
 import PairedBarIcon from '@cdc/core/assets/paired-bar.svg'
 
-export default function ChooseTab() {
+const ChooseTab = () => {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(WizardContext)
 
   useEffect(() => {
@@ -101,3 +101,5 @@ export default function ChooseTab() {
     </div>
   )
 }
+
+export default ChooseTab

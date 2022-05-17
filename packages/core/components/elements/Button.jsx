@@ -9,14 +9,14 @@ const Button = ({
                   fluid = false,
                   hoverStyle = {},
                   loading = false,
-                  hasIcon,
+                  flexCenter,
                   children, ...attributes
                 }) => {
   const [ customStyles, setCustomStyles ] = useState({ ...attributes.style })
 
   let attributesObj = {
     ...attributes,
-    className: 'cove-button' + (hasIcon ? ' cove-button--has-icon' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : '')
+    className: 'cove-button' + (flexCenter ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : '')
   }
 
   const setStyles = (direction) => {

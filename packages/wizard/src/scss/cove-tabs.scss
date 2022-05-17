@@ -44,11 +44,11 @@
   }
 
   &.active {
-    color: #333;
+    color: $blue;
 
     &::after {
       height: 5px;
-      background-color: #565656;
+      background-color: $blue;
       top: calc(100% - 5px);
     }
   }

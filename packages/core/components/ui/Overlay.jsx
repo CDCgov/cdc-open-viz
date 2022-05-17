@@ -4,7 +4,7 @@ import { useGlobalContext } from '../GlobalContext'
 
 import '../../styles/v2/components/overlay.scss'
 
-const Overlay = ({ disableBgClose, children, override = null}) => {
+const Overlay = ({ disableBgClose, children, override = null }) => {
   //Access global modal state
   let { overlay } = useGlobalContext()
 
@@ -19,6 +19,7 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
   useEffect(() => {
     if (overlayDisplay === false) return //Reject
 
+    document.body.style.overflow = 'hidden'
     setDisplayOverlay(true)
     setOverlayAnimationState('animate-in')
 
@@ -38,6 +39,7 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
     const timeoutHide = setTimeout(() => {
       setOverlayAnimationState(null)
       setDisplayOverlay(false)
+      document.body.style.overflow = null
     }, 400)
 
     return () => clearTimeout(timeoutHide)
@@ -58,22 +60,23 @@ const Overlay = ({ disableBgClose, children, override = null}) => {
   return (
     <>
       {displayOverlay &&
-      <div className={`cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
-        <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
-             onClick={(e) =>
-               disableBgClose ? setOverlayErrorState(true) :
-                 overlay ? overlay.actions.toggleOverlay(false) :
-                   override ? override.actions.toggleOverlay(false) :
-                     e.preventDefault()
-             }
-             role="alert"
-        />
-        <div className="cove-overlay__wrapper">
-          <div className="cove-overlay__container">
-            {children}
+        <div
+          className={`cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
+          <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
+               onClick={(e) =>
+                 disableBgClose ? setOverlayErrorState(true) :
+                   overlay ? overlay.actions.toggleOverlay(false) :
+                     override ? override.actions.toggleOverlay(false) :
+                       e.preventDefault()
+               }
+               role="alert"
+          />
+          <div className="cove-overlay__wrapper">
+            <div className="cove-overlay__container">
+              {children}
+            </div>
           </div>
         </div>
-      </div>
       }
     </>
   )

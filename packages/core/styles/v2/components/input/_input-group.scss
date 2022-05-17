@@ -1,0 +1,47 @@
+.cove-input-group {
+  display: flex;
+}
+
+.cove-input-group .cove-input:first-child {
+  border-right-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.cove-input-group .cove-input:last-child {
+  border-left-width: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.cove-input-group .cove-button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.cove-input-group .cove-button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.cove-input-group .cove-input:first-child:last-child {
+  border-radius: 0.1875rem;
+  border-left-width: 1px;
+  border-right-width: 1px;
+}
+
+//TODO: Resolve conflict with above formats
+.cove-input-group {
+  &:not(:last-child) {
+    margin-bottom: 1.5em;
+  }
+
+  > label {
+    margin-bottom: 0.5rem;
+  }
+
+  .cove-input-group--checkbox:last-of-type,
+  .cove-input-group--radio:last-of-type {
+    margin-bottom: 0;
+  }
+}

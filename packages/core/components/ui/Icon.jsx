@@ -8,7 +8,7 @@ import iconFileUpload from '../../assets/file-upload-solid.svg'
 
 import '../../styles/v2/components/icon.scss'
 
-const Icon = ({display = null, alt = '', size, ...attributes}) => {
+const Icon = ({display = null, alt = '', size, color, ...attributes}) => {
 
   const iconList = {
     "close": iconClose,
@@ -26,8 +26,17 @@ const Icon = ({display = null, alt = '', size, ...attributes}) => {
     IconObj = iconList[display]
   }
 
+  const filteredAttrs = { ...attributes }
+  delete filteredAttrs.className
+
+  const styles = {
+    ...attributes.style,
+    color: color ? color : null,
+    width: size ? size + 'px' : null
+  }
+
   return (
-    <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={{ width: size ? size + 'px' : null}}>
+    <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={styles} {...filteredAttrs}>
       <IconObj title={alt} />
     </span>
   )

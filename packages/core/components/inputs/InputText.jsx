@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
-import '../../styles/v2/components/input.scss'
+import '../../styles/v2/components/input/index.scss'
 
 const InputText = memo((
   {
@@ -40,23 +40,23 @@ const InputText = memo((
     }
   }
 
-  let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value}/>
+  let formElement = <input className="cove-input" type="text" name={name} onChange={onChange} {...attributes} value={value}/>
 
   if ('textarea' === type) {
     formElement = (
-      <textarea name={name} onChange={onChange} {...attributes} value={value}/>
+      <textarea className="cove-input" name={name} onChange={onChange} {...attributes} value={value}/>
     )
   }
 
   if ('number' === type) {
-    formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value}/>
+    formElement = <input className="cove-input" type="number" name={name} onChange={onChange} {...attributes} value={value}/>
   }
 
   return (
-    <div className="input-group">
-      {label && <label>{label}</label>}
+    <>
+      {label && <label className="cove-input__label">{label}</label>}
       {formElement}
-    </div>
+    </>
   )
 })
 

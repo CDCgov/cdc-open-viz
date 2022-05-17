@@ -7,20 +7,25 @@ import axios from 'axios'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import WizardContext from '../WizardContext'
 
+import { DataTransform } from '@cdc/core/components/DataTransform'
 import Modal from '@cdc/core/components/ui/Modal'
 import GuidanceBlock from '@cdc/core/components/elements/GuidanceBlock'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
+import InputGroup from '@cdc/core/components/inputs/InputGroup'
+import InputText from '@cdc/core/components/inputs/InputText'
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import Card from '@cdc/core/components/elements/Card'
+
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
+import DataDesigner from './DataDesigner'
 
 import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
-
-export default function DataImport() {
+const DataImport = () => {
   const { overlay } = useGlobalContext()
 
   const {
@@ -246,7 +251,7 @@ export default function DataImport() {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
     return (
       <>
-        <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
+        {/*<form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json"
                  onChange={(e) => setExternalURL(e.target.value)}
@@ -259,9 +264,23 @@ export default function DataImport() {
           </Button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/> Always
-          load from URL (normally will only pull once)
-        </label>
+          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/>
+          Always load from URL (normally will only pull once)
+        </label>*/}
+        <form onSubmit={(e) => e.preventDefault()}>
+          <InputGroup>
+            <InputText type="text"
+                       placeholder="e.g., https://data.cdc.gov/resources/file.json"
+                       onChange={(e) => setExternalURL(e.target.value)}
+                       aria-describedby="load-data"
+                       aria-label="Load data from external URL"
+                       value={externalURL}
+            />
+            <Button type="submit" id="load-data" onClick={() => loadData(null, externalURL)}>Load</Button>
+          </InputGroup>
+        </form>
+        <InputCheckbox label="Always load from URL (normally will only pull once)" checked={keepURL}
+                       onChange={() => setKeepURL(!keepURL)}/>
       </>
     )
   }
@@ -306,118 +325,125 @@ export default function DataImport() {
 
   const resetButton = () => {
     return (
-      <Button className="warn" onClick={() => overlay.actions.openOverlay(warningModal(), true)} hasIcon>
+      <Button className="warn" style={{ height: '2.5rem' }}
+              onClick={() => overlay.actions.openOverlay(warningModal(), true)} flexCenter>
         Clear <Icon display="close"/>
       </Button>
     )
   }
 
   return (
-    <>
-      <div className="cove-wizard__grid">
-        <div className="cove-wizard__grid--left">
-          {/* left-col */}
-          {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
-            <div className="cove-wizard__load-data">
-              <Tabs style={{ marginBottom: '2rem' }}>
-                <Tabs.Pane title="Upload File" icon={<Icon display="fileUpload"/>}>
-                  <div
-                    className={`cove-wizard__file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
-                    {/* cdcdataviz-file-selector */}
-                    <input {...getInputProps()} />
-                    {
-                      isDragActive ?
-                        <p>Drop file here</p> :
-                        <p>Drag file to this area, or <span>select a file</span>.</p>
-                    }
-                  </div>
-                </Tabs.Pane>
-                <Tabs.Pane title="Load from URL" icon={<Icon display="link"/>}>
-                  {loadFileFromUrl(externalURL)}
-                </Tabs.Pane>
-              </Tabs>
+    <div className="cove-wizard__grid">
+      <div className="cove-wizard__grid--left">
 
-              {errors && (errors.map ? errors.map((message, index) => (
-                <div className="cove-alert__error" style={{ marginTop: '0.5rem' }} key={index}>
-                  <span>{message}</span> <Icon className="cove-alert__error-dismiss" display="close"
-                                               onClick={() => setErrors(errors.filter((val, i) => i !== index))}/>
+        {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+          <div className="cove-wizard__data">
+            <Tabs className="mb-4">
+              <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>}>
+                <div
+                  className={`cove-file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
+                  {/* cdcdataviz-file-selector */}
+                  <input {...getInputProps()} />
+                  {
+                    isDragActive ?
+                      <p>Drop file here</p> :
+                      <p>Drag file to this area, or <span>select a file</span>.</p>
+                  }
                 </div>
-              )) : errors.message)}
+              </Tabs.Content>
+              <Tabs.Content title="Load from URL" icon={<Icon className="mr-1" display="link"/>}>
+                {loadFileFromUrl(externalURL)}
+              </Tabs.Content>
+            </Tabs>
 
-              <small style={{ margin: '1rem 0 2rem 0' }}>
-                Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
-              </small>
-
-              {/* TODO: Add more sample data in, but this will do for now. */}
-              <span className="heading-3">Load Sample Data:</span>
-              <ul className="cove-wizard__sample-data">
-                <li
-                  onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
-                  States Sample Data #1
-                </li>
-                <li
-                  onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
-                  Sample Data
-                </li>
-                <li
-                  onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
-                  States Counties Sample Data
-                </li>
-              </ul>
-
-              <GuidanceBlock style={{ margin: '2em 0 1em' }} linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html"
-              >
-                <GuidanceBlock.Title>
-                  Get Help
-                </GuidanceBlock.Title>
-                <GuidanceBlock.Content>
-                  <p>Documentation and examples on formatting data and configuring visualizations.</p>
-                </GuidanceBlock.Content>
-              </GuidanceBlock>
-            </div>
-          )}
-
-          {config.dataFileSourceType && (
-            <div>
-              <div className="heading-3">Data Source</div>
-              <div className="file-loaded-area">
-                {config.dataFileSourceType === 'file' && (
-                  <div className="data-source-options">
-                    <div
-                      className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      {
-                        isDragActive ?
-                          <p>Drop file here</p> :
-                          <p><Icon display="fileUpload"/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
-                      }
-                    </div>
-                    <div>
-                      {resetButton()}
-                    </div>
-                  </div>
-                )}
-
-                {config.dataFileSourceType === 'url' && (
-                  <div className="url-source-options">
-                    <div>
-                      {loadFileFromUrl(externalURL)}
-                    </div>
-                    <div>
-                      {resetButton()}
-                    </div>
-                  </div>
-                )}
+            {errors && (errors.map ? errors.map((message, index) => (
+              <div className="cove-alert__error mt-1" key={index}>
+                <span>{message}</span>
+                <Icon
+                  className="cove-alert__error-dismiss"
+                  display="close"
+                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+                />
               </div>
-              <div className="question">
-                <div className="heading-3">Describe Data</div>
-                <div className="heading-4 data-question">Data Orientation</div>
-                <div className="table-button-container">
-                  <div
-                    className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
-                    onClick={() => {
-                      updateDescriptionProp('horizontal', false)
-                    }}>
+            )) : errors.message)}
+
+            <small className="mt-2 mb-4">
+              Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
+            </small>
+
+            <div className="cove-heading--3 mb-0">Load Sample Data:</div>
+            <ul className="cove-wizard__data-samples">
+              <li
+                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
+                States Sample Data #1
+              </li>
+              <li
+                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
+                Sample Data
+              </li>
+              <li
+                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
+                States Counties Sample Data
+              </li>
+            </ul>
+            <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html"
+                           bob="sagat" bill="murray">
+              <GuidanceBlock.Title>
+                Get Help
+              </GuidanceBlock.Title>
+              <GuidanceBlock.Content>
+                <p>Documentation and examples on formatting data and configuring visualizations.</p>
+              </GuidanceBlock.Content>
+            </GuidanceBlock>
+          </div>
+        )}
+
+        {config.dataFileSourceType &&
+          <DataDesigner>
+            <div className="cove-heading--3 mb-1">Data Source</div>
+
+            {config.dataFileSourceType === 'file' && (
+              <div className="cove-data-designer__source">
+                <div
+                  className={`cove-file-selector py-1 loaded-file${isDragActive ? ' drag-active ' : ''}`} {...getRootProps()}
+                >
+                  <input {...getInputProps()} />
+                  {
+                    isDragActive ?
+                      <p>Drop file here</p> :
+                      <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Icon display="fileUpload" size={12} color="#333" style={{ marginRight: '0.5rem' }}/>
+                        <span>{config.dataFileName ?? 'Replace data file'}</span>
+                      </p>
+                  }
+                </div>
+                <div>
+                  {resetButton()}
+                </div>
+              </div>
+            )}
+
+            {config.dataFileSourceType === 'url' && (
+              <div className="url-source-options">
+                <div>
+                  {loadFileFromUrl(externalURL)}
+                </div>
+                <div>
+                  {resetButton()}
+                </div>
+              </div>
+            )}
+
+            <div className="question">
+              <div className="cove-heading--3">Describe Data</div>
+              <div className="cove-heading--4 data-question">Data Orientation</div>
+              <div className="cove-data-designer__options">
+                <button
+                  className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
+                  onClick={() => {
+                    updateDescriptionProp('horizontal', false)
+                  }}>
+                  <Card>
                     <strong>Vertical</strong>
                     <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.
                     </p>
@@ -459,12 +485,15 @@ export default function DataImport() {
                       </tr>
                       </tbody>
                     </table>
-                  </div>
-                  <div
-                    className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
-                    onClick={() => {
-                      updateDescriptionProp('horizontal', true)
-                    }}>
+                  </Card>
+                </button>
+
+                <button
+                  className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
+                  onClick={() => {
+                    updateDescriptionProp('horizontal', true)
+                  }}>
+                  <Card>
                     <strong>Horizontal</strong>
                     <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
                     <table>
@@ -499,186 +528,195 @@ export default function DataImport() {
                       </tr>
                       </tbody>
                     </table>
+                  </Card>
+                </button>
+              </div>
+            </div>
+
+            {config.dataDescription && (
+              <>
+                <div className="question">
+                  <div className="cove-heading--4 data-question">Are there multiple series represented in your data?
+                  </div>
+                  <div>
+                    <Button
+                      style={{backgroundColor: '#00345d'}}
+                      hoverStyle={{backgroundColor: '#015daa'}}
+                      className={`mr-1${config.dataDescription.series === true ? ' active' : ''}`}
+                      onClick={() => {
+                      updateDescriptionProp('series', true)
+                    }}>Yes
+                    </Button>
+                    <Button
+                      style={{backgroundColor: '#00345d'}}
+                      hoverStyle={{backgroundColor: '#015daa'}}
+                      className={config.dataDescription.series === false ? 'active' : ''}
+                      onClick={() => {
+                        updateDescriptionProp('series', false)
+                      }}>No
+                    </Button>
                   </div>
                 </div>
-              </div>
-              {config.dataDescription && (
-                <>
+                {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
                   <div className="question">
-                    <div className="heading-4 data-question">Are there multiple series represented in your data?</div>
-                    <div>
-                      <button
-                        className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'}
-                        style={{ marginRight: '.5em' }} onClick={() => {
-                        updateDescriptionProp('series', true)
-                      }}>Yes
-                      </button>
-                      <button
-                        className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'}
-                        onClick={() => {
-                          updateDescriptionProp('series', false)
-                        }}>No
-                      </button>
+                    <div className="cove-heading--4 data-question">Which property in the dataset represents which series
+                      the
+                      row is describing?
                     </div>
+                    <select onChange={(e) => {
+                      updateDescriptionProp('seriesKey', e.target.value)
+                    }} value={config.dataDescription.seriesKey}>
+                      <option value="">Choose an option</option>
+                      {Object.keys(config.data[0]).map((value, index) => (
+                        <option value={value} key={index}>{value}</option>
+                      ))}
+                    </select>
                   </div>
-                  {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
+                )}
+                {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
+                  <>
                     <div className="question">
-                      <div className="heading-4 data-question">Which property in the dataset represents which series the
-                        row is describing?
+                      <div className="cove-heading--4 data-question">Are the series values in your data represented in a
+                        single row, or across multiple rows?
                       </div>
-                      <select onChange={(e) => {
-                        updateDescriptionProp('seriesKey', e.target.value)
-                      }} value={config.dataDescription.seriesKey}>
-                        <option value="">Choose an option</option>
-                        {Object.keys(config.data[0]).map((value, index) => (
-                          <option value={value} key={index}>{value}</option>
-                        ))}
-                      </select>
+                      <div className="table-button-container">
+                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')}
+                             onClick={() => {
+                               updateDescriptionProp('singleRow', true)
+                             }}>
+                          <p>Each row contains the data for an individual series in itself.</p>
+                          <table>
+                            <tbody>
+                            <tr>
+                              <th>Date</th>
+                              <th>Virus 1</th>
+                              <th>Virus 2</th>
+                              <th>...</th>
+                            </tr>
+                            <tr>
+                              <td>01/01/2020</td>
+                              <td>100</td>
+                              <td>150</td>
+                              <td>...</td>
+                            </tr>
+                            <tr>
+                              <td>02/01/2020</td>
+                              <td>15</td>
+                              <td>20</td>
+                              <td>...</td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div
+                          className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')}
+                          onClick={() => {
+                            updateDescriptionProp('singleRow', false)
+                          }}>
+                          <p>Each series data is broken out into multiple rows.</p>
+                          <table>
+                            <tbody>
+                            <tr>
+                              <th>Virus</th>
+                              <th>Date</th>
+                              <th>Value</th>
+                            </tr>
+                            <tr>
+                              <td>Virus 1</td>
+                              <td>01/01/2020</td>
+                              <td>100</td>
+                            </tr>
+                            <tr>
+                              <td>Virus 1</td>
+                              <td>02/01/2020</td>
+                              <td>150</td>
+                            </tr>
+                            <tr>
+                              <td>...</td>
+                              <td>...</td>
+                              <td>...</td>
+                            </tr>
+                            <tr>
+                              <td>Virus 2</td>
+                              <td>01/01/2020</td>
+                              <td>15</td>
+                            </tr>
+                            <tr>
+                              <td>Virus 2</td>
+                              <td>02/01/2020</td>
+                              <td>20</td>
+                            </tr>
+                            <tr>
+                              <td>...</td>
+                              <td>...</td>
+                              <td>...</td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
-                    <>
-                      <div className="question">
-                        <div className="heading-4 data-question">Are the series values in your data represented in a
-                          single row, or across multiple rows?
+                    {config.dataDescription.singleRow === false && (
+                      <>
+                        <div className="question">
+                          <div className="cove-heading--4 data-question">Which property in the dataset represents which
+                            series
+                            the row is describing?
+                          </div>
+                          <select onChange={(e) => {
+                            updateDescriptionProp('seriesKey', e.target.value)
+                          }}>
+                            <option value="">Choose an option</option>
+                            {Object.keys(config.data[0]).map((value, index) => (
+                              <option value={value} key={index}>{value}</option>
+                            ))}
+                          </select>
                         </div>
-                        <div className="table-button-container">
-                          <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')}
-                               onClick={() => {
-                                 updateDescriptionProp('singleRow', true)
-                               }}>
-                            <p>Each row contains the data for an individual series in itself.</p>
-                            <table>
-                              <tbody>
-                              <tr>
-                                <th>Date</th>
-                                <th>Virus 1</th>
-                                <th>Virus 2</th>
-                                <th>...</th>
-                              </tr>
-                              <tr>
-                                <td>01/01/2020</td>
-                                <td>100</td>
-                                <td>150</td>
-                                <td>...</td>
-                              </tr>
-                              <tr>
-                                <td>02/01/2020</td>
-                                <td>15</td>
-                                <td>20</td>
-                                <td>...</td>
-                              </tr>
-                              </tbody>
-                            </table>
+                        <div className="question">
+                          <div className="cove-heading--4 data-question">
+                            Which property in the dataset represents the values for the category/date axis or map
+                            geography?
                           </div>
-                          <div
-                            className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')}
-                            onClick={() => {
-                              updateDescriptionProp('singleRow', false)
-                            }}>
-                            <p>Each series data is broken out into multiple rows.</p>
-                            <table>
-                              <tbody>
-                              <tr>
-                                <th>Virus</th>
-                                <th>Date</th>
-                                <th>Value</th>
-                              </tr>
-                              <tr>
-                                <td>Virus 1</td>
-                                <td>01/01/2020</td>
-                                <td>100</td>
-                              </tr>
-                              <tr>
-                                <td>Virus 1</td>
-                                <td>02/01/2020</td>
-                                <td>150</td>
-                              </tr>
-                              <tr>
-                                <td>...</td>
-                                <td>...</td>
-                                <td>...</td>
-                              </tr>
-                              <tr>
-                                <td>Virus 2</td>
-                                <td>01/01/2020</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td>Virus 2</td>
-                                <td>02/01/2020</td>
-                                <td>20</td>
-                              </tr>
-                              <tr>
-                                <td>...</td>
-                                <td>...</td>
-                                <td>...</td>
-                              </tr>
-                              </tbody>
-                            </table>
-                          </div>
+                          <select onChange={(e) => {
+                            updateDescriptionProp('xKey', e.target.value)
+                          }}>
+                            <option value="">Choose an option</option>
+                            {Object.keys(config.data[0]).map((value, index) => (
+                              <option value={value} key={index}>{value}</option>
+                            ))}
+                          </select>
                         </div>
-                      </div>
-                      {config.dataDescription.singleRow === false && (
-                        <>
-                          <div className="question">
-                            <div className="heading-4 data-question">Which property in the dataset represents which
-                              series
-                              the row is describing?
-                            </div>
-                            <select onChange={(e) => {
-                              updateDescriptionProp('seriesKey', e.target.value)
-                            }}>
-                              <option value="">Choose an option</option>
-                              {Object.keys(config.data[0]).map((value, index) => <option value={value}
-                                                                                         key={index}>{value}</option>)}
-                            </select>
+                        <div className="question">
+                          <div className="cove-heading--4 data-question">
+                            Which property in the dataset represents the numeric value?
                           </div>
-                          <div className="question">
-                            <div className="heading-4 data-question">
-                              Which property in the dataset represents the values for the category/date axis or map
-                              geography?
-                            </div>
-                            <select onChange={(e) => {
-                              updateDescriptionProp('xKey', e.target.value)
-                            }}>
-                              <option value="">Choose an option</option>
-                              {Object.keys(config.data[0]).map((value, index) => (
-                                <option value={value} key={index}>{value}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="question">
-                            <div className="heading-4 data-question">Which property in the dataset represents the
-                              numeric value?
-                            </div>
-                            <select onChange={(e) => {
-                              updateDescriptionProp('valueKey', e.target.value)
-                            }}>
-                              <option value="">Choose an option</option>
-                              {Object.keys(config.data[0]).map((value, index) => (
-                                <option value={value} key={index}>{value}</option>
-                              ))}
-                            </select>
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
-              {config.formattedData && (
-                <button className="btn btn-primary" style={{ float: 'right', marginBottom: '2em' }}
-                        onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="cove-wizard__grid--right">
-          {/* right-col */}
-          <PreviewDataTable data={config.data}/>
-        </div>
+                          <select onChange={(e) => {
+                            updateDescriptionProp('valueKey', e.target.value)
+                          }}>
+                            <option value="">Choose an option</option>
+                            {Object.keys(config.data[0]).map((value, index) => (
+                              <option value={value} key={index}>{value}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+            <Button className="mt-2" style={{ float: 'right' }} onClick={() => setGlobalActive(1)} disabled={!config.formattedData}>
+              Select your visualization type &raquo;
+            </Button>
+          </DataDesigner>
+        }
       </div>
-    </>
+      <div className="cove-wizard__grid--right">
+        {/* right-col */}
+        <PreviewDataTable data={config.data}/>
+      </div>
+    </div>
   )
 }
+
+export default DataImport

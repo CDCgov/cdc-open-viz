@@ -105,16 +105,16 @@ const CdcWizard = ({ config: configObj = { newViz: true }, hostname, containerEl
           {/* cdc-open-viz-module cdc-editor*/}
           <Tabs startingTab={globalActive} fullsize>
             {/* top-level */}
-            <Tabs.Pane title="1. Import Data" className="data-designer">
+            <Tabs.Content title="1. Import Data" className="data-designer">
               <DataImport/>
-            </Tabs.Pane>
-            <Tabs.Pane title="2. Choose Visualization Type" className="choose-type"
+            </Tabs.Content>
+            <Tabs.Content title="2. Choose Visualization Type" className="choose-type"
                        disableRule={!config.data && !config.formattedData}>
               <ChooseTab/>
-            </Tabs.Pane>
-            <Tabs.Pane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
+            </Tabs.Content>
+            <Tabs.Content title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
               <ConfigureTab containerEl={containerEl}/>
-            </Tabs.Pane>
+            </Tabs.Content>
           </Tabs>
         </div>
       </WizardContext.Provider>

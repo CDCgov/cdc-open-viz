@@ -23,21 +23,28 @@
   background-color: $primary;
   border-radius: 0.1875rem;
   border: 0;
+  outline: none;
   transition: all 500ms $transition-expo-out;
   user-select: none;
+
+  &:disabled {
+    background-color: #d3d3d3 !important;
+    cursor: not-allowed !important;
+  }
 
   &:not(:disabled) {
     cursor: pointer;
   }
 
-  &:hover {
+  &:hover,
+  &:active,
+  &:focus,
+  &.active {
     background-color: lighten($primary, 5%);
   }
 
   &:active,
   &:focus {
-    background-color: lighten($primary, 5%);
-
     &::after {
       content: '';
       position: absolute;
@@ -77,8 +84,9 @@
     }
   }
 
-  &.cove-button--has-icon {
+  &.cove-button--flex-center {
     display: inline-flex;
+    justify-content: center;
     align-items: center;
   }
 }
