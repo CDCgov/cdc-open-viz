@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -11,6 +11,7 @@ import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
 import PairedBarChart from './PairedBarChart';
+import useIntersectionObserver from "./useIntersectionObserver";
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -19,6 +20,21 @@ import '../scss/LinearChart.scss';
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
+
+  const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+
+  const triggerRef = useRef();
+  const dataRef = useIntersectionObserver(triggerRef, {
+    freezeOnceVisible: false
+  });
+
+  if( dataRef?.isIntersecting && config.animate && ! animatedChart ) {
+    console.log('dataref', dataRef.isIntersecting);
+    console.log('animatedChart', animatedChart);
+    setTimeout(() => {
+      setAnimatedChart(true);
+    }, 500);
+  }
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
@@ -137,10 +153,10 @@ export default function LinearChart() {
     ReactTooltip.rebuild();
   });
 
-
+console.log('config', config)
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear">
+      <svg width={width} height={height} className={`linear ${config.visualizationType} ${animatedChart ? 'animated' : ''}`}>
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -425,15 +441,22 @@ export default function LinearChart() {
           
           {/* Bar chart */}
           { (config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              <>            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
+
+              </>
+
           )}
 
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
-            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              <> <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              </>
+
           )}
       </svg>
+
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <div ref={triggerRef} />
     </ErrorBoundary>
   )
 }

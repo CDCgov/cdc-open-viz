@@ -330,44 +330,92 @@
     outline: 2px solid rgb(0, 95, 204) !important;
   }
 
-  // animations
-  .animated-pie path,
-  .animated-pie text {
+  // ANIMATIONS
 
-    border: rgba(0,0,0,.3) 1px solid !important;
-    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
-    opacity: 1;
-    line-height: 1.4em;
-    font-size: 1em;
-    border-radius: 4px;
-    padding: 8px 12px;
-  }
-
+  // Pie Chart Animations
   .animated-pie {
     transition: all .4s ease-in-out;
     opacity: 0;
     transform-origin: center;
     transform: scale(0, 0);
+
+    &.animated {
+      opacity: 1;
+      transform-origin: center;
+      transform: scale(1, 1);
+    }
+
+    path,
+    text {
+      border: rgba(0,0,0,.3) 1px solid !important;
+      box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+      opacity: 1;
+      line-height: 1.4em;
+      font-size: 1em;
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+
+    .animated-pie-text {
+      opacity: 0;
+      transition: opacity .5s ease-in-out;
+      transition-delay: .4s;
+
+      &.animated {
+        opacity: 1;
+      }
+    }
   }
 
-  .animated-pie.animated {
-    opacity: 1;
-    transform-origin: center;
-    transform: scale(1, 1);
+  // Line Chart Animations
+  .Line.animated {
+    path {
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: dash 2s ease-in-out forwards;
+    }
+    @keyframes dash {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
   }
 
-  .animated-pie .animated-pie-text {
-    opacity: 0;
-    transition: opacity .5s ease-in-out;
-    transition-delay: .4s;
+  // Bar Chart Animations
+  .Bar  {
+    .visx-group {
+      position: relative;
+    }
+
+    rect {
+      animation: growBar 1.2s linear forwards;
+      animation-play-state: paused;
+      //transform-origin: bottom;
+    }
+
+    &.horizontal {
+      //transform: scale(0, 1);
+      //display: none;
+    }
+
+    &.animated rect {
+      animation-play-state: running;
+    }
   }
 
-  .animated-pie .animated-pie-text.animated {
-    opacity: 1;
+  @keyframes growBar {
+    from {
+      transform: scale(1, 0) ;
+    }
+
+    to {
+      transform: scale(1) ;
+    }
   }
 
-  .cdc-chart-inner-container {
-    padding-top: 1000px
+  //todo remove this temp margin
+  .chart-container {
+    //margin-top: 1000px;
   }
 }
 
