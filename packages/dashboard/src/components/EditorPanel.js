@@ -233,20 +233,10 @@ const EditorPanel = memo(() => {
 
   const removeFilter = (index) => {
     let dashboardConfig = config.dashboard;
-    let visualizationConfig = config.visualizations;
-
-    Object.keys(visualizationConfig).forEach(vizKey => {
-      if(visualizationConfig[vizKey].setsSharedFilter === dashboardConfig.sharedFilters[index].key){
-        delete visualizationConfig[vizKey].setsSharedFilter;
-      }
-      if(visualizationConfig[vizKey].usesSharedFilter === dashboardConfig.sharedFilters[index].key){
-        delete visualizationConfig[vizKey].usesSharedFilter;
-      }
-    });
 
     dashboardConfig.sharedFilters.splice(index, 1);
 
-    updateConfig({...config, dashboard: dashboardConfig, visualizations: visualizationConfig});
+    updateConfig({...config, dashboard: dashboardConfig});
   }
 
   const updateFilterProp = (name, index, value) => {
@@ -258,40 +248,16 @@ const EditorPanel = memo(() => {
   }
 
   const updateFilterSetBy = (filter, index, value) => {
-    let newVisualizations = {...config.visualizations};
-    Object.keys(newVisualizations).forEach(vizKey => {
-      if(newVisualizations[vizKey].setsSharedFilter === filter.key){
-        delete newVisualizations[vizKey].setsSharedFilter;
-      }
-    });
-
-    if(value) {
-      newVisualizations[value].setsSharedFilter = filter.key;
-    }
-
-    updateConfig({...config, visualizations: newVisualizations})
     updateFilterProp('setBy', index, value)
   }
 
   const addFilterUsedBy = (filter, index, value) => {
-    let newVisualizations = {...config.visualizations};
-
-    newVisualizations[value].usesSharedFilter = filter.key;
-
-    updateConfig({...config, visualizations: newVisualizations});
-
     if(!filter.usedBy) filter.usedBy = [];
     filter.usedBy.push(value);
     updateFilterProp('usedBy', index, filter.usedBy);
   }
 
   const removeFilterUsedBy = (filter, index, value) => {
-    let newVisualizations = {...config.visualizations};
-
-    delete newVisualizations[value].usesSharedFilter;
-
-    updateConfig({...config, visualizations: newVisualizations});
-    
     let usedByIndex = filter.usedBy.indexOf(value);
     if(usedByIndex !== -1){
       filter.usedBy.splice(usedByIndex, 1);
