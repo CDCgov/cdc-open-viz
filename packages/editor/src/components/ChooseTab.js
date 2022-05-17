@@ -14,6 +14,7 @@ import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg';
 import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
 import PairedBarIcon from '@cdc/core/assets/paired-bar.svg';
+import HorizontalStackIcon from '@cdc/core/assets/horizontal-stacked-bar.svg'
 
 export default function ChooseTab() {
     const {config, setConfig, setGlobalActive, tempConfig, setTempConfig} = useContext(GlobalState);
@@ -28,7 +29,7 @@ export default function ChooseTab() {
     /**
      * IconButton component
      */
-    const IconButton = ({icon, label, type, subType, barType}) => {
+    const IconButton = ({icon, label, type, subType, barType, orientation}) => {
         let isSubType = false
 
         if(type === 'map' && config.general) {
@@ -53,7 +54,9 @@ export default function ChooseTab() {
                 dataDescription: config.dataDescription,
                 dataUrl: config.dataUrl,
                 newViz: true,
-                type
+                type,
+                orientation: orientation ? orientation : null,
+                visualizationSubType: label === 'Horizontal Bar (Stacked)' ? 'stacked' : null
             }
 
             if(config.formattedData) {
@@ -91,6 +94,7 @@ export default function ChooseTab() {
                 <li><IconButton label="Line" type="chart" subType="Line" icon={ <LineIcon /> } /></li>
                 <li><IconButton label="Pie" type="chart" subType="Pie" icon={ <PieIcon /> } /></li>
                 <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={ <PairedBarIcon /> } /></li>
+                <li><IconButton label="Horizontal Bar (Stacked)" type="chart" subType="Bar" orientation="horizontal" icon={ <HorizontalStackIcon /> } /></li>
             </ul>
             <div className="heading-2">Maps</div>
             <ul className="grid">
