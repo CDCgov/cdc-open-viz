@@ -20,6 +20,9 @@ import WarningImage from '../images/warning.svg';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+import {useColorPalette} from '../hooks/useColorPalette';
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+import InputToggle from '@cdc/core/components/inputs/InputToggle';
 
 const Helper = ({text}) => {
   return (
@@ -181,6 +184,17 @@ const EditorPanel = () => {
     missingRequiredSections,
     setFilteredData
   } = useContext(Context);
+
+  const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
+	useEffect(()=>{
+		if(paletteName) updateConfig({...config, palette:paletteName})
+	},[paletteName]) 
+
+  useEffect(()=>{
+    dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
+ },[dispatch,config.palette]);
+
+
 
   const filterOptions = [
     {
@@ -551,7 +565,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo' ]} />
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} />
                   {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
                   { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
@@ -961,9 +975,36 @@ const EditorPanel = () => {
                   <label>
                     <span className="edit-label">Chart Color Palette</span>
                   </label>
-                  <span className="h5">Non-Sequential</span>
+                  {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
+                  <InputToggle fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+                  <span>Sequential</span>
                   <ul className="color-palette">
-                    {Object.keys(colorPalettes).filter((name) => name.includes('qualitative')).map( (palette) => {
+                    {filteredPallets.map( (palette) => {
+
+                      const colorOne = {
+                        backgroundColor: colorPalettes[palette][2]
+                      }
+
+                      const colorTwo = {
+                        backgroundColor: colorPalettes[palette][3]
+                      }
+
+                      const colorThree = {
+                        backgroundColor: colorPalettes[palette][5]
+                      }
+
+                      return (
+                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
+                          <span style={colorOne}></span>
+                          <span style={colorTwo}></span>
+                          <span style={colorThree}></span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <span>Non-Sequential</span>
+                  <ul className="color-palette">
+                    {filteredQualitative.map( (palette) => {
 
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
@@ -977,31 +1018,6 @@ const EditorPanel = () => {
                         backgroundColor: colorPalettes[palette][6]
                       }
 
-                      return (
-                        <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>
-                          <span style={colorOne}></span>
-                          <span style={colorTwo}></span>
-                          <span style={colorThree}></span>
-                        </li>
-                      )
-                    })}
-                  </ul>
-
-                  <span className="h5">Sequential</span>
-                  <ul className="color-palette">
-                    {Object.keys(colorPalettes).filter((name) => name.includes('sequential')).map( (palette) => {
-
-                      const colorOne = {
-                        backgroundColor: colorPalettes[palette][2]
-                      }
-
-                      const colorTwo = {
-                        backgroundColor: colorPalettes[palette][3]
-                      }
-
-                      const colorThree = {
-                        backgroundColor: colorPalettes[palette][5]
-                      }
 
                       return (
                         <li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, palette}) }} className={ config.palette === palette ? "selected" : ""}>

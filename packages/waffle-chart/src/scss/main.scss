@@ -1,10 +1,7 @@
-@import '~@cdc/core/styles/base';
-@import "~@cdc/core/styles/heading-colors";
-@import 'variables';
+@import '~@cdc/core/styles/v2/main';
 @import 'waffle-chart';
 
 .cdc-open-viz-module.type-waffle-chart {
-  @import 'editor-panel';
 
   .loader {
     width: 100%;

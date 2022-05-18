@@ -10,8 +10,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 import ReactTooltip from 'react-tooltip';
 
+
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
   const { visualizationSubType } = config;
 
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5;
@@ -180,6 +181,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     if (chroma.contrast(labelColor, barColor) < 4.9) {
                       labelColor = '#FFFFFF';
                     }
+
+                    // let paletteColors = colorPalettes[config.palette]
+                    // paletteColors[1]
+                    
 
                     // font size and text spacing used for centering text on bar
                     if(config.fontSize === "small") {
