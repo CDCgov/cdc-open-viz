@@ -554,7 +554,7 @@ const EditorPanel = () => {
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
-        <div role="heading" className="heading-2">Configure Chart</div>
+        <div aria-level="2" role="heading" className="heading-2">Configure Chart</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
