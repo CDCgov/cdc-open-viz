@@ -6,7 +6,11 @@ import ResizeObserver from 'resize-observer-polyfill'
 
 import getViewport from '@cdc/core/helpers/getViewport';
 
+import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import GlobalState from './context';
+
+import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
+
 import DataImport from './components/DataImport';
 import ChooseTab from './components/ChooseTab';
 import ConfigureTab from './components/ConfigureTab';
@@ -15,7 +19,7 @@ import Tabs from './components/Tabs';
 
 import './scss/main.scss';
 
-export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl }) {
+export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl, sharepath }) {
   const [config, setConfig] = useState(configObj)
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
@@ -93,24 +97,28 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     globalActive,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   }
 
   return (
-    <GlobalState.Provider value={state}>
-      <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
-        <Tabs className="top-level" startingTab={globalActive}>
-          <TabPane title="1. Import Data" className="data-designer">
-            <DataImport />
-          </TabPane>
-          <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
-            <ChooseTab />
-          </TabPane>
-          <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-            <ConfigureTab containerEl={containerEl }/>
-          </TabPane>
-        </Tabs>
-      </div>
-    </GlobalState.Provider>
+    <GlobalContextProvider>
+      <GlobalState.Provider value={state}>
+        <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef} >
+          <Tabs className="top-level" startingTab={globalActive}>
+            <TabPane title="1. Import Data" className="data-designer">
+              <DataImport />
+            </TabPane>
+            <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
+              <ChooseTab />
+            </TabPane>
+            <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
+              <ConfigureTab containerEl={containerEl }/>
+            </TabPane>
+          </Tabs>
+        </div>
+      </GlobalState.Provider>
+      <OverlayFrame/>
+    </GlobalContextProvider>
   );
 }

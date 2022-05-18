@@ -179,7 +179,7 @@ export default function CdcChart(
       });
     }
 
-    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -613,7 +613,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
           <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
             Skip Over Chart Container
           </a>
