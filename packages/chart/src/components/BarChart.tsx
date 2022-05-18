@@ -125,10 +125,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barStacks) =>
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar, index) => {
-
-                    console.log('config', config)
-                    console.log('data', data)
-                    console.log('bar', bar)
                     
                     let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
                     let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index].name}`
@@ -168,7 +164,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         <rect
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
-                          y={bar.y - config.barHeight}
+                          y={bar.y - config.barHeight - 3}
                           width={bar.width}
                           height={config.barHeight}
                           fill={bar.color}
@@ -183,7 +179,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
                           <Text
                             x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
-                            y={ bar.y + 5 }
+                            y={ bar.y + 8 }
                             fill={ '#000000' }
                             textAnchor="start"
                             verticalAnchor="middle"
@@ -195,7 +191,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       { displayNumbersOnBar && textWidth + 50 < bar.width &&
                           <Text
                             x={ bar.x + barStack.bars[bar.index].width / 2 } // padding
-                            y={ bar.y - config.barHeight/2 }
+                            y={ bar.y - config.barHeight/2 + 3 }
                             fill={ labelColor }
                             textAnchor="middle"
                             verticalAnchor="end"
