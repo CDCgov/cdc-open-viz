@@ -6,19 +6,26 @@ export const useGlobalContext = () => useContext(GlobalContext)
 export const GlobalContextProvider = ({ children }) => {
   const [ globalContextData, setGlobalContextData ] = useState({})
 
-  const openOverlay = (obj) => {
-    let payload = { object: obj, show: true }
+  const openOverlay = (obj, disableBgClose = false) => {
+    let payload = { object: obj, show: true, disableBgClose: disableBgClose }
     setGlobalContextData(context => ({ ...context, overlay: { ...payload } }))
   }
 
   const toggleOverlay = (display = false) => {
-    setGlobalContextData(context => ({ ...context, overlay: {...context.overlay, show: display } }))
+    setGlobalContextData(context => ({
+      ...context,
+      overlay: {
+        ...context.overlay,
+        show: display
+      }
+    }))
   }
 
   const globalSettings = {
     overlay: {
       object: globalContextData.overlay?.object || null,
       show: globalContextData.overlay?.show || false,
+      disableBgClose: globalContextData.overlay?.disableBgClose || false,
       actions: {
         openOverlay,
         toggleOverlay

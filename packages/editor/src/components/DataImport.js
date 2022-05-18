@@ -4,21 +4,28 @@ import { csvParse } from 'd3'
 import { useDebounce } from 'use-debounce'
 import { get } from 'axios'
 
+import { DataTransform } from '@cdc/core/components/DataTransform'
+import Modal from '@cdc/core/components/ui/modal'
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+
 import GlobalState from '../context'
-import '../scss/data-import.scss'
+
 import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-
 import LinkIcon from '../assets/icons/link.svg'
+
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-
 import validMapData from '../../example/valid-data-map.csv'
+
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
+
+import '../scss/data-import.scss'
+import Button from '@cdc/core/components/elements/Button'
+import Icon from '@cdc/core/components/ui/Icon'
 
 export default function DataImport() {
   const {
@@ -30,8 +37,11 @@ export default function DataImport() {
     maxFileSize,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   } = useContext(GlobalState)
+
+  const { overlay } = useGlobalContext()
 
   const transform = new DataTransform()
 
@@ -242,7 +252,7 @@ export default function DataImport() {
 
   const loadFileFromUrl = (url) => {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
-    
+
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
@@ -261,22 +271,50 @@ export default function DataImport() {
     )
   }
 
+  const warningModal = () => {
+    return (
+      <Modal fontTheme={'light'} headerBgColor={'#d73636'} showClose={false}>
+        <Modal.Header>
+          <center>Warning</center>
+        </Modal.Header>
+        <Modal.Content>
+          <center>
+            <p style={{ fontSize: '1rem' }}>Reseting will remove your data and settings.</p>
+          </center>
+        </Modal.Content>
+        <Modal.Footer>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              marginBottom: '1rem',
+              fontSize: '1rem'
+            }}>
+              Are you sure you want to continue?
+            </p>
+            <Button className="warn" style={{ marginRight: '1rem' }}
+                    onClick={() => overlay.actions.toggleOverlay(false)}
+            >No, Cancel</Button>
+            <Button className="success" onClick={() => {
+              resetEditor({})
+              overlay.actions.toggleOverlay(false)
+            }}>Yes, Continue</Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
   const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
     config.newViz = true
-    const confirmDataReset = window.confirm(message)
-
-    if (confirmDataReset === true) {
-      setTempConfig(null)
-      setConfig(config)
-    }
+    setTempConfig(null)
+    setConfig(config)
   }
 
   const resetButton = () => {
-    return ( //todo convert to modal
-      <button className="btn danger"
-              onClick={() => resetEditor({}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
-        <CloseIcon/>
-      </button>
+    return (
+      <Button className="warn" style={{ height: '2.5rem' }}
+              onClick={() => overlay.actions.openOverlay(warningModal(), true)} flexCenter>
+        Clear <Icon display="close"/>
+      </Button>
     )
   }
 
@@ -287,6 +325,11 @@ export default function DataImport() {
           <div className="load-data-area">
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+                {sharepath &&
+                  <p className="alert--info">
+                    The share path set for this website is: {sharepath}
+                  </p>
+                }
                 <div
                   className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
                   <input {...getInputProps()} />

@@ -28,6 +28,7 @@ export default {
     label: 'Data Table',
     expanded: true
   },
+  orientation: "vertical",
   legend: {
     behavior: 'isolate',
     position: 'right'
