@@ -82,13 +82,25 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
-  <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => {
+  const [state,setState] = useState(value || false)
+  const onChangeHandler =(event)=>{
+    const isChecked = event.target.checked;
+    setState(()=>isChecked)
+
+  };
+  useEffect(()=>{
+    updateField(section, subsection, fieldName, state)
+
+  },[section,subsection,label,fieldName,state])
+  return (
+    <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ state } onChange={onChangeHandler} {...attributes}/>
     <span className="edit-label">{label}</span>
     {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
   </label>
-))
+  )
+});
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = options.map((optionName, index) => <option value={optionName} key={index}>{optionName}</option>)
