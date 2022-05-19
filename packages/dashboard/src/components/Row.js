@@ -11,7 +11,8 @@ import ThreeColIcon from '../images/icon-col-4.svg'
 import FourEightColIcon from '../images/icon-col-4-8.svg'
 import EightFourColIcon from '../images/icon-col-8-4.svg'
 import {useGlobalContext} from '@cdc/core/components/GlobalContext'
-import Modal from "@cdc/core/components/ui/Modal";
+import Modal from '@cdc/core/components/ui/Modal'
+import InputToggle from '@cdc/core/components/inputs/InputToggle'
 
 const RowMenu = ({ rowIdx, row }) => {
   const { rows, config, updateConfig } = useContext(Context)
@@ -28,6 +29,7 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const [curr, setCurr] = useState(getCurr())
+  const [equalHeight, setEqualHeight] = useState(false)
 
   const setRowLayout = (layout) => {
     const newRows = [...rows]
@@ -88,6 +90,16 @@ const RowMenu = ({ rowIdx, row }) => {
     updateConfig({...config, rows})
   }
 
+  const rowItemsHeight = () => {
+    console.log('hit')
+    setEqualHeight(!equalHeight)
+
+    row.equalHeight = !equalHeight;
+
+    console.log('equalHeight var', equalHeight)
+    console.log('equalHeight', row.equalHeight)
+  }
+console.log('equal height var', row.equalHeight)
   const layoutList = [
     <li className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([ 12 ])} key="12" title="1 Column">
       <OneColIcon />
@@ -109,14 +121,16 @@ const RowMenu = ({ rowIdx, row }) => {
   const rowSettings = (
       <Modal>
         <Modal.Header>
-          Header
+          Row Settings
         </Modal.Header>
         <Modal.Content>
-          Test
+          <InputToggle
+            label='Visualizations in this row should be equal height'
+            fieldName={`toggleEqualHeight${rowIdx}`}
+            value={row.equalHeight ? row.equalHeight : false}
+            updateField={rowItemsHeight}
+          ></InputToggle>
         </Modal.Content>
-        <Modal.Footer>
-          Footer
-        </Modal.Footer>
       </Modal>
   )
 

@@ -130,6 +130,7 @@
     margin-bottom: 20px;
   }
 
+
   .dashboard-row {
     display: flex;
     flex-direction: column;
@@ -153,15 +154,27 @@
       margin: 1em 0;
       justify-content: space-between;
       column-gap: 1em;
-    }
 
+      &.equal-height {
+        align-items: stretch;
+
+        // This makes sure each inside div is full height
+        .dashboard-col,
+        .cdc-open-viz-module,
+        .cdc-open-viz-module > div,
+        .cdc-data-bite-inner-container,
+        .bite
+        {
+          display: grid;
+        }
+      }
+    }
     .dashboard-col-8 {
       width: 66%;
     }
     .dashboard-col-6 {
       width: 50%;
     }
-
     .dashboard-col-4 {
       width: 33%;
     }
