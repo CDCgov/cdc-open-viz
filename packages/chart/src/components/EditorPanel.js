@@ -689,9 +689,18 @@ const EditorPanel = () => {
                   </div>
                   {(config.orientation === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
-                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <Fragment> 
+                    <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </Fragment>
                     :
+                    <Fragment>
                     <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hidLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+
+                    </Fragment>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -763,9 +772,16 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.orientation === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                       <Fragment> 
+                        <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        </Fragment>
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <Fragment> 
+                        <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </Fragment>
                       }
                     </>
                   )}
