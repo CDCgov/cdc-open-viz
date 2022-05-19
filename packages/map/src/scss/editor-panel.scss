@@ -23,7 +23,7 @@
       cursor: pointer;
       overflow: hidden;
       flex-direction: column;
-      transition: .2s all; 
+      transition: .2s all;
       svg {
         display: block;
         height: 25px;
@@ -36,7 +36,7 @@
       }
       &:hover {
         background: #F2F2F2;
-        transition: .2s all;  
+        transition: .2s all;
       }
       &.active {
         background: #fff;
@@ -58,7 +58,7 @@
       }
     }
   }
-  
+
   .editor-toggle {
     background: #F2F2F2;
     border-radius: 60px;
@@ -83,7 +83,7 @@
     }
     &.collapsed {
       left: 1em;
-      margin-left: 0;  
+      margin-left: 0;
       &:before {
       content: "\00bb";
      }
@@ -92,7 +92,7 @@
       background: rgba(255,255,255,1)
     }
   }
-  
+
   .editor-panel {
     background: #fff;
     width: $editorWidth;
@@ -104,6 +104,12 @@
     left: 0;
     top: 0;
     bottom: 0;
+
+    //TODO: Remove after COVE refactor
+    &.cove {
+      @import "@cdc/core/styles/v2/layout/tooltip.scss";
+    }
+
     .remove-column {
       font-size: 13px;
     }
@@ -171,7 +177,7 @@
       position: relative;
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     }
-  
+
     .accordion__button:before {
       display: inline-block;
       content: '';
@@ -187,7 +193,7 @@
       transform: rotate(-45deg) translateY(-50%);
       transition: .1s all;
     }
-  
+
     .accordion__button[aria-expanded='true']::before,
     .accordion__button[aria-selected='true']::before {
       top: 45%;
@@ -195,7 +201,7 @@
       margin-right: 1.3em;
       transition: .1s all;
     }
-  
+
     .accordion__panel {
       border-bottom: 1px solid rgba(0, 0, 0, 0.2);
       padding: 1em 1.25em 2em;
@@ -204,7 +210,7 @@
         font-size: .8em;
       }
     }
-  
+
     .advanced {
       padding: 0 1em 1em;
       text-align: left;
@@ -237,17 +243,17 @@
         box-sizing: border-box
       }
     }
-  
+
     @keyframes fadein {
       0% {
         opacity: 0;
       }
-  
+
       100% {
         opacity: 1;
       }
     }
-  
+
     .base-label {
       background: #565656;
       color: #fff;
@@ -276,9 +282,7 @@
       &.checkbox {
         margin-top: .5rem;
         display: flex;
-        span {
-          display: inline;
-        }
+
         input {
           margin-left: 0;
           width: inherit;
@@ -331,17 +335,17 @@
         }
       }
     }
-  
+
     fieldset {
       display: block;
     }
-  
+
     .primary-fieldset {
       padding: 0;
       margin: 0;
       border: 0;
     }
-  
+
     ul.column-edit {
       list-style: none;
       li {
@@ -360,11 +364,11 @@
         }
       }
     }
-  
+
     &.hidden {
       display: none;
     }
-  
+
     .emove-column {
       float: right;
       text-transform: uppercase;
@@ -380,7 +384,7 @@
       cursor: pointer;
       font-weight: bold;
     }
-  
+
     .edit-block {
       padding-left: 1em;
       border-left: rgba(0, 0, 0, 0.2) 4px solid;
@@ -402,7 +406,7 @@
         transition: .2s all;
       }
     }
-  
+
     .data-toggle {
       list-style: none;
       li {
@@ -471,14 +475,14 @@
         }
       }
     }
-  
+
     span.subtext {
       display: block;
       color: rgba(0,0,0,.5);
       text-transform: none;
       font-weight: normal;
     }
-  
+
     .btn {
       margin-top: 1em;
     }
@@ -486,7 +490,7 @@
       list-style: none;
       > li {
         margin-right: .3em;
-        margin-bottom: .3em;  
+        margin-bottom: .3em;
       }
     }
     .sort-list li > div {
@@ -497,22 +501,22 @@
       background: #F1F1F1;
       padding: .4em .6em;
       font-size: .8em;
-      margin-bottom: .3em; 
+      margin-bottom: .3em;
       cursor: move;
       z-index: 999;
     }
-    
+
     .info {
       font-size: .8em;
       line-height: 1.4em;
       font-style: italic;
       padding-top: 10px;
     }
-  
+
     .react-tags__search {
       width: 100%;
     }
-  
+
     .react-tags {
       position: relative;
       input.react-tags__search-input {
@@ -524,15 +528,15 @@
         display: inline
       }
     }
-  
+
     .react-tags.is-focused {
       border-color: rgba(0, 0, 0, 0.7);
     }
-  
+
     .react-tags__selected {
       display: inline;
     }
-  
+
     .react-tags__selected-tag {
       display: inline-block;
       box-sizing: border-box;
@@ -544,67 +548,67 @@
       margin-right: .3em;
       margin-bottom: .3em;
     }
-  
+
     .react-tags__selected-tag:after {
       content: '\2715';
       color: #AAA;
       margin-left: 8px;
     }
-  
+
     .react-tags__selected-tag:hover,
     .react-tags__selected-tag:focus {
       border-color: #B1B1B1;
     }
-  
+
     .react-tags__search {
       display: inline-block;
-  
+
       /* prevent autoresize overflowing the container */
       max-width: 100%;
     }
-  
+
     @media screen and (min-width: 30em) {
-  
+
       .react-tags__search {
         /* this will become the offsetParent for suggestions */
         position: relative;
       }
-  
+
     }
-  
+
     .react-tags__search input {
       /* prevent autoresize overflowing the container */
       max-width: 100%;
-  
+
       /* emove styles and layout from this element */
       margin: 0;
       outline: none;
       padding: .5em .3em;
-  
+
       /* match the font styles */
       font-size: inherit;
       line-height: inherit;
     }
-  
+
     .react-tags__search input::-ms-clear {
       display: none;
     }
-  
+
     .react-tags__suggestions {
       position: absolute;
       top: 100%;
       left: 0;
       width: 100%;
     }
-  
+
     @media screen and (min-width: 30em) {
-  
+
       .react-tags__suggestions {
         width: 240px;
       }
-  
+
     }
-  
+
     .react-tags__suggestions ul {
       margin: 4px -1px;
       padding: 0;
@@ -614,32 +618,32 @@
       border-radius: 2px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
-  
+
     .react-tags__suggestions li {
       border-bottom: 1px solid #ddd;
       padding: 6px 8px;
     }
-  
+
     .react-tags__suggestions li mark {
       text-decoration: underline;
       background: none;
       font-weight: 600;
     }
-  
+
     .react-tags__suggestions li:hover {
       cursor: pointer;
       background: #eee;
     }
-  
+
     .react-tags__suggestions li.is-active {
       background: #b7cfe0;
     }
-  
+
     .react-tags__suggestions li.is-disabled {
       opacity: 0.5;
       cursor: auto;
     }
-  
+
   }
 
   @include breakpointClass(md) {
