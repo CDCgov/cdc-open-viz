@@ -83,6 +83,13 @@ export default function ChooseTab() {
 
   return (
     <div className="choose-vis">
+      <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html" target="_blank"
+         rel="noopener noreferrer" className="guidance-link" style={{marginTop: 0, marginBottom: "2rem"}}>
+        <div>
+          <p>For more information on the types of data visualizations in the WCMS, including examples and best practices, <u>see the WCMS Features Gallery</u>.</p>
+        </div>
+      </a>
+
       <div className="heading-2">General</div>
       <ul className="grid cove-temp"> {/*TODO: Remove cove class during refactor to Wizard*/}
         <li>
