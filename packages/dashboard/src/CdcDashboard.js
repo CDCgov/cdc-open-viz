@@ -374,7 +374,7 @@ export default function CdcDashboard(
             if (row.filter(col => col.widget).length === 0) return null
 
             return (
-              <div className="dashboard-row" key={`row__${index}`}>
+              <div className={`dashboard-row ${ row.equalHeight ? 'equal-height' : '' }`} key={`row__${index}`}>
                 {row.map((col, index) => {
                   if (col.width) {
                     if (!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
