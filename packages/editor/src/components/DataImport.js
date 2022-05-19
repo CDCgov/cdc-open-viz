@@ -5,7 +5,7 @@ import { useDebounce } from 'use-debounce'
 import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/components/DataTransform'
-import Modal from '@cdc/core/components/ui/modal'
+import Modal from '@cdc/core/components/ui/Modal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 import GlobalState from '../context'

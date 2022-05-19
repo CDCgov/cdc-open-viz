@@ -14,6 +14,8 @@ export default {
     right: 5
   },
   yAxis: {
+    hideLabel:false,
+    hideTicks:false,
     size: 50,
     gridLines: false
   },
@@ -21,6 +23,8 @@ export default {
   height: 300,
   xAxis: {
     type: 'categorical',
+    hideLabel:false,
+    hideTicks:false,
     size: 75,
     tickRotation: 0
   },
@@ -28,6 +32,7 @@ export default {
     label: 'Data Table',
     expanded: true
   },
+  orientation: "vertical",
   legend: {
     behavior: 'isolate',
     position: 'right'

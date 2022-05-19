@@ -3,7 +3,7 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
     "visualizationSubType": "stacked",
-    "series": [{"dataKey": "Radius"}, {"dataKey": "Diameter"}],
+    "series": [{"dataKey": "Radius"}],
     "fontSize": "medium",
     "dataCutoff": "0.5",
     "orientation": "horizontal",
@@ -31,5 +31,6 @@
     "table": {
         "label": "Data Table",
         "expanded": false
-    }
+    },
+	"displayNumbersOnBar": true
 }
