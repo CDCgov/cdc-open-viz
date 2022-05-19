@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext, Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -82,13 +82,25 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
-  <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => {
+  const [state,setState] = useState(value || false)
+  const onChangeHandler =(event)=>{
+    const isChecked = event.target.checked;
+    setState(()=>isChecked)
+
+  };
+  useEffect(()=>{
+    updateField(section, subsection, fieldName, state)
+
+  },[section,subsection,label,fieldName,state])
+  return (
+    <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ state } onChange={onChangeHandler} {...attributes}/>
     <span className="edit-label">{label}</span>
     {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
   </label>
-))
+  )
+});
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = options.map((optionName, index) => <option value={optionName} key={index}>{optionName}</option>)
@@ -232,7 +244,7 @@ const EditorPanel = () => {
   let hasLineChart = false
 
   const enforceRestrictions = (updatedConfig) => {
-    if(updatedConfig.visualizationSubType === 'horizontal'){
+    if(updatedConfig.orientation === 'horizontal'){
       updatedConfig.labels = false;
     }
     if(updatedConfig.table.show === undefined){
@@ -422,7 +434,7 @@ const EditorPanel = () => {
   // when to show lollipop checkbox.
   // update as the need grows (ie. vertical bars, divergeing, etc.)
   const showLollipopCheckbox = () => {
-    if (config.visualizationType === 'Bar' && (config.visualizationSubType === 'horizontal' || config.visualizationSubType === 'regular')) {
+    if (config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular') && config.visualizationSubType !== 'stacked') {
       return true;
     }
     else {
@@ -488,7 +500,7 @@ const EditorPanel = () => {
   }, [config])
 
   useEffect(() => {
-    if(config.visualizationSubType === 'horizontal') {
+    if(config.orientation === 'horizontal') {
       updateConfig({
         ...config,
         lollipopShape: config.lollipopShape
@@ -554,7 +566,7 @@ const EditorPanel = () => {
       {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       <section className={`${displayPanel ? 'editor-panel' : 'hidden editor-panel'}${isDashboard ? ' dashboard': ''}`}>
-        <div className="heading-2">Configure Chart</div>
+        <div aria-level="2" role="heading" className="heading-2">Configure Chart</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -566,21 +578,22 @@ const EditorPanel = () => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} />
-                  {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked', 'horizontal']} />}
-                  { (config.visualizationType === "Bar" && config.visualizationSubType === "horizontal") &&
+                  {config.visualizationType === "Bar" && <Select value={config.visualizationSubType || "Regular"} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={['regular', 'stacked']} />}
+                  {config.visualizationType === "Bar" && <Select value={config.orientation || "vertical"} fieldName="orientation" label="Orientation" updateField={updateField} options={['vertical', 'horizontal']} />}
+                  { (config.visualizationType === "Bar" && config.orientation === "horizontal") &&
                     <Select value={config.yAxis.labelPlacement || "Below Bar"} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={['Below Bar', 'On Date/Category Axis' ]} />
                   }
                   { (showLollipopCheckbox()) &&
                     <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} />
                   }
-                  {config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&
+                  {config.orientation === "horizontal" && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === "On Date/Category Axis") &&
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   }
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} />
+                  <TextField type="textarea" value={config.description} fieldName="subtext" label="Subtext" updateField={updateField} />
                   {config.visualizationSubType !== "horizontal" &&
-                    <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
+                  <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField} />
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -675,8 +688,8 @@ const EditorPanel = () => {
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField} />
-                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={ config.visualizationSubType === 'horizontal' ? 'Size (Height)' : 'Size (Width)' } className="number-narrow" updateField={updateField} />
-                      {config.visualizationSubType !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={ config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)' } className="number-narrow" updateField={updateField} />
+                      {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField} />}
                     </>
                   )}
                   <span className="divider-heading">Number Formatting</span>
@@ -686,11 +699,20 @@ const EditorPanel = () => {
                     <TextField value={config.dataFormat.prefix} section="dataFormat" fieldName="prefix" label="Prefix" updateField={updateField} />
                     <TextField value={config.dataFormat.suffix} section="dataFormat" fieldName="suffix" label="Suffix" updateField={updateField} />
                   </div>
-                  {(config.visualizationSubType === 'horizontal') ?
+                  {(config.orientation === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
-                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <Fragment> 
+                    <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </Fragment>
                     :
+                    <Fragment>
                     <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hidLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+
+                    </Fragment>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -756,15 +778,22 @@ const EditorPanel = () => {
                         </>
                       }
 
-                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.visualizationSubType === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
+                      <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={ config.orientation === "horizontal" ? "Size (Width)" : "Size (Height)" } className="number-narrow" updateField={updateField} />
 
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
-                      {(config.visualizationSubType === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      {(config.orientation === 'horizontal') ?
+                       <Fragment> 
+                        <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        </Fragment>
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <Fragment> 
+                        <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </Fragment>
                       }
                     </>
                   )}
@@ -809,7 +838,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  {config.visualizationSubType === 'horizontal' &&
+                  {config.orientation === 'horizontal' &&
                     <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField} />
                   }
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} />
@@ -1016,16 +1045,16 @@ const EditorPanel = () => {
 
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      {config.visualizationSubType !== 'horizontal' &&
+                      {config.orientation !== 'horizontal' &&
                         <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField} />
                       }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} />
                     </>
                   )}
-                  { (config.visualizationSubType === "horizontal" && config.yAxis.labelPlacement !== "On Bar") &&
+                  { (config.orientation === "horizontal" && config.yAxis.labelPlacement !== "On Bar") &&
                     <TextField type="number" value={ config.barHeight || "25" } fieldName="barHeight" label="Bar Thickness" updateField={updateField} min="15"/>
                   }
-                  { ((config.visualizationType === "Bar" && config.visualizationSubType !== "horizontal") || config.visualizationType === "Combo" ) &&
+                  { ((config.visualizationType === "Bar" && config.orientation !== "horizontal") || config.visualizationType === "Combo" ) &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField} />
                   }
                 </AccordionItemPanel>
