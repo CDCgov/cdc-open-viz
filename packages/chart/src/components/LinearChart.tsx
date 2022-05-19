@@ -213,7 +213,7 @@ export default function LinearChart() {
                           ) : ''
                         }
 
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                        { config.orientation === "horizontal" && config.visualizationSubType !== 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
                             // 17 is a magic number from the offset in barchart.
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
@@ -222,8 +222,17 @@ export default function LinearChart() {
                             >{tick.formattedValue}</Text>
                         }
 
+                        { config.orientation === "horizontal" && config.visualizationSubType === 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                        }
 
-                        { config.visualizationSubType !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
+
+                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
