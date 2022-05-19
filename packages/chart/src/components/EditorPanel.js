@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, useCallback, memo, useContext, Fragment } from 'react'
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -82,13 +82,25 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
-  <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => {
+  const [state,setState] = useState(value || false)
+  const onChangeHandler =(event)=>{
+    const isChecked = event.target.checked;
+    setState(()=>isChecked)
+
+  };
+  useEffect(()=>{
+    updateField(section, subsection, fieldName, state)
+
+  },[section,subsection,label,fieldName,state])
+  return (
+    <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={ state } onChange={onChangeHandler} {...attributes}/>
     <span className="edit-label">{label}</span>
     {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
   </label>
-))
+  )
+});
 
 const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
   let optionsJsx = options.map((optionName, index) => <option value={optionName} key={index}>{optionName}</option>)
@@ -689,9 +701,18 @@ const EditorPanel = () => {
                   </div>
                   {(config.orientation === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
-                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <Fragment> 
+                    <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.xAxis.hidTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </Fragment>
                     :
+                    <Fragment>
                     <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hidLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                    <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+
+                    </Fragment>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -763,9 +784,16 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.orientation === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                       <Fragment> 
+                        <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        </Fragment>
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <Fragment> 
+                        <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </Fragment>
                       }
                     </>
                   )}
