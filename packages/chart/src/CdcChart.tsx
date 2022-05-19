@@ -135,8 +135,6 @@ export default function CdcChart(
     setExcludedData(newExcludedData)
 
     // After data is grabbed, loop through and generate filter column values if there are any
-    let currentData;
-
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
@@ -150,8 +148,8 @@ export default function CdcChart(
           newConfig.filters[index].active = filterValues[0];
 
       });
-      currentData = filterData(newConfig.filters, newExcludedData);
-      setFilteredData(currentData);
+
+      setFilteredData(filterData(newConfig.filters, newExcludedData));
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -196,20 +194,6 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
-    // Check for duplicate x axis values in data
-    if(!currentData) currentData = newExcludedData;
-
-    let uniqueXValues = {};
-
-    if(newConfig.visualizationType !== 'Paired Bar') {
-      for(let i = 0; i < currentData.length; i++) {
-        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-        } else {
-          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
-        }
-      }
-    }
     setConfig(newConfig);
   };
 
@@ -291,22 +275,6 @@ export default function CdcChart(
   useEffect(() => {
     loadConfig();
   }, []);
-
-  // useEffect(() => {
-  //   if(config.visualizationType === 'Paired Bar') {
-  //     updateConfig({
-  //       ...config,
-  //       yAxis: {
-  //         ...config.yAxis,
-  //         hideAxis: true
-  //       },
-  //       xAxis: {
-  //         ...config.xAxis,
-  //         hideAxis: true
-  //       }
-  //     })
-  //   }
-  // }, [config.visualizationType]);
 
   // Load data when configObj data changes
   if(configObj){
