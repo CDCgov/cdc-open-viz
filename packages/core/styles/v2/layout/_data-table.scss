@@ -1,4 +1,7 @@
-.collapsed + .table-container { border-bottom: none; }
+.collapsed + .table-container {
+  border-bottom: none;
+}
+
 .table-container {
   overflow-x: auto;
   border-right: 1px solid $lightGray;
@@ -16,10 +19,12 @@ div.data-table-heading {
   background-size: 15px 15px; // Need to define both for IE11
   background-position: right .7em center;
   background-repeat: no-repeat;
+
   &:focus {
     z-index: 2;
     position: relative;
   }
+
   &.collapsed {
     background-image: url(~@cdc/core/assets/plus.svg);
     background-size: 15px 15px; // Need to define both for IE11
@@ -38,6 +43,7 @@ table.data-table {
   border-collapse: collapse;
   overflow: auto;
   appearance: none;
+
   * {
     box-sizing: border-box
   }
@@ -46,14 +52,16 @@ table.data-table {
     user-select: none;
     -moz-user-select: none;
     user-select: none;
+
     tr {
       background: none;
     }
   }
-  
+
   thead {
     color: #fff;
     background-color: $mediumGray;
+
     .resizer {
       cursor: e-resize;
       width: 10px;
@@ -61,11 +69,13 @@ table.data-table {
       top: 0;
       bottom: 0;
       right: 0;
-      touch-action:none;
+      touch-action: none;
     }
+
     tr {
       text-align: left;
     }
+
     th,
     td {
       padding: .5em 1.3em .5em .7em;
@@ -74,11 +84,12 @@ table.data-table {
       text-align: left;
       cursor: pointer;
       border-right: 1px solid $lightGray !important;
+
       svg {
         margin-left: 1rem;
       }
     }
-    
+
     th.sort {
       background-color: darken($mediumGray, 10%);
       background-repeat: no-repeat;
@@ -90,21 +101,22 @@ table.data-table {
     td.sort-asc {
       background-image: url(~@cdc/core/assets/asc.svg);
     }
-    
+
     th.sort-desc,
     td.sort-desc {
       background-image: url(~@cdc/core/assets/desc.svg);
     }
-    
+
     th:last-child,
     td:last-child {
       border-right: 0
     }
   }
-  
+
   tbody {
     tr {
       width: 100%;
+
       &:hover {
         background: rgba(0, 0, 0, 0.05)
       }
@@ -118,20 +130,22 @@ table.data-table {
       border-bottom: 0
     }
   }
-  
+
   td {
     padding: .3em .7em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
-  
+
   th,
   td {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+
     &:last-child {
       border-right: 0 !important;
     }
+
     &:first-child {
       flex-grow: 1;
     }
@@ -152,11 +166,12 @@ table.data-table {
     color: inherit;
     text-decoration: none;
   }
-  
+
   td span.table-link {
     text-decoration: underline;
     cursor: pointer;
     color: #075290;
+
     svg {
       max-width: 13px;
       vertical-align: baseline;
@@ -167,19 +182,24 @@ table.data-table {
 
 .no-data {
   position: relative;
+
   .no-data-message {
     @include emptyState;
+
     h3 {
       font-size: 1.3rem;
       font-weight: 600;
       margin-bottom: .3rem;
     }
   }
+
   tr:hover {
     background: #fff;
   }
+
   th, td {
     width: 50%;
+
     &::before {
       content: "\00a0";
     }
@@ -190,20 +210,25 @@ table.data-table {
   margin: 1rem 0;
   display: flex;
   align-items: center;
+
   ul {
     list-style: none;
     margin: 0 1rem 0 0;
     display: flex;
+
     li + li {
       margin-left: .3rem;
     }
+
     button {
       background: $mediumGray;
       padding: .6rem .8rem;
+
       &:hover {
         background: lighten($mediumGray, 5%);
       }
     }
+
     button.btn-next {
       &::before {
         content: " ";
@@ -215,6 +240,7 @@ table.data-table {
         transform: rotate(90deg);
       }
     }
+
     button.btn-prev {
       &::before {
         content: " ";
@@ -226,10 +252,12 @@ table.data-table {
         transform: rotate(-90deg);
       }
     }
+
     button[disabled] {
       background: $mediumGray;
       opacity: .3;
       cursor: default;
+
       &:hover {
         background: $mediumGray;
       }
@@ -243,6 +271,7 @@ table.data-table {
   text-decoration: none;
   transition: .3s all;
   margin: 1em 0;
+
   &:hover {
     transition: .3s all;
   }

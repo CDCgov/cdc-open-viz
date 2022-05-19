@@ -15,9 +15,9 @@ import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
 
 // Data
+import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
-import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
 // Sass
@@ -33,6 +33,7 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
 
 // Child Components
@@ -1061,7 +1062,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-
 
         validateFipsCodeLength(newState);
         setState(newState)

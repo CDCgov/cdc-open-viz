@@ -9,7 +9,14 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+
+import Overlay from '@cdc/core/components/ui/Overlay'
+import Modal from '@cdc/core/components/ui/Modal'
+import Button from '@cdc/core/components/elements/Button'
+
 import './scss/main.scss'
+
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 const CdcMarkupInclude = (
   {
@@ -64,7 +71,6 @@ const CdcMarkupInclude = (
     setLoading(false)
   }, [])
 
-
   // Custom Functions
   useEffect(() => {
     if (markupError) {
@@ -94,7 +100,7 @@ const CdcMarkupInclude = (
 
     if (config.srcUrl) {
       if (config.srcUrl === '#example') {
-        setUrlMarkup('<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p> But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. </p><br/><p> No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. </p><br/><p> To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?</p></body></html>')
+        setUrlMarkup('<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p> <br> <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. </p><br><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>')
       } else {
         try {
           await axios
@@ -136,6 +142,114 @@ const CdcMarkupInclude = (
     return hasBody ? parse[1] : parse
   }
 
+  // Overlay & Modal
+  let { overlay } = useGlobalContext()
+
+  const callTest = () => {
+    overlay.actions.toggleOverlay(false)
+    alert('Called the function')
+  }
+
+  const testModal1 = () => {
+    return (
+      <Overlay>
+        <Modal showClose={false}>
+          <Modal.Header>
+            Modal Title 1
+          </Modal.Header>
+          <Modal.Content>
+            This is a modal without a close button. There could be a lot of content to display but we're not sure how much
+            is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'right' }}>
+              <Button className="muted" onClick={() => overlay.actions.toggleOverlay(false)}>Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Submit</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal2 = () => {
+    return (
+      <Overlay>
+        <Modal showDividerTop={false}>
+          <Modal.Content>
+            This is a modal without a header or a top divider. There could be a lot of content to display, but we're not
+            sure how much is
+            going to show in such a small area. This is why we need to test the length of the text that we're putting
+            inside of
+            each modal.
+          </Modal.Content>
+          <Modal.Footer>
+            <Button onClick={() => callTest()}>Trigger an Action</Button>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal3 = () => {
+    return (
+      <Overlay disableBgClose={true}>
+        <Modal fontTheme={'light'} headerBgColor={'#d9006e'}>
+          <Modal.Header>
+            Disable Background Close
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal where the background close is disabled. Either the default close button, or an action
+              button <b><i>must</i></b> be available to the user in order to close the modal.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal4 = () => {
+    return (
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#363955'}>
+          <Modal.Header>
+            General Information Modal
+          </Modal.Header>
+          <Modal.Content>
+            <p>This is a modal with some general information. Anything can go here to give details or explain some
+              information further. This can contain as much information as is needed in order to provide the proper
+              context for the content.</p>
+          </Modal.Content>
+        </Modal>
+      </Overlay>
+    )
+  }
+
+  const testModal5 = () => {
+    return (
+      <Overlay>
+        <Modal fontTheme={'light'} headerBgColor={'#d73636'}>
+          <Modal.Header>
+            Warning Modal
+          </Modal.Header>
+          <Modal.Content>
+            Making these changes will perform an unreversible action.
+          </Modal.Content>
+          <Modal.Footer>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '1rem' }}>Are you sure you want to continue?</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Button className="warn" onClick={() => overlay.actions.toggleOverlay(false)}>No, Cancel</Button>
+              <Button className="success" onClick={() => callTest()}>Yes, Continue</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>
+      </Overlay>
+    )
+  }
+
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
@@ -164,9 +278,9 @@ const CdcMarkupInclude = (
           }
           <div className="cove-component__content">
             {!markupError && urlMarkup &&
-            <div className="cove-component__content-wrap">
-              <Markup content={parseBodyMarkup(urlMarkup)}/>
-            </div>
+              <div className="cove-component__content-wrap">
+                <Markup content={parseBodyMarkup(urlMarkup)}/>
+              </div>
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
@@ -178,6 +292,7 @@ const CdcMarkupInclude = (
       <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
+        {overlay.object || null}
       </div>
     )
   }

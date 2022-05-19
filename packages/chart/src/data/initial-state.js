@@ -28,6 +28,7 @@ export default {
     label: 'Data Table',
     expanded: true
   },
+  orientation: "vertical",
   legend: {
     behavior: 'isolate',
     position: 'right'
@@ -37,6 +38,7 @@ export default {
     keys: []
   },
   palette: 'qualitative-bold',
+  isPaletteReversed:false,
   labels: false,
   dataFormat: {},
   confidenceKeys: {}

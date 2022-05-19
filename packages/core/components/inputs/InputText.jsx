@@ -1,6 +1,8 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
+import '../../styles/v2/components/input.scss'
+
 const InputText = memo((
   {
     label,
@@ -19,7 +21,7 @@ const InputText = memo((
   const [ debouncedValue ] = useDebounce(value, 500)
 
   useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
+    if ('string' === typeof debouncedValue && stateValue !== debouncedValue && updateField) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
   }, [ debouncedValue, section, subsection, fieldName, i, stateValue, updateField ])

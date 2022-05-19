@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  memo } from 'react';
+  memo, 
+  Fragment} from 'react';
 import {
   useTable,
   useSortBy,
@@ -61,16 +62,16 @@ export default function DataTable() {
       Cell: ({ row }) => {
         const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original;
         return (
-          <>
+          <Fragment>
             {config.visualizationType !== 'Pie' && <LegendCircle fill={colorScale(seriesLabel)} />}
             <span>{seriesLabel}</span>
-          </>
+          </Fragment>
         )
       },
       id: 'series-label'
     }];
 
-    data.map((d) => {
+    data.forEach((d) => {
         const newCol = {
           Header: config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
@@ -88,12 +89,12 @@ export default function DataTable() {
     });
 
     return newTableColumns;
-  }, [config]);
+  }, [config,colorScale]);
 
 
 
   const tableData = useMemo(
-    () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
+ () => config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys,
     [config.runtime.seriesKeys]
   );
 
