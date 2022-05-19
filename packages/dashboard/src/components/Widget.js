@@ -173,7 +173,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
             <div className="widget-menu">
               {data.dataKey && data.dataDescription && data.formattedData && <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>}
               {data.dataKey && <button className="btn btn-configure" onClick={() => setModal(true)}>Configure Data</button>}
-              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => changeDataset(data.uid, e.target.value)}>
+              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {if(e.target.value) setModal(true); changeDataset(data.uid, e.target.value)}}>
                 <option value="">Select a dataset</option>
                 {Object.keys(config.datasets).map(datasetKey => (
                   <option key={datasetKey}>{datasetKey}</option>
