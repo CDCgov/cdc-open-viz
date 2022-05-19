@@ -1,3 +1,8 @@
+//TODO: Remove after COVE refactor
+.cove {
+  @import "@cdc/core/styles/v2/layout/tooltip.scss";
+}
+
 .editor-panel {
   display: flex;
   flex-direction: column;
@@ -327,10 +332,6 @@
 
     &.checkbox {
       display: flex;
-
-      span {
-        display: inline;
-      }
 
       input {
         margin-left: 0;
