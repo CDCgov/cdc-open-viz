@@ -7,8 +7,6 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 .cove-tooltip {
   display: inline-flex;
   position: relative;
-  margin-left: 100px;
-  z-index: 2;
 }
 
 .cove-tooltip--target {
