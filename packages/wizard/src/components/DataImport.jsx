@@ -44,6 +44,8 @@ const DataImport = () => {
   const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
 
+  const [ isLoading, setIsLoading ] = useState(false)
+
   const transform = new DataTransform()
 
   const supportedDataTypes = {
@@ -370,6 +372,10 @@ const DataImport = () => {
             <small className="mt-2 mb-4">
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
             </small>
+
+            <Button className="mt-4" type="loader" loading={isLoading}>Testing text here</Button>
+            <br/>
+            <input type='checkbox' onChange={()=>setIsLoading(loading => !loading)}/>
 
             <div className="cove-heading--3 mb-0">Load Sample Data:</div>
             <ul className="cove-wizard__data-samples">
