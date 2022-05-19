@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -198,12 +198,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!config.runtime.yAxis.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                           display={config.runtime.horizontal ? 'none' : 'block'}
                         />
+                        )}
                         { config.runtime.yAxis.gridLines ? (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
@@ -213,16 +215,18 @@ export default function LinearChart() {
                           ) : ''
                         }
 
-                        { config.orientation === "horizontal" && config.visualizationSubType !== 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                        {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
+                            <Fragment> 
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
+                             </Fragment>
                         }
 
-                        { config.orientation === "horizontal" && config.visualizationSubType === 'stacked' && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                        { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
@@ -232,7 +236,7 @@ export default function LinearChart() {
                         }
 
 
-                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
+                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
@@ -296,11 +300,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!config.xAxis.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                         />
+                        )}
+                        {!config.xAxis.hideLabel && (
                         <Text
                           transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
@@ -309,6 +316,8 @@ export default function LinearChart() {
                         >
                           {tick.formattedValue}
                         </Text>
+                        )}
+
                       </Group>
                     );
                   })}
