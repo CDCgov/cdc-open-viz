@@ -164,3 +164,8 @@
     }
   }
 }
+
+//TODO: Remove after refactor to wizard
+.cdc-open-viz-module .cove-temp {
+  @import '@cdc/core/styles/v2/layout/_tooltip.scss';
+}

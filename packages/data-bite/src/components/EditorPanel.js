@@ -11,10 +11,12 @@ import {
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
 import WarningImage from '../images/warning.svg'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../CdcDataBite'
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, max = null, ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, tooltip, type = "input", i = null, min = null, max = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -56,7 +58,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
     <>
       {label && label.length > 0 &&
         <label>
-          <span className="edit-label column-heading">{label}</span>
+          <span className="edit-label column-heading">{label}{tooltip}</span>
           {formElement}
         </label>
       }
@@ -235,7 +237,7 @@ const EditorPanel = memo(() => {
           return Object.keys(row).forEach(columnName => columns[columnName] = true)
          })
       }
-    
+
 
     return Object.keys(columns)
   }
@@ -311,7 +313,7 @@ const EditorPanel = memo(() => {
       {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error /> }
       {(!config.dataColumn || !config.dataFunction) && <Confirm />}
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+      <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}>
         <div className="heading-2">Configure Data Bite</div>
         <section className="form-container">
           <form>
@@ -325,8 +327,26 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <Select value={config.biteStyle} fieldName="biteStyle" label="Data Bite Style" updateField={updateField} options={BITE_LOCATIONS} initial="Select" />
                   <TextField value={config.title} fieldName="title" label="Title" placeholder="Data Bite Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} />
-                  <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation" placeholder="Data Bite Subtext or Citation" updateField={updateField} />
+                  <TextField type="textarea" value={config.biteBody} fieldName="biteBody" label="Message" updateField={updateField} tooltip={
+                    <Tooltip style={{textTransform: 'none'}}>
+                      <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>Enter the message text for the visualization. <br/><br/><small>The following HTML tags are supported:<br/> strong, em, sup, and sub.</small></p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }/>
+                  <TextField value={config.subtext} fieldName="subtext" label="Subtext/Citation" placeholder="Data Bite Subtext or Citation" updateField={updateField} tooltip={
+                    <Tooltip style={{textTransform: 'none'}}>
+                      <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Enter supporting text to display below the data visualization, if applicable. <br/>
+                          <br/>
+                          <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }/>
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -353,6 +373,19 @@ const EditorPanel = memo(() => {
                   </ul>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
                   <hr className="accordion__divider" />
+
+                  <label style={{marginBottom: '1rem'}}>
+                    <span className="edit-label">
+                      Data Point Filters
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>To refine the highlighted data point, specify one or more filters (e.g., "Male" and
+                            "Female" for a column called "Sex").</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
+                  </label>
                   {
                     config.filters &&
                     <ul className="filters-list">
@@ -381,7 +414,13 @@ const EditorPanel = memo(() => {
                       ))}
                     </ul>
                   }
-                  {(!config.filters || config.filters.length === 0) && <p style={{textAlign: "center"}}>There are currently no filters.</p>}
+                  {(!config.filters || config.filters.length === 0) &&
+                    <div>
+                      <fieldset className="edit-block">
+                        <p style={{textAlign: "center"}}>There are currently no filters.</p>
+                      </fieldset>
+                    </div>
+                  }
                   <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
                 </AccordionItemPanel>
               </AccordionItem>
