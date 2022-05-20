@@ -195,23 +195,24 @@
   }
 
   .remove-column {
-    float: right;
-    text-transform: uppercase;
+    margin: 0 auto;
     color: #C32B2B;
     font-size: .7em;
+    font-weight: bold;
     line-height: 1.6em;
-    border-radius: 5px;
-    margin: 0 auto;
-    transition: .1s all;
-    border: 0;
     text-decoration: underline;
+    text-transform: uppercase;
+    border: 0;
+    border-radius: 5px;
+    transition: .1s all;
+    float: right;
     outline: 0;
     cursor: pointer;
-    font-weight: bold;
   }
 
   .edit-block {
     padding-left: 1em;
+    border: 0;
     border-left: rgba(0, 0, 0, 0.2) 4px solid;
     transition: .2s all;
 

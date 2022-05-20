@@ -1271,7 +1271,10 @@ const EditorPanel = (props) => {
                       <Tooltip style={{textTransform: 'none'}}>
                         <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+                          <p>Enter supporting text to display below the data visualization, if applicable.<br/>
+                          <br/>
+                            <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -1896,10 +1899,10 @@ const EditorPanel = (props) => {
 											placeholder='Data Table'
 										/>
 										<TextField
-											value={dataTable.indexTitle}
+											value={dataTable.indexLabel || ''}
 											updateField={updateField}
 											section='dataTable'
-											fieldName='indexTitle'
+											fieldName='indexLabel'
 											label='Index Column Header'
 											placeholder='Location'
                       tooltip={
