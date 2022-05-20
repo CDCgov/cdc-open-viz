@@ -11,6 +11,10 @@ import {
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
+
+import Button from '@cdc/core/components/elements/Button'
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import InputText from '@cdc/core/components/inputs/InputText'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
@@ -222,10 +226,26 @@ const EditorPanel = memo((props) => {
                     <AccordionItemPanel>
                       <InputText value={config.title} fieldName="title" label="Title" placeholder="Waffle Chart Title"
                                  updateField={updateField}/>
-                      <InputText type="textarea" value={config.content} fieldName="content" label="Message"
-                                 updateField={updateField}/>
+                      <InputText type="textarea" value={config.content} fieldName="content" label="Message" updateField={updateField} tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter the message text for the visualization. <br/><br/><small>The following HTML tags are supported:<br/> strong, em, sup, and sub.</small></p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }/>
                       <InputText value={config.subtext} fieldName="subtext" label="Subtext/Citation"
-                                 placeholder="Waffle Chart Subtext or Citation" updateField={updateField}/>
+                                 placeholder="Waffle Chart Subtext or Citation" updateField={updateField} tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter supporting text to display below the data visualization, if applicable.<br/>
+                              <br/>
+                              <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }/>
                     </AccordionItemPanel>
                   </AccordionItem>
                   <AccordionItem>
@@ -258,8 +278,9 @@ const EditorPanel = memo((props) => {
                           </div>
                         </div>
                         {config.invalidComparate &&
-                        <div className="accordion__panel-error">Non-numerical comparate values can only be used with = or
-                          ≠.</div>
+                        <div className="accordion__panel-error">
+                          Non-numerical comparate values can only be used with = or ≠.
+                        </div>
                         }
                       </div>
 
@@ -268,7 +289,7 @@ const EditorPanel = memo((props) => {
                           <h4 style={{ fontWeight: '600' }}>Denominator</h4>
                         </div>
                         <div className="accordion__panel-col">
-                          <div className="d-flex justify-end">
+                          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
                             <label className={'accordion__panel-label--inline'}>Select from data</label>
                             <InputCheckbox size='small' value={config.customDenom} fieldName='customDenom' updateField={updateField}/>
                           </div>
@@ -302,17 +323,21 @@ const EditorPanel = memo((props) => {
                                      updateField={updateField}/>
                         </li>
                       </ul>
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>
-                        Filters
-                      </AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <ul className="filters-list">
-                        {config.filters && config.filters.map((filter, index) => (
+                      <hr className="accordion__divider" />
+
+                      <label style={{marginBottom: '1rem'}}>
+                        <span className="edit-label">Data Point Filters</span>
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>To refine the highlighted data point, specify one or more filters (e.g., "Male" and
+                              "Female" for a column called "Sex").</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </label>
+                      {config.filters &&
+                        <ul className="filters-list" style={{paddingLeft: 0}}>
+                          {config.filters.map((filter, index) => (
                             <fieldset className="edit-block" key={index}>
                               <button type="button" className="remove-column" onClick={() => {
                                 removeFilter(index)
@@ -341,11 +366,10 @@ const EditorPanel = memo((props) => {
                                 </select>
                               </label>
                             </fieldset>
-                          )
-                        )}
-                      </ul>
-
-                      <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                          ))}
+                        </ul>
+                      }
+                      <Button onClick={addNewFilter} fluid>Add Filter</Button>
                     </AccordionItemPanel>
                   </AccordionItem>
                   <AccordionItem>
