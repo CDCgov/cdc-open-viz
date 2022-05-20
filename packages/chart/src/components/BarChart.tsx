@@ -175,7 +175,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         />
 
-                      {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 &&
+                      {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
                           <Text
                             x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
                             y={ bar.y + 8 }
@@ -418,7 +418,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           </Group>
                       }
 
-                      { orientation === "horizontal" && isLabelBelowBar &&
+                      { orientation === "horizontal" && isLabelBelowBar && !config.yAxis.hideLabel &&
                       <>
                         <Text
                             x={ config.yAxis.hideAxis ? 0 : 5 } // padding
