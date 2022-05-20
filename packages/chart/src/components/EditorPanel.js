@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
-import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 
@@ -79,7 +78,7 @@ const TextField = memo(({label, tooltip, section = null, subsection = null, fiel
 
 const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes}) => (
   <label className="checkbox">
-    <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
+    <input type="checkbox" name={fieldName} checked={value} onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
     <span className="edit-label">{label}{tooltip}</span>
   </label>
 ))
@@ -732,11 +731,18 @@ const EditorPanel = () => {
                       </Tooltip>
                     }/>
                   </div>
-                  {(config.orientation === 'horizontal') ?
-                    // horizontal - x is vertical y is horizontal
-                    <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                  {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
+                    <>
+                      <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                      <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </>
                     :
-                    <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <>
+                      <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                      <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                      <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                    </>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -822,9 +828,16 @@ const EditorPanel = () => {
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField} />
                       }
                       {(config.orientation === 'horizontal') ?
-                        <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <>
+                          <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                          <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                        </>
                         :
-                        <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                        <>
+                          <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                          <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
+                          <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                        </>
                       }
                     </>
                   )}
