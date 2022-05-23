@@ -30,23 +30,51 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   }
 
   // Legacy support - dashboards using a single dataset
-  if(config.type === 'dashboard' && (config.data || config.dataUrl)){
-    let newConfig = {...config};
+  if(config.type === 'dashboard'){
+    let legacyUpdateNeeded = false;
+    let newConfig;
 
-    newConfig.datasets = {};
-    newConfig.datasets[config.dataFileName || 'dataset-1'] = {
-      data: config.data,
-      dataUrl: config.dataUrl,
-      dataFileName: config.dataFileName || 'dataset-1',
-      dataFileSourceType: config.dataFileSourceType
-    };
+    if(config.data || config.dataUrl){
+      legacyUpdateNeeded = true;
+      newConfig = {...config};
 
-    delete newConfig.data;
-    delete newConfig.dataUrl,
-    delete newConfig.dataFileName;
-    delete connewConfigfig.dataFileSourceType;
+      newConfig.datasets = {};
+      newConfig.datasets[config.dataFileName || 'dataset-1'] = {
+        data: config.data,
+        dataUrl: config.dataUrl,
+        dataFileName: config.dataFileName || 'dataset-1',
+        dataFileSourceType: config.dataFileSourceType
+      };
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1';
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription;
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData;
+      });
+
+      delete newConfig.data;
+      delete newConfig.dataUrl,
+      delete newConfig.dataFileName;
+      delete newConfig.dataFileSourceType;
+      delete newConfig.dataDescription;
+      delete newConfig.formattedData;
+    }
+
+    if(config.dashboard && config.dashboard.filters){
+      legacyUpdateNeeded = true;
+      newConfig = {...config};
+
+      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || [];
+      newConfig.dashboard.filters.forEach(filter => {
+        newConfig.dashboard.sharedFilters.push({...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations)});
+      });
+
+      delete newConfig.dashboard.filters;
+    }
     
-    setConfig(newConfig);
+    if(legacyUpdateNeeded){
+      setConfig(newConfig);
+    }
   }
 
   const [globalActive, setGlobalActive] = useState(startingTab);
@@ -123,7 +151,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
       configureDisabled = false;
     }
   } else {
-    if(Object.keys(config.datasets).length > 0){
+    if(config.datasets && Object.keys(config.datasets).length > 0){
       configureDisabled = false;
     }
   }
