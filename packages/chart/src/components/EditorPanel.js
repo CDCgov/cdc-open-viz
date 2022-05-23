@@ -34,7 +34,7 @@ const ValueInput = ({isValid,section=null,message,subsection=null,fieldName,valu
   updateField(section, subsection, fieldName, value)
   }else if(!isValid || !value){
     updateField(section, subsection, fieldName,undefined)
-} 
+}
   },[fieldName,section,subsection,value,isValid]);
 
   return (
@@ -604,7 +604,7 @@ const EditorPanel = () => {
                   {config.visualizationType === "Pie" && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={['Regular', 'Donut']} />}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
 
-                  <TextField type="textarea" value={config.description} fieldName="subtext" label="Subtext" updateField={updateField} tooltip={
+                  <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} tooltip={
                     <Tooltip style={{textTransform: 'none'}}>
                       <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                       <Tooltip.Content>
@@ -755,7 +755,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }/>
                   </div>
-                 
+
                   {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
                     <>
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
@@ -773,10 +773,10 @@ const EditorPanel = () => {
                       <ValueInput isValid={state.isValid.min}  message={state.message.min}  section='yAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'   onChange={(e) => onChangeHandler(e, 'MIN')} updateField={updateField}  max={'0'} />
                     </>
                   }
-               
 
-                      
-                     
+
+
+
                 </AccordionItemPanel>
               </AccordionItem>
 
