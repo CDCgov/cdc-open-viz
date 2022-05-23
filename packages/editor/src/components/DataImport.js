@@ -311,9 +311,9 @@ export default function DataImport() {
 
   const resetButton = () => {
     return (
-      <Button className="warn" style={{ height: '2.5rem' }}
-              onClick={() => overlay.actions.openOverlay(warningModal(), true)} flexCenter>
-        Clear <Icon display="close"/>
+      <Button className="warn" style={{ height: '2.5rem', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
+              onClick={() => overlay.actions.openOverlay(warningModal(), true)}>
+        Clear <Icon display="close" style={{marginLeft: '0.5rem'}}/>
       </Button>
     )
   }

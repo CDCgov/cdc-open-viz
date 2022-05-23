@@ -11,6 +11,7 @@ import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import WorldIcon from '@cdc/core/assets/world-graphic.svg';
+import AlabamaIcon from '@cdc/core/assets/alabama-graphic.svg';
 
 import Context from '../context';
 
@@ -22,7 +23,9 @@ const iconHash = {
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
   'us' : <UsaIcon />,
-  'world' : <WorldIcon />
+  'us-county': <UsaIcon />,
+  'world' : <WorldIcon />,
+  'single-state': <AlabamaIcon />
 }
 
 const labelHash = {
@@ -32,8 +35,10 @@ const labelHash = {
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
-  'us' : 'United States',
-  'world' : 'World'
+  'us': 'United States (State- or County-Level)',
+  'us-county': 'United States (State- or County-Level)',
+  'world' : 'World',
+  'single-state': 'U.S. State'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {

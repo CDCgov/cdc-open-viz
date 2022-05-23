@@ -12,6 +12,7 @@ const InputText = memo((
     updateField,
     value: stateValue,
     type = 'input',
+    tooltip,
     i = null, min = null, max = null,
     ...attributes
   }
@@ -53,8 +54,12 @@ const InputText = memo((
   }
 
   return (
-    <div className="input-group">
-      {label && <label>{label}</label>}
+    <div className="cove-input-group">
+      {label &&
+        <>
+          <label>{label}{tooltip}</label>
+        </>
+      }
       {formElement}
     </div>
   )
