@@ -1,17 +1,16 @@
 @import "~@cdc/core/styles/v2/themes/color-definitions";
 
+:root {
+  --wizardTabsHeight: 48px;
+}
+
 .cove-wizard {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 .cove-wizard__grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 0;
-  grid-row-gap: 0;
   height: 100%;
 
   .cove-wizard__grid--left {
@@ -27,6 +26,10 @@
     padding: 1.875em;
     overflow-x: auto;
   }
+}
+
+.cove-wizard__data-designer {
+  height: calc(100% - var(--wizardTabsHeight));
 }
 
 .cove-wizard__data-samples {

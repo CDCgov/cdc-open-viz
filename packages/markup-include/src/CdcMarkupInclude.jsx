@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react'
-import { Markup } from 'interweave'
 import axios from 'axios'
 import parse from 'html-react-parser'
+import { Markup } from 'interweave'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -152,10 +152,6 @@ const CdcMarkupInclude = (
   }, [ loadConfigMarkupData ])
 
   let content = (<Loading/>)
-
-  console.log('isDashboard', isDashboard)
-  console.log('isEditor', isEditor)
-  console.log('isWizard', isWizard)
 
   if (loading === false) {
     let body = (

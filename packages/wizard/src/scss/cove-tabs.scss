@@ -2,7 +2,10 @@
 @import "~@cdc/core/styles/v2/themes/color-definitions";
 
 .cove-tabs {
-  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
 }
 
 .cove-tabs__list {
@@ -76,5 +79,5 @@
 
 .cove-tabs-content {
   height: 100%;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
 }

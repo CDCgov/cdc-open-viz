@@ -13,9 +13,6 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import InputText from '@cdc/core/components/inputs/InputText'
 
-import Icon from '@cdc/core/components/ui/Icon'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-
 import '@cdc/core/styles/v2/components/accordion.scss'
 import '@cdc/core/styles/v2/components/editor.scss'
 
@@ -81,7 +78,7 @@ const EditorPanel = memo((props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
 
-  useEffect(()=> {
+  useEffect(() => {
     if (!showConfigConfirm) {
       let newConfig = { ...config }
       delete newConfig.newViz
@@ -173,43 +170,6 @@ const EditorPanel = memo((props) => {
                         value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
                         placeholder="https://www.example.com/file.html" updateField={updateField}
                       />
-
-                      <Tooltip position="top" trigger="click" border={false}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="right" trigger="click" border={'1'} borderColor={'red'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="bottom" trigger="click" shadow={false} border={'2'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
-                      <Tooltip position="left" trigger="click" border={'2'} borderColor={'blue'}>
-                        <Tooltip.Target>
-                          <Icon display="question" alt="hello"/>
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          Hello world! I have a <a href="#">link</a>.
-                        </Tooltip.Content>
-                      </Tooltip>
-
                     </AccordionItemPanel>
                   </AccordionItem>
                   <AccordionItem>

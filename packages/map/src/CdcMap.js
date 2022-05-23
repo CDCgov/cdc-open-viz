@@ -15,9 +15,9 @@ import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
 
 // Data
+import colorPalettes from '@cdc/core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
-import colorPalettes from './data/color-palettes';
 import initialState from './data/initial-state';
 
 // Sass
@@ -98,7 +98,7 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
-     
+
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
@@ -116,7 +116,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-            
+
             setCurrentViewport(newViewport)
         }
     });
@@ -271,8 +271,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                             }
 
                             let specialColor = '';
-                            
-                            // color the state if val is in row 
+
+                            // color the state if val is in row
                             specialColor = result.findIndex(p => p.value === val)
 
                             newLegendMemo.set( hashObj(row), specialColor)
@@ -302,10 +302,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                             specialClasses += 1;
                         }
-                    
+
                         let specialColor = '';
-                        
-                        // color the state if val is in row 
+
+                        // color the state if val is in row
                         if ( Object.values(row).includes(val) ) {
                             specialColor = result.findIndex(p => p.value === val)
                         }
@@ -570,7 +570,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 value : hash
             });
         }
-        
+
 
         obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
@@ -591,7 +591,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
-                
+
                 if ( undefined !== navigateUrl && typeof navigateUrl === "string" ) {
                     // Strip hidden characters before we check length
                     navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
@@ -738,7 +738,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             filters[idx].active = activeValue
             const newData = generateRuntimeData(state, filters)
-            
+
             // throw an error if newData is empty
             if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
 
@@ -812,18 +812,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
-        let stateOrCounty = 
-            state.general.geoType === 'us' ? 'State: ' : 
+        let stateOrCounty =
+            state.general.geoType === 'us' ? 'State: ' :
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
-            
+
             //supportedStatesFipsCodes[]
             toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
         }
-        
+
         toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
@@ -1011,7 +1011,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = async (configObj) => { 
+    const loadConfig = async (configObj) => {
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1153,7 +1153,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
             const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+            setRuntimeData(data)
         }
 
         // Legend
@@ -1161,7 +1161,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
-        
+
     }, [state])
 
     useEffect(() => {
@@ -1176,7 +1176,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             geoType: state.general.geoType,
             data: state.data
         })
-        
+
         // Legend - Update when runtimeData does
         if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
@@ -1240,7 +1240,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     if (!mapProps.data || !state.data) return <Loading />;
 
     const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
-    
+
 
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1327,7 +1327,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 )}
                                 {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                             </section>
-                        
+
                         )}
                         </section>
 

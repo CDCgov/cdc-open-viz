@@ -341,7 +341,7 @@ const DataImport = () => {
         {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="cove-wizard__data">
             <Tabs className="mb-4">
-              <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>}>
+              <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>} className="mt-4">
                 <div
                   className={`cove-file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
                   {/* cdcdataviz-file-selector */}
@@ -353,7 +353,7 @@ const DataImport = () => {
                   }
                 </div>
               </Tabs.Content>
-              <Tabs.Content title="Load from URL" icon={<Icon className="mr-1" display="link"/>}>
+              <Tabs.Content title="Load from URL" icon={<Icon className="mr-1" display="link"/>} className="mt-4">
                 {loadFileFromUrl(externalURL)}
               </Tabs.Content>
             </Tabs>
@@ -373,9 +373,14 @@ const DataImport = () => {
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
             </small>
 
-            <Button className="mt-4" type="loader" loading={isLoading}>Testing text here</Button>
+            <Button className="mt-4" role="loader" loading={isLoading} onClick={() => {
+              setIsLoading(true)
+              setTimeout(() => {
+                setIsLoading(false)
+              }, 1000)
+            }}>Test load here</Button>
             <br/>
-            <input type='checkbox' onChange={()=>setIsLoading(loading => !loading)}/>
+            <br/>
 
             <div className="cove-heading--3 mb-0">Load Sample Data:</div>
             <ul className="cove-wizard__data-samples">
@@ -392,6 +397,53 @@ const DataImport = () => {
                 States Counties Sample Data
               </li>
             </ul>
+
+            <div className="grid grid-gap-1">
+              <div className="col-6 row-2" style={{ background: 'red' }}>
+                <div>Hello</div>
+              </div>
+              <div className="col-6 row-1" style={{ background: 'green' }}>
+                <div>Another section</div>
+              </div>
+              <div className="col-6 row-1" style={{ background: 'blue' }}>
+                <div>World</div>
+                <div>How</div>
+                <div>Are</div>
+                <div>Things?</div>
+              </div>
+            </div>
+
+            <br/>
+            <br/>
+            <div className="mb-2">
+              <InputText label={'Test'}/>
+            </div>
+
+            <div className="mb-2">
+              <InputText label={'Test 2'} type="textarea"/>
+            </div>
+
+            <div className="mb-2">
+              <InputText label={'Test 2'} type="number"/>
+            </div>
+
+            <InputGroup flow="left" text={<><Icon className="mr-1" display="upload"/> There is text here</>}
+                        className="mb-2">
+              <InputText type="text" label="bob"/>
+            </InputGroup>
+
+            <InputGroup flow="right" text="Test label text" className="mb-2">
+              <InputText type="text"/>
+            </InputGroup>
+
+            <InputGroup flow="center" text="@" className="mb-2">
+              <InputText type="text" placeholder="User"/>
+              <InputText type="text" placeholder="Server"/>
+            </InputGroup>
+
+            <br/>
+            <br/>
+
             <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html"
                            bob="sagat" bill="murray">
               <GuidanceBlock.Title>
@@ -411,21 +463,17 @@ const DataImport = () => {
             {config.dataFileSourceType === 'file' && (
               <div className="cove-data-designer__source">
                 <div
-                  className={`cove-file-selector py-1 loaded-file${isDragActive ? ' drag-active ' : ''}`} {...getRootProps()}
-                >
+                  className={`cove-file-selector py-1 mr-1 loaded-file${isDragActive ? ' drag-active ' : ''}`} style={{flex: '1 1 auto'}} {...getRootProps()}> {/*TODO: Replace file selector with component*/}
                   <input {...getInputProps()} />
-                  {
-                    isDragActive ?
-                      <p>Drop file here</p> :
-                      <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Icon display="fileUpload" size={12} color="#333" style={{ marginRight: '0.5rem' }}/>
-                        <span>{config.dataFileName ?? 'Replace data file'}</span>
-                      </p>
+                  {isDragActive ?
+                    <p>Drop file here</p> :
+                    <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Icon display="fileUpload" size={12} color="#333" style={{ marginRight: '0.5rem' }}/>
+                      <span>{config.dataFileName ?? 'Replace data file'}</span>
+                    </p>
                   }
                 </div>
-                <div>
-                  {resetButton()}
-                </div>
+                {resetButton()}
               </div>
             )}
 
@@ -440,114 +488,48 @@ const DataImport = () => {
               </div>
             )}
 
-            <div className="question">
+            <div className="mb-2">
               <div className="cove-heading--3">Describe Data</div>
-              <div className="cove-heading--4 data-question">Data Orientation</div>
-              <div className="cove-data-designer__options">
-                <button
-                  className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
-                  onClick={() => {
-                    updateDescriptionProp('horizontal', false)
-                  }}>
-                  <Card>
-                    <strong>Vertical</strong>
-                    <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.
-                    </p>
-                    <table>
-                      <tbody>
-                      <tr>
-                        <th>Date</th>
-                        <th>Value</th>
-                        <th>...</th>
-                      </tr>
-                      <tr>
-                        <td>01/01/2020</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      <tr>
-                        <td>02/01/2020</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      </tbody>
-                    </table>
-                    <table>
-                      <tbody>
-                      <tr>
-                        <th>State</th>
-                        <th>Value</th>
-                        <th>...</th>
-                      </tr>
-                      <tr>
-                        <td>Georgia</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      <tr>
-                        <td>Florida</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </Card>
-                </button>
-
-                <button
-                  className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
-                  onClick={() => {
-                    updateDescriptionProp('horizontal', true)
-                  }}>
-                  <Card>
-                    <strong>Horizontal</strong>
-                    <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
-                    <table>
-                      <tbody>
-                      <tr>
-                        <th>Date</th>
-                        <td>01/01/2020</td>
-                        <td>02/01/2020</td>
-                        <td>...</td>
-                      </tr>
-                      <tr>
-                        <th>Value</th>
-                        <td>100</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      </tbody>
-                    </table>
-                    <table>
-                      <tbody>
-                      <tr>
-                        <th>State</th>
-                        <td>Georgia</td>
-                        <td>Florida</td>
-                        <td>...</td>
-                      </tr>
-                      <tr>
-                        <th>Value</th>
-                        <td>100</td>
-                        <td>150</td>
-                        <td>...</td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </Card>
-                </button>
+              <div className="cove-heading--4">Data Orientation</div>
+              <div className="grid grid-gap-2 mb-4">
+                <div className="col-6">
+                  <button
+                    className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
+                    onClick={() => {
+                      updateDescriptionProp('horizontal', false)
+                    }}>
+                    <Card>
+                      <strong>Vertical</strong>
+                      <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.</p>
+                      {DEMO_TABLE_VERTICAL}
+                    </Card>
+                  </button>
+                </div>
+                <div className="col-6">
+                  <button
+                    className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
+                    onClick={() => {
+                      updateDescriptionProp('horizontal', true)
+                    }}>
+                    <Card>
+                      <strong>Horizontal</strong>
+                      <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
+                      {DEMO_TABLE_HORIZONTAL}
+                    </Card>
+                  </button>
+                </div>
               </div>
             </div>
 
             {config.dataDescription && (
               <>
-                <div className="question">
-                  <div className="cove-heading--4 data-question">Are there multiple series represented in your data?
+                <div className="mb-2">
+                  <div className="cove-heading--4">Are there multiple series represented in your data?
                   </div>
                   <div>
                     <Button
-                      style={{backgroundColor: '#00345d'}}
-                      hoverStyle={{backgroundColor: '#015daa'}}
+                      style={{ backgroundColor: '#00345d' }}
+                      hoverStyle={{ backgroundColor: '#015daa' }}
                       className="mr-1"
                       onClick={() => {
                         updateDescriptionProp('series', true)
@@ -557,8 +539,8 @@ const DataImport = () => {
                       Yes
                     </Button>
                     <Button
-                      style={{backgroundColor: '#00345d'}}
-                      hoverStyle={{backgroundColor: '#015daa'}}
+                      style={{ backgroundColor: '#00345d' }}
+                      hoverStyle={{ backgroundColor: '#015daa' }}
                       onClick={() => {
                         updateDescriptionProp('series', false)
                       }}
@@ -569,8 +551,8 @@ const DataImport = () => {
                   </div>
                 </div>
                 {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
-                  <div className="question">
-                    <div className="cove-heading--4 data-question">Which property in the dataset represents which series
+                  <div className="mb-2">
+                    <div className="cove-heading--4">Which property in the dataset represents which series
                       the
                       row is describing?
                     </div>
@@ -586,8 +568,8 @@ const DataImport = () => {
                 )}
                 {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
                   <>
-                    <div className="question">
-                      <div className="cove-heading--4 data-question">Are the series values in your data represented in a
+                    <div className="mb-2">
+                      <div className="cove-heading--4">Are the series values in your data represented in a
                         single row, or across multiple rows?
                       </div>
                       <div className="table-button-container">
@@ -669,8 +651,8 @@ const DataImport = () => {
                     </div>
                     {config.dataDescription.singleRow === false && (
                       <>
-                        <div className="question">
-                          <div className="cove-heading--4 data-question">Which property in the dataset represents which
+                        <div className="mb-2">
+                          <div className="cove-heading--4">Which property in the dataset represents which
                             series
                             the row is describing?
                           </div>
@@ -683,8 +665,8 @@ const DataImport = () => {
                             ))}
                           </select>
                         </div>
-                        <div className="question">
-                          <div className="cove-heading--4 data-question">
+                        <div className="mb-2">
+                          <div className="cove-heading--4">
                             Which property in the dataset represents the values for the category/date axis or map
                             geography?
                           </div>
@@ -697,8 +679,8 @@ const DataImport = () => {
                             ))}
                           </select>
                         </div>
-                        <div className="question">
-                          <div className="cove-heading--4 data-question">
+                        <div className="mb-2">
+                          <div className="cove-heading--4">
                             Which property in the dataset represents the numeric value?
                           </div>
                           <select onChange={(e) => {
@@ -716,7 +698,8 @@ const DataImport = () => {
                 )}
               </>
             )}
-            <Button className="mt-2" style={{ float: 'right' }} onClick={() => setGlobalActive(1)} disabled={!config.formattedData}>
+            <Button className="mt-2" style={{ float: 'right' }} onClick={() => setGlobalActive(1)}
+                    disabled={!config.formattedData}>
               Select your visualization type &raquo;
             </Button>
           </DataDesigner>
@@ -729,5 +712,85 @@ const DataImport = () => {
     </div>
   )
 }
+
+const DEMO_TABLE_VERTICAL = (
+  <>
+    <table>
+      <tbody>
+      <tr>
+        <th>Date</th>
+        <th>Value</th>
+        <th>...</th>
+      </tr>
+      <tr>
+        <td>01/01/2020</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <td>02/01/2020</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      </tbody>
+    </table>
+    <table>
+      <tbody>
+      <tr>
+        <th>State</th>
+        <th>Value</th>
+        <th>...</th>
+      </tr>
+      <tr>
+        <td>Georgia</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <td>Florida</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      </tbody>
+    </table>
+  </>
+)
+
+const DEMO_TABLE_HORIZONTAL = (
+  <>
+    <table>
+      <tbody>
+      <tr>
+        <th>Date</th>
+        <td>01/01/2020</td>
+        <td>02/01/2020</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <th>Value</th>
+        <td>100</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      </tbody>
+    </table>
+    <table>
+      <tbody>
+      <tr>
+        <th>State</th>
+        <td>Georgia</td>
+        <td>Florida</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <th>Value</th>
+        <td>100</td>
+        <td>150</td>
+        <td>...</td>
+      </tr>
+      </tbody>
+    </table>
+  </>
+)
 
 export default DataImport

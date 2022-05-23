@@ -1,23 +1,14 @@
 @import "../utils/variables";
 @import '../themes/color-definitions';
 
-.cove-data-designer {}
-
 .cove-data-designer__source {
-  display: grid;
-  grid-template-columns: 1fr 100px;
-  gap: 0.5rem;
+  display: flex;
+  flex-wrap: nowrap;
   margin-bottom: 1.5rem;
 }
 
-.cove-data-designer__options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 1fr;
-  grid-column-gap: 1rem;
-}
-
 .cove-data-designer__button {
+  height: 100%;
   padding: 0;
   background-color: transparent;
   border: 0;

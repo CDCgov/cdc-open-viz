@@ -1,4 +1,5 @@
 .cove-input {
+  display: block;
   padding: 0.5em 0.5em;
   border-width: 1px;
   border-style: solid;
@@ -6,7 +7,9 @@
   border-radius: 0.1875rem;
   transition: border-color 200ms $transition-expo-out;
   font-family: sans-serif;
+  color: $baseColor;
   width: 100%;
+  max-width: 100%;
 
   &::placeholder {
     transition: opacity 400ms $transition-expo-out;
@@ -34,22 +37,21 @@
   }
 }
 
+.cove-input__label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: $baseColor;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .cove-input__textarea {
   width: 100%;
   min-height: 140px;
   max-width: 100%;
   line-height: 1.5em;
-}
-
-.cove-input__label {
-  display: block;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  user-select: none;
-
-  &:not(:first-child) {
-    margin-top: 1em;
-  }
+  color: $baseColor;
 }
 
 .cove-input--hidden {

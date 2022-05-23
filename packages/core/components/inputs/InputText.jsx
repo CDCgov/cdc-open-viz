@@ -12,8 +12,10 @@ const InputText = memo((
     updateField,
     value: stateValue,
     type = 'input',
+    tooltip,
+    placeholder,
     i = null, min = null, max = null,
-    ...attributes
+    className, ...attributes
   }
 ) => {
 
@@ -40,21 +42,23 @@ const InputText = memo((
     }
   }
 
-  let formElement = <input className="cove-input" type="text" name={name} onChange={onChange} {...attributes} value={value}/>
-
-  if ('textarea' === type) {
-    formElement = (
-      <textarea className="cove-input" name={name} onChange={onChange} {...attributes} value={value}/>
-    )
+  let inputAttrs = {
+    className: `cove-input ${className ? ' ' + {...className} : ''}`,
+    type,
+    name,
+    placeholder,
+    onChange,
+    value,
+    ...attributes
   }
 
-  if ('number' === type) {
-    formElement = <input className="cove-input" type="number" name={name} onChange={onChange} {...attributes} value={value}/>
-  }
+  let formElement = 'textarea' === type
+    ? (<textarea {...inputAttrs}/>)
+    : (<input {...inputAttrs}/>)
 
   return (
     <>
-      {label && <label className="cove-input__label">{label}</label>}
+      {label && <label className="cove-input__label">{label}</label>}{tooltip}
       {formElement}
     </>
   )

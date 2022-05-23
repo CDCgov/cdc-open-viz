@@ -6,7 +6,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import { CustomProjection } from '@visx/geo';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '@cdc/core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 import testJSON from '../data/dfc-map.json';
 import { abbrs } from '../data/abbreviations';
@@ -264,7 +264,7 @@ const CountyMap = (props) => {
 			allStates.forEach( state => state.setAttribute('stroke-width', 0.75 / scale))
 			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale );
 		}
-		
+
 	}
 
 	const StateLines = memo(({ stateLines, lineWidth, geoStrokeColor }) => {

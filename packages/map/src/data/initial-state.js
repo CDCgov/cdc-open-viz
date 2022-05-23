@@ -14,7 +14,10 @@ export default {
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
-    type: 'data'
+    type: 'data',
+    palette:{
+      isReversed:false
+    }
   },
   type: "map",
   color: 'pinkpurple',

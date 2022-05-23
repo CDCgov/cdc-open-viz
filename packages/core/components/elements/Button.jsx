@@ -7,13 +7,14 @@ import '../../styles/v2/components/button.scss'
 
 const Button = ({
                   style,
-                  type,
+                  role,
                   hoverStyle = {},
                   fluid = false,
                   loading = false,
                   loadingText = "Loading...",
                   flexCenter,
                   active = false,
+                  onClick,
                   children, ...attributes
                 }) => {
 
@@ -27,7 +28,12 @@ const Button = ({
   const attributesObj = {
     ...attributes,
     style: customStyles,
-    className: 'cove-button' + (flexCenter || 'loader' === type ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (attributes.className ? ' ' + attributes.className : ''),
+    className:
+      'cove-button' +
+      (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
+      (fluid ? ' fluid' : '') +
+      (loading ? ' loading' : '') +
+      (attributes.className ? ' ' + attributes.className : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
@@ -35,7 +41,7 @@ const Button = ({
   }
 
   useEffect(() => {
-    if ('loader' === type && buttonRef.current) {
+    if ('loader' === role && buttonRef.current) {
       //Create ghost object and text nodes for children
       const ghostSpan = document.createElement('span')
       const ghostContent = document.createTextNode(children)
@@ -78,10 +84,16 @@ const Button = ({
   }, [ buttonState, active ])
 
   return (
-    <button {...attributesObj} disabled={loading || attributesObj.disabled} ref={buttonRef}>
+    <button {...attributesObj}
+            onClick={(e) => {
+              e.preventDefault()
+              return loading || onClick()
+            }}
+            disabled={loading || attributesObj.disabled}
+            ref={buttonRef}>
       {children &&
         <>
-          {'loader' === type &&
+          {'loader' === role &&
             <>
               <span className="cove-button__text" style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}>
                 <div className="cove-button__text--loading" style={loading ? { opacity: 1 } : null}>{loadingText}</div>
@@ -92,7 +104,7 @@ const Button = ({
               </div>
             </>
           }
-          {type !== 'loader' && children}
+          {role !== 'loader' && children}
         </>
       }
     </button>
@@ -100,8 +112,8 @@ const Button = ({
 }
 
 Button.propTypes = {
-  /** Specify special type for button */
-  type: PropTypes.oneOf([ 'loader' ]),
+  /** Specify special role type for button */
+  role: PropTypes.oneOf([ 'loader' ]),
   /** Provide object with styles that overwrite base styles when hovered */
   hoverStyle: PropTypes.object,
   /** Enables button to stretch to the full width of the content */

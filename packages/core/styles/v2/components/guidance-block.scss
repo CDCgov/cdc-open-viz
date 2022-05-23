@@ -24,10 +24,33 @@
     border-radius: 0.1875rem 0 0 0.1875rem;
   }
 
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active {
     background: $lightestGray;
     color: #444;
     transition: .2s all;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: -4px;
+    margin: -4px;
+    border-radius: 0.1875rem;
+    outline: 2px solid transparent;
+    transition: outline 200ms $transition-expo-out;
+    pointer-events: none;
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+
+    &:after {
+      outline: 2px solid rgba(161, 161, 161, 0.6);
+    }
   }
 
   svg {

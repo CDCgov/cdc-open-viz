@@ -1,4 +1,6 @@
-export default {
+import { updatePaletteNames } from '../helpers/updatePaletteNames'
+
+const colorPalettesMap = {
   yelloworangered: [
     '#ffffcc',
     '#ffeda0',
@@ -8,7 +10,8 @@ export default {
     '#fc4e2a',
     '#e31a1c',
     '#bd0026',
-    '#800026'],
+    '#800026',
+  ],
   yelloworangebrown: [
     '#ffffe5',
     '#fff7bc',
@@ -18,7 +21,8 @@ export default {
     '#ec7014',
     '#cc4c02',
     '#993404',
-    '#662506'],
+    '#662506',
+  ],
   pinkpurple: [
     '#fff7f3',
     '#fde0dd',
@@ -28,7 +32,8 @@ export default {
     '#dd3497',
     '#ae017e',
     '#7a0177',
-    '#49006a'],
+    '#49006a',
+  ],
   bluegreen: [
     '#fff7fb',
     '#ece2f0',
@@ -38,7 +43,8 @@ export default {
     '#3690c0',
     '#02818a',
     '#016c59',
-    '#014636'],
+    '#014636',
+  ],
   orangered: [
     '#fff7ec',
     '#fee8c8',
@@ -48,7 +54,8 @@ export default {
     '#ef6548',
     '#d7301f',
     '#b30000',
-    '#7f0000'],
+    '#7f0000',
+  ],
   red: [
     '#fff5f0',
     '#fee0d2',
@@ -58,7 +65,8 @@ export default {
     '#ef3b2c',
     '#cb181d',
     '#a50f15',
-    '#67000d'],
+    '#67000d',
+  ],
   greenblue: [
     '#f7fcf0',
     '#e0f3db',
@@ -68,77 +76,8 @@ export default {
     '#4eb3d3',
     '#2b8cbe',
     '#0868ac',
-    '#084081'],
-  yelloworangeredreverse: [
-    '#800026',
-    '#bd0026',
-    '#e31a1c',
-    '#fc4e2a',
-    '#fd8d3c',
-    '#feb24c',
-    '#fed976',
-    '#ffeda0',
-    '#ffffcc'],
-  yelloworangebrownreverse: [
-    '#662506',
-    '#993404',
-    '#cc4c02',
-    '#ec7014',
-    '#fe9929',
-    '#fec44f',
-    '#fee391',
-    '#fff7bc',
-    '#ffffe5'],
-  pinkpurplereverse: [
-    '#49006a',
-    '#7a0177',
-    '#ae017e',
-    '#dd3497',
-    '#f768a1',
-    '#fa9fb5',
-    '#fcc5c0',
-    '#fde0dd',
-    '#fff7f3'],
-  bluegreenreverse: [
-    '#014636',
-    '#016c59',
-    '#02818a',
-    '#3690c0',
-    '#67a9cf',
-    '#a6bddb',
-    '#d0d1e6',
-    '#ece2f0',
-    '#fff7fb'],
-  orangeredreverse: [
-    '#7f0000',
-    '#b30000',
-    '#d7301f',
-    '#ef6548',
-    '#fc8d59',
-    '#fdbb84',
-    '#fdd49e',
-    '#fee8c8',
-    '#fff7ec'],
-  redreverse: [
-    '#67000d',
-    '#a50f15',
-    '#cb181d',
-    '#ef3b2c',
-    '#fb6a4a',
-    '#fc9272',
-    '#fcbba1',
-    '#fee0d2',
-    '#fff5f0'],
-  greenbluereverse: [
     '#084081',
-    '#0868ac',
-    '#2b8cbe',
-    '#4eb3d3',
-    '#7bccc4',
-    '#a8ddb5',
-    '#ccebc5',
-    '#e0f3db',
-    '#f7fcf0'],
+  ],
   yellowpurple: [
     '#FFF0B0',
     '#F5CC76',
@@ -148,7 +87,8 @@ export default {
     '#6D2059',
     '#8F0C4B',
     '#310958',
-    '#0E0943'],
+    '#0E0943',
+  ],
   qualitative1: [
     '#a6cee3',
     '#1f78b4',
@@ -160,7 +100,9 @@ export default {
     '#cab2d6',
     '#E31A90',
     '#15017A',
-    '#C2C0FC'],
+    '#C2C0FC',
+  ],
+
   qualitative2: [
     '#7fc97f',
     '#beaed4',
@@ -169,7 +111,9 @@ export default {
     '#f0027f',
     '#bf5b17',
     '#666',
-    '#fedab8'],
+    '#fedab8',
+  ],
+
   qualitative3: [
     '#1b9e77',
     '#d95f02',
@@ -178,7 +122,9 @@ export default {
     '#66a61e',
     '#e6ab02',
     '#a6761d',
-    '#666'],
+    '#666',
+  ],
+
   qualitative4: [
     '#e41a1c',
     '#377eb8',
@@ -187,7 +133,9 @@ export default {
     '#ff7f00',
     '#ff3',
     '#a65628',
-    '#f781bf'],
+    '#f781bf',
+  ],
+
   qualitative9: [
     '#497d0c',
     '#84BC49',
@@ -195,6 +143,56 @@ export default {
     '#fcad90',
     '#f26b4f',
     '#c31b1f',
-    '#c31b1f'
-  ]
-};
+    '#c31b1f',
+  ],
+}
+
+// * ============= Palettes for Chart project ==========  * //
+
+const colorPalettes2 = {
+  'qualitative-bold': [
+    '#377eb8',
+    '#ff7f00',
+    '#4daf4a',
+    '#984ea3',
+    '#e41a1c',
+    '#ffff33',
+    '#a65628',
+    '#f781bf',
+    '#3399CC',
+  ],
+
+  'qualitative-soft': [
+    '#A6CEE3',
+    '#1F78B4',
+    '#B2DF8A',
+    '#33A02C',
+    '#FB9A99',
+    '#E31A1C',
+    '#FDBF6F',
+    '#FF7F00',
+    '#ACA9EB',
+  ],
+
+  'sequential-blue': [
+    '#C6DBEF',
+    '#9ECAE1',
+    '#6BAED6',
+    '#4292C6',
+    '#2171B5',
+    '#084594',
+  ],
+
+  'sequential-green': [
+    '#C7E9C0',
+    '#A1D99B',
+    '#74C476',
+    '#41AB5D',
+    '#238B45',
+    '#005A32',
+  ],
+}
+
+export const colorPalettesChart = updatePaletteNames(colorPalettes2)  // adds reverse keyword to eact palette
+const colorPalettes = updatePaletteNames(colorPalettesMap)   // adds reverse keyword to eact palette
+export default colorPalettes
