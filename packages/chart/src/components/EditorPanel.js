@@ -23,12 +23,31 @@ import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 import {useColorPalette} from '../hooks/useColorPalette';
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
+import useInput from '../hooks/useinput';
 
 const Helper = ({text}) => {
   return (
     <span className='tooltip helper' data-tip={text}>
       <QuestionIcon />
     </span>
+  )
+}
+
+const ValueInput = ({isValid,section=null,message,subsection=null,fieldName,value,label,onChange , updateField,...attributes})=>{
+  useEffect(()=>{
+  if(isValid && value){
+  updateField(section, subsection, fieldName, value)
+  }else if(!isValid || !value){
+    updateField(section, subsection, fieldName,undefined)
+} 
+  },[fieldName,section,subsection,value,isValid]);
+
+  return (
+    <label>
+    <span>{label}</span>
+    <input style={ {outline:(!isValid && value  ) ? '1px solid red':'none'  }} onChange={onChange}  placeholder='Auto' type='number'   value={value}  {...attributes} />
+     {!isValid && value && <span style={{color:'red',display:'block'}} > {message} </span> }
+  </label>
   )
 }
 
@@ -174,6 +193,7 @@ const EditorPanel = () => {
   const {
     config,
     updateConfig,
+    transformedData:data,
     loading,
     colorPalettes,
     unfilteredData,
@@ -230,6 +250,7 @@ const EditorPanel = () => {
   };
 
   let hasLineChart = false
+  const {state,onChangeHandler } = useInput(config,data);
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.orientation === 'horizontal'){
@@ -689,10 +710,22 @@ const EditorPanel = () => {
                   </div>
                   {(config.orientation === 'horizontal') ?
                     // horizontal - x is vertical y is horizontal
+                    <> 
                     <CheckBox value={config.xAxis.hideAxis || ''} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <ValueInput  isValid={state.isValid.max}   message={state.message.max}    section='xAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}  updateField={updateField}  min={state.data.max} />
+                    <ValueInput  isValid={state.isValid.min}   message={state.message.min}    section='xAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'  onChange={(e)=>onChangeHandler(e,'MIN')} updateField={updateField} />
+                    </>
                     :
+                    <> 
                     <CheckBox value={config.yAxis.hideAxis || ''} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
+                    <ValueInput isValid={state.isValid.max}  message={state.message.max}  section='yAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}    updateField={updateField}  min={state.data.max} />
+                    <ValueInput isValid={state.isValid.min}  message={state.message.min}  section='yAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'   onChange={(e) => onChangeHandler(e, 'MIN')} updateField={updateField}  max={'0'} />
+                   </>
                   }
+               
+
+                      
+                     
                 </AccordionItemPanel>
               </AccordionItem>
 
