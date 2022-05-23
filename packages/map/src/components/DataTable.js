@@ -164,7 +164,6 @@ const DataTable = (props) => {
           id={`${skipId}`}
           data-html2canvas-ignore
           role="button"
-          tabIndex="-1"
         >
           Download Data (CSV)
         </a>
