@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
+import React, { useState, useEffect, memo, useContext } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 import {
@@ -14,6 +14,8 @@ import Context from '../context';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const Helper = ({text}) => {
   return (
@@ -38,7 +40,7 @@ const Helper = ({text}) => {
   window.CustomEvent = CustomEvent;
 })();
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
+const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, tooltip, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
 
   const [ debouncedValue ] = useDebounce(value, 500);
@@ -77,7 +79,7 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
 
   return (
     <label>
-      <span className="edit-label column-heading">{label}</span>
+      <span className="edit-label column-heading">{label}{tooltip}</span>
       {formElement}
     </label>
   )
@@ -107,8 +109,6 @@ const Select = memo(({label, value, options, fieldName, section = null, subsecti
     </label>
   )
 })
-
-const headerColors = ['theme-blue','theme-purple','theme-brown','theme-teal','theme-pink','theme-orange','theme-slate','theme-indigo','theme-cyan','theme-green','theme-amber']
 
 const EditorPanel = memo(() => {
   const {
@@ -203,7 +203,6 @@ const EditorPanel = memo(() => {
         </section>
       </section>
     );
-
   }
 
   const convertStateToConfig = (type = "JSON") => {
@@ -266,12 +265,12 @@ const EditorPanel = memo(() => {
 
     updateConfig({...config, dashboard: dashboardConfig});
   }
-  
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
-      <section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'}>
+      <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}>
         <div className="heading-2">Configure</div>
         <section className="form-container">
           <form>
@@ -284,7 +283,17 @@ const EditorPanel = memo(() => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <TextField value={config.dashboard.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} />
+                  <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} tooltip={
+                    <Tooltip style={{textTransform: 'none'}}>
+                      <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>Enter supporting text to display below the data visualization, if applicable.<br/>
+                          <br/>
+                          <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }/>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
