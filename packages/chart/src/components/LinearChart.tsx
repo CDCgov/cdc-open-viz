@@ -93,10 +93,12 @@ export default function LinearChart() {
         domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [0, yMax]
       });
-
+      
       yScale.rangeRound([0, yMax]);
     } else {
-      yScale = scaleLinear<number>({
+      min = min < 0 ? min * 1.11 : min 
+
+       yScale = scaleLinear<number>({
         domain: [min, max],
         range: [yMax, 0]
       });
