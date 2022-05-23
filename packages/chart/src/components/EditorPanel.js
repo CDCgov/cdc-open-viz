@@ -23,8 +23,30 @@ import {useColorPalette} from '../hooks/useColorPalette';
 
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
+import useInput from '../hooks/useinput';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+
+
+const ValueInput = ({isValid,section=null,message,subsection=null,fieldName,value,label,onChange , updateField,...attributes})=>{
+  useEffect(()=>{
+  if(isValid && value){
+  updateField(section, subsection, fieldName, value)
+  }else if(!isValid || !value){
+    updateField(section, subsection, fieldName,undefined)
+} 
+  },[fieldName,section,subsection,value,isValid]);
+
+  return (
+    <label>
+    <span>{label}</span>
+    <input style={ {outline:(!isValid && value  ) ? '1px solid red':'none'  }} onChange={onChange}  placeholder='Auto' type='number'   value={value}  {...attributes} />
+     {!isValid && value && <span style={{color:'red',display:'block'}} > {message} </span> }
+  </label>
+  )
+}
+
+
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -167,6 +189,7 @@ const EditorPanel = () => {
   const {
     config,
     updateConfig,
+    transformedData:data,
     loading,
     colorPalettes,
     unfilteredData,
@@ -223,6 +246,7 @@ const EditorPanel = () => {
   };
 
   let hasLineChart = false
+  const {state,onChangeHandler } = useInput(config,data);
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.orientation === 'horizontal'){
@@ -731,19 +755,28 @@ const EditorPanel = () => {
                       </Tooltip>
                     }/>
                   </div>
+                 
                   {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
                     <>
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                      <ValueInput  isValid={state.isValid.max}   message={state.message.max}    section='xAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}  updateField={updateField}  min={state.data.max} />
+                     <ValueInput  isValid={state.isValid.min}   message={state.message.min}    section='xAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'  onChange={(e)=>onChangeHandler(e,'MIN')} updateField={updateField} />
                     </>
                     :
                     <>
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
+                      <ValueInput isValid={state.isValid.max}  message={state.message.max}  section='yAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}    updateField={updateField}  min={state.data.max} />
+                      <ValueInput isValid={state.isValid.min}  message={state.message.min}  section='yAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'   onChange={(e) => onChangeHandler(e, 'MIN')} updateField={updateField}  max={'0'} />
                     </>
                   }
+               
+
+                      
+                     
                 </AccordionItemPanel>
               </AccordionItem>
 
