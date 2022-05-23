@@ -54,6 +54,8 @@ export default function DataImport() {
   }
 
   const displaySize = (size) => {
+    if(size === undefined) return '';
+    
     if(size > Math.pow(1024, 3)){
       return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
     } else if(size > Math.pow(1024, 2)){

@@ -254,6 +254,59 @@ export default function CdcDashboard(
     setConfig(newConfig);
   };
 
+  // Backwards compatiblity support for .filters after moving to .sharedFilters
+  useEffect(() => {
+    let legacyUpdateNeeded = false;
+    let newConfig;
+
+    if(config.data || config.dataUrl){
+      legacyUpdateNeeded = true;
+      newConfig = {...config};
+
+      newConfig.datasets = {};
+      newConfig.datasets[config.dataFileName || 'dataset-1'] = {
+        data: config.data,
+        dataUrl: config.dataUrl,
+        dataFileName: config.dataFileName || 'dataset-1',
+        dataFileSourceType: config.dataFileSourceType
+      };
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1';
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription;
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData;
+      });
+
+      delete newConfig.data;
+      delete newConfig.dataUrl,
+      delete newConfig.dataFileName;
+      delete newConfig.dataFileSourceType;
+      delete newConfig.dataDescription;
+      delete newConfig.formattedData;
+    }
+
+    if(config.dashboard && config.dashboard.filters){
+      legacyUpdateNeeded = true;
+      newConfig = {...(newConfig || config)};
+
+      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || [];
+      newConfig.dashboard.filters.forEach(filter => {
+        newConfig.dashboard.sharedFilters.push({...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations)});
+      });
+
+      delete newConfig.dashboard.filters;
+    }
+    
+    if(legacyUpdateNeeded){
+      setConfig(newConfig);
+      if(newConfig.datasets){
+        let newData = {};
+        Object.keys(newConfig.datasets).forEach(dataKey => newData[dataKey] = newConfig.datasets[dataKey].data);
+        setData(newData);
+      }
+    }
+  })
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();

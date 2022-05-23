@@ -323,7 +323,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     loadConfig()
   }, [])
 
-  if(configObj && config && configObj.data !== config.data){
+  if(configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)){
     loadConfig();
   }
 
