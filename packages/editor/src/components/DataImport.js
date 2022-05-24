@@ -21,10 +21,8 @@ import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
 import DataQuestionnaire from '@cdc/core/components/DataQuestionnaire'
-import { DataTransform } from '@cdc/core/components/DataTransform'
 
 import '../scss/data-import.scss'
-import Button from '@cdc/core/components/elements/Button'
 
 import '@cdc/core/styles/dataquestionnaire.scss'
 

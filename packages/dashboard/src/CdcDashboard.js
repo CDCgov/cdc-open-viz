@@ -355,7 +355,7 @@ export default function CdcDashboard(
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if(!singleFilter.showDropdown) return;
 
-      const values = [];=
+      const values = [];
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
