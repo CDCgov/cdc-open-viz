@@ -28,13 +28,6 @@ import defaults from './data/initial-state';
 import Widget from './components/Widget';
 import DataTable from './components/DataTable';
 
-import EditorPanel from './components/EditorPanel'
-import Grid from './components/Grid'
-import Header from './components/Header'
-import defaults from './data/initial-state'
-import Widget from './components/Widget'
-import DataTable from './components/DataTable'
-
 import Papa from 'papaparse'
 
 import './scss/main.scss'
