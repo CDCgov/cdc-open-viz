@@ -2,12 +2,10 @@ import React from 'react'
 
 import '../../styles/v2/components/button.scss'
 
-const Button = ({children, ...attributes}) => {
-
-  let attributesObj = {...attributes, className: 'cove-button ' + attributes.className }
+const Button = ({fluid, children, onClick, className, ...attributes}) => {
 
   return (
-    <button {...attributesObj}>{children}</button>
+    <button className={`cove-button${fluid ? ' fluid' : ''}${className ? className : ''}`} {...attributes} onClick={(e) => {e.preventDefault(); onClick();}}>{children}</button>
   )
 }
 

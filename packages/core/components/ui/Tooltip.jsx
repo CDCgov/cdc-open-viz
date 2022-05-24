@@ -12,7 +12,9 @@ const Tooltip = ({
                    border = null,
                    borderColor = '#bdbdbd',
                    hideOnScroll = true,
-                   children
+                   children,
+                   style,
+                   ...attributes
                  }) => {
 
   const tooltipTargetChildren = children.find(el => el.type === TooltipTarget)
@@ -21,7 +23,7 @@ const Tooltip = ({
   const uid = 'tooltip-' + Math.floor(Math.random() * 100000)
 
   return (
-    <span className="cove-tooltip">
+    <span className="cove-tooltip" style={style} {...attributes}>
       <a className="cove-tooltip--target"
          data-for={uid}
          data-place={position}

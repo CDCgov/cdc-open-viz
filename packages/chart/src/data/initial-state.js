@@ -6,16 +6,17 @@ export default {
   lineDatapointStyle: 'hover',
   barHasBorder: 'false',
   isLollipopChart: false,
-  lollipopShape: "circle",
+  lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
-  visualizationSubType: "regular",
+  visualizationSubType: 'regular',
   padding: {
     left: 5,
     right: 5
   },
   yAxis: {
-    hideLabel:false,
-    hideTicks:false,
+    hideAxis: false,
+    hideLabel: false,
+    hideTicks: false,
     size: 50,
     gridLines: false
   },
@@ -23,8 +24,9 @@ export default {
   height: 300,
   xAxis: {
     type: 'categorical',
-    hideLabel:false,
-    hideTicks:false,
+    hideAxis: false,
+    hideLabel: false,
+    hideTicks: false,
     size: 75,
     tickRotation: 0
   },
@@ -32,7 +34,7 @@ export default {
     label: 'Data Table',
     expanded: true
   },
-  orientation: "vertical",
+  orientation: 'vertical',
   legend: {
     behavior: 'isolate',
     position: 'right'
@@ -42,7 +44,7 @@ export default {
     keys: []
   },
   palette: 'qualitative-bold',
-  isPaletteReversed:false,
+  isPaletteReversed: false,
   labels: false,
   dataFormat: {},
   confidenceKeys: {}

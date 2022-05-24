@@ -93,10 +93,12 @@ export default function LinearChart() {
         domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [0, yMax]
       });
-
+      
       yScale.rangeRound([0, yMax]);
     } else {
-      yScale = scaleLinear<number>({
+      min = min < 0 ? min * 1.11 : min 
+
+       yScale = scaleLinear<number>({
         domain: [min, max],
         range: [yMax, 0]
       });
@@ -177,7 +179,6 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
-          {!config.yAxis.hideAxis && (
             <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
@@ -250,11 +251,13 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
+                  {!config.yAxis.hideAxis &&  (
                   <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
                   />
+                  )}
                   { yScale.domain()[0] < 0 && (
                     <Line
                       from={{x: props.axisFromPoint.x, y: yScale(0)}}
@@ -275,10 +278,9 @@ export default function LinearChart() {
               );
             }}
           </AxisLeft>
-          )}
 
           {/* X axis */}
-          {!config.xAxis.hideAxis && config.visualizationType !== 'Paired Bar' && (
+          {config.visualizationType !== 'Paired Bar' && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -321,11 +323,13 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
+                  {!config.xAxis.hideAxis && (
                   <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
                   />
+                  )}
                   <Text
                     x={axisCenter}
                     y={config.runtime.xAxis.size}
