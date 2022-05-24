@@ -17,7 +17,7 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
 
   //Animate In effect
   useEffect(() => {
-    if (overlayDisplay === false) return //Reject
+    if ((!overlayDisplay) || overlayDisplay === false) return //Reject
 
     document.body.style.overflow = 'hidden'
     setDisplayOverlay(true)
@@ -32,7 +32,7 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
 
   //Animate Out effect
   useEffect(() => {
-    if (overlayDisplay === true) return //Reject
+    if ((!overlayDisplay) || overlayDisplay === true) return //Reject
 
     setOverlayAnimationState('animate-out')
 
