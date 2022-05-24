@@ -73,8 +73,9 @@ const VisualizationsPanel = () => (
     </div>
     <span className="subheading-3">Map</span>
     <div className="drag-grid">
-      <Widget addVisualization={() => addVisualization('map', 'us')} type="us"/>
-      <Widget addVisualization={() => addVisualization('map', 'world')} type="world"/>
+      <Widget addVisualization={() => addVisualization('map', 'us')} type="us" />
+      <Widget addVisualization={() => addVisualization('map', 'world')} type="world" />
+      <Widget addVisualization={() => addVisualization('map', 'single-state')} type="single-state" />
     </div>
     <span className="subheading-3">Misc.</span>
     <div className="drag-grid">

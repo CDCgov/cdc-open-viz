@@ -5,6 +5,8 @@ import iconQuestion from '../../assets/question-circle.svg'
 import iconLink from '../../assets/link.svg'
 import iconUpload from '../../assets/upload-solid.svg'
 import iconFileUpload from '../../assets/file-upload-solid.svg'
+import iconWarning from '../../assets/icon-warning.svg'
+import iconInfo from '../../assets/icon-info.svg'
 
 import '../../styles/v2/components/icon.scss'
 
@@ -16,8 +18,8 @@ const Icon = ({display = null, alt = '', size, color, ...attributes}) => {
     "link": iconLink,
     "upload": iconUpload,
     "fileUpload": iconFileUpload,
-    "warning": "",
-    "info": ""
+    "warning": iconWarning,
+    "info": iconInfo
   }
 
   let IconObj = null

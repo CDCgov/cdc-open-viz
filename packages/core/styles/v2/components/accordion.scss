@@ -84,6 +84,13 @@
   padding-right: 4px;
 }
 
+.accordion__divider {
+  border: 0;
+  border-top: 1px solid #e2e2e2;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
 // TODO: May not need these? Input styles should be pulling from global ----------
 
 .accordion__panel-label {
