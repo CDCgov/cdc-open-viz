@@ -28,7 +28,16 @@ import defaults from './data/initial-state';
 import Widget from './components/Widget';
 import DataTable from './components/DataTable';
 
-import './scss/main.scss';
+import EditorPanel from './components/EditorPanel'
+import Grid from './components/Grid'
+import Header from './components/Header'
+import defaults from './data/initial-state'
+import Widget from './components/Widget'
+import DataTable from './components/DataTable'
+
+import Papa from 'papaparse'
+
+import './scss/main.scss'
 
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
@@ -84,7 +93,7 @@ const VisualizationsPanel = () => (
 )
 
 export default function CdcDashboard(
-  { configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }
+  { configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig, hostname }
 ) {
 
   const transform = new DataTransform();
@@ -103,30 +112,76 @@ export default function CdcDashboard(
 
   const { title, description } = config.dashboard || config;
 
-  const loadConfig = async () => {
-    let response = configObj || await (await fetch(configUrl)).json();
+  // Supports JSON or CSV
+  const fetchRemoteData = async (url) => {
+    try {
+      const urlObj = new URL(url);
+      const regex = /(?:\.([^.]+))?$/
 
-    // If data is included through a URL, fetch that and store
-    let data = response.formattedData || response.data || {}
+      let data = []
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
+      const ext = (regex.exec(urlObj.pathname)[1])
+      if ('csv' === ext) {
+        data = await fetch(url)
+          .then(response => response.text())
+          .then(responseText => {
+            const parsedCsv = Papa.parse(responseText, {
+              header: true,
+              dynamicTyping: true,
+              skipEmptyLines: true
+            })
+            return parsedCsv.data
+          })
+      }
 
-      data = await dataString.json();
+      if ('json' === ext) {
+        data = await fetch(url)
+          .then(response => response.json())
+      }
 
-      if(data && response.dataDescription){
-        try {
-          data = transform.autoStandardize(data);
-          data = transform.developerStandardize(data, response.dataDescription);
-        } catch(e) {
-          //Data not able to be standardized, leave as is
-        }
+      return data;
+    } catch {
+      // If we can't parse it, still attempt to fetch it
+      try {
+        let response = await (await fetch(configUrl)).json()
+        return response
+      } catch {
+        console.error(`Cannot parse URL: ${url}`);
+      }
+    }
+  }
+
+
+  const loadConfig = async (configObj) => {
+    // Set loading flag
+    if (!loading) setLoading(true)
+
+    let newState = configObj || await (await fetch(configObj)).json()
+
+    // If a dataUrl property exists, always pull from that.
+    if (newState.dataUrl) {
+      if (newState.dataUrl[0] === '/') {
+        newState.dataUrl = 'https://' + hostname + newState.dataUrl
+      }
+
+      let newData = await fetchRemoteData(newState.dataUrl)
+
+      if (newData && newState.dataDescription) {
+        newData = transform.autoStandardize(newData);
+        newData = transform.developerStandardize(newData, newState.dataDescription);
+      }
+
+      if (newData) {
+        newState.data = newData
       }
     }
 
-    setData(data);
+    // If data is included through a URL, fetch that and store
+    let data = newState.formattedData || newState.data || {}
 
-    let newConfig = {...defaults, ...response}
+    setData(data)
+
+    let newConfig = { ...defaults, ...newState }
 
     updateConfig(newConfig, data);
 
@@ -199,10 +254,11 @@ export default function CdcDashboard(
     setConfig(newConfig);
   };
 
+
   // Load data when component first mounts
   useEffect(() => {
-    loadConfig();
-  }, []);
+    loadConfig(config)
+  }, [])
 
   // Pass up to <CdcEditor /> if it exists when config state changes
   useEffect(() => {
