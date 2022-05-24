@@ -8,10 +8,16 @@ import {
   AccordionItemButton,
 } from 'react-accessible-accordion'
 
-import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import InputText from '@cdc/core/components/input/InputText'
 
+import ConfigContext from '../ConfigContext'
+import InputText from '@cdc/core/components/inputs/InputText'
+
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+
+import '@cdc/core/styles/v2/components/accordion.scss'
+import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 

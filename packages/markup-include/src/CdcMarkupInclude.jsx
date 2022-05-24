@@ -9,6 +9,7 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+
 import './scss/main.scss'
 
 const CdcMarkupInclude = (
@@ -63,7 +64,6 @@ const CdcMarkupInclude = (
     updateConfig({ ...defaults, ...response })
     setLoading(false)
   }, [])
-
 
   // Custom Functions
   useEffect(() => {
@@ -158,17 +158,17 @@ const CdcMarkupInclude = (
       <>
         <div className="cove-component markup-include">
           {title &&
-          <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-            {parse(title)} {isDashboard}
-          </header>
+            <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+              {parse(title)} {isDashboard}
+            </header>
           }
           <div className="cove-component__content">
-            {!markupError && urlMarkup &&
             <div className="cove-component__content-wrap">
-              <Markup content={parseBodyMarkup(urlMarkup)}/>
+              {!markupError && urlMarkup &&
+                <Markup content={parseBodyMarkup(urlMarkup)}/>
+              }
+              {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
             </div>
-            }
-            {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
         </div>
       </>

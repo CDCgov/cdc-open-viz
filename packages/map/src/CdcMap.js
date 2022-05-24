@@ -14,9 +14,9 @@ import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
 
 // Data
+import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
-import colorPalettes from './data/color-palettes';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
 import initialState from './data/initial-state';
 
 // Sass
@@ -32,7 +32,6 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString';
-import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength';
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 
@@ -889,6 +888,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         setRuntimeLegend(newLegend)
     }
 
+    const formatLegendLocation = (key) => {
+        let value = key;
+        var formattedName = '';
+        let stateName = stateFipsToTwoDigit[key.substring(0, 2)]
+
+        if(stateName) {
+            formattedName += stateName
+        }
+
+        if (countyKeys.includes(value)) {
+            formattedName += ', ' + titleCase(supportedCounties[key])
+        }
+
+        return formattedName;
+    }
+
     // Attempts to find the corresponding value
     const displayGeoName = (key) => {
         let value = key
@@ -1200,7 +1215,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
-        titleCase
+        titleCase,
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
@@ -1341,6 +1356,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						indexTitle={dataTable.indexTitle}
 						mapTitle={general.title}
 						viewport={currentViewport}
+                        formatLegendLocation={formatLegendLocation}
 					/>
 				)}
 				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}

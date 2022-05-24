@@ -3,22 +3,28 @@ import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
 import { get } from 'axios'
 
+import { DataTransform } from '@cdc/core/components/DataTransform'
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+
 import GlobalState from '../context'
-import '../scss/data-import.scss'
+
 import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-
 import LinkIcon from '../assets/icons/link.svg'
+
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-
 import validMapData from '../../example/valid-data-map.csv'
+
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
 import DataQuestionnaire from '@cdc/core/components/DataQuestionnaire'
 import { DataTransform } from '@cdc/core/components/DataTransform'
+
+import '../scss/data-import.scss'
+import Button from '@cdc/core/components/elements/Button'
 
 import '@cdc/core/styles/dataquestionnaire.scss'
 
@@ -32,8 +38,11 @@ export default function DataImport() {
     maxFileSize,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   } = useContext(GlobalState)
+
+  const { overlay } = useGlobalContext()
 
   const transform = new DataTransform()
 
@@ -312,7 +321,7 @@ export default function DataImport() {
 
   const loadFileFromUrl = (url) => {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
-    
+
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
@@ -333,6 +342,7 @@ export default function DataImport() {
 
   const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
     config.newViz = true
+
     const confirmDataReset = window.confirm(message)
 
     if (confirmDataReset === true) {
@@ -464,6 +474,11 @@ export default function DataImport() {
             <div className="heading-3">Add Dataset</div>
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+                {sharepath &&
+                  <p className="alert--info">
+                    The share path set for this website is: {sharepath}
+                  </p>
+                }
                 <div
                   className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
                   <input {...getInputProps()} />

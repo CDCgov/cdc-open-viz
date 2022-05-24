@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
 import 'core-js/stable'
@@ -8,53 +8,56 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-import parse from 'html-react-parser';
+import parse from 'html-react-parser'
 
-import Loading from '@cdc/core/components/Loading';
-import DataTransform from '@cdc/core/components/DataTransform';
-import getViewport from '@cdc/core/helpers/getViewport';
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
+import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import Context from './context'
 
-import CdcMap from '@cdc/map';
-import CdcChart from '@cdc/chart';
-import CdcDataBite from '@cdc/data-bite';
-import CdcWaffleChart from '@cdc/waffle-chart';
-import CdcMarkupInclude from '@cdc/markup-include';
+import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
+import Loading from '@cdc/core/components/Loading'
+import DataTransform from '@cdc/core/components/DataTransform'
+import getViewport from '@cdc/core/helpers/getViewport'
 
-import EditorPanel from './components/EditorPanel';
-import Grid from './components/Grid';
-import Header from './components/Header';
-import Context from './context';
-import defaults from './data/initial-state';
-import Widget from './components/Widget';
-import DataTable from './components/DataTable';
+import CdcMap from '@cdc/map'
+import CdcChart from '@cdc/chart'
+import CdcDataBite from '@cdc/data-bite'
+import CdcWaffleChart from '@cdc/waffle-chart'
+import CdcMarkupInclude from '@cdc/markup-include'
 
-import './scss/main.scss';
+import EditorPanel from './components/EditorPanel'
+import Grid from './components/Grid'
+import Header from './components/Header'
+import defaults from './data/initial-state'
+import Widget from './components/Widget'
+import DataTable from './components/DataTable'
+
+import './scss/main.scss'
 
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
     newViz: true,
     uid: type + Date.now(),
     type
-  };
+  }
 
-  switch(type) {
+  switch (type) {
     case 'chart':
-      newVisualizationConfig.visualizationType = subType;
-      break;
+      newVisualizationConfig.visualizationType = subType
+      break
     case 'map':
-      newVisualizationConfig.general = {};
-      newVisualizationConfig.general.geoType = subType;
-      break;
+      newVisualizationConfig.general = {}
+      newVisualizationConfig.general.geoType = subType
+      break
     case 'data-bite':
-      newVisualizationConfig.visualizationType = type;
+      newVisualizationConfig.visualizationType = type
       break
     case 'waffle-chart':
-      newVisualizationConfig.visualizationType = type;
-      break;
+      newVisualizationConfig.visualizationType = type
+      break
     case 'markup-include':
-      newVisualizationConfig.visualizationType = type;
-      break;
+      newVisualizationConfig.visualizationType = type
+      break
   }
 
   return newVisualizationConfig
@@ -62,23 +65,24 @@ const addVisualization = (type, subType) => {
 
 const VisualizationsPanel = () => (
   <div className="visualizations-panel">
-    <p style={{fontSize: '14px'}}>Click and drag an item onto the grid to add it to your dashboard.</p>
+    <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
     <span className="subheading-3">Chart</span>
     <div className="drag-grid">
-      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar" />
-      <Widget addVisualization={() => addVisualization('chart', 'Line')} type="Line" />
-      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type="Pie" />
+      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar"/>
+      <Widget addVisualization={() => addVisualization('chart', 'Line')} type="Line"/>
+      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type="Pie"/>
     </div>
     <span className="subheading-3">Map</span>
     <div className="drag-grid">
       <Widget addVisualization={() => addVisualization('map', 'us')} type="us" />
       <Widget addVisualization={() => addVisualization('map', 'world')} type="world" />
+      <Widget addVisualization={() => addVisualization('map', 'single-state')} type="single-state" />
     </div>
     <span className="subheading-3">Misc.</span>
     <div className="drag-grid">
-      <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite" />
-      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart" />
-      <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include" />
+      <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
+      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
+      <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
     </div>
   </div>
 )
@@ -87,21 +91,21 @@ export default function CdcDashboard(
   { configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }
 ) {
 
-  const transform = new DataTransform();
+  const transform = new DataTransform()
 
-  const [config, setConfig] = useState(configObj ?? {});
+  const [ config, setConfig ] = useState(configObj ?? {})
 
-  const [data, setData] = useState([]);
+  const [ data, setData ] = useState([])
 
-  const [filteredData, setFilteredData] = useState();
+  const [ filteredData, setFilteredData ] = useState()
 
-  const [loading, setLoading] = useState(true);
+  const [ loading, setLoading ] = useState(true)
 
-  const [preview, setPreview] = useState(false);
+  const [ preview, setPreview ] = useState(false)
 
-  const [currentViewport, setCurrentViewport] = useState('lg');
+  const [ currentViewport, setCurrentViewport ] = useState('lg')
 
-  const { title, description } = config.dashboard || config;
+  const { title, description } = config.dashboard || config
 
   const processData = async (config) => {
     let dataset = config.formattedData || config.data;
@@ -137,27 +141,27 @@ export default function CdcDashboard(
 
     setData(datasets);
 
-    let newConfig = {...defaults, ...response}
+    let newConfig = { ...defaults, ...response }
 
     updateConfig(newConfig, datasets);
 
-    setLoading(false);
+    setLoading(false)
   }
 
   const filterData = (filters, data) => {
-    let filteredData = [];
+    let filteredData = []
 
     data.forEach((row) => {
-      let add = true;
+      let add = true
 
       filters.forEach((filter) => {
-        if(row[filter.columnName] !== filter.active) {
-          add = false;
+        if (row[filter.columnName] !== filter.active) {
+          add = false
         }
-      });
+      })
 
-      if(add) filteredData.push(row);
-    });
+      if (add) filteredData.push(row)
+    })
 
     return filteredData;
   };
@@ -187,7 +191,7 @@ export default function CdcDashboard(
 
   // Gets filer values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
-    const values = [];
+    const values = []
 
     Object.keys(data).forEach(key => {
       data[key].forEach( (row) => {
@@ -198,7 +202,7 @@ export default function CdcDashboard(
       });
     });
 
-    return values;
+    return values
   }
 
   const updateConfig = (newConfig, dataOverride = null) => {
@@ -244,15 +248,14 @@ export default function CdcDashboard(
     }
 
     if(Object.keys(newFilteredData).length > 0) {
-
       setFilteredData(newFilteredData);
     }
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {};
+    newConfig.runtime = {}
 
-    setConfig(newConfig);
-  };
+    setConfig(newConfig)
+  }
 
   // Backwards compatiblity support for .filters after moving to .sharedFilters
   useEffect(() => {
@@ -309,18 +312,18 @@ export default function CdcDashboard(
 
   // Load data when component first mounts
   useEffect(() => {
-    loadConfig();
-  }, []);
+    loadConfig()
+  }, [])
 
   // Pass up to <CdcEditor /> if it exists when config state changes
   useEffect(() => {
-    if(setParentConfig && isEditor) {
-      setParentConfig(config);
+    if (setParentConfig && isEditor) {
+      setParentConfig(config)
     }
-  }, [config])
+  }, [ config ])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
-    let updatedConfig = {...config}
+    let updatedConfig = { ...config }
 
     updatedConfig.visualizations[visualizationKey] = newConfig;
 
@@ -331,11 +334,11 @@ export default function CdcDashboard(
 
   const Filters = () => {
     const changeFilterActive = (index, value) => {
-      let dashboardConfig = {...config.dashboard};
+      let dashboardConfig = { ...config.dashboard }
 
       dashboardConfig.sharedFilters[index].active = value;
 
-      setConfig({...config, dashboard: dashboardConfig});
+      setConfig({ ...config, dashboard: dashboardConfig })
 
       let newFilteredData = {};
       Object.keys(config.visualizations).forEach(key => {
@@ -347,20 +350,20 @@ export default function CdcDashboard(
 
     const announceChange = (text) => {
 
-    };
+    }
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if(!singleFilter.showDropdown) return;
 
-      const values = [];
+      const values = [];=
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
           key={index}
           value={filterOption}
         >{filterOption}
-        </option>);
-      });
+        </option>)
+      })
 
       return (
         <section className="dashboard-filters-section" key={index}>
@@ -378,32 +381,33 @@ export default function CdcDashboard(
             {values}
           </select>
         </section>
-      );
-    });;
+      )
+    })
+
   }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-        let newViewport = getViewport(entry.contentRect.width)
+      let newViewport = getViewport(entry.contentRect.width)
 
-        setCurrentViewport(newViewport)
+      setCurrentViewport(newViewport)
     }
-  });
+  })
 
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
-        resizeObserver.observe(node);
+      resizeObserver.observe(node)
     }
-  },[]);
+  }, [])
 
   // Prevent render if loading
-  if(loading) return <Loading />
+  if (loading) return <Loading/>
 
   let body = null
 
   // Editor mode
-  if(isEditor && !preview) {
-    let subVisualizationEditing = false;
+  if (isEditor && !preview) {
+    let subVisualizationEditing = false
 
     Object.keys(config.visualizations).forEach(visualizationKey => {
       let visualizationConfig = {...config.visualizations[visualizationKey]};
@@ -421,7 +425,7 @@ export default function CdcDashboard(
         subVisualizationEditing = true;
 
         const back = () => {
-          const newConfig = {...config}
+          const newConfig = { ...config }
 
           delete newConfig.visualizations[visualizationKey].editing
 
@@ -430,34 +434,75 @@ export default function CdcDashboard(
 
         const updateConfig = (newConfig) => updateChildConfig(visualizationKey, newConfig)
 
-        switch(visualizationConfig.type){
+        switch (visualizationConfig.type) {
           case 'chart':
-            body = <><Header back={back} subEditor="Chart" /><CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} /></>;
+            body = <><Header back={back} subEditor="Chart" />
+              <CdcChart 
+                key={visualizationKey} 
+                config={visualizationConfig} 
+                isEditor={true} 
+                setConfig={updateConfig} 
+                setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} 
+              />
+            </>;
             break;
           case 'map':
-            body = <><Header back={back} subEditor="Map" /><CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} /></>;
+            body = <><Header back={back} subEditor="Map" />
+              <CdcMap 
+                key={visualizationKey} 
+                config={visualizationConfig} 
+                isEditor={true} 
+                setConfig={updateConfig} 
+                setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} 
+                isDashboard={true} 
+              />
+            </>;
             break;
           case 'data-bite':
-            visualizationConfig = {...visualizationConfig, newViz: true}
-            body = <><Header back={back} subEditor="Data Bite" /><CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
-            break;
+            visualizationConfig = { ...visualizationConfig, newViz: true }
+            body = <><Header back={back} subEditor="Data Bite"/>
+              <CdcDataBite 
+                key={visualizationKey}
+                config={visualizationConfig}
+                isEditor={true} 
+                setConfig={updateConfig}
+                isDashboard={true}
+              />
+            </>
+            break
           case 'waffle-chart':
-            body = <><Header back={back} subEditor="Waffle Chart" /><CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
-            break;
+            body = <><Header back={back} subEditor="Waffle Chart"/>
+              <CdcWaffleChart 
+                key={visualizationKey}
+                config={visualizationConfig}
+                isEditor={true}
+                setConfig={updateConfig}
+                isDashboard={true}
+              />
+            </>
+            break
           case 'markup-include':
-            body = <><Header back={back} subEditor="Markup Include" /><CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} /></>
-            break;
+            body = <><Header back={back} subEditor="Markup Include"/>
+              <CdcMarkupInclude 
+                key={visualizationKey}
+                config={visualizationConfig}
+                isEditor={true}
+                setConfig={updateConfig}
+                isDashboard={true}
+              />
+            </>
+            break
         }
       }
-    });
+    })
 
-    if(!subVisualizationEditing){
+    if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header preview={preview} setPreview={setPreview} />
+          <Header preview={preview} setPreview={setPreview}/>
           <div className="layout-container">
-            <VisualizationsPanel />
-            <Grid />
+            <VisualizationsPanel/>
+            <Grid/>
           </div>
         </DndProvider>
       )
@@ -465,11 +510,12 @@ export default function CdcDashboard(
   } else {
     body = (
       <>
-        {isEditor && <Header preview={preview} setPreview={setPreview} />}
-        {isEditor && <EditorPanel />}
+        {isEditor && <Header preview={preview} setPreview={setPreview}/>}
+        {isEditor && <EditorPanel/>}
         <div className="cdc-dashboard-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
+          {title &&
+            <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
           {config.dashboard.sharedFilters && <Filters />}
@@ -478,10 +524,10 @@ export default function CdcDashboard(
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row,index) => {
 
             return (
-              <div className="dashboard-row" key={`row__${index}`}>
-                {row.map( (col,index) => {
-                  if(col.width) {
-                    if(!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
+              <div className={`dashboard-row ${ row.equalHeight ? 'equal-height' : '' }`} key={`row__${index}`}>
+                {row.map((col, index) => {
+                  if (col.width) {
+                    if (!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
 
                     let visualizationConfig = {...config.visualizations[col.widget]};
 
@@ -497,10 +543,50 @@ export default function CdcDashboard(
                     return (
                       <React.Fragment key={`vis__${index}`}>
                         <div className={`dashboard-col dashboard-col-${col.width}`}>
-                          {visualizationConfig.type === 'chart' && <CdcChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />}
-                          {visualizationConfig.type === 'map' && <CdcMap key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />}
-                          {visualizationConfig.type === 'data-bite' && <CdcDataBite key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => { updateChildConfig(col.widget, newConfig) }} isDashboard={true} />}
-                          {visualizationConfig.type === 'waffle-chart' && <CdcWaffleChart key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {updateChildConfig(col.widget, newConfig)}} isDashboard={true} />}
+                          {visualizationConfig.type === 'chart' && (
+                            <CdcChart 
+                              key={col.widget} 
+                              config={visualizationConfig} 
+                              isEditor={false} 
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }} 
+                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} 
+                              isDashboard={true} 
+                            />
+                          )}
+                          {visualizationConfig.type === 'map' && (
+                            <CdcMap 
+                              key={col.widget} 
+                              config={visualizationConfig} 
+                              isEditor={false} 
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }} 
+                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} 
+                              isDashboard={true} 
+                            />
+                          )}
+                          {visualizationConfig.type === 'data-bite' && (
+                            <CdcDataBite 
+                              key={col.widget} 
+                              config={visualizationConfig} 
+                              isEditor={false} 
+                              setConfig={(newConfig) => { 
+                                updateChildConfig(col.widget, newConfig) 
+                              }} 
+                              isDashboard={true} />
+                          )}
+                          {visualizationConfig.type === 'waffle-chart' && (
+                            <CdcWaffleChart 
+                              key={col.widget} 
+                              config={visualizationConfig} 
+                              isEditor={false} 
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }} 
+                              isDashboard={true} />
+                          )}
                         </div>
                         
                         {/* Data Table */}
@@ -509,7 +595,7 @@ export default function CdcDashboard(
                     )
                   }
                 })}
-              </div>);
+              </div>)
           })}
 
           {/* Description */}
@@ -532,10 +618,13 @@ export default function CdcDashboard(
   }
 
   return (
-    <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
-        {body}
-      </div>
-    </Context.Provider>
-  );
+    <GlobalContextProvider>
+      <Context.Provider value={contextValues}>
+        <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
+          {body}
+        </div>
+      </Context.Provider>
+      <OverlayFrame/>
+    </GlobalContextProvider>
+  )
 }
