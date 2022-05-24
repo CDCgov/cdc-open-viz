@@ -51,11 +51,11 @@ const Tabs = ({ children, startingTab = 0, className, changeTab = null, fullsize
   return (
     <>
       <div className={`cove-tabs${tabsClassList}`} {...attributes}>
-        <nav className="cove-tabs__list">
+        <nav className="cove-tabs__tab-list">
           {tabList}
         </nav>
         {tabsContentChildren &&
-          <div className={`cove-tabs-content${tabsContentChildren[active].props.className ? ' ' + tabsContentChildren[active].props.className : ''}`}>
+          <div className={`cove-tabs__content${tabsContentChildren[active].props.className ? ' ' + tabsContentChildren[active].props.className : ''}`}>
             {tabsContentChildren[active].props.children}
           </div>
         }

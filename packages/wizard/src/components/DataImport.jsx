@@ -7,6 +7,13 @@ import axios from 'axios'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import WizardContext from '../WizardContext'
 
+import {
+  DEMO_TABLE_VERTICAL,
+  DEMO_TABLE_HORIZONTAL,
+  DEMO_TABLE_SINGLE_ROW,
+  DEMO_TABLE_MULTI_ROW
+} from './demo-data/demoTables'
+
 import { DataTransform } from '@cdc/core/components/DataTransform'
 import Modal from '@cdc/core/components/ui/Modal'
 import GuidanceBlock from '@cdc/core/components/elements/GuidanceBlock'
@@ -19,7 +26,6 @@ import Card from '@cdc/core/components/elements/Card'
 
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-import DataDesigner from './DataDesigner'
 
 import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
@@ -329,7 +335,7 @@ const DataImport = () => {
     return (
       <Button className="warn" style={{ height: '2.5rem' }}
               onClick={() => overlay.actions.openOverlay(warningModal(), true)} flexCenter>
-        Clear <Icon display="close"/>
+        Clear <Icon className="ml-1" display="close"/>
       </Button>
     )
   }
@@ -337,460 +343,339 @@ const DataImport = () => {
   return (
     <div className="cove-wizard__grid">
       <div className="cove-wizard__grid--left">
-
-        {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
-          <div className="cove-wizard__data">
-            <Tabs className="mb-4">
-              <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>} className="mt-4">
-                <div
-                  className={`cove-file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
-                  {/* cdcdataviz-file-selector */}
-                  <input {...getInputProps()} />
-                  {
-                    isDragActive ?
-                      <p>Drop file here</p> :
-                      <p>Drag file to this area, or <span>select a file</span>.</p>
-                  }
-                </div>
-              </Tabs.Content>
-              <Tabs.Content title="Load from URL" icon={<Icon className="mr-1" display="link"/>} className="mt-4">
-                {loadFileFromUrl(externalURL)}
-              </Tabs.Content>
-            </Tabs>
-
-            {errors && (errors.map ? errors.map((message, index) => (
-              <div className="cove-alert__error mt-1" key={index}>
-                <span>{message}</span>
-                <Icon
-                  className="cove-alert__error-dismiss"
-                  display="close"
-                  onClick={() => setErrors(errors.filter((val, i) => i !== index))}
-                />
-              </div>
-            )) : errors.message)}
-
-            <small className="mt-2 mb-4">
-              Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
-            </small>
-
-            <Button className="mt-4" role="loader" loading={isLoading} onClick={() => {
-              setIsLoading(true)
-              setTimeout(() => {
-                setIsLoading(false)
-              }, 1000)
-            }}>Test load here</Button>
-            <br/>
-            <br/>
-
-            <div className="cove-heading--3 mb-0">Load Sample Data:</div>
-            <ul className="cove-wizard__data-samples">
-              <li
-                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
-                States Sample Data #1
-              </li>
-              <li
-                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
-                Sample Data
-              </li>
-              <li
-                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
-                States Counties Sample Data
-              </li>
-            </ul>
-
-            <div className="grid grid-gap-1">
-              <div className="col-6 row-2" style={{ background: 'red' }}>
-                <div>Hello</div>
-              </div>
-              <div className="col-6 row-1" style={{ background: 'green' }}>
-                <div>Another section</div>
-              </div>
-              <div className="col-6 row-1" style={{ background: 'blue' }}>
-                <div>World</div>
-                <div>How</div>
-                <div>Are</div>
-                <div>Things?</div>
-              </div>
-            </div>
-
-            <br/>
-            <br/>
-            <div className="mb-2">
-              <InputText label={'Test'}/>
-            </div>
-
-            <div className="mb-2">
-              <InputText label={'Test 2'} type="textarea"/>
-            </div>
-
-            <div className="mb-2">
-              <InputText label={'Test 2'} type="number"/>
-            </div>
-
-            <InputGroup flow="left" text={<><Icon className="mr-1" display="upload"/> There is text here</>}
-                        className="mb-2">
-              <InputText type="text" label="bob"/>
-            </InputGroup>
-
-            <InputGroup flow="right" text="Test label text" className="mb-2">
-              <InputText type="text"/>
-            </InputGroup>
-
-            <InputGroup flow="center" text="@" className="mb-2">
-              <InputText type="text" placeholder="User"/>
-              <InputText type="text" placeholder="Server"/>
-            </InputGroup>
-
-            <br/>
-            <br/>
-
-            <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html"
-                           bob="sagat" bill="murray">
-              <GuidanceBlock.Title>
-                Get Help
-              </GuidanceBlock.Title>
-              <GuidanceBlock.Content>
-                <p>Documentation and examples on formatting data and configuring visualizations.</p>
-              </GuidanceBlock.Content>
-            </GuidanceBlock>
-          </div>
-        )}
-
-        {config.dataFileSourceType &&
-          <DataDesigner>
-            <div className="cove-heading--3 mb-1">Data Source</div>
-
-            {config.dataFileSourceType === 'file' && (
-              <div className="cove-data-designer__source">
-                <div
-                  className={`cove-file-selector py-1 mr-1 loaded-file${isDragActive ? ' drag-active ' : ''}`} style={{flex: '1 1 auto'}} {...getRootProps()}> {/*TODO: Replace file selector with component*/}
-                  <input {...getInputProps()} />
-                  {isDragActive ?
-                    <p>Drop file here</p> :
-                    <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <Icon display="fileUpload" size={12} color="#333" style={{ marginRight: '0.5rem' }}/>
-                      <span>{config.dataFileName ?? 'Replace data file'}</span>
-                    </p>
-                  }
-                </div>
-                {resetButton()}
-              </div>
-            )}
-
-            {config.dataFileSourceType === 'url' && (
-              <div className="url-source-options">
-                <div>
+        <div className="cove-wizard__data">
+          {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+            <>
+              <Tabs className="mb-4">
+                <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>} className="mt-4">
+                  <div
+                    className={`cove-file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
+                    {/* cdcdataviz-file-selector */}
+                    <input {...getInputProps()} />
+                    {
+                      isDragActive ?
+                        <p>Drop file here</p> :
+                        <p>Drag file to this area, or <span>select a file</span>.</p>
+                    }
+                  </div>
+                </Tabs.Content>
+                <Tabs.Content title="Load from URL" icon={<Icon className="mr-1" display="link"/>} className="mt-4">
                   {loadFileFromUrl(externalURL)}
+                </Tabs.Content>
+              </Tabs>
+
+              {errors && (errors.map ? errors.map((message, index) => (
+                <div className="cove-alert__error mt-1" key={index}>
+                  <span>{message}</span>
+                  <Icon
+                    className="cove-alert__error-dismiss"
+                    display="close"
+                    onClick={() => setErrors(errors.filter((val, i) => i !== index))}
+                  />
                 </div>
-                <div>
+              )) : errors.message)}
+
+              <small className="mt-2 mb-4">
+                Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
+              </small>
+
+              <Button className="mt-4" role="loader" loading={isLoading} onClick={() => {
+                setIsLoading(true)
+                setTimeout(() => {
+                  setIsLoading(false)
+                }, 2000)
+              }}>Test load here</Button>
+              <br/>
+              <br/>
+
+              <div className="cove-heading--3 mb-0">Load Sample Data:</div>
+              <ul className="cove-wizard__data-samples">
+                <li
+                  onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
+                  States Sample Data #1
+                </li>
+                <li
+                  onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
+                  Sample Data
+                </li>
+                <li
+                  onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
+                  States Counties Sample Data
+                </li>
+              </ul>
+
+              <div className="grid grid-gap-1">
+                <div className="col-6 row-2" style={{ background: 'red' }}>
+                  <div>Hello</div>
+                </div>
+                <div className="col-6 row-1" style={{ background: 'green' }}>
+                  <div>Another section</div>
+                </div>
+                <div className="col-6 row-1" style={{ background: 'blue' }}>
+                  <div>World</div>
+                  <div>How</div>
+                  <div>Are</div>
+                  <div>Things?</div>
+                </div>
+              </div>
+
+              <br/>
+              <br/>
+              <div className="mb-2">
+                <InputText label={'Test'}/>
+              </div>
+
+              <div className="mb-2">
+                <InputText label={'Test 2'} type="textarea"/>
+              </div>
+
+              <div className="mb-2">
+                <InputText label={'Test 2'} type="number"/>
+              </div>
+
+              <InputGroup flow="left" label={<><Icon className="mr-1" display="upload"/> There is text here</>}
+                          className="mb-2">
+                <InputText type="text" label="bob"/>
+              </InputGroup>
+
+              <InputGroup flow="right" label="Test label text" className="mb-2">
+                <InputText type="text"/>
+              </InputGroup>
+
+              <InputGroup flow="center" label="@" className="mb-2">
+                <InputText type="text" placeholder="User"/>
+                <InputText type="text" placeholder="Server"/>
+              </InputGroup>
+
+              <br/>
+              <br/>
+
+              <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html"
+                             bob="sagat" bill="murray">
+                <GuidanceBlock.Title>
+                  Get Help
+                </GuidanceBlock.Title>
+                <GuidanceBlock.Content>
+                  <p>Documentation and examples on formatting data and configuring visualizations.</p>
+                </GuidanceBlock.Content>
+              </GuidanceBlock>
+            </>
+          )}
+          {config.dataFileSourceType &&
+            <>
+              <div className="cove-heading--3 mb-1">Data Source</div>
+
+              {config.dataFileSourceType === 'file' && (
+                <div className="cove-wizard__data-designer__source">
+                  <div
+                    className={`cove-file-selector py-1 mr-1 loaded-file${isDragActive ? ' drag-active ' : ''}`}
+                    style={{ flex: '1 1 auto' }} {...getRootProps()}> {/*TODO: Replace file selector with component*/}
+                    <input {...getInputProps()} />
+                    {isDragActive ?
+                      <p>Drop file here</p> :
+                      <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Icon display="fileUpload" size={12} color="#333" style={{ marginRight: '0.5rem' }}/>
+                        <span>{config.dataFileName ?? 'Replace data file'}</span>
+                      </p>
+                    }
+                  </div>
                   {resetButton()}
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="mb-2">
-              <div className="cove-heading--3">Describe Data</div>
-              <div className="cove-heading--4">Data Orientation</div>
-              <div className="grid grid-gap-2 mb-4">
-                <div className="col-6">
-                  <button
-                    className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
-                    onClick={() => {
-                      updateDescriptionProp('horizontal', false)
-                    }}>
-                    <Card>
-                      <strong>Vertical</strong>
-                      <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.</p>
-                      {DEMO_TABLE_VERTICAL}
-                    </Card>
-                  </button>
-                </div>
-                <div className="col-6">
-                  <button
-                    className={'cove-data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
-                    onClick={() => {
-                      updateDescriptionProp('horizontal', true)
-                    }}>
-                    <Card>
-                      <strong>Horizontal</strong>
-                      <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
-                      {DEMO_TABLE_HORIZONTAL}
-                    </Card>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {config.dataDescription && (
-              <>
-                <div className="mb-2">
-                  <div className="cove-heading--4">Are there multiple series represented in your data?
+              {config.dataFileSourceType === 'url' && (
+                <div className="url-source-options">
+                  <div>
+                    {loadFileFromUrl(externalURL)}
                   </div>
                   <div>
-                    <Button
-                      style={{ backgroundColor: '#00345d' }}
-                      hoverStyle={{ backgroundColor: '#015daa' }}
-                      className="mr-1"
-                      onClick={() => {
-                        updateDescriptionProp('series', true)
-                      }}
-                      active={config.dataDescription.series === true}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      style={{ backgroundColor: '#00345d' }}
-                      hoverStyle={{ backgroundColor: '#015daa' }}
-                      onClick={() => {
-                        updateDescriptionProp('series', false)
-                      }}
-                      active={config.dataDescription.series === false}
-                    >
-                      No
-                    </Button>
+                    {resetButton()}
                   </div>
                 </div>
-                {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
-                  <div className="mb-2">
-                    <div className="cove-heading--4">Which property in the dataset represents which series
-                      the
-                      row is describing?
-                    </div>
-                    <select onChange={(e) => {
-                      updateDescriptionProp('seriesKey', e.target.value)
-                    }} value={config.dataDescription.seriesKey}>
-                      <option value="">Choose an option</option>
-                      {Object.keys(config.data[0]).map((value, index) => (
-                        <option value={value} key={index}>{value}</option>
-                      ))}
-                    </select>
+              )}
+
+              <div className="mb-2">
+                <div className="cove-heading--3">Describe Data</div>
+                <div className="cove-heading--4">Data Orientation</div>
+                <div className="grid grid-gap-2 mb-4">
+                  <div className="col-12 col-xl-6">
+                    <button
+                      className={'cove-wizard__data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
+                      onClick={() => {
+                        updateDescriptionProp('horizontal', false)
+                      }}>
+                      <Card>
+                        <strong>Vertical</strong>
+                        <p>Values for map geography or chart date/category axis are contained in a
+                          single <em>column</em>.
+                        </p>
+                        {DEMO_TABLE_VERTICAL}
+                      </Card>
+                    </button>
                   </div>
-                )}
-                {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
-                  <>
-                    <div className="mb-2">
-                      <div className="cove-heading--4">Are the series values in your data represented in a
-                        single row, or across multiple rows?
-                      </div>
-                      <div className="table-button-container">
-                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')}
-                             onClick={() => {
-                               updateDescriptionProp('singleRow', true)
-                             }}>
-                          <p>Each row contains the data for an individual series in itself.</p>
-                          <table>
-                            <tbody>
-                            <tr>
-                              <th>Date</th>
-                              <th>Virus 1</th>
-                              <th>Virus 2</th>
-                              <th>...</th>
-                            </tr>
-                            <tr>
-                              <td>01/01/2020</td>
-                              <td>100</td>
-                              <td>150</td>
-                              <td>...</td>
-                            </tr>
-                            <tr>
-                              <td>02/01/2020</td>
-                              <td>15</td>
-                              <td>20</td>
-                              <td>...</td>
-                            </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <div
-                          className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')}
-                          onClick={() => {
-                            updateDescriptionProp('singleRow', false)
-                          }}>
-                          <p>Each series data is broken out into multiple rows.</p>
-                          <table>
-                            <tbody>
-                            <tr>
-                              <th>Virus</th>
-                              <th>Date</th>
-                              <th>Value</th>
-                            </tr>
-                            <tr>
-                              <td>Virus 1</td>
-                              <td>01/01/2020</td>
-                              <td>100</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 1</td>
-                              <td>02/01/2020</td>
-                              <td>150</td>
-                            </tr>
-                            <tr>
-                              <td>...</td>
-                              <td>...</td>
-                              <td>...</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 2</td>
-                              <td>01/01/2020</td>
-                              <td>15</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 2</td>
-                              <td>02/01/2020</td>
-                              <td>20</td>
-                            </tr>
-                            <tr>
-                              <td>...</td>
-                              <td>...</td>
-                              <td>...</td>
-                            </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
+                  <div className="col-12 col-xl-6">
+                    <button
+                      className={'cove-wizard__data-designer__button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
+                      onClick={() => {
+                        updateDescriptionProp('horizontal', true)
+                      }}>
+                      <Card>
+                        <strong>Horizontal</strong>
+                        <p>Values for map geography or chart date/category axis are contained in a single <em>row</em>
+                        </p>
+                        {DEMO_TABLE_HORIZONTAL}
+                      </Card>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {config.dataDescription && (
+                <>
+                  <div className="mb-2">
+                    <div className="cove-heading--4">Are there multiple series represented in your data?
                     </div>
-                    {config.dataDescription.singleRow === false && (
-                      <>
-                        <div className="mb-2">
-                          <div className="cove-heading--4">Which property in the dataset represents which
-                            series
-                            the row is describing?
-                          </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('seriesKey', e.target.value)
-                          }}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => (
-                              <option value={value} key={index}>{value}</option>
-                            ))}
-                          </select>
+                    <div>
+                      <Button
+                        style={{ backgroundColor: '#00345d' }}
+                        hoverStyle={{ backgroundColor: '#015daa' }}
+                        className="mr-1"
+                        onClick={() => {
+                          updateDescriptionProp('series', true)
+                        }}
+                        active={config.dataDescription.series === true}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        style={{ backgroundColor: '#00345d' }}
+                        hoverStyle={{ backgroundColor: '#015daa' }}
+                        onClick={() => {
+                          updateDescriptionProp('series', false)
+                        }}
+                        active={config.dataDescription.series === false}
+                      >
+                        No
+                      </Button>
+                    </div>
+                  </div>
+                  {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
+                    <div className="mb-2">
+                      <div className="cove-heading--4">Which property in the dataset represents which series
+                        the
+                        row is describing?
+                      </div>
+                      <select onChange={(e) => {
+                        updateDescriptionProp('seriesKey', e.target.value)
+                      }} value={config.dataDescription.seriesKey}>
+                        <option value="">Choose an option</option>
+                        {Object.keys(config.data[0]).map((value, index) => (
+                          <option value={value} key={index}>{value}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
+                    <>
+                      <div className="mb-2">
+                        <div className="cove-heading--4">Are the series values in your data represented in a
+                          single row, or across multiple rows?
                         </div>
-                        <div className="mb-2">
-                          <div className="cove-heading--4">
-                            Which property in the dataset represents the values for the category/date axis or map
-                            geography?
+
+                        <div className="grid grid-gap-2 mb-4">
+                          <div className="col-12 col-xl-6">
+                            <button
+                              className={'cove-wizard__data-designer__button' + (config.dataDescription.singleRow === true ? ' active' : '')}
+                              onClick={() => {
+                                updateDescriptionProp('singleRow', true)
+                              }}>
+                              <Card>
+                                <strong>Single Row</strong>
+                                <p>Each row contains the data for an individual series in itself.</p>
+                                {DEMO_TABLE_SINGLE_ROW}
+                              </Card>
+                            </button>
                           </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('xKey', e.target.value)
-                          }}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => (
-                              <option value={value} key={index}>{value}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="mb-2">
-                          <div className="cove-heading--4">
-                            Which property in the dataset represents the numeric value?
+                          <div className="col-12 col-xl-6">
+                            <button
+                              className={'cove-wizard__data-designer__button' + (config.dataDescription.singleRow === false ? ' active' : '')}
+                              onClick={() => {
+                                updateDescriptionProp('singleRow', false)
+                              }}>
+                              <Card>
+                                <strong>Multiple Rows</strong>
+                                <p>Each row contains the data for an individual series in itself.</p>
+                                {DEMO_TABLE_MULTI_ROW}
+                              </Card>
+                            </button>
                           </div>
-                          <select onChange={(e) => {
-                            updateDescriptionProp('valueKey', e.target.value)
-                          }}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => (
-                              <option value={value} key={index}>{value}</option>
-                            ))}
-                          </select>
                         </div>
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-            <Button className="mt-2" style={{ float: 'right' }} onClick={() => setGlobalActive(1)}
-                    disabled={!config.formattedData}>
-              Select your visualization type &raquo;
-            </Button>
-          </DataDesigner>
-        }
+                      </div>
+                      {config.dataDescription.singleRow === false && (
+                        <>
+                          <div className="mb-2">
+                            <div className="cove-heading--4">
+                              Which property in the dataset represents which series the row is describing?
+                            </div>
+                            <select onChange={(e) => {
+                              updateDescriptionProp('seriesKey', e.target.value)
+                            }}>
+                              <option value="">Choose an option</option>
+                              {Object.keys(config.data[0]).map((value, index) => (
+                                <option value={value} key={index}>{value}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="mb-2">
+                            <div className="cove-heading--4">
+                              Which property in the dataset represents the values for the category/date axis or map
+                              geography?
+                            </div>
+                            <select onChange={(e) => {
+                              updateDescriptionProp('xKey', e.target.value)
+                            }}>
+                              <option value="">Choose an option</option>
+                              {Object.keys(config.data[0]).map((value, index) => (
+                                <option value={value} key={index}>{value}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="mb-2">
+                            <div className="cove-heading--4">
+                              Which property in the dataset represents the numeric value?
+                            </div>
+                            <select onChange={(e) => {
+                              updateDescriptionProp('valueKey', e.target.value)
+                            }}>
+                              <option value="">Choose an option</option>
+                              {Object.keys(config.data[0]).map((value, index) => (
+                                <option value={value} key={index}>{value}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+              <div style={{textAlign: 'right'}}>
+                <Button className="mt-2" onClick={() => setGlobalActive(1)}
+                        disabled={!config.formattedData}>
+                  Select your visualization type &raquo;
+                </Button>
+              </div>
+            </>
+          }
+        </div>
       </div>
       <div className="cove-wizard__grid--right">
-        {/* right-col */}
-        <PreviewDataTable data={config.data}/>
+        <div className="cove-wizard__data-preview">
+          <PreviewDataTable data={config.data}/>
+        </div>
       </div>
     </div>
   )
 }
-
-const DEMO_TABLE_VERTICAL = (
-  <>
-    <table>
-      <tbody>
-      <tr>
-        <th>Date</th>
-        <th>Value</th>
-        <th>...</th>
-      </tr>
-      <tr>
-        <td>01/01/2020</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      <tr>
-        <td>02/01/2020</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      </tbody>
-    </table>
-    <table>
-      <tbody>
-      <tr>
-        <th>State</th>
-        <th>Value</th>
-        <th>...</th>
-      </tr>
-      <tr>
-        <td>Georgia</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      <tr>
-        <td>Florida</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      </tbody>
-    </table>
-  </>
-)
-
-const DEMO_TABLE_HORIZONTAL = (
-  <>
-    <table>
-      <tbody>
-      <tr>
-        <th>Date</th>
-        <td>01/01/2020</td>
-        <td>02/01/2020</td>
-        <td>...</td>
-      </tr>
-      <tr>
-        <th>Value</th>
-        <td>100</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      </tbody>
-    </table>
-    <table>
-      <tbody>
-      <tr>
-        <th>State</th>
-        <td>Georgia</td>
-        <td>Florida</td>
-        <td>...</td>
-      </tr>
-      <tr>
-        <th>Value</th>
-        <td>100</td>
-        <td>150</td>
-        <td>...</td>
-      </tr>
-      </tbody>
-    </table>
-  </>
-)
 
 export default DataImport

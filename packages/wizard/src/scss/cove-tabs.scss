@@ -8,7 +8,7 @@
   flex-wrap: nowrap;
 }
 
-.cove-tabs__list {
+.cove-tabs__tab-list {
   display: flex;
   flex-wrap: nowrap;
 }
@@ -22,7 +22,7 @@
   height: 3rem;
   text-align: center;
   line-height: 1.5em;
-  color: #565656;
+  color: $baseColor;
   background-color: transparent;
   border: 0;
   outline: 0;
@@ -38,7 +38,7 @@
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: #c7c7c7;
+    background-color: $lightGray;
     transition: all 400ms $transition-expo-out;
   }
 
@@ -64,20 +64,20 @@
     color: #333;
     border-right: 1px solid $lightGray;
     border-bottom: 1px solid $lightGray;
-    background-color: #F2F2F2;
+    background-color: $lightestGray;
 
     &::after {
       display: none;
     }
 
     &.active {
-      color: #fff;
-      background-color: #565656;
+      color: $white;
+      background-color: $mediumGray;
     }
   }
 }
 
-.cove-tabs-content {
+.cove-tabs__content {
   height: 100%;
   flex: 1 1 auto;
 }

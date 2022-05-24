@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin')
 const svgToMiniDataURI = require('mini-svg-data-uri')
 
 module.exports = (env = {}, { mode }) => {
@@ -21,15 +21,15 @@ module.exports = (env = {}, { mode }) => {
     loader: 'babel-loader',
     options: {
       presets: [
-        ['@babel/preset-env', {
+        [ '@babel/preset-env', {
           useBuiltIns: 'entry',
           corejs: '3.8',
           targets: {
             browsers: [
-                'IE 11',
+              'IE 11',
             ],
           }
-        }],
+        } ],
         '@babel/preset-react', // TODO: Enable automatic runtime support
         {
           plugins: [
@@ -37,10 +37,10 @@ module.exports = (env = {}, { mode }) => {
             [
               '@babel/plugin-transform-runtime',
               {
-                "helpers": false,
-                "regenerator": true,
+                'helpers': false,
+                'regenerator': true,
                 useModules: false,
-                "version": "7.12.5"
+                'version': '7.12.5'
               }
             ]
           ]
@@ -53,9 +53,9 @@ module.exports = (env = {}, { mode }) => {
     mode,
     entry,
     optimization: {
-      minimizer: [new TerserPlugin({
+      minimizer: [ new TerserPlugin({
         extractComments: false,
-      })],
+      }) ],
     },
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
@@ -65,21 +65,21 @@ module.exports = (env = {}, { mode }) => {
     },
     stats: mode === 'development' ? 'normal' : 'minimal',
     output: {
-        path: packagePath + `/dist`,
-        filename: () => `${packageName.toLowerCase()}.js`,
-        libraryTarget: 'umd',
-        environment: {
-          arrowFunction: false,
-          bigIntLiteral: false,
-          const: false,
-          destructuring: false,
-          dynamicImport: false,
-          forOf: false,
-          module: false,
-        },
+      path: packagePath + `/dist`,
+      filename: () => `${packageName.toLowerCase()}.js`,
+      libraryTarget: 'umd',
+      environment: {
+        arrowFunction: false,
+        bigIntLiteral: false,
+        const: false,
+        destructuring: false,
+        dynamicImport: false,
+        forOf: false,
+        module: false,
+      },
     },
     resolve: {
-      extensions: ['*', '.tsx', '.ts', '.jsx', '.js'],
+      extensions: [ '*', '.tsx', '.ts', '.jsx', '.js' ],
     },
     target: 'web',
     module: {
@@ -110,16 +110,16 @@ module.exports = (env = {}, { mode }) => {
 
             let shouldExclude = false
 
-            for(let p of excluded) {
-              if(path.includes(p)) {
+            for (let p of excluded) {
+              if (path.includes(p)) {
                 shouldExclude = true
                 break
               }
             }
 
-            if(shouldExclude) {
-              for(let p of except) {
-                if( path.includes(p) && false === path.includes('d3-interpolate-path') ) { // No joke, none of the core d3 libraries export transcoded but this random plugin does!
+            if (shouldExclude) {
+              for (let p of except) {
+                if (path.includes(p) && false === path.includes('d3-interpolate-path')) { // No joke, none of the core d3 libraries export transcoded but this random plugin does!
                   shouldExclude = false
                   break
                 }
@@ -163,9 +163,9 @@ module.exports = (env = {}, { mode }) => {
           ],
         },
         {
-         // CSV
-         test: /\.(csv)$/i,
-         type: 'asset/source'
+          // CSV
+          test: /\.(csv)$/i,
+          type: 'asset/source'
         },
         {
           // SVG
@@ -212,7 +212,7 @@ module.exports = (env = {}, { mode }) => {
   }
 
   // Only export as a library when building for production.
-  if(mode !== 'development') {
+  if (mode !== 'development') {
     configObj.externals = prodExternals
     configObj.output = {
       ...configObj.output,
@@ -224,7 +224,7 @@ module.exports = (env = {}, { mode }) => {
   }
 
   // We only need to generate an index.html file during development for testing purposes.
-  if(mode === 'development') {
+  if (mode === 'development') {
     configObj.devServer = {
       open: true,
       compress: true,
@@ -232,7 +232,7 @@ module.exports = (env = {}, { mode }) => {
         warnings: false,
         errors: true
       }
-    };
+    }
     configObj.plugins = [
       new HtmlWebpackPlugin({
         template: './src/index.html'

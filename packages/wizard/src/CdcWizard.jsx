@@ -102,20 +102,21 @@ const CdcWizard = ({ config: configObj = { newViz: true }, hostname, containerEl
   return (
     <GlobalContextProvider>
       <WizardContext.Provider value={state}>
-        {/* cdc-open-viz-module cdc-editor*/}
-        <Tabs className={`cove-wizard ${currentViewport}`} startingTab={globalActive} fullsize ref={outerContainerRef}>
-          {/* top-level */}
-          <Tabs.Content title="1. Import Data" className="cove-wizard__data-designer">
-            <DataImport/>
-          </Tabs.Content>
-          <Tabs.Content title="2. Choose Visualization Type" className="choose-type"
-                        disableRule={!config.data && !config.formattedData}>
-            <ChooseTab/>
-          </Tabs.Content>
-          <Tabs.Content title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-            <ConfigureTab containerEl={containerEl}/>
-          </Tabs.Content>
-        </Tabs>
+        <div className={`cove-wizard ${currentViewport}`} ref={outerContainerRef}>
+          <Tabs startingTab={globalActive} fullsize>
+            {/* top-level */}
+            <Tabs.Content title="1. Import Data" className="cove-wizard__data-designer">
+              <DataImport/>
+            </Tabs.Content>
+            <Tabs.Content title="2. Choose Visualization Type" className="choose-type"
+                          disableRule={!config.data && !config.formattedData}>
+              <ChooseTab/>
+            </Tabs.Content>
+            <Tabs.Content title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
+              <ConfigureTab containerEl={containerEl}/>
+            </Tabs.Content>
+          </Tabs>
+        </div>
       </WizardContext.Provider>
       <OverlayFrame/>
     </GlobalContextProvider>

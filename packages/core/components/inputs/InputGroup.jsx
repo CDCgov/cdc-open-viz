@@ -1,17 +1,36 @@
-import React from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-const InputGroup = ({ text, flow, children, className, ...attributes }) => {
+const InputGroup = ({ label, flow, children, clear, className, style, ...attributes }) => {
+  const [ styles, setStyles ] = useState({})
+  const [ labelWidth, setLabelWidth ] = useState(null)
 
-  const groupText = <div className="cove-input-group__text">{text}</div>
-  console.log(children)
+  const groupLabelRef = useRef(null)
+  const groupLabel = <div className="cove-input-group__label" ref={groupLabelRef}>{label}</div>
+
+  useLayoutEffect(() => {
+    if (!clear) return
+    if (!groupLabelRef.current) return
+    setLabelWidth(groupLabelRef.current.offsetWidth)
+  }, [ clear, groupLabelRef ])
+
+  useLayoutEffect(() => {
+    if (!clear) return
+    if ('left' === flow) {
+      setStyles(() => ({ paddingLeft: labelWidth + 'px' }))
+    }
+    if ('right' === flow) {
+      setStyles(() => ({ paddingRight: labelWidth + 'px' }))
+    }
+  }, [ clear, flow, labelWidth ])
+
 
   return (
-    <div className={`cove-input-group${className ? ' ' + className : ''}`} {...attributes}>
-      {text ? <>
-          {'left' === flow && <> {groupText}{children} </>}
-          {'right' === flow && <> {children}{groupText} </>}
-          {'center' === flow && children.length > 1 && <> {children[0]}{groupText}{children[1]} </>}
+    <div className={`cove-input-group${clear ? ' clear' : ''}${className ? ' ' + className : ''}`} flow={flow} {...attributes}>
+      {label && flow ? <>
+          {'left' === flow && <> {groupLabel}{children} </>}
+          {'right' === flow && <> {children}{groupLabel} </>}
+          {'center' === flow && children.length > 1 && <> {children[0]}{groupLabel}{children[1]} </>}
         </> :
         children
       }
@@ -21,7 +40,7 @@ const InputGroup = ({ text, flow, children, className, ...attributes }) => {
 
 InputGroup.propTypes = {
   /* Text to display for the input group */
-  text: PropTypes.oneOfType([
+  label: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object
   ]),

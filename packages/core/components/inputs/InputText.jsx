@@ -43,7 +43,7 @@ const InputText = memo((
   }
 
   let inputAttrs = {
-    className: `cove-input ${className ? ' ' + {...className} : ''}`,
+    className: `cove-input${className ? ' ' + className : ''}`,
     type,
     name,
     placeholder,

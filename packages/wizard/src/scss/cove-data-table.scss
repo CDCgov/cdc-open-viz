@@ -1,13 +1,7 @@
 .cove-data-table {
 
-  .skeleton {
-
-  }
 }
 
 .cove-data-table__header {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 1fr;
   margin-bottom: 1.5rem;
 }

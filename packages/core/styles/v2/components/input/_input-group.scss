@@ -16,21 +16,49 @@
     .cove-input__label {
       display: none;
     }
+  }
 
-    :not(:first-child) {
-      margin-left: -1px;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+  &:not(.clear) {
+    > {
+      :not(:first-child) {
+        margin-left: -1px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      :not(:last-child) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  }
+
+  &.clear {
+    &[flow="left"] > {
+      :first-child {
+        border: 0;
+        left: 0;
+      }
     }
 
-    :not(:last-child) {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+    &[flow="right"] > {
+      :last-child {
+        border: 0;
+        right: 0;
+      }
+    }
+
+    .cove-input-group__label {
+      position: absolute;
+      background-color: transparent;
+      height: 100%;
+      pointer-events: none;
+      user-select: none;
     }
   }
 }
 
-.cove-input-group__text {
+.cove-input-group__label {
   display: flex;
   align-items: center;
   padding: 0.375rem 0.75rem;
@@ -40,7 +68,7 @@
   color: $baseColor;
   text-align: center;
   white-space: nowrap;
-  background-color: $lightestGray; //#e9ecef
-  border: 1px solid $lightGray; //#ced4da
+  background-color: $lightestGray;
+  border: 1px solid $lightGray;
   border-radius: 0.1875rem;
 }

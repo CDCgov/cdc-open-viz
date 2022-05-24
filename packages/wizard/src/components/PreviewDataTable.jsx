@@ -10,15 +10,16 @@ import {
 } from 'react-table'
 
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
-
-import InputText from '@cdc/core/components/inputs/InputText'
+import InputGroup from '@cdc/core/components/inputs/InputGroup'
+import Button from '@cdc/core/components/elements/Button'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import WizardContext from '../WizardContext'
+
 import '../scss/cove-data-table.scss'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [ filterValue, setFilterValue ] = useState(globalFilter)
-
   const [ debouncedValue ] = useDebounce(filterValue, 200)
 
   useEffect(() => {
@@ -31,42 +32,46 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
     setFilterValue(e.target.value)
   }
 
-  {/* filter */}
   return (
-    <input
-      type="search"
-      className="cove-input"
-      placeholder="Filter..."
-      onChange={onChange}
-      value={filterValue}
-      disabled={disabled}
-    />
+    <InputGroup label={<Icon display="filterBars"/>} flow="right" clear>
+      <input
+        type="search"
+        className="cove-input"
+        placeholder="Filter..."
+        onChange={onChange}
+        value={filterValue}
+        disabled={disabled}
+      />
+    </InputGroup>
   )
 })
 
-const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => {
-  return (
-    <header className="cove-data-table__header">
-      <h2 className="cove-heading--2 align-self-center mb-0">Data Preview</h2>
-      <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
-    </header>
-  )
-})
+const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => (
+  <header className="cove-data-table__header">
+    <div className="grid">
+      <div className="col-6">
+        <h2 className="cove-heading--2 align-self-center mb-0">Data Preview</h2>
+      </div>
+      <div className="col-6">
+        <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
+      </div>
+    </div>
+  </header>
+))
 
 const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }) => (
-  <footer className="data-table-pagination">
-    <ul>
-      <li>
-        <button onClick={() => previousPage()} className="btn btn-prev" disabled={!canPreviousPage}
-                title="Previous Page"/>
-      </li>
-      <li>
-        <button onClick={() => nextPage()} className="btn btn-next" disabled={!canNextPage} title="Next Page"/>
-      </li>
-    </ul>
-    <span>
-      Page{' '} {pageNumber} of {totalPages}
-    </span>
+  <footer className="cove-data-table__footer">
+    <div className="cove-data-table__pagination">
+      <Button title="Previous Page" className="px-2 py-1 mr-1" onClick={() => previousPage()} disabled={!canPreviousPage} flexCenter>
+        <Icon display="caretUp" size={10} style={{transform: "rotate(-90deg)"}}/>
+      </Button>
+      <Button title="Next Page" className="px-2 py-1 mr-1" onClick={() => nextPage()} disabled={!canNextPage} flexCenter>
+        <Icon display="caretUp" size={10} style={{transform: "rotate(90deg)"}}/>
+      </Button>
+      <span className="cove-data-table__pagination--index">
+        Page{' '} {pageNumber} of {totalPages}
+      </span>
+    </div>
   </footer>
 ))
 
@@ -114,9 +119,7 @@ const PreviewDataTable = ({ data }) => {
   }, [])
 
   useEffect(() => {
-    if (!data) {
-      return
-    }
+    if (!data) return
 
     let newData = [ ...data ]
 
@@ -145,9 +148,9 @@ const PreviewDataTable = ({ data }) => {
   }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination)
 
   const NoData = () => (
-    <section className="no-data-message">
+    <section className="cove-data-table__no-data--message">
       <section>
-        <h3>No Data</h3>
+        <h3 className="cove-heading--2 mb-1">No Data</h3>
         <p>Import data to preview</p>
       </section>
     </section>
@@ -155,10 +158,10 @@ const PreviewDataTable = ({ data }) => {
 
   const PlaceholderTable = () => {
     return (
-      <section className="no-data">
+      <section className="cove-data-table__no-data">
         <NoData/>
-        <div className="table-container">
-          <table className="editor data-table" role="table">
+        <div className="cove-data-table__table-wrapper">
+          <table className="cove-data-table__table" role="table">
             <thead>
               <tr role="row">
                 <th scope="col" colSpan="1" role="columnheader"/>
@@ -179,7 +182,12 @@ const PreviewDataTable = ({ data }) => {
     )
   }
 
-  if (!data) return [ <Header key="header"/>, <PlaceholderTable key="table"/> ]
+  if (!data) return (
+    <div className="cove-data-table">
+      <Header key="header"/>
+      <PlaceholderTable key="table"/>
+    </div>
+  )
 
   const footerProps = {
     previousPage,
@@ -192,9 +200,9 @@ const PreviewDataTable = ({ data }) => {
 
   const Table = () => (
     <>
-      <section className="data-table-container">
-        <div className="table-container">
-          <table className="data-table" {...getTableProps()} aria-hidden="true">
+      <section className="cove-data-table__content">
+        <div className="cove-data-table__table-wrapper">
+          <table className="cove-data-table__table" {...getTableProps()} aria-hidden="true">
             <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -230,8 +238,12 @@ const PreviewDataTable = ({ data }) => {
     </>
   )
 
-  return [ <Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter}/>,
-    <Table key="table"/> ]
+  return (
+    <div className="cove-data-table">
+      <Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter}/>
+      <Table key="table"/>
+    </div>
+  )
 }
 
 export default PreviewDataTable
