@@ -57,11 +57,11 @@ const InputToggle = (
 
   return (
     <div className="input-group">
-      {label && <label htmlFor={name()}>{label}</label>}
+      {label && <label>{label}</label>}
       <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (toggleTypeClass()) + (value ? ' active' : '')} onClick={() => setValue(!value)}>
         <div className="cove-input__toggle-button"/>
         <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
-        <input id={name()} className="cove-input--hidden" type="checkbox" name={name()} checked={value || false} readOnly/>
+        <input className="cove-input--hidden" type="checkbox" name={name()} checked={value || false} readOnly/>
       </div>
     </div>
   )
