@@ -21,15 +21,18 @@ import DataTable from './components/DataTable';
 import Context from './context';
 import defaults from './data/initial-state';
 
-import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
+import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
+import './scss/main.scss';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
+
   const transform = new DataTransform();
 
   interface keyable { [key: string]: any }
@@ -48,14 +51,6 @@ export default function CdcChart(
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  const colorPalettes = {
-    'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
-    'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
-    'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
-    'sequential-blue-reverse': ['#084594', '#2171B5', '#4292C6', '#6BAED6', '#9ECAE1', '#C6DBEF'],
-    'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
-  };
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
@@ -138,7 +133,7 @@ export default function CdcChart(
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
-          
+
           let filterValues = [];
 
           filterValues = generateValuesForFilter(filter.columnName, newExcludedData);
@@ -182,7 +177,7 @@ export default function CdcChart(
       });
     }
 
-    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -222,7 +217,7 @@ export default function CdcChart(
             values.push(value)
         }
     });
-    
+
     return values;
   }
 
@@ -505,7 +500,7 @@ export default function CdcChart(
         const sortAsc = (a, b) => {
           return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
         };
-        
+
         const sortDesc = (a, b) => {
           return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
         };
@@ -586,7 +581,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
           <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
             Skip Over Chart Container
           </a>

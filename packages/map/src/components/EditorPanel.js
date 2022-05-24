@@ -17,23 +17,20 @@ import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '../../../core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+import InputToggle from '@cdc/core/components/inputs/InputToggle';
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
-
-const Helper = ({ text }) => {
-	return (
-		<span className='tooltip helper' data-tip={text}>
-			<QuestionIcon />
-		</span>
-	);
-};
 
 const TextField = ({
 	label,
@@ -43,7 +40,7 @@ const TextField = ({
 	updateField,
 	value: stateValue,
 	type = 'input',
-	helper = null,
+	tooltip,
 	...attributes
 }) => {
 	const [value, setValue] = useState(stateValue);
@@ -73,7 +70,7 @@ const TextField = ({
 	return (
 		<label>
 			<span className='edit-label column-heading'>
-				{label} {helper && <Helper text={helper} />}
+				{label}{tooltip}
 			</span>
 			{formElement}
 		</label>
@@ -106,6 +103,9 @@ const EditorPanel = (props) => {
 	const [advancedToggle, setAdvancedToggle] = useState(false);
 
 	const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0]);
+
+	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
+
 
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
@@ -162,7 +162,7 @@ const EditorPanel = (props) => {
 	};
 
 
-	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', helper = null, ...attributes }) => {
+	const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
 		const [value, setValue] = useState(stateValue);
 
 		const [debouncedValue] = useDebounce(value, 500);
@@ -948,7 +948,12 @@ const EditorPanel = (props) => {
 				<label>
 					<span className='edit-label column-heading'>
 						Filter Column{' '}
-						<Helper text='Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.' />
+            <Tooltip style={{textTransform: 'none'}}>
+              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+              <Tooltip.Content>
+                <p>Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.</p>
+              </Tooltip.Content>
+            </Tooltip>
 					</span>
 					<select
 						value={filter.columnName}
@@ -961,7 +966,7 @@ const EditorPanel = (props) => {
 						)}
 					</select>
 				</label>
-				
+
 				<label>
 					<span className="edit-filterOrder column-heading">Filter Order</span>
 					<select value={filter.order} onChange={ (e) => {
@@ -1009,7 +1014,7 @@ const EditorPanel = (props) => {
 						</Droppable>
 					</DragDropContext>
 				}
-				
+
 			</fieldset>
 		);
 	});
@@ -1042,6 +1047,11 @@ const EditorPanel = (props) => {
 			});
 		});
 	}
+
+
+	useEffect(()=>{
+		if(paletteName) handleEditorChanges('color',paletteName)
+	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
 
 	useEffect(() => {
 		const parsedData = convertStateToConfig();
@@ -1096,7 +1106,7 @@ const EditorPanel = (props) => {
 				onClick={onBackClick}
 				data-html2canvas-ignore
 			></button>
-			<section className={displayPanel ? 'editor-panel' : 'hidden editor-panel'} data-html2canvas-ignore>
+			<section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'} data-html2canvas-ignore>
 				<ReactTooltip html={true} multiline={true} />
 				<span className='base-label'>Configure Map</span>
 				<section className='form-container'>
@@ -1146,7 +1156,15 @@ const EditorPanel = (props) => {
 									{/* Select > State or County Map */}
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
-											<span className='edit-label column-heading'>Map Type</span>
+											<span className='edit-label column-heading'>
+                        Map Type
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
 											<select
 												value={state.general.geoType}
 												onChange={(event) => {
@@ -1233,7 +1251,14 @@ const EditorPanel = (props) => {
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
-										helper='For accessibility reasons, you should enter a title even if you are not planning on displaying it.'
+                    tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
 									/>
 									<TextField
 										type='textarea'
@@ -1242,6 +1267,17 @@ const EditorPanel = (props) => {
 										section='general'
 										fieldName='subtext'
 										label='Subtext'
+                    tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Enter supporting text to display below the data visualization, if applicable.<br/>
+                          <br/>
+                            <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
 									/>
 									{'us' === state.general.geoType && (
 										<TextField
@@ -1267,7 +1303,15 @@ const EditorPanel = (props) => {
 								</AccordionItemHeading>
 								<AccordionItemPanel>
 									<label className='edit-block geo'>
-										<span className='edit-label column-heading'>Geography</span>
+										<span className='edit-label column-heading'>
+                      Geography
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
 										<select
 											value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
 											onChange={(event) => {
@@ -1277,155 +1321,191 @@ const EditorPanel = (props) => {
 											{columnsOptions}
 										</select>
 									</label>
+
 									{'navigation' !== state.general.type && (
-										<fieldset className='primary-fieldset edit-block'>
-											<label>
-												<span className='edit-label column-heading'>Primary</span>
-												<select
-													value={
-														state.columns.primary
-															? state.columns.primary.name
-															: columnsOptions[0]
-													}
-													onChange={(event) => {
-														editColumn('primary', 'name', event.target.value);
-													}}
-												>
-													{columnsOptions}
-												</select>
-											</label>
-											<TextField
-												value={columns.primary.label}
-												section='columns'
-												subsection='primary'
-												fieldName='label'
-												label='Label'
-												updateField={updateField}
-											/>
-											<ul className='column-edit'>
-												<li className='three-col'>
-													<TextField
-														value={columns.primary.prefix}
-														section='columns'
-														subsection='primary'
-														fieldName='prefix'
-														label='Prefix'
-														updateField={updateField}
-													/>
-													<TextField
-														value={columns.primary.suffix}
-														section='columns'
-														subsection='primary'
-														fieldName='suffix'
-														label='Suffix'
-														updateField={updateField}
-													/>
-													<TextField
-														type='number'
-														value={columns.primary.roundToPlace}
-														section='columns'
-														subsection='primary'
-														fieldName='roundToPlace'
-														label='Round'
-														updateField={updateField}
-													/>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.useCommas}
-															onChange={(event) => {
-																editColumn(
-																	'primary',
-																	'useCommas',
-																	event.target.checked
-																);
-															}}
-														/>
-														<span className='edit-label'>Add Commas to Numbers</span>
-													</label>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.dataTable ||false}
-															onChange={(event) => {
-																editColumn(
-																	'primary',
-																	'dataTable',
-																	event.target.checked
-																);
-															}}
-														/>
-														<span className='edit-label'>Display in Data Table</span>
-													</label>
-												</li>
-												<li>
-													<label className='checkbox'>
-														<input
-															type='checkbox'
-															checked={state.columns.primary.tooltip ||false}
-															onChange={(event) => {
-																editColumn('primary', 'tooltip', event.target.checked);
-															}}
-														/>
-														<span className='edit-label'>Display in Tooltips</span>
-													</label>
-												</li>
-												<li>
-													<label>
-														<span className='edit-label'>Special Classes</span>
-													</label>
-													{specialClasses.map((specialClass, i) => (
-														<div className="edit-block" key={`special-class-${i}`}>
-															<button className="remove-column"
-																onClick={(e) => {
-																	e.preventDefault();
-																	editColumn('primary', 'specialClassDelete', i);
-																}}
-															>Remove</button>
-															<p>Special Class {i + 1}</p>
-															<label>
-																<span className="edit-label column-heading">Data Key</span>
-																<select value={specialClass.key} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
-																}}>
-																	{columnsOptions}
-																</select>
-															</label>
-															<label>
-																<span className="edit-label column-heading">Value</span>
-																<select value={specialClass.value} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
-																}}>
-																	<option value="">- Select Value -</option>
-																	{columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
-																		<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-																	))}
-																</select>
-															</label>
-															<label>
-																<span className="edit-label column-heading">Label</span>
-																<input type="text" value={specialClass.label} onChange={(e) => {
-																	editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
-																}} />
-															</label>
-														</div>
-													))}
-													<button className="btn full-width"
-														onClick={(e) => {
-															e.preventDefault();
-															editColumn('primary', 'specialClassAdd', {});
-														}}
-													>Add SpecialClass</button>
-												</li>
-											</ul>
-										</fieldset>
+                    <>
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+												<span className='edit-label column-heading'>
+                          Data Column
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Select the source column containing the categorical or numeric values to be mapped.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                          <select
+                            value={
+                              state.columns.primary
+                                ? state.columns.primary.name
+                                : columnsOptions[0]
+                            }
+                            onChange={(event) => {
+                              editColumn('primary', 'name', event.target.value);
+                            }}
+                          >
+                            {columnsOptions}
+                          </select>
+                        </label>
+                        <TextField
+                          value={columns.primary.label}
+                          section='columns'
+                          subsection='primary'
+                          fieldName='label'
+                          label='Label'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Enter a data label for use in tooltips and the data table.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                        <ul className='column-edit'>
+                          <li className='three-col'>
+                            <TextField
+                              value={columns.primary.prefix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='prefix'
+                              label='Prefix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              value={columns.primary.suffix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='suffix'
+                              label='Suffix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              type='number'
+                              value={columns.primary.roundToPlace}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='roundToPlace'
+                              label='Round'
+                              updateField={updateField}
+                            />
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.useCommas}
+                                onChange={(event) => {
+                                  editColumn(
+                                    'primary',
+                                    'useCommas',
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className='edit-label'>Add Commas to Numbers</span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.dataTable || false}
+                                onChange={(event) => {
+                                  editColumn(
+                                    'primary',
+                                    'dataTable',
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className='edit-label'>Display in Data Table</span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.tooltip || false}
+                                onChange={(event) => {
+                                  editColumn('primary', 'tooltip', event.target.checked);
+                                }}
+                              />
+                              <span className='edit-label'>Display in Tooltips</span>
+                            </label>
+                          </li>
+                        </ul>
+                      </fieldset>
+                      <fieldset className="primary-fieldset edit-block">
+                        <label>
+                          <span className='edit-label'>
+                            Special Classes
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>For secondary values such as "NA", the system can automatically color-code them in shades of gray, one shade for each special class.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {specialClasses.map((specialClass, i) => (
+                          <div className="edit-block" key={`special-class-${i}`}>
+                            <button className="remove-column"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      editColumn('primary', 'specialClassDelete', i);
+                                    }}
+                            >Remove</button>
+                            <p>Special Class {i + 1}</p>
+                            <label>
+                              <span className="edit-label column-heading">Data Key</span>
+                              <select value={specialClass.key} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
+                              }}>
+                                {columnsOptions}
+                              </select>
+                            </label>
+                            <label>
+                              <span className="edit-label column-heading">Value</span>
+                              <select value={specialClass.value} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
+                              }}>
+                                <option value="">- Select Value -</option>
+                                {columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
+                                  <option key={`special-class-value-option-${i}-${option}`}>{option}</option>
+                                ))}
+                              </select>
+                            </label>
+                            <label>
+                              <span className="edit-label column-heading">Label</span>
+                              <input type="text" value={specialClass.label} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
+                              }} />
+                            </label>
+                          </div>
+                        ))}
+                        <button className="btn full-width" onClick={(e) => {
+                          e.preventDefault();
+                          editColumn('primary', 'specialClassAdd', {});
+                        }}>
+                          Add Special Class
+                        </button>
+                      </fieldset>
+                    </>
 									)}
+
 									<label className='edit-block navigate column-heading'>
-										<span className='edit-label column-heading'>Navigation</span>
+										<span className='edit-label column-heading'>
+                      Navigation
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>To provide end users with navigation functionality, select the source column containing the navigation URLs.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
 										<select
 											value={
 												state.columns.navigate ? state.columns.navigate.name : columnsOptions[0]
@@ -1438,118 +1518,130 @@ const EditorPanel = (props) => {
 										</select>
 									</label>
 									{'navigation' !== state.general.type &&
-										additionalColumns.map((val) => (
-											<fieldset className='edit-block' key={val}>
-												<button
-													className='remove-column'
-													onClick={(event) => {
-														event.preventDefault();
-														removeAdditionalColumn(val);
-													}}
-												>
-													Remove
-												</button>
-												<label>
-													<span className='edit-label column-heading'>Column</span>
-													<select
-														value={
-															state.columns[val]
-																? state.columns[val].name
-																: columnsOptions[0]
-														}
-														onChange={(event) => {
-															editColumn(val, 'name', event.target.value);
-														}}
-													>
-														{columnsOptions}
-													</select>
-												</label>
-												<TextField
-													value={columns[val].label}
-													section='columns'
-													subsection={val}
-													fieldName='label'
-													label='Label'
-													updateField={updateField}
-												/>
-												<ul className='column-edit'>
-													<li className='three-col'>
-														<TextField
-															value={columns[val].prefix}
-															section='columns'
-															subsection={val}
-															fieldName='prefix'
-															label='Prefix'
-															updateField={updateField}
-														/>
-														<TextField
-															value={columns[val].suffix}
-															section='columns'
-															subsection={val}
-															fieldName='suffix'
-															label='Suffix'
-															updateField={updateField}
-														/>
-														<TextField
-															type='number'
-															value={columns[val].roundToPlace}
-															section='columns'
-															subsection={val}
-															fieldName='roundToPlace'
-															label='Round'
-															updateField={updateField}
-														/>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].useCommas}
-																onChange={(event) => {
-																	editColumn(val, 'useCommas', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Add Commas to Numbers</span>
-														</label>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].dataTable}
-																onChange={(event) => {
-																	editColumn(val, 'dataTable', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Display in Data Table</span>
-														</label>
-													</li>
-													<li>
-														<label className='checkbox'>
-															<input
-																type='checkbox'
-																checked={state.columns[val].tooltip}
-																onChange={(event) => {
-																	editColumn(val, 'tooltip', event.target.checked);
-																}}
-															/>
-															<span className='edit-label'>Display in Tooltips</span>
-														</label>
-													</li>
-												</ul>
-											</fieldset>
-										))}
-									{'navigation' !== state.general.type && (
-										<button
-											className={'btn full-width'}
-											onClick={(event) => {
-												event.preventDefault();
-												addAdditionalColumn(additionalColumns.length + 1);
-											}}
-										>
-											Add Column
-										</button>
-									)}
+                    <fieldset className="primary-fieldset edit-block">
+                      <label>
+                        <span className="edit-label">
+                          Additional Columns
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                      </label>
+                      {additionalColumns.map((val) => (
+                        <fieldset className="edit-block" key={val}>
+                          <button
+                            className="remove-column"
+                            onClick={(event) => {
+                              event.preventDefault()
+                              removeAdditionalColumn(val)
+                            }}
+                          >
+                            Remove
+                          </button>
+                          <label>
+                            <span className="edit-label column-heading">Column</span>
+                            <select
+                              value={
+                                state.columns[val]
+                                  ? state.columns[val].name
+                                  : columnsOptions[0]
+                              }
+                              onChange={(event) => {
+                                editColumn(val, 'name', event.target.value)
+                              }}
+                            >
+                              {columnsOptions}
+                            </select>
+                          </label>
+                          <TextField
+                            value={columns[val].label}
+                            section="columns"
+                            subsection={val}
+                            fieldName="label"
+                            label="Label"
+                            updateField={updateField}
+                          />
+                          <ul className="column-edit">
+                            <li className="three-col">
+                              <TextField
+                                value={columns[val].prefix}
+                                section="columns"
+                                subsection={val}
+                                fieldName="prefix"
+                                label="Prefix"
+                                updateField={updateField}
+                              />
+                              <TextField
+                                value={columns[val].suffix}
+                                section="columns"
+                                subsection={val}
+                                fieldName="suffix"
+                                label="Suffix"
+                                updateField={updateField}
+                              />
+                              <TextField
+                                type="number"
+                                value={columns[val].roundToPlace}
+                                section="columns"
+                                subsection={val}
+                                fieldName="roundToPlace"
+                                label="Round"
+                                updateField={updateField}
+                              />
+                            </li>
+                            <li>
+                              <label className="checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={state.columns[val].useCommas}
+                                  onChange={(event) => {
+                                    editColumn(val, 'useCommas', event.target.checked)
+                                  }}
+                                />
+                                <span className="edit-label">Add Commas to Numbers</span>
+                              </label>
+                            </li>
+                            <li>
+                              <label className="checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={state.columns[val].dataTable}
+                                  onChange={(event) => {
+                                    editColumn(val, 'dataTable', event.target.checked)
+                                  }}
+                                />
+                                <span className="edit-label">Display in Data Table</span>
+                              </label>
+                            </li>
+                            <li>
+                              <label className="checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={state.columns[val].tooltip}
+                                  onChange={(event) => {
+                                    editColumn(val, 'tooltip', event.target.checked)
+                                  }}
+                                />
+                                <span className="edit-label">Display in Tooltips</span>
+                              </label>
+                            </li>
+                          </ul>
+                        </fieldset>
+                      ))}
+                      <button
+                        className={'btn full-width'}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          addAdditionalColumn(additionalColumns.length + 1);
+                        }}
+                      >
+                        Add Column
+                      </button>
+                    </fieldset>
+                  }
 								</AccordionItemPanel>
 							</AccordionItem>{' '}
 							{/* Columns */}
@@ -1583,12 +1675,28 @@ const EditorPanel = (props) => {
 														handleEditorChanges('separateZero', event.target.checked)
 													}
 												/>
-												<span className='edit-label'>Separate Zero</span>
+												<span className='edit-label'>
+                          Separate Zero
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For numeric data, you can separate the zero value as its own data class.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 										{'category' !== legend.type && (
 											<label>
-												<span className='edit-label'>Number of Items</span>
+												<span className='edit-label'>
+                          Number of Items
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For numeric maps, select the number of data classes. Do not include designated special classes.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 												<select
 													value={legend.numberOfItems}
 													onChange={(event) => {
@@ -1608,7 +1716,15 @@ const EditorPanel = (props) => {
 										{'category' === legend.type && (
 											<React.Fragment>
 												<label>
-													<span className='edit-label'>Category Order</span>
+													<span className='edit-label'>
+                            Category Order
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Drag map categories into preferred legend order. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
 												</label>
 												{/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
 												<DragDropContext
@@ -1707,7 +1823,15 @@ const EditorPanel = (props) => {
 														);
 													}}
 												/>
-												<span className='edit-label'>Dynamic Legend Description</span>
+												<span className='edit-label'>
+                          Dynamic Legend Description
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 										{filtersJSX.length > 0 && (
@@ -1719,7 +1843,15 @@ const EditorPanel = (props) => {
 														handleEditorChanges('unifiedLegend', event.target.checked)
 													}
 												/>
-												<span className='edit-label'>Unified Legend</span>
+												<span className='edit-label'>
+                          Unified Legend
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 									</AccordionItemPanel>
@@ -1767,12 +1899,20 @@ const EditorPanel = (props) => {
 											placeholder='Data Table'
 										/>
 										<TextField
-											value={dataTable.indexTitle}
+											value={dataTable.indexLabel || ''}
 											updateField={updateField}
 											section='dataTable'
-											fieldName='indexTitle'
-											label='Index Column Title'
+											fieldName='indexLabel'
+											label='Index Column Header'
 											placeholder='Location'
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
 										/>
 										<TextField
 											value={dataTable.caption}
@@ -1781,7 +1921,14 @@ const EditorPanel = (props) => {
 											fieldName='caption'
 											label='Data Table Caption'
 											placeholder='Data Table'
-											helper='Text that describes the data table for screen'
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Text that describes the data table for screen</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
 											type="textarea"
 										/>
 										<label className='checkbox'>
@@ -1796,8 +1943,15 @@ const EditorPanel = (props) => {
 													handleEditorChanges('showDataTable', event.target.checked);
 												}}
 											/>
-											<span className='edit-label'>Show Table</span>
-											<Helper text='Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.' />
+											<span className='edit-label'>
+                        Show Table
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
 										</label>
 										<label className='checkbox'>
 											<input
@@ -1855,7 +2009,12 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>
 											Detail displays on{' '}
-											<Helper text='At mobile sizes, information always appears in a popover modal when a user taps on an item.' />
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
 										</span>
 										<select
 											value={state.tooltips.appearanceType}
@@ -1991,10 +2150,11 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									<span className='h5'>Sequential</span>
+									{/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
+									<InputToggle type='3d' section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+										<span>Sequential</span>
 									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => !name.includes('qualitative'))
+										{filteredPallets
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],
@@ -2024,11 +2184,9 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<span className='h5'>Non-Sequential</span>
+									<span>Non-Sequential</span>
 									<ul className='color-palette'>
-										{Object.keys(colorPalettes)
-											.filter((name) => name.includes('qualitative'))
-                      .filter((name) => name !== 'qualitative9')
+										{filteredQualitative
 											.map((palette) => {
 												const colorOne = {
 													backgroundColor: colorPalettes[palette][2],

@@ -11,7 +11,7 @@ const Grid = () => {
       ...config,
       rows: [
         ...rows,
-        [{width: 12}, {}, {}]
+        [{width: 12}, {equalHeight: false}, {}, {}]
       ],
       uuid: Date.now()
     })
