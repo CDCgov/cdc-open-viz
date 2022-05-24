@@ -117,8 +117,8 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
             </TabPane>
           </Tabs>
         </div>
-        <OverlayFrame/>
       </GlobalState.Provider>
+      <OverlayFrame/>
     </GlobalContextProvider>
   );
 }
