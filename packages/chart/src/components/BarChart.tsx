@@ -150,15 +150,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                     }
 
-                    config.height = (barsPerGroup * Number(barHeight) ) * data.length + (config.barPadding * data.length);
+                    config.height = (Number(barHeight) ) * data.length + (config.barPadding * data.length);
 
                     let labelColor = "#000000";
 
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF';
                     }
-
-                    let offset = yMax / data.length * (config.barHeight) / 2;
 
                     return (
                       <Group key={index}>
