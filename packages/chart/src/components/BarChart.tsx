@@ -49,6 +49,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, [config.isLollipopChart]);
 
+  useEffect(() => {
+    if(config.visualizationSubType === 'horizontal') {
+      updateConfig({
+        ...config,
+        orientation: 'horizontal'
+      })
+    }
+  }, []);
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
