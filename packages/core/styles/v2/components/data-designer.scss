@@ -1,0 +1,68 @@
+@import "../utils/variables";
+@import "../themes/color-definitions";
+
+.cove-data-designer__button {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  overflow: hidden;
+  cursor: pointer;
+
+  strong {
+    font-weight: bold;
+  }
+
+  .cove-card {
+    position: relative;
+    border: 0;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border: 1px solid $lightGray;
+      border-radius: 0.25rem;
+    }
+  }
+
+  &.active {
+    .cove-card::after {
+      border: 2px solid #005eaa;
+    }
+  }
+
+  p {
+    font-size: .8rem;
+    margin-bottom: 1rem;
+  }
+
+  table + table {
+    margin-top: 1em;
+  }
+
+  table {
+    margin: auto;
+    font-size: .8rem;
+    background-color: #fff;
+    border: 1px solid $lightGray;
+    border-collapse: collapse;
+
+    th {
+      color: white;
+      text-align: left;
+      background-color: $primary;
+    }
+
+    th, td {
+      padding: 0 5px;
+      border-top: 1px solid $lightGray;
+      border-bottom: 1px solid $lightGray;
+    }
+  }
+}
