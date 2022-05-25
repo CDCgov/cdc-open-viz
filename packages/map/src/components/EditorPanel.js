@@ -10,25 +10,27 @@ import ReactTooltip from 'react-tooltip';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDebounce } from 'use-debounce';
 
+import colorPalettes from '../../../core/data/colorPalettes';
+import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import MapIcon from '../images/map-folded.svg';
-import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
-import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../../../core/data/colorPalettes';
-import worldDefaultConfig from '../../examples/default-world.json';
-import usaDefaultConfig from '../../examples/default-usa.json';
-import countyDefaultConfig from '../../examples/default-county.json';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
-
-import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+
+import MapIcon from '../images/map-folded.svg'; // TODO: Move to Icon component
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'; // TODO: Move to Icon component
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'; // TODO: Move to Icon component
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'; // TODO: Move to Icon component
+import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'; // TODO: Move to Icon component
+
+import worldDefaultConfig from '../../examples/default-world.json';
+import usaDefaultConfig from '../../examples/default-usa.json';
+import countyDefaultConfig from '../../examples/default-county.json';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 

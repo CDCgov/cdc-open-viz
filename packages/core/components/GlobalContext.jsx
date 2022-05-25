@@ -8,7 +8,6 @@ export const GlobalContextProvider = ({ children }) => {
 
   const openOverlay = (obj, disableBgClose = false) => {
     let payload = { object: obj, show: true, disableBgClose: disableBgClose }
-    console.log('payload', payload)
     setGlobalContextData(context => ({ ...context, overlay: { ...payload } }))
   }
 
