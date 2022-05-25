@@ -32,6 +32,8 @@ export default function ChooseTab() {
    */
   const IconButton = ({ icon, label, type, subType, barType, orientation }) => {
     let isSubType = false
+    let isSelectedOrientation = false
+    let classNames;
 
     if (type === 'map' && config.general) {
       let geoType = config.general.geoType
@@ -40,11 +42,17 @@ export default function ChooseTab() {
 
     if (type === 'chart') {
       isSubType = (subType === config.visualizationType)
+      isSelectedOrientation = (orientation === config.orientation)
     }
 
     if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
 
-    let classNames = (config.type === type && isSubType) ? 'active' : ''
+    if(type === 'chart') {
+      classNames = (config.type === type && isSubType && isSelectedOrientation) ? 'active' : ''
+    } else {
+      classNames = (config.type === type && isSubType) ? 'active' : ''
+    }
+
 
     let setTypes = () => {
       // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
@@ -139,7 +147,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip position="right">
             <Tooltip.Target>
-              <IconButton label="Bar" type="chart" subType="Bar" icon={<BarIcon/>}/>
+              <IconButton label="Bar" type="chart" subType="Bar" orientation="vertical" icon={<BarIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Use bars to show comparisons between data categories.
@@ -149,7 +157,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Line" type="chart" subType="Line" icon={<LineIcon/>}/>
+              <IconButton label="Line" type="chart" subType="Line" orientation="vertical" icon={<LineIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Present one or more data trends over time.
@@ -159,7 +167,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Pie" type="chart" subType="Pie" icon={<PieIcon/>}/>
+              <IconButton label="Pie" type="chart" subType="Pie" orientation="vertical" icon={<PieIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Present the numerical proportions of a data series.
@@ -169,7 +177,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={<PairedBarIcon/>}/>
+              <IconButton label="Paired Bar" type="chart" subType="Paired Bar" orientation="horizontal" icon={<PairedBarIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Use paired bars to show comparisons between two different data categories.
