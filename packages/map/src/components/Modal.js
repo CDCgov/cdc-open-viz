@@ -2,6 +2,7 @@ import React from 'react';
 import closeIcon from '../images/close.svg?inline';
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
+//TODO: Where is this being used? Transfer to new Modal component?
 const Modal = (props) => {
   const {
     applyTooltipsToGeo,

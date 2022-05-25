@@ -18,7 +18,7 @@ import WarningImage from '../images/warning.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
+import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'; //TODO: Update with Icon component
 import {useColorPalette} from '../hooks/useColorPalette';
 
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';

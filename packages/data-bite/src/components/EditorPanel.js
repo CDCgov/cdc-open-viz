@@ -10,7 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
-import WarningImage from '../images/warning.svg'
+import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'

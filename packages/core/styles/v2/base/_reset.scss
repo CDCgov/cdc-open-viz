@@ -27,7 +27,8 @@ html:focus-within {
 }
 
 body {
-  min-height: 100vh;
+  // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>. Why the $#@&%! 'that' was done in the first place, I have no clue.
+  //min-height: 100vh;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
 }
