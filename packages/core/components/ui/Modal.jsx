@@ -42,7 +42,8 @@ const Modal = ({
       <div className="cove-modal__header" style={{
         backgroundColor: headerBgColor,
         boxShadow: dividerBorder(modalHeaderChildren && showDividerTop),
-        padding: !modalHeaderChildren ? '0' : null
+        padding: !modalHeaderChildren ? '0' : null,
+        minHeight: !modalHeaderChildren ? 'unset' : null
       }}>
         {modalHeaderChildren && modalHeaderChildren.props.children}
         {showClose &&

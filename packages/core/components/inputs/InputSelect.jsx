@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 
-import '../../styles/v2/components/input.scss'
+import '../../styles/v2/components/input/index.scss'
 
 const InputSelect = memo((
   {

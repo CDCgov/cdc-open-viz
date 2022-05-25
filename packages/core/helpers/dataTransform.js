@@ -1,7 +1,7 @@
-export class DataTransform {
+export class dataTransform {
   constructor() {
     this.constants = {
-      errorMessageEmtpyData: 'Your data file is empty.', 
+      errorMessageEmtpyData: 'Your data file is empty.',
       errorMessageFormat: 'Your datatype is not supported.',
       descriptionHeader: 1,
       descriptionRoot: 2,
@@ -16,7 +16,7 @@ export class DataTransform {
     // Empty data
     if ( 0 === data.length ) {
       errorsFound.push(this.constants.errorMessageEmptyData);
-    }   
+    }
 
     // Does it have the correct data structure?
     if (!data.filter || data.filter(row =>  typeof row !== 'object').length > 0) {
@@ -153,10 +153,10 @@ export class DataTransform {
       } else {
         return undefined
       }
-    } 
+    }
 
     return data;
   }
 }
 
-export default DataTransform;
+export default dataTransform;

@@ -16,7 +16,7 @@ import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
-import DataTransform from '@cdc/core/components/DataTransform'
+import { dataTransform } from '@cdc/core/helpers/dataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import CdcMap from '@cdc/map'
@@ -33,6 +33,7 @@ import Widget from './components/Widget'
 import DataTable from './components/DataTable'
 
 import './scss/main.scss'
+import '@cdc/core/styles/v2/main.scss'
 
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
@@ -89,18 +90,13 @@ const VisualizationsPanel = () => (
 
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }) {
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [ config, setConfig ] = useState(configObj ?? {})
-
   const [ data, setData ] = useState([])
-
   const [ filteredData, setFilteredData ] = useState()
-
   const [ loading, setLoading ] = useState(true)
-
   const [ preview, setPreview ] = useState(false)
-
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
   const { title, description } = config.dashboard || config
@@ -126,7 +122,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json()
-
     let datasets = {}
 
     if (response.datasets) {
@@ -142,7 +137,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let newConfig = { ...defaults, ...response }
 
     updateConfig(newConfig, datasets)
-
     setLoading(false)
   }
 
@@ -205,7 +199,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const updateConfig = (newConfig, dataOverride = null) => {
     let newFilteredData = {}
-
     let visualizationKeys = Object.keys(newConfig.visualizations)
 
     if (newConfig.dashboard.sharedFilters) {
@@ -222,7 +215,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             }
 
             newConfig.dashboard.sharedFilters[i].values = filterValues
-
             newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
             break
           }
@@ -230,9 +222,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
           newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, (dataOverride || data))
-
           newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
         }
+
         if (newConfig.dashboard.sharedFilters[i].usedBy) {
           visualizationKeys.forEach(visualizationKey => {
             if (newConfig.dashboard.sharedFilters[i].usedBy.indexOf(visualizationKey) !== -1) {
@@ -241,8 +233,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           })
         }
       })
-
-
     }
 
     if (Object.keys(newFilteredData).length > 0) {
@@ -251,7 +241,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
-
     setConfig(newConfig)
   }
 
@@ -279,8 +268,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       delete newConfig.data
-      delete newConfig.dataUrl,
-        delete newConfig.dataFileName
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
       delete newConfig.dataFileSourceType
       delete newConfig.dataDescription
       delete newConfig.formattedData
@@ -324,7 +313,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let updatedConfig = { ...config }
 
     updatedConfig.visualizations[visualizationKey] = newConfig
-
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
 
     setConfig(updatedConfig)
@@ -346,9 +334,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = (text) => {
-
-    }
+    const announceChange = (text) => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return
@@ -621,8 +607,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
           {body}
         </div>
+        <OverlayFrame/>
       </ConfigContext.Provider>
-      <OverlayFrame/>
     </GlobalContextProvider>
   )
 }

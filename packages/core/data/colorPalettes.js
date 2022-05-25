@@ -1,4 +1,4 @@
-import { updatePaletteNames} from "../helpers/updatePaletteNames";
+import { updatePaletteNames } from '../helpers/updatePaletteNames'
 
 const colorPalettesMap = {
   yelloworangered: [
@@ -102,7 +102,7 @@ const colorPalettesMap = {
     '#15017A',
     '#C2C0FC',
   ],
- 
+
   qualitative2: [
     '#7fc97f',
     '#beaed4',
@@ -113,7 +113,7 @@ const colorPalettesMap = {
     '#666',
     '#fedab8',
   ],
- 
+
   qualitative3: [
     '#1b9e77',
     '#d95f02',
@@ -124,7 +124,7 @@ const colorPalettesMap = {
     '#a6761d',
     '#666',
   ],
- 
+
   qualitative4: [
     '#e41a1c',
     '#377eb8',
@@ -135,7 +135,7 @@ const colorPalettesMap = {
     '#a65628',
     '#f781bf',
   ],
- 
+
   qualitative9: [
     '#497d0c',
     '#84BC49',
@@ -145,7 +145,7 @@ const colorPalettesMap = {
     '#c31b1f',
     '#c31b1f',
   ],
-};
+}
 
 // * ============= Palettes for Chart project ==========  * //
 
@@ -161,7 +161,7 @@ const colorPalettes2 = {
     '#f781bf',
     '#3399CC',
   ],
- 
+
   'qualitative-soft': [
     '#A6CEE3',
     '#1F78B4',
@@ -191,8 +191,8 @@ const colorPalettes2 = {
     '#238B45',
     '#005A32',
   ],
-};
+}
 
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)  // adds reverse keyword to eact palette
 const colorPalettes = updatePaletteNames(colorPalettesMap)   // adds reverse keyword to eact palette
-export default colorPalettes;
+export default colorPalettes

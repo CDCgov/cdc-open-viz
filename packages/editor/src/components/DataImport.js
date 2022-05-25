@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
 import { get } from 'axios'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
+import { dataTransform } from '@cdc/core/helpers/dataTransform'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 import GlobalState from '../context'
@@ -42,7 +42,7 @@ export default function DataImport() {
 
   const { overlay } = useGlobalContext()
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
@@ -62,7 +62,7 @@ export default function DataImport() {
 
   const displaySize = (size) => {
     if(size === undefined) return '';
-    
+
     if(size > Math.pow(1024, 3)){
       return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
     } else if(size > Math.pow(1024, 2)){

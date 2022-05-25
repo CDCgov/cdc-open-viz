@@ -1,13 +1,14 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { useDrag } from 'react-dnd'
 
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
-import DataTransform from '@cdc/core/components/DataTransform'
-import DataQuestionnaire from '@cdc/core/components/DataQuestionnaire'
-import Icon from '@cdc/core/components/ui/Icon'
+import { dataTransform } from '@cdc/core/helpers/dataTransform'
 
-//import '@cdc/core/styles/dataquestionnaire.scss'
+import DataDesigner from '@cdc/core/components/managers/DataDesigner'
+import Icon from '@cdc/core/components/ui/Icon'
+import Modal from '@cdc/core/components/ui/Modal'
 
 const iconHash = {
   'data-bite': <Icon display="databite" base/>,
@@ -36,11 +37,10 @@ const labelHash = {
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
+  const { overlay } = useGlobalContext()
   const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
 
-  const [ modal, setModal ] = useState(false)
-
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const handleWidgetMove = (item, monitor) => {
     let result = monitor.getDropResult()
@@ -70,6 +70,29 @@ const Widget = ({ data = {}, addVisualization, type }) => {
       isDragging: monitor.isDragging()
     })
   })
+
+  const deleteWidget = () => {
+    rows[data.rowIdx][data.colIdx].widget = null
+
+    delete visualizations[data.uid]
+
+    updateConfig({ ...config, rows, visualizations })
+  }
+
+  const editWidget = () => {
+    visualizations[data.uid].editing = true
+
+    updateConfig({ ...config, visualizations })
+  }
+
+  const changeDataset = (uid, value) => {
+    delete visualizations[uid].dataDescription
+    delete visualizations[uid].formattedData
+
+    visualizations[uid].dataKey = value
+
+    updateConfig({ ...config, visualizations })
+  }
 
   const fetchRemoteData = async (url) => {
     try {
@@ -108,29 +131,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     }
   }
 
-  const deleteWidget = () => {
-    rows[data.rowIdx][data.colIdx].widget = null
-
-    delete visualizations[data.uid]
-
-    updateConfig({ ...config, rows, visualizations })
-  }
-
-  const editWidget = () => {
-    visualizations[data.uid].editing = true
-
-    updateConfig({ ...config, visualizations })
-  }
-
-  const changeDataset = (uid, value) => {
-    delete visualizations[uid].dataDescription
-    delete visualizations[uid].formattedData
-
-    visualizations[uid].dataKey = value
-
-    updateConfig({ ...config, visualizations })
-  }
-
   const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
     let dataDescription = { ...config.visualizations[visualizationKey].dataDescription, [key]: value }
 
@@ -150,26 +150,32 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     updateConfig({ ...config, visualizations: newVisualizations })
   }
 
+  const dataDesignerModal = (
+    <Modal>
+      <Modal.Content>
+        <DataDesigner visualizationKey={data.uid} dataKey={data.dataKey} configureData={data} updateDescriptionProp={updateDescriptionProp}/>
+      </Modal.Content>
+    </Modal>
+  )
+
   return (
     <>
-      {modal && (
-        <div className="data-questionnaire-modal">
-          <div className="data-questionnaire-modal-content">
-            <button className="close-button" onClick={() => setModal(false)}>
-              <Icon display="close"/>
-            </button>
-            <DataQuestionnaire visualizationKey={data.uid} dataKey={data.dataKey} configureData={data} updateDescriptionProp={updateDescriptionProp}/>
-          </div>
-        </div>
-      )}
       <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
         <Icon display="move" className="drag-icon"/>
         <div className="widget__content">
           {data.rowIdx !== undefined && (
             <div className="widget-menu">
-              {data.dataKey && data.dataDescription && data.formattedData && <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>}
-              {data.dataKey && <button className="btn btn-configure" onClick={() => setModal(true)}>Configure Data</button>}
-              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {if(e.target.value) setModal(true); changeDataset(data.uid, e.target.value)}}>
+              {data.dataKey && data.dataDescription && data.formattedData &&
+                <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>
+              }
+              {data.dataKey &&
+                <button className="btn btn-configure" onClick={() => overlay?.actions.openOverlay(dataDesignerModal)}>Configure Data</button>
+              }
+              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {
+                if (e.target.value)
+                  overlay?.actions.openOverlay(dataDesignerModal)
+                  changeDataset(data.uid, e.target.value)
+              }}>
                 <option value="">Select a dataset</option>
                 {config.datasets && Object.keys(config.datasets).map(datasetKey => (
                   <option key={datasetKey}>{datasetKey}</option>

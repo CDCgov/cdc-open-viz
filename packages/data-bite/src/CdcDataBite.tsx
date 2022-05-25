@@ -7,8 +7,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import parse from 'html-react-parser';
 
 import Context from './context';
-// @ts-ignore
-import DataTransform from '@cdc/core/components/DataTransform';
+import { dataTransform } from '@cdc/core/helpers/dataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
@@ -45,7 +44,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
 
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
@@ -101,10 +100,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   }
 
   const calculateDataBite = ():string|number => {
-  
+
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return '';  
+      return '';
     }
 
 
@@ -113,8 +112,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       if(value === undefined || value===null){
        console.error('Enter correct value to "applyPrecision()" function ')
       return ;
-    }  
-  // second validation 
+    }
+  // second validation
   if(Number.isNaN(value)){
     console.error(' Argunment isNaN, "applyPrecision()" function ')
     return;
@@ -157,9 +156,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       // first validation
       if(arr===undefined || arr===null ||!Array.isArray(arr)){
         console.error('Enter valid parameter getColumnMean function')
-        return 
+        return
       }
-     
+
       let mean:number = 0
       if(arr.length > 1){
        /// first convert each element to number then add using reduce method to escape string concatination.
@@ -223,13 +222,13 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
       return formattedValue
     }
-  
-  
 
-  
+
+
+
 
     let dataBite:string|number = '';
-    
+
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
 
@@ -247,14 +246,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
 
    // Get the column's data
-     if(filteredData.length){   
+     if(filteredData.length){
       filteredData.forEach(row => {
         let value = numberFromString(row[dataColumn])
         if(typeof value === 'number') numericalData.push(value)
       });
      }
-    
-  
+
+
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
@@ -287,7 +286,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
           rangeMin = applyLocaleString(rangeMin)
           rangeMax = applyLocaleString(rangeMax)
           }
-      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax+config.dataFormat.suffix;  
+      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax+config.dataFormat.suffix;
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
@@ -296,15 +295,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     // If not the range, then round and format here
     if (dataFunction !== DATA_FUNCTION_RANGE) {
       dataBite = applyPrecision(dataBite);
-  
+
       if (config.dataFormat.commas) {
        dataBite = applyLocaleString(dataBite)
       }
-          // Optional 
+          // Optional
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
      return dataBite
-    } else { 
+    } else {
       //Rounding and formatting for ranges happens earlier.
 
       return dataBite

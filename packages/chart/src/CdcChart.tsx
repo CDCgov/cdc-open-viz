@@ -11,7 +11,7 @@ import { timeParse, timeFormat } from 'd3-time-format';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
-import DataTransform from '@cdc/core/components/DataTransform';
+import { dataTransform } from '@cdc/core/helpers/dataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
@@ -33,7 +33,7 @@ export default function CdcChart(
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
 
-  const transform = new DataTransform();
+  const transform = new dataTransform();
 
   interface keyable { [key: string]: any }
 
