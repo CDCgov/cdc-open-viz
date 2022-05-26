@@ -30,9 +30,9 @@ export default function ChooseTab() {
   /**
    * IconButton component
    */
-  const IconButton = ({ icon, label, type, subType, barType, orientation }) => {
+  const IconButton = ({ icon, label, type, subType, barType, orientation, stacked = false }) => {
     let isSubType = false
-    let isSelectedOrientation = false
+    let isHorizontalStackedChart = false
     let classNames;
 
     if (type === 'map' && config.general) {
@@ -42,15 +42,22 @@ export default function ChooseTab() {
 
     if (type === 'chart') {
       isSubType = (subType === config.visualizationType)
-      isSelectedOrientation = (orientation === config.orientation)
+      isHorizontalStackedChart = (orientation === config.orientation && stacked === true)
     }
 
     if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
 
-    if(type === 'chart') {
-      classNames = (config.type === type && isSubType && isSelectedOrientation) ? 'active' : ''
-    } else {
-      classNames = (config.type === type && isSubType) ? 'active' : ''
+    // TODO: sorry, we should refactor this at some point.
+    // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
+    // this functionality appears to be working but is admittedly confusing.
+    if(type === 'chart' && stacked) {
+      classNames = (config.type === type && isSubType && config.visualizationSubType === 'stacked') ? 'active' : ''
+    } else if (type === 'chart' && !stacked && config.visualizationSubType !== 'stacked') {
+      classNames = (config.type === type && isSubType ) ? 'active' : ''
+    }
+
+    if(type !== 'chart') {
+      classNames = (config.type === type && isSubType && !isHorizontalStackedChart) ? 'active' : ''
     }
 
 
@@ -187,7 +194,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Horizontal Bar (Stacked)" type="chart" subType="Bar" orientation="horizontal"
+              <IconButton label="Horizontal Bar (Stacked)" type="chart" subType="Bar" orientation="horizontal" stacked={true}
                           icon={<HorizontalStackIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
