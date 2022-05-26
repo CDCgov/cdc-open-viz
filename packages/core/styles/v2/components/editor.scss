@@ -11,6 +11,7 @@
     grid-area: panel;
     width: $editorWidth;
     transition: width 500ms ease;
+    font-size: 15px;
     background: #fff;
     border-right: 1px solid #c2c2c2;
     overflow-x: hidden;
@@ -19,8 +20,9 @@
   }
 
   .cove-editor__heading {
-    font-size: 1.2em;
+    font-size: 1.125em;
     user-select: none;
+    padding: .625rem 1.125rem;
   }
 
   .cove-editor__panel-container {
