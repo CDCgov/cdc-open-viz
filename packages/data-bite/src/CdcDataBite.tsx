@@ -7,7 +7,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import parse from 'html-react-parser';
 
 import Context from './context';
-import { dataTransform } from '@cdc/core/helpers/dataTransform';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
@@ -44,7 +44,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
 
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 

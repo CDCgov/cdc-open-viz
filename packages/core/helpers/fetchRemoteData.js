@@ -1,3 +1,5 @@
+import Papa from 'papaparse';
+
 export default async function (url) {
     try {
         const regex = /(?:\.([^.]+))?$/
@@ -27,7 +29,7 @@ export default async function (url) {
     } catch {
         // If we can't parse it, still attempt to fetch it
         try {
-            let response = await (await fetch(configUrl)).json()
+            let response = await (await fetch(url)).json()
             return response
         } catch {
             console.error(`Cannot parse URL: ${url}`);

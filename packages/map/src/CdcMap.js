@@ -30,7 +30,7 @@ import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading';
-import { dataTransform } from '@cdc/core/helpers/dataTransform';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
@@ -100,7 +100,7 @@ const getUniqueValues = (data, columnName) => {
 const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, hostname}) => {
 
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
-    const transform = new dataTransform()
+    const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
     const [loading, setLoading] = useState(true)
     const [currentViewport, setCurrentViewport] = useState()
