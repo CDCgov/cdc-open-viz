@@ -616,7 +616,6 @@ const EditorPanel = () => {
     }
   }, [data,minValue])
   
-  console.log(minValue)
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
