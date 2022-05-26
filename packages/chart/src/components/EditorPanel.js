@@ -603,9 +603,16 @@ const EditorPanel = () => {
   }, [data,maxValue])
   
   useEffect(() => {
-     if (config[section].min && config[section].min < minValue) {
-      updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-      updateField(section,null,'min',minValue)
+    if (config.visualizationType === 'Line') {
+      if (config[section].min && config[section].min > minValue) {
+        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
+        updateField(section,null,'min',minValue)
+      }
+    } else {
+      if (config[section].min && config[section].min < minValue) {
+        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
+        updateField(section,null,'min',minValue)
+      }
     }
   }, [data,minValue])
   
