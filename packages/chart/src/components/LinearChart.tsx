@@ -15,11 +15,12 @@ import PairedBarChart from './PairedBarChart';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import '../scss/LinearChart.scss';
+import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
-
+  const {minValue,maxValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
@@ -36,40 +37,18 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
-
-
   if (data) {
-    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
+    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
     }
-
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
-      //If stacked bar, add together y values to get max, otherwise map data to find max
-      if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
-        const yTotals = data.reduce((allTotals, xValue) => {
-          const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-            yTotal += Number(xValue[k]);
-            return yTotal;
-          }, 0);
-          allTotals.push(totalYValues);
-          if(totalYValues > max){
-            max = totalYValues;
-          }
-          return allTotals;
-        }, [] as number[]);
-
-        max = Math.max(...yTotals);
-      } else if(config.visualizationType === 'Bar' && config.confidenceKeys && config.confidenceKeys.upper) {
-        max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
-      } else {
-        max = Math.max(...data.map((d) => Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
-      }
+     max = maxValue
     }
-
+    
     //Adds Y Axis data padding if applicable
     if(config.runtime.yAxis.paddingPercent) {
       let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent;
