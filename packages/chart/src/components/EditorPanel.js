@@ -23,30 +23,9 @@ import {useColorPalette} from '../hooks/useColorPalette';
 
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
-import useInput from '../hooks/useinput';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-
-
-const ValueInput = ({isValid,section=null,message,subsection=null,fieldName,value,label,onChange , updateField,...attributes})=>{
-  useEffect(()=>{
-  if(isValid && value){
-  updateField(section, subsection, fieldName, value)
-  }else if(!isValid || !value){
-    updateField(section, subsection, fieldName,undefined)
-} 
-  },[fieldName,section,subsection,value,isValid]);
-
-  return (
-    <label>
-    <span>{label}</span>
-    <input style={ {outline:(!isValid && value  ) ? '1px solid red':'none'  }} onChange={onChange}  placeholder='Auto' type='number'   value={value}  {...attributes} />
-     {!isValid && value && <span style={{color:'red',display:'block'}} > {message} </span> }
-  </label>
-  )
-}
-
-
+import useReduceData from '../hooks/useReduceData';
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue);
@@ -201,6 +180,7 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context);
 
+  const {minValue,maxValue} = useReduceData(config,data)
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
@@ -246,7 +226,6 @@ const EditorPanel = () => {
   };
 
   let hasLineChart = false
-  const {state,onChangeHandler } = useInput(config,data);
 
   const enforceRestrictions = (updatedConfig) => {
     if(updatedConfig.orientation === 'horizontal'){
@@ -565,6 +544,72 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Add a data series';
   }
 
+  const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
+  const [warningMsg,updateWarningMsg] = useState({maxMsg:'',minMsg:''})
+  
+  const onMaxChangeHandler = (e) => {
+     const enteredValue = e.target.value;
+     const existPositiveValue =  data.some(d => d[config.runtime.seriesKeys] >= 0 )
+     let value 
+    if (Number(enteredValue) >= maxValue) {
+        value = enteredValue
+        updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
+    } else if (Number(enteredValue)< maxValue && existPositiveValue) {
+        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Max value must be more than '+ maxValue}})
+    }else if (Number(enteredValue) < maxValue && !existPositiveValue) {
+        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Value must be more than or equal to 0'}})
+    }
+    updateField(section, null, 'max', value)
+    
+    if (!enteredValue.length) {
+      updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
+    }
+  }
+  
+  const onMinChangeHandler = (e) => {
+    const enteredValue = e.target.value;
+    let value;
+    if (config.visualizationType === 'Line') {
+      if (Number(enteredValue) > minValue) {
+        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than ' + minValue}})
+      } else {
+        value = enteredValue
+        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' } })
+      }
+      } else {
+        if (Number(enteredValue) > minValue) {
+          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than '+ minValue }})
+        } else if (Number(enteredValue) > 0  ) {
+          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than or equal to 0' }})
+        } else {
+          value = enteredValue
+          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' }})
+        }
+       
+      }
+      updateField(section, null, 'min', value)
+
+      if (!enteredValue.length) {
+        updateWarningMsg(function (presMsg) { return {...presMsg, minMsg: ''}})
+      }
+    }
+  
+
+  useEffect(() => {
+    if (config[section].max && config[section].max < maxValue) {
+      updateField(section,null,'max',maxValue)
+      updateWarningMsg(function (presMsg) {return {...presMsg, maxMsg: `Entered value ${config[section].max} is not valid `}})
+    } 
+  }, [data,maxValue])
+  
+  useEffect(() => {
+     if (config[section].min && config[section].min < minValue) {
+      updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
+      updateField(section,null,'min',minValue)
+    }
+  }, [data,minValue])
+  
+  console.log(minValue)
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm />}
@@ -761,22 +806,20 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <ValueInput  isValid={state.isValid.max}   message={state.message.max}    section='xAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}  updateField={updateField}  min={state.data.max} />
-                     <ValueInput  isValid={state.isValid.min}   message={state.message.min}    section='xAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'  onChange={(e)=>onChangeHandler(e,'MIN')} updateField={updateField} />
+                      <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
-                    :
+                    : config.visualizationType !=='Pie' &&
                     <>
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <ValueInput isValid={state.isValid.max}  message={state.message.max}  section='yAxis' fieldName='max'   placeholder='Auto'  value={state.enteredValue.max} label='update max scale'  onChange={(e)=>onChangeHandler(e,'MAX')}    updateField={updateField}  min={state.data.max} />
-                      <ValueInput isValid={state.isValid.min}  message={state.message.min}  section='yAxis' fieldName='min'   placeholder='Auto' value={state.enteredValue.min} label='update min scale'   onChange={(e) => onChangeHandler(e, 'MIN')} updateField={updateField}  max={'0'} />
+                      <TextField value={config.yAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
+                      <TextField value={config.yAxis.min} type='number' label='update min value' placeholder='Auto' onChange={(e)=>onMinChangeHandler(e)}  />
+                      <span style={{color:'red',display:'block'}} >{warningMsg.minMsg}</span>
                     </>
                   }
-               
-
-                      
-                     
                 </AccordionItemPanel>
               </AccordionItem>
 
