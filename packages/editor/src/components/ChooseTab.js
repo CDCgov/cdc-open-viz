@@ -30,8 +30,10 @@ export default function ChooseTab() {
   /**
    * IconButton component
    */
-  const IconButton = ({ icon, label, type, subType, barType, orientation }) => {
+  const IconButton = ({ icon, label, type, subType, barType, orientation, stacked = false }) => {
     let isSubType = false
+    let isHorizontalStackedChart = false
+    let classNames;
 
     if (type === 'map' && config.general) {
       let geoType = config.general.geoType
@@ -40,11 +42,24 @@ export default function ChooseTab() {
 
     if (type === 'chart') {
       isSubType = (subType === config.visualizationType)
+      isHorizontalStackedChart = (orientation === config.orientation && stacked === true)
     }
 
     if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
 
-    let classNames = (config.type === type && isSubType) ? 'active' : ''
+    // TODO: sorry, we should refactor this at some point.
+    // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
+    // this functionality appears to be working but is admittedly confusing.
+    if(type === 'chart' && stacked) {
+      classNames = (config.type === type && isSubType && config.visualizationSubType === 'stacked') ? 'active' : ''
+    } else if (type === 'chart' && !stacked && config.visualizationSubType !== 'stacked') {
+      classNames = (config.type === type && isSubType ) ? 'active' : ''
+    }
+
+    if(type !== 'chart') {
+      classNames = (config.type === type && isSubType && !isHorizontalStackedChart) ? 'active' : ''
+    }
+
 
     let setTypes = () => {
       // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
@@ -139,7 +154,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip position="right">
             <Tooltip.Target>
-              <IconButton label="Bar" type="chart" subType="Bar" icon={<BarIcon/>}/>
+              <IconButton label="Bar" type="chart" subType="Bar" orientation="vertical" icon={<BarIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Use bars to show comparisons between data categories.
@@ -149,7 +164,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Line" type="chart" subType="Line" icon={<LineIcon/>}/>
+              <IconButton label="Line" type="chart" subType="Line" orientation="vertical" icon={<LineIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Present one or more data trends over time.
@@ -159,7 +174,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Pie" type="chart" subType="Pie" icon={<PieIcon/>}/>
+              <IconButton label="Pie" type="chart" subType="Pie" orientation="vertical" icon={<PieIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Present the numerical proportions of a data series.
@@ -169,7 +184,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={<PairedBarIcon/>}/>
+              <IconButton label="Paired Bar" type="chart" subType="Paired Bar" orientation="horizontal" icon={<PairedBarIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Use paired bars to show comparisons between two different data categories.
@@ -179,7 +194,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip>
             <Tooltip.Target>
-              <IconButton label="Horizontal Bar (Stacked)" type="chart" subType="Bar" orientation="horizontal"
+              <IconButton label="Horizontal Bar (Stacked)" type="chart" subType="Bar" orientation="horizontal" stacked={true}
                           icon={<HorizontalStackIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
