@@ -570,7 +570,7 @@ const EditorPanel = () => {
         existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
       }
     }
-    
+
      // input >= max
     if (Number(enteredValue) >= maxValue) {
         value = enteredValue
