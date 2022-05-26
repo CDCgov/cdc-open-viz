@@ -4,7 +4,8 @@ import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
-import { dataTransform } from '@cdc/core/helpers/dataTransform'
+import { DataTransform } from '@cdc/core/helpers/dataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -40,7 +41,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   const { overlay } = useGlobalContext()
   const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
 
-  const transform = new dataTransform()
+  const transform = new DataTransform()
 
   const handleWidgetMove = (item, monitor) => {
     let result = monitor.getDropResult()
@@ -94,43 +95,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     updateConfig({ ...config, visualizations })
   }
 
-  const fetchRemoteData = async (url) => {
-    try {
-      const regex = /(?:\.([^.]+))?$/
-
-      let data = []
-
-      const ext = (regex.exec(url)[1])
-      if ('csv' === ext) {
-        data = await fetch(url)
-          .then(response => response.text())
-          .then(responseText => {
-            const parsedCsv = Papa.parse(responseText, {
-              header: true,
-              dynamicTyping: true,
-              skipEmptyLines: true
-            })
-            return parsedCsv.data
-          })
-      }
-
-      if ('json' === ext) {
-        data = await fetch(url)
-          .then(response => response.json())
-      }
-
-      return data
-    } catch {
-      // If we can't parse it, still attempt to fetch it
-      try {
-        let response = await (await fetch(configUrl)).json()
-        return response
-      } catch {
-        console.error(`Cannot parse URL: ${url}`)
-      }
-    }
-  }
-
   const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
     let dataDescription = { ...config.visualizations[visualizationKey].dataDescription, [key]: value }
 
@@ -150,10 +114,17 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     updateConfig({ ...config, visualizations: newVisualizations })
   }
 
+  let dataDesignerPayload = {
+    configureData: data,
+    visualizationKey: data.uid,
+    dataKey: data.dataKey,
+    updateDescriptionProp
+  }
+
   const dataDesignerModal = (
     <Modal>
       <Modal.Content>
-        <DataDesigner visualizationKey={data.uid} dataKey={data.dataKey} configureData={data} updateDescriptionProp={updateDescriptionProp}/>
+        <DataDesigner {...dataDesignerPayload}/>
       </Modal.Content>
     </Modal>
   )
@@ -169,12 +140,14 @@ const Widget = ({ data = {}, addVisualization, type }) => {
                 <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>
               }
               {data.dataKey &&
-                <button className="btn btn-configure" onClick={() => overlay?.actions.openOverlay(dataDesignerModal)}>Configure Data</button>
+                <button className="btn btn-configure" onClick={() => {
+                  overlay?.actions.openOverlay(dataDesignerModal)
+                }}>Configure Data</button>
               }
               <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {
                 if (e.target.value)
                   overlay?.actions.openOverlay(dataDesignerModal)
-                  changeDataset(data.uid, e.target.value)
+                changeDataset(data.uid, e.target.value)
               }}>
                 <option value="">Select a dataset</option>
                 {config.datasets && Object.keys(config.datasets).map(datasetKey => (

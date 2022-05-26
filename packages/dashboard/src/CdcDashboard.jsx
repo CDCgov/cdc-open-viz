@@ -16,7 +16,7 @@ import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
-import { dataTransform } from '@cdc/core/helpers/dataTransform'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import CdcMap from '@cdc/map'
@@ -89,9 +89,6 @@ const VisualizationsPanel = () => (
 )
 
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }) {
-
-  const transform = new dataTransform()
-
   const [ config, setConfig ] = useState(configObj ?? {})
   const [ data, setData ] = useState([])
   const [ filteredData, setFilteredData ] = useState()
@@ -100,6 +97,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
   const { title, description } = config.dashboard || config
+
+  const transform = new DataTransform()
 
   const processData = async (config) => {
     let dataset = config.formattedData || config.data
@@ -367,7 +366,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         </section>
       )
     })
-
   }
 
   const resizeObserver = new ResizeObserver(entries => {

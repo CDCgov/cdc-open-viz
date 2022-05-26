@@ -1,4 +1,4 @@
-export class dataTransform {
+export class DataTransform {
   constructor() {
     this.constants = {
       errorMessageEmtpyData: 'Your data file is empty.',
@@ -159,4 +159,4 @@ export class dataTransform {
   }
 }
 
-export default dataTransform;
+export default DataTransform;

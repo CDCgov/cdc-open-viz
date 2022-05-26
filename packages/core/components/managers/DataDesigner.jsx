@@ -1,10 +1,9 @@
 import React from 'react'
 
-import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../data/dataDesignerTables'
-
 import Button from '../elements/Button'
 import Card from '../elements/Card'
 
+import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../data/dataDesignerTables'
 import '../../styles/v2/components/data-designer.scss'
 
 const DataDesigner = (props) => {
@@ -96,7 +95,9 @@ const DataDesigner = (props) => {
                   <div className="col-12 col-xl-6">
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === true ? ' active' : '')}
-                      onClick={() => {configureData.dataFileName, updateDescriptionProp('singleRow', true)}}>
+                      onClick={() => {
+                          updateDescriptionProp(visualizationKey, dataKey, 'singleRow', true)
+                      }}>
                       <Card>
                         <strong>Single Row</strong>
                         <p>Each row contains the data for an individual series in itself.</p>
