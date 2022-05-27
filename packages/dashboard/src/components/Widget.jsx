@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef } from 'react'
 import { useDrag } from 'react-dnd'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -40,6 +40,9 @@ const labelHash = {
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { overlay } = useGlobalContext()
   const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
+
+  const dataRef = useRef();
+  dataRef.current = data;
 
   const transform = new DataTransform()
 
@@ -96,35 +99,35 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
-    let dataDescription = { ...config.visualizations[visualizationKey].dataDescription, [key]: value }
+    let dataDescription = { ...dataRef.current.dataDescription, [key]: value }
 
-    let data
+    let newData
     if (!config.datasets[datasetKey].data && config.datasets[datasetKey].dataUrl) {
-      data = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
-      data = transform.autoStandardize(data)
+      newData = await fetchRemoteData(config.datasets[datasetKey].dataUrl)
+      newData = transform.autoStandardize(newData)
     } else {
-      data = config.datasets[datasetKey].data
+      newData = config.datasets[datasetKey].data
     }
 
-    let formattedData = transform.developerStandardize(data, dataDescription)
+    let formattedData = transform.developerStandardize(newData, dataDescription)
 
     let newVisualizations = { ...config.visualizations }
-    newVisualizations[visualizationKey] = { ...newVisualizations[visualizationKey], data, dataDescription, formattedData }
+    newVisualizations[visualizationKey] = { ...newVisualizations[visualizationKey], data: newData, dataDescription, formattedData }
 
     updateConfig({ ...config, visualizations: newVisualizations })
+
+    overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
 
-  let dataDesignerPayload = {
-    configureData: data,
-    visualizationKey: data.uid,
-    dataKey: data.dataKey,
-    updateDescriptionProp
-  }
-
-  const dataDesignerModal = (
+  const dataDesignerModal = (configureData) => (
     <Modal>
       <Modal.Content>
-        <DataDesigner {...dataDesignerPayload}/>
+        <DataDesigner {...{
+          configureData, 
+          visualizationKey: data.uid,
+          dataKey: data.dataKey,
+          updateDescriptionProp
+        }}/>
       </Modal.Content>
     </Modal>
   )
@@ -141,12 +144,12 @@ const Widget = ({ data = {}, addVisualization, type }) => {
               }
               {data.dataKey &&
                 <button className="btn btn-configure" onClick={() => {
-                  overlay?.actions.openOverlay(dataDesignerModal)
+                  overlay?.actions.openOverlay(dataDesignerModal(data))
                 }}>Configure Data</button>
               }
               <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {
                 if (e.target.value)
-                  overlay?.actions.openOverlay(dataDesignerModal)
+                  overlay?.actions.openOverlay(dataDesignerModal(data))
                 changeDataset(data.uid, e.target.value)
               }}>
                 <option value="">Select a dataset</option>
