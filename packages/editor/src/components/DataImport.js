@@ -20,11 +20,11 @@ import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
-import DataQuestionnaire from '@cdc/core/components/DataQuestionnaire'
+import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
 import '../scss/data-import.scss'
 
-import '@cdc/core/styles/dataquestionnaire.scss'
+import '@cdc/core/styles/v2/components/data-designer.scss'
 
 export default function DataImport() {
   const {
@@ -463,7 +463,7 @@ export default function DataImport() {
               </>
             )}
 
-            <DataQuestionnaire visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
           </>
         )}
 
