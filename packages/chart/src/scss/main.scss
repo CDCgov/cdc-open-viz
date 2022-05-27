@@ -1,7 +1,5 @@
 @import '~@cdc/core/styles/base';
 @import "~@cdc/core/styles/heading-colors";
-@import 'mixins';
-@import 'variables';
 
 .form-container {
   overflow: scroll;
@@ -13,7 +11,7 @@
 }
 
 .cdc-open-viz-module.type-chart {
-  @import 'DataTable';
+  @import 'data-table';
   @import 'editor-panel';
 
   .visually-hidden {

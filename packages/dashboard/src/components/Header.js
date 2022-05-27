@@ -1,4 +1,4 @@
-import React, { useContext, memo } from 'react'
+import React from 'react'
 
 const Header = ({preview, setPreview, back, subEditor = null}) => {
   return (

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
-
 import {
   Accordion,
   AccordionItem,
@@ -9,7 +8,7 @@ import {
 } from 'react-accessible-accordion';
 import { useDebounce } from 'use-debounce';
 
-import Context from '../context';
+import ConfigContext from '../ConfigContext';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import QuestionIcon from '@cdc/core/assets/question-circle.svg';
@@ -80,26 +79,9 @@ const CheckBox = memo(({label, value, fieldName, section = null, subsection = nu
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
     <span className="edit-label">{label}</span>
-    {section === 'table' && fieldName === 'show' && <Helper text=" Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement." />}
+    {section === 'table' && fieldName === 'show'}
   </label>
 ))
-
-const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-  let optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
-
-  if(initialValue) {
-    optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
-  }
-
-  return (
-    <label>
-      <span className="edit-label">{label}</span>
-      <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
-        {optionsJsx}
-      </select>
-    </label>
-  )
-})
 
 const EditorPanel = memo(() => {
   const {
@@ -109,11 +91,33 @@ const EditorPanel = memo(() => {
     rawData,
     setParentConfig,
     setEditing
-  } = useContext(Context);
+  } = useContext(ConfigContext);
 
-  const enforceRestrictions = (updatedConfig) => {
-    // TODO
-  };
+  const [ displayPanel, setDisplayPanel ] = useState(true);
+
+  // Used to pipe a JSON version of the config you are creating out
+  const [ configData, setConfigData ] = useState({})
+
+  useEffect(() => {
+    const parsedData = convertStateToConfig()
+
+    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
+
+    setConfigData(formattedData)
+
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+
+    window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if(setParentConfig) {
+      const newConfig = convertStateToConfig("object")
+      setParentConfig(newConfig)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config]);
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -123,8 +127,6 @@ const EditorPanel = memo(() => {
       dashboardConfig[fieldName] = newValue;
 
       let updatedConfig = {...config, dashboard: dashboardConfig};
-
-      enforceRestrictions(updatedConfig);
 
       updateConfig(updatedConfig);
       return
@@ -147,24 +149,7 @@ const EditorPanel = memo(() => {
 
     let updatedConfig = {...config, [section]: sectionValue};
 
-    enforceRestrictions(updatedConfig);
-
     updateConfig(updatedConfig)
-  }
-
-  const missingRequiredSections = () => {
-    //TODO
-
-    return false;
-  };
-
-  const [ displayPanel, setDisplayPanel ] = useState(true);
-
-  // Used to pipe a JSON version of the config you are creating out
-  const [ configData, setConfigData ] = useState({})
-
-  if(loading) {
-    return null
   }
 
   const getColumns = (filter = true) => {
@@ -185,22 +170,9 @@ const EditorPanel = memo(() => {
     return Object.keys(columns)
   }
 
-  const Error = () => {
-    return (
-      <section className="waiting">
-        <section className="waiting-container">
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    );
-  }
-
   const convertStateToConfig = (type = "JSON") => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if(false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
+    delete strippedState.newViz
     delete strippedState.runtime
 
     if(type === "JSON") {
@@ -209,27 +181,6 @@ const EditorPanel = memo(() => {
 
     return strippedState
   }
-
-  useEffect(() => {
-    const parsedData = convertStateToConfig()
-
-    const formattedData = JSON.stringify(JSON.parse(parsedData), undefined, 2);
-
-    setConfigData(formattedData)
-
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
-
-    window.dispatchEvent(event)
-
-    // Pass up to Editor if needed
-    if(setParentConfig) {
-      const newConfig = convertStateToConfig("object")
-      setParentConfig(newConfig)
-    }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config]);
 
   const removeFilter = (index) => {
     let dashboardConfig = config.dashboard;
@@ -257,6 +208,19 @@ const EditorPanel = memo(() => {
     updateConfig({...config, dashboard: dashboardConfig});
   }
 
+  const Error = () => {
+    return (
+      <section className="waiting">
+        <section className="waiting-container">
+          <h3>Error With Configuration</h3>
+          <p>{config.runtime.editorErrorMessage}</p>
+        </section>
+      </section>
+    );
+  }
+
+  if (loading) return null
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.runtime && config.runtime.editorErrorMessage && <Error /> }
@@ -266,7 +230,7 @@ const EditorPanel = memo(() => {
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* General */}
+              <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     General

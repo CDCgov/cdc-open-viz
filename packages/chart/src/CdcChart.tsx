@@ -1,80 +1,121 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 
-import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
-import { scaleOrdinal } from '@visx/scale';
-import { timeParse, timeFormat } from 'd3-time-format';
-import parse from 'html-react-parser';
+import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
+import { scaleOrdinal } from '@visx/scale'
+import { timeParse, timeFormat } from 'd3-time-format'
+import parse from 'html-react-parser'
 
-import Loading from '@cdc/core/components/Loading';
-import DataTransform from '@cdc/core/components/DataTransform';
-import getViewport from '@cdc/core/helpers/getViewport';
-
-import PieChart from './components/PieChart';
-import LinearChart from './components/LinearChart';
-import DataTable from './components/DataTable';
-import Context from './context';
-import defaults from './data/initial-state';
-
-import EditorPanel from './components/EditorPanel';
+import DataTransform from '@cdc/core/helpers/DataTransform'
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import LegendCircle from '@cdc/core/components/LegendCircle';
-import {colorPalettesChart as colorPalettes} from '@cdc/core/data/colorPalettes';
+import getViewport from '@cdc/core/helpers/getViewport'
+import Loading from '@cdc/core/components/Loading'
+import LegendCircle from '@cdc/core/components/LegendCircle'
+import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 
-import './scss/main.scss';
+import EditorPanel from './components/EditorPanel'
+import PieChart from './components/PieChart'
+import LinearChart from './components/LinearChart'
+import DataTable from './components/DataTable'
+
+import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import ConfigContext from './ConfigContext'
+import defaults from './data/initial-state'
+
+import './scss/main.scss'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing }:
+    { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
 
-  const transform = new DataTransform();
+  const transform = new DataTransform()
 
-  interface keyable { [key: string]: any }
+  interface keyable {
+    [key: string]: any
+  }
 
-  const [loading, setLoading] = useState<Boolean>(true);
-  const [colorScale, setColorScale] = useState<any>(null);
-  const [config, setConfig] = useState<keyable>({});
-  const [stateData, setStateData] = useState<Array<Object>>(config.data || []);
-  const [excludedData, setExcludedData] = useState<Array<Object>>();
-  const [filteredData, setFilteredData] = useState<Array<Object>>();
-  const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
-  const [currentViewport, setCurrentViewport] = useState<String>('lg');
-  const [dimensions, setDimensions] = useState<Array<Number>>([]);
+  const [ loading, setLoading ] = useState<Boolean>(true)
+  const [ colorScale, setColorScale ] = useState<any>(null)
+  const [ config, setConfig ] = useState<keyable>({})
+  const [ stateData, setStateData ] = useState<Array<Object>>(config.data || [])
+  const [ excludedData, setExcludedData ] = useState<Array<Object>>()
+  const [ filteredData, setFilteredData ] = useState<Array<Object>>()
+  const [ seriesHighlight, setSeriesHighlight ] = useState<Array<String>>([])
+  const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
+  const [ dimensions, setDimensions ] = useState<Array<Number>>([])
 
-  const legendGlyphSize = 15;
-  const legendGlyphSizeHalf = legendGlyphSize / 2;
-
+  const legendGlyphSize = 15
+  const legendGlyphSizeHalf = legendGlyphSize / 2
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  // Load data when component first mounts
+  useEffect(() => {
+    loadConfig()
+  }, [])
+
+  // Load data when configObj data changes
+  if (configObj) {
+    useEffect(() => {
+      loadConfig()
+    }, [ configObj.data ])
+  }
+
+  // Generates color palette to pass to child chart component
+  useEffect(() => {
+    if (stateData && config.xAxis && config.runtime.seriesKeys) {
+      let palette = colorPalettes[config.palette]
+      let numberOfKeys = config.runtime.seriesKeys.length
+
+      while (numberOfKeys > palette.length) {
+        palette = palette.concat(palette)
+      }
+
+      palette = palette.slice(0, numberOfKeys)
+
+      const newColorScale = () => scaleOrdinal({
+        domain: config.runtime.seriesLabelsAll,
+        range: palette,
+      })
+
+      setColorScale(newColorScale)
+      setLoading(false)
+    }
+
+    if (config && stateData && config.sortData) {
+      stateData.sort(sortData)
+    }
+  }, [ config, stateData ])
+
   const loadConfig = async () => {
-    let response = configObj || await (await fetch(configUrl)).json();
+    let response = configObj || await (await fetch(configUrl)).json()
 
     // If data is included through a URL, fetch that and store
-    let data = response.formattedData || response.data || {};
+    let data = response.formattedData || response.data || {}
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
+    if (response.dataUrl) {
+      const dataString = await fetch(response.dataUrl)
 
-      data = await dataString.json();
-      if(response.dataDescription) {
-        data = transform.autoStandardize(data);
-        data = transform.developerStandardize(data, response.dataDescription);
+      data = await dataString.json()
+      if (response.dataDescription) {
+        data = transform.autoStandardize(data)
+        data = transform.developerStandardize(data, response.dataDescription)
       }
     }
 
-    if(data) {
+    if (data) {
       setStateData(data)
       setExcludedData(data)
     }
 
-    let newConfig = {...defaults, ...response}
-    if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
-    updateConfig(newConfig, data);
+    let newConfig = { ...defaults, ...response }
+    if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
+    updateConfig(newConfig, data)
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
@@ -85,7 +126,7 @@ export default function CdcChart(
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
         newConfig[key] = { ...defaults[key], ...newConfig[key] }
       }
-    });
+    })
 
     // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
     let newExcludedData
@@ -101,7 +142,7 @@ export default function CdcChart(
       ) {
 
         // Filter dates
-        const timestamp = (e) => new Date(e).getTime();
+        const timestamp = (e) => new Date(e).getTime()
 
         let startDate = timestamp(newConfig.exclusions.dateStart)
         let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
@@ -130,325 +171,271 @@ export default function CdcChart(
     setExcludedData(newExcludedData)
 
     // After data is grabbed, loop through and generate filter column values if there are any
-    let currentData;
+    let currentData
 
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
 
-          let filterValues = [];
+        let filterValues = []
 
-          filterValues = generateValuesForFilter(filter.columnName, newExcludedData);
+        filterValues = generateValuesForFilter(filter.columnName, newExcludedData)
 
-          newConfig.filters[index].values = filterValues;
-          // Initial filter should be active
-          newConfig.filters[index].active = filterValues[0];
+        newConfig.filters[index].values = filterValues
+        // Initial filter should be active
+        newConfig.filters[index].active = filterValues[0]
 
-      });
-      currentData = filterData(newConfig.filters, newExcludedData);
-      setFilteredData(currentData);
+      })
+      currentData = filterData(newConfig.filters, newExcludedData)
+      setFilteredData(currentData)
     }
 
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {};
-    newConfig.runtime.seriesLabels = {};
-    newConfig.runtime.seriesLabelsAll = [];
-    newConfig.runtime.originalXAxis = newConfig.xAxis;
+    newConfig.runtime = {}
+    newConfig.runtime.seriesLabels = {}
+    newConfig.runtime.seriesLabelsAll = []
+    newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.visualizationType === 'Pie') {
-      newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
-      newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys;
+      newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
+      newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
-        newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey;
-        newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey);
-        return series.dataKey;
-      }) : [];
+        newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+        newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+        return series.dataKey
+      }) : []
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
-      newConfig.runtime.barSeriesKeys = [];
-      newConfig.runtime.lineSeriesKeys = [];
+      newConfig.runtime.barSeriesKeys = []
+      newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach((series) => {
-        if(series.type === 'Bar'){
-          newConfig.runtime.barSeriesKeys.push(series.dataKey);
+        if (series.type === 'Bar') {
+          newConfig.runtime.barSeriesKeys.push(series.dataKey)
         }
-        if(series.type === 'Line'){
-          newConfig.runtime.lineSeriesKeys.push(series.dataKey);
+        if (series.type === 'Line') {
+          newConfig.runtime.lineSeriesKeys.push(series.dataKey)
         }
-      });
+      })
     }
 
-    if ( (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
-      newConfig.runtime.xAxis = newConfig.yAxis;
-      newConfig.runtime.yAxis = newConfig.xAxis;
-      newConfig.runtime.horizontal = true;
+    if ((newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+      newConfig.runtime.xAxis = newConfig.yAxis
+      newConfig.runtime.yAxis = newConfig.xAxis
+      newConfig.runtime.horizontal = true
     } else {
-      newConfig.runtime.xAxis = newConfig.xAxis;
-      newConfig.runtime.yAxis = newConfig.yAxis;
-      newConfig.runtime.horizontal = false;
+      newConfig.runtime.xAxis = newConfig.xAxis
+      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.horizontal = false
     }
-    newConfig.runtime.uniqueId = Date.now();
-    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
+    newConfig.runtime.uniqueId = Date.now()
+    newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
     // Check for duplicate x axis values in data
-    if(!currentData) currentData = newExcludedData;
+    if (!currentData) currentData = newExcludedData
 
-    let uniqueXValues = {};
+    let uniqueXValues = {}
 
-    if(newConfig.visualizationType !== 'Paired Bar') {
-      for(let i = 0; i < currentData.length; i++) {
-        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+    if (newConfig.visualizationType !== 'Paired Bar') {
+      for (let i = 0; i < currentData.length; i++) {
+        if (uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]) {
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.'
         } else {
-          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true
         }
       }
     }
-    setConfig(newConfig);
-  };
+    setConfig(newConfig)
+  }
 
   const filterData = (filters, data) => {
-    let filteredData = [];
+    let filteredData = []
 
     data.forEach((row) => {
-      let add = true;
+      let add = true
       filters.forEach((filter) => {
         if (row[filter.columnName] !== filter.active) {
-          add = false;
+          add = false
         }
-      });
-      if(add) filteredData.push(row);
-    });
-    return filteredData;
+      })
+      if (add) filteredData.push(row)
+    })
+    return filteredData
   }
 
   // Gets filer values from dataset
   const generateValuesForFilter = (columnName, data = this.state.data) => {
-    const values = [];
+    const values = []
 
-    data.forEach( (row) => {
-        const value = row[columnName]
-        if(value && false === values.includes(value)) {
-            values.push(value)
-        }
-    });
+    data.forEach((row) => {
+      const value = row[columnName]
+      if (value && false === values.includes(value)) {
+        values.push(value)
+      }
+    })
 
-    return values;
+    return values
   }
 
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
-    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey;
-    let aData = parseFloat(a[sortKey]);
-    let bData = parseFloat(b[sortKey]);
+    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey
+    let aData = parseFloat(a[sortKey])
+    let bData = parseFloat(b[sortKey])
 
-    if(aData < bData){
-      return config.sortData === 'ascending' ? 1 : -1;
-    } else if (aData > bData){
-      return config.sortData === 'ascending' ? -1 : 1;
+    if (aData < bData) {
+      return config.sortData === 'ascending' ? 1 : -1
+    } else if (aData > bData) {
+      return config.sortData === 'ascending' ? -1 : 1
     } else {
-      return 0;
+      return 0
     }
   }
 
-  // Observes changes to outermost container and changes viewport size in state
-  const resizeObserver:ResizeObserver = new ResizeObserver(entries => {
+  // Observe changes to outermost container and changes viewport size in state
+  const resizeObserver: ResizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(width)
-      let svgMarginWidth = 32;
-      let editorWidth = 350;
+      let svgMarginWidth = 32
+      let editorWidth = 350
 
       setCurrentViewport(newViewport)
 
-      if(isEditor) {
-        width = width - editorWidth;
+      if (isEditor) {
+        width = width - editorWidth
       }
 
-      if(entry.target.dataset.lollipop === 'true') {
-        width = width - 2.5;
+      if (entry.target.dataset.lollipop === 'true') {
+        width = width - 2.5
       }
 
-      width = width - svgMarginWidth;
+      width = width - svgMarginWidth
 
-      setDimensions([width, height])
+      setDimensions([ width, height ])
     }
   })
 
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
-        resizeObserver.observe(node);
+      resizeObserver.observe(node)
     }
-  },[]);
-
-  // Load data when component first mounts
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  // useEffect(() => {
-  //   if(config.visualizationType === 'Paired Bar') {
-  //     updateConfig({
-  //       ...config,
-  //       yAxis: {
-  //         ...config.yAxis,
-  //         hideAxis: true
-  //       },
-  //       xAxis: {
-  //         ...config.xAxis,
-  //         hideAxis: true
-  //       }
-  //     })
-  //   }
-  // }, [config.visualizationType]);
-
-  // Load data when configObj data changes
-  if(configObj){
-    useEffect(() => {
-      loadConfig();
-    }, [configObj.data]);
-  }
-
-  // Generates color palette to pass to child chart component
-  useEffect(() => {
-    if(stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = colorPalettes[config.palette]
-      let numberOfKeys = config.runtime.seriesKeys.length
-
-      while(numberOfKeys > palette.length) {
-        palette = palette.concat(palette);
-      }
-
-      palette = palette.slice(0, numberOfKeys);
-
-      const newColorScale = () => scaleOrdinal({
-        domain: config.runtime.seriesLabelsAll,
-        range: palette,
-      });
-
-      setColorScale(newColorScale);
-      setLoading(false);
-    }
-
-    if(config && stateData && config.sortData){
-      stateData.sort(sortData);
-    }
-  }, [config, stateData])
+  }, [])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
-    const newSeriesHighlight = [];
+    const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
       highlightReset()
       return
     }
 
     seriesHighlight.forEach((value) => {
-      newSeriesHighlight.push(value);
-    });
+      newSeriesHighlight.push(value)
+    })
 
-    let newHighlight = label.datum;
-    if(config.runtime.seriesLabels){
-      for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        if(config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum){
-          newHighlight = config.runtime.seriesKeys[i];
-          break;
+    let newHighlight = label.datum
+    if (config.runtime.seriesLabels) {
+      for (let i = 0; i < config.runtime.seriesKeys.length; i++) {
+        if (config.runtime.seriesLabels[config.runtime.seriesKeys[i]] === label.datum) {
+          newHighlight = config.runtime.seriesKeys[i]
+          break
         }
       }
     }
 
     if (newSeriesHighlight.indexOf(newHighlight) !== -1) {
-      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1);
+      newSeriesHighlight.splice(newSeriesHighlight.indexOf(newHighlight), 1)
     } else {
-      newSeriesHighlight.push(newHighlight);
+      newSeriesHighlight.push(newHighlight)
     }
 
-    setSeriesHighlight(newSeriesHighlight);
-  };
+    setSeriesHighlight(newSeriesHighlight)
+  }
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    setSeriesHighlight([]);
+    setSeriesHighlight([])
   }
 
   const parseDate = (dateString: string) => {
-    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
-    if(!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`;
-      return new Date();
+    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString)
+    if (!date) {
+      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
+      return new Date()
     } else {
-      return date;
+      return date
     }
-  };
+  }
 
   const formatDate = (date: Date) => {
-    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
-  };
+    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date)
+  }
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
-    let original = num;
-    let prefix = config.dataFormat.prefix;
-    num = numberFromString(num);
+    let original = num
+    let prefix = config.dataFormat.prefix
+    num = numberFromString(num)
 
-    if(isNaN(num)) {
-      config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
+    if (isNaN(num)) {
+      config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`
       return
     }
 
-    if (!config.dataFormat) return num;
-    if (config.dataCutoff){
+    if (!config.dataFormat) return num
+    if (config.dataCutoff) {
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
-        num = cutoff;
+      if (num < cutoff) {
+        prefix = '< ' + (prefix || '')
+        num = cutoff
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo)
+    if (config.dataFormat.commas) num = num.toLocaleString('en-US')
 
-    let result = ""
+    let result = ''
 
-    if(prefix) {
+    if (prefix) {
       result += prefix
     }
 
     result += num
 
-    if(config.dataFormat.suffix) {
+    if (config.dataFormat.suffix) {
       result += config.dataFormat.suffix
     }
 
     return result
-  };
+  }
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config;
+  const { legend, title, description, visualizationType } = config
 
   // Select appropriate chart type
   const chartComponents = {
-    'Paired Bar' : <LinearChart />,
-    'Bar' : <LinearChart />,
-    'Line' : <LinearChart />,
-    'Combo': <LinearChart />,
-    'Pie' : <PieChart />,
+    'Paired Bar': <LinearChart/>,
+    'Bar': <LinearChart/>,
+    'Line': <LinearChart/>,
+    'Combo': <LinearChart/>,
+    'Pie': <PieChart/>,
   }
 
   // JSX for Legend
   const Legend = () => {
 
-    let containerClasses = ['legend-container']
-    let innerClasses = ['legend-container__inner'];
+    let containerClasses = [ 'legend-container' ]
+    let innerClasses = [ 'legend-container__inner' ]
 
-    if(config.legend.position === "left") {
+    if (config.legend.position === 'left') {
       containerClasses.push('left')
     }
 
-    if(config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
+    if (config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
       innerClasses.push('d-flex')
       innerClasses.push('flex-column-reverse')
     }
@@ -457,28 +444,28 @@ export default function CdcChart(
       <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
         {legend.label && <h2>{legend.label}</h2>}
         <LegendOrdinal
-        scale={colorScale}
-        itemDirection="row"
-        labelMargin="0 20px 0 0"
-        shapeMargin="0 10px 0"
+          scale={colorScale}
+          itemDirection="row"
+          labelMargin="0 20px 0 0"
+          shapeMargin="0 10px 0"
         >
           {labels => (
             <div className={innerClasses.join(' ')}>
               {labels.map((label, i) => {
                 let className = 'legend-item'
-                let itemName:any = label.datum
+                let itemName: any = label.datum
 
                 // Filter excluded data keys from legend
                 if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
                   return
                 }
 
-                if(config.runtime.seriesLabels){
+                if (config.runtime.seriesLabels) {
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                   itemName = config.runtime.seriesKeys[index]
                 }
 
-                if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) ) {
+                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
                   className += ' inactive'
                 }
 
@@ -489,21 +476,22 @@ export default function CdcChart(
                     key={`legend-quantile-${i}`}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        highlight(label);
+                        highlight(label)
                       }
                     }}
                     onClick={() => {
-                      highlight(label);
+                      highlight(label)
                     }}
                   >
-                    <LegendCircle fill={label.value} />
+                    <LegendCircle fill={label.value}/>
                     <LegendLabel align="left" margin="0 0 0 4px">
                       {label.text}
                     </LegendLabel>
                   </LegendItem>
                 )
               })}
-              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+              {seriesHighlight.length > 0 &&
+                <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
             </div>
           )}
         </LegendOrdinal>
@@ -513,39 +501,37 @@ export default function CdcChart(
 
   const Filters = () => {
     const changeFilterActive = (index, value) => {
-      let newFilters = config.filters;
+      let newFilters = config.filters
+      newFilters[index].active = value
+      setConfig({ ...config, filters: newFilters })
+      setFilteredData(filterData(newFilters, excludedData))
+    }
 
-      newFilters[index].active = value;
+    const announceChange = (text) => {
+    }
 
-      setConfig({...config, filters: newFilters});
-
-      setFilteredData(filterData(newFilters, excludedData));
-    };
-
-    const announceChange = (text) => {};
-
-    let filterList = '';
+    let filterList = ''
     if (config.filters) {
 
       filterList = config.filters.map((singleFilter, index) => {
-        const values = [];
+        const values = []
         const sortAsc = (a, b) => {
           return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-        };
+        }
 
         const sortDesc = (a, b) => {
           return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-        };
+        }
 
-        if(!singleFilter.order || singleFilter.order === '' ){
+        if (!singleFilter.order || singleFilter.order === '') {
           singleFilter.order = 'asc'
         }
 
-        if(singleFilter.order === 'desc') {
+        if (singleFilter.order === 'desc') {
           singleFilter.values = singleFilter.values.sort(sortDesc)
         }
 
-        if(singleFilter.order === 'asc') {
+        if (singleFilter.order === 'asc') {
           singleFilter.values = singleFilter.values.sort(sortAsc)
         }
 
@@ -554,8 +540,8 @@ export default function CdcChart(
             <option key={index} value={filterOption}>
               {filterOption}
             </option>
-          );
-        });
+          )
+        })
 
         return (
           <div className="single-filter" key={index}>
@@ -566,15 +552,15 @@ export default function CdcChart(
               data-index="0"
               value={singleFilter.active}
               onChange={(val) => {
-                changeFilterActive(index, val.target.value);
-                announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`);
+                changeFilterActive(index, val.target.value)
+                announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
               }}
             >
               {values}
             </select>
           </div>
-        );
-      });
+        )
+      })
     }
 
     return (<section className="filters-section">{filterList}</section>)
@@ -583,55 +569,77 @@ export default function CdcChart(
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
-        return true;
+        return true
       }
     } else {
-      if (undefined === config?.series || false === config?.series.length > 0) {
-        return true;
+      if (undefined === config?.series || !(config?.series.length > 0)) {
+        return true
       }
     }
+    return !config.xAxis.dataKey;
+  }
 
-    if (!config.xAxis.dataKey) {
-      return true;
-    }
+  let content = (<Loading/>)
 
-    return false;
-  };
-
-  // Prevent render if loading
-  let body = (<Loading />)
   let lineDatapointClass = ''
   let barBorderClass = ''
 
-  if(false === loading) {
-    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
-    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
-    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
-
-    body = (
+  if (loading === false) {
+    let body = (
       <>
-        {isEditor && <EditorPanel />}
+
+
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
+          {title && <div  className={`chart-title ${config.theme}`}>{parse(title)}</div>}
+
+          <div
+            className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
             {chartComponents[visualizationType]}
             {/* Legend */}
-            {!config.legend.hide && <Legend />}
+            {!config.legend.hide && <Legend/>}
           </div>
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable/>}
         </div>}
+
+
+
+        <div className="cove-component cove-chart">
+          {title &&
+            <header role="heading" className={`cove-component__header ${config.theme}`} aria-hidden="true" aria-level={2}>
+              {parse(title)}
+            </header>
+          }
+          <a id="skip-chart-container" className="cdcdataviz-sr-only-focusable" href={handleChartTabbing}>
+            Skip Over Chart Container
+          </a>
+          {config.filters && <Filters/>}
+          <div className="cove-component__content">
+
+          </div>
+        </div>
       </>
     )
+
+    content = isEditor ? (
+      <EditorPanel>
+        {body}
+      </EditorPanel>
+    ) : body
+
+    if (config.lineDatapointStyle === 'hover') {
+      lineDatapointClass = ' chart-line--hover'
+    }
+    if (config.lineDatapointStyle === 'always show') {
+      lineDatapointClass = ' chart-line--always'
+    }
+    if (config.barHasBorder === 'false') {
+      barBorderClass = ' chart-bar--no-border'
+    }
+
   }
 
   const contextValues = {
@@ -657,11 +665,20 @@ export default function CdcChart(
     setFilteredData
   }
 
+  const component = (
+    <>
+      <ErrorBoundary component="CdcChart">
+        <ConfigContext.Provider value={contextValues}>
+          <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`}
+               ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+            {content}
+          </div>
+        </ConfigContext.Provider>
+      </ErrorBoundary>
+    </>
+  )
+
   return (
-    <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
-        {body}
-      </div>
-    </Context.Provider>
-  );
+
+  )
 }

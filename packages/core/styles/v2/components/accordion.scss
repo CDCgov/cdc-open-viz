@@ -1,11 +1,7 @@
 @import "../utils/variables";
 @import "../themes/index";
 
-.accordion__heading {
-  background: $lightestGray;
-}
-
-.accordion__item {
+.cove-accordion__item {
   select {
     text-transform: capitalize;
   }
@@ -16,15 +12,21 @@
   }
 }
 
-.accordion__button {
-  cursor: pointer;
-  font-size: 1em;
-  padding: .3em 1em;
-  width: 100%;
-  text-align: left;
+.cove-accordion__heading {
+  background: $lightestGray;
+}
+
+.cove-accordion__button {
+  display: flex;
+  justify-content: space-between;
   position: relative;
+  width: 100%;
+  padding: .3em 1em;
+  font-size: 1em;
+  text-align: left;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   user-select: none;
+  cursor: pointer;
 
   &::before {
     display: inline-block;
@@ -47,9 +49,18 @@
     margin-right: 1.3em;
     transition: .1s all;
   }
+
+  .cove-tooltip,
+  .cove-tooltip--target {
+    display: inline-flex;
+  }
+
+  .cove-tooltip {
+    right: 1.5rem;
+  }
 }
 
-.accordion__panel {
+.cove-accordion__panel {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 1em 1.25em 2em;
   animation: fadeIn 0.2s ease-in;
@@ -63,7 +74,7 @@
   }
 }
 
-.accordion__panel-section {
+.cove-accordion__panel-section {
   padding: 16px;
   border: 1px solid #c4c4c4;
   border-radius: 8px;
@@ -71,22 +82,29 @@
   margin-bottom: 24px;
 }
 
-.accordion__panel-row {
+.cove-accordion__panel-row {
   display: flex;
   justify-content: flex-start;
   margin-left: -4px;
   margin-right: -4px;
 }
 
-.accordion__panel-col {
+.cove-accordion__panel-col {
   flex: 1 1 0;
   padding-left: 4px;
   padding-right: 4px;
 }
 
+.cove-accordion__divider {
+  border: 0;
+  border-top: 1px solid #e2e2e2;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
 // TODO: May not need these? Input styles should be pulling from global ----------
 
-.accordion__panel-label {
+.cove-accordion__panel-label {
   font-size: 14px;
   text-transform: unset;
   font-weight: normal;
@@ -94,7 +112,7 @@
   user-select: none;
 }
 
-.accordion__small-inputs {
+.cove-accordion__small-inputs {
   input[type="text"] {
     display: block;
     width: 100%;
@@ -108,23 +126,23 @@
   }
 }
 
-.accordion__panel-label--inline {
-  @extend .accordion__panel-label;
+.cove-accordion__panel-label--inline {
+  @extend .cove-accordion__panel-label;
   text-align: right;
   margin-right: 8px;
 }
 
-.accordion__panel-label--muted {
-  @extend .accordion__panel-label;
+.cove-accordion__panel-label--muted {
+  @extend .cove-accordion__panel-label;
   color: #6f6f6f;
 }
 
-.accordion__input-error {
+.cove-accordion__input-error {
   color: #D8000C;
   border: #D8000C 1px solid;
 }
 
-.accordion__panel-error {
+.cove-accordion__panel-error {
   color: #D8000C;
   background-color: #FFD2D2;
   border: #D8000C 1px solid;

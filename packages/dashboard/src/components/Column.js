@@ -1,11 +1,11 @@
 import React, { useContext, memo } from 'react'
 import { useDrop } from 'react-dnd'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import Widget from './Widget'
 
 const Column = ({ data, rowIdx, colIdx }) => {
-  const { visualizations } = useContext(Context)
+  const { visualizations } = useContext(ConfigContext)
 
   const [ { isOver, canDrop }, drop ] = useDrop(() => ({
     accept: 'vis-widget',
@@ -28,17 +28,19 @@ const Column = ({ data, rowIdx, colIdx }) => {
     'column-size--' + data.width,
   ]
 
-  if(isOver && canDrop) {
+  if (isOver && canDrop) {
     classNames.push('column--drop')
   }
 
-  if(widget) {
+  if (widget) {
     classNames.push('column--populated')
   }
 
   return (
     <div className={classNames.join(' ')} ref={drop}>
-      {widget ? <Widget data={{rowIdx, colIdx, ...widget}} type={widget.visualizationType ?? widget.general?.geoType} /> : <p className="builder-column__text">Drag and drop <br/> visualization</p>}
+      {widget ?
+        <Widget data={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType}/> :
+        <p className="builder-column__text">Drag and drop <br/> visualization</p>}
     </div>
   )
 }

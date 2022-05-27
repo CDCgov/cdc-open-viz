@@ -1,17 +1,17 @@
 import React, { useContext } from 'react'
 import Row from './Row'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 
 const Grid = () => {
-  const { rows, config, updateConfig } = useContext(Context)
+  const { rows, config, updateConfig } = useContext(ConfigContext)
 
   const addRow = () => {
     updateConfig({
       ...config,
       rows: [
         ...rows,
-        [{width: 12}, {}, {}]
+        [ { width: 12 }, { equalHeight: false }, {}, {} ]
       ],
       uuid: Date.now()
     })
