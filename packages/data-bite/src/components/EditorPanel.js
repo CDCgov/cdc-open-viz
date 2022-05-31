@@ -432,6 +432,10 @@ const EditorPanel = memo(() => {
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="16" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
                   <CheckBox value={config.shadow} fieldName="shadow" label="Display Shadow" updateField={updateField} />
+                  <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                  <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                  <CheckBox value={config.visual?.roundedBorders} section="visual" fieldName="roundedBorders" label="Use Rounded Borders" updateField={updateField} />
+                  <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">

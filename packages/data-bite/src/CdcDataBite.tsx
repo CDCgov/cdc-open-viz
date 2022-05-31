@@ -437,7 +437,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         break;
     }
 
-    if(config.shadow) biteClasses.push('shadow')
+    config?.visual?.border && biteClasses.push('bite--has-border');
+    config?.visual?.accent && biteClasses.push('bite--has-accent');
+    config?.visual?.roundedBorders && biteClasses.push('bite--has-rounded-borders');
+    config?.visual?.background && biteClasses.push('bite--has-background');
+    config.shadow && biteClasses.push('shadow')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
@@ -446,9 +450,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className="cdc-data-bite-inner-container">
-            {title && <div className="bite-header">{parse(title)}</div>}
+            {title && <div className="bite-header" style={ config?.visual?.roundedBorders ? { borderTopLeftRadius: '.25rem', borderTopRightRadius: '.25rem' } : null }>{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className="bite-content-container">
+              <div className="bite-content-container" >
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
