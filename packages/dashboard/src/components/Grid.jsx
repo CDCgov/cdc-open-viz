@@ -13,6 +13,7 @@ const Grid = () => {
         ...rows,
         [ { width: 12 }, { equalHeight: false }, {}, {} ]
         //[{width: 12}, {}, {}]      ],
+      ],
       uuid: Date.now()
     })
   }
