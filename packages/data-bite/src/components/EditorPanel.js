@@ -331,7 +331,7 @@ const EditorPanel = memo(() => {
                     <Tooltip style={{textTransform: 'none'}}>
                       <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                       <Tooltip.Content>
-                        <p>Enter the message text for the visualization. <br/><br/><small>The following HTML tags are supported:<br/> strong, em, sup, and sub.</small></p>
+                        <p>Enter the message text for the visualization. The following HTML tags are supported: strong, em, sup, and sub.</p>
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
@@ -340,10 +340,7 @@ const EditorPanel = memo(() => {
                       <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                       <Tooltip.Content>
                         <p>
-                          Enter supporting text to display below the data visualization, if applicable. <br/>
-                          <br/>
-                          <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
-                        </p>
+                          Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
