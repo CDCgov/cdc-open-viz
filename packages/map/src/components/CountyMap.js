@@ -6,7 +6,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import { CustomProjection } from '@visx/geo';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 import testJSON from '../data/dfc-map.json';
 import { abbrs } from '../data/abbreviations';
