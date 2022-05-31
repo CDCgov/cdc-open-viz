@@ -30,7 +30,8 @@ const DataTable = (props) => {
     applyLegendToRow,
     displayGeoName,
     navigationHandler,
-    viewport
+    viewport,
+    formatLegendLocation
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -164,7 +165,6 @@ const DataTable = (props) => {
           id={`${skipId}`}
           data-html2canvas-ignore
           role="button"
-          tabIndex="-1"
         >
           Download Data (CSV)
         </a>
@@ -204,7 +204,11 @@ const DataTable = (props) => {
 
             const legendColor = applyLegendToRow(rowObj);
 
-            let labelValue = displayGeoName(row.original);
+            if(state.general.geoType !== 'us-county') {
+              var labelValue = displayGeoName(row.original);
+            } else {
+              var labelValue = formatLegendLocation(row.original)
+            }
 
             labelValue = getCellAnchor(labelValue, rowObj);
 

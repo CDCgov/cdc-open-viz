@@ -15,12 +15,19 @@
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
-  "devDependencies": {
-    "use-debounce": "^6.0.1"
-  },
   "peerDependencies": {
     "react": "^17.0.2",
     "react-dom": ">=16"
+  },
+  "dependencies": {
+    "react-select": "^5.3.1",
+    "prop-types": "^15.8.1",
+    "react-tooltip": "4.2.8",
+    "use-debounce": "^6.0.1",
+    "react-accessible-accordion": "^3.3.4"
+  },
+  "resolutions": {
+    "@types/react": "17.x"
   },
   "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
 }

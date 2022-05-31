@@ -103,6 +103,7 @@ strong {
 input[type="text"], input[type="date"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
   padding: .5em .5em;
   font-size: 1em;
+  font-weight: normal;
   font-family: sans-serif;
   border: rgba(0,0,0,.3) 1px solid !important;
   &:focus {
@@ -116,6 +117,7 @@ textarea {
 select {
   width: 100%;
   font-size: 1em;
+  font-weight: normal;
   text-transform: none;
   border: rgba(0, 0, 0, 0.3) 1px solid !important;
 }
