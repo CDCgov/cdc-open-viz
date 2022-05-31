@@ -44,7 +44,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }, [config, updateConfig]);
 
   useEffect(() => {
-    if(config.isLollipopChart === false) {
+    if(config.isLollipopChart === false && config.visualizationSubType !== 'stacked') {
       updateConfig({ ...config, barHeight: 25 })
     }
   }, [config.isLollipopChart]);
@@ -137,6 +137,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     const barsPerGroup = config.series.length;
                     let barHeight = config.barHeight ? config.barHeight : 25;
                     let barPadding = barHeight;
+
+                    config.barHeight = Number(config.barHeight)
                     
                     if (orientation=== "horizontal") {
   
