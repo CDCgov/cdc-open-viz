@@ -1273,10 +1273,7 @@ const EditorPanel = (props) => {
                       <Tooltip style={{textTransform: 'none'}}>
                         <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable.<br/>
-                          <br/>
-                            <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
-                          </p>
+                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -1927,7 +1924,7 @@ const EditorPanel = (props) => {
                         <Tooltip style={{textTransform: 'none'}}>
                           <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Text that describes the data table for screen</p>
+                            <p>Enter a description of the data table to be read by screen readers.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }

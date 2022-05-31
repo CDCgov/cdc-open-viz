@@ -1,22 +1,12 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemPanel,
-  AccordionItemButton,
-} from 'react-accessible-accordion'
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
+
+import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
 
-import Icon from '@cdc/core/components/ui/Icon'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-
-import '@cdc/core/styles/v2/components/accordion.scss'
 import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
@@ -32,7 +22,9 @@ const EditorPanel = memo((props) => {
   } = useContext(ConfigContext)
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
-  const [ showConfigConfirm, setShowConfigConfirm ] = useState(true)
+  const [ showConfigConfirm, setShowConfigConfirm ] = useState(false)
+
+  console.log('loaded markup-include editor panel')
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -78,7 +70,6 @@ const EditorPanel = memo((props) => {
 
       setParentConfig(newConfig)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
 
   useEffect(()=> {
@@ -123,7 +114,7 @@ const EditorPanel = memo((props) => {
         <section className="waiting-container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the markup.</p>
-          <button className="btn" style={{ margin: '1em auto' }} disabled={missingRequiredSections()}
+          <button className="btn" style={{ margin: '1em auto' }}
                   onClick={confirmDone}>I'm Done
           </button>
         </section>
@@ -133,17 +124,41 @@ const EditorPanel = memo((props) => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
+    delete strippedState.newViz
     delete strippedState.runtime
 
     return strippedState
   }
 
-  if (loading) {
-    return null
-  }
+  const editorContent = (
+    <Accordion>
+      <Accordion.Section title="General">
+        <InputText value={config.title || ''} fieldName="title" label="Title"
+                   placeholder="Markup Include Title"
+                   updateField={updateField}/>
+
+        <InputText
+          value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
+          placeholder="https://www.example.com/file.html" updateField={updateField}
+        />
+      </Accordion.Section>
+      <Accordion.Section title="Visual">
+        <div className="input-group">
+          <label>Theme</label>
+          <ul className="color-palette">
+            {headerColors.map((palette) => (
+              <li title={palette} key={palette} onClick={() => {
+                updateConfig({ ...config, theme: palette })
+              }} className={config.theme === palette ? 'selected ' + palette : palette}>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Accordion.Section>
+    </Accordion>
+  )
+
+  if (loading) return null
 
   return (
     <ErrorBoundary component="EditorPanel">
@@ -155,48 +170,8 @@ const EditorPanel = memo((props) => {
         <section className={`cove-editor__panel` + (displayPanel ? `` : ' hidden')}>
           <div className="cove-editor__panel-container">
             <h2 className="cove-editor__heading">Configure Markup Include</h2>
-            <section className="form-container">
-              <form>
-                <Accordion allowZeroExpanded={true}>
-                  <AccordionItem> {/* General */}
-                    <AccordionItemHeading>
-                      <AccordionItemButton>
-                        General
-                      </AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <InputText value={config.title || ''} fieldName="title" label="Title"
-                                 placeholder="Markup Include Title"
-                                 updateField={updateField}/>
-
-                      <InputText
-                        value={config.srcUrl || ''} fieldName="srcUrl" label="Source URL"
-                        placeholder="https://www.example.com/file.html" updateField={updateField}
-                      />
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>
-                        Visual
-                      </AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel>
-                      <div className="input-group">
-                        <label>Theme</label>
-                        <ul className="color-palette">
-                          {headerColors.map((palette) => (
-                            <li title={palette} key={palette} onClick={() => {
-                              updateConfig({ ...config, theme: palette })
-                            }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                </Accordion>
-              </form>
+            <section className="cove-editor__content">
+              {editorContent}
             </section>
           </div>
         </section>

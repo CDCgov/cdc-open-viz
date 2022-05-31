@@ -18,7 +18,9 @@ export default {
     hideLabel: false,
     hideTicks: false,
     size: 50,
-    gridLines: false
+    gridLines: false,
+    min: undefined,
+    max:undefined
   },
   barThickness: 0.35,
   height: 300,
@@ -28,7 +30,9 @@ export default {
     hideLabel: false,
     hideTicks: false,
     size: 75,
-    tickRotation: 0
+    tickRotation: 0,
+    min: undefined,
+    max:undefined
   },
   table: {
     label: 'Data Table',

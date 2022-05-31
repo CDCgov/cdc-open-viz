@@ -49,6 +49,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, [config.isLollipopChart]);
 
+  useEffect(() => {
+    if(config.visualizationSubType === 'horizontal') {
+      updateConfig({
+        ...config,
+        orientation: 'horizontal'
+      })
+    }
+  }, []);
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
@@ -150,20 +159,22 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
                     }
 
-                    config.height = ( Number(config.barPadding) + barHeight) * data.length;
+                    config.height = (Number(barHeight) ) * data.length + (config.barPadding * data.length);
 
                     let labelColor = "#000000";
+
+                    let textPosition = (bar.y - config.barPadding/2 - Number(config.barHeight/2) + Number(config.barHeight) ) + 5;
 
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF';
                     }
-                    
+
                     return (
                       <Group key={index}>
                         <rect
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
-                          y={bar.y - config.barHeight - 3}
+                          y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
                           height={config.barHeight}
                           fill={bar.color}
@@ -178,10 +189,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
                           <Text
                             x={ `${bar.x + (config.isLollipopChart ? 15 : 5)}` } // padding
-                            y={ bar.y + 8 }
+                            y={textPosition}
                             fill={ '#000000' }
                             textAnchor="start"
-                            verticalAnchor="middle"
+                            verticalAnchor="start"
                           >
                            {data[bar.index][config.runtime.originalXAxis.dataKey]}
                           </Text>
@@ -190,10 +201,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       { displayNumbersOnBar && textWidth + 50 < bar.width &&
                           <Text
                             x={ bar.x + barStack.bars[bar.index].width / 2 } // padding
-                            y={ bar.y - config.barHeight/2 + 3 }
+                            y={ textPosition - 5 - config.barHeight/2 }
                             fill={ labelColor }
                             textAnchor="middle"
-                            verticalAnchor="end"
+                            verticalAnchor="middle"
                             innerRef={
                               (e) => {
                                 if(e) {
