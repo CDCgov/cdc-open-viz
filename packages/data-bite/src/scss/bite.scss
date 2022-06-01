@@ -120,6 +120,42 @@
 
 
 .cdc-data-bite-inner-container {
+
+  // Visual: Shadow
+  &.shadow {
+    box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
+  }
+
+  // Visual: Borders
+  &.bite--has-title.bite--has-rounded-borders .bite-header { border-top-left-radius: .25rem; border-top-right-radius: .25rem;}
+  &.bite--has-title.bite--has-rounded-borders .bite { border-bottom-left-radius: .25rem; border-bottom-right-radius: .25rem; }
+  &.bite--has-rounded-borders:not(.bite--has-title) .bite { border-radius: .25rem; }
+  &.bite:not(.bite--has-subtext) { margin-bottom: 1rem; }
+
+  // General: Bite Style > Graphic
+  .bite__style--graphic {
+    .bite-content { flex: 1; }
+  }
+
+  
+  // General: Bite Style > End
+  &.bite__style--end .bite-text { margin-bottom: 0 !important; }
+  
+  // General: Bite Style > Split
+  &.bite__style--split {
+    .bite-content {
+      flex-direction: row !important;
+    }
+    .bite-value { 
+      flex-basis: 25%;
+      align-self: center;
+      text-align: center;
+    }
+    .bite-text {
+      flex: 75% !important;
+    }
+  }
+
   .bite-header + .bite { border-top: 0; }
   .bite {
     position: relative;
@@ -127,9 +163,8 @@
     border-top: none;
     background: $lightestGray;
 
-    &.shadow {
-      box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
-    }
+
+
     &.theme-blue {
       .bite-value {
         color: $primary;
@@ -244,7 +279,7 @@
 
     .bite-content-container {
       display: flex;
-      padding: 1em 1em;
+      padding: 1em 1em 0 1em;
       justify-content: space-between;
 
       .bite-content {
