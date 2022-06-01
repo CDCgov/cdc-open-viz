@@ -436,12 +436,17 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         isBottom = true
         break;
     }
-
     config?.visual?.border && biteClasses.push('bite--has-border');
     config?.visual?.accent && biteClasses.push('bite--has-accent');
-    config?.visual?.roundedBorders && biteClasses.push('bite--has-rounded-borders');
     config?.visual?.background && biteClasses.push('bite--has-background');
-    config.shadow && biteClasses.push('shadow')
+    
+    let innerContainerClasses = ['cdc-data-bite-inner-container']
+    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+    config.title && innerContainerClasses.push('bite--has-title')
+    config.subtext && innerContainerClasses.push('bite--has-subtext')
+    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+    config.shadow && innerContainerClasses.push('shadow')
+
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
@@ -449,22 +454,24 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       <>
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
-          <div className="cdc-data-bite-inner-container">
-            {title && <div className="bite-header" style={ config?.visual?.roundedBorders ? { borderTopLeftRadius: '.25rem', borderTopRightRadius: '.25rem' } : null }>{parse(title)}</div>}
+          <div className={innerContainerClasses.join(' ')}>
+            {title && <div className="bite-header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container" >
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
                   {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'split' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
                       <p className="bite-text">
                         {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                         {parse(biteBody)}
                       </p>
-                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      {showBite && 'end' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                     </Fragment>
                 </div>
+                {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>
@@ -522,8 +529,10 @@ export const BITE_LOCATION_BODY = 'body';
 export const BITE_LOCATION_GRAPHIC = 'graphic';
 export const BITE_LOCATIONS = {
   'graphic': 'Graphic',
+  'split': 'Split Graphic and Message',
   'title': 'Value above Message',
-  'body': 'Value before Message'
+  'body': 'Value before Message',
+  'end': 'Value after Message'
 };
 
 export const IMAGE_POSITION_LEFT = 'Left';
