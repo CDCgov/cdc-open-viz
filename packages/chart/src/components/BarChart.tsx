@@ -44,7 +44,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }, [config, updateConfig]);
 
   useEffect(() => {
-    if(config.isLollipopChart === false && config.visualizationSubType !== 'stacked') {
+    if(config.isLollipopChart === false && config.visualizationSubType !== ('stacked' || 'regular') ) {
       updateConfig({ ...config, barHeight: 25 })
     }
   }, [config.isLollipopChart]);
