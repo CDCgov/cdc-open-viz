@@ -439,6 +439,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     config?.visual?.border && biteClasses.push('bite--has-border');
     config?.visual?.accent && biteClasses.push('bite--has-accent');
     config?.visual?.background && biteClasses.push('bite--has-background');
+    config?.visual?.hideBackgroundColor && biteClasses.push('bite--hideBackgroundColor');
     
     let innerContainerClasses = ['cdc-data-bite-inner-container']
     config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
@@ -464,14 +465,16 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                   {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                   {showBite && 'split' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
+                      <div className="bite-content__text-wrap">
                       <p className="bite-text">
                         {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                         {parse(biteBody)}
                       </p>
                       {showBite && 'end' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
+                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      </div>
                     </Fragment>
                 </div>
-                {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
               </div>

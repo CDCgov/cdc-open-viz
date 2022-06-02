@@ -436,6 +436,7 @@ const EditorPanel = memo(() => {
                   <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
                   <CheckBox value={config.visual?.roundedBorders} section="visual" fieldName="roundedBorders" label="Use Rounded Borders" updateField={updateField} />
                   <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                  <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
                   <label className="header">
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
