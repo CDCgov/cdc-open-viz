@@ -88,10 +88,6 @@ $theme: (
 
     &.theme-#{$theme-name} {
 
-      .cdc-data-bite-inner-container.bite--has-title.bite--has-rounded-borders .bite-header { border-top-left-radius: .25rem; border-top-right-radius: .25rem;} // title exists on bite
-      .cdc-data-bite-inner-container.bite--has-title.bite--has-rounded-borders .bite { border-bottom-left-radius: .25rem; border-bottom-right-radius: .25rem; } // title exist on bite
-      .cdc-data-bite-inner-container.bite--has-rounded-borders:not(.bite--has-title) .bite { border-radius: .25rem; }
-
       // if the bite has a border always show borders on the edges
       .bite.bite--has-border {
         border-left: 1px solid string.unquote(nth($theme-colors, 1)) !important;
@@ -99,46 +95,19 @@ $theme: (
         border-bottom: 1px solid string.unquote(nth($theme-colors, 1)) !important;
       }
 
-      .bite:not(.bite--has-border) {
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-      }
-
       // if the bite has borders and no title on top add the border on top
       .cdc-data-bite-inner-container:not(.bite--has-title) .bite.bite--has-border {
         border-top: 1px solid string.unquote(nth($theme-colors, 1)) !important;
       }
 
-
-
+      // Left border Color
       .bite.bite--has-accent {
         border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
       }
 
-      .bite:not(.bite--has-accent) {
-        border-left: .5rem solid transparent;
-      }
-
-      .bite.bite--has-background {
-        background: string.unquote(nth($theme-colors, 2)) !important;
-      }
-
-      .bite-content-container {
-        display: flex;
-        flex-wrap: wrap;
-
-        .bite-subtext {
-          padding-top: 0.5rem;
-          padding-bottom: 0.5rem;
-          flex-basis: 100%;
-          width: 100%;
-        }
+      .bite.bite--has-background:not(.bite--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3)) !important;
       }
     }
   }
-}
-
-.bite__style--graphic {
-  .bite-content { flex: 1; }
 }
