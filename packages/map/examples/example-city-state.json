@@ -453,6 +453,12 @@
       "Rate": 14,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "WINSTON-SALEM",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
     }
   ],
   "sharing": {
