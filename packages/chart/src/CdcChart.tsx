@@ -596,7 +596,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && <DataTable />}
         </div>}
       </>
     )
