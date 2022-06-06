@@ -3,6 +3,14 @@
 
 .cove-modal__content .cove-data-designer__container {
   padding: 1em;
+
+  .fw-bold {
+    font-weight: bold;
+  }
+
+  .fw-normal {
+    font-weight: normal;
+  }
 }
 
 .cove-data-designer__button {
@@ -21,6 +29,7 @@
   .cove-card {
     position: relative;
     text-align: left;
+    box-sizing: border-box;
     border: 0;
     padding: 1em;
 
