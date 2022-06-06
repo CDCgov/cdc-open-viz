@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -119,6 +119,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
 
+ 
   const dataDesignerModal = (configureData) => (
     <Modal>
       <Modal.Content>
@@ -131,6 +132,11 @@ const Widget = ({ data = {}, addVisualization, type }) => {
       </Modal.Content>
     </Modal>
   )
+
+  useEffect(() => {
+    if(data.dataKey)
+      overlay?.actions.openOverlay(dataDesignerModal(data))
+  }, [data.dataKey])
 
   return (
     <>
@@ -148,8 +154,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
                 }}>Configure Data</button>
               }
               <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {
-                if (e.target.value)
-                  overlay?.actions.openOverlay(dataDesignerModal(data))
                 changeDataset(data.uid, e.target.value)
               }}>
                 <option value="">Select a dataset</option>

@@ -1,6 +1,10 @@
 @import "../utils/variables";
 @import "../themes/color-definitions";
 
+.cove-modal__content .cove-data-designer__container {
+  padding: 1em;
+}
+
 .cove-data-designer__button {
   width: 100%;
   height: 100%;
@@ -16,7 +20,9 @@
 
   .cove-card {
     position: relative;
+    text-align: left;
     border: 0;
+    padding: 1em;
 
     &::after {
       content: '';
@@ -47,7 +53,6 @@
   }
 
   table {
-    margin: auto;
     font-size: .8rem;
     background-color: #fff;
     border: 1px solid $lightGray;
