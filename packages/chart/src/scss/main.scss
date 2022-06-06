@@ -4,7 +4,7 @@
 @import 'variables';
 
 .form-container {
-  overflow: scroll;
+  overflow-y: auto;
 }
 
 .d-flex { display: flex; }

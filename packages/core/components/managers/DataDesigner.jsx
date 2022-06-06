@@ -12,8 +12,8 @@ const DataDesigner = (props) => {
   return (
     <div className="cove-data-designer__container">
       <div className="mb-2">
-        <strong className="cove-heading--3 mb-1">Describe Data</strong>
-        <div className="cove-heading--3 mb-1">Data Orientation</div>
+        <div className="cove-heading--3 fw-bold mb-1">Describe Data</div>
+        <div className="cove-heading--3 fw-normal mb-1">Data Orientation</div>
         <div className="grid grid-gap-2 mb-4">
           <div className="col-6">
             <button
