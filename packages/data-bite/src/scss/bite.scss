@@ -170,6 +170,13 @@
         border-left: .5rem solid transparent;
     }
 
+    &-content__text-wrap { 
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
     &.theme-blue {
       .bite-value {
         color: $primary;
@@ -306,7 +313,6 @@
           margin-bottom: 15px;
           font-size: 0.9em;
           color: #222;
-          flex: 1 0 auto;
         }
 
         .bite-subtext {
@@ -314,6 +320,7 @@
           font-style: italic;
           flex-basis: 100%;
           width: 100%;
+          align-self: flex-end;
         }
       }
     }
