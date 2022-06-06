@@ -10,35 +10,35 @@ const DataDesigner = (props) => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props;
 
   return (
-    <>
+    <div className="cove-data-designer__container">
       <div className="mb-2">
-        <div className="cove-heading--3">Describe Data</div>
-        <div className="cove-heading--4">Data Orientation</div>
+        <strong className="cove-heading--3 mb-1">Describe Data</strong>
+        <div className="cove-heading--3 mb-1">Data Orientation</div>
         <div className="grid grid-gap-2 mb-4">
-          <div className="col-12 col-xl-6">
+          <div className="col-6">
             <button
               className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === false ? ' active' : '')}
               onClick={() => {
                 updateDescriptionProp(visualizationKey, dataKey, 'horizontal', false)
               }}>
               <Card>
-                <strong>Vertical</strong>
-                <p>Values for map geography or chart date/category axis are contained in a
+                <strong className="cove-heading--3">Vertical</strong>
+                <p className="mb-1">Values for map geography or chart date/category axis are contained in a
                   single <em>column</em>.
                 </p>
                 {DATA_TABLE_VERTICAL}
               </Card>
             </button>
           </div>
-          <div className="col-12 col-xl-6">
+          <div className="col-6">
             <button
               className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === true ? ' active' : '')}
               onClick={() => {
                 updateDescriptionProp(visualizationKey, dataKey, 'horizontal', true)
               }}>
               <Card>
-                <strong>Horizontal</strong>
-                <p>Values for map geography or chart date/category axis are contained in a single <em>row</em>
+                <strong className="cove-heading--3">Horizontal</strong>
+                <p className="mb-1">Values for map geography or chart date/category axis are contained in a single <em>row</em>
                 </p>
                 {DATA_TABLE_HORIZONTAL}
               </Card>
@@ -49,7 +49,7 @@ const DataDesigner = (props) => {
       {configureData.dataDescription && (
         <>
           <div className="mb-2">
-            <div className="cove-heading--4">Are there multiple series represented in your data?</div>
+            <div className="mb-1">Are there multiple series represented in your data?</div>
             <div>
               <Button
                 style={{ backgroundColor: '#00345d' }}
@@ -76,7 +76,7 @@ const DataDesigner = (props) => {
           </div>
           {configureData.dataDescription.horizontal === true && configureData.dataDescription.series === true && (
             <div className="mb-2">
-              <div className="cove-heading--4">Which property in the dataset represents which series the row is describing?</div>
+              <div className="mb-1">Which property in the dataset represents which series the row is describing?</div>
               <select onChange={(e) => {
                 updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
               }} value={configureData.dataDescription.seriesKey}>
@@ -88,32 +88,32 @@ const DataDesigner = (props) => {
           {configureData.dataDescription.horizontal === false && configureData.dataDescription.series === true && (
             <>
               <div className="mb-2">
-                <div className="cove-heading--4">Are the series values in your data represented in a
+                <div className="mb-1">Are the series values in your data represented in a
                   single row, or across multiple rows?
                 </div>
                 <div className="grid grid-gap-2 mb-4">
-                  <div className="col-12 col-xl-6">
+                  <div className="col-6">
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === true ? ' active' : '')}
                       onClick={() => {
                           updateDescriptionProp(visualizationKey, dataKey, 'singleRow', true)
                       }}>
                       <Card>
-                        <strong>Single Row</strong>
-                        <p>Each row contains the data for an individual series in itself.</p>
+                        <strong className="cove-heading--3">Single Row</strong>
+                        <p className="mb-1">Each row contains the data for an individual series in itself.</p>
                         {DATA_TABLE_SINGLE_ROW}
                       </Card>
                     </button>
                   </div>
-                  <div className="col-12 col-xl-6">
+                  <div className="col-6">
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === false ? ' active' : '')}
                       onClick={() => {
                         updateDescriptionProp(visualizationKey, dataKey, 'singleRow', false)
                       }}>
                       <Card>
-                        <strong>Multiple Rows</strong>
-                        <p>Each series data is broken out into multiple rows.</p>
+                        <strong className="cove-heading--3">Multiple Rows</strong>
+                        <p className="mb-1">Each series data is broken out into multiple rows.</p>
                         {DATA_TABLE_MULTI_ROW}
                       </Card>
                     </button>
@@ -123,7 +123,7 @@ const DataDesigner = (props) => {
               {configureData.dataDescription.singleRow === false && (
                 <>
                   <div className="mb-2">
-                    <div className="cove-heading--4">Which property in the dataset represents which series the row is describing?</div>
+                    <div className="mb-1">Which property in the dataset represents which series the row is describing?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
                     }}>
@@ -134,7 +134,7 @@ const DataDesigner = (props) => {
                     </select>
                   </div>
                   <div className="mb-2">
-                    <div className="cove-heading--4">Which property in the dataset represents the values for the category/date axis or map geography?</div>
+                    <div className="mb-1">Which property in the dataset represents the values for the category/date axis or map geography?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'xKey', e.target.value)
                     }}>
@@ -145,7 +145,7 @@ const DataDesigner = (props) => {
                     </select>
                   </div>
                   <div className="mb-2">
-                    <div className="cove-heading--4">Which property in the dataset represents the numeric value?</div>
+                    <div className="mb-1">Which property in the dataset represents the numeric value?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'valueKey', e.target.value)
                     }}>
@@ -164,7 +164,7 @@ const DataDesigner = (props) => {
       {configureData.dataDescription && configureData.formattedData && (
         <p>Data configured successfully</p>
       )}
-    </>
+    </div>
   )
 }
 
