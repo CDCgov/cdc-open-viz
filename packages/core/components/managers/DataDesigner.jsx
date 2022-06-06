@@ -15,7 +15,7 @@ const DataDesigner = (props) => {
         <div className="cove-heading--3 fw-bold mb-1">Describe Data</div>
         <div className="cove-heading--3 fw-normal mb-1">Data Orientation</div>
         <div className="grid grid-gap-2 mb-4">
-          <div className="col-6">
+          <div className="column">
             <button
               className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === false ? ' active' : '')}
               onClick={() => {
@@ -30,7 +30,7 @@ const DataDesigner = (props) => {
               </Card>
             </button>
           </div>
-          <div className="col-6">
+          <div className="column">
             <button
               className={'cove-data-designer__button' + (configureData.dataDescription && configureData.dataDescription.horizontal === true ? ' active' : '')}
               onClick={() => {
@@ -92,7 +92,7 @@ const DataDesigner = (props) => {
                   single row, or across multiple rows?
                 </div>
                 <div className="grid grid-gap-2 mb-4">
-                  <div className="col-6">
+                  <div className="column">
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === true ? ' active' : '')}
                       onClick={() => {
@@ -105,7 +105,7 @@ const DataDesigner = (props) => {
                       </Card>
                     </button>
                   </div>
-                  <div className="col-6">
+                  <div className="column">
                     <button
                       className={'cove-data-designer__button' + (configureData.dataDescription.singleRow === false ? ' active' : '')}
                       onClick={() => {
@@ -162,7 +162,7 @@ const DataDesigner = (props) => {
         </>
       )}
       {configureData.dataDescription && configureData.formattedData && (
-        <p>Data configured successfully</p>
+        <div>Data configured successfully</div>
       )}
     </div>
   )

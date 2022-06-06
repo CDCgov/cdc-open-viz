@@ -3,13 +3,19 @@
 
 .cove-modal__content .cove-data-designer__container {
   padding: 1em;
+}
 
+.cove-data-designer__container {
   .fw-bold {
     font-weight: bold;
   }
 
   .fw-normal {
     font-weight: normal;
+  }
+
+  .column {
+    grid-column-end: span 6;
   }
 }
 
