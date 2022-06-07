@@ -58,7 +58,8 @@ export default function LinearChart() {
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
 
-    if(config.runtime.horizontal){
+    if (config.runtime.horizontal) {
+      max = max * 1.1; 
       xScale = scaleLinear<number>({
         domain: [min, max],
         range: [0, xMax]
