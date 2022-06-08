@@ -22,6 +22,7 @@ export default {
     min: undefined,
     max:undefined
   },
+  barHeight: 25,
   barThickness: 0.35,
   height: 300,
   xAxis: {
