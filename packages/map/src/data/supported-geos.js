@@ -474,14 +474,14 @@ export const supportedCountries = {
 };
 
 export const supportedTerritories = {
-  'US-AS': ['American Samoa', 'AS'],
-  'US-GU': ['Guam', 'GU'],
-  'US-PR': ['Puerto Rico', 'PR'],
-  'US-VI': ['Virgin Islands', 'VI'],
-  'US-MP': ['Northern Marianas', 'MP', 'CNMI'],
-  'US-FM': ['Micronesia', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
-  'US-PW': ['Palau', 'PW'], // Note: Key is not an official ISO code
-  'US-MH': ['Marshall Islands', 'MH', 'RMI'], // Note: Key is not an official ISO code
+  'US-AS': ['AMERICAN SAMOA', 'AS'],
+  'US-GU': ['GUAM', 'GU'],
+  'US-PR': ['PUERTO RICO', 'PR'],
+  'US-VI': ['VIRGIN ISLANDS', 'VI'],
+  'US-MP': ['NORTHERN MARIANAS', 'MP', 'CNMI'],
+  'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
+  'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code
+  'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'], // Note: Key is not an official ISO code
 };
 
 export const supportedCities = {
