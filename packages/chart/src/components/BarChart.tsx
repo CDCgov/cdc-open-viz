@@ -58,6 +58,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, []);
 
+  // type is staked but no bar height exists.
+  useEffect(() => {
+    if(!config.barHeight && config.visualizationSubType === 'stacked') {
+      updateConfig({ ...config, barHeight: 25 })
+    }
+  }, []);
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
@@ -154,14 +161,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         if(barHeight < 40) {
                           config.barPadding = 40;
                         } else {
-                          config.barPadding = barPadding;
+                          config.barPadding = Number(barPadding);
                         }
                       } else {
-                        config.barPadding = barPadding / 2;
+                        config.barPadding = Number(barPadding) / 2;
                       }
                     }
 
-                    config.height = (Number(barHeight) ) * data.length + (config.barPadding * data.length);
+                    config.height = (Number(barHeight) ) * data.length + (Number(config.barPadding) * data.length);
 
                     let labelColor = "#000000";
 
