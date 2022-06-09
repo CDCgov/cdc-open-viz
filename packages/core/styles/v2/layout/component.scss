@@ -1,0 +1,45 @@
+@import "../utils/_variables.scss";
+
+.cove-component {
+  border-radius: 3px;
+
+  @at-root {
+    .cove-editor #{&} {
+      transition: box-shadow 500ms $transition-expo-out;
+    }
+
+    .cove-editor.panel-shown #{&} {
+      box-shadow: rgb(0 0 0 / 10%) 10px 10px 30px;
+    }
+  }
+}
+
+.cove-component__header {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-bottom-width: 3px;
+  border-bottom-style: solid;
+  border-radius: 3px 3px 0 0;
+  font-size: 1.1rem;
+  transition: background-color 200ms ease, border-color 200ms ease;
+  color: #fff;
+}
+
+.cove-component__content {
+  padding: 1rem;
+  background-color: #fff;
+  border: solid 1px #ccc;
+  border-radius: 3px;
+
+  @at-root {
+    .cove-component__header + #{&} {
+      border-top: none;
+      border-radius: 0 0 3px 3px;
+    }
+  }
+}
+
+.cove-component__description {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}

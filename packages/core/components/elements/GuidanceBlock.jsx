@@ -1,7 +1,7 @@
 import React, { Children } from 'react'
 import PropTypes from 'prop-types'
 
-import '../../styles/v2/components/guidance-block.scss'
+import '../../styles/v2/components/element/guidance-block.scss'
 
 //Define the "slots" to be populated by subcomponents
 const GuidanceTitle = () => null

@@ -1,0 +1,67 @@
+@import "../../utils/_variables";
+@import "../../themes/color-definitions";
+
+.cove-list-group {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border: $lightGray 1px solid;
+  list-style: none;
+  user-select: none;
+
+  &:empty {
+    border: none !important
+  }
+}
+
+.cove-list-group__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  background-color: #fff;
+  transition: background-color 400ms $transition-expo-out;
+
+  &:hover {
+    background-color: $lightestGray;
+  }
+
+  + .cove-list-group__item {
+    border-top: $lightGray 1px solid;
+  }
+}
+
+.cove-list-group__item-value {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.cove-list-group__item-value__text {
+  max-width: 250px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  @at-root {
+    .cove-list-group__item--has-option #{&} {
+      max-width: 150px;
+    }
+  }
+}
+
+.cove-list-group__item-children {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cove-list-group__item-remove {
+  display: inline-flex;
+  justify-content: center;
+  padding: 0 0.25rem;
+  color: $red;
+  cursor: pointer;
+}
+
+//Radius is a really long text area that I really don't know if I can handle, but I'm going to try

@@ -5,238 +5,114 @@
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas: "panel content";
+  position: relative;
   height: 100vh;
+}
 
-  .cove-editor__panel {
-    grid-area: panel;
-    width: $editorWidth;
-    transition: width 500ms ease;
-    background: #fff;
-    border-right: 1px solid #c2c2c2;
-    overflow-x: hidden;
-    overflow-y: auto;
-    z-index: 7;
-  }
+.cove-editor__toggle {
+  position: absolute;
+  top: 10px;
+  left: 307px;
+  width: 25px;
+  height: 25px;
+  background-color: #f2f2f2;
+  border-radius: 60px;
+  color: #000;
+  font-size: 1em;
+  border: 0;
+  cursor: pointer;
+  transition: left 400ms ease 65ms, background-color 200ms ease;
+  box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+  user-select: none;
+  z-index: 8;
 
-  .cove-editor__heading {
-    font-size: 1.125em;
-    user-select: none;
-    padding: .625rem 1.125rem;
-  }
-
-  .cove-editor__panel-container {
-    width: $editorWidth;
-    min-width: $editorWidth;
-  }
-
-  .cove-editor__content {
-    grid-area: content;
-
-    .cove-editor__content-wrap {
-      margin: 3em auto 0;
-      max-width: 35em;
-    }
-  }
-
-  .cove-editor--toggle {
+  &:before {
+    top: 43%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     position: absolute;
-    top: 10px;
-    left: 307px;
-    width: 25px;
-    height: 25px;
-    background-color: #f2f2f2;
-    border-radius: 60px;
-    color: #000;
-    font-size: 1em;
-    border: 0;
-    cursor: pointer;
-    transition: left 400ms ease 65ms, background-color 200ms ease;
-    box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
-    user-select: none;
-    z-index: 8;
+    content: "\00ab";
+  }
+
+  &.collapsed {
+    left: 1em;
+    margin-left: 0;
 
     &:before {
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      content: "\00ab";
+      content: "\00bb";
     }
+  }
 
-    &.collapsed {
-      left: 1em;
-      margin-left: 0;
-
-      &:before {
-        content: "\00bb";
-      }
-    }
-
-    &:hover {
-      background-color: #ffffff
-    }
+  &:hover {
+    background-color: #ffffff
   }
 }
 
 .cove-editor__panel {
-  &.hidden {
-    width: 0;
-  }
+  grid-area: panel;
+  width: 0;
+  background-color: #fff;
+  border-right: 1px solid #c2c2c2;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: width 500ms ease;
+  z-index: 7;
 
-  // TODO: What is this stuff? -----------------------------------------------
-  .two-col-inputs {
-    display: flex;
-    margin-top: 1em;
-    justify-content: space-between;
-
-    > label {
-      width: 48%;
-      margin-top: 0 !important
+  @at-root {
+    .cove-editor.panel-shown #{&}{
+      width: $editorWidth;
     }
   }
+}
 
+.cove-editor__panel-container {
+  width: $editorWidth;
+  min-width: $editorWidth;
+}
+
+.cove-editor__panel-config {} //TODO: COVE Refactor - Is this needed in DOM at all?
+
+.cove-editor__divider {
+  border: 0;
+  border-top: 1px solid #e2e2e2;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cove-editor__content {
+  position: relative;
+  grid-area: content;
+  background-color: #fff;
+  transition: background-color 500ms $transition-expo-out;
+
+  @at-root {
+    .cove-editor.panel-shown #{&}{
+      background-color: #e7e7e7;
+    }
+  }
+}
+
+.cove-editor__content-wrap {
+  position: relative;
+  margin: 3rem auto;
+  min-width: 35rem;
+  max-width: 50%;
+}
+
+.cove-editor__heading {
+  padding: .625rem 1.125rem;
+  color: #fff;
+  font-size: 1.125em;
+  background-color: $mediumGray;
+  user-select: none;
+}
+
+// TODO: What is this stuff? -----------------------------------------------
+.TODO-make-components {
   .divider-heading {
     display: block;
     font-size: 1em;
     margin-top: 1em;
-  }
-
-  .series-list {
-    list-style: none;
-    border: $lightGray 1px solid;
-
-    &:empty {
-      border: none !important
-    }
-
-    li {
-      padding: .3em .5em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: .9em;
-
-      &:hover {
-        background-color: $lightestGray;
-      }
-
-      span {
-        font-size: .8em;
-        color: #f00;
-        cursor: pointer;
-      }
-
-      + li {
-        border-top: $lightGray 1px solid;
-      }
-    }
-  }
-
-  .form-container {
-    border-right: $lightGray 1px solid;
-    flex-grow: 1;
-  }
-
-  .guidance-link {
-    margin: 2em 1em 0;
-    padding: .75em 1em;
-
-    svg {
-      width: 60px;
-      color: $blue;
-      margin-right: 1rem;
-      height: 60px; // IE11
-      path {
-        fill: currentColor;
-      }
-    }
-  }
-
-  h2 {
-    background: #565656;
-    color: #fff;
-    font-size: 1.1em;
-    padding: .6em 1em;
-    position: relative;
-    border-bottom: #565656 3px solid;
-    z-index: 3;
-  }
-
-  fieldset {
-    display: block;
-  }
-
-  .primary-fieldset {
-    padding: 0;
-    margin: 0;
-    border: 0;
-  }
-
-  ul.column-edit {
-    list-style: none;
-    padding-left: 0;
-
-    li {
-      margin-top: 1em;
-    }
-
-    .three-col {
-      display: flex;
-      justify-content: space-between;
-
-      > label {
-        margin-top: 0;
-        width: 30%;
-        display: inline-block;
-
-        input[type="text"], input[type="number"] {
-          width: 50px;
-        }
-      }
-    }
-  }
-
-  .remove-column {
-    float: right;
-    text-transform: uppercase;
-    color: #C32B2B;
-    font-size: .7em;
-    line-height: 1.6em;
-    border-radius: 5px;
-    margin: 0 auto;
-    transition: .1s all;
-    border: 0;
-    text-decoration: underline;
-    outline: 0;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-  .edit-block {
-    padding-left: 1em;
-    border-left: rgba(0, 0, 0, 0.2) 4px solid;
-    transition: .2s all;
-
-    &:not(:first-child) {
-      margin-top: 2em;
-    }
-
-    input[type="text"], input[type="number"] {
-      font-size: 1em;
-    }
-
-    label {
-      margin-top: 0;
-    }
-
-    label + label {
-      margin-top: 1em;
-    }
-
-    &:hover {
-      border-left: rgba(0, 0, 0, 0.7) 4px solid;
-      transition: .2s all;
-    }
   }
 
   .sort-list {
@@ -424,52 +300,5 @@
     padding: .5em;
     font-family: monospace;
     box-sizing: border-box
-  }
-}
-
-// -------------------------------------------------------------------------------
-// TODO: Refactor the palette
-ul.color-palette {
-  display: flex;
-  max-width: 100%;
-  padding: 0;
-  list-style: none;
-  flex-wrap: wrap;
-
-  li {
-    display: flex;
-    width: 21px;
-    height: 21px;
-    border-radius: 40px;
-    margin-right: 4px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-
-    .click-target {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-
-    &.selected {
-      border: rgba(0, 0, 0, .8) 2px solid;
-    }
-
-    span {
-      width: 33.3%;
-    }
-  }
-
-  @at-root .header #{&} {
-    li {
-      width: 21px;
-      height: 21px;
-      border-radius: 40px;
-      margin-right: 2.8px;
-    }
   }
 }

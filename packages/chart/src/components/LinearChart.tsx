@@ -17,7 +17,7 @@ import PairedBarChart from './PairedBarChart'
 
 import useReduceData from '../hooks/useReduceData'
 
-export default function LinearChart() {
+const LinearChart = () => {
   const {
     transformedData: data,
     dimensions,
@@ -26,8 +26,10 @@ export default function LinearChart() {
     formatDate,
     currentViewport
   } = useContext<any>(ConfigContext)
+
   let [ width ] = dimensions
   const { minValue, maxValue } = useReduceData(config, data)
+
   if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73
   }
@@ -100,8 +102,6 @@ export default function LinearChart() {
 
 
     if (config.visualizationType === 'Paired Bar') {
-
-
       let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
       let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
 
@@ -126,7 +126,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear">
+      <svg className="cove-chart__visualization" width={width} height={height}>
         {/* Higlighted regions */}
         {config.regions ? config.regions.map((region) => {
           if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -445,3 +445,5 @@ export default function LinearChart() {
     </ErrorBoundary>
   )
 }
+
+export default LinearChart

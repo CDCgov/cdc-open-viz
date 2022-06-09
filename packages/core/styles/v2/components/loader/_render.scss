@@ -1,0 +1,32 @@
+@import "../../utils/variables";
+@import "../../utils/animations";
+
+.cove-render {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 1.25rem;
+  user-select: none;
+}
+
+.cove-render__content {
+  text-align: center;
+}
+
+.cove-render__content {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+
+.cove-render__text {
+  position: absolute;
+  font-style: italic;
+  font-size: 1rem;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+  white-space: nowrap;
+  animation: fadeOutIn 3000ms ease infinite;
+  z-index: 1;
+}

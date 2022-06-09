@@ -1,43 +1,63 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, useRef, memo } from 'react'
 import { useDebounce } from 'use-debounce'
+import PropTypes from 'prop-types'
+
+import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
 
 const InputText = memo((
   {
     label,
+    type = 'text',
+    tooltip,
+    placeholder,
+
     section = null,
     subsection = null,
     fieldName,
     updateField,
     value: stateValue,
-    type = 'input',
-    tooltip,
-    placeholder,
-    i = null, min = null, max = null,
+    i = null, min, max,
     className, ...attributes
   }
 ) => {
 
-  const [ value, setValue ] = useState(stateValue)
+  const [ value, setValue ] = useState(stateValue || '')
   const [ debouncedValue ] = useDebounce(value, 500)
+
+  const inputRef = useRef(null)
 
   useEffect(() => {
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue && updateField) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
-  }, [ debouncedValue, section, subsection, fieldName, i, stateValue, updateField ])
+  }, [ debouncedValue, section, subsection, fieldName, i, updateField ])
 
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+  const isNumberWithinBounds = (val) => {
+    let inBounds = false
+    if (val === '') inBounds = true
+    if (min || max) {
+      if (min && (parseFloat(val) >= parseFloat(min))) {
+        inBounds = true
+      }
+      if (max && (parseFloat(val) <= parseFloat(max))) {
+        inBounds = true
+      }
+    } else {
+      inBounds = true
+    }
+    return inBounds
+  }
 
   const onChange = (e) => {
-    if ('number' !== type || min === null) {
+    if ('number' !== type) {
       setValue(e.target.value)
     } else {
-      if (!e.target.value || (parseFloat(min) <= parseFloat(e.target.value) & parseFloat(max) >= parseFloat(e.target.value))) {
+      if (isNumberWithinBounds(e.target.value)) {
         setValue(e.target.value)
       } else {
-        setValue(min.toString())
+        setValue(value)
       }
     }
   }
@@ -45,23 +65,48 @@ const InputText = memo((
   let inputAttrs = {
     className: `cove-input${className ? ' ' + className : ''}`,
     type,
-    name,
     placeholder,
     onChange,
-    value,
     ...attributes
   }
 
   let formElement = 'textarea' === type
-    ? (<textarea {...inputAttrs}/>)
-    : (<input {...inputAttrs}/>)
+    ? (<textarea {...inputAttrs} ref={inputRef}/>)
+    : (<input {...inputAttrs} value={value} ref={inputRef}/>)
+
 
   return (
     <>
-      {label && <label className="cove-input__label">{label}</label>}{tooltip}
+      {label && <Label tooltip={tooltip} onClick={() => inputRef.current.focus()}>{label}</Label>}
       {formElement}
     </>
   )
 })
+
+InputText.propTypes = {
+  label: PropTypes.string,
+  type: PropTypes.oneOf(['text', 'number', 'textarea', 'date']),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]),
+  tooltip: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string
+  ]),
+  placeholder: PropTypes.string,
+  min: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ]),
+  max: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ]),
+  section: PropTypes.string,
+  subsection: PropTypes.string,
+  fieldName: PropTypes.string,
+  updateField: PropTypes.func
+}
 
 export default InputText

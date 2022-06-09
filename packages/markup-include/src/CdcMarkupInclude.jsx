@@ -138,17 +138,17 @@ const CdcMarkupInclude = (
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch((err) => console.log(err))
+    loadConfig().catch((err) => console.error(err))
   }, [])
 
   //Reload config if config object provided/updated
   useEffect(() => {
-    loadConfig().catch((err) => console.log(err))
+    loadConfig().catch((err) => console.error(err))
   }, [ configObj?.data ])
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch((err) => console.log(err))
+    loadConfigMarkupData().catch((err) => console.error(err))
   }, [ loadConfigMarkupData ])
 
   let content = (<Loading/>)
@@ -164,9 +164,7 @@ const CdcMarkupInclude = (
           }
           <div className="cove-component__content">
             {!markupError && urlMarkup &&
-            <div className="cove-component__content-wrap">
               <Markup content={parseBodyMarkup(urlMarkup)}/>
-            </div>
             }
             {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
@@ -181,11 +179,20 @@ const CdcMarkupInclude = (
     ) : body
   }
 
+  const contextValues = {
+    config,
+    updateConfig,
+    loading,
+    data: config.data,
+    setParentConfig,
+    isDashboard
+  }
+
   const component = (
     <>
       <ErrorBoundary component="CdcMarkupInclude">
         <ConfigContext.Provider
-          value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+          value={contextValues}>
           {content}
         </ConfigContext.Provider>
       </ErrorBoundary>

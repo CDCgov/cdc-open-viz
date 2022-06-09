@@ -1,5 +1,5 @@
-@import "../utils/variables";
-@import "../themes/index";
+@import "../../utils/variables";
+@import "../../themes";
 
 .sbdocs .cove-button {
   margin-right: 1rem;
@@ -26,6 +26,7 @@
   border: 0;
   outline: none;
   transition: all 500ms $transition-expo-out;
+  user-select: none;
 
   * {
     pointer-events: none;
@@ -93,6 +94,19 @@
     &:hover {
       background-color: darken(#a0a0a0, 5%);
     }
+  }
+
+  &.cove-button--remove {
+    float: right;
+    text-transform: uppercase;
+    color: #C32B2B;
+    font-size: .7em;
+    border-radius: 5px;
+    text-decoration: underline;
+    font-weight: bold;
+    background-color: transparent;
+    padding: 0;
+    min-height: unset;
   }
 
   &.cove-button--flex-center {

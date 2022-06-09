@@ -8,6 +8,7 @@ import iconCaretFilledDown from '../../assets/icon-caret-filled-down.svg'
 import iconChartBar from '../../assets/icon-chart-bar.svg'
 import iconChartLine from '../../assets/icon-chart-line.svg'
 import iconChartPie from '../../assets/icon-chart-pie.svg'
+import iconCheck from '../../assets/icon-check.svg'
 import iconClose from '../../assets/icon-close.svg'
 import iconCode from '../../assets/icon-code.svg'
 import iconDataBite from '../../assets/icon-databite.svg'
@@ -26,7 +27,7 @@ import iconUpload from '../../assets/icon-upload.svg'
 import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 
-import '../../styles/v2/components/icon.scss'
+import '../../styles/v2/components/ui/icon.scss'
 
 const iconHash = {
   'caretUp': iconCaretUp,
@@ -36,6 +37,7 @@ const iconHash = {
   'chartBar': iconChartBar,
   'chartLine': iconChartLine,
   'chartPie': iconChartPie,
+  'check': iconCheck,
   'close': iconClose,
   'code': iconCode,
   'databite': iconDataBite,

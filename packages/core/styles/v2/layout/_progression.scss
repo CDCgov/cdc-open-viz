@@ -1,5 +1,5 @@
-//TODO: Replace any '.waiting' classes with below
-.waiting-splash {
+//TODO: COVE Refactor - Replace any '.waiting' classes with below
+.cove-splash__waiting {
   @include emptyState;
   padding-top: 0;
 
@@ -7,27 +7,13 @@
     padding: 2em !important;
   }
 
-  .waiting-container {
+  .cove-splash__waiting__container {
     max-width: 400px;
-  }
-
-  h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: .3rem;
-  }
-
-  p {
-    font-size: 1em;
-
-    strong {
-      font-weight: bold;
-    }
   }
 }
 
-//TODO: Replace any '.loading' classes with below
-.loading-splash {
+//TODO: COVE Refactor - Replace any '.loading' classes with below
+.cove-splash__loading {
   position: absolute;
   top: 0;
   right: 0;

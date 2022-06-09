@@ -1,4 +1,5 @@
-*[class^='cove-heading'] {
+*[class^='cove-heading'],
+*[class*=' cove-heading'] {
   font-weight: 700;
   margin-bottom: 1.5rem;
 }
@@ -12,9 +13,13 @@
 }
 
 .cove-heading--3 {
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 
 .cove-heading--4 {
-  font-size: 0.75rem;
+  font-size: 1rem;
+}
+
+.cove-heading--5 {
+  font-size: 0.875rem;
 }

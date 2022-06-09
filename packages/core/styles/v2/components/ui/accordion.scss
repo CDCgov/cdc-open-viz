@@ -1,5 +1,5 @@
-@import "../utils/variables";
-@import "../themes/index";
+@import "../../utils/variables";
+@import "../../themes";
 
 .cove-accordion__item {
   select {
@@ -29,8 +29,8 @@
   cursor: pointer;
 
   &::before {
-    display: inline-block;
     content: '';
+    display: inline-block;
     height: 7px;
     width: 7px;
     margin-right: 1em;
@@ -49,20 +49,21 @@
     margin-right: 1.3em;
     transition: .1s all;
   }
+}
 
-  .cove-tooltip,
-  .cove-tooltip--target {
-    display: inline-flex;
-  }
+.cove-accordion__button--text {
+  display: inherit;
 
-  .cove-tooltip {
-    right: 1.5rem;
+  //Accordion Warning Icon
+  .cove-icon {
+    margin-left: 0.5rem;
+    color: $red;
   }
 }
 
 .cove-accordion__panel {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 1em 1.25em 2em;
+  padding: 1rem;
   animation: fadeIn 0.2s ease-in;
 
   &:first-child {
@@ -72,34 +73,6 @@
   h5 {
     font-size: .8em;
   }
-}
-
-.cove-accordion__panel-section {
-  padding: 16px;
-  border: 1px solid #c4c4c4;
-  border-radius: 8px;
-  margin-top: 8px;
-  margin-bottom: 24px;
-}
-
-.cove-accordion__panel-row {
-  display: flex;
-  justify-content: flex-start;
-  margin-left: -4px;
-  margin-right: -4px;
-}
-
-.cove-accordion__panel-col {
-  flex: 1 1 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-.cove-accordion__divider {
-  border: 0;
-  border-top: 1px solid #e2e2e2;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
 }
 
 // TODO: May not need these? Input styles should be pulling from global ----------

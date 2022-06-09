@@ -3,6 +3,12 @@ $cove-spacers-offset: 8;
 $cove-spacers-max: 64;
 
 @mixin spacers($className, $styleNameCollection) {
+  #{$className + 'auto'} {
+    @each $styleName in $styleNameCollection {
+      #{$styleName}: #{'auto'} !important;
+    }
+  }
+
   $i: 0;
   @while ($i * $cove-spacers-offset) <= $cove-spacers-max {
     #{$className + $i} {
@@ -28,4 +34,4 @@ $cove-spacers-max: 64;
 @include spacers('.mb-', 'margin-bottom');
 @include spacers('.ml-', 'margin-left');
 @include spacers('.mx-', ('margin-left', 'margin-right'));
-@include spacers('.mx-', ('margin-top', 'margin-bottom'));
+@include spacers('.my-', ('margin-top', 'margin-bottom'));

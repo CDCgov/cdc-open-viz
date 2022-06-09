@@ -1,4 +1,7 @@
-import React, { memo } from 'react'
+import React, { useRef, memo } from 'react'
+import PropTypes from 'prop-types'
+
+import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
 
@@ -7,43 +10,83 @@ const InputSelect = memo((
     label,
     value,
     options,
+    initial,
+    required,
+    tooltip,
+
     fieldName,
     section = null,
     subsection = null,
-    required = false,
     updateField,
-    initial: initialValue,
-    ...attributes
+    onChange, className, style, ...attributes
   }
 ) => {
 
-  let optionsJsx = ''
+  const inputRef = useRef(null)
 
-  if (Array.isArray(options)) {
-    //Handle basic array
-    optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
-  } else {
-    //Handle object with value/name pairs
-    optionsJsx = []
-    for (const [ optionValue, optionName ] of Object.entries(options)) {
-      optionsJsx.push(<option value={optionValue} key={optionValue}>{optionName}</option>)
+  let optionsJsx = options.map((option, index) => {
+    if (option === Object(option)) { //Handle Object entry with key/value pair
+      for (const [ key, value ] of Object.entries(option)) {
+        return <option value={value} key={index}>{value}</option>
+      }
+    } else { //Handle Array entry
+      return <option value={option} key={index}>{option}</option>
+    }
+  })
+
+  if (initial) { //Add custom, initial option
+    optionsJsx.unshift(<option value="" key={initial}>{initial}</option>)
+  }
+
+  let styles = {
+    ...style
+  }
+
+  let onChangeHandler = (e) => {
+    if (updateField) { //Found reference to config update function, updating field value
+      updateField(section, subsection, fieldName, e.target.value)
+    }
+    if (onChange) { //Found additional onChange functions to run
+      onChange(e)
     }
   }
 
-  if (initialValue) {
-    optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
-  }
-
   return (
-    <label>
-      {label && <span className="edit-label">{label}</span>}
-      <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => {
-        updateField(section, subsection, fieldName, event.target.value)
-      }} {...attributes}>
-        {optionsJsx}
+    <>
+      {label &&
+        <Label tooltip={tooltip} onClick={() => {
+          inputRef.current.focus()
+          inputRef.current.click()
+        }}>
+          {label}
+        </Label>
+      }
+      <select className={`cove-input${required && !value ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
+              name={fieldName} value={value} style={styles}
+              onChange={(e) => onChangeHandler(e)} {...attributes}
+              ref={inputRef}
+      >
+        {optionsJsx.map(option => (option))}
       </select>
-    </label>
+    </>
   )
 })
+
+InputSelect.propTypes = {
+  label: PropTypes.string,
+  value: PropTypes.any,
+  options: PropTypes.array,
+  initial: PropTypes.string,
+  required: PropTypes.bool,
+  tooltip: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string
+  ]),
+  onChange: PropTypes.func,
+  section: PropTypes.string,
+  subsection: PropTypes.string,
+  fieldName: PropTypes.string,
+  updateField: PropTypes.func
+}
 
 export default InputSelect

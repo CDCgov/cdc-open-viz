@@ -152,7 +152,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height}>
+      <svg className="cove-chart__visualization" width={width} height={height}>
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}

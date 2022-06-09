@@ -1,7 +1,38 @@
+.cove-input__slider-group {
+  display: block;
+  margin-bottom: 1.5rem;
+
+  &[flow="left"],
+  &[flow="right"] {
+    display: flex;
+    align-items: center;
+
+    .cove-label {
+      margin-bottom: 0;
+    }
+  }
+
+  &[flow="left"] {
+    [class^='cove-label'] {
+      margin-right: 0.5rem;
+    }
+  }
+
+  &[flow="right"] {
+    [class^='cove-input__slider--'] {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .cove-label {
+    display: block;
+  }
+}
+
 .cove-input__slider {
   display: inline-block;
   position: relative;
-  width: 60px;
+  width: 50px;
   height: 26px;
   padding: 3px;
   cursor: pointer;
@@ -30,12 +61,6 @@
     .cove-input__slider-track {
       border-radius: 4px;
       box-shadow: 0 0 0 transparent;
-    }
-
-    &.active {
-      .cove-input__slider-track {
-        box-shadow: inset -40px 0 10px -10px rgb(0 0 0 / 15%);
-      }
     }
   }
 
@@ -69,6 +94,8 @@
   }
 
   &.slider--3d {
+    width: 60px;
+
     .cove-input__slider-button {
       background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 1) 45%, rgb(200 200 200) 100%);
       box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;

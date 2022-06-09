@@ -2,9 +2,9 @@
 @import 'base';
 @import 'themes';
 
-.cove {
-  @import 'layout';
+@import 'layout';
 
+.cove {
   @include breakpointClass(md) {
     font-size: 16px;
   }

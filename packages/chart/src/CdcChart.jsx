@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react'
 
 // IE11
 import 'core-js/stable'
@@ -8,63 +8,98 @@ import 'whatwg-fetch'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import { scaleOrdinal } from '@visx/scale'
 import { timeParse, timeFormat } from 'd3-time-format'
-import parse from 'html-react-parser'
 
 import DataTransform from '@cdc/core/helpers/DataTransform'
-import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
+import numberFromString from '@cdc/core/helpers/numberFromString'
+
+import Button from '@cdc/core/components/elements/Button'
+import Component from '@cdc/core/components/elements/Component'
 import Loading from '@cdc/core/components/Loading'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 
 import EditorPanel from './components/EditorPanel'
-import PieChart from './components/PieChart'
-import LinearChart from './components/LinearChart'
 import DataTable from './components/DataTable'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 import defaults from './data/initial-state'
 
-import './scss/main.scss'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import RenderFallback from '@cdc/core/components/loaders/RenderFallback'
 
-export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing }:
-    { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
-) {
+import './scss/cove-chart.scss'
 
+const LinearChart = lazy(() => import('./components/LinearChart'))
+const PieChart = lazy(() => import('./components/PieChart'))
+
+const ChartVis = ({ visType, config, children }) => {
+  let lineDatapointClass = ''
+  let barBorderClass = ''
+
+  if (config.lineDatapointStyle === 'hover') {
+    lineDatapointClass = ' line--hover'
+  }
+  if (config.lineDatapointStyle === 'always show') {
+    lineDatapointClass = ' line--always'
+  }
+  if (config.barHasBorder === 'false') {
+    barBorderClass = ' no-border'
+  }
+
+  const chartList = {
+    'Paired Bar': <LinearChart/>,
+    'Bar': <LinearChart/>,
+    'Line': <LinearChart/>,
+    'Combo': <LinearChart/>,
+    'Pie': <PieChart/>
+  }
+
+  return (
+    <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
+      <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
+        {chartList[visType]}
+        {children}
+      </div>
+    </Suspense>
+  )
+}
+
+const CdcChart = (
+  {
+    configUrl,
+    config: configObj,
+    isEditor = false,
+    isDashboard = false,
+    isWizard = false,
+    setConfig: setParentConfig,
+    setEditing
+  }
+) => {
   const transform = new DataTransform()
 
-  interface keyable {
-    [key: string]: any
-  }
+  const [ loading, setLoading ] = useState(true)
+  const [ colorScale, setColorScale ] = useState(null)
+  const [ config, setConfig ] = useState({})
+  const [ stateData, setStateData ] = useState(config.data || [])
+  const [ excludedData, setExcludedData ] = useState()
+  const [ filteredData, setFilteredData ] = useState()
+  const [ seriesHighlight, setSeriesHighlight ] = useState([])
+  const [ currentViewport, setCurrentViewport ] = useState('lg')
+  const [ dimensions, setDimensions ] = useState([])
 
-  const [ loading, setLoading ] = useState<Boolean>(true)
-  const [ colorScale, setColorScale ] = useState<any>(null)
-  const [ config, setConfig ] = useState<keyable>({})
-  const [ stateData, setStateData ] = useState<Array<Object>>(config.data || [])
-  const [ excludedData, setExcludedData ] = useState<Array<Object>>()
-  const [ filteredData, setFilteredData ] = useState<Array<Object>>()
-  const [ seriesHighlight, setSeriesHighlight ] = useState<Array<String>>([])
-  const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
-  const [ dimensions, setDimensions ] = useState<Array<Number>>([])
+  const { legend, title, description, visualizationType } = config
 
-  const legendGlyphSize = 15
-  const legendGlyphSizeHalf = legendGlyphSize / 2
-  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  // Load data when component first mounts
+  //Load initial config
   useEffect(() => {
-    loadConfig()
+    loadConfig().catch((err) => console.error(err))
   }, [])
 
-  // Load data when configObj data changes
-  if (configObj) {
-    useEffect(() => {
-      loadConfig()
-    }, [ configObj.data ])
-  }
+  //Reload config if config object provided/updated
+  useEffect(() => {
+    loadConfig().catch((err) => console.error(err))
+  }, [ configObj?.data ])
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -174,17 +209,12 @@ export default function CdcChart(
     let currentData
 
     if (newConfig.filters) {
-
       newConfig.filters.forEach((filter, index) => {
-
         let filterValues = []
-
         filterValues = generateValuesForFilter(filter.columnName, newExcludedData)
-
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
         newConfig.filters[index].active = filterValues[0]
-
       })
       currentData = filterData(newConfig.filters, newExcludedData)
       setFilteredData(currentData)
@@ -229,6 +259,7 @@ export default function CdcChart(
       newConfig.runtime.yAxis = newConfig.yAxis
       newConfig.runtime.horizontal = false
     }
+
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
@@ -265,7 +296,7 @@ export default function CdcChart(
   }
 
   // Gets filer values from dataset
-  const generateValuesForFilter = (columnName, data = this.state.data) => {
+  const generateValuesForFilter = (columnName, data) => {
     const values = []
 
     data.forEach((row) => {
@@ -294,18 +325,14 @@ export default function CdcChart(
   }
 
   // Observe changes to outermost container and changes viewport size in state
-  const resizeObserver: ResizeObserver = new ResizeObserver(entries => {
+  const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
+
       let newViewport = getViewport(width)
       let svgMarginWidth = 32
-      let editorWidth = 350
 
       setCurrentViewport(newViewport)
-
-      if (isEditor) {
-        width = width - editorWidth
-      }
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5
@@ -361,7 +388,9 @@ export default function CdcChart(
     setSeriesHighlight([])
   }
 
-  const parseDate = (dateString: string) => {
+  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
+
+  const parseDate = (dateString) => {
     let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString)
     if (!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
@@ -371,7 +400,7 @@ export default function CdcChart(
     }
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date)
   }
 
@@ -413,67 +442,33 @@ export default function CdcChart(
     return result
   }
 
-  // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
-
-  // Select appropriate chart type
-  const chartComponents = {
-    'Paired Bar': <LinearChart/>,
-    'Bar': <LinearChart/>,
-    'Line': <LinearChart/>,
-    'Combo': <LinearChart/>,
-    'Pie': <PieChart/>,
-  }
-
   // JSX for Legend
   const Legend = () => {
-
-    let containerClasses = [ 'legend-container' ]
-    let innerClasses = [ 'legend-container__inner' ]
-
-    if (config.legend.position === 'left') {
-      containerClasses.push('left')
-    }
-
-    if (config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
-      innerClasses.push('d-flex')
-      innerClasses.push('flex-column-reverse')
-    }
+    const isReversed = () => (config.orientation === 'horizontal' && config.legend.reverseLabelOrder)
 
     return (
-      <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
-        {legend.label && <h2>{legend.label}</h2>}
-        <LegendOrdinal
-          scale={colorScale}
-          itemDirection="row"
-          labelMargin="0 20px 0 0"
-          shapeMargin="0 10px 0"
-        >
+      <aside id="legend" className="cove-chart__legend" flow={config.legend.position} role="region" aria-label="legend">
+        {legend.label && <h2 className="cove-heading--4 mb-1">{legend.label}</h2>}
+        <LegendOrdinal scale={colorScale} itemDirection="row" labelMargin="0 20px 0 0" shapeMargin="0 10px 0">
           {labels => (
-            <div className={innerClasses.join(' ')}>
+            <div className={'cove-chart__legend-container' + (isReversed() ? ' reverse' : '')}>
               {labels.map((label, i) => {
-                let className = 'legend-item'
-                let itemName: any = label.datum
+                const isInactive = () => seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)
+
+                let itemName = label.datum
 
                 // Filter excluded data keys from legend
-                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                  return
-                }
+                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) return null
 
                 if (config.runtime.seriesLabels) {
                   let index = config.runtime.seriesLabelsAll.indexOf(itemName)
                   itemName = config.runtime.seriesKeys[index]
                 }
 
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  className += ' inactive'
-                }
-
                 return (
                   <LegendItem
-                    className={className}
-                    tabIndex={0}
-                    key={`legend-quantile-${i}`}
+                    className={'cove-chart__legend-item' + (isInactive() ? ' inactive' : '')}
+                    tabIndex={0} key={`legend-quantile-${i}`}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         highlight(label)
@@ -484,14 +479,12 @@ export default function CdcChart(
                     }}
                   >
                     <LegendCircle fill={label.value}/>
-                    <LegendLabel align="left" margin="0 0 0 4px">
-                      {label.text}
-                    </LegendLabel>
+                    <LegendLabel className="cove-chart__legend-text" align="left" margin="0 0 0 4px">{capitalizeFirstLetter(label.text)}</LegendLabel>
                   </LegendItem>
                 )
               })}
               {seriesHighlight.length > 0 &&
-                <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+                <Button className={`cove-chart__legend__reset-button`} onClick={highlightReset}>Reset</Button>}
             </div>
           )}
         </LegendOrdinal>
@@ -576,51 +569,38 @@ export default function CdcChart(
         return true
       }
     }
-    return !config.xAxis.dataKey;
+    return !config.xAxis.dataKey
   }
 
-  let content = (<Loading/>)
+  const handleChartTabbing = config.showSidebar
+    ? `#legend`
+    : config?.title
+      ? `#dataTableSection__${config.title.replace(/\s/g, '')}`
+      : `#dataTableSection`
 
-  let lineDatapointClass = ''
-  let barBorderClass = ''
+  //Start building CdcChart Renders ------------------------------
+  let content = (<Loading/>)
 
   if (loading === false) {
     let body = (
       <>
+        {!missingRequiredSections() && !config.newViz &&
+          <Component className={`cove-chart ${currentViewport}`} title={title} description={description}
+                     table={<DataTable/>} tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
+                     theme={config.theme}
+          >
+            <a className="sr-only" href={handleChartTabbing}>
+              Skip Over Chart Container
+            </a>
 
-
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div  className={`chart-title ${config.theme}`}>{parse(title)}</div>}
-
-          <div
-            className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend/>}
-          </div>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable/>}
-        </div>}
-
-
-
-        <div className="cove-component cove-chart">
-          {title &&
-            <header role="heading" className={`cove-component__header ${config.theme}`} aria-hidden="true" aria-level={2}>
-              {parse(title)}
-            </header>
-          }
-          <a id="skip-chart-container" className="cdcdataviz-sr-only-focusable" href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {config.filters && <Filters/>}
-          <div className="cove-component__content">
-
-          </div>
-        </div>
+            {config.filters && <Filters/>}
+            <div className="cove-component__visualization" ref={outerContainerRef}>
+              <ChartVis visType={visualizationType} config={config}>
+                {!config.legend.hide && <Legend/>}
+              </ChartVis>
+            </div>
+          </Component>
+        }
       </>
     )
 
@@ -629,17 +609,6 @@ export default function CdcChart(
         {body}
       </EditorPanel>
     ) : body
-
-    if (config.lineDatapointStyle === 'hover') {
-      lineDatapointClass = ' chart-line--hover'
-    }
-    if (config.lineDatapointStyle === 'always show') {
-      lineDatapointClass = ' chart-line--always'
-    }
-    if (config.barHasBorder === 'false') {
-      barBorderClass = ' chart-bar--no-border'
-    }
-
   }
 
   const contextValues = {
@@ -669,16 +638,18 @@ export default function CdcChart(
     <>
       <ErrorBoundary component="CdcChart">
         <ConfigContext.Provider value={contextValues}>
-          <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`}
-               ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
-            {content}
-          </div>
+          {content}
         </ConfigContext.Provider>
       </ErrorBoundary>
     </>
   )
 
-  return (
-
-  )
+  return isWizard ?
+    component : (
+      <GlobalContextProvider>
+        {component}
+      </GlobalContextProvider>
+    )
 }
+
+export default CdcChart
