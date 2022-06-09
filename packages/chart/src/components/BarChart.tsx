@@ -44,7 +44,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }, [config, updateConfig]);
 
   useEffect(() => {
-    if(config.isLollipopChart === false && config.visualizationSubType !== 'stacked') {
+    if(config.isLollipopChart === false && config.barHeight < 25) {
       updateConfig({ ...config, barHeight: 25 })
     }
   }, [config.isLollipopChart]);
@@ -55,13 +55,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         ...config,
         orientation: 'horizontal'
       })
-    }
-  }, []);
-
-  // type is staked but no bar height exists.
-  useEffect(() => {
-    if(!config.barHeight && config.visualizationSubType === 'stacked') {
-      updateConfig({ ...config, barHeight: 25 })
     }
   }, []);
 
