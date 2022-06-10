@@ -416,6 +416,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         const updateConfig = (newConfig) => updateChildConfig(visualizationKey, newConfig)
 
+        let dataTable
+        if(config.table && config.table.show && config.datasets && visualizationConfig.dataKey){
+          dataTable = <div className="preview-table-container"><DataTable data={config.datasets[visualizationConfig.dataKey].data} config={config}></DataTable></div>
+        }
+
         switch (visualizationConfig.type) {
           case 'chart':
             body = <><Header back={back} subEditor="Chart"/>
@@ -426,6 +431,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 setConfig={updateConfig}
                 setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true}
               />
+              {dataTable}
             </>
             break
           case 'map':
@@ -438,6 +444,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                 isDashboard={true}
               />
+              {dataTable}
             </>
             break
           case 'data-bite':
@@ -450,6 +457,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 setConfig={updateConfig}
                 isDashboard={true}
               />
+              {dataTable}
             </>
             break
           case 'waffle-chart':
@@ -461,6 +469,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 setConfig={updateConfig}
                 isDashboard={true}
               />
+              {dataTable}
             </>
             break
           case 'markup-include':
@@ -472,6 +481,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 setConfig={updateConfig}
                 isDashboard={true}
               />
+              {dataTable}
             </>
             break
         }
@@ -569,16 +579,22 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                               }}
                               isDashboard={true}/>
                           )}
+                          {config.table && config.table.show && config.datasets && <a href={`#data-table-${visualizationConfig.dataKey}`}>Data Table</a>}
                         </div>
-
-                        {/* Data Table */}
-                        {visualizationConfig.table && visualizationConfig.table.show && <DataTable data={visualizationConfig.data} config={visualizationConfig}/>}
                       </React.Fragment>
                     )
                   }
                 })}
               </div>)
           })}
+
+          {/* Data Table */}
+          {config.table && config.table.show && config.data && <DataTable data={config.data} config={config}/>}
+          {config.table && config.table.show && config.datasets && Object.keys(config.datasets).map(datasetKey => (
+            <div className="multi-table-container" id={`data-table-${datasetKey}`}>
+              <DataTable data={config.datasets[datasetKey].data} config={config}></DataTable>
+            </div>
+          ))}
 
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
