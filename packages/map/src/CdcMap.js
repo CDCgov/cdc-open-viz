@@ -468,7 +468,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Equal Interval
-        if(type === 'equalinterval') {
+        
+        if(type === 'equalinterval' && dataSet?.length !== 0) {
+            if(!dataSet || dataSet.length === 0) {
+                setState({
+                    ...state,
+                    runtime: {
+                        ...state.runtime,
+                        editorErrorMessage: 'Error setting equal interval legend type'
+                    }
+                })
+                return;
+            }
             dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
@@ -1252,13 +1263,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         runtimeLegend,
         generateColorsArray,
         titleCase,
+        setState,
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
 
     const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
     
-
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1274,7 +1285,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
@@ -1375,7 +1386,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
 				)}
-				{true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
 						rawData={state.data}
