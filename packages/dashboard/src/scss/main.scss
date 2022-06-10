@@ -147,6 +147,17 @@
   .dashboard-col-12 {
     width: 100%;
   }
+
+  .preview-table-container {
+    padding-left: 350px;
+    padding-top: 100px;
+  }
+
+  .multi-table-container {
+    display: inline-block;
+    width: 100%;
+  }
+
   @include breakpointClass(md) {
     .dashboard-row {
       flex-direction: row;

@@ -5,7 +5,8 @@ import Papa from 'papaparse'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-export default function DataTable(data, config) {
+export default function DataTable(params) {
+  const { data, config } = params;
 
   const [ tableExpanded, setTableExpanded ] = useState(config.table ? config.table.expanded : false)
   const [ accessibilityLabel, setAccessibilityLabel ] = useState('')
@@ -118,12 +119,12 @@ export default function DataTable(data, config) {
             }
           }}
         >
-          {config.table.label}
+          {config.table && config.table.label}
         </div>
         <div className="table-container">
           <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}
                  hidden={!tableExpanded} {...getTableProps()}>
-            <caption className="visually-hidden">{config.table.label}</caption>
+            <caption className="visually-hidden">{config.table && config.table.label}</caption>
             <thead>
             {headerGroups && headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -156,7 +157,7 @@ export default function DataTable(data, config) {
             }
           </table>
         </div>
-        {config.table.download && <DownloadButton data={data}/>}
+        {config.table && config.table.download && <DownloadButton data={data}/>}
       </section>
     </ErrorBoundary>
   )
