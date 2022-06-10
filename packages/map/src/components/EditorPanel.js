@@ -1295,7 +1295,7 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
-									<label className="header">
+									<label>
                      <span className="edit-label">Data Classification Type</span>
                      <div>
                        <label>
