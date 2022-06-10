@@ -61,6 +61,7 @@ export default {
     linkLabel: 'Learn More',
     capitalizeLabels: true
   },
- 
- 
+  runtime: {
+    editorErrorMessage: []
+  }
 };

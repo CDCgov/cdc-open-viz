@@ -274,12 +274,31 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'legendType':
+
+				let testForType = typeof state.data[0][state.columns.primary.name];
+				let hasValue = state.data[0][state.columns.primary.name];
+				let messages = [];
+
+				if(!hasValue) {
+					messages.push(`There appears to be values missing for data in the primary column ${state.columns.primary.name}`);
+				}
+
+				if (testForType === 'string' && value !== 'category') {
+					messages.push( 'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.' );
+				} else {
+					messages = []
+				}
+
 				setState({
 					...state,
 					legend: {
 						...state.legend,
 						type: value,
 					},
+					runtime: {
+						...state.runtime,
+						editorErrorMessage: messages
+					}
 				});
 				break;
 			case 'legendNumber':
@@ -1078,6 +1097,7 @@ const EditorPanel = (props) => {
 
 	}, [state]);
 
+
 	let numberOfItemsLimit = 8;
 
 	const getItemStyle = (isDragging, draggableStyle) => ({
@@ -1104,8 +1124,20 @@ const EditorPanel = (props) => {
 		));
 	};
 
+	const Error = () => {
+		return (
+			<section className="waiting">
+				<section className="waiting-container">
+					<h3>Error With Configuration</h3>
+					<p>{state.runtime.editorErrorMessage}</p>
+				</section>
+			</section>
+		);
+	}
+
 	return (
 		<ErrorBoundary component='EditorPanel'>
+			{state?.runtime?.editorErrorMessage.length > 0 && <Error />}
 			{requiredColumns && (
 				<Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
 			)}
@@ -1115,6 +1147,7 @@ const EditorPanel = (props) => {
 				onClick={onBackClick}
 				data-html2canvas-ignore
 			></button>
+			
 			<section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'} data-html2canvas-ignore>
 				<ReactTooltip html={true} multiline={true} />
 				<span className='base-label'>Configure Map</span>
