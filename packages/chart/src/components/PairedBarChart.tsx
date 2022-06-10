@@ -15,7 +15,7 @@ interface PairedBarChartProps {
 
 const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
-	const { config, colorScale, transformedData } = useContext<any>(Context);
+	const { config, colorScale, transformedData, formatNumber } = useContext<any>(Context);
 
 	if(!config || config?.series?.length < 2) return;
 
@@ -63,6 +63,26 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 		groupTwo.labelColor = '#FFFFFF';
 	}
 
+	const dataTipOne = (d) => {
+		return (
+			`<p>
+				${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
+				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
+				${config.dataDescription.valueKey}: ${formatNumber(d[groupOne.dataKey])} 
+			</p>`
+		)
+	}
+
+	const dataTipTwo = (d) => {
+		return (
+			`<p>
+				${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
+				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
+				${config.dataDescription.valueKey}: ${formatNumber(d[groupTwo.dataKey])}
+			</p>`
+		)
+	}
+
 	return (width > 0) && (
 		<>
 			<svg
@@ -71,6 +91,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 				height={height}>
 				<Group top={0} left={config.xAxis.size}>
 					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map(d => {
+						
 						let barWidth = (xScale(d[config.series[0].dataKey]))
 						return (
 						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
@@ -82,14 +103,12 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								width={xScale(d[config.series[0].dataKey])}
 								height={yScale.bandwidth()}
 								fill={groupOne.color}
-								data-tip={
-									`<p>
-										${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
-										${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-										${config.dataDescription.valueKey}: ${d[groupOne.dataKey]}
-									</p>`
-								}
+								data-tip={ dataTipOne(d) }
 								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+								stroke="#333"
+								strokeWidth={config.barBorderThickness || 1}
+								// opacity={transparentBar ? 0.5 : 1}
+								// display={displayBar ? 'block' : 'none'}
 							/>
 							<Text
 								textAnchor={barWidth < 100 ? 'end' : 'start' }
@@ -114,13 +133,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 									width={xScale(d[config.series[1].dataKey])}
 									height={yScale.bandwidth()}
 									fill={groupTwo.color}
-									data-tip={
-										`<p>
-											${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
-											${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-											${config.dataDescription.valueKey}: ${d[groupTwo.dataKey]}
-										</p>`
-									}
+									data-tip={ dataTipTwo(d) }
 									data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
 
 								/>
