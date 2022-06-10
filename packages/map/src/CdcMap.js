@@ -1163,7 +1163,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
             geoType: state.general.geoType,
-            data: state.data
+            data: state.data,
+             ...runtimeLegend
         })
 
         const hashData = hashObj({

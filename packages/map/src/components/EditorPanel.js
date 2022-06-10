@@ -577,6 +577,15 @@ const EditorPanel = (props) => {
 					},
 				});
 				break;
+			case "classificationType":
+				setState({
+				...state,
+				legend: {
+					...state.legend,
+					type: value,
+				},
+				});
+				break;
 			default:
 				console.warn(`Did not recognize editor property.`);
 				break;
@@ -1319,6 +1328,41 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
+									<label>
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1683,6 +1727,7 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
+										{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
 										<label>
 											<span className='edit-label'>Legend Type</span>
 											<select
@@ -1695,7 +1740,8 @@ const EditorPanel = (props) => {
 												<option value='equalinterval'>Equal Interval</option>
 												<option value='category'>Categorical</option>
 											</select>
-										</label>
+											</label>
+											)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
