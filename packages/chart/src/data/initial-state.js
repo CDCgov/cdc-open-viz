@@ -9,6 +9,10 @@ export default {
   lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
   visualizationSubType: 'regular',
+  barStyle:'flat',
+  roundingStyle:'standard',
+  tipRounding:'top',
+
   padding: {
     left: 5,
     right: 5
