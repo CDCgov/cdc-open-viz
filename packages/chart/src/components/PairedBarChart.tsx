@@ -113,13 +113,15 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								opacity={transparentBar ? 0.5 : 1}
 								display={displayBar ? 'block' : 'none'}
 							/>
-							<Text
-								textAnchor={barWidth < 100 ? 'end' : 'start' }
-								x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
-								y={yScale([d[config.dataDescription.xKey]]) + yScale.bandwidth() / 1.5}
-								fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
-								{d[config.dataDescription.xKey]}
-							</Text>
+							{config.yAxis.displayNumbersOnBar && displayBar &&
+								<Text
+									textAnchor={barWidth < 100 ? 'end' : 'start' }
+									x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
+									y={yScale([d[config.dataDescription.xKey]]) + yScale.bandwidth() / 1.5}
+									fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
+									{formatNumber(d[groupOne.dataKey])}
+								</Text>
+							}
 						</Group>
 					)}
 					)}
@@ -145,13 +147,15 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 									opacity={transparentBar ? 0.5 : 1}
 									display={displayBar ? 'block' : 'none'}
 								/>
-								<Text
-									textAnchor={barWidth < 100 ? 'start' : 'end' }
-									x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
-									y={yScale([d[config.dataDescription.xKey]]) + (yScale.bandwidth() / 1.5)}
-									fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
-									{d[config.dataDescription.xKey]}
-								</Text>
+								{config.yAxis.displayNumbersOnBar && displayBar &&
+									<Text
+										textAnchor={barWidth < 100 ? 'start' : 'end' }
+										x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
+										y={yScale([d[config.dataDescription.xKey]]) + (yScale.bandwidth() / 1.5)}
+										fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
+										{formatNumber(d[groupTwo.dataKey])}
+									</Text>
+								}
 							</Group>
 						)
 					}
