@@ -68,6 +68,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       })
     }
   }, []);
+  
+  useEffect(()=>{
+    if(config.barStyle==='lollipop'){
+      updateConfig({ ...config, isLollipopChart:true })
+    }
+    if(config.barStyle==='rounded' || config.barStyle==='flat'){
+      updateConfig({ ...config, isLollipopChart:false })
+    }
+  },[config.barStyle])
 
   return (
     <ErrorBoundary component="BarChart">
