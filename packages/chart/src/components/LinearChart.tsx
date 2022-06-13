@@ -186,6 +186,7 @@ export default function LinearChart() {
                             display={config.runtime.horizontal ? 'block' : 'none'}
                           />
                         )}
+
                         {!config.runtime.yAxis.hideTicks && config.orientation === 'vertical' && (
                           <Line
                             from={tick.from}
@@ -194,6 +195,7 @@ export default function LinearChart() {
                             display={config.runtime.horizontal ? 'none' : 'block'}
                           />
                         )}
+                        
                         { config.runtime.yAxis.gridLines ? (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
