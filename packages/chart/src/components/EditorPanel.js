@@ -663,6 +663,9 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
+                  {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.roundingStyle||'standard'} fieldName="roundingStyle" label="rounding style" updateField={updateField} options={['standard','shallow','finger']}/>}
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
                     <Select value={config.yAxis.labelPlacement || 'Below Bar'} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={[ 'Below Bar', 'On Date/Category Axis' ]}/>
                   }
