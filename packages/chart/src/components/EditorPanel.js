@@ -1183,7 +1183,7 @@ const EditorPanel = () => {
 
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
 
-                  {config.series?.some(series => series.type === 'Bar') &&
+                  {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') &&
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 

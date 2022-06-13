@@ -15,7 +15,7 @@ interface PairedBarChartProps {
 
 const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
-	const { config, colorScale, transformedData, formatNumber } = useContext<any>(Context);
+	const { config, colorScale, transformedData, formatNumber, seriesHighlight } = useContext<any>(Context);
 
 	if(!config || config?.series?.length < 2) return;
 
@@ -90,8 +90,11 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 				width={width}
 				height={height}>
 				<Group top={0} left={config.xAxis.size}>
-					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map(d => {
-						
+					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map( (d,index) => {
+
+						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1;
+						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1;
+
 						let barWidth = (xScale(d[config.series[0].dataKey]))
 						return (
 						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
@@ -107,8 +110,8 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
 								stroke="#333"
 								strokeWidth={config.barBorderThickness || 1}
-								// opacity={transparentBar ? 0.5 : 1}
-								// display={displayBar ? 'block' : 'none'}
+								opacity={transparentBar ? 0.5 : 1}
+								display={displayBar ? 'block' : 'none'}
 							/>
 							<Text
 								textAnchor={barWidth < 100 ? 'end' : 'start' }
@@ -122,7 +125,9 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 					)}
 					{data.filter(item => config.series[1].dataKey === groupTwo.dataKey).map(d => {
 						let barWidth = (xScale(d[config.series[1].dataKey]))
-
+						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1;
+						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1;
+						
 						return(
 							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}>
 								<Bar
@@ -135,7 +140,10 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 									fill={groupTwo.color}
 									data-tip={ dataTipTwo(d) }
 									data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-
+									strokeWidth={config.barBorderThickness || 1}
+									stroke="#333"
+									opacity={transparentBar ? 0.5 : 1}
+									display={displayBar ? 'block' : 'none'}
 								/>
 								<Text
 									textAnchor={barWidth < 100 ? 'start' : 'end' }
