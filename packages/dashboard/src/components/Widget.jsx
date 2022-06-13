@@ -118,25 +118,45 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
-
  
-  const dataDesignerModal = (configureData) => (
-    <Modal>
-      <Modal.Content>
-        <DataDesigner {...{
-          configureData, 
-          visualizationKey: data.uid,
-          dataKey: data.dataKey,
-          updateDescriptionProp
-        }}/>
-      </Modal.Content>
-    </Modal>
-  )
+  const dataDesignerModal = (configureData, dataKeyOverride) => {
+    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
+
+    return (
+      <Modal>
+        <Modal.Content>
+          <div className="dataset-selector-container">
+            Select a dataset:&nbsp;
+            <select className="dataset-selector" defaultValue={dataKey} onChange={(e) => {
+              changeDataset(data.uid, e.target.value)
+              overlay?.actions.openOverlay(dataDesignerModal(data, e.target.value || ''))
+            }}>
+              <option value="">Select a dataset</option>
+              {config.datasets && Object.keys(config.datasets).map(datasetKey => (
+                <option key={datasetKey}>{datasetKey}</option>
+              ))}
+            </select>
+          </div>
+          {dataKey && <DataDesigner {...{
+            configureData, 
+            visualizationKey: data.uid,
+            dataKey: dataKey,
+            updateDescriptionProp
+          }}/>}
+        </Modal.Content>
+      </Modal>
+    )
+  }
 
   useEffect(() => {
-    if(data.dataKey)
-      overlay?.actions.openOverlay(dataDesignerModal(data))
-  }, [data.dataKey])
+    if(data.openModal){
+      overlay?.actions.openOverlay(dataDesignerModal(dataRef.current))
+
+      visualizations[data.uid].openModal = false
+
+      updateConfig({ ...config, visualizations })
+    }
+  }, [data.openModal])
 
   return (
     <>
@@ -148,19 +168,9 @@ const Widget = ({ data = {}, addVisualization, type }) => {
               {data.dataKey && data.dataDescription && data.formattedData &&
                 <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>
               }
-              {data.dataKey &&
-                <button className="btn btn-configure" onClick={() => {
-                  overlay?.actions.openOverlay(dataDesignerModal(data))
-                }}>Configure Data</button>
-              }
-              <select className="dataset-selector" defaultValue={data.dataKey} onChange={(e) => {
-                changeDataset(data.uid, e.target.value)
-              }}>
-                <option value="">Select a dataset</option>
-                {config.datasets && Object.keys(config.datasets).map(datasetKey => (
-                  <option key={datasetKey}>{datasetKey}</option>
-                ))}
-              </select>
+              <button className="btn btn-configure" onClick={() => {
+                overlay?.actions.openOverlay(dataDesignerModal(data))
+              }}>Configure Data</button>
               <div className="widget-menu-item" onClick={deleteWidget}>
                 <Icon display="close" base/>
               </div>

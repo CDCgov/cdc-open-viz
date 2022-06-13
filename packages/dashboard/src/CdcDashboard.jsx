@@ -38,6 +38,7 @@ import '@cdc/core/styles/v2/main.scss'
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
     newViz: true,
+    openModal: true,
     uid: type + Date.now(),
     type
   }
@@ -142,19 +143,21 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const filterData = (filters, data) => {
     let filteredData = []
 
-    data.forEach((row) => {
-      let add = true
+    if(data){
+      data.forEach((row) => {
+        let add = true
 
-      filters.forEach((filter) => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
+        filters.forEach((filter) => {
+          if (row[filter.columnName] !== filter.active) {
+            add = false
+          }
+        })
+
+        if (add) filteredData.push(row)
       })
 
-      if (add) filteredData.push(row)
-    })
-
-    return filteredData
+      return filteredData
+    }
   }
 
   const setSharedFilter = (key, datum) => {
@@ -214,14 +217,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             }
 
             newConfig.dashboard.sharedFilters[i].values = filterValues
-            newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+            if(newConfig.visualizations[visualizationKeys[j]].dataKey){
+              newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+            }
             break
           }
         }
 
         if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
           newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, (dataOverride || data))
-          newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+          if(newConfig.visualizations[visualizationKeys[j]].dataKey){
+            newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+          }
         }
 
         if (newConfig.dashboard.sharedFilters[i].usedBy) {
