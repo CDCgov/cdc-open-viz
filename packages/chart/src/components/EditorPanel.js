@@ -436,6 +436,13 @@ const EditorPanel = () => {
       return false
     }
   }
+  const showBarStyleOptions = ()=>{
+    if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation==='horizontal' || config.orientation==='vertical') ) {
+      return ['flat','rounded','lollipop']
+    } else {
+      return ['flat','rounded']
+    }
+  }
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
