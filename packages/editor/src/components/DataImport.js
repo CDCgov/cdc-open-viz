@@ -310,7 +310,6 @@ export default function DataImport() {
       let dataDescription = { ...config.dataDescription, [key]: value }
       let formattedData = transform.developerStandardize(config.data, dataDescription)
 
-      console.log('setConfig');
       setConfig({ ...config, formattedData, dataDescription })
     }
   }
@@ -385,6 +384,24 @@ export default function DataImport() {
     setConfig({...config, datasets: newDatasets});
   }
 
+  const renameDataset = (oldName, newName) => {
+    if(oldName === newName) return;
+
+    let newDatasets = {...config.datasets};
+
+    let suffix = 2;
+    let originalName = newName;
+    while(newDatasets[newName]){
+      newName = originalName + '-' + suffix;
+      suffix++;
+    }
+
+    newDatasets[newName] = newDatasets[oldName];
+    delete newDatasets[oldName];
+
+    setConfig({...config, datasets: newDatasets});
+  }
+
   let previewData, configureData, readyToConfigure = false;
   if(config.type === 'dashboard'){
     readyToConfigure = Object.keys(config.datasets).length > 0;
@@ -414,7 +431,7 @@ export default function DataImport() {
               <tbody>
                 {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
                   <tr key={`tr-${datasetKey}`}>
-                    <td>{displayFileName(config.datasets[datasetKey].dataFileName)}</td>
+                    <td><input className="dataset-name-input" type="text" defaultValue={datasetKey} onBlur={(e) => renameDataset(datasetKey, e.target.value)}/></td>
                     <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                     <td>{config.datasets[datasetKey].dataFileFormat}</td>
                     <td><button className="btn btn-primary" onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
