@@ -178,13 +178,21 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        {!config.runtime.yAxis.hideTicks && (
-                        <Line
-                          from={tick.from}
-                          to={tick.to}
-                          stroke="#333"
-                          display={config.runtime.horizontal ? 'none' : 'block'}
-                        />
+                        {!config.runtime.yAxis.hideTicks && config.orientation === 'horizontal' && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'block' : 'none'}
+                          />
+                        )}
+                        {!config.runtime.yAxis.hideTicks && config.orientation === 'vertical' && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'none' : 'block'}
+                          />
                         )}
                         { config.runtime.yAxis.gridLines ? (
                           <Line
@@ -210,6 +218,15 @@ export default function LinearChart() {
                             // 17 is a magic number from the offset in barchart.
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                        }
+
+                        { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.xAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
