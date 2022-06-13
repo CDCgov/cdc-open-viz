@@ -26,7 +26,7 @@ const LinearChart = lazy(() => import('./Chart.Linear'))
 const PieChart = lazy(() => import('./Chart.Pie'))
 
 const Chart = () => {
-  const { config } = useConfigContext()
+  const { config, configActions, missingRequiredSections } = useConfigContext()
 
   const [ colorScale, setColorScale ] = useState(null)
   const [ currentViewport, setCurrentViewport ] = useState('lg')
@@ -41,7 +41,7 @@ const Chart = () => {
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
-    if (stateData && config.xAxis && config.runtime.seriesKeys) {
+    if (stateData && config.xAxis && config.runtime?.seriesKeys) {
       let palette = colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
@@ -281,7 +281,7 @@ const Chart = () => {
     const changeFilterActive = (index, value) => {
       let newFilters = config.filters
       newFilters[index].active = value
-      setConfig({ ...config, filters: newFilters })
+      configActions.setConfig({ ...config, filters: newFilters })
       setFilteredData(filterData(newFilters, excludedData))
     }
 
@@ -351,40 +351,15 @@ const Chart = () => {
       : `#dataTableSection`
 
 
-
-  const isRequiredSectionValid = (test) => {
-    return test
-  };
-
-  if (config.visualizationType === 'Pie') {
-    isRequiredSectionValid(undefined !== config?.yAxis.dataKey)
+  //Validate Required Sections
+/*  if (config.visualizationType === 'Pie') {
+    configActions.setMissingRequiredSections(undefined !== config?.yAxis.dataKey)
   } else {
-    isRequiredSectionValid((undefined !== config?.series || config?.series.length > 0))
+    configActions.setMissingRequiredSections((undefined !== config?.series || config?.series.length > 0))
   }
+  configActions.setMissingRequiredSections(config.xAxis.dataKey)*/
 
-  isRequiredSectionValid(config.xAxis.dataKey)
-
-  let body = (
-    <>
-      {!missingRequiredSections() && !config.newViz &&
-        <Component className={`cove-chart ${currentViewport}`} title={title} description={description}
-                   table={<DataTable/>} tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
-                   theme={config.theme}
-        >
-          <a className="sr-only" href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-
-          {config.filters && <Filters/>}
-          <div className="cove-component__visualization" ref={outerContainerRef}>
-            <ChartVis visType={visualizationType} config={config}>
-              {!config.legend.hide && <Legend/>}
-            </ChartVis>
-          </div>
-        </Component>
-      }
-    </>
-  )
+  //Build Chart styles
 
   let lineDatapointClass = ''
   let barBorderClass = ''
@@ -427,14 +402,26 @@ const Chart = () => {
   }
 
   return (
-    <ErrorBoundary component="CdcChart">
-      <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
-        <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-          {chartList[visType]}
-          {children}
-        </div>
-      </Suspense>
-    </ErrorBoundary>
+      <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
+        <Component className={`cove-chart ${currentViewport}`} title={title} description={description}
+                   // table={<DataTable/>}
+                   tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
+                   theme={config.theme}
+        >
+          <a className="sr-only" href={handleChartTabbing}>
+            Skip Over Chart Container
+          </a>
+          {config.filters && <Filters/>}
+          <div className="cove-component__visualization" ref={outerContainerRef}>
+            <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
+              {!missingRequiredSections && !config.newViz && (<>
+                {chartList[config.visualizationType]}
+                {/*{!config.legend.hide && <Legend/>}*/}
+              </>)}
+            </Suspense>
+          </div>
+        </Component>
+      </div>
   )
 }
 

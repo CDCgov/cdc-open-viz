@@ -22,6 +22,11 @@ export const ConfigContextProvider = ({ defaults, children }) => {
       return obj.hasOwnProperty(prop)
     }
 
+    if ('string' === typeof payload) {
+      setConfig(config => ({...config, [payload]: value}))
+      return
+    }
+
     let updateFieldObj = {}
 
     const updateConfigKey = {
@@ -49,7 +54,7 @@ export const ConfigContextProvider = ({ defaults, children }) => {
     updateConfigKey[payload.length].entry()
 
     if (updateConfigKey[payload.length].validate()) {
-      setConfig({...config, ...updateFieldObj })
+      setConfig(config => ({...config, ...updateFieldObj }))
     } else {
       updateConfig(updateFieldObj)
     }

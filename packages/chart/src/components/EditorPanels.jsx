@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 //Hooks
-import useColorPalette from '../hooks/useColorPalette'
-import useReduceData from '../hooks/useReduceData'
+// import useColorPalette from '../hooks/useColorPalette'
+// import useReduceData from '../hooks/useReduceData'
 
 //Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
@@ -27,16 +27,14 @@ const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal'
 const Regions = () => {
   const { config, configActions} = useConfigContext()
 
-  let regionUpdate = (fieldName, value, i) => {
+  let regionUpdate = (fieldName, value, index) => {
     let regions = []
     if (config.regions) regions = [ ...config.regions ]
-    regions[i][fieldName] = value
+    regions[index][fieldName] = value
     configActions.updateConfig({ ...config, regions })
   }
 
-  let updateField = (section, subsection, fieldName, value, i) => regionUpdate(fieldName, value, i)
-
-  let removeColumn = (i) => {
+  let removeColumn = (index) => {
     let regions = []
     if (config.regions) regions = [ ...config.regions ]
     regions.splice(i, 1)
@@ -52,28 +50,28 @@ const Regions = () => {
 
   return (
     <>
-      {config.regions && config.regions.map(({ label, color, from, to, background }, i) => (
-        <SectionBlock key={`region-${i}`}>
+      {config.regions && config.regions.map(({ label, color, from, to, background }, index) => (
+        <SectionBlock key={`region-${index}`}>
           <Button className="cove-button--remove" onClick={() => {
-            removeColumn(i)
+            removeColumn(index)
           }}>Remove</Button>
-          <InputText label="Region Label" value={label} fieldName="label" i={i}/>
+          <InputText label="Region Label" value={label} fieldName="label" i={index}/>
 
           <div className="grid grid-gap-2">
             <div className="col-6">
-              <InputText label="Text Color" value={color} fieldName="color" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}/>
+              <InputText label="Text Color" value={color} fieldName="color" onChange={(e)=>regionUpdate("color", e.target.value, index)}/>
             </div>
             <div className="col-6">
-              <InputText label="Background" value={background} fieldName="background" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}/>
+              <InputText label="Background" value={background} fieldName="background" onChange={(e)=>regionUpdate("background", e.target.value, index)}/>
             </div>
           </div>
 
           <div className="grid grid-gap-2">
             <div className="col-6">
-              <InputText label="From Value" value={from} fieldName="from" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}/>
+              <InputText label="From Value" value={from} fieldName="from" onChange={(e)=>regionUpdate("from", e.target.value, index)}/>
             </div>
             <div className="col-6">
-              <InputText label="To Value" value={to} fieldName="to" updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}/>
+              <InputText label="To Value" value={to} fieldName="to" onChange={(e)=>regionUpdate("to", e.target.value, index)}/>
             </div>
           </div>
         </SectionBlock>
@@ -469,37 +467,37 @@ const EditorPanels = () => {
 
   const panelGeneral = (
     <panel label="General">
-      <InputSelect label="Chart Type" value={config.visualizationType} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} fieldName="visualizationType"/>
+      <InputSelect label="Chart Type" value={config.visualizationType} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]} configField="visualizationType"/>
 
       {config.visualizationType === 'Bar' &&
         <>
-          <InputSelect label="Chart Subtype" value={config.visualizationSubType || 'Regular'} options={[ 'regular', 'stacked' ]} fieldName="visualizationSubType"/>
-          <InputSelect label="Orientation" value={config.orientation || 'vertical'} options={[ 'vertical', 'horizontal' ]} fieldName="orientation"/>
+          <InputSelect label="Chart Subtype" value={config.visualizationSubType || 'Regular'} options={[ 'regular', 'stacked' ]} configField="visualizationSubType"/>
+          <InputSelect label="Orientation" value={config.orientation || 'vertical'} options={[ 'vertical', 'horizontal' ]} configField="orientation"/>
           {config.orientation === 'horizontal' &&
-            <InputSelect label="Label Placement" value={config.yAxis.labelPlacement || 'Below Bar'} options={[ 'Below Bar', 'On Date/Category Axis' ]} section="yAxis" fieldName="labelPlacement"/>
+            <InputSelect label="Label Placement" value={config.yAxis.labelPlacement || 'Below Bar'} options={[ 'Below Bar', 'On Date/Category Axis' ]} configField={['yAxis','labelPlacement']}/>
           }
         </>
       }
 
       {(showLollipopCheckbox()) &&
-        <InputCheckbox label="Use lollipop styling" className="mt-3" value={config.isLollipopChart} tooltip="Select this option to replace each bar with a line and a dot at the end." fieldName="isLollipopChart"/>
+        <InputCheckbox label="Use lollipop styling" className="mt-3" value={config.isLollipopChart} tooltip="Select this option to replace each bar with a line and a dot at the end." configField="isLollipopChart"/>
       }
 
       {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
-        <InputCheckbox label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} className="mt-3" value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar"/>
+        <InputCheckbox label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} className="mt-3" value={config.yAxis.displayNumbersOnBar} configField="{['yAxis', 'displayNumbersOnBar']}"/>
       }
 
       {config.visualizationType === 'Pie' &&
-        <InputSelect label="Pie Chart Type" options={[ 'Regular', 'Donut' ]} fieldName="pieType"/>
+        <InputSelect label="Pie Chart Type" options={[ 'Regular', 'Donut' ]} configField="pieType"/>
       }
-      <InputText label="Title" value={config.title} fieldName="title"/>
+      <InputText label="Title" value={config.title} configField="title"/>
 
-      <InputText label="Subtext" value={config.description} type="textarea" fieldName="description"
+      <InputText label="Subtext" value={config.description} type="textarea" configField="description"
                  tooltip="Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub."
       />
 
       {config.orientation !== 'horizontal' &&
-        <InputText label="Chart Height" value={config.height} type="number" fieldName="height"/>
+        <InputText label="Chart Height" value={config.height} type="number" configField="height"/>
       }
     </panel>
   )
@@ -537,13 +535,13 @@ const EditorPanels = () => {
             addNewSeries(e.target.value)
           }
           e.target.value = ''
-        }} fieldName="visualizationType"/>
+        }} configField="visualizationType"/>
 
         {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
           <>
             <SectionWrapper label="Confidence Keys">
-              <InputSelect label="Upper" value={config.confidenceKeys.upper || ''} options={getColumns()} initial="Select" section="confidenceKeys" fieldName="upper"/>
-              <InputSelect label="Lower" value={config.confidenceKeys.lower || ''} options={getColumns()} initial="Select" section="confidenceKeys" fieldName="lower"/>
+              <InputSelect label="Upper" value={config.confidenceKeys.upper || ''} options={getColumns()} initial="Select" configField={['confidenceKeys', 'upper']}/>
+              <InputSelect label="Lower" value={config.confidenceKeys.lower || ''} options={getColumns()} initial="Select" configField={['confidenceKeys', 'lower']}/>
             </SectionWrapper>
           </>
         )}
@@ -554,23 +552,23 @@ const EditorPanels = () => {
       {config.visualizationType === 'Pie' ?
         <>
           <InputSelect label="Data Column" value={config.yAxis.dataKey || ''} options={getColumns(false)} initial="Select" required={true}
-                       tooltip="Select the source data to be visually represented." section="yAxis" fieldName="dataKey"
+                       tooltip="Select the source data to be visually represented." configField={['yAxis', 'dataKey']}
           />
         </>
         :
         <>
-          <InputText label="Label" value={config.yAxis.label} section="yAxis" fieldName="label"/>
-          <InputText label="Number of ticks" value={config.yAxis.numTicks} type="number" placeholder="Auto" section="yAxis" fieldName="numTicks"/>
-          <InputText label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} value={config.yAxis.size} type="number" section="yAxis" fieldName="size"/>
+          <InputText label="Label" value={config.yAxis.label} configField={['yAxis', 'label']}/>
+          <InputText label="Number of ticks" value={config.yAxis.numTicks} type="number" placeholder="Auto" configField={['yAxis', 'numTicks']}/>
+          <InputText label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} value={config.yAxis.size} type="number" configField={['yAxis', 'size']}/>
           {config.orientation !== 'horizontal' &&
-            <InputCheckbox label="Display Gridlines" value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines"/>
+            <InputCheckbox label="Display Gridlines" value={config.yAxis.gridLines} section="yAxis" configField={['yAxis', 'gridLines']}/>
           }
         </>
       }
 
       <SectionWrapper label="Number Formatting" tooltip="Section for more info">
-        <InputCheckbox className="mt-1" label="Add commas" value={config.dataFormat.commas} section="dataFormat" fieldName="commas"/>
-        <InputText label="Round to decimal point" value={config.dataFormat.roundTo} type="number" min={0} section="dataFormat" fieldName="roundTo"/>
+        <InputCheckbox className="mt-1" label="Add commas" value={config.dataFormat.commas} configField={['dataFormat', 'commas']}/>
+        <InputText label="Round to decimal point" value={config.dataFormat.roundTo} type="number" min={0} configField={['dataFormat', 'roundTo']}/>
 
         <div className="grid grid-gap-2">
           <div className="col-6">
@@ -579,7 +577,7 @@ const EditorPanels = () => {
                 {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
                 {config.visualizationType !== 'Pie' && <p>Enter a data prefix (such as "$"), if applicable.</p>}
               </>
-            } section="dataFormat" fieldName="prefix"/>
+            } configField={['dataFormat', 'prefix']}/>
           </div>
           <div className="col-6">
             <InputText label="Suffix" value={config.dataFormat.suffix} tooltip={
@@ -587,25 +585,25 @@ const EditorPanels = () => {
                 {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
                 {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
               </>
-            } section="dataFormat" fieldName="suffix"/>
+            } configField={['dataFormat', 'suffix']}/>
           </div>
         </div>
       </SectionWrapper>
 
       {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
         <>
-          <InputCheckbox label="Hide Axis" value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis"/>
-          <InputCheckbox label="Hide Label" value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel"/>
-          <InputCheckbox label="Hide Ticks" value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks"/>
+          <InputCheckbox label="Hide Axis" value={config.xAxis.hideAxis} configField={['xAxis', 'hideAxis']}/>
+          <InputCheckbox label="Hide Label" value={config.xAxis.hideLabel} configField={['xAxis', 'hideLabel']}/>
+          <InputCheckbox label="Hide Ticks" value={config.xAxis.hideTicks} configField={['xAxis', 'hideTicks']}/>
           <InputText label="update max value" value={config.xAxis.max} type="number" placeholder="Auto" onChange={(e) => onMaxChangeHandler(e)}/>
           {/*TODO: Adjust with COVE Refactor*/}
           <span style={{ color: 'red', display: 'block' }}>{warningMsg.maxMsg}</span>
         </>
         : config.visualizationType !== 'Pie' &&
         <>
-          <InputCheckbox label="Hide Axis" value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis"/>
-          <InputCheckbox label="Hide Label" value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel"/>
-          <InputCheckbox label="Hide Ticks" value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks"/>
+          <InputCheckbox label="Hide Axis" value={config.yAxis.hideAxis} configField={['yAxis', 'hideAxis']}/>
+          <InputCheckbox label="Hide Label" value={config.yAxis.hideLabel} configField={['yAxis', 'hideLabel']}/>
+          <InputCheckbox label="Hide Ticks" value={config.yAxis.hideTicks} configField={['yAxis', 'hideTicks']}/>
 
           <InputText label="update max value" value={config.yAxis.max} type="number" placeholder="Auto" onChange={(e) => onMaxChangeHandler(e)}/>
           {/*TODO: Adjust with COVE Refactor*/}
@@ -621,32 +619,31 @@ const EditorPanels = () => {
 
   const panelAxisSegments = (
     <panel label={`${config.visualizationType !== 'Pie' ? config.visualizationType === 'Bar' ? 'Date/Category Axis' : 'Date/Category Axis' : 'Segments'}`} warnIf={!config.xAxis.dataKey}>
-      {config.visualizationType !== 'Pie' && <>
-        <InputSelect label="Data Type" value={config.xAxis.type} options={[ 'categorical', 'date' ]} section="xAxis" fieldName="type"/>
-        <InputSelect label="Data Key" value={config.xAxis.dataKey || ''} options={getColumns(false)} initial="Select" required={true}
-                     tooltip="Select the column or row containing the categories or dates for this axis." section="xAxis" fieldName="dataKey"/>
-      </>}
-
-      {config.visualizationType === 'Pie' &&
-        <InputSelect label="Segment Labels" value={config.xAxis.dataKey || ''} options={getColumns(false)} initial="Select" required={true}
-                     tooltip={`Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."`} section="xAxis" fieldName="dataKey"/>
+      {config.visualizationType !== 'Pie' &&
+        <InputSelect label="Data Type" value={config.xAxis.type} options={[ 'categorical', 'date' ]} configField={['xAxis', 'type']}/>
       }
+
+      <InputSelect label="Data Key" value={config.xAxis.dataKey || ''} options={getColumns(false)} initial="Select" required={true}
+                   tooltip={config.visualizationType === 'Pie' ?
+                     `Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."`:
+                     `Select the column or row containing the categories or dates for this axis.`}
+                   configField={['xAxis', 'dataKey']}/>
 
       {config.visualizationType !== 'Pie' && (
         <>
-          <InputText label="Label" value={config.xAxis.label} section="xAxis" fieldName="label"/>
+          <InputText label="Label" value={config.xAxis.label} configField={['xAxis', 'label']}/>
           {config.xAxis.type === 'date' && (
             <>
               <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                 Format how charts should parse and display your dates using <a href="https://github.com/d3/d3-time-format#locale_format" target="_blank" rel="noreferrer">these guidelines</a>.
               </p>
-              <InputText label="Date Parse Format" value={config.xAxis.dateParseFormat} placeholder="Ex. %Y-%m-%d" section="xAxis" fieldName="dateParseFormat"/>
-              <InputText label="Date Display Format" value={config.xAxis.dateDisplayFormat} placeholder="Ex. %Y-%m-%d" section="xAxis" fieldName="dateDisplayFormat"/>
+              <InputText label="Date Parse Format" value={config.xAxis.dateParseFormat} placeholder="Ex. %Y-%m-%d" configField={['xAxis', 'dateParseFormat']}/>
+              <InputText label="Date Display Format" value={config.xAxis.dateDisplayFormat} placeholder="Ex. %Y-%m-%d" configField={['xAxis', 'dateDisplayFormat']}/>
             </>
           )}
 
           <InputCheckbox label={config.xAxis.type === 'date' ? 'Limit by start and/or end dates' : 'Exclude one or more values'} value={config.exclusions.active}
-                         tooltip="When this option is checked, you can select source-file values for exclusion from the date/category axis." section="exclusions" fieldName="active"/>
+                         tooltip="When this option is checked, you can select source-file values for exclusion from the date/category axis." configField={['exclusions', 'active']}/>
 
           {config.exclusions.active &&
             <>
@@ -663,14 +660,14 @@ const EditorPanels = () => {
                       addNewExclusion(e.target.value)
                     }
                     e.target.value = ''
-                  }} fieldName="visualizationType"/>
+                  }} configField="visualizationType"/>
                 </>
               }
 
               {config.xAxis.type === 'date' &&
                 <>
-                  <InputText label="Start Date" value={config.exclusions.dateStart || ''} type="date" section="exclusions" fieldName="dateStart"/>
-                  <InputText label="End Date" value={config.exclusions.dateEnd || ''} type="date" section="exclusions" fieldName="dateEnd"/>
+                  <InputText label="Start Date" value={config.exclusions.dateStart || ''} type="date" configField={['exclusions', 'dateStart']}/>
+                  <InputText label="End Date" value={config.exclusions.dateEnd || ''} type="date" configField={['exclusions', 'dateEnd']}/>
                 </>
               }
             </>
@@ -678,26 +675,26 @@ const EditorPanels = () => {
 
           {config.xAxis.type === 'date' &&
             <>
-              <InputText label="Number of ticks" value={config.xAxis.numTicks} type="number" placeholder="Auto" min="1" section="xAxis" fieldName="numTicks"/>
+              <InputText label="Number of ticks" value={config.xAxis.numTicks} type="number" placeholder="Auto" min="1" configField={['xAxis', 'numTicks']}/>
             </>
           }
 
-          <InputText label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size"/>
+          <InputText label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} value={config.xAxis.size} type="number" min="0" configField={['xAxis', 'size']}/>
 
           {config.yAxis.labelPlacement !== 'Below Bar' &&
-            <InputText label="Tick rotation (Degrees)" value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation"/>
+            <InputText label="Tick rotation (Degrees)" value={config.xAxis.tickRotation} type="number" min="0" configField={['xAxis', 'tickRotation']}/>
           }
 
           {(config.orientation === 'horizontal') ?
             <>
-              <InputCheckbox label="Hide Axis" value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis"/>
-              <InputCheckbox label="Hide Label" value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel"/>
+              <InputCheckbox label="Hide Axis" value={config.yAxis.hideAxis} configField={['yAxis', 'hideAxis']}/>
+              <InputCheckbox label="Hide Label" value={config.yAxis.hideLabel} configField={['yAxis', 'hideLabel']}/>
             </>
             :
             <>
-              <InputCheckbox label="Hide Axis" value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis"/>
-              <InputCheckbox label="Hide Label" value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel"/>
-              <InputCheckbox label="Hide Ticks" value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks"/>
+              <InputCheckbox label="Hide Axis" value={config.xAxis.hideAxis} configField={['xAxis', 'hideAxis']}/>
+              <InputCheckbox label="Hide Label" value={config.xAxis.hideLabel} configField={['xAxis', 'hideLabel']}/>
+              <InputCheckbox label="Hide Ticks" value={config.xAxis.hideTicks} configField={['xAxis', 'hideTicks']}/>
             </>
           }
         </>
@@ -705,8 +702,10 @@ const EditorPanels = () => {
 
       {config.visualizationType === 'Pie' &&
         <>
+          <InputSelect label="Segment Labels" value={config.xAxis.dataKey || ''} options={getColumns(false)} initial="Select" required={true}
+                       tooltip={``} configField={['xAxis', 'dataKey']}/>
           <InputCheckbox label="Exclude one or more values" value={config.exclusions.active} tooltip="When this option is checked, you can select values for exclusion from the pie segments."
-                         section="exclusions" fieldName="active"/>
+                         configField={['exclusions', 'active']}/>
           {config.exclusions.active &&
             <>
               {config.exclusions.keys.length > 0 &&
@@ -720,7 +719,7 @@ const EditorPanels = () => {
                   addNewExclusion(e.target.value)
                 }
                 e.target.value = ''
-              }} fieldName="visualizationType"/>
+              }} configField="visualizationType"/>
             </>
           }
         </>
@@ -730,19 +729,19 @@ const EditorPanels = () => {
 
   const panelRegions = (config.visualizationType !== 'Pie' && config.visualizationType !== 'Paired Bar') &&
       <panel label="Regions">
-        <Regions config={config}/>
+        <Regions/>
       </panel>
 
   const panelLegend = (
     <panel label="Legend">
       {config.orientation === 'horizontal' &&
-        <InputCheckbox label="Reverse Labels" value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder"/>
+        <InputCheckbox label="Reverse Labels" value={config.legend.reverseLabelOrder} configField={['legend', 'reverseLabelOrder']}/>
       }
       <InputCheckbox label="Hide Legend" value={config.legend.hide} tooltip="With a single-series chart, consider hiding the legend to reduce visual clutter."
-                     section="legend" fieldName="hide"/>
-      <InputSelect label="Legend Behavior (When clicked)" value={config.legend.behavior} options={[ 'highlight', 'isolate' ]} section="legend" fieldName="behavior"/>
-      <InputText label="Title" value={config.legend.label} section="legend" fieldName="label"/>
-      <InputSelect label="Position" value={config.legend.position} options={[ 'right', 'left' ]} section="legend" fieldName="position"/>
+                     configField={['legend', 'hide']}/>
+      <InputSelect label="Legend Behavior (When clicked)" value={config.legend.behavior} options={[ 'highlight', 'isolate' ]} configField={['legend', 'behavior']}/>
+      <InputText label="Title" value={config.legend.label} configField={['legend', 'label']}/>
+      <InputSelect label="Position" value={config.legend.position} options={[ 'right', 'left' ]} configField={['legend', 'position']}/>
     </panel>
   )
 
@@ -840,31 +839,31 @@ const EditorPanels = () => {
               </label>
             </div>
           </label>
-          <InputSelect label="Lollipop Color Style" value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} options={[ 'regular', 'two-tone' ]} fieldName="lollipopColorStyle"/>
-          <InputSelect label="Lollipop Size" value={config.lollipopSize ? config.lollipopSize : 'small'} options={[ 'small', 'medium', 'large' ]} fieldName="lollipopSize"/>
+          <InputSelect label="Lollipop Color Style" value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} options={[ 'regular', 'two-tone' ]} configField="lollipopColorStyle"/>
+          <InputSelect label="Lollipop Size" value={config.lollipopSize ? config.lollipopSize : 'small'} options={[ 'small', 'medium', 'large' ]} configField="lollipopSize"/>
         </>
       }
 
-      <InputSelect label="Font Size" value={config.fontSize} options={[ 'small', 'medium', 'large' ]} fieldName="fontSize"/>
+      <InputSelect label="Font Size" value={config.fontSize} options={[ 'small', 'medium', 'large' ]} configField="fontSize"/>
 
       {config.series?.some(series => series.type === 'Bar') &&
-        <InputSelect label="Bar Borders" value={config.barHasBorder} options={[ 'true', 'false' ]} fieldName="barHasBorder"/>
+        <InputSelect label="Bar Borders" value={config.barHasBorder} options={[ 'true', 'false' ]} configField="barHasBorder"/>
       }
 
       {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
-        <InputSelect label="Line Datapoint Style" value={config.lineDatapointStyle} options={[ 'hidden', 'hover', 'always show' ]} fieldName="lineDatapointStyle"/>
+        <InputSelect label="Line Datapoint Style" value={config.lineDatapointStyle} options={[ 'hidden', 'hover', 'always show' ]} configField="lineDatapointStyle"/>
       }
 
-      <ColorPicker label="Header Theme" colors={headerColors} config={config}
+      <ColorPicker label="Header Theme" colors={headerColors}
                    tooltip="Select the theme color for the component" colorTooltip/>
 
       <InputSlider size="medium" label="Reverse Colors"
                    tooltip="Reverse the colors for the selected color palette"
                    labelPosition="top"
-        // value={isPaletteReversed}
-                   fieldName="isPaletteReversed"/>
+                   // value={isPaletteReversed}
+                   configField="isPaletteReversed"/>
 
-      <ColorPicker label="Sequential" colors={headerColors} config={config}
+      <ColorPicker label="Sequential" colors={headerColors}
                    tooltip="Select the theme color for the component" colorTooltip/>
 
       <Label>Sequential</Label>
@@ -908,29 +907,31 @@ const EditorPanels = () => {
       {config.visualizationType !== 'Pie' && (
         <>
           {config.orientation !== 'horizontal' &&
-            <InputCheckbox label="Display label on data" value={config.labels} fieldName="labels"/>
+            <InputCheckbox label="Display label on data" value={config.labels} configField="labels"/>
           }
-          <InputText label="Data Cutoff" value={config.dataCutoff} type="number" tooltip={`Any value below the cut-off value is included in a special "less than" category. This option supports special conditions like suppressed data.`}
-                     fieldName="dataCutoff"/>
+          <InputText label="Data Cutoff" value={config.dataCutoff} type="number"
+                     tooltip={`Any value below the cut-off value is included in a special "less than" category. This option supports special conditions like suppressed data.`}
+                     configField="dataCutoff"/>
         </>
       )}
       {(config.orientation === 'horizontal' && config.yAxis.labelPlacement !== 'On Bar') &&
-        <InputText label="Bar Thickness" value={config.barHeight || '25'} type="number" min="15" fieldName="barHeight"/>
+        <InputText label="Bar Thickness" value={config.barHeight || '25'} type="number" min="15" configField="barHeight"/>
       }
       {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
-        <InputText label="Bar Thickness" value={config.barThickness} type="number" fieldName="barThickness"/>
+        <InputText label="Bar Thickness" value={config.barThickness} type="number" configField="barThickness"/>
       }
     </panel>
   )
 
   const panelDataTable = (
     <panel label="Data Table">
-      <InputCheckbox label="Show Table" value={config.table.show} tooltip="Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement."
-                     section="table" fieldName="show"/>
-      <InputCheckbox label="Expanded by Default" value={config.table.expanded} section="table" fieldName="expanded"/>
-      <InputCheckbox label="Display Download Button" value={config.table.download} section="table" fieldName="download"/>
-      <InputText label="Label" value={config.table.label} section="table" fieldName="label"/>
-      <InputText label="Index Column Header" value={config.table.indexLabel} section="table" fieldName="indexLabel"/>
+      <InputCheckbox label="Show Table" value={config.table.show}
+                     tooltip="Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement."
+                     configField={['table', 'show']}/>
+      <InputCheckbox label="Expanded by Default" value={config.table.expanded} configField={['table', 'expanded']}/>
+      <InputCheckbox label="Display Download Button" value={config.table.download} configField={['table', 'download']}/>
+      <InputText label="Label" value={config.table.label} configField={['table', 'label']}/>
+      <InputText label="Index Column Header" value={config.table.indexLabel} configField={['table', 'indexLabel']}/>
     </panel>
   )
 

@@ -17,6 +17,7 @@ const useLoadConfig = (configObj, configUrl) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log('fetching config data')
       let response = configObj || await (await fetch(configUrl)).json()
 
       // If data is included through a URL, fetch that and store

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
+import { useConfigContext } from '../../context/ConfigContext'
+
 import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
@@ -13,15 +15,13 @@ const InputText = memo((
     tooltip,
     placeholder,
 
-    section = null,
-    subsection = null,
-    fieldName,
-    updateField,
+    configField,
     value: stateValue,
-    i = null, min, max,
-    className, ...attributes
+    min, max, className, ...attributes
   }
 ) => {
+
+  const { configActions } = useConfigContext()
 
   const [ value, setValue ] = useState(stateValue || '')
   const [ debouncedValue ] = useDebounce(value, 500)
@@ -29,10 +29,12 @@ const InputText = memo((
   const inputRef = useRef(null)
 
   useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue && updateField) {
-      updateField(section, subsection, fieldName, debouncedValue, i)
+    if (configField) {
+      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
+        configActions.updateField(configField, debouncedValue)
+      }
     }
-  }, [ debouncedValue, section, subsection, fieldName, i, updateField ])
+  }, [ debouncedValue ])
 
   const isNumberWithinBounds = (val) => {
     let inBounds = false
@@ -50,6 +52,7 @@ const InputText = memo((
     return inBounds
   }
 
+  //TODO: COVE Refactor - Expand to support source onChange events
   const onChange = (e) => {
     if ('number' !== type) {
       setValue(e.target.value)

@@ -9,22 +9,23 @@ import useLoadConfig from '@cdc/core/hooks/useLoadConfig'
 
 //Components
 import Chart from './components/Chart'
-
-import './scss/cove-chart.scss'
 import Editor from '@cdc/core/components/Editor'
 import EditorPanels from './components/EditorPanels'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+import './scss/cove-chart.scss'
 
 //Visualization
 const CdcChart = ({ configUrl }) => {
   const { view } = useGlobalContext()
-  const { config } = useConfigContext()
+  const { config, configActions } = useConfigContext()
   const [ reloadConfig ] = useLoadConfig(config, configUrl)
 
   useEffect(() => {
     reloadConfig()
   }, [ reloadConfig ])
 
-  /*const updateConfig = (newConfig, dataOverride = undefined) => {
+  const updateConfig = (newConfig, dataOverride = undefined) => {
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -91,6 +92,16 @@ const CdcChart = ({ configUrl }) => {
       setFilteredData(currentData)
     }
 
+    if (!currentData) currentData = newExcludedData
+  }
+
+  useEffect(() => {
+    return buildChartData()
+  }, [])
+
+  const buildChartData = () => {
+    let newConfig = {}
+
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.seriesLabels = {}
@@ -98,7 +109,7 @@ const CdcChart = ({ configUrl }) => {
     newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.visualizationType === 'Pie') {
-      newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
+      newConfig.runtime.seriesKeys = config.data.map(data => data[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
@@ -135,12 +146,11 @@ const CdcChart = ({ configUrl }) => {
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
     // Check for duplicate x axis values in data
-    if (!currentData) currentData = newExcludedData
-
     let uniqueXValues = {}
+    let currentData
 
     if (newConfig.visualizationType !== 'Paired Bar') {
-      for (let i = 0; i < currentData.length; i++) {
+      for (let i = 0; i < currentData?.length; i++) {
         if (uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]) {
           newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.'
         } else {
@@ -148,20 +158,26 @@ const CdcChart = ({ configUrl }) => {
         }
       }
     }
-    setConfig(newConfig)
-  }*/
 
-  return (<>
-    {view === 'editor' ?
+    configActions.setConfig(newConfig)
+    console.log('new chart config', newConfig)
+  }
+
+  return (
+    <ErrorBoundary component="CdcChart">
       <>
-        <Editor panels={EditorPanels()}>
+        {view === 'editor' ?
+          <>
+            <Editor panels={EditorPanels()}>
+              <Chart/>
+            </Editor>
+          </>
+          :
           <Chart/>
-        </Editor>
+        }
       </>
-      :
-      <Chart/>
-    }
-  </>)
+    </ErrorBoundary>
+  )
 }
 
 export default CdcChart

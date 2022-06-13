@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
+import { useConfigContext } from '../../context/ConfigContext'
 
 const InputSlider = (
   {
@@ -14,28 +15,16 @@ const InputSlider = (
     size = 'small',
     activeColor = null,
 
-    section = null,
-    subsection = null,
-    fieldName,
-    updateField,
+    configField,
     value: stateValue,
-    i = null, min = null, max = null,
+    min = null, max = null,
     className, ...attributes
   }
 ) => {
 
-  const [ value, setValue ] = useState(stateValue || false)
+  const { configActions } = useConfigContext()
 
-  let name = () => {
-    let str = ''
-    if (section)
-      str += section + '-'
-    if (subsection)
-      str += subsection + '-'
-    if (fieldName)
-      str += fieldName
-    return str
-  }
+  const [ value, setValue ] = useState(stateValue || false)
 
   const sliderTypeClass = () => {
     const typeArr = {
@@ -54,8 +43,10 @@ const InputSlider = (
   }, [ stateValue ])
 
   useEffect(() => {
-    if (stateValue !== value && updateField) {
-      updateField(section, subsection, fieldName, value, i)
+    if (configField) {
+      if (stateValue !== value) {
+        configActions.updateField(configField, value)
+      }
     }
   }, [ value ])
 
@@ -76,7 +67,7 @@ const InputSlider = (
              onClick={() => setValue(!value)}>
           <div className="cove-input__slider-button"/>
           <div className="cove-input__slider-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
-          <input className="cove-input--hidden" type="checkbox" name={name()} checked={value} readOnly/>
+          <input className="cove-input--hidden" type="checkbox" checked={value} readOnly/>
         </div>
         {label && labelPosition === 'right' &&
           <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>

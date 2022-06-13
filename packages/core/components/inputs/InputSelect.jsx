@@ -11,14 +11,14 @@ import '../../styles/v2/components/input/index.scss'
 const InputSelect = memo((
   {
     label,
-    value,
     options,
     initial,
     required,
     tooltip,
 
     configField,
-    onChange, className, style, ...attributes
+    value: stateValue,
+    onChange, className, ...attributes
   }
 ) => {
   const { configActions } = useConfigContext()
@@ -27,8 +27,8 @@ const InputSelect = memo((
 
   let optionsJsx = options.map((option, index) => {
     if (option === Object(option)) { //Handle Object entry with key/value pair
-      for (const [ key, value ] of Object.entries(option)) {
-        return <option value={value} key={index}>{value}</option>
+      for (const [ key, stateValue ] of Object.entries(option)) {
+        return <option value={stateValue} key={index}>{stateValue}</option>
       }
     } else { //Handle Array entry
       return <option value={option} key={index}>{option}</option>
@@ -37,10 +37,6 @@ const InputSelect = memo((
 
   if (initial) { //Add custom, initial option
     optionsJsx.unshift(<option value="" key={initial}>{initial}</option>)
-  }
-
-  let styles = {
-    ...style
   }
 
   let onChangeHandler = (e) => {
@@ -62,9 +58,8 @@ const InputSelect = memo((
           {label}
         </Label>
       }
-      <select className={`cove-input${required && !value ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
-              value={value} style={styles}
-              onChange={(e) => onChangeHandler(e)} {...attributes}
+      <select className={`cove-input${required && !stateValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
+              value={stateValue} onChange={(e) => onChangeHandler(e)} {...attributes}
               ref={inputRef}
       >
         {optionsJsx.map(option => (option))}
@@ -83,11 +78,7 @@ InputSelect.propTypes = {
     PropTypes.object,
     PropTypes.string
   ]),
-  onChange: PropTypes.func,
-  section: PropTypes.string,
-  subsection: PropTypes.string,
-  fieldName: PropTypes.string,
-  updateField: PropTypes.func
+  onChange: PropTypes.func
 }
 
 export default InputSelect

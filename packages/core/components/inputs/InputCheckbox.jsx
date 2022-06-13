@@ -1,6 +1,8 @@
 import React, { useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
 
+import { useConfigContext } from '../../context/ConfigContext'
+
 import Icon from '../ui/Icon'
 import Label from '../elements/Label'
 
@@ -15,19 +17,15 @@ const InputCheckbox = memo((
     activeCheckColor = null,
     tooltip,
 
-    section = null,
-    subsection = null,
-    fieldName,
-    updateField,
+    configField,
     value: stateValue,
-    i = null,
     className, ...attributes
   }
 ) => {
 
-  const [ value, setValue ] = useState(stateValue || false)
+  const { configActions } = useConfigContext()
 
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+  const [ value, setValue ] = useState(stateValue || false)
 
   useEffect(() => {
     if (stateValue !== undefined && stateValue !== value)
@@ -35,8 +33,10 @@ const InputCheckbox = memo((
   }, [ stateValue ])
 
   useEffect(() => {
-    if (stateValue !== value && updateField) {
-      updateField(section, subsection, fieldName, value, i)
+    if (configField) {
+      if (stateValue !== value) {
+        configActions.updateField(configField, value)
+      }
     }
   }, [ value ])
 

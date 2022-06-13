@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import React, { useState, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 const InputGroup = ({ label, flow, children, clear, className, style, ...attributes }) => {
+  // TODO: COVE Refactor - Check below styles state usage?
   const [ styles, setStyles ] = useState({})
   const [ labelWidth, setLabelWidth ] = useState(null)
 
