@@ -194,6 +194,16 @@ const EditorPanel = (props) => {
 				})
 				break;
 
+			case 'hideGeoColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
+				})
+				break;
+
 			case 'toggleExtraBubbleBorder':
 				setState({
 					...state,
@@ -208,8 +218,17 @@ const EditorPanel = (props) => {
 					...state,
 					general: {
 						...state.general,
-						allowMapZoom: value
-					},
+						[property]: value
+					}
+				})
+				break;
+			case 'hidePrimaryColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
 				})
 				break;
 			case 'showTitle':
@@ -2250,6 +2269,29 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Show Title</span>
 									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hideGeoColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hideGeoColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Geography Column Name in Tooltip</span>
+									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hidePrimaryColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
+									</label>
+
 									{'navigation' !== state.general.type && (
 										<label className='checkbox'>
 											<input
