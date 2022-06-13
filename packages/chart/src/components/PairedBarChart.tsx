@@ -49,7 +49,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 	const yScale = scaleBand({
 		range: [0, adjustedHeight],
 		domain: data.map(d => d[config.dataDescription.xKey]),
-		padding: 0.2
 	});
 
 	// Set label color
@@ -83,6 +82,10 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 		)
 	}
 
+	const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
+	const isLabelOnYAxis = config.yAxis.labelPlacement === "On Date/Category Axis";
+	const isLabelMissing = !config.yAxis.labelPlacement;
+
 	return (width > 0) && (
 		<>
 			<svg
@@ -94,17 +97,39 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
 						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1;
 						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1;
-
 						let barWidth = (xScale(d[config.series[0].dataKey]))
+                    	let barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25;
+                    	let barPadding = barHeight;
+                    	config.barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25;
+						config.barPadding = config.barHeight;
+                    
+						if (config.orientation=== "horizontal") {
+	
+							if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+								if(barHeight < 40) {
+								config.barPadding = 40;
+								} else {
+								config.barPadding = barPadding;
+								}
+							} else {
+								config.barPadding = barPadding / 2;
+							}
+						}
+
+                    	config.height = (Number(barHeight) ) * data.length + (config.barPadding * data.length);
+
+						let y =  yScale([d[config.dataDescription.xKey]]) + config.barHeight/1.5;
+						y = Number(config.barPadding) > 20 ? y += Number(config.barPadding/3.5) - config.barHeight/2 : y += 0
+
 						return (
 						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
 							<Bar
 								className="bar"
 								key={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
 								x={halfWidth - barWidth}
-								y={yScale([d[config.dataDescription.xKey]])}
+								y={ y }
 								width={xScale(d[config.series[0].dataKey])}
-								height={yScale.bandwidth()}
+								height={barHeight}
 								fill={groupOne.color}
 								data-tip={ dataTipOne(d) }
 								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -116,8 +141,9 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 							{config.yAxis.displayNumbersOnBar && displayBar &&
 								<Text
 									textAnchor={barWidth < 100 ? 'end' : 'start' }
+									verticalAnchor="middle"
 									x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
-									y={yScale([d[config.dataDescription.xKey]]) + yScale.bandwidth() / 1.5}
+									y={ y + config.barHeight/2}
 									fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
 									{formatNumber(d[groupOne.dataKey])}
 								</Text>
@@ -130,15 +156,35 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1;
 						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1;
 						
+                    	let barHeight = config.barHeight ? config.barHeight : 25;
+                    	let barPadding = barHeight;
+                    	config.barHeight = Number(config.barHeight)
+
+						let y =  yScale([d[config.dataDescription.xKey]]) + config.barHeight/1.5;
+						y = Number(config.barPadding) > 20 ? y += Number(config.barPadding/3.5) - config.barHeight/2 : y += 0
+                    
+						if (config.orientation=== "horizontal") {
+	
+							if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+								if(barHeight < 40) {
+								config.barPadding = 40;
+								} else {
+								config.barPadding = barPadding;
+								}
+							} else {
+								config.barPadding = barPadding / 2;
+							}
+						}
+
 						return(
 							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}>
 								<Bar
 									className="bar"
 									key={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
 									x={halfWidth}
-									y={yScale([d[config.dataDescription.xKey]])}
+									y={ y }
 									width={xScale(d[config.series[1].dataKey])}
-									height={yScale.bandwidth()}
+									height={barHeight}
 									fill={groupTwo.color}
 									data-tip={ dataTipTwo(d) }
 									data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -150,8 +196,9 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								{config.yAxis.displayNumbersOnBar && displayBar &&
 									<Text
 										textAnchor={barWidth < 100 ? 'start' : 'end' }
+										verticalAnchor="middle"
 										x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
-										y={yScale([d[config.dataDescription.xKey]]) + (yScale.bandwidth() / 1.5)}
+										y={ y + config.barHeight/2}
 										fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
 										{formatNumber(d[groupTwo.dataKey])}
 									</Text>
