@@ -35,8 +35,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   let style = {};
   if(isHorizontal  && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`0  ${radius} ${radius} 0`} : {borderRadius: radius};
   if(!isHorizontal && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`${radius} ${radius} 0 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`${radius} ${radius} 0 0 `} : {borderRadius: radius};
-  if(isHorizontal  && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  ? {borderRadius:`${radius}`}:{};
-  if(!isHorizontal && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:` ${radius} ${radius} 0 0 `}:tipRounding==='full'  ? {borderRadius:`${radius}`}:{};
+  if(isHorizontal  && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  ? {borderRadius:radius}:{};
+  if(!isHorizontal && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:` ${radius} ${radius} 0 0 `}:tipRounding==='full'  ? {borderRadius:radius}:{};
 
   // Using State 
   const [horizBarHeight, setHorizBarHeight] = useState(null);
@@ -73,7 +73,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if(config.barStyle==='lollipop'){
       updateConfig({ ...config, isLollipopChart:true })
     }
-    if(config.barStyle==='rounded' || config.barStyle==='flat'){
+    if( isRounded || config.barStyle==='flat'){
       updateConfig({ ...config, isLollipopChart:false })
     }
   },[config.barStyle])
