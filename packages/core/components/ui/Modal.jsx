@@ -1,7 +1,7 @@
 import React, { Children } from 'react'
 import PropTypes from 'prop-types'
 
-import { useGlobalContext } from '../GlobalContext'
+import { useGlobalContext } from '../../context/GlobalContext'
 import Icon from './Icon'
 
 import '../../styles/v2/components/ui/modal.scss'

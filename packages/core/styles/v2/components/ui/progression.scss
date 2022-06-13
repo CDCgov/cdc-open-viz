@@ -32,15 +32,15 @@
 
   .la-ball-beat {
     display: flex;
-    position: relative;
     justify-content: center;
     align-items: center;
+    position: relative;
     width: 108px;
     height: 36px;
     margin: 0 auto;
     font-size: 0;
-    transform: scale(1.3);
     color: #777;
+    transform: scale(1.3);
 
     &.sm, &.xs, &.xxs {
       transform: scale(0.7)

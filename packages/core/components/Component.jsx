@@ -1,7 +1,7 @@
 import React from 'react'
 import parse from 'html-react-parser'
 
-import '../../styles/v2/layout/component.scss'
+import '../styles/v2/components/component.scss'
 
 const Component = (props) => {
   const { title, description, table, tableShowIf = true, theme, className, children } = props

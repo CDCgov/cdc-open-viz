@@ -7,8 +7,8 @@
   .cove-label,
   .cove-input__checkbox,
   .cove-input__radio {
-    cursor: pointer;
     user-select: none;
+    cursor: pointer;
   }
 
   .cove-label {
@@ -41,8 +41,8 @@
 .cove-input__checkbox {
   display: inline-block;
   width: 1.75rem;
-  aspect-ratio: 1/1;
   cursor: pointer;
+  aspect-ratio: 1/1;
 
   &--small {
     @extend .cove-input__checkbox;
@@ -75,8 +75,8 @@
   height: 100%;
   background-color: #f4f4f4;
   border-radius: 3px;
-  box-shadow: inset 0 0 0 1px #c4c4c4;
   transition: all 150ms $transition-expo-out;
+  box-shadow: inset 0 0 0 1px #c4c4c4;
 }
 
 .cove-input__checkbox-check {
@@ -88,8 +88,8 @@
   width: 100%;
   height: 100%;
   padding: 2px;
-  fill: #fff;
-  pointer-events: none;
   transition: all 250ms $transition-expo-out;
+  pointer-events: none;
   opacity: 0;
+  fill: #fff;
 }

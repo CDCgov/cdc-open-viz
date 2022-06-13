@@ -7,9 +7,9 @@ import chroma from 'chroma-js'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
+export default function ChartLinearBar({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
   const {
     transformedData: data,
     colorScale,
@@ -19,7 +19,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     updateConfig,
     setParentConfig,
     colorPalettes
-  } = useContext<any>(ConfigContext)
+  } = useConfigContext()
+
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -72,7 +73,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           <BarStack
             data={data}
             keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
-            x={(d: any) => d[config.runtime.xAxis.dataKey]}
+            x={(data) => data[config.runtime.xAxis.dataKey]}
             xScale={xScale}
             yScale={yScale}
             color={colorScale}
@@ -130,7 +131,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
               height={yMax}
-              y={(d: any) => d[config.runtime.yAxis.dataKey]}
+              y={(data) => data[config.runtime.yAxis.dataKey]}
               xScale={xScale}
               yScale={yScale}
               color={colorScale}
@@ -241,7 +242,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
               height={yMax}
-              x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
+              x0={data => data[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.runtime.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
               yScale={config.runtime.horizontal ? xScale : yScale}

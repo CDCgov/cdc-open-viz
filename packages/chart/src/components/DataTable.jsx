@@ -11,7 +11,7 @@ import { Base64 } from 'js-base64'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
 export default function DataTable() {
   const {
@@ -22,15 +22,12 @@ export default function DataTable() {
     parseDate,
     formatDate,
     formatNumber: numberFormatter
-  } = useContext<any>(ConfigContext)
+  } = useConfigContext()
 
-  const legendGlyphSize = 15
-  const legendGlyphSizeHalf = legendGlyphSize / 2
-
-  const [ tableExpanded, setTableExpanded ] = useState<boolean>(config.table.expanded)
+  const [ tableExpanded, setTableExpanded ] = useState(config.table.expanded)
   const [ accessibilityLabel, setAccessibilityLabel ] = useState('')
 
-  const DownloadButton = ({ data }: any) => {
+  const DownloadButton = ({ data }) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
 
     const csvData = Papa.unparse(data)

@@ -1,6 +1,5 @@
 import React from 'react'
 
-import Icon from './Icon'
 import Label from '../elements/Label'
 import Tooltip from './Tooltip'
 
@@ -21,8 +20,8 @@ const ColorPicker = ({ label, colors, config, updateConfig, tooltip, colorToolti
     <>
       {label && <Label tooltip={tooltip}>{label}</Label>}
       <div className="cove-color-picker">
-        {colorTooltip
-          ?
+        {/* Use two separate maps to resolve key warnings */}
+        {colorTooltip ?
           colors.map((color, index) => (
             <Tooltip position="bottom" key={index}>
               <Tooltip.Target>
@@ -30,8 +29,7 @@ const ColorPicker = ({ label, colors, config, updateConfig, tooltip, colorToolti
               </Tooltip.Target>
               <Tooltip.Content>{color}</Tooltip.Content>
             </Tooltip>
-          ))
-          :
+          )) :
           colors.map((color, index) => (
             <ColorButton color={color} config={config} updateConfig={updateConfig} key={index}/>
           ))

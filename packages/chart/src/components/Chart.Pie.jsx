@@ -1,23 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie'
+import Pie from '@visx/shape/lib/shapes/Pie'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import ReactTooltip from 'react-tooltip'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-// react-spring transition definitions
-type PieStyles = { startAngle: number; endAngle: number };
+const enterUpdateTransition = ({ startAngle, endAngle }) => ({ startAngle, endAngle })
 
-const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
-  startAngle,
-  endAngle,
-})
-
-export default function PieChart() {
+export default function ChartPie() {
   const {
     transformedData: data,
     config,
@@ -26,9 +20,9 @@ export default function PieChart() {
     colorScale,
     formatNumber,
     currentViewport
-  } = useContext<any>(ConfigContext)
+  } = useConfigContext()
 
-  const [ filteredData, setFilteredData ] = useState<any>(undefined)
+  const [ filteredData, setFilteredData ] = useState(undefined)
 
   useEffect(() => {
     if (seriesHighlight.length > 0 && config.legend.behavior !== 'highlight') {
@@ -50,14 +44,8 @@ export default function PieChart() {
     ReactTooltip.rebuild()
   })
 
-  type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
-    animate?: boolean;
-    getKey: (d: PieArcDatum<Datum>) => string;
-    delay?: number;
-  };
-
-  function AnimatedPie<Datum>({ arcs, path, getKey, }: AnimatedPieProps<Datum>) {
-    const transitions = useTransition<PieArcDatum<Datum>, PieStyles>(arcs, getKey, // @ts-ignore react-spring doesn't like this overload
+  function AnimatedPie({ arcs, path, getKey }) {
+    const transitions = useTransition(arcs, getKey,
       {
         from: enterUpdateTransition,
         enter: enterUpdateTransition,
@@ -68,15 +56,7 @@ export default function PieChart() {
     return (
       <>
         {transitions.map(
-          ({
-             item: arc,
-             props,
-             key,
-           }: {
-            item: PieArcDatum<Datum>;
-            props: PieStyles;
-            key: string;
-          }) => {
+          ({item: arc,props,key}) => {
             let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
             let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${arc.data[config.runtime.xAxis.dataKey]}` : arc.data[config.runtime.xAxis.dataKey]
 
@@ -103,21 +83,13 @@ export default function PieChart() {
           },
         )}
         {transitions.map(
-          ({
-             item: arc,
-             key,
-           }: {
-            item: PieArcDatum<Datum>;
-            props: PieStyles;
-            key: string;
-          }) => {
+          ({item: arc, key}) => {
             const [ centroidX, centroidY ] = path.centroid(arc)
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
             return (
               <animated.g key={key}>
                 {hasSpaceForLabel && (
-
                   <Text
                     fill="white"
                     x={centroidX}
@@ -162,10 +134,7 @@ export default function PieChart() {
             outerRadius={radius}
           >
             {pie => (
-              <AnimatedPie<any>
-                {...pie}
-                getKey={d => d.data[config.runtime.xAxis.dataKey]}
-              />
+              <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]}/>
             )}
           </Pie>
         </Group>

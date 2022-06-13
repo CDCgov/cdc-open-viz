@@ -6,8 +6,8 @@
 
 .cove-chart__container {
   display: flex;
-  align-items: flex-start;
   flex-wrap: wrap;
+  align-items: flex-start;
   margin-bottom: 1rem;
 
   &.no-border {
@@ -19,14 +19,14 @@
   }
 
   @include breakpoint(md) {
-    margin-left: 1rem;
     margin-right: 1rem;
+    margin-left: 1rem;
   }
 }
 
 .cove-chart__visualization {
-  overflow: visible;
   font-size: 0.875rem;
+  overflow: visible;
 
   .visx-linepath {
     pointer-events: none;
@@ -56,10 +56,10 @@
 
 .cove-chart__legend {
   position: relative;
-  vertical-align: top;
   width: 100%;
   padding: 0.75rem;
   text-align: center;
+  vertical-align: top;
   background-color: #fff;
   border: 1px solid $lightGray;
   order: 1;
@@ -70,8 +70,8 @@
     order: 2;
 
     &[flow="left"] {
-      margin-left: 0;
       margin-right: 1rem;
+      margin-left: 0;
       order: 0;
     }
   }
@@ -111,9 +111,9 @@
   min-height: unset;
   padding: 0.375rem;
   font-size: 0.6875rem;
+  text-transform: uppercase;
   color: rgba(0, 0, 0, 0.6);
   background-color: rgba(0, 0, 0, 0.1);
-  text-transform: uppercase;
 
   &:hover {
     background: rgba(0, 0, 0, .15);

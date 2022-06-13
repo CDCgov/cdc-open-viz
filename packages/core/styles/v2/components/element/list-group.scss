@@ -5,8 +5,8 @@
   padding-left: 0;
   margin-top: 0;
   margin-bottom: 1.5rem;
-  border: $lightGray 1px solid;
   list-style: none;
+  border: $lightGray 1px solid;
   user-select: none;
 
   &:empty {
@@ -33,14 +33,14 @@
 }
 
 .cove-list-group__item-value {
-  position: relative;
   flex: 1 1 auto;
+  position: relative;
 }
 
 .cove-list-group__item-value__text {
   max-width: 250px;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
   overflow: hidden;
 
   @at-root {

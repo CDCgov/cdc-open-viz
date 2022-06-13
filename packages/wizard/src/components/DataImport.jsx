@@ -4,7 +4,7 @@ import { csvParse } from 'd3'
 import { useDebounce } from 'use-debounce'
 import axios from 'axios'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import { useGlobalContext } from '@cdc/core/components/context/GlobalContext'
 import WizardContext from '../WizardContext'
 
 import {

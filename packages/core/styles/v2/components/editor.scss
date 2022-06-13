@@ -3,8 +3,8 @@
 
 .cove-editor {
   display: grid;
-  grid-template-columns: auto 1fr;
   grid-template-areas: "panel content";
+  grid-template-columns: auto 1fr;
   position: relative;
   height: 100vh;
 }
@@ -15,23 +15,23 @@
   left: 307px;
   width: 25px;
   height: 25px;
-  background-color: #f2f2f2;
-  border-radius: 60px;
-  color: #000;
   font-size: 1em;
+  color: #000;
+  background-color: #f2f2f2;
   border: 0;
-  cursor: pointer;
+  border-radius: 60px;
   transition: left 400ms ease 65ms, background-color 200ms ease;
   box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
   user-select: none;
+  cursor: pointer;
   z-index: 8;
 
   &:before {
+    content: "\00ab";
+    position: absolute;
     top: 43%;
     left: 50%;
     transform: translate(-50%, -50%);
-    position: absolute;
-    content: "\00ab";
   }
 
   &.collapsed {
@@ -53,13 +53,13 @@
   width: 0;
   background-color: #fff;
   border-right: 1px solid #c2c2c2;
+  transition: width 500ms ease;
   overflow-x: hidden;
   overflow-y: auto;
-  transition: width 500ms ease;
   z-index: 7;
 
   @at-root {
-    .cove-editor.panel-shown #{&}{
+    .cove-editor.panel-shown #{&} {
       width: $editorWidth;
     }
   }
@@ -70,49 +70,240 @@
   min-width: $editorWidth;
 }
 
-.cove-editor__panel-config {} //TODO: COVE Refactor - Is this needed in DOM at all?
+.cove-editor__panel-config {
+}
+
+//TODO: COVE Refactor - Is this needed in DOM at all?
+
+.cove-editor__panel-heading {
+  padding: .625rem 1.125rem;
+  font-size: 1.125em;
+  color: #fff;
+  background-color: $mediumGray;
+  user-select: none;
+}
 
 .cove-editor__divider {
-  border: 0;
-  border-top: 1px solid #e2e2e2;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+  border: 0;
+  border-top: 1px solid #e2e2e2;
 }
 
 .cove-editor__content {
-  position: relative;
   grid-area: content;
+  position: relative;
   background-color: #fff;
   transition: background-color 500ms $transition-expo-out;
+  transform: scale(1); //Set baseline for fixed
+  overflow: hidden;
 
   @at-root {
-    .cove-editor.panel-shown #{&}{
+    .cove-editor.panel-shown #{&} {
       background-color: #e7e7e7;
     }
   }
 }
 
-.cove-editor__content-wrap {
+
+.cove-editor__content-wrap--x {
   position: relative;
-  margin: 3rem auto;
   min-width: 35rem;
   max-width: 50%;
+  height: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  transition: max-width 500ms $transition-expo-out;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      width: 1px;
+      height: 100vh;
+      top: 50%;
+      transform: translateY(-50%);
+      display: block;
+      position: absolute;
+      background-image: repeating-linear-gradient(0deg, #999, #999 18px, transparent 18px, transparent 26px);
+      transition: opacity 500ms ease;
+      opacity: 0;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -1px;
+    }
+  }
 }
 
-.cove-editor__heading {
-  padding: .625rem 1.125rem;
-  color: #fff;
-  font-size: 1.125em;
-  background-color: $mediumGray;
-  user-select: none;
+.cove-editor__content-wrap--y {
+  position: absolute;
+  top: 3rem;
+  width: 100%;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 50%;
+      width: 100vw;
+      height: 1px;
+      background-image: repeating-linear-gradient(90deg, #999, #999 18px, transparent 18px, transparent 26px);
+      transform: translateX(-50%);
+      transition: opacity 500ms ease;
+      opacity: 0;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      top: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      bottom: -1px;
+    }
+  }
 }
+
+.cove-editor-utils__grid--x::before {
+  content: '';
+  display: block;
+  position: fixed;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  background-color: red;
+}
+
+.cove-editor-utils {
+}
+
+.cove-editor-utils__breakpoints {
+  position: absolute;
+  right: 4rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-radius: 999px;
+  box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 15%);
+  user-select: none;
+
+  @at-root {
+    .cove-editor:not(.panel-shown) #{&} {
+      animation: editorBreakpointsDown 500ms ease forwards;
+    }
+
+    .cove-editor.panel-shown #{&} {
+      animation: editorBreakpointsUp 500ms ease forwards;
+    }
+  }
+}
+
+@keyframes editorBreakpointsUp {
+  0% {
+    bottom: -3rem;
+  }
+  100% {
+    bottom: 2rem;
+  }
+}
+
+@keyframes editorBreakpointsDown {
+  0% {
+    bottom: 2rem;
+  }
+  100% {
+    bottom: -3rem;
+  }
+}
+
+.cove-editor-utils__breakpoints-list {
+  display: flex;
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.cove-editor-utils__breakpoints-item {
+  display: block;
+  position: relative;
+  margin-right: 1rem;
+  font-size: 0.875em;
+  color: $primary;
+  border-bottom: 2px solid transparent;
+  transition: all 400ms $transition-expo-out;
+  transition-property: border, color, transform;
+  cursor: pointer;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+
+  &:not(:last-of-type) {
+    &::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      margin-left: 0.5rem;
+      background-color: #d3d3d3;
+      pointer-events: none;
+    }
+  }
+
+  &.active {
+    border-bottom: 2px dotted $secondary;
+  }
+
+  > .reset {
+    display: inline-flex;
+    height: 1.25rem;
+    transition: color 400ms $transition-expo-out;
+  }
+
+  @at-root {
+    //Gray out
+    .cove-editor-utils__breakpoints-list:hover #{&},
+    .cove-editor-utils__breakpoints-list.has-active #{&}:not(.active) {
+      color: #888;
+    }
+
+    //Colored
+    .cove-editor-utils__breakpoints-list.has-active #{&} .reset {
+      color: $primary !important;
+    }
+
+    .cove-editor-utils__breakpoints-list:hover #{&}.active,
+    .cove-editor-utils__breakpoints-list #{&}:hover,
+    .cove-editor-utils__breakpoints-list.has-active #{&}:hover {
+      color: $primary;
+    }
+  }
+}
+
 
 // TODO: What is this stuff? -----------------------------------------------
 .TODO-make-components {
   .divider-heading {
     display: block;
-    font-size: 1em;
     margin-top: 1em;
+    font-size: 1em;
   }
 
   .sort-list {
@@ -126,21 +317,21 @@
     li > div {
       display: block;
       box-sizing: border-box;
+      padding: .4em .6em;
+      margin-bottom: .3em;
+      font-size: .8em;
+      background: #F1F1F1;
       border: 1px solid #D1D1D1;
       border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-bottom: .3em;
       cursor: move;
     }
   }
 
   .info {
-    font-size: .8em;
-    line-height: 1.4em;
-    font-style: italic;
     padding-top: 10px;
+    font-size: .8em;
+    font-style: italic;
+    line-height: 1.4em;
   }
 
   .react-tags__search {
@@ -171,18 +362,18 @@
   .react-tags__selected-tag {
     display: inline-block;
     box-sizing: border-box;
-    border: 1px solid #D1D1D1;
-    border-radius: 2px;
-    background: #F1F1F1;
     padding: .4em .6em;
-    font-size: .8em;
     margin-right: .3em;
     margin-bottom: .3em;
+    font-size: .8em;
+    background: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    border-radius: 2px;
 
     &::after {
       content: '\2715';
-      color: #AAA;
       margin-left: 8px;
+      color: #AAA;
     }
 
     &:hover,
@@ -197,11 +388,11 @@
 
     input {
       max-width: 100%;
-      margin: 0;
-      outline: none;
       padding: .5em .3em;
+      margin: 0;
       font-size: inherit;
       line-height: inherit;
+      outline: none;
     }
 
     input::-ms-clear {
@@ -222,8 +413,8 @@
     width: 100%;
 
     ul {
-      margin: 4px -1px;
       padding: 0;
+      margin: 4px -1px;
       list-style: none;
       background: white;
       border: 1px solid #D1D1D1;
@@ -232,12 +423,12 @@
     }
 
     li {
-      border-bottom: 1px solid #ddd;
       padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
 
       &:hover {
-        cursor: pointer;
         background: #eee;
+        cursor: pointer;
       }
 
       &.is-active {
@@ -250,9 +441,9 @@
       }
 
       mark {
+        font-weight: 600;
         text-decoration: underline;
         background: none;
-        font-weight: 600;
       }
     }
   }
@@ -274,18 +465,18 @@
   }
 
   .advanced-toggle-link {
-    padding-top: 1em;
     display: block;
+    padding-top: 1em;
     text-align: left;
-    cursor: pointer;
-    color: rgba(0, 0, 0, .5);
     text-decoration: underline;
+    color: rgba(0, 0, 0, .5);
+    cursor: pointer;
 
     span {
-      text-decoration: none;
       display: inline-block;
-      font-family: monospace;
       padding-right: 5px;
+      font-family: monospace;
+      text-decoration: none;
     }
 
     &:hover {
@@ -294,11 +485,11 @@
   }
 
   textarea {
-    height: 400px;
+    box-sizing: border-box;
     width: 100%;
-    font-size: .9em;
+    height: 400px;
     padding: .5em;
     font-family: monospace;
-    box-sizing: border-box
+    font-size: .9em;
   }
 }

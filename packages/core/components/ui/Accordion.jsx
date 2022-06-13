@@ -16,9 +16,9 @@ import '../../styles/v2/components/ui/accordion.scss'
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = () => null
 
-const Accordion = ({children}) => {
+const Accordion = ({ children }) => {
   const childNodes = Children.toArray(children)
-  const accordionSections = childNodes.filter(child => child?.type === AccordionSection)
+  const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || children
 
   return (
     <AccordionComponent allowZeroExpanded={true}>

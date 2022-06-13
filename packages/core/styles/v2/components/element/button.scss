@@ -22,8 +22,8 @@
   vertical-align: middle;
   color: #fff;
   background-color: $primary;
-  border-radius: 0.1875rem;
   border: 0;
+  border-radius: 0.1875rem;
   outline: none;
   transition: all 500ms $transition-expo-out;
   user-select: none;
@@ -55,11 +55,11 @@
       &::after {
         content: '';
         position: absolute;
-        inset: 0;
-        outline: 2px solid rgba(161, 161, 161, 0.6);
-        border-radius: .3125em;
         margin: -2px;
+        border-radius: .3125em;
+        outline: 2px solid rgba(161, 161, 161, 0.6);
         pointer-events: none;
+        inset: 0;
       }
     }
   }
@@ -98,15 +98,15 @@
 
   &.cove-button--remove {
     float: right;
+    min-height: unset;
+    padding: 0;
+    font-size: .7em;
+    font-weight: bold;
+    text-decoration: underline;
     text-transform: uppercase;
     color: #C32B2B;
-    font-size: .7em;
-    border-radius: 5px;
-    text-decoration: underline;
-    font-weight: bold;
     background-color: transparent;
-    padding: 0;
-    min-height: unset;
+    border-radius: 5px;
   }
 
   &.cove-button--flex-center {
@@ -117,9 +117,9 @@
 }
 
 .cove-button__text {
+  align-self: stretch;
   position: relative;
   transition: width 500ms $transition-expo-out;
-  align-self: stretch;
 
   .cove-button__text--loading {
     opacity: 0;

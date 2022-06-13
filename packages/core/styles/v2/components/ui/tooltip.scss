@@ -3,8 +3,8 @@ $cove-tooltip-color: #333;
 $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 
 .cove-tooltip {
-  position: relative;
   display: inline-block;
+  position: relative;
   line-height: 1em;
 
   @at-root {
@@ -43,15 +43,15 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 .cove-tooltip__content {
   max-width: 280px;
   padding: 10px 8px;
-  text-align: left;
   font-size: 0.875rem;
   line-height: 1.125rem;
+  text-align: left;
   color: $cove-tooltip-color;
   background-color: $cove-tooltip-bg;
   border-radius: 5px;
   user-select: none;
-  cursor: default;
   opacity: 0;
+  cursor: default;
 
   &.place-top {
     &.has-shadow {

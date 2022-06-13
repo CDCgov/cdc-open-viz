@@ -31,8 +31,8 @@
   width: 20px;
   height: 20px;
   border-radius: 100%;
-  transform: translate(-50%, -50%) scale(1);
   transition: transform 400ms $transition-expo-out;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .cove-color-picker__color {

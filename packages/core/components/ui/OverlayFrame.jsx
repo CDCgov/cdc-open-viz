@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useGlobalContext } from '../GlobalContext'
+import { useGlobalContext } from '../../context/GlobalContext'
 
 import Overlay from './Overlay'
 

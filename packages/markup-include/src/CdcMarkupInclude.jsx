@@ -3,7 +3,7 @@ import axios from 'axios'
 import parse from 'html-react-parser'
 import { Markup } from 'interweave'
 
-import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import { GlobalContextProvider } from '@cdc/core/components/context/GlobalContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 

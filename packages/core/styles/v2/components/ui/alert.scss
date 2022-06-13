@@ -15,8 +15,8 @@
   }
 
   .cove-alert__error-dismiss {
-    font-size: .8rem;
     flex-shrink: 0;
+    font-size: .8rem;
     cursor: pointer;
   }
 }
@@ -31,7 +31,7 @@
   border-radius: 0.1875rem;
 
   strong {
-    font-weight: 600;
     display: block;
+    font-weight: 600;
   }
 }

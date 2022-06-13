@@ -23,6 +23,7 @@ import iconMapUsa from '../../assets/icon-map-usa.svg'
 import iconMapWorld from '../../assets/icon-map-world.svg'
 import iconMove from '../../assets/icon-move.svg'
 import iconQuestion from '../../assets/icon-question-circle.svg'
+import iconRotateLeft from '../../assets/icon-rotate-left.svg'
 import iconUpload from '../../assets/icon-upload.svg'
 import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
@@ -52,6 +53,7 @@ const iconHash = {
   'mapWorld': iconMapWorld,
   'move': iconMove,
   'question': iconQuestion,
+  'rotateLeft': iconRotateLeft,
   'upload': iconUpload,
   'warningCircle': iconWarningCircle,
   'warningTriangle': iconWarningTriangle

@@ -1,17 +1,23 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React from 'react'
+import { render } from 'react-dom'
 
-import CdcChart from './CdcChart';
+import { GlobalContextProvider } from '@cdc/core/context/GlobalContext'
+import { ConfigContextProvider } from '@cdc/core/context/ConfigContext'
 
-const domContainers = document.querySelectorAll('.react-container');
+import defaults from './data/initial-state'
+import CdcChart from './CdcChart'
 
-let isEditor = window.location.href.includes('editor=true');
+const domContainers = document.querySelectorAll('.react-container')
 
 domContainers.forEach((domContainer) => {
   render(
     <React.StrictMode>
-      <CdcChart configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+      <GlobalContextProvider>
+        <ConfigContextProvider defaults={defaults}>
+          <CdcChart configUrl={domContainer.attributes['data-config'].value}/>
+        </ConfigContextProvider>
+      </GlobalContextProvider>
     </React.StrictMode>,
     domContainer,
-  );
-});
+  )
+})

@@ -16,15 +16,15 @@
 
 .cove-render__content {
   display: flex;
-  position: relative;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .cove-render__text {
   position: absolute;
-  font-style: italic;
   font-size: 1rem;
+  font-style: italic;
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
   white-space: nowrap;
   animation: fadeOutIn 3000ms ease infinite;

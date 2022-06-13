@@ -24,6 +24,15 @@ const Tooltip = ({
 
   const uid = 'tooltip-' + Math.floor(Math.random() * 100000)
 
+  const generateTriggerEvent = (trigger) => {
+    const eventList = {
+      'hover': null,
+      'focus': 'focus',
+      'click': 'click focus'
+    }
+    return eventList[trigger]
+  }
+
   // Props added to anchor are local
   // Props added to ReactTooltip are global
   return (
@@ -32,7 +41,7 @@ const Tooltip = ({
          data-border={!!border}
          data-border-color={borderColor}
          data-effect={float ? 'float' : 'solid'}
-         data-event={trigger !== 'click' ? null : 'click focus'}
+         data-event={generateTriggerEvent()}
          data-for={uid}
          data-place={position ? position : null}
          data-scroll-hide={hideOnScroll}

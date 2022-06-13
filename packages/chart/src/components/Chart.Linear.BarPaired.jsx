@@ -5,16 +5,10 @@ import { scaleLinear, scaleBand } from '@visx/scale'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-interface PairedBarChartProps {
-  width: number,
-  height: number
-}
-
-const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
-
-  const { config, colorScale, transformedData } = useContext<any>(ConfigContext)
+const ChartLinearBarPaired = ({ width, height }) => {
+  const { config, colorScale, transformedData } = useConfigContext()
 
   if (!config || config?.series?.length < 2) return
 
@@ -141,4 +135,4 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
   )
 }
 
-export default PairedBarChart
+export default ChartLinearBarPaired

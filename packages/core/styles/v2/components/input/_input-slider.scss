@@ -50,8 +50,8 @@
 
   &.slider--block {
     width: unset;
-    aspect-ratio: 1.85/1;
     padding: 4px;
+    aspect-ratio: 1.85/1;
 
     .cove-input__slider-button {
       border-radius: 10%;
@@ -76,11 +76,11 @@
       &::after {
         content: '';
         display: block;
+        position: absolute;
+        top: 5px;
         width: 1px;
         height: calc(100% - 10px);
         background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(227, 227, 227, 1) 30%, rgba(227, 227, 227, 1) 70%, rgba(255, 255, 255, 1) 100%);
-        position: absolute;
-        top: 5px;
       }
 
       &::before {
@@ -97,11 +97,11 @@
     width: 60px;
 
     .cove-input__slider-button {
-      background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 1) 45%, rgb(200 200 200) 100%);
-      box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;
-      height: 160%;
       top: -30%;
+      height: 160%;
+      background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 1) 45%, rgb(200 200 200) 100%);
       transform: translateX(-20%);
+      box-shadow: 0 1px 3px 1px rgb(0 0 0 / 40%), inset 0 0 3px 2px #fff;
 
       &:after {
         content: '';
@@ -111,9 +111,9 @@
         left: 0;
         width: calc(100% - 6px);
         height: calc(100% - 6px);
+        margin: 3px;
         border: 1px solid #ececec;
         border-radius: 999px;
-        margin: 3px;
       }
     }
 
@@ -191,12 +191,12 @@
   position: relative;
   left: 0;
   height: 100%;
-  aspect-ratio: 1/1;
   background-color: #fff;
-  box-shadow: -2px 4px 10px -7px rgb(0 0 0);
   border-radius: 100%;
   transition: all 200ms $transition-expo-out;
+  box-shadow: -2px 4px 10px -7px rgb(0 0 0);
   z-index: 2;
+  aspect-ratio: 1/1;
 }
 
 .cove-input__slider-track {

@@ -1,6 +1,9 @@
 import React, { useRef, memo } from 'react'
 import PropTypes from 'prop-types'
 
+//Context
+import { useConfigContext } from '../../context/ConfigContext'
+
 import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
@@ -14,13 +17,11 @@ const InputSelect = memo((
     required,
     tooltip,
 
-    fieldName,
-    section = null,
-    subsection = null,
-    updateField,
+    configField,
     onChange, className, style, ...attributes
   }
 ) => {
+  const { configActions } = useConfigContext()
 
   const inputRef = useRef(null)
 
@@ -43,8 +44,8 @@ const InputSelect = memo((
   }
 
   let onChangeHandler = (e) => {
-    if (updateField) { //Found reference to config update function, updating field value
-      updateField(section, subsection, fieldName, e.target.value)
+    if (configField) { //Found reference to config update function, updating field value
+      configActions.updateField(configField, e.target.value)
     }
     if (onChange) { //Found additional onChange functions to run
       onChange(e)
@@ -62,7 +63,7 @@ const InputSelect = memo((
         </Label>
       }
       <select className={`cove-input${required && !value ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
-              name={fieldName} value={value} style={styles}
+              value={value} style={styles}
               onChange={(e) => onChangeHandler(e)} {...attributes}
               ref={inputRef}
       >

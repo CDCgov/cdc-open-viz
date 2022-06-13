@@ -7,10 +7,10 @@ import { Text } from '@visx/text';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import ConfigContext from '../ConfigContext';
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(ConfigContext);
+export default function ChartLinearLine({ xScale, yScale, getXAxisData, getYAxisData }) {
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber } = useConfigContext()
 
   return (
     <ErrorBoundary component="LineChart">

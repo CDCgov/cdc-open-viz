@@ -11,8 +11,8 @@
   transform-origin: top left;
 
   div {
-    animation: cove-loadspin__roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     transform-origin: 40px 40px;
+    animation: cove-loadspin__roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 
     &:after {
       content: " ";
@@ -20,9 +20,9 @@
       position: absolute;
       width: 7px;
       height: 7px;
-      border-radius: 50%;
-      background-color: inherit;
       margin: -4px 0 0 -4px;
+      background-color: inherit;
+      border-radius: 50%;
     }
 
     &:nth-child(1) {

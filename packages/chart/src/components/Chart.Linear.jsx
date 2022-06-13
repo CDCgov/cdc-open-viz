@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 import { Group } from '@visx/group'
@@ -9,23 +9,23 @@ import { AxisLeft, AxisBottom } from '@visx/axis'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-import BarChart from './BarChart'
-import LineChart from './LineChart'
-import PairedBarChart from './PairedBarChart'
+import ChartLinearBar from './Chart.Linear.Bar'
+import ChartLinearBarPaired from './Chart.Linear.BarPaired'
+import ChartLinearLine from './Chart.Linear.Line'
 
 import useReduceData from '../hooks/useReduceData'
 
-const LinearChart = () => {
+const ChartLinear = () => {
   const {
+    config,
+    currentViewport,
     transformedData: data,
     dimensions,
-    config,
-    parseDate,
     formatDate,
-    currentViewport
-  } = useContext<any>(ConfigContext)
+    parseDate
+  } = useConfigContext()
 
   let [ width ] = dimensions
   const { minValue, maxValue } = useReduceData(config, data)
@@ -39,8 +39,8 @@ const LinearChart = () => {
   const xMax = width - config.runtime.yAxis.size
   const yMax = height - config.runtime.xAxis.size
 
-  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey]
+  const getXAxisData = (data) => config.runtime.xAxis.type === 'date' ? (parseDate(data[config.runtime.originalXAxis.dataKey])).getTime() : data[config.runtime.originalXAxis.dataKey]
+  const getYAxisData = (data, seriesKey) => data[seriesKey]
 
   let xScale
   let yScale
@@ -69,13 +69,13 @@ const LinearChart = () => {
     let xAxisDataMapped = data.map(d => getXAxisData(d))
 
     if (config.runtime.horizontal) {
-      xScale = scaleLinear<number>({
+      xScale = scaleLinear({
         domain: [ min, max ],
         range: [ 0, xMax ]
       })
 
       yScale = config.runtime.xAxis.type === 'date' ?
-        scaleLinear<number>({ domain: [ Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped) ] }) :
+        scaleLinear({ domain: [ Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped) ] }) :
         scalePoint<string>({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint<string>({
@@ -87,32 +87,31 @@ const LinearChart = () => {
     } else {
       min = min < 0 ? min * 1.11 : min
 
-      yScale = scaleLinear<number>({
+      yScale = scaleLinear({
         domain: [ min, max ],
         range: [ yMax, 0 ]
       })
 
-      xScale = scalePoint<string>({ domain: xAxisDataMapped, range: [ 0, xMax ], padding: 0.5 })
+      xScale = scalePoint({ domain: xAxisDataMapped, range: [ 0, xMax ], padding: 0.5 })
 
-      seriesScale = scalePoint<string>({
+      seriesScale = scalePoint({
         domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [ 0, xMax ]
       })
     }
-
 
     if (config.visualizationType === 'Paired Bar') {
       let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
       let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
 
       // group one
-      var g1xScale = scaleLinear<number>({
+      var g1xScale = scaleLinear({
         domain: [ 0, Math.max(groupOneMax, groupTwoMax) ],
         range: [ xMax / 2, 0 ]
       })
 
       // group 2
-      var g2xScale = scaleLinear<number>({
+      var g2xScale = scaleLinear({
         domain: g1xScale.domain(),
         range: [ xMax / 2, xMax ]
       })
@@ -125,7 +124,7 @@ const LinearChart = () => {
   })
 
   return (
-    <ErrorBoundary component="LinearChart">
+    <ErrorBoundary component="ChartLinear">
       <svg className="cove-chart__visualization" width={width} height={height}>
         {/* Higlighted regions */}
         {config.regions ? config.regions.map((region) => {
@@ -388,7 +387,6 @@ const LinearChart = () => {
               numTicks={config.runtime.xAxis.numTicks || undefined}
             >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <Group className="bottom-axis">
                     {props.ticks.map((tick, i) => {
@@ -426,18 +424,18 @@ const LinearChart = () => {
           </>
         }
         {config.visualizationType === 'Paired Bar' && (
-          <PairedBarChart width={xMax} height={yMax}/>
+          <ChartLinearBarPaired width={xMax} height={yMax}/>
         )}
 
         {/* Bar chart */}
         {(config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-          <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
-                    getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
+          <ChartLinearBar xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
+                          getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
         )}
 
         {/* Line chart */}
         {(config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
-          <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
+          <ChartLinearLine xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
         )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light"
@@ -446,4 +444,4 @@ const LinearChart = () => {
   )
 }
 
-export default LinearChart
+export default ChartLinear
