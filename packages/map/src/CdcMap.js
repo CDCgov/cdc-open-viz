@@ -823,19 +823,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
+        
+        // Adds geo label, ie State: Georgia
         let stateOrCounty = 
             state.general.geoType === 'us' ? 'State: ' : 
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
+
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
-            //supportedStatesFipsCodes[]
-            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+            toolTipText +=  !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>` ;
         }
         
-        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
+        toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
@@ -863,7 +865,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
-                        toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
+                        toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
                     }
 
                 }

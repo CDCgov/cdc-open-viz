@@ -181,15 +181,18 @@ export default function DataTable() {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
-                      {row.cells.map((cell, index) => (
-                        <td 
-                          tabIndex="0" 
-                          {...cell.getCellProps()} 
-                          key={`tbody__tr__td-${index}`} 
-                          role="gridcell">
-                          {cell.render('Cell')}
-                        </td>
-                      ))}
+                      {row.cells.map((cell, index) => {
+                        return (
+                          <td 
+                            tabIndex="0" 
+                            {...cell.getCellProps()} 
+                            key={`tbody__tr__td-${index}`} 
+                            role="gridcell">
+                            { cell.render('Cell') }
+                          </td>
+                        )
+                      }
+                      )}
                     </tr>
                   );
                 })}
