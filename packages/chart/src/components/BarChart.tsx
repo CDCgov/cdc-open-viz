@@ -117,20 +117,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 textAnchor="middle">
                   {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
               </Text>
-                <rect
-                  key={`bar-stack-${barStack.index}-${bar.index}`}
-                  x={barThickness * bar.index + offset}
-                  y={bar.y}
-                  height={bar.height}
-                  width={barThicknessAdjusted}
-                  fill={bar.color}
-                  stroke="#333"
-                  strokeWidth={config.barBorderThickness || 1}
-                  opacity={transparentBar ? 0.5 : 1}
-                  display={displayBar ? 'block' : 'none'}
-                  data-tip={tooltip}
-                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                />
+              <foreignObject 
+                key={`bar-stack-${barStack.index}-${bar.index}`}
+                className={`${isRounded && barStacks.length > 1 ? ` ${roundingStyle} stack-vertical-${tipRounding}-${barStack.index}` : ''}`}
+                x={barThickness * bar.index + offset}
+                y={bar.y}
+                width={barThicknessAdjusted}
+                height={bar.height}
+                style={{background:bar.color,border:`${config.barBorderThickness ||1}px solid #333`,...style}}
+                opacity={transparentBar ? 0.5 : 1}
+                display={displayBar ? 'block' : 'none'}
+                data-tip={tooltip}
+                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              >  </foreignObject> 
               </Group>
             )}
             ))}
