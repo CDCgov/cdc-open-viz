@@ -427,13 +427,12 @@ const EditorPanel = () => {
     return unique ? [ ...new Set(values) ] : values
   }
 
-  // when to show lollipop checkbox.
-  // update as the need grows (ie. vertical bars, divergeing, etc.)
-  const showLollipopCheckbox = () => {
-    if (config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular') && config.visualizationSubType !== 'stacked') {
-      return true
+ 
+  const showBarStyleOptions = ()=>{
+    if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation==='horizontal' || config.orientation==='vertical') ) {
+      return ['flat','rounded','lollipop']
     } else {
-      return false
+      return ['flat','rounded']
     }
   }
 
@@ -673,20 +672,15 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
+                  {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.roundingStyle||'standard'} fieldName="roundingStyle" label="rounding style" updateField={updateField} options={['standard','shallow','finger']}/>}
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
                     <Select value={config.yAxis.labelPlacement || 'Below Bar'} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={[ 'Below Bar', 'On Date/Category Axis' ]}/>
                   }
-                  {(showLollipopCheckbox()) &&
-                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select this option to replace each bar with a line and a dot at the end.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }/>
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
                   }
-
                   {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField}/>
 
