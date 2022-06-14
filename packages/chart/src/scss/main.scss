@@ -346,3 +346,16 @@
     margin: 0.25em;
   }
 }
+
+.stack-horizontal-top-0,.stack-vertical-top-0{border-radius: 0 !important;} 
+
+.stack-horizontal-full-0{
+  &.standard{border-radius:  8px 0px 0px 8px !important;}
+  &.shallow{border-radius:  5px 0px 0px 5px !important;}
+  &.finger{border-radius:  12px 0px 0px 12px !important;}
+} 
+.stack-vertical-full-0{
+  &.standard{ border-radius:  0 0 8px 8px !important;}
+  &.shallow{border-radius: 0 0 5px 5px !important;}
+  &.finger{border-radius:  0 0 12px 12px !important;}
+} 
