@@ -352,21 +352,23 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         textAnchor="middle">
                           {formatNumber(bar.value)}
                       </Text>
-                      <rect
+                      <foreignObject
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0) : barY }
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
-                        fill={config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : 
-                              config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor }
-                        stroke="#333"
-                        strokeWidth={config.isLollipopChart ? 0 : config.barBorderThickness || 1}
+                        style={{
+                          background:config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : 
+                            config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor ,
+                          border:`${config.isLollipopChart ? 0 : config.barBorderThickness || 1}px solid #333`,
+                          ...style
+                        }}
                         opacity={transparentBar ? 0.5 : 1}
                         display={displayBar ? 'block' : 'none'}
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                      />
+                      ></foreignObject>
                       {config.isLollipopChart && config.lollipopShape === 'circle' &&
                         <circle 
                           cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize/3.5}
