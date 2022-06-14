@@ -192,20 +192,20 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     return (
                       <Group key={index}>
-                        <rect
+                          <foreignObject
+                          className={`${isRounded && barStacks.length > 1 ? ` ${roundingStyle} stack-horizontal-${tipRounding}-${barStack.index}` : ''}`}
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
                           y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
                           height={config.barHeight}
-                          fill={bar.color}
                           stroke="#333"
-                          strokeWidth={config.barBorderThickness || 1}
+                          style={{background:bar.color,border:`${config.barBorderThickness ||1}px solid #333`,...style}}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                        />
+                        ></foreignObject>
 
                       {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
                           <Text
