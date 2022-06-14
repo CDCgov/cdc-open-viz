@@ -17,7 +17,9 @@ export default {
     type: 'data',
     palette:{
       isReversed:false
-    }
+    },
+    hideGeoColumnInTooltip: false,
+    hidePrimaryColumnInTooltip: false
   },
   
   type: "map",
