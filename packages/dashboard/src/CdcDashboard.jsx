@@ -425,7 +425,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         let dataTable
         if(config.table && config.table.show && config.datasets && visualizationConfig.dataKey){
-          dataTable = <div className="preview-table-container"><DataTable data={config.datasets[visualizationConfig.dataKey].data} config={config}></DataTable></div>
+          dataTable = <div className="preview-table-container"><DataTable data={config.datasets[visualizationConfig.dataKey].data} config={config} datasetName={visualizationConfig.dataKey}></DataTable></div>
         }
 
         switch (visualizationConfig.type) {
@@ -586,7 +586,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                               }}
                               isDashboard={true}/>
                           )}
-                          {config.table && config.table.show && config.datasets && <a href={`#data-table-${visualizationConfig.dataKey}`}>Data Table</a>}
+                          {config.table && config.table.show && config.datasets && <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>}
                         </div>
                       </React.Fragment>
                     )
@@ -599,7 +599,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {config.table && config.table.show && config.data && <DataTable data={config.data} config={config}/>}
           {config.table && config.table.show && config.datasets && Object.keys(config.datasets).map(datasetKey => (
             <div className="multi-table-container" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-              <DataTable data={config.datasets[datasetKey].data} config={config}></DataTable>
+              <DataTable data={config.datasets[datasetKey].data} config={config} datasetName={datasetKey}></DataTable>
             </div>
           ))}
 

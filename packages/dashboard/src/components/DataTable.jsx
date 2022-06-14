@@ -5,8 +5,10 @@ import Papa from 'papaparse'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
+import DownloadIcon from '@cdc/core/assets/icon-upload.svg';
+
 export default function DataTable(params) {
-  const { data, config } = params;
+  const { data, config, datasetName } = params;
 
   const [ tableExpanded, setTableExpanded ] = useState(config.table ? config.table.expanded : false)
   const [ accessibilityLabel, setAccessibilityLabel ] = useState('')
@@ -31,7 +33,7 @@ export default function DataTable(params) {
         aria-label="Download this data in a CSV file format."
         className={`btn btn-download no-border`}
       >
-        Download Data (CSV)
+        <DownloadIcon style={{transform: 'rotate(180deg)'}} /> Download {datasetName ? datasetName : 'Data'} (CSV)
       </a>
     )
   })
@@ -119,12 +121,12 @@ export default function DataTable(params) {
             }
           }}
         >
-          {config.table && config.table.label}
+          {config.table && config.table.label ? config.table.label : 'Data Table'}{datasetName ? ': ' + datasetName : ''}
         </div>
         <div className="table-container">
           <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}
                  hidden={!tableExpanded} {...getTableProps()}>
-            <caption className="visually-hidden">{config.table && config.table.label}</caption>
+            <caption className="visually-hidden">{config.table && config.table.label ? config.table.label : 'Data Table'}{datasetName ? ': ' + datasetName : ''}</caption>
             <thead>
             {headerGroups && headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
