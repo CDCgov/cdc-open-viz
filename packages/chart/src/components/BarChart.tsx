@@ -27,6 +27,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
 
+  const isStacked = config.visualizationSubType === 'stacked';
+  const isRounded = config.barStyle==='rounded';
+  const tipRounding =  config.tipRounding ;
+  const roundingStyle = config.roundingStyle;
+  const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
+  let style = {};
+  if(isHorizontal  && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`0  ${radius} ${radius} 0`} : {borderRadius: radius};
+  if(!isHorizontal && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`${radius} ${radius} 0 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`${radius} ${radius} 0 0 `} : {borderRadius: radius};
+  if(isHorizontal  && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  ? {borderRadius:radius}:{};
+  if(!isHorizontal && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:` ${radius} ${radius} 0 0 `}:tipRounding==='full'  ? {borderRadius:radius}:{};
+
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null);
   const [textWidth, setTextWidth] = useState(null);
