@@ -44,7 +44,8 @@ export default {
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
-    position: 'right'
+    position: 'right',
+    reverseLabelOrder:false
   },
   exclusions: {
     active: false,
