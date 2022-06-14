@@ -58,38 +58,70 @@ export default function LinearChart() {
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
 
-    if (config.runtime.horizontal) {
-      max = max * 1.1; 
-      xScale = scaleLinear<number>({
-        domain: [min, max],
-        range: [0, xMax]
-      });
+    if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
+      const dataKey = data.map((item) => item[config.series[0].dataKey]);
+      const maxDataVal = Math.max(...dataKey).toString().length;
+      const longRange = [7, 8, 9, 10, 11, 12, 13];
+      const shortRange = [1, 2, 3, 4, 5, 6];
 
-      yScale = config.runtime.xAxis.type === 'date' ?
-        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) :
-        scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
-
-      seriesScale = scalePoint<string>({
-        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
-        range: [0, yMax]
-      });
-      
-      yScale.rangeRound([0, yMax]);
-    } else {
-      min = min < 0 ? min * 1.11 : min 
-
-       yScale = scaleLinear<number>({
-        domain: [min, max],
-        range: [yMax, 0]
-      });
-
-      xScale = scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
-
-      seriesScale = scalePoint<string>({
-        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
-        range: [0, xMax]
-      });
+      switch (true) {
+        case maxDataVal === 12 ||
+          maxDataVal === 11 ||
+          maxDataVal === 10 ||
+          maxDataVal === 9 ||
+          maxDataVal === 8:
+          max = max * 1.3;
+          break;
+        case maxDataVal === 7 || maxDataVal === 6 || maxDataVal === 5:
+          max = max * 1.1;
+          break;
+        case maxDataVal <= 4:
+          max = max * 1.1;
+          break;
+      }
     }
+
+      if (config.runtime.horizontal) {
+        xScale = scaleLinear<number>({
+          domain: [min, max],
+          range: [0, xMax],
+        });
+
+        yScale =
+          config.runtime.xAxis.type === "date"
+            ? scaleLinear<number>({
+                domain: [
+                  Math.min(...xAxisDataMapped),
+                  Math.max(...xAxisDataMapped),
+                ],
+              })
+            : scalePoint<string>({ domain: xAxisDataMapped, padding: 0.5 });
+
+        seriesScale = scalePoint<string>({
+          domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
+          range: [0, yMax],
+        });
+
+        yScale.rangeRound([0, yMax]);
+      } else {
+        min = min < 0 ? min * 1.11 : min;
+
+        yScale = scaleLinear<number>({
+          domain: [min, max],
+          range: [yMax, 0],
+        });
+
+        xScale = scalePoint<string>({
+          domain: xAxisDataMapped,
+          range: [0, xMax],
+          padding: 0.5,
+        });
+
+        seriesScale = scalePoint<string>({
+          domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
+          range: [0, xMax],
+        });
+      }
 
       
   if(config.visualizationType === 'Paired Bar') {
