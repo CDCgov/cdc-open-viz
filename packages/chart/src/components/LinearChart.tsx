@@ -70,10 +70,7 @@ export default function LinearChart() {
           maxDataVal === 8:
           max = max * 1.3;
           break;
-        case maxDataVal === 7 || maxDataVal === 6 || maxDataVal === 5:
-          max = max * 1.1;
-          break;
-        case maxDataVal <= 4:
+        case maxDataVal === 7 || maxDataVal === 6 || maxDataVal <= 5:
           max = max * 1.1;
           break;
       }
