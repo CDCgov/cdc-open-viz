@@ -188,7 +188,7 @@ export default function DataTable() {
                             {...cell.getCellProps()} 
                             key={`tbody__tr__td-${index}`} 
                             role="gridcell">
-                            { (config.dataFormat.commas)  ? cell.render('Cell') : cell.render('Cell') }
+                            { cell.render('Cell') }
                           </td>
                         )
                       }
