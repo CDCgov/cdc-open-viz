@@ -61,8 +61,6 @@ export default function LinearChart() {
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
       const dataKey = data.map((item) => item[config.series[0].dataKey]);
       const maxDataVal = Math.max(...dataKey).toString().length;
-      const longRange = [7, 8, 9, 10, 11, 12, 13];
-      const shortRange = [1, 2, 3, 4, 5, 6];
 
       switch (true) {
         case maxDataVal === 12 ||
