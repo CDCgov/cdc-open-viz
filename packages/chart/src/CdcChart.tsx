@@ -454,7 +454,7 @@ export default function CdcChart(
       containerClasses.push('left')
     }
 
-    if(config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
+    if(config.legend.reverseLabelOrder) {
       innerClasses.push('d-flex')
       innerClasses.push('flex-column-reverse')
     }
