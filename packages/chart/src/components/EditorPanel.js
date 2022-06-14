@@ -678,23 +678,9 @@ const EditorPanel = () => {
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
                     <Select value={config.yAxis.labelPlacement || 'Below Bar'} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={[ 'Below Bar', 'On Date/Category Axis' ]}/>
                   }
-<<<<<<< HEAD
                   {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
                   }
-=======
-                  {(showLollipopCheckbox()) &&
-                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select this option to replace each bar with a line and a dot at the end.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }/>
-                  }
-
->>>>>>> test
                   {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField}/>
 
