@@ -183,6 +183,24 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+			case 'hideGeoColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
+				})
+				break;
+			case 'hidePrimaryColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
+				})
+				break;
 			case 'showTitle':
 				setState({
 					...state,
@@ -274,12 +292,31 @@ const EditorPanel = (props) => {
 				});
 				break;
 			case 'legendType':
+
+				let testForType = typeof state.data[0][state.columns.primary.name];
+				let hasValue = state.data[0][state.columns.primary.name];
+				let messages = [];
+
+				if(!hasValue) {
+					messages.push(`There appears to be values missing for data in the primary column ${state.columns.primary.name}`);
+				}
+
+				if (testForType === 'string' && value !== 'category') {
+					messages.push( 'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.' );
+				} else {
+					messages = []
+				}
+
 				setState({
 					...state,
 					legend: {
 						...state.legend,
 						type: value,
 					},
+					runtime: {
+						...state.runtime,
+						editorErrorMessage: messages
+					}
 				});
 				break;
 			case 'legendNumber':
@@ -556,6 +593,15 @@ const EditorPanel = (props) => {
 						...state.general,
 						statePicked: stateData,
 					},
+				});
+				break;
+			case "classificationType":
+				setState({
+				...state,
+				legend: {
+					...state.legend,
+					type: value,
+				},
 				});
 				break;
 			default:
@@ -1069,6 +1115,7 @@ const EditorPanel = (props) => {
 
 	}, [state]);
 
+
 	let numberOfItemsLimit = 8;
 
 	const getItemStyle = (isDragging, draggableStyle) => ({
@@ -1095,8 +1142,20 @@ const EditorPanel = (props) => {
 		));
 	};
 
+	const Error = () => {
+		return (
+			<section className="waiting">
+				<section className="waiting-container">
+					<h3>Error With Configuration</h3>
+					<p>{state.runtime.editorErrorMessage}</p>
+				</section>
+			</section>
+		);
+	}
+
 	return (
 		<ErrorBoundary component='EditorPanel'>
+			{state?.runtime?.editorErrorMessage.length > 0 && <Error />}
 			{requiredColumns && (
 				<Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
 			)}
@@ -1106,6 +1165,7 @@ const EditorPanel = (props) => {
 				onClick={onBackClick}
 				data-html2canvas-ignore
 			></button>
+			
 			<section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'} data-html2canvas-ignore>
 				<ReactTooltip html={true} multiline={true} />
 				<span className='base-label'>Configure Map</span>
@@ -1286,6 +1346,41 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
+									<label>
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1650,6 +1745,7 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
+										{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
 										<label>
 											<span className='edit-label'>Legend Type</span>
 											<select
@@ -1662,7 +1758,8 @@ const EditorPanel = (props) => {
 												<option value='equalinterval'>Equal Interval</option>
 												<option value='category'>Categorical</option>
 											</select>
-										</label>
+											</label>
+											)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
@@ -2082,6 +2179,29 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Show Title</span>
 									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hideGeoColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hideGeoColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Geography Column Name in Tooltip</span>
+									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hidePrimaryColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
+									</label>
+
 									{'navigation' !== state.general.type && (
 										<label className='checkbox'>
 											<input

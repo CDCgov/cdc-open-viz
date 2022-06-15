@@ -493,6 +493,16 @@ const EditorPanel = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
+  
+  // Set paired bars to be horizontal, even though that option doesn't display
+  useEffect(() => {
+    if(config.visualizationType === 'Paired Bar') {
+        updateConfig({
+          ...config,
+          orientation: 'horizontal'
+      })
+    }
+  }, []);
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
@@ -676,9 +686,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }/>
                   }
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
-                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
-                  }
+
                   {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField}/>
 
@@ -842,7 +850,7 @@ const EditorPanel = () => {
                     }/>
                   </div>
                  
-                  {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
+                  {(config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar') ?  // horizontal - x is vertical y is horizontal
                     <>
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
@@ -850,7 +858,7 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
-                    : config.visualizationType !=='Pie' &&
+                    : (config.visualizationType !=='Pie' || config.visualizationType === 'Paired Bar') &&
                     <>
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
@@ -959,7 +967,7 @@ const EditorPanel = () => {
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField}/>
                       }
-                      {(config.orientation === 'horizontal') ?
+                      {(config.orientation === 'horizontal' && !config.orientation === 'horizontal') ?
                         <>
                           <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField}/>
                           <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField}/>
@@ -1173,7 +1181,7 @@ const EditorPanel = () => {
 
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
 
-                  {config.series?.some(series => series.type === 'Bar') &&
+                  {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') &&
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
@@ -1273,6 +1281,10 @@ const EditorPanel = () => {
                   }
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
+                  }
+
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') &&
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
                   }
                 </AccordionItemPanel>
               </AccordionItem>
