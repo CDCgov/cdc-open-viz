@@ -63,14 +63,10 @@ export default function LinearChart() {
       const maxDataVal = Math.max(...dataKey).toString().length;
 
       switch (true) {
-        case maxDataVal === 12 ||
-          maxDataVal === 11 ||
-          maxDataVal === 10 ||
-          maxDataVal === 9 ||
-          maxDataVal === 8:
+        case maxDataVal > 8 && maxDataVal <= 12:
           max = max * 1.3;
           break;
-        case maxDataVal === 7 || maxDataVal === 6 || maxDataVal <= 5:
+        case maxDataVal > 4 && maxDataVal <= 7:
           max = max * 1.1;
           break;
       }
