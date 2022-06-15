@@ -21,7 +21,6 @@ import colorPalettes from '../../../core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
 import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
@@ -850,12 +849,14 @@ const EditorPanel = (props) => {
 	}, [state]);
 
 	useEffect(() => {
-		if ('category' === state.legend.type && editorCatOrder.length === 0) {
+		if ('category' === state.legend.type) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+			
+			console.log('runtimeLegend', runtimeLegend)
 
 			setEditorCatOrder(arr);
 		}
-	}, [runtimeLegend]);
+	}, [runtimeLegend] );
 
 
 	// if no state choice by default show alabama
@@ -1122,6 +1123,8 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
+	console.log('editorCatOrder', editorCatOrder)
+
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1193,6 +1196,7 @@ const EditorPanel = (props) => {
 														: ''
 												}
 												onClick={() => handleEditorChanges('geoType', 'us')}
+												aria-hidden="true"
 											>
 												<UsaGraphic />
 												<span>United States</span>
@@ -1200,6 +1204,7 @@ const EditorPanel = (props) => {
 											<li
 												className={state.general.geoType === 'world' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'world')}
+												aria-hidden="true"
 											>
 												<WorldGraphic />
 												<span>World</span>
@@ -1207,6 +1212,7 @@ const EditorPanel = (props) => {
 											<li
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'single-state')}
+												aria-hidden="true"
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
@@ -1918,14 +1924,14 @@ const EditorPanel = (props) => {
 													}}
 												/>
 												<span className='edit-label'>
-                          Dynamic Legend Description
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Dynamic Legend Description
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
 											</label>
 										)}
 										{filtersJSX.length > 0 && (
