@@ -17,7 +17,9 @@ export default {
     type: 'data',
     palette:{
       isReversed:false
-    }
+    },
+    hideGeoColumnInTooltip: false,
+    hidePrimaryColumnInTooltip: false
   },
   
   type: "map",
@@ -61,6 +63,7 @@ export default {
     linkLabel: 'Learn More',
     capitalizeLabels: true
   },
- 
- 
+  runtime: {
+    editorErrorMessage: []
+  }
 };

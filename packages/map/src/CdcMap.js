@@ -468,7 +468,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Equal Interval
-        if(type === 'equalinterval') {
+        
+        if(type === 'equalinterval' && dataSet?.length !== 0) {
+            if(!dataSet || dataSet.length === 0) {
+                setState({
+                    ...state,
+                    runtime: {
+                        ...state.runtime,
+                        editorErrorMessage: 'Error setting equal interval legend type'
+                    }
+                })
+                return;
+            }
             dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
@@ -812,19 +823,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
+        
+        // Adds geo label, ie State: Georgia
         let stateOrCounty = 
             state.general.geoType === 'us' ? 'State: ' : 
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
+
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
-            //supportedStatesFipsCodes[]
-            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+            toolTipText +=  !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>` ;
         }
         
-        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
+        toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
@@ -852,7 +865,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
-                        toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
+                        toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
                     }
 
                 }
@@ -1152,7 +1165,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
             geoType: state.general.geoType,
-            data: state.data
+            data: state.data,
+             ...runtimeLegend
         })
 
         const hashData = hashObj({
@@ -1251,13 +1265,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         runtimeLegend,
         generateColorsArray,
         titleCase,
+        setState,
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
 
     const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
     
-
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1273,7 +1287,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
@@ -1374,7 +1388,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
 				)}
-				{true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
 						rawData={state.data}
