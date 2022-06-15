@@ -21,6 +21,7 @@ import colorPalettes from '../../../core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
+import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
 import { supportedStatesFipsCodes } from '../data/supported-geos';
 import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
@@ -851,12 +852,10 @@ const EditorPanel = (props) => {
 	useEffect(() => {
 		if ('category' === state.legend.type) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
-			
-			console.log('runtimeLegend', runtimeLegend)
 
 			setEditorCatOrder(arr);
 		}
-	}, [runtimeLegend] );
+	}, [runtimeLegend]);
 
 
 	// if no state choice by default show alabama
@@ -1123,8 +1122,6 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
-	console.log('editorCatOrder', editorCatOrder)
-
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1196,7 +1193,6 @@ const EditorPanel = (props) => {
 														: ''
 												}
 												onClick={() => handleEditorChanges('geoType', 'us')}
-												aria-hidden="true"
 											>
 												<UsaGraphic />
 												<span>United States</span>
@@ -1204,7 +1200,6 @@ const EditorPanel = (props) => {
 											<li
 												className={state.general.geoType === 'world' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'world')}
-												aria-hidden="true"
 											>
 												<WorldGraphic />
 												<span>World</span>
@@ -1212,7 +1207,6 @@ const EditorPanel = (props) => {
 											<li
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
 												onClick={() => handleEditorChanges('geoType', 'single-state')}
-												aria-hidden="true"
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
@@ -1223,14 +1217,14 @@ const EditorPanel = (props) => {
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-												Map Type
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-												</Tooltip.Content>
-												</Tooltip>
-											</span>
+                        Map Type
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
 											<select
 												value={state.general.geoType}
 												onChange={(event) => {
@@ -1317,14 +1311,14 @@ const EditorPanel = (props) => {
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
-										tooltip={
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-											</Tooltip.Content>
-										</Tooltip>
-										}
+                    tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
 									/>
 									<TextField
 										type='textarea'
@@ -1333,14 +1327,14 @@ const EditorPanel = (props) => {
 										section='general'
 										fieldName='subtext'
 										label='Subtext'
-										tooltip={
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-											</Tooltip.Content>
-										</Tooltip>
-										}
+                    tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
 									/>
 									{'us' === state.general.geoType && (
 										<TextField
@@ -1353,44 +1347,44 @@ const EditorPanel = (props) => {
 										/>
 									)}
 									<label>
-									<span className="edit-label">Data Classification Type</span>
-									<div>
-									<label>
-										<input
-										type="radio"
-										name="equalnumber"
-										value="equalnumber"
-										checked={state.legend.type === "equalnumber"}
-										onChange={(e) =>
-											handleEditorChanges(
-											"classificationType",
-											e.target.value
-											)
-										}
-										/>
-										Numeric/Quantitative
-									</label>
-									<label>
-										<input
-										type="radio"
-										name="category"
-										value="category"
-										checked={state.legend.type === "category"}
-										onChange={(e) =>
-											handleEditorChanges(
-											"classificationType",
-											e.target.value
-											)
-										}
-										/>
-										Categorical
-									</label>
-									</div>
-								</label>
-								{/* <label className="checkbox mt-4">
-								<input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
-								<span className="edit-label">Enable Media Download</span>
-								</label> */}
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
+									{/* <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
+                    <span className="edit-label">Enable Media Download</span>
+                  </label> */}
 								</AccordionItemPanel>
 							</AccordionItem>
 							<AccordionItem>
@@ -1402,14 +1396,14 @@ const EditorPanel = (props) => {
 								<AccordionItemPanel>
 									<label className='edit-block geo'>
 										<span className='edit-label column-heading'>
-										Geography
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
-											</Tooltip.Content>
-										</Tooltip>
-										</span>
+                      Geography
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
 										<select
 											value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
 											onChange={(event) => {
@@ -1421,189 +1415,189 @@ const EditorPanel = (props) => {
 									</label>
 
 									{'navigation' !== state.general.type && (
-									<>
-										<fieldset className='primary-fieldset edit-block'>
-											<label>
-											<span className='edit-label column-heading'>
-											Data Column
-											<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-												<p>Select the source column containing the categorical or numeric values to be mapped.</p>
-												</Tooltip.Content>
-											</Tooltip>
-											</span>
-											<select
-												value={
-												state.columns.primary
-													? state.columns.primary.name
-													: columnsOptions[0]
-												}
-												onChange={(event) => {
-												editColumn('primary', 'name', event.target.value);
-												}}
-											>
-												{columnsOptions}
-											</select>
-											</label>
-											<TextField
-											value={columns.primary.label}
-											section='columns'
-											subsection='primary'
-											fieldName='label'
-											label='Label'
-											updateField={updateField}
-											tooltip={
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Enter a data label for use in tooltips and the data table.</p>
-												</Tooltip.Content>
-												</Tooltip>
-											}
-											/>
-											<ul className='column-edit'>
-											<li className='three-col'>
-												<TextField
-												value={columns.primary.prefix}
-												section='columns'
-												subsection='primary'
-												fieldName='prefix'
-												label='Prefix'
-												updateField={updateField}
-												/>
-												<TextField
-												value={columns.primary.suffix}
-												section='columns'
-												subsection='primary'
-												fieldName='suffix'
-												label='Suffix'
-												updateField={updateField}
-												/>
-												<TextField
-												type='number'
-												value={columns.primary.roundToPlace}
-												section='columns'
-												subsection='primary'
-												fieldName='roundToPlace'
-												label='Round'
-												updateField={updateField}
-												/>
-											</li>
-											<li>
-												<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={state.columns.primary.useCommas}
-													onChange={(event) => {
-													editColumn(
-														'primary',
-														'useCommas',
-														event.target.checked
-													);
-													}}
-												/>
-												<span className='edit-label'>Add Commas to Numbers</span>
-												</label>
-											</li>
-											<li>
-												<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={state.columns.primary.dataTable || false}
-													onChange={(event) => {
-													editColumn(
-														'primary',
-														'dataTable',
-														event.target.checked
-													);
-													}}
-												/>
-												<span className='edit-label'>Display in Data Table</span>
-												</label>
-											</li>
-											<li>
-												<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={state.columns.primary.tooltip || false}
-													onChange={(event) => {
-													editColumn('primary', 'tooltip', event.target.checked);
-													}}
-												/>
-												<span className='edit-label'>Display in Tooltips</span>
-												</label>
-											</li>
-											</ul>
-										</fieldset>
-										<fieldset className="primary-fieldset edit-block">
-											<label>
-											<span className='edit-label'>
-												Special Classes
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>For secondary values such as "NA", the system can automatically color-code them in shades of gray, one shade for each special class.</p>
-												</Tooltip.Content>
-												</Tooltip>
-											</span>
-											</label>
-											{specialClasses.map((specialClass, i) => (
-											<div className="edit-block" key={`special-class-${i}`}>
-												<button className="remove-column"
-														onClick={(e) => {
-														e.preventDefault();
-														editColumn('primary', 'specialClassDelete', i);
-														}}
-												>Remove</button>
-												<p>Special Class {i + 1}</p>
-												<label>
-												<span className="edit-label column-heading">Data Key</span>
-												<select value={specialClass.key} onChange={(e) => {
-													editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
-												}}>
-													{columnsOptions}
-												</select>
-												</label>
-												<label>
-												<span className="edit-label column-heading">Value</span>
-												<select value={specialClass.value} onChange={(e) => {
-													editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
-												}}>
-													<option value="">- Select Value -</option>
-													{columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
-													<option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-													))}
-												</select>
-												</label>
-												<label>
-												<span className="edit-label column-heading">Label</span>
-												<input type="text" value={specialClass.label} onChange={(e) => {
-													editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
-												}} />
-												</label>
-											</div>
-											))}
-											<button className="btn full-width" onClick={(e) => {
-											e.preventDefault();
-											editColumn('primary', 'specialClassAdd', {});
-											}}>
-											Add Special Class
-											</button>
-										</fieldset>
-									</>
+                    <>
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+												<span className='edit-label column-heading'>
+                          Data Column
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Select the source column containing the categorical or numeric values to be mapped.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                          <select
+                            value={
+                              state.columns.primary
+                                ? state.columns.primary.name
+                                : columnsOptions[0]
+                            }
+                            onChange={(event) => {
+                              editColumn('primary', 'name', event.target.value);
+                            }}
+                          >
+                            {columnsOptions}
+                          </select>
+                        </label>
+                        <TextField
+                          value={columns.primary.label}
+                          section='columns'
+                          subsection='primary'
+                          fieldName='label'
+                          label='Label'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Enter a data label for use in tooltips and the data table.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                        <ul className='column-edit'>
+                          <li className='three-col'>
+                            <TextField
+                              value={columns.primary.prefix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='prefix'
+                              label='Prefix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              value={columns.primary.suffix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='suffix'
+                              label='Suffix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              type='number'
+                              value={columns.primary.roundToPlace}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='roundToPlace'
+                              label='Round'
+                              updateField={updateField}
+                            />
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.useCommas}
+                                onChange={(event) => {
+                                  editColumn(
+                                    'primary',
+                                    'useCommas',
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className='edit-label'>Add Commas to Numbers</span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.dataTable || false}
+                                onChange={(event) => {
+                                  editColumn(
+                                    'primary',
+                                    'dataTable',
+                                    event.target.checked
+                                  );
+                                }}
+                              />
+                              <span className='edit-label'>Display in Data Table</span>
+                            </label>
+                          </li>
+                          <li>
+                            <label className='checkbox'>
+                              <input
+                                type='checkbox'
+                                checked={state.columns.primary.tooltip || false}
+                                onChange={(event) => {
+                                  editColumn('primary', 'tooltip', event.target.checked);
+                                }}
+                              />
+                              <span className='edit-label'>Display in Tooltips</span>
+                            </label>
+                          </li>
+                        </ul>
+                      </fieldset>
+                      <fieldset className="primary-fieldset edit-block">
+                        <label>
+                          <span className='edit-label'>
+                            Special Classes
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>For secondary values such as "NA", the system can automatically color-code them in shades of gray, one shade for each special class.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {specialClasses.map((specialClass, i) => (
+                          <div className="edit-block" key={`special-class-${i}`}>
+                            <button className="remove-column"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      editColumn('primary', 'specialClassDelete', i);
+                                    }}
+                            >Remove</button>
+                            <p>Special Class {i + 1}</p>
+                            <label>
+                              <span className="edit-label column-heading">Data Key</span>
+                              <select value={specialClass.key} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'key', index: i, value: e.target.value});
+                              }}>
+                                {columnsOptions}
+                              </select>
+                            </label>
+                            <label>
+                              <span className="edit-label column-heading">Value</span>
+                              <select value={specialClass.value} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'value', index: i, value: e.target.value});
+                              }}>
+                                <option value="">- Select Value -</option>
+                                {columnsByKey[specialClass.key] && columnsByKey[specialClass.key].sort().map(option => (
+                                  <option key={`special-class-value-option-${i}-${option}`}>{option}</option>
+                                ))}
+                              </select>
+                            </label>
+                            <label>
+                              <span className="edit-label column-heading">Label</span>
+                              <input type="text" value={specialClass.label} onChange={(e) => {
+                                editColumn('primary', 'specialClassEdit', {prop: 'label', index: i, value: e.target.value});
+                              }} />
+                            </label>
+                          </div>
+                        ))}
+                        <button className="btn full-width" onClick={(e) => {
+                          e.preventDefault();
+                          editColumn('primary', 'specialClassAdd', {});
+                        }}>
+                          Add Special Class
+                        </button>
+                      </fieldset>
+                    </>
 									)}
 
 									<label className='edit-block navigate column-heading'>
 										<span className='edit-label column-heading'>
-										Navigation
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>To provide end users with navigation functionality, select the source column containing the navigation URLs.</p>
-											</Tooltip.Content>
-										</Tooltip>
-										</span>
+                      Navigation
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>To provide end users with navigation functionality, select the source column containing the navigation URLs.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </span>
 										<select
 											value={
 												state.columns.navigate ? state.columns.navigate.name : columnsOptions[0]
@@ -1776,27 +1770,27 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-												Separate Zero
-												<Tooltip style={{textTransform: 'none'}}>
-													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-													<Tooltip.Content>
-													<p>For numeric data, you can separate the zero value as its own data class.</p>
-													</Tooltip.Content>
-												</Tooltip>
-												</span>
+                          Separate Zero
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For numeric data, you can separate the zero value as its own data class.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 										{'category' !== legend.type && (
 											<label>
 												<span className='edit-label'>
-												Number of Items
-												<Tooltip style={{textTransform: 'none'}}>
-													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-													<Tooltip.Content>
-													<p>For numeric maps, select the number of data classes. Do not include designated special classes.</p>
-													</Tooltip.Content>
-												</Tooltip>
-												</span>
+                          Number of Items
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For numeric maps, select the number of data classes. Do not include designated special classes.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 												<select
 													value={legend.numberOfItems}
 													onChange={(event) => {
@@ -1817,14 +1811,14 @@ const EditorPanel = (props) => {
 											<React.Fragment>
 												<label>
 													<span className='edit-label'>
-														Category Order
-														<Tooltip style={{textTransform: 'none'}}>
-														<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-														<Tooltip.Content>
-															<p>Drag map categories into preferred legend order. </p>
-														</Tooltip.Content>
-														</Tooltip>
-													</span>
+                            Category Order
+                            <Tooltip style={{textTransform: 'none'}}>
+                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Drag map categories into preferred legend order. </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
 												</label>
 												{/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
 												<DragDropContext
@@ -1924,14 +1918,14 @@ const EditorPanel = (props) => {
 													}}
 												/>
 												<span className='edit-label'>
-												Dynamic Legend Description
-												<Tooltip style={{textTransform: 'none'}}>
-													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-													<Tooltip.Content>
-													<p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
-													</Tooltip.Content>
-												</Tooltip>
-												</span>
+                          Dynamic Legend Description
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 										{filtersJSX.length > 0 && (
@@ -1944,14 +1938,14 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-												Unified Legend
-												<Tooltip style={{textTransform: 'none'}}>
-													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-													<Tooltip.Content>
-													<p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
-													</Tooltip.Content>
-												</Tooltip>
-												</span>
+                          Unified Legend
+                          <Tooltip style={{textTransform: 'none'}}>
+                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
 											</label>
 										)}
 									</AccordionItemPanel>
@@ -2005,14 +1999,14 @@ const EditorPanel = (props) => {
 											fieldName='indexLabel'
 											label='Index Column Header'
 											placeholder='Location'
-											tooltip={
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
-												</Tooltip.Content>
-												</Tooltip>
-											}
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
 										/>
 										<TextField
 											value={dataTable.caption}
@@ -2021,14 +2015,14 @@ const EditorPanel = (props) => {
 											fieldName='caption'
 											label='Data Table Caption'
 											placeholder='Data Table'
-											tooltip={
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Enter a description of the data table to be read by screen readers.</p>
-												</Tooltip.Content>
-												</Tooltip>
-											}
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a description of the data table to be read by screen readers.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
 											type="textarea"
 										/>
 										<label className='checkbox'>
@@ -2044,14 +2038,14 @@ const EditorPanel = (props) => {
 												}}
 											/>
 											<span className='edit-label'>
-											Show Table
-											<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-												<p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-											</Tooltip.Content>
-											</Tooltip>
-										</span>
+                        Show Table
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
 										</label>
 										<label className='checkbox'>
 											<input
@@ -2109,12 +2103,12 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>
 											Detail displays on{' '}
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>
-											</Tooltip.Content>
-										</Tooltip>
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
 										</span>
 										<select
 											value={state.tooltips.appearanceType}
