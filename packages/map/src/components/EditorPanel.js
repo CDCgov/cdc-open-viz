@@ -804,7 +804,7 @@ const EditorPanel = (props) => {
 	}, [state]);
 
 	useEffect(() => {
-		if ('category' === state.legend.type && editorCatOrder.length === 0) {
+		if ('category' === state.legend.type) {
 			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
 
 			setEditorCatOrder(arr);
