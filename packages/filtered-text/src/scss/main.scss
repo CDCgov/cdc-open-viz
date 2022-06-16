@@ -1,0 +1,13 @@
+@import '~@cdc/core/styles/v2/main';
+
+.cove {
+	.filtered-text {
+		.cove-component__content {
+			background-color: #fff;
+			border: none;
+		}
+		&.cove-component {
+			box-shadow: none;
+		}
+	}
+}
