@@ -1,15 +1,18 @@
-import React, { useCallback, useEffect, useState, lazy, Suspense } from 'react'
+import React, { useEffect, useState, lazy, Suspense } from 'react'
 
 //Third Party
 import { LegendItem, LegendLabel, LegendOrdinal } from '@visx/legend'
 import { scaleOrdinal } from '@visx/scale'
-import { timeFormat, timeParse } from 'd3-time-format'
-
-//Helpers
-import numberFromString from '@cdc/core/helpers/numberFromString'
 
 //Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
+
+//Data
+import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
+
+//Helpers
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import { capitalizeFirstLetter } from '@cdc/core/helpers/coveHelpers'
 
 //Components
 import Button from '@cdc/core/components/elements/Button'
@@ -18,52 +21,26 @@ import DataTable from './DataTable'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import RenderFallback from '@cdc/core/components/loaders/RenderFallback'
 
-//Data
-import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
-
 //Lazy Loads
 const LinearChart = lazy(() => import('./Chart.Linear'))
 const PieChart = lazy(() => import('./Chart.Pie'))
 
+//Visualization
 const Chart = () => {
-  const { config, configActions, missingRequiredSections } = useConfigContext()
+  const { config, configActions, data, missingRequiredSections } = useConfigContext()
+  const { legend, title, description } = config
 
-  const [ colorScale, setColorScale ] = useState(null)
-  const [ currentViewport, setCurrentViewport ] = useState('lg')
-  const [ dimensions, setDimensions ] = useState([])
+  //Loader States
+  const [ loadingLegend, setLoadingLegend ] = useState(true)
+
+  //Data States
   const [ excludedData, setExcludedData ] = useState()
   const [ filteredData, setFilteredData ] = useState()
-  const [ loading, setLoading ] = useState(true)
+
+  //Function States
+  const [ colorScale, setColorScale ] = useState(null)
   const [ seriesHighlight, setSeriesHighlight ] = useState([])
-  const [ stateData, setStateData ] = useState(config.data || [])
 
-  const { legend, title, description, visualizationType } = config
-
-  // Generates color palette to pass to child chart component
-  useEffect(() => {
-    if (stateData && config.xAxis && config.runtime?.seriesKeys) {
-      let palette = colorPalettes[config.palette]
-      let numberOfKeys = config.runtime.seriesKeys.length
-
-      while (numberOfKeys > palette.length) {
-        palette = palette.concat(palette)
-      }
-
-      palette = palette.slice(0, numberOfKeys)
-
-      const newColorScale = () => scaleOrdinal({
-        domain: config.runtime.seriesLabelsAll,
-        range: palette,
-      })
-
-      setColorScale(newColorScale)
-      setLoading(false)
-    }
-
-    if (config && stateData && config.sortData) {
-      stateData.sort(sortData)
-    }
-  }, [ config, stateData ])
 
   const filterData = (filters, data) => {
     let filteredData = []
@@ -79,6 +56,46 @@ const Chart = () => {
     })
     return filteredData
   }
+
+  // Generates color palette to pass to child chart component
+  useEffect(() => {
+    if (data && config.xAxis && config.runtime?.seriesKeys) {
+      let palette = colorPalettes[config.palette]
+      let numberOfKeys = config.runtime.seriesKeys.length
+
+      while (numberOfKeys > palette.length) {
+        palette = palette.concat(palette)
+      }
+
+      palette = palette.slice(0, numberOfKeys)
+
+      const newColorScale = () => scaleOrdinal({
+        domain: config.runtime.seriesLabelsAll,
+        range: palette,
+      })
+
+      setColorScale(newColorScale)
+      setLoadingLegend(false)
+    }
+
+    if (config && data && config.sortData) {
+      data.sort(sortData)
+    }
+  }, [ config, data ])
+
+  //Validate Required Sections
+  useEffect(() => {
+    configActions.setMissingRequiredSections(false)
+
+    if (config.visualizationType === 'Pie') {
+      configActions.setMissingRequiredSections(undefined !== config.yAxis.dataKey)
+    } else {
+      configActions.setMissingRequiredSections((undefined !== config.series || config?.series.length > 0))
+    }
+
+    configActions.setMissingRequiredSections(config.xAxis.dataKey)
+    return () => {}
+  }, [ config.series, config.xAxis.dataKey, config.yAxis.dataKey ])
 
   // Gets filer values from dataset
   const generateValuesForFilter = (columnName, data) => {
@@ -108,32 +125,6 @@ const Chart = () => {
       return 0
     }
   }
-
-  // Observe changes to outermost container and changes viewport size in state
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let { width, height } = entry.contentRect
-
-      let newViewport = getViewport(width)
-      let svgMarginWidth = 32
-
-      setCurrentViewport(newViewport)
-
-      if (entry.target.dataset.lollipop === 'true') {
-        width = width - 2.5
-      }
-
-      width = width - svgMarginWidth
-
-      setDimensions([ width, height ])
-    }
-  })
-
-  const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
-  }, [])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label) => {
@@ -171,22 +162,6 @@ const Chart = () => {
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
     setSeriesHighlight([])
-  }
-
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
-
-  const parseDate = (dateString) => {
-    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString)
-    if (!date) {
-      config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
-      return new Date()
-    } else {
-      return date
-    }
-  }
-
-  const formatDate = (date) => {
-    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date)
   }
 
   // Format numeric data based on settings in config
@@ -350,15 +325,6 @@ const Chart = () => {
       ? `#dataTableSection__${config.title.replace(/\s/g, '')}`
       : `#dataTableSection`
 
-
-  //Validate Required Sections
-/*  if (config.visualizationType === 'Pie') {
-    configActions.setMissingRequiredSections(undefined !== config?.yAxis.dataKey)
-  } else {
-    configActions.setMissingRequiredSections((undefined !== config?.series || config?.series.length > 0))
-  }
-  configActions.setMissingRequiredSections(config.xAxis.dataKey)*/
-
   //Build Chart styles
 
   let lineDatapointClass = ''
@@ -374,54 +340,52 @@ const Chart = () => {
     barBorderClass = ' no-border'
   }
 
-  const chartList = {
-    'Paired Bar': <LinearChart/>,
-    'Bar': <LinearChart/>,
-    'Line': <LinearChart/>,
-    'Combo': <LinearChart/>,
-    'Pie': <PieChart/>
-  }
-
   const contextValues = {
-    colorPalettes,
+    /*colorPalettes,
     colorScale,
     config,
-    currentViewport,
-    dimensions,
     excludedData,
     transformedData: filteredData || excludedData,
-    formatDate,
     formatNumber,
-    loading,
-    missingRequiredSections,
-    parseDate,
     seriesHighlight,
-    setFilteredData,
-    unfilteredData: stateData,
-    rawData: stateData ?? {}
+    setFilteredData*/
+  }
+
+  const chartProps = {
+    formatNumber: formatNumber,
+    colorScale: colorScale,
+    seriesHighlight
+  }
+
+  const chartList = {
+    'Paired Bar': <LinearChart {...chartProps}/>,
+    'Bar': <LinearChart {...chartProps}/>,
+    'Line': <LinearChart {...chartProps}/>,
+    'Combo': <LinearChart {...chartProps}/>,
+    'Pie': <PieChart {...chartProps}/>
   }
 
   return (
-      <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-        <Component className={`cove-chart ${currentViewport}`} title={title} description={description}
-                   // table={<DataTable/>}
-                   tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
-                   theme={config.theme}
-        >
+
+    <Component className="cove-chart" title={title} description={description}
+               tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
+               theme={config.theme}
+      // table={<DataTable/>}
+    >
+      <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
+        <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
           <a className="sr-only" href={handleChartTabbing}>
             Skip Over Chart Container
           </a>
           {config.filters && <Filters/>}
-          <div className="cove-component__visualization" ref={outerContainerRef}>
-            <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
-              {!missingRequiredSections && !config.newViz && (<>
-                {chartList[config.visualizationType]}
-                {/*{!config.legend.hide && <Legend/>}*/}
-              </>)}
-            </Suspense>
-          </div>
-        </Component>
-      </div>
+          {missingRequiredSections && <>Missing stuff</>}
+          {!missingRequiredSections && !config.newViz && (<>
+            {chartList[config.visualizationType]}
+            {!config.legend.hide && !loadingLegend && <Legend/> }
+          </>)}
+        </div>
+      </Suspense>
+    </Component>
   )
 }
 

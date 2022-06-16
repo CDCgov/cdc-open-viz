@@ -1,71 +1,61 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useCallback, useState } from 'react'
+
+import { getConfigKeyValue, setConfigKeyValue } from '../helpers/configHelpers'
+import merge from 'lodash.merge'
 
 export const ConfigContext = createContext({})
 export const useConfigContext = () => useContext(ConfigContext)
 
-export const ConfigContextProvider = ({ defaults, children }) => {
-  const [ config, setConfig ] = useState(defaults)
+export const ConfigContextProvider = ({ children }) => {
+  const merge = require('lodash.merge')
+
+  //Working config object, loaded from supplied object, or external json url
+  const [ config, setConfig ] = useState({})
+  const [ configDefaults, setConfigDefaults ] = useState({})
+
+  //Working config.data set for visualization
+  const [ data, setData ] = useState(config?.data || [])
+
+  //Integrity check for supplied data - set in visualization and updated through context
   const [ missingRequiredSections, setMissingRequiredSections ] = useState(false)
 
   //Global Actions
-  const updateConfig = (newConfig) => {
-    Object.keys(config).forEach(configKey => {
+  const updateConfig = useCallback((newConfig, dataOverride = undefined) => {
+    let defaultConfig = configDefaults
+    let newData = dataOverride || data //TODO: COVE Refactor - Use data variable to filter and exclude returned data
+
+    setData(newData)
+
+    Object.keys(defaultConfig).forEach(configKey => {
       if (newConfig[configKey] && 'object' === typeof newConfig[configKey] && !Array.isArray(newConfig[configKey])) {
-        newConfig[configKey] = { ...config[configKey], ...newConfig[configKey] }
+        newConfig[configKey] = { ...defaultConfig[configKey], ...newConfig[configKey] }
       }
     })
-    setConfig(config => ({...config, ...newConfig}))
-  }
 
-  const updateField = (payload, value) => {
-    const configHasProp = (prop, obj = config) => {
-      return obj.hasOwnProperty(prop)
-    }
+    setConfig(config => ({ ...config, ...newConfig }))
+  }, [ configDefaults, data ])
 
-    if ('string' === typeof payload) {
-      setConfig(config => ({...config, [payload]: value}))
-      return
-    }
+  const updateField = useCallback((payload, value) => {
+    let updateFieldObj = setConfigKeyValue(payload, value)
+    let updateFieldVal = getConfigKeyValue(payload, config)
 
-    let updateFieldObj = {}
-
-    const updateConfigKey = {
-      1: {
-        'entry': () => updateFieldObj[payload[0]] = value,
-        'validate': () => configHasProp(payload[0])
-      },
-      2: {
-        'entry': () => {
-          updateFieldObj[payload[0]] = {}
-          updateFieldObj[payload[0]][payload[1]] = value
-        },
-        'validate': () => configHasProp(payload[0]) && configHasProp(payload[1], config[[payload[0]]])
-      },
-      3: {
-        'entry': () => {
-          updateFieldObj[payload[0]] = {}
-          updateFieldObj[payload[0]][payload[1]] = {}
-          updateFieldObj[payload[0]][payload[1]][payload[2]] = value
-        },
-        'validate': () => configHasProp(payload[0]) && configHasProp(payload[1], config[[payload[0]]]) && configHasProp(payload[2], config[[payload[0]]][[payload[1]]])
-      }
-    }
-
-    updateConfigKey[payload.length].entry()
-
-    if (updateConfigKey[payload.length].validate()) {
-      setConfig(config => ({...config, ...updateFieldObj }))
+    if (undefined !== updateFieldVal && null !== updateFieldVal) {
+      setConfig({ ...config, ...updateFieldObj })
     } else {
-      updateConfig(updateFieldObj)
+      updateConfig(merge(config[Object.keys(updateFieldObj)[0]], updateFieldObj))
     }
-  }
+  }, [ config ])
 
   //Build Context
   const configContext = {
     config,
+    configDefaults,
+    data,
     missingRequiredSections,
     configActions: {
       setConfig,
+      setConfigDefaults,
+      setData,
       setMissingRequiredSections,
       updateField,
       updateConfig
@@ -79,4 +69,5 @@ export const ConfigContextProvider = ({ defaults, children }) => {
   )
 }
 
+ConfigContextProvider.displayName = 'ConfigContext'
 ConfigContext.displayName = 'ConfigContext'

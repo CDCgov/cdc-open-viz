@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
+//Context
+import { useConfigContext } from '../../context/ConfigContext'
+
+//Helpers
+import { getConfigKeyValue } from '../../helpers/configHelpers'
+
+//Components
 import Label from '../elements/Label'
 
+//Styles
 import '../../styles/v2/components/input/index.scss'
-import { useConfigContext } from '../../context/ConfigContext'
 
 const InputSlider = (
   {
@@ -22,9 +29,9 @@ const InputSlider = (
   }
 ) => {
 
-  const { configActions } = useConfigContext()
+  const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(stateValue || false)
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : stateValue || false)
 
   const sliderTypeClass = () => {
     const typeArr = {

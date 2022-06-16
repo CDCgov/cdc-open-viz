@@ -4,104 +4,28 @@ import React, { useEffect } from 'react'
 import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
+//Data
+import defaults from './data/initial-state'
+
 //Hooks
 import useLoadConfig from '@cdc/core/hooks/useLoadConfig'
 
-//Components
-import Chart from './components/Chart'
+//Components - Core
 import Editor from '@cdc/core/components/Editor'
-import EditorPanels from './components/EditorPanels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+//Components - Local
+import Chart from './components/Chart'
+import EditorPanels from './components/EditorPanels'
 
 import './scss/cove-chart.scss'
 
 //Visualization
-const CdcChart = ({ configUrl }) => {
+const CdcChart = ({ configObj, configUrlObj }) => {
   const { view } = useGlobalContext()
-  const { config, configActions } = useConfigContext()
-  const [ reloadConfig ] = useLoadConfig(config, configUrl)
+  const { data, configActions } = useConfigContext()
 
-  useEffect(() => {
-    reloadConfig()
-  }, [ reloadConfig ])
-
-  const updateConfig = (newConfig, dataOverride = undefined) => {
-    let data = dataOverride || stateData
-
-    // Deeper copy
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
-
-    // Loop through and set initial data with exclusions - this should persist through any following data transformations (ie. filters)
-    let newExcludedData
-
-    if (newConfig.exclusions && newConfig.exclusions.active) {
-
-      if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {
-        newExcludedData = data.filter(e => !newConfig.exclusions.keys.includes(e[newConfig.xAxis.dataKey]))
-      } else if (
-        newConfig.xAxis.type === 'date' &&
-        (newConfig.exclusions.dateStart || newConfig.exclusions.dateEnd) &&
-        newConfig.xAxis.dateParseFormat
-      ) {
-
-        // Filter dates
-        const timestamp = (e) => new Date(e).getTime()
-
-        let startDate = timestamp(newConfig.exclusions.dateStart)
-        let endDate = timestamp(newConfig.exclusions.dateEnd) + 86399999 //Increase by 24h in ms (86400000ms - 1ms) to include selected end date for .getTime() comparative
-
-        let startDateValid = undefined !== typeof startDate && false === isNaN(startDate)
-        let endDateValid = undefined !== typeof endDate && false === isNaN(endDate)
-
-        if (startDateValid && endDateValid) {
-          newExcludedData = data.filter(e =>
-            (timestamp(e[newConfig.xAxis.dataKey]) >= startDate) &&
-            (timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
-          )
-        } else if (startDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) >= startDate)
-        } else if (endDateValid) {
-          newExcludedData = data.filter(e => timestamp(e[newConfig.xAxis.dataKey]) <= endDate)
-        }
-
-      } else {
-        newExcludedData = dataOverride || stateData
-      }
-    } else {
-      newExcludedData = dataOverride || stateData
-    }
-
-    setExcludedData(newExcludedData)
-
-    // After data is grabbed, loop through and generate filter column values if there are any
-    let currentData
-
-    if (newConfig.filters) {
-      newConfig.filters.forEach((filter, index) => {
-        let filterValues = []
-        filterValues = generateValuesForFilter(filter.columnName, newExcludedData)
-        newConfig.filters[index].values = filterValues
-        // Initial filter should be active
-        newConfig.filters[index].active = filterValues[0]
-      })
-      currentData = filterData(newConfig.filters, newExcludedData)
-      setFilteredData(currentData)
-    }
-
-    if (!currentData) currentData = newExcludedData
-  }
-
-  useEffect(() => {
-    return buildChartData()
-  }, [])
-
-  const buildChartData = () => {
-    let newConfig = {}
-
+  const configChartRuntime = (newConfig, dataOverride = data) => {
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.seriesLabels = {}
@@ -109,7 +33,7 @@ const CdcChart = ({ configUrl }) => {
     newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.visualizationType === 'Pie') {
-      newConfig.runtime.seriesKeys = config.data.map(data => data[newConfig.xAxis.dataKey])
+      newConfig.runtime.seriesKeys = dataOverride.map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
@@ -145,9 +69,10 @@ const CdcChart = ({ configUrl }) => {
     newConfig.runtime.uniqueId = Date.now()
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : ''
 
+    let currentData
+
     // Check for duplicate x axis values in data
     let uniqueXValues = {}
-    let currentData
 
     if (newConfig.visualizationType !== 'Paired Bar') {
       for (let i = 0; i < currentData?.length; i++) {
@@ -160,20 +85,29 @@ const CdcChart = ({ configUrl }) => {
     }
 
     configActions.setConfig(newConfig)
-    console.log('new chart config', newConfig)
   }
+
+  const [ loadingConfig, reloadConfig ] = useLoadConfig(configObj, configUrlObj, defaults, configChartRuntime)
+
+  useEffect(() => {
+    reloadConfig()
+  }, [ reloadConfig ])
 
   return (
     <ErrorBoundary component="CdcChart">
       <>
-        {view === 'editor' ?
+        {loadingConfig ?
+          <p>Loading...</p> :
           <>
-            <Editor panels={EditorPanels()}>
+            {view === 'editor' ?
+              <>
+                <Editor EditorPanels={EditorPanels}>
+                  <Chart/>
+                </Editor>
+              </> :
               <Chart/>
-            </Editor>
+            }
           </>
-          :
-          <Chart/>
         }
       </>
     </ErrorBoundary>

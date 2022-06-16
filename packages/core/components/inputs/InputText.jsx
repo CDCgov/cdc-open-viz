@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import { useConfigContext } from '../../context/ConfigContext'
 
+import { getConfigKeyValue } from '../../helpers/configHelpers'
+
 import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
@@ -21,9 +23,9 @@ const InputText = memo((
   }
 ) => {
 
-  const { configActions } = useConfigContext()
+  const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(stateValue || '')
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : stateValue || '')
   const [ debouncedValue ] = useDebounce(value, 500)
 
   const inputRef = useRef(null)

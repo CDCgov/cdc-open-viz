@@ -1,11 +1,17 @@
 import React, { useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
 
+//Context
 import { useConfigContext } from '../../context/ConfigContext'
 
+//Helpers
+import { getConfigKeyValue } from '../../helpers/configHelpers'
+
+//Components
 import Icon from '../ui/Icon'
 import Label from '../elements/Label'
 
+//Styles
 import '../../styles/v2/components/input/index.scss'
 
 const InputCheckbox = memo((
@@ -17,44 +23,45 @@ const InputCheckbox = memo((
     activeCheckColor = null,
     tooltip,
 
-    configField,
-    value: stateValue,
+    configField, value,
     className, ...attributes
   }
 ) => {
 
-  const { configActions } = useConfigContext()
+  const { config, configActions } = useConfigContext()
+  const [ checkValue, setCheckValue ] = useState(value || false)
 
-  const [ value, setValue ] = useState(stateValue || false)
-
+  //Set initial value
   useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value)
-      setValue(stateValue)
-  }, [ stateValue ])
-
-  useEffect(() => {
-    if (configField) {
-      if (stateValue !== value) {
-        configActions.updateField(configField, value)
-      }
+    let defaultValue = getConfigKeyValue(configField, config)
+    if (defaultValue !== undefined && defaultValue !== null && defaultValue !== checkValue) {
+      setCheckValue(defaultValue)
     }
-  }, [ value ])
+  }, [configField, config])
+
+  //Update config when state changes
+  useEffect(() => {
+    configActions.updateField(configField, checkValue)
+  }, [ checkValue ])
+
+  const onClick = () => {
+    setCheckValue(!checkValue)
+  }
 
   return (
     <div className={'cove-input__checkbox-group' + (className ? ' ' + className : '')} flow={labelPosition}>
       {label && labelPosition === 'left' &&
-        <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>
+        <Label tooltip={tooltip} onClick={() => onClick()}>{label}</Label>
       }
-      <div className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')}
-           onClick={() => setValue(!value)}>
+      <div className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (checkValue ? ' active' : '')} onClick={() => onClick()}>
         <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
-             style={value && activeColor ? { backgroundColor: activeColor } : null}>
+             style={checkValue && activeColor ? { backgroundColor: activeColor } : null}>
           <Icon display="check" className="cove-input__checkbox-check" color={activeCheckColor || '#025eaa'}/>
         </div>
-        <input className="cove-input--hidden" type="checkbox" name={name} checked={value} readOnly/>
+        <input className="cove-input--hidden" type="checkbox" checked={checkValue} readOnly/>
       </div>
       {label && labelPosition === 'right' &&
-        <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>
+        <Label tooltip={tooltip} onClick={() => onClick()}>{label}</Label>
       }
     </div>
   )

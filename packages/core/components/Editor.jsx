@@ -1,4 +1,4 @@
-import React, { Children, useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 //Context
@@ -15,13 +15,12 @@ import Icon from './ui/Icon'
 //Styles
 import '../styles/v2/components/editor.scss'
 
-const Editor = ({ panels, children }) => {
+const Editor = ({ EditorPanels, children }) => {
   const { config, configActions, missingRequiredSections } = useConfigContext()
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ viewportPreview, setViewportPreview ] = useState(null)
   const [ rotateAnimation, setRotateAnimation ] = useState(false)
-
 
   const resetIcon = useRef(null)
 
@@ -99,15 +98,7 @@ const Editor = ({ panels, children }) => {
           <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
           <section className="cove-editor__panel-config">
             <Accordion>
-              <Accordion.Section label="Global">
-                Test data
-              </Accordion.Section>
-              {
-                panels.map((panel, index) => {
-                  const {label, warnIf, children } = panel.props
-                  return <Accordion.Section label={label} warnIf={warnIf} children={children} key={index}/>
-                })
-              }
+              {EditorPanels().props.children.map((panel) => panel)}
             </Accordion>
           </section>
         </div>

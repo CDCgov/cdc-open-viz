@@ -1,37 +1,46 @@
 import React, { useEffect } from 'react'
 import ReactTooltip from 'react-tooltip'
 
+//Third Party
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { scaleLinear, scalePoint } from '@visx/scale'
 import { AxisLeft, AxisBottom } from '@visx/axis'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-
+//Context
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
+//Hooks
+import useReduceData from '../hooks/useReduceData'
+
+//Helpers
+import { visxParseDate, visxFormatDate } from '@cdc/core/helpers/visxHelpers'
+
+//Components - Core
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+//Components - Local
 import ChartLinearBar from './Chart.Linear.Bar'
 import ChartLinearBarPaired from './Chart.Linear.BarPaired'
 import ChartLinearLine from './Chart.Linear.Line'
 
-import useReduceData from '../hooks/useReduceData'
+//Visualization
+const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
+  const { viewport, dimensions } = useGlobalContext()
+  const { config, data } = useConfigContext()
 
-const ChartLinear = () => {
-  const {
-    config,
-    currentViewport,
-    transformedData: data,
-    dimensions,
-    formatDate,
-    parseDate
-  } = useConfigContext()
-
-  let [ width ] = dimensions
   const { minValue, maxValue } = useReduceData(config, data)
 
-  if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
-    width = width * 0.73
+  let [ width ] = dimensions
+  let svgMargin = 32
+  width = width - svgMargin
+
+  if (config && config.legend && !config.legend.hide && (viewport === 'lg' || viewport === 'md')) {
+    //Resize the chart svg width so legend can flex to the right - md and lg viewports
+    const containerPercentWidth = 0.73
+    width = width * containerPercentWidth
   }
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height
@@ -39,8 +48,8 @@ const ChartLinear = () => {
   const xMax = width - config.runtime.yAxis.size
   const yMax = height - config.runtime.xAxis.size
 
-  const getXAxisData = (data) => config.runtime.xAxis.type === 'date' ? (parseDate(data[config.runtime.originalXAxis.dataKey])).getTime() : data[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (data, seriesKey) => data[seriesKey]
+  const getXAxisData = (d) => config.runtime.xAxis.type === 'date' ? (visxParseDate(config.runtime.xAxis.dateParseFormat, d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey]
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   let xScale
   let yScale
@@ -76,9 +85,9 @@ const ChartLinear = () => {
 
       yScale = config.runtime.xAxis.type === 'date' ?
         scaleLinear({ domain: [ Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped) ] }) :
-        scalePoint<string>({ domain: xAxisDataMapped, padding: 0.5 })
+        scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
-      seriesScale = scalePoint<string>({
+      seriesScale = scalePoint({
         domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
         range: [ 0, yMax ]
       })
@@ -123,15 +132,21 @@ const ChartLinear = () => {
     ReactTooltip.rebuild()
   })
 
+  const chartProps = {
+    formatNumber,
+    colorScale,
+    seriesHighlight
+  }
+
   return (
     <ErrorBoundary component="ChartLinear">
-      <svg className="cove-chart__visualization" width={width} height={height}>
+      <svg className="cove-chart__chart" width={width} height={height}>
         {/* Higlighted regions */}
         {config.regions ? config.regions.map((region) => {
           if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-          const from = xScale((parseDate(region.from)).getTime())
-          const to = xScale((parseDate(region.to)).getTime())
+          const from = xScale((visxParseDate(config.runtime.xAxis.dateParseFormat, region.from)).getTime())
+          const to = xScale((visxParseDate(config.runtime.xAxis.dateParseFormat, region.to)).getTime())
           const width = to - from
 
           return (
@@ -268,7 +283,7 @@ const ChartLinear = () => {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
-            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
+            tickFormat={config.runtime.xAxis.type === 'date' ? visxFormatDate(config.runtime.xAxis.dateDisplayFormat) : (tick) => tick}
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
@@ -334,14 +349,13 @@ const ChartLinear = () => {
               top={yMax}
               left={config.runtime.yAxis.size}
               label={config.runtime.xAxis.label}
-              tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
+              tickFormat={config.runtime.xAxis.type === 'date' ? visxFormatDate(config.runtime.xAxis.dateDisplayFormat) : (tick) => tick}
               scale={g1xScale}
               stroke="#333"
               tickStroke="#333"
               numTicks={config.runtime.xAxis.numTicks || undefined}
             >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <Group className="bottom-axis">
                     {props.ticks.map((tick, i) => {
@@ -380,7 +394,7 @@ const ChartLinear = () => {
               top={yMax}
               left={config.runtime.yAxis.size}
               label={config.runtime.xAxis.label}
-              tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
+              tickFormat={config.runtime.xAxis.type === 'date' ? visxFormatDate(config.runtime.xAxis.dateDisplayFormat) : (tick) => tick}
               scale={g2xScale}
               stroke="#333"
               tickStroke="#333"
@@ -429,7 +443,7 @@ const ChartLinear = () => {
 
         {/* Bar chart */}
         {(config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-          <ChartLinearBar xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
+          <ChartLinearBar colorScale={colorScale} seriesHighlight={seriesHighlight} formatNumber={formatNumber} xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
                           getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
         )}
 

@@ -7,20 +7,24 @@ import { useConfigContext } from '../context/ConfigContext'
 //Helpers
 import DataTransform from '../helpers/DataTransform'
 
-const useLoadConfig = (configObj, configUrl) => {
-  const [ loaded, setLoaded ] = useState(false)
-
+const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
   const { view } = useGlobalContext()
   const { config, configActions } = useConfigContext()
 
+  const [ loadingConfig, setLoadingConfig ] = useState(true)
+  const [ cycle, setCycle ] = useState(false)
+
   const transform = new DataTransform()
+  const reloadConfig = () => setCycle(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      console.log('fetching config data')
-      let response = configObj || await (await fetch(configUrl)).json()
+    configActions.setConfigDefaults({ ...defaults })
 
-      // If data is included through a URL, fetch that and store
+    const fetchConfig = async () => {
+      let response = configObj || await (await fetch(configUrlObj)).json()
+
+      //Set data variable and check if included through a URL.
+      //If so, fetch that data
       let data = response.formattedData || response.data || {}
 
       if (response.dataUrl) {
@@ -33,21 +37,36 @@ const useLoadConfig = (configObj, configUrl) => {
         }
       }
 
-      let newConfig = { ...config, ...response }
-      if (undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === view
+      //Push data to config context state
+      if (data) configActions.setData(data)
 
+      //Build the new config object, tie it all together
+      let newConfig = { ...defaults, ...response }
+      newConfig.data = data
+
+      //Add any runtime entries (visualization specific) to the config
+      if (runtime) runtime(newConfig, data)
+
+      //Make config entry for table visibility - TODO: May no longer need with global context inclusion of view mode?
+      if (undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === view
       configActions.updateConfig(newConfig, data)
     }
 
-    if (!loaded) {
-      setLoaded(true)
-      fetchData().catch(console.error)
+    if (!cycle) {
+      fetchConfig()
+        .catch(console.error)
+        .finally(()=>{
+          setCycle(true)
+          setLoadingConfig(false)
+        })
     }
-  }, [ loaded ])
+  }, [ cycle, configObj, configUrlObj ])
 
-  const reloadConfig = () => setLoaded(false)
+  useEffect(() => {
+    reloadConfig()
+  }, [ config ])
 
-  return [ reloadConfig ]
+  return [ loadingConfig, reloadConfig ]
 }
 
 export default useLoadConfig

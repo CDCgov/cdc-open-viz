@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useCallback, useState, useRef } from 'react'
 
 //Helpers
 import getViewport from '../helpers/getViewport'
@@ -11,8 +11,9 @@ export const useGlobalContext = () => useContext(GlobalContext)
 
 export const GlobalContextProvider = ({ children }) => {
   const [ globalContextData, setGlobalContextData ] = useState({})
+  const [ currentViewport, setCurrentViewport ] = useState('lg')
 
-  //Overlay Actions
+  //Overlay Actions -----------------------------------
   const openOverlay = (obj, disableBgClose = false) => {
     let payload = { object: obj, show: true, disableBgClose: disableBgClose }
     setGlobalContextData(context => ({ ...context, overlay: { ...payload } }))
@@ -28,15 +29,34 @@ export const GlobalContextProvider = ({ children }) => {
     }))
   }
 
-  //General Actions & Data
+  //General Actions & Data -----------------------------------
   let isEditor = () => window.location.href.includes('editor=true') ? 'editor' : false
   let isDashboard = false
   const getView = (isEditor() || isDashboard) || 'component'
 
+  //Observe changes to viewport size
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      let { width } = entry.contentRect
+      setCurrentViewport(getViewport(width))
+    }
+  })
+
+  //Create viewport size observer callback
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+      resizeObserver.observe(node)
+    }
+  }, [])
+
   //Build Context
   const globalSettings = {
     view: getView,
-    viewport: '',
+    viewport: currentViewport,
+    dimensions: globalContextData.dimensions,
+    globalActions: {
+      setGlobalContextData
+    },
     overlay: {
       object: globalContextData.overlay?.object || null,
       show: globalContextData.overlay?.show || false,
@@ -50,11 +70,12 @@ export const GlobalContextProvider = ({ children }) => {
 
   return (
     <GlobalContext.Provider value={globalSettings}>
-      <div className="cove">
+      <div className={'cove' + (currentViewport ? ' ' + currentViewport : '')} ref={outerContainerRef}>
         {children}
       </div>
     </GlobalContext.Provider>
   )
 }
 
+GlobalContextProvider.displayName = 'GlobalContext'
 GlobalContext.displayName = 'GlobalContext'

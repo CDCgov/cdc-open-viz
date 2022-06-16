@@ -17,11 +17,6 @@
       }
     }
   }
-
-  @include breakpoint(md) {
-    margin-right: 1rem;
-    margin-left: 1rem;
-  }
 }
 
 .cove-chart__visualization {

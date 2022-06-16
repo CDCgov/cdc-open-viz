@@ -1,25 +1,25 @@
 import React, { useContext, useState, useEffect } from 'react'
+
+//Third Party
 import { Group } from '@visx/group'
 import { BarGroup, BarStack } from '@visx/shape'
 import { BarStackHorizontal } from '@visx/shape'
 import { Text } from '@visx/text'
+
+//IE11
 import chroma from 'chroma-js'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-
+//Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-export default function ChartLinearBar({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const {
-    transformedData: data,
-    colorScale,
-    seriesHighlight,
-    config,
-    formatNumber,
-    updateConfig,
-    setParentConfig,
-    colorPalettes
-  } = useConfigContext()
+//Components
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+//Visualization
+const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, colorScale, seriesHighlight, formatNumber }) => {
+  const { config, configActions, data } = useConfigContext()
+
+  // colorScale, seriesHighlight, formatNumber
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -39,7 +39,7 @@ export default function ChartLinearBar({ xScale, yScale, seriesScale, xMax, yMax
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
-      updateConfig({
+      configActions.updateConfig({
         ...config,
         yAxis: {
           ...config,
@@ -47,17 +47,17 @@ export default function ChartLinearBar({ xScale, yScale, seriesScale, xMax, yMax
         }
       })
     }
-  }, [ config, updateConfig ])
+  }, [ config ])
 
   useEffect(() => {
     if (config.isLollipopChart === false) {
-      updateConfig({ ...config, barHeight: 25 })
+      configActions.updateConfig({ ...config, barHeight: 25 })
     }
   }, [ config.isLollipopChart ])
 
   useEffect(() => {
     if (config.visualizationSubType === 'horizontal') {
-      updateConfig({
+      configActions.updateConfig({
         ...config,
         orientation: 'horizontal'
       })
@@ -547,3 +547,5 @@ export default function ChartLinearBar({ xScale, yScale, seriesScale, xMax, yMax
     </ErrorBoundary>
   )
 }
+
+export default ChartLinearBar
