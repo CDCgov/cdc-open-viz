@@ -129,6 +129,9 @@ header + .map-container.full-border {
 		&:active {
 			transform: scale(0.9);
 		}
+		&:focus {
+			background: #005eaa;
+		}
 	}
 	> button:first-child {
 		margin-right: 0.25em;
@@ -140,6 +143,7 @@ header + .map-container.full-border {
 		height: 2.5em;
 		width: 2.5em;
 	}
+	
 }
 
 @include breakpointClass(md) {
