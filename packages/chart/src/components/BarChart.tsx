@@ -4,7 +4,6 @@ import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
 import { Text } from '@visx/text';
 import chroma from 'chroma-js';
-import {useSpring} from "react-spring";
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -27,13 +26,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null);
   const [textWidth, setTextWidth] = useState(null);
-  // const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
-
-  const animationSpeed = "1.25s";
-
-  const animateBars = () => {
-
-  }
 
   useEffect(() => {
     if(config.visualizationSubType === "horizontal" && !config.yAxis.labelPlacement) {
@@ -57,6 +49,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
+
         { config.visualizationSubType === 'stacked' ? (
           <BarStack
             data={data}
@@ -81,41 +74,44 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
 
-
               return (
-              <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-              <Text
-                display={config.labels && displayBar ? 'block' : 'none'}
-                opacity={transparentBar ? 0.5 : 1}
-                x={barThickness * (bar.index + 0.5) + offset}
-                y={bar.y - 5}
-                fill={bar.color}
-                textAnchor="middle">
-                  {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
-              </Text>
-                <rect
-                  key={`bar-stack-${barStack.index}-${bar.index}`}
-                  x={barThickness * bar.index + offset}
-                  y={bar.y}
-                  height={bar.height}
-                  width={barThicknessAdjusted}
-                  fill={bar.color}
-                  stroke="#333"
-                  strokeWidth={config.barBorderThickness || 1}
-                  opacity={transparentBar ? 0.5 : 1}
-                  display={displayBar ? 'block' : 'none'}
-                  data-tip={tooltip}
-                  data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                  // style={ rectStyle }
-                >
-                  { animatedChart &&
-                      <>
-                        {/*<animate attributeName="y" values={`${barY + barHeight}; ${barY}`} dur={animationSpeed} />*/}
-                        {/*<animate attributeName="height" values={`0; ${barHeight}`} dur={animationSpeed} />*/}
-                      </>
-                  }
-                </rect>
-              </Group>
+                  <>
+                    <style>
+                      {`
+                         #barStack${barStack.index}-${bar.index} rect{
+                          animation-delay: ${barStack.index}.2s;
+                          transform-origin: ${barThicknessAdjusted/2}px ${bar.y + bar.height}px
+                        }
+                      `}
+                    </style>
+                    <Group id={`barStack${barStack.index}-${bar.index}`} className='stack vertical' key={`bar-stack-${barStack.index}-${bar.index}`}>
+                      <Text
+                          display={config.labels && displayBar ? 'block' : 'none'}
+                          opacity={transparentBar ? 0.5 : 1}
+                          x={barThickness * (bar.index + 0.5) + offset}
+                          y={bar.y - 5}
+                          fill={bar.color}
+                          textAnchor="middle">
+                        {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
+                      </Text>
+                      <rect
+                          key={`bar-stack-${barStack.index}-${bar.index}`}
+                          x={barThickness * bar.index + offset}
+                          y={bar.y}
+                          height={bar.height}
+                          width={barThicknessAdjusted}
+                          fill={bar.color}
+                          stroke="#333"
+                          strokeWidth={config.barBorderThickness || 1}
+                          opacity={transparentBar ? 0.5 : 1}
+                          display={displayBar ? 'block' : 'none'}
+                          data-tip={tooltip}
+                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          // style={ rectStyle }
+                      >
+                      </rect>
+                    </Group>
+                  </>
             )}
             ))
             }
@@ -133,11 +129,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               color={() => {return '';}}
             >
               {(barGroups) => {
-
+                let barType = 'vertical';
                 if (config.visualizationSubType === "horizontal") {
                   const barsPerGroup = config.series.length;
                   let barHeight = config.barHeight ? config.barHeight : 25;
                   let barPadding = barHeight;
+                  barType = 'horizontal';
 
                   if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
                     if(barHeight < 40) {
@@ -158,7 +155,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                 return barGroups.map((barGroup, index) => (
                 <Group 
-                  className={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                  className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${barType}`}
                   key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} 
                   top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} 
                   left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
@@ -214,41 +211,18 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
-                    // console.log( 'BarY:', barY );
-                    // console.log( 'Bar Height:', barHeight );
                     return (
                         <>
                           <style>
                             {`
                             
                             .Bar #barGroup${barGroup.index} {
-                              transform-origin: ${barWidth/2}px ${barHeight}px
+                              transform-origin: ${barWidth/2}px ${barY + barHeight}px
                             }
                             
                             `}
                           </style>
-                          {/*<style>*/}
-                          {/*  {`*/}
-                          {/*    .Bar #barGroup${barGroup.index} {*/}
-                          {/*      animation: growBar${barGroup.index} 4s linear forwards;*/}
-                          {/*      transform: scale(1, 3px) translate(0, ${barHeight}px);*/}
-                          {/*      animation-play-state: paused;*/}
-                          {/*    }*/}
-                          {/*    */}
-                          {/*    */}
-                          {/*    */}
-                          {/*    @keyframes growBar${barGroup.index} {*/}
-                          {/*      from {*/}
-                          {/*        transform: scale(1, 3px) translate(0, ${barHeight}px);*/}
-                          {/*      }*/}
 
-                          {/*      to {*/}
-                          {/*        transform: scale(1) translate(0,0);*/}
-                          {/*      }*/}
-                          {/*    }*/}
-                          {/*  `}*/}
-                          {/*</style>*/}
-                          {/*{ visible &&*/}
                             <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                               <Text
                                   display={config.labels && displayBar ? 'block' : 'none'}
@@ -274,15 +248,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   display={displayBar ? 'block' : 'none'}
                                   data-tip={tooltip}
                                   data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                                  // className={animatedChart ? 'animated' : ''}
-                                  // style={{ 'opacity': 1, 'transform': 'scale(1, 0) translate(0, ' + (bar.y + bar.height) + 'px )' }}
                               >
-
-                                <>
-                                  {/*<animate attributeName="y" values={`${barY + barHeight}; ${barY}`} dur={animationSpeed}/>*/}
-                                  {/*<animate attributeName="height" values={`0; ${barHeight}`} dur={animationSpeed}/>*/}
-                                  {/*<animate attributeName="height" values={`0; ${barHeight}`} dur={animationSpeed} begin={ ( barGroup.index === 0 ) ? '0s' : `barGroup${barGroup.index - 1}.end` } />*/}
-                                </>
 
                               </rect>
                               {config.isLollipopChart && config.lollipopShape === 'circle' &&

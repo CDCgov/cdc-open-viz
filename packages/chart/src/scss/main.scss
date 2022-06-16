@@ -387,15 +387,17 @@
       position: relative;
     }
 
-    rect {
+    .vertical rect {
       animation: growBar 1.2s linear forwards;
       animation-play-state: paused;
       //transform-origin: bottom;
     }
 
-    &.horizontal {
+    .horizontal rect {
       //transform: scale(0, 1);
       //display: none;
+      animation: growBarH 1.2s linear forwards;
+      animation-play-state: paused;
     }
 
     &.animated rect {
@@ -413,9 +415,14 @@
     }
   }
 
-  //todo remove this temp margin
-  .chart-container {
-    //margin-top: 1000px;
+  @keyframes growBarH {
+    from {
+      transform: scale(0, 1) ;
+    }
+
+    to {
+      transform: scale(1) ;
+    }
   }
 }
 
