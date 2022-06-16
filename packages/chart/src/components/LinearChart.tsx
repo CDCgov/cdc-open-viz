@@ -441,20 +441,20 @@ console.log('config', config)
           
           {/* Bar chart */}
           { (config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-              <>            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
-
+              <>
+                <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
               </>
 
           )}
 
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
-              <> <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              <>
+                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
               </>
 
           )}
       </svg>
-
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
       <div ref={triggerRef} />
     </ErrorBoundary>
