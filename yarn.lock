@@ -967,6 +967,11 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
+"@cdc/core@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@cdc/core/-/core-1.1.2.tgz#71ac97d6b86308172b7112a242921f6d0ec2b60f"
+  integrity sha512-pUCrVF2ZsCDWYi9V2EXtR+6NHqfjT/ASv4dhX2sbtVxCwPb24CoV0Q9LT8oAjc/hV5P/vQ28ebpxmF91caFBdA==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
