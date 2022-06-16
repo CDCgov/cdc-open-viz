@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -16,11 +16,12 @@ import useIntersectionObserver from "./useIntersectionObserver";
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import '../scss/LinearChart.scss';
+import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
-
+  const {minValue,maxValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
 
   const triggerRef = useRef();
@@ -52,38 +53,16 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
-
-
   if (data) {
-    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : Math.min(...data.map((d) => Math.min(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
+    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
     }
-
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
-      //If stacked bar, add together y values to get max, otherwise map data to find max
-      if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
-        const yTotals = data.reduce((allTotals, xValue) => {
-          const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-            yTotal += Number(xValue[k]);
-            return yTotal;
-          }, 0);
-          allTotals.push(totalYValues);
-          if(totalYValues > max){
-            max = totalYValues;
-          }
-          return allTotals;
-        }, [] as number[]);
-
-        max = Math.max(...yTotals);
-      } else if(config.visualizationType === 'Bar' && config.confidenceKeys && config.confidenceKeys.upper) {
-        max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
-      } else {
-        max = Math.max(...data.map((d) => Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
-      }
+     max = maxValue
     }
 
     //Adds Y Axis data padding if applicable
@@ -95,38 +74,64 @@ export default function LinearChart() {
 
     let xAxisDataMapped = data.map(d => getXAxisData(d));
 
-    if(config.runtime.horizontal){
-      xScale = scaleLinear<number>({
-        domain: [min, max],
-        range: [0, xMax]
-      });
+    if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
+      const dataKey = data.map((item) => item[config.series[0].dataKey]);
+      const maxDataVal = Math.max(...dataKey).toString().length;
 
-      yScale = config.runtime.xAxis.type === 'date' ?
-        scaleLinear<number>({domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]}) :
-        scalePoint<string>({domain: xAxisDataMapped, padding: 0.5});
-
-      seriesScale = scalePoint<string>({
-        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
-        range: [0, yMax]
-      });
-
-      yScale.rangeRound([0, yMax]);
-    } else {
-      yScale = scaleLinear<number>({
-        domain: [min, max],
-        range: [yMax, 0]
-      });
-
-      xScale = scalePoint<string>({domain: xAxisDataMapped, range: [0, xMax], padding: 0.5});
-
-      seriesScale = scalePoint<string>({
-        domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
-        range: [0, xMax]
-      });
+      switch (true) {
+        case maxDataVal > 8 && maxDataVal <= 12:
+          max = max * 1.3;
+          break;
+        case maxDataVal > 4 && maxDataVal <= 7:
+          max = max * 1.1;
+          break;
+      }
     }
 
+      if (config.runtime.horizontal) {
+        xScale = scaleLinear<number>({
+          domain: [min, max],
+          range: [0, xMax],
+        });
+
+        yScale =
+          config.runtime.xAxis.type === "date"
+            ? scaleLinear<number>({
+                domain: [
+                  Math.min(...xAxisDataMapped),
+                  Math.max(...xAxisDataMapped),
+                ],
+              })
+            : scalePoint<string>({ domain: xAxisDataMapped, padding: 0.5 });
+
+        seriesScale = scalePoint<string>({
+          domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
+          range: [0, yMax],
+        });
+
+        yScale.rangeRound([0, yMax]);
+      } else {
+        min = min < 0 ? min * 1.11 : min;
+
+        yScale = scaleLinear<number>({
+          domain: [min, max],
+          range: [yMax, 0],
+        });
+
+        xScale = scalePoint<string>({
+          domain: xAxisDataMapped,
+          range: [0, xMax],
+          padding: 0.5,
+        });
+
+        seriesScale = scalePoint<string>({
+          domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
+          range: [0, xMax],
+        });
+      }
+
       
-  if(config.visualizationType === 'Paired Bar') {
+    if(config.visualizationType === 'Paired Bar') {
 
 
     let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
@@ -144,7 +149,7 @@ export default function LinearChart() {
       range: [xMax / 2, xMax]
     })
 
-  }
+    }
   }
 
   
@@ -153,7 +158,7 @@ export default function LinearChart() {
     ReactTooltip.rebuild();
   });
 
-console.log('config', config)
+
   return (
     <ErrorBoundary component="LinearChart">
       <svg width={width} height={height} className={`linear ${config.visualizationType} ${animatedChart ? 'animated' : ''}`}>
@@ -193,7 +198,6 @@ console.log('config', config)
           }) : '' }
 
           {/* Y axis */}
-          {!config.yAxis.hideAxis && (
             <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
@@ -214,12 +218,24 @@ console.log('config', config)
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        <Line
-                          from={tick.from}
-                          to={tick.to}
-                          stroke="#333"
-                          display={config.runtime.horizontal ? 'none' : 'block'}
-                        />
+                        {!config.runtime.yAxis.hideTicks && config.orientation === 'horizontal' && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'block' : 'none'}
+                          />
+                        )}
+
+                        {!config.runtime.yAxis.hideTicks && config.orientation === 'vertical' && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'none' : 'block'}
+                          />
+                        )}
+
                         { config.runtime.yAxis.gridLines ? (
                           <Line
                             from={{x: tick.from.x + xMax, y: tick.from.y}}
@@ -229,17 +245,37 @@ console.log('config', config)
                           ) : ''
                         }
 
-                        { config.visualizationSubType === "horizontal" && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) &&
+                        {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
+                            <Fragment>
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                             </Fragment>
+                        }
+
+                        { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{tick.formattedValue}</Text>
+                        }
+
+                        { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.xAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
                             >{tick.formattedValue}</Text>
                         }
 
 
-                        { config.visualizationSubType !== "horizontal" && config.visualizationType !== 'Paired Bar' &&
+                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
                             <Text
                               x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
@@ -253,11 +289,13 @@ console.log('config', config)
                       </Group>
                     );
                   })}
+                  { (!config.yAxis.hideAxis && config.orientation === 'vertical') || (!config.xAxis.hideAxis && config.orientation === 'horizontal') && (
                   <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
                   />
+                  )}
                   { yScale.domain()[0] < 0 && (
                     <Line
                       from={{x: props.axisFromPoint.x, y: yScale(0)}}
@@ -278,10 +316,9 @@ console.log('config', config)
               );
             }}
           </AxisLeft>
-          )}
 
           {/* X axis */}
-          {!config.xAxis.hideAxis && config.visualizationType !== 'Paired Bar' && (
+          {config.visualizationType !== 'Paired Bar' && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -303,11 +340,14 @@ console.log('config', config)
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+                        {!config.xAxis.hideTicks && (
                         <Line
                           from={tick.from}
                           to={tick.to}
                           stroke="#333"
                         />
+                        )}
+                        {!config.xAxis.hideLabel && (
                         <Text
                           transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${!config.runtime.horizontal ? config.runtime.xAxis.tickRotation : 0})`}
                           verticalAnchor="start"
@@ -316,14 +356,18 @@ console.log('config', config)
                         >
                           {tick.formattedValue}
                         </Text>
+                        )}
+
                       </Group>
                     );
                   })}
+                  {!config.xAxis.hideAxis && (
                   <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
                     stroke="#333"
                   />
+                  )}
                   <Text
                     x={axisCenter}
                     y={config.runtime.xAxis.size}
@@ -362,27 +406,33 @@ console.log('config', config)
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        <Line
-                          from={tick.from}
-                          to={tick.to}
-                          stroke="#333"
-                        />
-                        <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
-                          verticalAnchor="start"
-                          textAnchor={'end'}
-                          width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
-                        >
-                          {tick.formattedValue}
-                        </Text>
+                        {!config.runtime.xAxis.hideTicks &&
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                          />
+                        }
+                        {!config.runtime.xAxis.hideLabel &&
+                          <Text
+                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
+                            verticalAnchor="start"
+                            textAnchor={'end'}
+                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                          >
+                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                          </Text>
+                      }
                       </Group>
                     );
                   })}
-                  <Line
-                    from={props.axisFromPoint}
-                    to={props.axisToPoint}
-                    stroke="#333"
-                  />
+                  {!config.runtime.xAxis.hideAxis &&
+                    <Line
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
+                      stroke="#333"
+                    />
+                  }
                 </Group>
               );
             }}
@@ -400,6 +450,7 @@ console.log('config', config)
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2;
               return (
+                <>
                 <Group className="bottom-axis">
                   {props.ticks.map((tick, i) => {
                     const tickWidth = xMax / props.ticks.length;
@@ -408,28 +459,45 @@ console.log('config', config)
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        <Line
-                          from={tick.from}
-                          to={tick.to}
-                          stroke="#333"
-                        />
-                        <Text
-                          transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
-                          verticalAnchor="start"
-                          textAnchor={'end'}
-                          width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
-                        >
-                          {tick.formattedValue}
-                        </Text>
+                        {!config.runtime.xAxis.hideTicks &&
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                          />
+                        }
+                        {!config.runtime.xAxis.hideLabel &&
+                          <Text
+                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
+                            verticalAnchor="start"
+                            textAnchor={'end'}
+                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                          >
+                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                          </Text>
+                        }
                       </Group>
                     );
                   })}
-                  <Line
-                    from={props.axisFromPoint}
-                    to={props.axisToPoint}
-                    stroke="#333"
-                  />
+                  {!config.runtime.xAxis.hideAxis &&
+                    <Line
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
+                      stroke="#333"
+                    />
+                  }
                 </Group>
+                  <Group>
+                      <Text
+                        transform={`translate(${xMax/2}, ${config.height - yMax + 20}) rotate(-${0})`}
+                        verticalAnchor="start"
+                        textAnchor={'middle'}
+                        stroke="#333"
+                      >
+                      {config.runtime.xAxis.label}
+                    </Text>
+                  </Group>
+                </>
               );
             }}
           </AxisBottom>

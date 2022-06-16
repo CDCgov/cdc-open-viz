@@ -62,24 +62,24 @@ export default function DataTable() {
       }];
     }
 
-    else {
-      Object.keys(data[0]).map((key) => {
-          const newCol = {
-            Header: key,
-            Cell: ({ row }) => {
-              return (
-                <>
-                  {row.original[key]}
-                </>
-              );
-            },
-            id: key,
-            canSort: true
-          };
+    // else {
+    //   Object.keys(data[0]).map((key) => {
+    //       const newCol = {
+    //         Header: key,
+    //         Cell: ({ row }) => {
+    //           return (
+    //             <>
+    //               {row.original[key]}
+    //             </>
+    //           );
+    //         },
+    //         id: key,
+    //         canSort: true
+    //       };
 
-          newTableColumns.push(newCol);
-      });
-    }
+    //       newTableColumns.push(newCol);
+    //   });
+    // }
 
     return newTableColumns;
   }, [config]);

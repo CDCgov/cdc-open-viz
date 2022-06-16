@@ -1,5 +1,7 @@
 @import '~@cdc/core/styles/v2/main';
 
-html,body {
-  margin: 0;
+.markup-include {
+  .cove-component__content {
+    background-color: #fff;
+  }
 }
