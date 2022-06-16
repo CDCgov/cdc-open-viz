@@ -1,6 +1,8 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
+import '../../styles/v2/components/input.scss'
+
 const InputText = memo((
   {
     label,
@@ -10,6 +12,7 @@ const InputText = memo((
     updateField,
     value: stateValue,
     type = 'input',
+    tooltip,
     i = null, min = null, max = null,
     ...attributes
   }
@@ -19,7 +22,7 @@ const InputText = memo((
   const [ debouncedValue ] = useDebounce(value, 500)
 
   useEffect(() => {
-    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
+    if ('string' === typeof debouncedValue && stateValue !== debouncedValue && updateField) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
   }, [ debouncedValue, section, subsection, fieldName, i, stateValue, updateField ])
@@ -51,8 +54,12 @@ const InputText = memo((
   }
 
   return (
-    <div className="input-group">
-      {label && <label>{label}</label>}
+    <div className="cove-input-group">
+      {label &&
+        <>
+          <label>{label}{tooltip}</label>
+        </>
+      }
       {formElement}
     </div>
   )

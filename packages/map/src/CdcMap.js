@@ -15,9 +15,9 @@ import html2canvas from 'html2canvas';
 import Canvg from 'canvg';
 
 // Data
+import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos';
-import colorPalettes from './data/color-palettes';
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
 import initialState from './data/initial-state';
 
 // Sass
@@ -33,6 +33,7 @@ import Loading from '@cdc/core/components/Loading';
 import DataTransform from '@cdc/core/components/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString'
+import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
 
 // Child Components
@@ -110,6 +111,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     let legendMemo = useRef(new Map())
 
+
+
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -117,6 +120,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
+
+    // *******START SCREEN READER DEBUG*******
+    // const focusedElement = useActiveElement();
+
+    // useEffect(() => {
+    //     if (focusedElement) {
+    //         focusedElement.value && console.log(focusedElement.value);
+    //     }
+    //     console.log(focusedElement);
+    // }, [focusedElement])
+    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -128,9 +142,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(row.uid) row.uid = null // Wipe existing UIDs
 
             // United States check
-            if("us" === obj.general.geoType) {
+            if("us" === obj.general.geoType && obj.columns.geo.name) {
+
+                // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+
                 let geoName = '';
-                if(row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null ){
+                if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
 
                     geoName = String(row[obj.columns.geo.name])
                     geoName = geoName.toUpperCase()
@@ -451,7 +468,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Equal Interval
-        if(type === 'equalinterval') {
+        
+        if(type === 'equalinterval' && dataSet?.length !== 0) {
+            if(!dataSet || dataSet.length === 0) {
+                setState({
+                    ...state,
+                    runtime: {
+                        ...state.runtime,
+                        editorErrorMessage: 'Error setting equal interval legend type'
+                    }
+                })
+                return;
+            }
             dataSet = dataSet.filter(row => row[primaryCol] !== undefined)
             let dataMin = dataSet[0][primaryCol]
             let dataMax = dataSet[dataSet.length - 1][primaryCol]
@@ -554,8 +582,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             });
         }
         
-        obj.data.forEach(row => {
 
+        obj.data.forEach(row => {
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
             // When on a single state map filter runtime data by state
@@ -598,6 +626,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 result[row.uid] = row
             }
         })
+
         return result
     })
 
@@ -794,19 +823,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
+        
+        // Adds geo label, ie State: Georgia
         let stateOrCounty = 
             state.general.geoType === 'us' ? 'State: ' : 
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
+
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
-            //supportedStatesFipsCodes[]
-            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+            toolTipText +=  !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>` ;
         }
         
-        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
+        toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
         if('data' === state.general.type && undefined !== row) {
             toolTipText += `<dl>`
@@ -816,13 +847,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 if (true === column.tooltip) {
 
-                    let label = '';
-                    if(column.label !== undefined && column.lebel !==null){
-                        // column.label could be : Number || String || undefined types
-                        label = String(column.label)
-                    }
-                    
-                    
+                    let label = column.label.length > 0 ? column.label : '';
+
                     let value;
 
                     if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
@@ -839,7 +865,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
-                        toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
+                        toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
                     }
 
                 }
@@ -913,6 +939,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 console.error(`Cannot parse URL: ${url}`);
             }
         }
+    }
+
+    const formatLegendLocation = (key) => {
+        let value = key;
+        var formattedName = '';
+        let stateName = stateFipsToTwoDigit[key.substring(0, 2)]
+
+        if(stateName) {
+            formattedName += stateName
+        }
+
+        if (countyKeys.includes(value)) {
+            formattedName += ', ' + titleCase(supportedCounties[key])
+        }
+
+        return formattedName;
     }
 
     // Attempts to find the corresponding value
@@ -998,7 +1040,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = useCallback(async (configObj) => {
+    const loadConfig = async (configObj) => { 
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1050,11 +1092,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             newState.dataTable.forceDisplay = !isDashboard;
         }
 
-
         validateFipsCodeLength(newState);
         setState(newState)
         setLoading(false)
-    },[])
+    }
 
     const init = async () => {
         let configData = null
@@ -1091,18 +1132,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // When geotype changes
     useEffect(() => {
         // UID
-        if (state.data && state.columns.geo.name) {
+        if(state.data && state.columns.geo.name) {
             addUIDs(state, state.columns.geo.name)
         }
 
     }, [state]);
 
-
     useEffect(() => {
-
         // UID
-        // Append fips code to front of runtime data as key.
-        if(state.data && state.columns.geo.name ) {
+        if(state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
             addUIDs(state, state.columns.geo.name)
         }
 
@@ -1127,7 +1165,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             categoryValuesOrder: state.legend.categoryValuesOrder,
             specialClasses: state.legend.specialClasses,
             geoType: state.general.geoType,
-            data: runtimeData || state.data
+            data: state.data,
+             ...runtimeLegend
         })
 
         const hashData = hashObj({
@@ -1142,10 +1181,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         // Data
         let newRuntimeData;
-        //console.table({hashData, runtimeData, state })
-        if( (hashData !== runtimeData.fromHash) && state.data?.fromColumn) {
-            newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(newRuntimeData) 
+        if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
+            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(data) 
         }
 
         // Legend
@@ -1176,11 +1214,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     }, [runtimeData])
 
-    useEffect(() => {
     if(config) {
-    loadConfig(config)
-        }
-    },[config])
+        useEffect(() => {
+            loadConfig(config)
+        }, [config.data])
+    }
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
@@ -1226,14 +1264,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         displayGeoName,
         runtimeLegend,
         generateColorsArray,
-        titleCase
+        titleCase,
+        setState,
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
 
     const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
     
-
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1249,7 +1287,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend.length !== 0) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
                 {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
@@ -1260,7 +1298,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="-1">
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
 						{parse(title)}
 					</div>
 				</header>
@@ -1350,7 +1388,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
 				)}
-				{true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
 						rawData={state.data}
@@ -1368,6 +1406,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						indexTitle={dataTable.indexTitle}
 						mapTitle={general.title}
 						viewport={currentViewport}
+                        formatLegendLocation={formatLegendLocation}
 					/>
 				)}
 				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}

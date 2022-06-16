@@ -14,8 +14,14 @@ export default {
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
-    type: 'data'
+    type: 'data',
+    palette:{
+      isReversed:false
+    },
+    hideGeoColumnInTooltip: false,
+    hidePrimaryColumnInTooltip: false
   },
+  
   type: "map",
   color: 'pinkpurple',
   columns: {
@@ -56,5 +62,8 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true
+  },
+  runtime: {
+    editorErrorMessage: []
   }
 };

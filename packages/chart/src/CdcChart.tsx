@@ -20,15 +20,18 @@ import DataTable from './components/DataTable';
 import Context from './context';
 import defaults from './data/initial-state';
 
-import './scss/main.scss';
 import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
+import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
+import './scss/main.scss';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
   { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
 ) {
+
   const transform = new DataTransform();
 
   interface keyable { [key: string]: any }
@@ -47,14 +50,6 @@ export default function CdcChart(
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  const colorPalettes = {
-    'qualitative-bold': ['#377eb8', '#ff7f00', '#4daf4a', '#984ea3', '#e41a1c', '#ffff33', '#a65628', '#f781bf', '#3399CC'],
-    'qualitative-soft': ['#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', '#FDBF6F', '#FF7F00', '#ACA9EB'],
-    'sequential-blue': ['#C6DBEF', '#9ECAE1', '#6BAED6', '#4292C6', '#2171B5', '#084594'],
-    'sequential-blue-reverse': ['#084594', '#2171B5', '#4292C6', '#6BAED6', '#9ECAE1', '#C6DBEF'],
-    'sequential-green': ['#C7E9C0', '#A1D99B', '#74C476', '#41AB5D', '#238B45', '#005A32']
-  };
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
@@ -140,7 +135,7 @@ export default function CdcChart(
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
-          
+
           let filterValues = [];
 
           filterValues = generateValuesForFilter(filter.columnName, newExcludedData);
@@ -184,7 +179,7 @@ export default function CdcChart(
       });
     }
 
-    if ( (newConfig.visualizationType === 'Bar' && newConfig.visualizationSubType === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
+    if ( (newConfig.visualizationType === 'Bar' && newConfig.orientation === 'horizontal') || newConfig.visualizationType === 'Paired Bar') {
       newConfig.runtime.xAxis = newConfig.yAxis;
       newConfig.runtime.yAxis = newConfig.xAxis;
       newConfig.runtime.horizontal = true;
@@ -238,7 +233,7 @@ export default function CdcChart(
             values.push(value)
         }
     });
-    
+
     return values;
   }
 
@@ -397,6 +392,13 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
+
+    let stringFormattingOptions = {
+      useGrouping: config.dataFormat.commas ? true : false,
+      minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
+      maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+    };
+
     num = numberFromString(num);
 
     if(isNaN(num)) {
@@ -413,8 +415,7 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    num = num.toLocaleString('en-US', stringFormattingOptions)
 
     let result = ""
 
@@ -453,7 +454,7 @@ export default function CdcChart(
       containerClasses.push('left')
     }
 
-    if(config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
+    if(config.legend.reverseLabelOrder) {
       innerClasses.push('d-flex')
       innerClasses.push('flex-column-reverse')
     }
@@ -537,7 +538,7 @@ export default function CdcChart(
         const sortAsc = (a, b) => {
           return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
         };
-        
+
         const sortDesc = (a, b) => {
           return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
         };
@@ -618,7 +619,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{title}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
           <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
             Skip Over Chart Container
           </a>
@@ -633,7 +634,7 @@ export default function CdcChart(
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar' && <DataTable />}
+          {config.xAxis.dataKey && config.table.show && <DataTable />}
         </div>}
       </>
     )

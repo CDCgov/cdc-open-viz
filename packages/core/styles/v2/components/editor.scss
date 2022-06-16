@@ -1,3 +1,6 @@
+@import "../utils/variables";
+@import "../themes/index";
+
 .cove-editor {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -8,6 +11,7 @@
     grid-area: panel;
     width: $editorWidth;
     transition: width 500ms ease;
+    font-size: 15px;
     background: #fff;
     border-right: 1px solid #c2c2c2;
     overflow-x: hidden;
@@ -16,7 +20,9 @@
   }
 
   .cove-editor__heading {
-    font-size: 1.2em;
+    font-size: 1.125em;
+    user-select: none;
+    padding: .625rem 1.125rem;
   }
 
   .cove-editor__panel-container {
@@ -47,6 +53,7 @@
     cursor: pointer;
     transition: left 400ms ease 65ms, background-color 200ms ease;
     box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+    user-select: none;
     z-index: 8;
 
     &:before {
@@ -167,6 +174,7 @@
 
   ul.column-edit {
     list-style: none;
+    padding-left: 0;
 
     li {
       margin-top: 1em;
@@ -189,23 +197,24 @@
   }
 
   .remove-column {
-    float: right;
-    text-transform: uppercase;
+    margin: 0 auto;
     color: #C32B2B;
     font-size: .7em;
+    font-weight: bold;
     line-height: 1.6em;
-    border-radius: 5px;
-    margin: 0 auto;
-    transition: .1s all;
-    border: 0;
     text-decoration: underline;
+    text-transform: uppercase;
+    border: 0;
+    border-radius: 5px;
+    transition: .1s all;
+    float: right;
     outline: 0;
     cursor: pointer;
-    font-weight: bold;
   }
 
   .edit-block {
     padding-left: 1em;
+    border: 0;
     border-left: rgba(0, 0, 0, 0.2) 4px solid;
     transition: .2s all;
 
