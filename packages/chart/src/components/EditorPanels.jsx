@@ -123,6 +123,7 @@ const EditorPanels = () => {
   }, [ config.isLollipopChart, config.lollipopShape ])
 
   useEffect(() => {
+    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis' //TODO: COVE Refactor - Dear god, standardize this..
     if (config[section].max && config[section].max < maxValue) {
       configActions.updateField(section, null, 'max', maxValue)
       updateWarningMsg(function (presMsg) {
@@ -132,6 +133,7 @@ const EditorPanels = () => {
   }, [ data, maxValue ])
 
   useEffect(() => {
+    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis' //TODO: COVE Refactor - Dear god, standardize this..
     if (config.visualizationType === 'Line') {
       if (config[section].min && config[section].min > minValue) {
         updateWarningMsg(function (presMsg) {
@@ -853,12 +855,12 @@ const EditorPanels = () => {
                    labelPosition="top"
                    configField="isPaletteReversed"/>
 
-      <ColorPicker label="Sequential" colors={headerColors}
+      {/*<ColorPicker label="Sequential" colors={headerColors}
                    tooltip="Select the theme color for the component" colorTooltip/>
 
       <Label>Sequential</Label>
       <ul className="color-palette">
-        {/*{filteredPallets.map((palette) => {
+        {filteredPallets.map((palette) => {
           const colorOne = { backgroundColor: colorPalettes[palette][2] }
           const colorTwo = { backgroundColor: colorPalettes[palette][3] }
           const colorThree = { backgroundColor: colorPalettes[palette][5] }
@@ -872,12 +874,12 @@ const EditorPanels = () => {
               <span style={colorThree}></span>
             </li>
           )
-        })}*/}
+        })}
       </ul>
 
       <Label>Non-Sequential</Label>
       <ul className="color-palette">
-        {/*{filteredQualitative.map((palette) => {
+        {filteredQualitative.map((palette) => {
           const colorOne = { backgroundColor: colorPalettes[palette][2] }
           const colorTwo = { backgroundColor: colorPalettes[palette][4] }
           const colorThree = { backgroundColor: colorPalettes[palette][6] }
@@ -891,8 +893,8 @@ const EditorPanels = () => {
               <span style={colorThree}></span>
             </li>
           )
-        })}*/}
-      </ul>
+        })}
+      </ul>*/}
 
       {config.visualizationType !== 'Pie' && (
         <>

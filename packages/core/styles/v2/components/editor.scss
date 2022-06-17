@@ -1,12 +1,16 @@
 @import "../utils/variables";
 @import "../themes/index";
 
+$editorAnimationTimer: 400ms;
+
 .cove-editor {
   display: grid;
   grid-template-areas: "panel content";
   grid-template-columns: auto 1fr;
   position: relative;
   height: 100vh;
+  transform: scale(1); //Set baseline for fixed
+  overflow: hidden;
 }
 
 .cove-editor__toggle {
@@ -20,7 +24,7 @@
   background-color: #f2f2f2;
   border: 0;
   border-radius: 60px;
-  transition: left 400ms ease 65ms, background-color 200ms ease;
+  transition: left 300ms ease 60ms, background-color 200ms ease;
   box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
   user-select: none;
   cursor: pointer;
@@ -53,7 +57,7 @@
   width: 0;
   background-color: #fff;
   border-right: 1px solid #c2c2c2;
-  transition: width 500ms ease;
+  transition: width $editorAnimationTimer ease;
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 7;
@@ -91,12 +95,13 @@
 }
 
 .cove-editor__content {
+  display: flex;
   grid-area: content;
+  justify-content: center;
   position: relative;
   background-color: #fff;
-  transition: background-color 500ms $transition-expo-out;
-  transform: scale(1); //Set baseline for fixed
-  overflow: hidden;
+  transition: background-color $editorAnimationTimer $transition-expo-out;
+  overflow: hidden auto;
 
   @at-root {
     .cove-editor.panel-shown #{&} {
@@ -105,28 +110,29 @@
   }
 }
 
-
 .cove-editor__content-wrap--x {
-  position: relative;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
   min-width: 35rem;
   max-width: 50%;
-  height: 100%;
+  min-height: 100vh;
   margin-right: auto;
   margin-left: auto;
-  transition: max-width 500ms $transition-expo-out;
+  transition: max-width $editorAnimationTimer $transition-expo-out;
 
   @at-root {
     .cove-editor__content[data-grid] #{&}::before,
     .cove-editor__content[data-grid] #{&}::after {
       content: '';
       width: 1px;
-      height: 100vh;
-      top: 50%;
-      transform: translateY(-50%);
+      height: 100%;
+      top: 0;
       display: block;
       position: absolute;
-      background-image: repeating-linear-gradient(0deg, #999, #999 18px, transparent 18px, transparent 26px);
-      transition: opacity 500ms ease;
+      background-image: repeating-linear-gradient(0deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transition: opacity $editorAnimationTimer ease;
       opacity: 0;
     }
 
@@ -146,9 +152,10 @@
 }
 
 .cove-editor__content-wrap--y {
-  position: absolute;
-  top: 3rem;
+  position: relative;
   width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
 
   @at-root {
     .cove-editor__content[data-grid] #{&}::before,
@@ -159,9 +166,9 @@
       left: 50%;
       width: 100vw;
       height: 1px;
-      background-image: repeating-linear-gradient(90deg, #999, #999 18px, transparent 18px, transparent 26px);
+      background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
       transform: translateX(-50%);
-      transition: opacity 500ms ease;
+      transition: opacity $editorAnimationTimer ease;
       opacity: 0;
     }
 
@@ -180,123 +187,77 @@
   }
 }
 
-.cove-editor-utils__grid--x::before {
-  content: '';
-  display: block;
-  position: fixed;
-  left: 0;
-  width: 100px;
-  height: 100px;
-  background-color: red;
-}
-
-.cove-editor-utils {
-}
-
-.cove-editor-utils__breakpoints {
-  position: absolute;
-  right: 4rem;
-  padding: 0.5rem 1rem;
-  background-color: #fff;
-  border-radius: 999px;
-  box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 15%);
-  user-select: none;
-
+.cove-editor__grid-caret--top {
   @at-root {
-    .cove-editor:not(.panel-shown) #{&} {
-      animation: editorBreakpointsDown 500ms ease forwards;
-    }
-
-    .cove-editor.panel-shown #{&} {
-      animation: editorBreakpointsUp 500ms ease forwards;
-    }
-  }
-}
-
-@keyframes editorBreakpointsUp {
-  0% {
-    bottom: -3rem;
-  }
-  100% {
-    bottom: 2rem;
-  }
-}
-
-@keyframes editorBreakpointsDown {
-  0% {
-    bottom: 2rem;
-  }
-  100% {
-    bottom: -3rem;
-  }
-}
-
-.cove-editor-utils__breakpoints-list {
-  display: flex;
-  padding-left: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.cove-editor-utils__breakpoints-item {
-  display: block;
-  position: relative;
-  margin-right: 1rem;
-  font-size: 0.875em;
-  color: $primary;
-  border-bottom: 2px solid transparent;
-  transition: all 400ms $transition-expo-out;
-  transition-property: border, color, transform;
-  cursor: pointer;
-
-  &:last-of-type {
-    margin-right: 0;
-  }
-
-  &:not(:last-of-type) {
-    &::after {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
       content: '';
-      display: inline-block;
+      display: block;
       position: absolute;
-      top: 0;
-      width: 1px;
-      height: 100%;
-      margin-left: 0.5rem;
-      background-color: #d3d3d3;
-      pointer-events: none;
-    }
-  }
-
-  &.active {
-    border-bottom: 2px dotted $secondary;
-  }
-
-  > .reset {
-    display: inline-flex;
-    height: 1.25rem;
-    transition: color 400ms $transition-expo-out;
-  }
-
-  @at-root {
-    //Gray out
-    .cove-editor-utils__breakpoints-list:hover #{&},
-    .cove-editor-utils__breakpoints-list.has-active #{&}:not(.active) {
-      color: #888;
+      top: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
     }
 
-    //Colored
-    .cove-editor-utils__breakpoints-list.has-active #{&} .reset {
-      color: $primary !important;
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-right-width: 2px;
+      border-bottom-width: 2px;
     }
 
-    .cove-editor-utils__breakpoints-list:hover #{&}.active,
-    .cove-editor-utils__breakpoints-list #{&}:hover,
-    .cove-editor-utils__breakpoints-list.has-active #{&}:hover {
-      color: $primary;
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
     }
   }
 }
 
+.cove-editor__grid-caret--bottom {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
 
 // TODO: What is this stuff? -----------------------------------------------
 .TODO-make-components {

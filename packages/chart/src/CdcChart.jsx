@@ -23,9 +23,8 @@ import './scss/cove-chart.scss'
 //Visualization
 const CdcChart = ({ configObj, configUrlObj }) => {
   const { view } = useGlobalContext()
-  const { data, configActions } = useConfigContext()
 
-  const configChartRuntime = (newConfig, dataOverride = data) => {
+  const configChartRuntime = (newConfig) => {
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     newConfig.runtime.seriesLabels = {}
@@ -33,7 +32,7 @@ const CdcChart = ({ configObj, configUrlObj }) => {
     newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.visualizationType === 'Pie') {
-      newConfig.runtime.seriesKeys = dataOverride.map(d => d[newConfig.xAxis.dataKey])
+      newConfig.runtime.seriesKeys = newConfig.data.map(d => d[newConfig.xAxis.dataKey])
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       newConfig.runtime.seriesKeys = newConfig.series ? newConfig.series.map((series) => {
@@ -83,8 +82,6 @@ const CdcChart = ({ configObj, configUrlObj }) => {
         }
       }
     }
-
-    configActions.setConfig(newConfig)
   }
 
   const [ loadingConfig, reloadConfig ] = useLoadConfig(configObj, configUrlObj, defaults, configChartRuntime)

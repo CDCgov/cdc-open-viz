@@ -30,9 +30,10 @@ export const GlobalContextProvider = ({ children }) => {
   }
 
   //General Actions & Data -----------------------------------
-  let isEditor = () => window.location.href.includes('editor=true') ? 'editor' : false
-  let isDashboard = false
+  const isEditor = () => window.location.href.includes('editor=true') ? 'editor' : false
+  const isDashboard = false
   const getView = (isEditor() || isDashboard) || 'component'
+  const getOS = navigator.userAgent.indexOf("Win") !== -1 ? "Win" : navigator.userAgent.indexOf("Mac") !== -1 ? "MacOS" : null
 
   //Observe changes to viewport size
   const resizeObserver = new ResizeObserver(entries => {
@@ -51,6 +52,7 @@ export const GlobalContextProvider = ({ children }) => {
 
   //Build Context
   const globalSettings = {
+    os: getOS,
     view: getView,
     viewport: currentViewport,
     dimensions: globalContextData.dimensions,

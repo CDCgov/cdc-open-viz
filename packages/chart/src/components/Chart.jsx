@@ -85,16 +85,13 @@ const Chart = () => {
 
   //Validate Required Sections
   useEffect(() => {
-    configActions.setMissingRequiredSections(false)
-
     if (config.visualizationType === 'Pie') {
-      configActions.setMissingRequiredSections(undefined !== config.yAxis.dataKey)
+      configActions.setMissingRequiredSections(undefined === config.yAxis.dataKey)
     } else {
-      configActions.setMissingRequiredSections((undefined !== config.series || config?.series.length > 0))
+      configActions.setMissingRequiredSections((undefined === config.series || !(config?.series.length > 0)))
     }
 
-    configActions.setMissingRequiredSections(config.xAxis.dataKey)
-    return () => {}
+    configActions.setMissingRequiredSections(!config.xAxis.dataKey)
   }, [ config.series, config.xAxis.dataKey, config.yAxis.dataKey ])
 
   // Gets filer values from dataset

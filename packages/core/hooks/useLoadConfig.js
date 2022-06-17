@@ -21,6 +21,7 @@ const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
     configActions.setConfigDefaults({ ...defaults })
 
     const fetchConfig = async () => {
+      const merge = require('lodash.merge')
       let response = configObj || await (await fetch(configUrlObj)).json()
 
       //Set data variable and check if included through a URL.
@@ -38,16 +39,17 @@ const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
       }
 
       //Push data to config context state
-      if (data) configActions.setData(data)
+      configActions.setData(data)
 
       //Build the new config object, tie it all together
-      let newConfig = { ...defaults, ...response }
+      let newConfig = merge(defaults, response)
+
       newConfig.data = data
 
       //Add any runtime entries (visualization specific) to the config
       if (runtime) runtime(newConfig, data)
 
-      //Make config entry for table visibility - TODO: May no longer need with global context inclusion of view mode?
+      //Make config entry for table visibility - TODO: COVE Refactor - May no longer need with global context inclusion of view mode?
       if (undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === view
       configActions.updateConfig(newConfig, data)
     }

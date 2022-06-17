@@ -93,6 +93,7 @@ const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
       })
 
       yScale.rangeRound([ 0, yMax ])
+
     } else {
       min = min < 0 ? min * 1.11 : min
 

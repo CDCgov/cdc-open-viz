@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 //Third Party
 import { Group } from '@visx/group'
@@ -22,6 +22,7 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
   // colorScale, seriesHighlight, formatNumber
 
   const { orientation, visualizationSubType } = config
+
   const isHorizontal = orientation === 'horizontal'
 
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
@@ -38,16 +39,12 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
   const [ textWidth, setTextWidth ] = useState(null)
 
   useEffect(() => {
-    if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
-      configActions.updateConfig({
-        ...config,
-        yAxis: {
-          ...config,
-          labelPlacement: 'Below Bar'
-        }
-      })
+    if (undefined === config.yAxis.labelPlacement) {
+      if (orientation === 'horizontal') {
+        configActions.updateField(["yAxis", "labelPlacement"], 'Below Bar', true)
+      }
     }
-  }, [ config ])
+  }, [config.yAxis])
 
   useEffect(() => {
     if (config.isLollipopChart === false) {

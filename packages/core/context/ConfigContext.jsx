@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useCallback, useState } from 'react'
 
 import { getConfigKeyValue, setConfigKeyValue } from '../helpers/configHelpers'
-import merge from 'lodash.merge'
 
 export const ConfigContext = createContext({})
 export const useConfigContext = () => useContext(ConfigContext)
@@ -22,9 +21,6 @@ export const ConfigContextProvider = ({ children }) => {
   //Global Actions
   const updateConfig = useCallback((newConfig, dataOverride = undefined) => {
     let defaultConfig = configDefaults
-    let newData = dataOverride || data //TODO: COVE Refactor - Use data variable to filter and exclude returned data
-
-    setData(newData)
 
     Object.keys(defaultConfig).forEach(configKey => {
       if (newConfig[configKey] && 'object' === typeof newConfig[configKey] && !Array.isArray(newConfig[configKey])) {
@@ -32,17 +28,25 @@ export const ConfigContextProvider = ({ children }) => {
       }
     })
 
+    let newData = dataOverride || data //TODO: COVE Refactor - Use data variable to filter and exclude returned data
+    setData(newData)
     setConfig(config => ({ ...config, ...newConfig }))
   }, [ configDefaults, data ])
 
-  const updateField = useCallback((payload, value) => {
+  const updateField = useCallback((payload, value, test = undefined) => {
+
     let updateFieldObj = setConfigKeyValue(payload, value)
     let updateFieldVal = getConfigKeyValue(payload, config)
 
     if (undefined !== updateFieldVal && null !== updateFieldVal) {
       setConfig({ ...config, ...updateFieldObj })
     } else {
-      updateConfig(merge(config[Object.keys(updateFieldObj)[0]], updateFieldObj))
+
+      // For some reason, when updating legend > reverse labels with checkbox,
+      // it's acting differently than the preload on Chart.Linear.Bar using the updateField on yAxis.labelPlacement
+
+      // [Object.keys(updateFieldObj)[0]]
+      updateConfig(merge(config, updateFieldObj))
     }
   }, [ config ])
 

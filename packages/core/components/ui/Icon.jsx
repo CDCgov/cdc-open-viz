@@ -11,6 +11,7 @@ import iconChartPie from '../../assets/icon-chart-pie.svg'
 import iconCheck from '../../assets/icon-check.svg'
 import iconClose from '../../assets/icon-close.svg'
 import iconCode from '../../assets/icon-code.svg'
+import iconCommand from '../../assets/icon-command.svg'
 import iconDataBite from '../../assets/icon-databite.svg'
 import iconEdit from '../../assets/icon-edit.svg'
 import iconFileUpload from '../../assets/icon-file-upload.svg'
@@ -41,6 +42,7 @@ const iconHash = {
   'check': iconCheck,
   'close': iconClose,
   'code': iconCode,
+  'command': iconCommand,
   'databite': iconDataBite,
   'edit': iconEdit,
   'fileUpload': iconFileUpload,
