@@ -2130,7 +2130,7 @@ const EditorPanel = (props) => {
 									<AccordionItemButton>Visual</AccordionItemButton>
 								</AccordionItemHeading>
 								<AccordionItemPanel>
-									<label className='header'>
+									<label>
 										<span className='edit-label'>Header Theme</span>
 										<ul className='color-palette'>
 											{headerColors.map((palette) => {
