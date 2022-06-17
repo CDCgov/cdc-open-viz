@@ -1270,7 +1270,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     if (!mapProps.data || !state.data) return <Loading />;
 
-    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
+    let handleMapTabbing;
+
+    if (general.showSidebar) {
+        handleMapTabbing = '#legend'
+    } else if (state.general.title && !state.general.type === 'navigation') {
+        handleMapTabbing = `#dataTableSection__${state.general.title.replace(/\s/g, "")}`;
+    } else if (state.general.type === 'navigation') {
+        handleMapTabbing = '#dropdown';
+    }
     
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
