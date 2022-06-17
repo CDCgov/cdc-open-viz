@@ -1269,7 +1269,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
-
     let handleMapTabbing;
 
     if (general.showSidebar) {
