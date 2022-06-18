@@ -23,6 +23,8 @@ composer.lock
 # Project Specific
 /packages/**/examples/private
 /packages/**/example/private
+/packages/**/example/dev
+/packages/**/examples/dev
 /node_modules
 /docs
 /**/**/node_modules
