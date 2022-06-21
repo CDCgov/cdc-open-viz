@@ -474,14 +474,14 @@ export const supportedCountries = {
 };
 
 export const supportedTerritories = {
-  'US-AS': ['American Samoa', 'AS'],
-  'US-GU': ['Guam', 'GU'],
-  'US-PR': ['Puerto Rico', 'PR'],
-  'US-VI': ['Virgin Islands', 'VI'],
-  'US-MP': ['Northern Marianas', 'MP', 'CNMI'],
-  'US-FM': ['Micronesia', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
-  'US-PW': ['Palau', 'PW'], // Note: Key is not an official ISO code
-  'US-MH': ['Marshall Islands', 'MH', 'RMI'], // Note: Key is not an official ISO code
+  'US-AS': ['AMERICAN SAMOA', 'AS'],
+  'US-GU': ['GUAM', 'GU'],
+  'US-PR': ['PUERTO RICO', 'PR'],
+  'US-VI': ['VIRGIN ISLANDS', 'VI'],
+  'US-MP': ['NORTHERN MARIANAS', 'MP', 'CNMI'],
+  'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
+  'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code
+  'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'], // Note: Key is not an official ISO code
 };
 
 export const supportedCities = {
@@ -509,9 +509,9 @@ export const supportedCities = {
   LOUISVILLE: [-85.758453, 38.252666],
   'NEW ORLEANS': [-90.071533, 29.951065],
   BOSTON: [-71.058884, 42.360081],
-  Baltimore: [-76.612190, 39.290386],
-  Detroit: [-83.045753, 42.331429],
-  Minneapolis: [-93.265015, 44.977753],
+  BALTIMORE: [-76.612190, 39.290386],
+  DETROIT: [-83.045753, 42.331429],
+  MINNEAPOLIS: [-93.265015, 44.977753],
   'KANSAS CITY': [-94.578568, 39.099728],
   CHARLOTTE: [-80.843124, 35.227085],
   RALEIGH: [-78.638176, 35.779591],
@@ -524,7 +524,7 @@ export const supportedCities = {
   'OKLAHOMA CITY': [-97.516426, 35.467560],
   TULSA: [-95.992775, 36.153980],
   PORTLAND: [-122.658722, 45.512230],
-  PHILIDELPHIA: [-75.165222, 39.952583],
+  PHILADELPHIA: [-75.165222, 39.952583],
   NASHVILLE: [-86.781601, 36.162663],
   MEMPHIS: [-90.048981, 35.149532],
   ARLINGTON: [-97.108063, 32.735687],
@@ -550,6 +550,7 @@ export const supportedCities = {
   STOCKTON: [-121.290779, 37.957703],
   HENDERSON: [-114.981720, 36.039524],
   'SAINT PAUL': [-93.089958, 44.953705],
+  'ST PAUL': [ -93.089958, 44.953705],
   'ST. LOUIS': [-90.199402, 38.627003],
   CINCINNATI: [-84.512016, 39.103119],
   PITTSBURGH: [-79.995888, 40.440624],
@@ -563,7 +564,8 @@ export const supportedCities = {
   TOLEDO: [-83.537865, 41.652805],
   DURHAM: [-78.898621, 35.994034],
   'CHULA VISTA': [-117.084198, 32.640053],
-  'FOR WAYNE': [-85.139351, 41.079273],
+  'FORT WAYNE': [-85.139351, 41.079273],
+  'FT WAYNE': [-85.139351, 41.079273],
   'JERSEY CITY': [-74.077644, 40.728157],
   'ST. PETERSBURG': [-82.640289, 27.767601],
   LAREDO: [-99.507553, 27.503561],
@@ -576,6 +578,7 @@ export const supportedCities = {
   GLENDALE: [-118.255074, 34.142509],
   GILBERT: [-111.789024, 33.352825],
   'WINSTON-SALEM': [-80.244217, 36.099861],
+  'WINSTON SALEM': [-80.244217, 36.099861],
   'NORTH LAS VEGAS': [-115.114571, 36.195850],
   NORFOLK: [-76.285873, 36.850769],
   CHESAPEAKE: [-76.287491, 36.768208],
@@ -588,7 +591,11 @@ export const supportedCities = {
   'BATON ROUGE': [-91.187149, 30.451468],
   SPOKANE: [-117.426048, 47.658779],
   'MARION COUNTY, INDIANA': [-86.136543, 39.781029],
-  'MONTGOMERY COUNTY, MARYLAND': [-77.199406, 39.153515]
+  'MONTGOMERY COUNTY, MARYLAND': [-77.199406, 39.153515],
+  BIRMINGHAM: [-86.9902166, 33.5314447],
+  HERSHEY: [-76.6779444, 40.2849997 ],
+  'SALT LAKE CITY': [-112.0605644, 40.7767833],
+  SYRACUSE: [-76.1742992, 43.0352913]
 };
 
 export const supportedCounties = {

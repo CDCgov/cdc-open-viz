@@ -360,6 +360,13 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
+
+    let stringFormattingOptions = {
+      useGrouping: config.dataFormat.commas ? true : false,
+      minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
+      maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+    };
+
     num = numberFromString(num);
 
     if(isNaN(num)) {
@@ -376,8 +383,7 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    num = num.toLocaleString('en-US', stringFormattingOptions)
 
     let result = ""
 
@@ -416,7 +422,7 @@ export default function CdcChart(
       containerClasses.push('left')
     }
 
-    if(config.visualizationSubType === 'horizontal' && config.legend.reverseLabelOrder) {
+    if(config.legend.reverseLabelOrder) {
       innerClasses.push('d-flex')
       innerClasses.push('flex-column-reverse')
     }

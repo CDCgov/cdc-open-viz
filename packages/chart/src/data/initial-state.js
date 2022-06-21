@@ -9,6 +9,9 @@ export default {
   lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
   visualizationSubType: 'regular',
+  barStyle:'',
+  roundingStyle:'standard',
+  tipRounding:'top',
   padding: {
     left: 5,
     right: 5
@@ -41,7 +44,8 @@ export default {
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
-    position: 'right'
+    position: 'right',
+    reverseLabelOrder:false
   },
   exclusions: {
     active: false,
