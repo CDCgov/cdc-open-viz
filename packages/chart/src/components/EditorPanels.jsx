@@ -99,7 +99,9 @@ const EditorPanels = () => {
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
 
   useEffect(() => {
-    if (paletteName) configActions.updateConfig({ ...config, palette: paletteName })
+    if (paletteName) {
+      configActions.updateConfig({ ...config, palette: paletteName })
+    }
   }, [ paletteName ])
 
   useEffect(() => {
@@ -123,9 +125,11 @@ const EditorPanels = () => {
   }, [ config.isLollipopChart, config.lollipopShape ])
 
   useEffect(() => {
-    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis' //TODO: COVE Refactor - Dear god, standardize this..
+    //TODO: COVE Refactor - Dear god, standardize this..
+    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
     if (config[section].max && config[section].max < maxValue) {
-      configActions.updateField(section, null, 'max', maxValue)
+      console.log('running updateField')
+      configActions.updateField([section, 'max'], maxValue)
       updateWarningMsg(function (presMsg) {
         return { ...presMsg, maxMsg: `Entered value ${config[section].max} is not valid ` }
       })
@@ -133,20 +137,23 @@ const EditorPanels = () => {
   }, [ data, maxValue ])
 
   useEffect(() => {
-    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis' //TODO: COVE Refactor - Dear god, standardize this..
+    //TODO: COVE Refactor - Dear god, standardize this..
+    const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
     if (config.visualizationType === 'Line') {
       if (config[section].min && config[section].min > minValue) {
         updateWarningMsg(function (presMsg) {
           return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid` }
         })
-        configActions.updateField(section, null, 'min', minValue)
+        console.log('running updateField')
+        configActions.updateField([section, 'min'], minValue)
       }
     } else {
       if (config[section].min && config[section].min < minValue) {
         updateWarningMsg(function (presMsg) {
           return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid` }
         })
-        configActions.updateField(section, null, 'min', minValue)
+        console.log('running updateField')
+        configActions.updateField([section, 'min'], minValue)
       }
     }
   }, [ data, minValue ])
@@ -377,6 +384,8 @@ const EditorPanels = () => {
   }
 
   const onMaxChangeHandler = (e) => {
+    //TODO: COVE Refactor - Dear god, standardize this..
+    let section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
     const enteredValue = e.target.value
 
     let existPositiveValue
@@ -410,7 +419,8 @@ const EditorPanels = () => {
         return { ...presMsg, maxMsg: 'Value must be more than or equal to 0' }
       })
     }
-    configActions.updateField(config.orientation === 'horizontal' ? 'xAxis' : 'yAxis', null, 'max', value)
+    console.log('running updateField')
+    configActions.updateField([section, 'max'], value)
 
     if (!enteredValue.length) {
       updateWarningMsg(function (prevMsg) {
@@ -420,6 +430,8 @@ const EditorPanels = () => {
   }
 
   const onMinChangeHandler = (e) => {
+    //TODO: COVE Refactor - Dear god, standardize this..
+    let section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
     const enteredValue = e.target.value
     let value
     if (config.visualizationType === 'Line') {
@@ -449,7 +461,8 @@ const EditorPanels = () => {
         })
       }
     }
-    configActions.updateField(config.orientation === 'horizontal' ? 'xAxis' : 'yAxis', null, 'min', value)
+    console.log('running updateField')
+    configActions.updateField([section, 'min'], value)
 
     if (!enteredValue.length) {
       updateWarningMsg(function (presMsg) {
@@ -483,6 +496,7 @@ const EditorPanels = () => {
       {config.visualizationType === 'Pie' &&
         <InputSelect label="Pie Chart Type" options={[ 'Regular', 'Donut' ]} configField="pieType"/>
       }
+
       <InputText label="Title" configField="title"/>
 
       <InputText label="Subtext" type="textarea" configField="description"
@@ -523,12 +537,10 @@ const EditorPanels = () => {
         </>
       }
 
-      <InputSelect label="Add Data Series" options={getColumns()} initial="Select" onChange={(e) => {
-        if (e.target.value !== '' && e.target.value !== 'Select') {
-          addNewSeries(e.target.value)
-        }
-        e.target.value = ''
-      }} configField="visualizationType"/>
+      {/*TODO: COVE Refactor - This is broken*/}
+      <InputSelect label="Add Data Series" options={getColumns()} initial="Select" initialSnap={true} onChange={(e) => {
+        if (e.target.value !== '' && e.target.value !== 'Select') addNewSeries(e.target.value)
+      }}/>
 
       {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
         <>
@@ -543,11 +555,9 @@ const EditorPanels = () => {
   const panelValueDataFormat = (
     <Accordion.Section label={`${config.visualizationType !== 'Pie' ? config.visualizationType === 'Bar' ? 'Value Axis' : 'Value Axis' : 'Data Format'}`} warnIf={config.visualizationType === 'Pie' && !config.yAxis.dataKey}>
       {config.visualizationType === 'Pie' ?
-        <>
-          <InputSelect label="Data Column" options={getColumns(false)} initial="Select" required={true}
-                       tooltip="Select the source data to be visually represented." configField={[ 'yAxis', 'dataKey' ]}
-          />
-        </>
+        <InputSelect label="Data Column" options={getColumns(false)} initial="Select" required={true}
+                     tooltip="Select the source data to be visually represented." configField={[ 'yAxis', 'dataKey' ]}
+        />
         :
         <>
           <InputText label="Label" configField={[ 'yAxis', 'label' ]}/>
@@ -586,6 +596,8 @@ const EditorPanels = () => {
       {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
         <>
           <InputCheckbox label="Hide Axis" configField={[ 'xAxis', 'hideAxis' ]}/>
+
+
           <InputCheckbox label="Hide Label" configField={[ 'xAxis', 'hideLabel' ]}/>
           <InputCheckbox label="Hide Ticks" configField={[ 'xAxis', 'hideTicks' ]}/>
           <InputText label="update max value" type="number" placeholder="Auto" onChange={(e) => onMaxChangeHandler(e)}/>
@@ -648,12 +660,7 @@ const EditorPanels = () => {
                     </>
                   }
 
-                  <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis.dataKey, true)} initial="Select" onChange={(e) => {
-                    if (e.target.value !== '' && e.target.value !== 'Select') {
-                      addNewExclusion(e.target.value)
-                    }
-                    e.target.value = ''
-                  }} configField="visualizationType"/>
+                  <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis.dataKey, true)} initial="Select" initialSnap onChange={(e) => addNewExclusion(e.target.value)}/>
                 </>
               }
 
@@ -707,12 +714,7 @@ const EditorPanels = () => {
                 </>
               }
 
-              <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis.dataKey, true)} initial="Select" onChange={(e) => {
-                if (e.target.value !== '' && e.target.value !== 'Select') {
-                  addNewExclusion(e.target.value)
-                }
-                e.target.value = ''
-              }} configField="visualizationType"/>
+              <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis.dataKey, true)} initial="Select" onChange={(e) => addNewExclusion(e.target.value)}/>
             </>
           }
         </>
@@ -906,9 +908,6 @@ const EditorPanels = () => {
                      configField="dataCutoff"/>
         </>
       )}
-      {(config.orientation === 'horizontal' && config.yAxis.labelPlacement !== 'On Bar') &&
-        <InputText label="Bar Thickness" type="number" default={25} min={15} configField="barHeight"/> /*TODO: COVE Refactor - Add 'default' option to inputs*/
-      }
       {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
         <InputText label="Bar Thickness" type="number" configField="barThickness"/>
       }

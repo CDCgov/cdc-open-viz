@@ -26,9 +26,10 @@ const Editor = ({ EditorPanels, children }) => {
   const [ viewportPreview, setViewportPreview ] = useState(null)
   const [ rotateAnimation, setRotateAnimation ] = useState(false)
 
-  const [ previewDimensions, setPreviewDimensions ] = useState([])
+  const [ previewDimensions, setPreviewDimensions ] = useState({})
 
   const resetIcon = useRef(null)
+  const editorPanelRef = useRef(null)
 
   useEffect(() => {
     document.addEventListener('keydown', onKeypress)
@@ -45,16 +46,19 @@ const Editor = ({ EditorPanels, children }) => {
 
   const onKeypress = (key) => {
     if (key.code === 'Escape') setDisplayPanel(display => !display)
-    if (key.code === 'KeyG') setDisplayGrid(display => !display)
-    if (key.code === 'KeyR') resetPreview()
 
-    const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
+    if (!editorPanelRef.current.contains(document.activeElement)) {
+      if (key.code === 'KeyG') setDisplayGrid(display => !display)
+      if (key.code === 'KeyR') resetPreview()
 
-    if (viewportCommandKey) {
-      key.preventDefault()
-      const keyIndex = key.key - 1
-      if (keyIndex <= breakpoints.length)
-        viewportPreviewController(breakpoints[keyIndex])
+      const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
+
+      if (viewportCommandKey) {
+        key.preventDefault()
+        const keyIndex = key.key - 1
+        if (keyIndex <= breakpoints.length)
+          viewportPreviewController(breakpoints[keyIndex])
+      }
     }
   }
 
@@ -64,7 +68,7 @@ const Editor = ({ EditorPanels, children }) => {
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
         let { width, height } = entry.contentRect
-        setPreviewDimensions([ width, height ])
+        setPreviewDimensions({width: width, height: height})
       }
     })
 
@@ -133,10 +137,9 @@ const Editor = ({ EditorPanels, children }) => {
       {config.newViz && <Confirm/>}
       <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
               title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
-      <section className="cove-editor__panel">
+      <section className="cove-editor__panel" tabIndex={0} ref={editorPanelRef}>
+        <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
         <div className="cove-editor__panel-container">
-          {/* TODO: COVE Refactor - Change below headers to be imported component? */}
-          <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
           <section className="cove-editor__panel-config">
             <Accordion>
               {EditorPanels().props.children.map((panel) => panel)}
@@ -149,7 +152,7 @@ const Editor = ({ EditorPanels, children }) => {
           <div className="cove-editor__content-wrap--y">
             <div className="cove-editor-utils__breakpoints--px">
               {displayGrid && displayPanel && <>
-                {Math.round(previewDimensions[0])}<span className="mx-1" style={{ fontSize: '0.675rem' }}>✕</span>{Math.round(previewDimensions[1])}
+                {Math.round(previewDimensions.width)}<span className="mx-1" style={{ fontSize: '0.675rem' }}>✕</span>{Math.round(previewDimensions.height)}
               </>}
             </div>
             <div className="cove-editor__grid-caret--top" ref={outerContainerRef}>

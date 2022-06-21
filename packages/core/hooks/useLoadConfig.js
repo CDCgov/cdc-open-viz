@@ -9,64 +9,65 @@ import DataTransform from '../helpers/DataTransform'
 
 const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
   const { view } = useGlobalContext()
-  const { config, configActions } = useConfigContext()
+  const { configActions, loadingConfig } = useConfigContext()
 
-  const [ loadingConfig, setLoadingConfig ] = useState(true)
   const [ cycle, setCycle ] = useState(false)
 
   const transform = new DataTransform()
   const reloadConfig = () => setCycle(false)
 
   useEffect(() => {
+    //Store the default config context object in ConfigContext
     configActions.setConfigDefaults({ ...defaults })
 
     const fetchConfig = async () => {
-      const merge = require('lodash.merge')
+      //Check if "data" is included through a URL, or directly, and set value
       let response = configObj || await (await fetch(configUrlObj)).json()
+      let responseData = response.formattedData || response.data || {}
 
-      //Set data variable and check if included through a URL.
-      //If so, fetch that data
-      let data = response.formattedData || response.data || {}
-
+      //If a data URL is provided, fetch data then return. Overrides any previous data set.
       if (response.dataUrl) {
         const dataString = await fetch(response.dataUrl)
+        responseData = await dataString.json()
 
-        data = await dataString.json()
+        //If data from the URL has a "data description", use the standardization functions on that returned data
         if (response.dataDescription) {
-          data = transform.autoStandardize(data)
-          data = transform.developerStandardize(data, response.dataDescription)
+          responseData = transform.autoStandardize(responseData)
+          responseData = transform.developerStandardize(responseData, response.dataDescription)
         }
       }
 
-      //Push data to config context state
-      configActions.setData(data)
+      //Create the new config object with defaults and data
+      let newConfig = { ...defaults, ...response }
 
-      //Build the new config object, tie it all together
-      let newConfig = merge(defaults, response)
+      //Create new keys on newConfig from defaults that don't exist
+      Object.keys(defaults).forEach(key => {
+        if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
+          newConfig[key] = { ...defaults[key], ...newConfig[key] }
+        }
+      })
 
-      newConfig.data = data
-
-      //Add any runtime entries (visualization specific) to the config
-      if (runtime) runtime(newConfig, data)
+      newConfig.data = responseData //Attach data to newConfig
 
       //Make config entry for table visibility - TODO: COVE Refactor - May no longer need with global context inclusion of view mode?
       if (undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === view
-      configActions.updateConfig(newConfig, data)
+
+      configActions.setData(newConfig.data) //Push data to ConfigContext
+      return newConfig
     }
 
     if (!cycle) {
       fetchConfig()
+        .then((newConfig)=>{
+          configActions.updateConfig(newConfig, runtime) //Sets final config data in ConfigContext
+          configActions.setLoadingConfig(false) //Tells subcomponents that the config is ready
+        })
         .catch(console.error)
-        .finally(()=>{
-          setCycle(true)
-          setLoadingConfig(false)
+        .finally(() => {
+            setCycle(true) //Switch to end the useLoadConfig cycle
         })
     }
   }, [ cycle, configObj, configUrlObj ])
-
-  useEffect(() => {
-    reloadConfig()
-  }, [ config ])
 
   return [ loadingConfig, reloadConfig ]
 }

@@ -23,7 +23,7 @@ const InputSlider = (
     activeColor = null,
 
     configField,
-    value: stateValue,
+    value: inlineValue,
     min = null, max = null,
     className, ...attributes
   }
@@ -31,7 +31,23 @@ const InputSlider = (
 
   const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : stateValue || false)
+  const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || false)
+
+  //Set initial value
+  useEffect(() => {
+    if (configField) {
+      if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets value
+        if (inlineValue !== value) {
+          configActions.updateField(configField, value, true)
+        }
+      }
+
+      // Initial value changed to configField value
+      // UpdateField func is now accessible
+      setLoadedConfigValue(true)
+    }
+  }, [ value ])
 
   const sliderTypeClass = () => {
     const typeArr = {
@@ -43,41 +59,31 @@ const InputSlider = (
     return typeArr[sliderType] || ''
   }
 
-  useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value) {
-      setValue(stateValue)
-    }
-  }, [ stateValue ])
-
-  useEffect(() => {
-    if (configField) {
-      if (stateValue !== value) {
-        configActions.updateField(configField, value)
-      }
-    }
-  }, [ value ])
+  const onClickHandler = () => {
+    setValue(value => !value)
+  }
 
   return (
     <>
       {label && labelPosition === 'top' &&
-        <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>
+        <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
       }
       <div className={'cove-input__slider-group' + (className ? ' ' + className : '')} flow={labelPosition}>
         {label && labelPosition === 'left' &&
-          <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>
+          <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
         }
         <div className={
           'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '')
           + (sliderTypeClass())
           + (value ? ' active' : '')
         }
-             onClick={() => setValue(!value)}>
+             onClick={() => onClickHandler()}>
           <div className="cove-input__slider-button"/>
           <div className="cove-input__slider-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
           <input className="cove-input--hidden" type="checkbox" checked={value} readOnly/>
         </div>
         {label && labelPosition === 'right' &&
-          <Label tooltip={tooltip} onClick={() => setValue(!value)}>{label}</Label>
+          <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
         }
       </div>
     </>
@@ -108,7 +114,7 @@ InputSlider.propTypes = {
   /** Prop drill down of the updateField function */
   updateField: PropTypes.func,
   /** Current value of the input, usually the current config option value */
-  stateValue: PropTypes.object
+  inlineValue: PropTypes.object
 }
 
 export default InputSlider

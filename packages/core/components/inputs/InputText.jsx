@@ -10,31 +10,40 @@ import Label from '../elements/Label'
 
 import '../../styles/v2/components/input/index.scss'
 
-const InputText = memo((
+const InputText = (
   {
     label,
     type = 'text',
     tooltip,
     placeholder,
+    test,
 
     configField,
-    value: stateValue,
+    value: inlineValue,
     min, max, className, ...attributes
   }
 ) => {
 
   const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : stateValue || '')
+  //Input will only accept either an inline value from the element, or a value from a connected config key
+  const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
   const [ debouncedValue ] = useDebounce(value, 500)
 
   const inputRef = useRef(null)
 
   useEffect(() => {
     if (configField) {
-      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-        configActions.updateField(configField, debouncedValue)
+      if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets debounceValue
+        if (inlineValue !== debouncedValue) {
+          configActions.updateField(configField, debouncedValue)
+        }
       }
+
+      // Initial debounceValue changed to configField value
+      // UpdateField func is now accessible
+      setLoadedConfigValue(true)
     }
   }, [ debouncedValue ])
 
@@ -54,16 +63,20 @@ const InputText = memo((
     return inBounds
   }
 
+  // This is some subtext that I found here
+
   //TODO: COVE Refactor - Expand to support source onChange events
   const onChange = (e) => {
-    if ('number' !== type) {
-      setValue(e.target.value)
-    } else {
-      if (isNumberWithinBounds(e.target.value)) {
+    switch(type) {
+      case 'number':
+        if (isNumberWithinBounds(e.target.value)) {
+          setValue(e.target.value)
+        } else {
+          setValue(value)
+        }
+        break
+      default:
         setValue(e.target.value)
-      } else {
-        setValue(value)
-      }
     }
   }
 
@@ -76,7 +89,7 @@ const InputText = memo((
   }
 
   let formElement = 'textarea' === type
-    ? (<textarea {...inputAttrs} ref={inputRef}/>)
+    ? (<textarea {...inputAttrs} ref={inputRef}>{value}</textarea>)
     : (<input {...inputAttrs} value={value} ref={inputRef}/>)
 
 
@@ -86,11 +99,11 @@ const InputText = memo((
       {formElement}
     </>
   )
-})
+}
 
 InputText.propTypes = {
   label: PropTypes.string,
-  type: PropTypes.oneOf(['text', 'number', 'textarea', 'date']),
+  type: PropTypes.oneOf([ 'text', 'textarea', 'number', 'date' ]),
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number

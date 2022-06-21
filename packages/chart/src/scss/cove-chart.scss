@@ -19,9 +19,13 @@
   }
 }
 
-.cove-chart__visualization {
+.cove-chart--chart {
   font-size: 0.875rem;
   overflow: visible;
+
+  &[flow="right"] {
+    order: 1;
+  }
 
   .visx-linepath {
     pointer-events: none;

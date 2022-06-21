@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 //Third Party
@@ -33,22 +33,24 @@ const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
 
   const { minValue, maxValue } = useReduceData(config, data)
 
-  let [ width ] = dimensions
-  let svgMargin = 32
-  width = width - svgMargin
+  const SVG_MARGIN = 32
+  const CONTAINER_PERCENT_WIDTH = 0.73
+  const { width, height } = dimensions
+
+  let chartWidth = width - SVG_MARGIN
+  let chartHeight = config.aspectRatio ? (chartWidth * config.aspectRatio) : config.height || height
 
   if (config && config.legend && !config.legend.hide && (viewport === 'lg' || viewport === 'md')) {
     //Resize the chart svg width so legend can flex to the right - md and lg viewports
-    const containerPercentWidth = 0.73
-    width = width * containerPercentWidth
+    chartWidth = chartWidth * CONTAINER_PERCENT_WIDTH
   }
 
-  const height = config.aspectRatio ? (width * config.aspectRatio) : config.height
+  const xMax = chartWidth - config.runtime.yAxis.size
+  const yMax = chartHeight - config.runtime.xAxis.size
 
-  const xMax = width - config.runtime.yAxis.size
-  const yMax = height - config.runtime.xAxis.size
-
-  const getXAxisData = (d) => config.runtime.xAxis.type === 'date' ? (visxParseDate(config.runtime.xAxis.dateParseFormat, d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey]
+  const getXAxisData = (d) => config.runtime.xAxis.type === 'date'
+    ? (visxParseDate(config.runtime.xAxis.dateParseFormat, d[config.runtime.originalXAxis.dataKey])).getTime()
+    : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   let xScale
@@ -141,7 +143,7 @@ const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
 
   return (
     <ErrorBoundary component="ChartLinear">
-      <svg className="cove-chart__chart" width={width} height={height}>
+      <svg className="cove-chart__chart" width={chartWidth} height={chartHeight}>
         {/* Higlighted regions */}
         {config.regions ? config.regions.map((region) => {
           if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null

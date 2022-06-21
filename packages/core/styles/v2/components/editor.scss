@@ -9,21 +9,20 @@ $editorAnimationTimer: 400ms;
   grid-template-columns: auto 1fr;
   position: relative;
   height: 100vh;
-  transform: scale(1); //Set baseline for fixed
+  transform: scale(1); //Set baseline for fixed position
   overflow: hidden;
 }
 
 .cove-editor__toggle {
   position: absolute;
-  top: 10px;
-  left: 307px;
-  width: 25px;
-  height: 25px;
-  font-size: 1em;
+  top: 0.5rem;
+  left: 309px;
+  width: 1.5rem;
+  height: 1.5rem;
   color: #000;
   background-color: #f2f2f2;
   border: 0;
-  border-radius: 60px;
+  border-radius: 999px;
   transition: left 300ms ease 60ms, background-color 200ms ease;
   box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
   user-select: none;
@@ -33,13 +32,15 @@ $editorAnimationTimer: 400ms;
   &:before {
     content: "\00ab";
     position: absolute;
-    top: 43%;
+    top: 46%;
     left: 50%;
     transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
   }
 
   &.collapsed {
-    left: 1em;
+    left: 1rem;
     margin-left: 0;
 
     &:before {
@@ -54,12 +55,14 @@ $editorAnimationTimer: 400ms;
 
 .cove-editor__panel {
   grid-area: panel;
+  position: relative;
   width: 0;
+  max-height: 100vh;
+  padding-top: 2.5rem;
   background-color: #fff;
   border-right: 1px solid #c2c2c2;
   transition: width $editorAnimationTimer ease;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 7;
 
   @at-root {
@@ -69,23 +72,27 @@ $editorAnimationTimer: 400ms;
   }
 }
 
-.cove-editor__panel-container {
-  width: $editorWidth;
-  min-width: $editorWidth;
-}
-
-.cove-editor__panel-config {
-}
-
-//TODO: COVE Refactor - Is this needed in DOM at all?
-
 .cove-editor__panel-heading {
-  padding: .625rem 1.125rem;
+  position: absolute;
+  top: 0;
+  width: $editorWidth;
+  padding: .5rem 1.125rem;
   font-size: 1.125em;
+  line-height: 1.5rem;
   color: #fff;
   background-color: $mediumGray;
   user-select: none;
+  z-index: 1;
 }
+
+.cove-editor__panel-container {
+  width: $editorWidth - 1px;
+  min-width: $editorWidth - 1px;
+  height: 100%;
+  overflow: hidden auto;
+}
+
+.cove-editor__panel-config {}
 
 .cove-editor__divider {
   margin-top: 1.5rem;

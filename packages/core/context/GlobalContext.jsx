@@ -6,11 +6,16 @@ import getViewport from '../helpers/getViewport'
 //Styles
 import '../styles/v2/main.scss'
 
-export const GlobalContext = createContext({})
+export const GlobalContext = createContext({
+  dimensions: {
+    width: 300,
+    height: 180
+  }
+})
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export const GlobalContextProvider = ({ children }) => {
-  const [ globalContextData, setGlobalContextData ] = useState({})
+  const [ globalContextData, setGlobalContextData ] = useState({}) //Needs empty object to assign settings
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
   //Overlay Actions -----------------------------------
@@ -35,7 +40,7 @@ export const GlobalContextProvider = ({ children }) => {
   const getView = (isEditor() || isDashboard) || 'component'
   const getOS = navigator.userAgent.indexOf("Win") !== -1 ? "Win" : navigator.userAgent.indexOf("Mac") !== -1 ? "MacOS" : null
 
-  //Observe changes to viewport size
+  //Observe and register changes to viewport size
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width } = entry.contentRect

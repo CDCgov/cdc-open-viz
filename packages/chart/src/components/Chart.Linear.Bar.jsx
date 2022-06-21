@@ -41,14 +41,16 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
   useEffect(() => {
     if (undefined === config.yAxis.labelPlacement) {
       if (orientation === 'horizontal') {
-        configActions.updateField(["yAxis", "labelPlacement"], 'Below Bar', true)
+        // console.log('running updateField')
+        configActions.updateField([ 'yAxis', 'labelPlacement' ], 'Below Bar')
       }
     }
-  }, [config.yAxis])
+  }, [ config.yAxis ])
 
   useEffect(() => {
     if (config.isLollipopChart === false) {
-      configActions.updateConfig({ ...config, barHeight: 25 })
+      // console.log('running updateField')
+      configActions.updateField([ 'barHeight' ], 25)
     }
   }, [ config.isLollipopChart ])
 

@@ -1,4 +1,4 @@
-import React, { useRef, memo, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 //Context
@@ -13,22 +13,24 @@ import Label from '../elements/Label'
 //Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputSelect = memo((
+const InputSelect = (
   {
     label,
     options,
     initial,
+    initialDisabled = true,
+    initialSnap,
     required,
     tooltip,
 
     configField,
-    value: stateValue,
+    value: inlineValue,
     onChange, className, ...attributes
   }
 ) => {
   const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : stateValue || '')
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
 
   const inputRef = useRef(null)
 
@@ -40,18 +42,30 @@ const InputSelect = memo((
     } else { //Handle Array entry
       return <option value={option} key={index}>{option}</option>
     }
+    return null
   })
 
-  if (initial) { //Add custom, initial option
-    optionsJsx.unshift(<option value="" key={initial}>{initial}</option>)
+  //Add custom, initial option
+  if (initial) optionsJsx.unshift(<option value="" disabled={initialDisabled || null} key={initial}>{initial}</option>)
+
+  const isInitial = (checkValue) => {
+    return initial && (checkValue === initial || checkValue === '')
   }
 
-  let onChangeHandler = (e) => {
-    setValue(e.target.value)
-    //Found reference to config update function, updating field value
-    if (configField) configActions.updateField(configField, e.target.value)
-    //Found additional onChange functions to run
-    if (onChange) onChange(e)
+  const onChangeHandler = (e) => {
+    let eventValue = e.target.value
+    setValue(eventValue)
+
+    // If either no initial option is set, or the option selected is not an initial value
+    if (!isInitial(eventValue)) {
+      // Update a config field value, if configField array was supplied
+      if (configField) configActions.updateField(configField, eventValue)
+      // Run any additional onChange functions supplied
+      if (onChange) onChange(e)
+    }
+
+    // Resets selected option to default if initialSnap is set
+    if (initialSnap && isInitial('')) setValue('')
   }
 
   return (
@@ -64,7 +78,7 @@ const InputSelect = memo((
           {label}
         </Label>
       }
-      <select className={`cove-input${required && !stateValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
+      <select className={`cove-input${required && !inlineValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
               value={value} onChange={(e) => onChangeHandler(e)} {...attributes}
               ref={inputRef}
       >
@@ -72,13 +86,16 @@ const InputSelect = memo((
       </select>
     </>
   )
-})
+}
 
 InputSelect.propTypes = {
   label: PropTypes.string,
   value: PropTypes.any,
   options: PropTypes.array,
   initial: PropTypes.string,
+  initialDisabled: PropTypes.bool,
+  /** Snap returns to the initial value, regardless of previous selection **/
+  initialSnap: PropTypes.bool,
   required: PropTypes.bool,
   tooltip: PropTypes.oneOfType([
     PropTypes.object,

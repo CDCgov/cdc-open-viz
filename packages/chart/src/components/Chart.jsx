@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react'
+import React, { useEffect, useState, memo, lazy, Suspense } from 'react'
 
 //Third Party
 import { LegendItem, LegendLabel, LegendOrdinal } from '@visx/legend'
@@ -26,8 +26,8 @@ const LinearChart = lazy(() => import('./Chart.Linear'))
 const PieChart = lazy(() => import('./Chart.Pie'))
 
 //Visualization
-const Chart = () => {
-  const { config, configActions, data, missingRequiredSections } = useConfigContext()
+const Chart = ({config}) => {
+  const { configActions, data, missingRequiredSections } = useConfigContext()
   const { legend, title, description } = config
 
   //Loader States
@@ -40,7 +40,6 @@ const Chart = () => {
   //Function States
   const [ colorScale, setColorScale ] = useState(null)
   const [ seriesHighlight, setSeriesHighlight ] = useState([])
-
 
   const filterData = (filters, data) => {
     let filteredData = []
@@ -201,14 +200,14 @@ const Chart = () => {
 
   // JSX for Legend
   const Legend = () => {
-    const isReversed = () => (config.orientation === 'horizontal' && config.legend.reverseLabelOrder)
+    const labelsAreReversed = () => (config.orientation === 'horizontal' && config.legend.reverseLabelOrder)
 
     return (
       <aside id="legend" className="cove-chart__legend" flow={config.legend.position} role="region" aria-label="legend">
         {legend.label && <h2 className="cove-heading--4 mb-1">{legend.label}</h2>}
         <LegendOrdinal scale={colorScale} itemDirection="row" labelMargin="0 20px 0 0" shapeMargin="0 10px 0">
           {labels => (
-            <div className={'cove-chart__legend-container' + (isReversed() ? ' reverse' : '')}>
+            <div className={'cove-chart__legend-container' + (labelsAreReversed() ? ' reverse' : '')}>
               {labels.map((label, i) => {
                 const isInactive = () => seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)
 
@@ -363,7 +362,6 @@ const Chart = () => {
   }
 
   return (
-
     <Component className="cove-chart" title={title} description={description}
                tableShowIf={config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Paired Bar'}
                theme={config.theme}
@@ -375,10 +373,12 @@ const Chart = () => {
             Skip Over Chart Container
           </a>
           {config.filters && <Filters/>}
-          {missingRequiredSections && <>Missing stuff</>}
+          {missingRequiredSections && <>Missing data in sections</>}
           {!missingRequiredSections && !config.newViz && (<>
-            {chartList[config.visualizationType]}
-            {!config.legend.hide && !loadingLegend && <Legend/> }
+            <div className="cove-chart--chart" flow={config.legend.position === 'left' ? 'right' : 'left'}>
+              {chartList[config.visualizationType]}
+            </div>
+            {!config.legend.hide && !loadingLegend && <Legend/>}
           </>)}
         </div>
       </Suspense>

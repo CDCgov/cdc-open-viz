@@ -15,11 +15,9 @@ const Component = (props) => {
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
 
-      // let { width, height } = entry.contentRect
-      let width = entry.target.offsetWidth
-      let height = entry.target.offsetHeight
+      let { width, height } = entry.contentRect
 
-      globalActions.setGlobalContextData(context => ({ ...context, dimensions: [ width, height ] }))
+      globalActions.setGlobalContextData(context => ({ ...context, dimensions: { width, height } }))
     }
   })
 
