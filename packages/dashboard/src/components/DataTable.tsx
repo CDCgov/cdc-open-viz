@@ -15,7 +15,7 @@ import { Base64 } from 'js-base64';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import Context from '../context';
+import Context from '../ConfigContext';
 
 export default function DataTable() {
 
