@@ -1276,7 +1276,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     } else if (state.general.title && !state.general.type === 'navigation') {
         handleMapTabbing = `#dataTableSection__${state.general.title.replace(/\s/g, "")}`;
     } else if (state.general.type === 'navigation') {
-        handleMapTabbing = '#dropdown';
+        handleMapTabbing = `#dropdown-${Math.floor(Math.random() * 100) + 1}`;
     }
     
     return (
@@ -1387,7 +1387,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					)}
 				</section>
 				{'navigation' === general.type && (
-					<NavigationMenu
+                    <NavigationMenu
+                        mapTabbingID={handleMapTabbing}
 						displayGeoName={displayGeoName}
 						data={runtimeData}
 						options={general}

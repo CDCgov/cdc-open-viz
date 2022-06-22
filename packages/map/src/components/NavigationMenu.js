@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const NavigationMenu = ({
-  data, navigationHandler, options, columns, displayGeoName
+  data, navigationHandler, options, columns, displayGeoName, mapTabbingID
 }) => {
   const [activeGeo, setActiveGeo] = useState('');
 
@@ -51,9 +51,9 @@ const NavigationMenu = ({
   return (
     <section className="navigation-menu">
       <form onSubmit={handleSubmit} type="get">
-        <label htmlFor="dropdown">
+        <label htmlFor={mapTabbingID.replace('#', '')}>
           <div className="select-heading">{navSelect}</div>
-          <select value={activeGeo} id="dropdown" onChange={(e) => setActiveGeo(e.target.value)}>
+          <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={(e) => setActiveGeo(e.target.value)}>
             {Object.keys(dropdownItems).map((key, i) => <option key={key} value={key}>{key}</option>)}
           </select>
         </label>
