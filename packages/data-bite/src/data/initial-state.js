@@ -26,4 +26,7 @@ export default {
     title: "",
     theme: "theme-blue",
     shadow: false,
+    general: {
+      isCompactStyle: false
+    }
 }
