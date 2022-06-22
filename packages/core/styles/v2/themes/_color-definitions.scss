@@ -21,6 +21,33 @@ $theme: (
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
     }
+
+    &.theme-#{$theme-name} {
+
+      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
+        border-left: 1px solid string.unquote(nth($theme-colors, 1));
+        border-right: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      // TODO: 
+      // Refactor to get out of data-bite-inner 
+      // when data bite doesn't have a title add border top to content container
+      .cdc-data-bite-inner-container:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
+        border-top: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+      .cove-component__header {
+        border-color: string.unquote(nth($theme-colors, 2));
+      }
+
+      .cove-component__content.component--has-accent {
+        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3));
+      }
+    }
   }
 }
 
