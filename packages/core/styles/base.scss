@@ -82,32 +82,3 @@ $theme: (
         'slate':  ('#29434e', '#7e9ba5', '#b6c6d2', '#e2e8ed'),
         'teal':   ('#00695c', '#4ebaaa', '#ceece7', '#ebf7f5' )
 );
-
-.cdc-open-viz-module {
-  @each $theme-name, $theme-colors in $theme {
-
-    &.theme-#{$theme-name} {
-
-      // if the bite has a border always show borders on the edges
-      .bite.bite--has-border {
-        border-left: 1px solid string.unquote(nth($theme-colors, 1)) !important;
-        border-right: 1px solid string.unquote(nth($theme-colors, 1)) !important;
-        border-bottom: 1px solid string.unquote(nth($theme-colors, 1)) !important;
-      }
-
-      // if the bite has borders and no title on top add the border on top
-      .cdc-data-bite-inner-container:not(.bite--has-title) .bite.bite--has-border {
-        border-top: 1px solid string.unquote(nth($theme-colors, 1)) !important;
-      }
-
-      // Left border Color
-      .bite.bite--has-accent {
-        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
-      }
-
-      .bite.bite--has-background:not(.bite--hideBackgroundColor) {
-        background: string.unquote(nth($theme-colors, 3)) !important;
-      }
-    }
-  }
-}
