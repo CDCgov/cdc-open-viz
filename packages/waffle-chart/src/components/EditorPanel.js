@@ -376,7 +376,7 @@ const EditorPanel = memo((props) => {
         <InputSelect value={config.overallFontSize} fieldName="overallFontSize" label="Overall Font Size"
                      updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
 
-        <label className="header">
+        <label>
           <span className="edit-label">Theme</span>
           <ul className="color-palette">
             {headerColors.map((palette) => (
@@ -387,6 +387,14 @@ const EditorPanel = memo((props) => {
             ))}
           </ul>
         </label>
+        
+        <div className="cove-accordion__panel-section">
+          <InputCheckbox inline size='small' value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+          <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
+          <InputCheckbox size='small' value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+          <InputCheckbox size='small' value={config.visual.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+          <InputCheckbox size='small' value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+        </div>
       </Accordion.Section>
     </Accordion>
   )

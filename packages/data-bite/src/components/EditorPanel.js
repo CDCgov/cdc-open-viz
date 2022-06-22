@@ -439,11 +439,16 @@ const EditorPanel = memo(() => {
                 <AccordionItemPanel>
                   <TextField type="number" value={config.biteFontSize} fieldName="biteFontSize" label="Bite Font Size" updateField={updateField} min="17" max="65" />
                   <Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
-                  <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
-                  <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
-                  <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
-                  <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
-                  <label className="header">
+                  
+                  <div className="cove-accordion__panel-section">
+                    <CheckBox value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                    <CheckBox value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                    <CheckBox value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                    <CheckBox value={config.visual.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                    <CheckBox value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                  </div>
+
+                  <label>
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map( (palette) => (
