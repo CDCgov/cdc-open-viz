@@ -279,6 +279,14 @@ const WaffleChart = ({ config, isEditor }) => {
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
+  let contentClasses = ['cove-component__content']
+  
+  !config.visual.border && contentClasses.push('no-borders');
+  config.visual.accent && contentClasses.push('component--has-accent')
+  config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
+  config.visual.background && contentClasses.push('component--has-background');
+  config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
   return (
     <>
       {title &&
@@ -286,7 +294,7 @@ const WaffleChart = ({ config, isEditor }) => {
         {parse(title)}
       </header>
       }
-      <div className="cove-component__content">
+      <div className={contentClasses.join(' ')}>
         <div className="cove-component__content-wrap">
           <div
             className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
@@ -407,14 +415,16 @@ const CdcWaffleChart = (
       classNames.push('is-editor')
     }
 
+    let bodyClasses = ['cove-component', 'waffle-chart']
+
     let body = (
-      <div className="cove-component waffle-chart" ref={outerContainerRef}>
+      <div className={bodyClasses.join(' ')} ref={outerContainerRef}>
         <WaffleChart config={config} isEditor={isEditor}/>
       </div>
     )
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme}`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>
