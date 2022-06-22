@@ -1,4 +1,4 @@
-import React, { useEffect,  useState, useCallback,FC } from 'react';
+import React, { useEffect,  useState, useCallback,FC, memo } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
@@ -40,9 +40,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    general: { isCompactStyle }
   } = config;
-
 
 
   const transform = new DataTransform()
@@ -261,10 +261,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
       return formattedValue
     }
-  
-  
-
-  
 
     let dataBite:string|number = '';
     
@@ -447,6 +443,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     config.subtext && innerContainerClasses.push('bite--has-subtext')
     config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
     config.shadow && innerContainerClasses.push('shadow')
+    config.general.isCompactStyle && innerContainerClasses.push(`bite--isCompactStyle`)
 
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
@@ -471,7 +468,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                         {parse(biteBody)}
                       </p>
                       {showBite && 'end' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
-                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      {subtext && !isCompactStyle && <p className="bite-subtext">{parse(subtext)}</p>}
                       </div>
                     </Fragment>
                 </div>

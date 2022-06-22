@@ -154,6 +154,18 @@
     }
   }
 
+  // General: Compact View
+  &.bite--isCompactStyle .bite .bite-content-container .bite-content {
+    align-items: center;
+    p.bite-text {
+      margin-bottom: 0;
+    }
+  }
+
+  &.bite--isCompactStyle .bite .bite-content-container {
+    align-items: center;
+  }
+
   .bite-header + .bite { border-top: 0; }
   .bite {
     position: relative;
