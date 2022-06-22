@@ -12,7 +12,7 @@
     color: $primary;
   }
 
-  .bite-header {
+  .cove-component__header {
     background-color: $primary;
   }
 }
@@ -21,7 +21,7 @@
   .bite-value {
     color: $purple-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $purple-primary;
   }
 }
@@ -30,7 +30,7 @@
   .bite-value {
     color: $amber-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $amber-primary;
   }
 }
@@ -39,7 +39,7 @@
   .bite-value {
     color: $orange-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $orange-primary;
   }
 }
@@ -48,7 +48,7 @@
   .bite-value {
     color: $brown-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $brown-primary;
   }
 }
@@ -57,7 +57,7 @@
   .bite-value {
     color: $teal-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $teal-primary;
   }
 }
@@ -66,7 +66,7 @@
   .bite-value {
     color: $pink-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $pink-primary;
   }
 }
@@ -75,7 +75,7 @@
   .bite-value {
     color: $slate-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $slate-primary;
   }
 }
@@ -84,7 +84,7 @@
   .bite-value {
     color: $indigo-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $indigo-primary;
   }
 }
@@ -93,7 +93,7 @@
   .bite-value {
     color: $cyan-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $cyan-primary;
   }
 }
@@ -102,11 +102,11 @@
   .bite-value {
     color: $green-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $green-primary;
   }
 }
-.bite-header {
+.cove-component__header {
   padding: 0 1em;
   left: 0;
   top: 0;
@@ -127,9 +127,6 @@
   }
 
   // Visual: Borders
-  &.bite--has-title.bite--has-rounded-borders .bite-header { border-top-left-radius: .25rem; border-top-right-radius: .25rem;}
-  &.bite--has-title.bite--has-rounded-borders .bite { border-bottom-left-radius: .25rem; border-bottom-right-radius: .25rem; }
-  &.bite--has-rounded-borders:not(.bite--has-title) .bite { border-radius: .25rem; }
 
   // General: Bite Style > Graphic
   .bite__style--graphic {
@@ -155,32 +152,23 @@
   }
 
   // General: Compact View
-  &.bite--isCompactStyle .bite .bite-content-container .bite-content {
+  &.bite--isCompactStyle .bite .cove-component__content .bite-content {
     align-items: center;
     p.bite-text {
       margin-bottom: 0;
     }
   }
 
-  &.bite--isCompactStyle .bite .bite-content-container {
+  &.bite--isCompactStyle .bite .cove-component__content {
     align-items: center;
   }
 
-  .bite-header + .bite { border-top: 0; }
+  .cove-component__header + .bite { border-top: 0; }
   .bite {
     position: relative;
     overflow: hidden;
     border-top: none;
 
-    &:not(.bite--has-border) {
-      border-left: 1px solid transparent;
-      border-right: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-    }
-
-    &:not(.bite--has-accent) {
-        border-left: .5rem solid transparent;
-    }
 
     &-content__text-wrap { 
       height: 100%;
@@ -194,7 +182,7 @@
         color: $primary;
       }
 
-      .bite-header {
+      .cove-component__header {
         background-color: $primary;
       }
     }
@@ -203,7 +191,7 @@
       .bite-value {
         color: $purple-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $purple-primary;
       }
     }
@@ -212,7 +200,7 @@
       .bite-value {
         color: $amber-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $amber-primary;
       }
     }
@@ -221,7 +209,7 @@
       .bite-value {
         color: $orange-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $orange-primary;
       }
     }
@@ -230,7 +218,7 @@
       .bite-value {
         color: $brown-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $brown-primary;
       }
     }
@@ -239,7 +227,7 @@
       .bite-value {
         color: $teal-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $teal-primary;
       }
     }
@@ -248,7 +236,7 @@
       .bite-value {
         color: $pink-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $pink-primary;
       }
     }
@@ -257,7 +245,7 @@
       .bite-value {
         color: $slate-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $slate-primary;
       }
     }
@@ -266,7 +254,7 @@
       .bite-value {
         color: $indigo-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $indigo-primary;
       }
     }
@@ -275,7 +263,7 @@
       .bite-value {
         color: $cyan-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $cyan-primary;
       }
     }
@@ -284,7 +272,7 @@
       .bite-value {
         color: $green-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $green-primary;
       }
     }
@@ -301,7 +289,7 @@
       border-radius: .3em;
     }
 
-    .bite-content-container {
+    .cove-component__content {
       display: flex;
       padding: 1em;
       justify-content: space-between;
@@ -351,13 +339,13 @@
         width: 33%;
         margin-left: 1.5em;
       }
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: row-reverse;
       }
     }
 
     &.bite-top {
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: column;
 
         .bite-image {
@@ -376,7 +364,7 @@
     }
 
     &.bite-bottom {
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: column;
 
         .bite-image {
@@ -395,7 +383,7 @@
     }
 
     &.bite-back {
-      .bite-content-container {
+      .cove-component__content {
         .bite-image {
           border-radius: 0 0 0.3em 0.3em;
           position: absolute;
