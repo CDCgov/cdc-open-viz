@@ -23,5 +23,12 @@ export default {
   "nodeWidth": "10",
   "nodeSpacer": "2",
   "theme": "theme-blue",
-  "type": "waffle-chart"
+  "type": "waffle-chart",
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false
+  }
 }
