@@ -28,5 +28,12 @@ export default {
     shadow: false,
     general: {
       isCompactStyle: false
+    },
+    visual: {
+      border: true,
+      borderColorTheme: false,
+      hideBackgroundColor: false,
+      accent: false,
+      background: false
     }
 }
