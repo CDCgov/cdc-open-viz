@@ -1,10 +1,11 @@
-import React, { useEffect, useState, memo, lazy, Suspense } from 'react'
+import React, { useEffect, useState, lazy, Suspense } from 'react'
 
 //Third Party
 import { LegendItem, LegendLabel, LegendOrdinal } from '@visx/legend'
 import { scaleOrdinal } from '@visx/scale'
 
 //Context
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
 //Data
@@ -26,12 +27,13 @@ const LinearChart = lazy(() => import('./Chart.Linear'))
 const PieChart = lazy(() => import('./Chart.Pie'))
 
 //Visualization
-const Chart = ({config}) => {
-  const { configActions, data, missingRequiredSections } = useConfigContext()
+const Chart = () => {
+  const { dimensions } = useGlobalContext()
+  const { config, configActions, data, missingRequiredSections } = useConfigContext()
   const { legend, title, description } = config
 
   //Loader States
-  const [ loadingLegend, setLoadingLegend ] = useState(true)
+  const [ loadingDependencies, setLoadingDependencies ] = useState(true)
 
   //Data States
   const [ excludedData, setExcludedData ] = useState()
@@ -74,13 +76,17 @@ const Chart = ({config}) => {
       })
 
       setColorScale(newColorScale)
-      setLoadingLegend(false)
     }
-
-    if (config && data && config.sortData) {
-      data.sort(sortData)
-    }
+    if (config && data && config.sortData) data.sort(sortData)
   }, [ config, data ])
+
+  //Required Dependency Functions
+  useEffect(() => {
+    let validColorScale = colorScale // Makes sure colorScale function is processed for both the Legend and Chart
+    let validDimensions = dimensions && dimensions.width !== 0 // Only checks width - height is calculated using ratio on width
+
+    if (validColorScale && validDimensions) setLoadingDependencies(false)
+  }, [ colorScale, dimensions ])
 
   //Validate Required Sections
   useEffect(() => {
@@ -164,12 +170,11 @@ const Chart = ({config}) => {
   const formatNumber = (num) => {
     let original = num
     let prefix = config.dataFormat.prefix
+    let suffix = config.dataFormat.suffix
+
     num = numberFromString(num)
 
-    if (isNaN(num)) {
-      config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`
-      return
-    }
+    if (isNaN(num)) return config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`
 
     if (!config.dataFormat) return num
     if (config.dataCutoff) {
@@ -191,8 +196,8 @@ const Chart = ({config}) => {
 
     result += num
 
-    if (config.dataFormat.suffix) {
-      result += config.dataFormat.suffix
+    if (suffix) {
+      result += suffix
     }
 
     return result
@@ -322,35 +327,18 @@ const Chart = ({config}) => {
       : `#dataTableSection`
 
   //Build Chart styles
-
   let lineDatapointClass = ''
   let barBorderClass = ''
 
-  if (config.lineDatapointStyle === 'hover') {
-    lineDatapointClass = ' line--hover'
-  }
-  if (config.lineDatapointStyle === 'always show') {
-    lineDatapointClass = ' line--always'
-  }
-  if (config.barHasBorder === 'false') {
-    barBorderClass = ' no-border'
-  }
-
-  const contextValues = {
-    /*colorPalettes,
-    colorScale,
-    config,
-    excludedData,
-    transformedData: filteredData || excludedData,
-    formatNumber,
-    seriesHighlight,
-    setFilteredData*/
-  }
+  if (config.lineDatapointStyle === 'hover') lineDatapointClass = ' line--hover'
+  if (config.lineDatapointStyle === 'always show') lineDatapointClass = ' line--always'
+  if (config.barHasBorder === 'false') barBorderClass = ' no-border'
 
   const chartProps = {
-    formatNumber: formatNumber,
-    colorScale: colorScale,
-    seriesHighlight
+    dimensions,
+    colorScale,
+    seriesHighlight,
+    formatNumber
   }
 
   const chartList = {
@@ -374,11 +362,11 @@ const Chart = ({config}) => {
           </a>
           {config.filters && <Filters/>}
           {missingRequiredSections && <>Missing data in sections</>}
-          {!missingRequiredSections && !config.newViz && (<>
-            <div className="cove-chart--chart" flow={config.legend.position === 'left' ? 'right' : 'left'}>
+          {!loadingDependencies && !missingRequiredSections && !config.newViz && (<>
+            <div className="cove-chart__visualization" flow={config.legend.position === 'left' ? 'right' : 'left'}>
               {chartList[config.visualizationType]}
             </div>
-            {!config.legend.hide && !loadingLegend && <Legend/>}
+            {!config.legend.hide && <Legend/>}
           </>)}
         </div>
       </Suspense>

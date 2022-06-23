@@ -22,7 +22,6 @@ import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputSlider from '@cdc/core/components/inputs/InputSlider'
 import InputText from '@cdc/core/components/inputs/InputText'
-import Label from '@cdc/core/components/elements/Label'
 import ListGroup from '@cdc/core/components/elements/ListGroup'
 import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
@@ -225,9 +224,7 @@ const EditorPanels = () => {
 
   const addNewFilter = () => {
     let filters = config.filters ? [ ...config.filters ] : []
-
     filters.push({ values: [] })
-
     configActions.updateConfig({ ...config, filters })
   }
 
@@ -710,11 +707,11 @@ const EditorPanels = () => {
             <>
               {config.exclusions.keys.length > 0 &&
                 <>
-                  <ListGroup label="Excluded Keys" items={config.exclusions.keys} removeAction={removeExclusion}/>
+                  <ListGroup label="Excluded Keys" items={config.exclusions?.keys} removeAction={removeExclusion}/>
                 </>
               }
 
-              <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis.dataKey, true)} initial="Select" onChange={(e) => addNewExclusion(e.target.value)}/>
+              <InputSelect label="Add Exclusion" options={getDataValues(config.xAxis?.dataKey, true)} initial="Select" onChange={(e) => addNewExclusion(e.target.value)}/>
             </>
           }
         </>
@@ -819,7 +816,7 @@ const EditorPanels = () => {
                   type="radio"
                   name="lollipopShape"
                   value="circle"
-                  checked={config.lollipopShape === 'circle'}
+                  defaultChecked={config.lollipopShape === 'circle'}
                 />
                 Circle
               </label>
@@ -828,7 +825,7 @@ const EditorPanels = () => {
                   type="radio"
                   name="lollipopShape"
                   value="square"
-                  checked={config.lollipopShape === 'square'}
+                  defaultChecked={config.lollipopShape === 'square'}
                 />
                 Square
               </label>

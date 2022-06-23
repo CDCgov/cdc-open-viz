@@ -1,7 +1,10 @@
 const useChartCreateRuntime = (newConfig) => {
   if (newConfig) {
     //Enforce default values that need to be calculated at runtime
-    newConfig.runtime = {}
+    if (!newConfig.runtime) {
+      newConfig.runtime = {}
+    }
+
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
 

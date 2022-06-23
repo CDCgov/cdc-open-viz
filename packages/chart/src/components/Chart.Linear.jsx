@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 //Third Party
@@ -27,18 +27,16 @@ import ChartLinearBarPaired from './Chart.Linear.BarPaired'
 import ChartLinearLine from './Chart.Linear.Line'
 
 //Visualization
-const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
-  const { viewport, dimensions } = useGlobalContext()
+const ChartLinear = ({ dimensions, colorScale, seriesHighlight, formatNumber }) => {
+  const { viewport } = useGlobalContext()
   const { config, data } = useConfigContext()
-
   const { minValue, maxValue } = useReduceData(config, data)
 
   const SVG_MARGIN = 32
   const CONTAINER_PERCENT_WIDTH = 0.73
-  const { width, height } = dimensions
 
-  let chartWidth = width - SVG_MARGIN
-  let chartHeight = config.aspectRatio ? (chartWidth * config.aspectRatio) : config.height || height
+  let chartWidth = dimensions.width - SVG_MARGIN
+  let chartHeight = config.aspectRatio ? (chartWidth * config.aspectRatio) : config.height || dimensions.height
 
   if (config && config.legend && !config.legend.hide && (viewport === 'lg' || viewport === 'md')) {
     //Resize the chart svg width so legend can flex to the right - md and lg viewports
@@ -135,15 +133,9 @@ const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
     ReactTooltip.rebuild()
   })
 
-  const chartProps = {
-    formatNumber,
-    colorScale,
-    seriesHighlight
-  }
-
   return (
     <ErrorBoundary component="ChartLinear">
-      <svg className="cove-chart__chart" width={chartWidth} height={chartHeight}>
+      <svg className="cove-chart__visualization--chart-linear" width={chartWidth} height={chartHeight}>
         {/* Higlighted regions */}
         {config.regions ? config.regions.map((region) => {
           if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -441,18 +433,20 @@ const ChartLinear = ({ formatNumber, colorScale, seriesHighlight }) => {
           </>
         }
         {config.visualizationType === 'Paired Bar' && (
-          <ChartLinearBarPaired width={xMax} height={yMax}/>
+          <ChartLinearBarPaired colorScale={colorScale} width={xMax} height={yMax}/>
         )}
 
         {/* Bar chart */}
         {(config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-          <ChartLinearBar colorScale={colorScale} seriesHighlight={seriesHighlight} formatNumber={formatNumber} xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
+          <ChartLinearBar colorScale={colorScale} seriesHighlight={seriesHighlight} formatNumber={formatNumber}
+                          xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax}
                           getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
         )}
 
         {/* Line chart */}
         {(config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
-          <ChartLinearLine xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
+          <ChartLinearLine colorScale={colorScale} seriesHighlight={seriesHighlight} formatNumber={formatNumber}
+                           xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData}/>
         )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light"

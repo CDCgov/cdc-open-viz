@@ -30,7 +30,7 @@ const CdcChart = ({ configObj, configUrlObj }) => {
 
   useEffect(() => {
     reloadConfig()
-  }, [ reloadConfig ])
+  }, [ configObj, configUrlObj ])
 
   return (
     <ErrorBoundary component="CdcChart">

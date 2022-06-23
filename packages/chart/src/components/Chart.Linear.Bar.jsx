@@ -16,11 +16,11 @@ import { useConfigContext } from '@cdc/core/context/ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 //Visualization
-const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, colorScale, seriesHighlight, formatNumber }) => {
+const ChartLinearBar = ({
+                          colorScale, seriesHighlight, formatNumber,
+                          xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData
+                        }) => {
   const { config, configActions, data } = useConfigContext()
-
-  // colorScale, seriesHighlight, formatNumber
-
   const { orientation, visualizationSubType } = config
 
   const isHorizontal = orientation === 'horizontal'
@@ -34,34 +34,25 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
   const isLabelMissing = !config.yAxis.labelPlacement
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
 
-  // Using State
+// Using State
   const [ horizBarHeight, setHorizBarHeight ] = useState(null)
   const [ textWidth, setTextWidth ] = useState(null)
 
+// Data standardization to migrate old key values to new field format -------------------------------------------
+  useEffect(() => {
+    if (config.visualizationSubType === 'horizontal') configActions.updateField([ 'orientation' ], 'horizontal')
+  }, [])
+// --------------------------------------------------------------------------------------------------------------
+
   useEffect(() => {
     if (undefined === config.yAxis.labelPlacement) {
-      if (orientation === 'horizontal') {
-        // console.log('running updateField')
-        configActions.updateField([ 'yAxis', 'labelPlacement' ], 'Below Bar')
-      }
+      if (orientation === 'horizontal') configActions.updateField([ 'yAxis', 'labelPlacement' ], 'Below Bar')
     }
   }, [ config.yAxis ])
 
   useEffect(() => {
-    if (config.isLollipopChart === false) {
-      // console.log('running updateField')
-      configActions.updateField([ 'barHeight' ], 25)
-    }
+    if (config.isLollipopChart === false) configActions.updateField([ 'barHeight' ], 25)
   }, [ config.isLollipopChart ])
-
-  useEffect(() => {
-    if (config.visualizationSubType === 'horizontal') {
-      configActions.updateConfig({
-        ...config,
-        orientation: 'horizontal'
-      })
-    }
-  }, [])
 
   return (
     <ErrorBoundary component="BarChart">
@@ -77,48 +68,51 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
             yScale={yScale}
             color={colorScale}
           >
-            {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
-                let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-                let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+            {barStacks => barStacks.reverse().map(
+              (barStack) => barStack.bars.map(
+                (bar) => {
+                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
 
-                const tooltip = `<div>
-                  ${yAxisTooltip}<br />
-                  ${xAxisTooltip}<br />
-                  ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                  const tooltip = `<div>
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
+                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}
+                  </div>` : ''}`
 
-                let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                let barThickness = xMax / barStack.bars.length
-                let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
-                let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2
-                return (
-                  <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
-                    <Text
-                      display={config.labels && displayBar ? 'block' : 'none'}
-                      opacity={transparentBar ? 0.5 : 1}
-                      x={barThickness * (bar.index + 0.5) + offset}
-                      y={bar.y - 5}
-                      fill={bar.color}
-                      textAnchor="middle">
-                      {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
-                    </Text>
-                    <rect
-                      key={`bar-stack-${barStack.index}-${bar.index}`}
-                      x={barThickness * bar.index + offset}
-                      y={bar.y}
-                      height={bar.height}
-                      width={barThicknessAdjusted}
-                      fill={bar.color}
-                      stroke="#333"
-                      strokeWidth={config.barBorderThickness || 1}
-                      opacity={transparentBar ? 0.5 : 1}
-                      display={displayBar ? 'block' : 'none'}
-                      data-tip={tooltip}
-                      data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                    />
-                  </Group>
-                )
-              }
+                  let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
+                  let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                  let barThickness = xMax / barStack.bars.length
+                  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
+                  let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2
+                  return (
+                    <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
+                      <Text
+                        display={config.labels && displayBar ? 'block' : 'none'}
+                        opacity={transparentBar ? 0.5 : 1}
+                        x={barThickness * (bar.index + 0.5) + offset}
+                        y={bar.y - 5}
+                        fill={bar.color}
+                        textAnchor="middle">
+                        {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
+                      </Text>
+                      <rect
+                        key={`bar-stack-${barStack.index}-${bar.index}`}
+                        x={barThickness * bar.index + offset}
+                        y={bar.y}
+                        height={bar.height}
+                        width={barThicknessAdjusted}
+                        fill={bar.color}
+                        stroke="#333"
+                        strokeWidth={config.barBorderThickness || 1}
+                        opacity={transparentBar ? 0.5 : 1}
+                        display={displayBar ? 'block' : 'none'}
+                        data-tip={tooltip}
+                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                      />
+                    </Group>
+                  )
+                }
             ))}
           </BarStack>
         )}
@@ -136,99 +130,93 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
               color={colorScale}
               offset="none"
             >
-              {(barStacks) =>
-                barStacks.map((barStack) =>
-                  barStack.bars.map((bar, index) => {
+              {barStacks => barStacks.map(
+                (barStack) => barStack.bars.map(
+                  (bar, index) => {
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
 
-                      let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
-                      let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` : `${data[bar.index].name}`
-                      const tooltip = `<div>
-                        ${yAxisTooltip}<br />
-                        ${xAxisTooltip}<br />
-                        ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    const tooltip = `<div>
+                      ${yAxisTooltip}<br />
+                      ${xAxisTooltip}<br />
+                      ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}
+                    </div>` : ''}`
 
-                      let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
-                      let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                      const barsPerGroup = config.series.length
-                      let barHeight = config.barHeight ? config.barHeight : 25
-                      let barPadding = barHeight
+                    let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
+                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
+                    const barsPerGroup = config.series.length
+                    let barHeight = config.barHeight ? config.barHeight : 25
+                    let barPadding = barHeight
 
-                      if (orientation === 'horizontal') {
+                    if (isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+                      if (barHeight < 40) {
+                        config.barPadding = 40
+                      } else {
+                        config.barPadding = barPadding
+                      }
+                    } else {
+                      config.barPadding = barPadding / 2
+                    }
 
-                        if (isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
-                          if (barHeight < 40) {
-                            config.barPadding = 40
-                          } else {
-                            config.barPadding = barPadding
-                          }
-                        } else {
-                          config.barPadding = barPadding / 2
+                    config.height = (Number(barHeight)) * data.length + (config.barPadding * data.length)
+
+                    const labelColor = chroma.contrast('#000', bar.color) < 4.9 ? '#fff' : '#000'
+
+                    const yCalc = bar.y - (config.barPadding / 2) - (config.barHeight / 2)
+                    const yPosition = isNaN(yCalc) ? 0 : yCalc
+                    const textPosition = yCalc + config.barHeight + 5
+
+                    return (
+                      <Group key={index}>
+                        <rect
+                          key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
+                          x={bar.x}
+                          y={yPosition}
+                          width={bar.width}
+                          height={config.barHeight}
+                          fill={bar.color}
+                          stroke="#333"
+                          strokeWidth={config.barBorderThickness || 1}
+                          opacity={transparentBar ? 0.5 : 1}
+                          display={displayBar ? 'block' : 'none'}
+                          data-tip={tooltip}
+                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        />
+                        {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
+                          <Text
+                            x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
+                            y={Number(textPosition)}
+                            fill={'#000000'}
+                            textAnchor="start"
+                            verticalAnchor="start"
+                          >
+                            {data[bar.index][config.runtime.originalXAxis.dataKey]}
+                          </Text>
                         }
-                      }
 
-                      config.height = (Number(barHeight)) * data.length + (config.barPadding * data.length)
-
-                      let labelColor = '#000000'
-
-                      let textPosition = (bar.y - config.barPadding / 2 - Number(config.barHeight / 2) + Number(config.barHeight)) + 5
-
-                      if (chroma.contrast(labelColor, bar.color) < 4.9) {
-                        labelColor = '#FFFFFF'
-                      }
-
-                      return (
-                        <Group key={index}>
-                          <rect
-                            key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
-                            x={bar.x}
-                            y={bar.y - config.barPadding / 2 - config.barHeight / 2}
-                            width={bar.width}
-                            height={config.barHeight}
-                            fill={bar.color}
-                            stroke="#333"
-                            strokeWidth={config.barBorderThickness || 1}
-                            opacity={transparentBar ? 0.5 : 1}
-                            display={displayBar ? 'block' : 'none'}
-                            data-tip={tooltip}
-                            data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          />
-
-                          {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
-                            <Text
-                              x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
-                              y={textPosition}
-                              fill={'#000000'}
-                              textAnchor="start"
-                              verticalAnchor="start"
-                            >
-                              {data[bar.index][config.runtime.originalXAxis.dataKey]}
-                            </Text>
-                          }
-
-                          {displayNumbersOnBar && textWidth + 50 < bar.width &&
-                            <Text
-                              x={bar.x + barStack.bars[bar.index].width / 2} // padding
-                              y={textPosition - 5 - config.barHeight / 2}
-                              fill={labelColor}
-                              textAnchor="middle"
-                              verticalAnchor="middle"
-                              innerRef={
-                                (e) => {
-                                  if (e) {
-                                    // use font sizes and padding to set the bar height
-                                    let elem = e.getBBox()
-                                    setTextWidth(elem.width)
-                                  }
+                        {displayNumbersOnBar && textWidth + 50 < bar.width &&
+                          <Text
+                            x={bar.x + barStack.bars[bar.index].width / 2} // padding
+                            y={Number(textPosition - 5 - config.barHeight / 2)}
+                            fill={labelColor}
+                            textAnchor="middle"
+                            verticalAnchor="middle"
+                            innerRef={(e) => {
+                                if (e) {
+                                  // use font sizes and padding to set the bar height
+                                  let elem = e.getBBox()
+                                  setTextWidth(elem.width)
                                 }
                               }
-                            >
-                              {data[bar.index][bar.key]}
-                            </Text>
-                          }
-                        </Group>
-                      )
-                    }
-                  ))
+                            }
+                          >
+                            {data[bar.index][bar.key]}
+                          </Text>
+                        }
+                      </Group>
+                    )
+                  }
+                ))
               }
             </BarStackHorizontal>
           </>
@@ -269,6 +257,7 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
                   if (config.isLollipopChart && config.yAxis.labelPlacement === 'Below Bar') {
                     config.barPadding = config.barPadding + 7
                   }
+
                   config.barHeight = config.isLollipopChart ? lollipopBarWidth : barHeight
                   config.height = (barsPerGroup * barHeight) * barGroups.length + (config.barPadding * barGroups.length)
                 }
@@ -309,12 +298,10 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
                         let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                         let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                         let horizBarLabelPadding = null
-                        let labelColor = '#000000'
+                        let labelColor = '#000'
 
                         // Set label color
-                        if (chroma.contrast(labelColor, barColor) < 4.9) {
-                          labelColor = '#FFFFFF'
-                        }
+                        if (chroma.contrast(labelColor, barColor) < 4.9) labelColor = '#fff'
 
                         // font size and text spacing used for centering text on bar
                         if (config.fontSize === 'small') {
@@ -324,11 +311,17 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
                         } else {
                           horizBarLabelPadding = 20
                         }
+
                         const onBarTextSpacing = 25
+
                         const tooltip = `<div>
-                          ${yAxisTooltip}<br />
-                          ${xAxisTooltip}<br />
-                          ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                            ${yAxisTooltip}<br />
+                            ${xAxisTooltip}<br />
+                            ${config.seriesLabel ?
+                              `${config.seriesLabel}: ${bar.key}` :
+                              ''
+                        }`
+
                         return (
                           <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                             <Text
@@ -390,8 +383,7 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
                                 <Text
                                   innerRef={
                                     (e) => {
-                                      if (e) {
-                                        // use font sizes and padding to set the bar height
+                                      if (e) { // use font sizes and padding to set the bar height
                                         let elem = e.getBBox()
                                         setTextWidth(elem.width)
                                         config.barHeight = ((elem.height * 2) + (horizBarLabelPadding * 2) + onBarTextSpacing / 2)
@@ -532,12 +524,14 @@ const ChartLinearBar = ({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData,
               return (
                 <path key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`} stroke="#333"
                       strokeWidth="2px" d={`
-                  M${xPos - tickWidth} ${upperPos}
-                  L${xPos + tickWidth} ${upperPos}
-                  M${xPos} ${upperPos}
-                  L${xPos} ${lowerPos}
-                  M${xPos - tickWidth} ${lowerPos}
-                  L${xPos + tickWidth} ${lowerPos}`}/>
+                        M${xPos - tickWidth} ${upperPos}
+                        L${xPos + tickWidth} ${upperPos}
+                        M${xPos} ${upperPos}
+                        L${xPos} ${lowerPos}
+                        M${xPos - tickWidth} ${lowerPos}
+                        L${xPos + tickWidth} ${lowerPos}`
+                      }
+                />
               )
             }) : ''}
           </Group>

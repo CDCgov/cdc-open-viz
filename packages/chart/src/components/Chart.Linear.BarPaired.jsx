@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Group } from '@visx/group'
 import { Bar } from '@visx/shape'
 import { scaleLinear, scaleBand } from '@visx/scale'
@@ -7,14 +7,14 @@ import chroma from 'chroma-js'
 
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-const ChartLinearBarPaired = ({ width, height }) => {
-  const { config, colorScale, transformedData } = useConfigContext()
+const ChartLinearBarPaired = ({ dimensions, colorScale }) => {
+  const { config, transformedData } = useConfigContext()
 
   if (!config || config?.series?.length < 2) return
 
   const data = transformedData
-  const adjustedWidth = width
-  const adjustedHeight = height
+  const adjustedWidth = dimensions.width
+  const adjustedHeight = dimensions.height
   const halfWidth = adjustedWidth / 2
 
   const groupOne = {
@@ -46,22 +46,16 @@ const ChartLinearBarPaired = ({ width, height }) => {
   })
 
   // Set label color
-  let labelColor = '#000000'
+  let labelColor = '#000'
+  if (chroma.contrast(labelColor, groupOne.color) < 4.9) groupOne.labelColor = '#fff'
+  if (chroma.contrast(labelColor, groupTwo.color) < 4.9) groupTwo.labelColor = '#fff'
 
-  if (chroma.contrast(labelColor, groupOne.color) < 4.9) {
-    groupOne.labelColor = '#FFFFFF'
-  }
-
-  if (chroma.contrast(labelColor, groupTwo.color) < 4.9) {
-    groupTwo.labelColor = '#FFFFFF'
-  }
-
-  return (width > 0) && (
+  return (adjustedWidth > 0) && (
     <>
       <svg
         id="cdc-visualization__paired-bar-chart"
-        width={width}
-        height={height}>
+        width={adjustedWidth}
+        height={adjustedHeight}>
         <Group top={0} left={config.xAxis.size}>
           {data.filter(item => config.series[0].dataKey === groupOne.dataKey).map(d => {
               let barWidth = (xScale(d[config.series[0].dataKey]))
