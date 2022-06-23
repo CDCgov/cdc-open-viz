@@ -9,26 +9,40 @@
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
+
   .editor-heading {
-    background-color: #fff;
+    background-color: #ddd;
     border-bottom: #C7C7C7 1px solid;
     padding: 0 1em;
     display: flex;
-    height: 3em;
-    justify-content: space-between;
-    align-items: center;
+    height: 6em;
     position: fixed;
     width: 100%;
     z-index: 19;
     top: 0;
+    &.sub-dashboard-viz {
+      height: 3em;
+    }
     .heading-1 {
       font-size: 1.2em;
+      padding-right: 1em;
+      margin: 0.5em 1em 0.5em 0;
+      border-right: 1px solid black;
       &.back-to {
         display: flex;
         span {
           font-weight: bold;
           padding-right: .3em;
         }
+      }
+    }
+
+    .heading-body {
+      padding: .5em;
+
+      input[type="checkbox"] {
+        margin-right: 2em;
+        margin-left: .5em;
       }
     }
 
@@ -40,10 +54,13 @@
       position: relative;
       bottom: -1px;
       li {
-        padding: .6em 1.5em;
+        padding: .3em 1.5em;
         color: $mediumGray;
         border-bottom: #C7C7C7 1px solid;
         cursor: pointer;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
         &.active {
           border-bottom-width: 5px;
           border-bottom-color: $mediumGray;
@@ -54,6 +71,19 @@
           color: $darkGray;
         }
       }
+    }
+
+    .description-input {
+      width: 100%;
+    }
+
+    .shared-filter-button {
+      display: inline-block;
+      border-radius: 1em;
+      border: 1px solid gray;
+      background-color: white;
+      padding: .5em;
+      margin-right: 1em;
     }
   }
 
@@ -200,6 +230,10 @@
 
   .cdc-dashboard-inner-container {
     margin: 1em;
+
+    &.is-editor {
+      margin-top: 7em;
+    }
   }
 
   .sub-editor {
@@ -221,5 +255,14 @@
     .editor-toggle {
       top: 3em;
     }
+  }
+}
+
+.shared-filter-modal {
+  border: none;
+
+  label {
+    display: block;
+    margin: 1em 0;
   }
 }
