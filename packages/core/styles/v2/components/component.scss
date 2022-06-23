@@ -1,7 +1,9 @@
 @import "../utils/_variables.scss";
 
+$componentBorderRadius: 3px;
+
 .cove-component {
-  border-radius: 3px;
+  border-radius: $componentBorderRadius;
 
   @at-root {
     .cove-editor #{&} {
@@ -21,7 +23,7 @@
   color: #fff;
   border-bottom-width: 3px;
   border-bottom-style: solid;
-  border-radius: 3px 3px 0 0;
+  border-radius: $componentBorderRadius $componentBorderRadius 0 0;
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
@@ -29,12 +31,12 @@
   padding: 1rem;
   background-color: #fff;
   border: solid 1px #ccc;
-  border-radius: 3px;
+  border-radius: $componentBorderRadius;
 
   @at-root {
     .cove-component__header + #{&} {
       border-top: none;
-      border-radius: 0 0 3px 3px;
+      border-radius: 0 0 $componentBorderRadius $componentBorderRadius;
     }
   }
 }

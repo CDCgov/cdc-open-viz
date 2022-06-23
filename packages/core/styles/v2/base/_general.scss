@@ -32,3 +32,25 @@
     overflow: hidden !important;
   }
 }
+
+.cove--developer-mode {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1rem 4rem;
+  z-index: 1;
+
+  .cove-input {
+    color: #767e85;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 2px solid #d9dbdd;
+    border-radius: 0;
+
+    &:active,
+    &:focus {
+      border: 0;
+      border-bottom: 2px solid #005eaa;
+    }
+  }
+}

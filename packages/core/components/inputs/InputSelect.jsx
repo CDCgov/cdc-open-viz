@@ -36,8 +36,8 @@ const InputSelect = (
 
   let optionsJsx = options.map((option, index) => {
     if (option === Object(option)) { //Handle Object entry with key/value pair
-      for (const [ key, value ] of Object.entries(option)) {
-        return <option value={value} key={index}>{value}</option>
+      for (const [ optionKey, optionValue ] of Object.entries(option)) {
+        return <option value={optionValue} key={index}>{optionValue}</option>
       }
     } else { //Handle Array entry
       return <option value={option} key={index}>{option}</option>

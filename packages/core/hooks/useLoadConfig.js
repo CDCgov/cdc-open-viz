@@ -9,18 +9,23 @@ import DataTransform from '../helpers/DataTransform'
 
 const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
   const { view } = useGlobalContext()
-  const { configActions, loadingConfig } = useConfigContext()
+  const { configActions } = useConfigContext()
 
   const [ cycle, setCycle ] = useState(false)
+  const [ loadingConfig, setLoadingConfig ] = useState(true)
 
   const transform = new DataTransform()
-  const reloadConfig = () => setCycle(false)
+
+  const reloadConfig = () => {
+    setLoadingConfig(true)
+    setCycle(false)
+  }
 
   useEffect(() => {
-    //Store the default config context object in ConfigContext
-    configActions.setConfigDefaults({ ...defaults })
-
     const fetchConfig = async () => {
+      //Store the default config context object in ConfigContext
+      configActions.setConfigDefaults({ ...defaults })
+
       //Check if "data" is included through a URL, or directly, and set value
       let response = configObj || await (await fetch(configUrlObj)).json()
       let responseData = response.formattedData || response.data || {}
@@ -60,7 +65,7 @@ const useLoadConfig = (configObj, configUrlObj, defaults, runtime = null) => {
       fetchConfig()
         .then((newConfig)=>{
           configActions.updateConfig(newConfig, runtime) //Sets final config data in ConfigContext
-          configActions.setLoadingConfig(false) //Tells subcomponents that the config is ready
+          setLoadingConfig(false) //Tells subcomponents that the config is ready
         })
         .catch(console.error)
         .finally(() => {

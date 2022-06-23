@@ -63,7 +63,7 @@ const InputCheckbox = (
              style={value && activeColor ? { backgroundColor: activeColor } : null}>
           <Icon display="check" className="cove-input__checkbox-check" color={activeCheckColor || '#025eaa'}/>
         </div>
-        <input className="cove-input--hidden" type="checkbox" checked={value || false} readOnly/>
+        <input className="cove-input--hidden" type="checkbox" defaultChecked={value || false} readOnly/>
       </div>
       {label && labelPosition === 'right' &&
         <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>

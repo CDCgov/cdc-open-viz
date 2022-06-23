@@ -1,15 +1,33 @@
 //TODO: COVE Refactor - Replace any '.waiting' classes with below
 .cove-splash__waiting {
-  @include emptyState;
-  padding-top: 0;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  padding: 4rem;
+  text-align: center;
+  color: #fff;
+  background-color: rgb(0 0 0 / 50%);
+  border-radius: 3px;
+  z-index: 1;
+  inset: 0;
 
-  &.collapsed {
-    padding: 2em !important;
+  [class^='cove-heading'] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  .cove-splash__waiting__container {
-    max-width: 400px;
+  + .cove-component .cove-component__content {
+    filter: blur(2px);
   }
+}
+
+.cove-splash__waiting__container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 70%;
 }
 
 //TODO: COVE Refactor - Replace any '.loading' classes with below

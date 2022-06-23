@@ -11,20 +11,16 @@ const Component = (props) => {
   const { globalActions } = useGlobalContext()
   const { title, description, table, tableShowIf = true, theme, className, children } = props
 
-  // Observe changes to outermost container and changes viewport size in state
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-
-      let { width, height } = entry.contentRect
-
-      globalActions.setGlobalContextData(context => ({ ...context, dimensions: { width, height } }))
-    }
-  })
-
+  // Observe changes to component container sizes for use with SVG renders
   const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
+    const resizeComponentObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        let { width, height } = entry.contentRect
+
+        globalActions.setGlobalContextData(context => ({ ...context, dimensions: { width, height } }))
+      }
+    })
+    if (node !== null) resizeComponentObserver.observe(node)
   }, [])
 
   return (

@@ -16,11 +16,13 @@ import Icon from './ui/Icon'
 //Styles
 import '../styles/v2/components/editor.scss'
 import '../styles/v2/components/element/editor-utils.scss'
+import SplashError from './ui/SplashError'
 
 const Editor = ({ EditorPanels, children }) => {
   const { os } = useGlobalContext()
-  const { config, configActions, missingRequiredSections } = useConfigContext()
+  const { config: contextConfig, configActions, missingRequiredSections } = useConfigContext()
 
+  const [ config, setConfig ] = useState(contextConfig) // Update when config entries change - forces refresh of editor
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ displayGrid, setDisplayGrid ] = useState(false)
   const [ viewportPreview, setViewportPreview ] = useState(null)
@@ -30,6 +32,7 @@ const Editor = ({ EditorPanels, children }) => {
 
   const resetIcon = useRef(null)
   const editorPanelRef = useRef(null)
+  const componentContainerRef = useRef(null)
 
   useEffect(() => {
     document.addEventListener('keydown', onKeypress)
@@ -37,11 +40,15 @@ const Editor = ({ EditorPanels, children }) => {
   }, [])
 
   useEffect(() => {
-    viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
+    return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [ viewportPreview ])
 
+  useEffect(() => {
+    setConfig({ ...contextConfig })
+  }, [ contextConfig ])
+
   const viewportPreviewController = useCallback((breakpoint) => {
-    setViewportPreview(prevState => prevState !== breakpoint ? breakpoint : null)
+    return setViewportPreview(prevState => prevState !== breakpoint ? breakpoint : null)
   }, [ viewportPreview ])
 
   const onKeypress = (key) => {
@@ -62,34 +69,28 @@ const Editor = ({ EditorPanels, children }) => {
     }
   }
 
-  //Create viewport size observer callback
-  const outerContainerRef = useCallback(node => {
-    //Observe changes to viewport size
-    const resizeObserver = new ResizeObserver(entries => {
+  // Observe and set editor component widths
+  useEffect(() => {
+    if (!componentContainerRef.current) return
+
+    let resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
         let { width, height } = entry.contentRect
-        setPreviewDimensions({width: width, height: height})
+        setPreviewDimensions({ width, height })
       }
     })
 
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
+    resizeObserver.observe(componentContainerRef.current)
+
+    return () => {
+      if (!resizeObserver) return;
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    };
   }, [])
 
   const onBackClick = () => {
     setDisplayPanel(!displayPanel)
-  }
-
-  const Error = () => {
-    return (
-      <section className="cove-splash__waiting">
-        <section className="cove-splash__waiting__container">
-          <h3 className="cove-heading--2 mb-1">Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
   }
 
   const Confirm = () => {
@@ -105,7 +106,7 @@ const Editor = ({ EditorPanels, children }) => {
         <section className="cove-splash__waiting__container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display the preview.</p>
-          <Button className="mt-2 mx-auto" disabled={missingRequiredSections} onClick={confirmDone}>I'm Done</Button>
+          <Button className="mt-2 mx-auto" disabled={missingRequiredSections} onClick={() => confirmDone}>I'm Done</Button>
         </section>
       </section>
     )
@@ -155,9 +156,11 @@ const Editor = ({ EditorPanels, children }) => {
                 {Math.round(previewDimensions.width)}<span className="mx-1" style={{ fontSize: '0.675rem' }}>✕</span>{Math.round(previewDimensions.height)}
               </>}
             </div>
-            <div className="cove-editor__grid-caret--top" ref={outerContainerRef}>
+            <div className="cove-editor__grid-caret--top" ref={componentContainerRef}>
               <div className="cove-editor__grid-caret--bottom">
-                {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error/>}
+                {undefined === config.newViz && config.runtime && config.runtime.editorErrorMessage &&
+                  <SplashError title="Error With Configuration" message={config.runtime.editorErrorMessage}/>
+                }
                 {children}
               </div>
             </div>
