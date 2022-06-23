@@ -25,7 +25,6 @@ import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 
-import EditorPanel from './components/EditorPanel'
 import Grid from './components/Grid'
 import Header from './components/Header'
 import defaults from './data/initial-state'
@@ -95,6 +94,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [ filteredData, setFilteredData ] = useState()
   const [ loading, setLoading ] = useState(true)
   const [ preview, setPreview ] = useState(false)
+  const [ tabSelected, setTabSelected ] = useState(0);
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
   const { title, description } = config.dashboard || config
@@ -430,7 +430,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         switch (visualizationConfig.type) {
           case 'chart':
-            body = <><Header back={back} subEditor="Chart"/>
+            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
               <CdcChart
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -442,7 +442,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'map':
-            body = <><Header back={back} subEditor="Map"/>
+            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
               <CdcMap
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -456,7 +456,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             break
           case 'data-bite':
             visualizationConfig = { ...visualizationConfig, newViz: true }
-            body = <><Header back={back} subEditor="Data Bite"/>
+            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
               <CdcDataBite
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -468,7 +468,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'waffle-chart':
-            body = <><Header back={back} subEditor="Waffle Chart"/>
+            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
               <CdcWaffleChart
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -480,7 +480,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'markup-include':
-            body = <><Header back={back} subEditor="Markup Include"/>
+            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
               <CdcMarkupInclude
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -498,7 +498,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header preview={preview} setPreview={setPreview}/>
+          <Header config={config} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
           <div className="layout-container">
             <VisualizationsPanel/>
             <Grid/>
@@ -509,9 +509,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   } else {
     body = (
       <>
-        {isEditor && <Header preview={preview} setPreview={setPreview}/>}
-        {isEditor && <EditorPanel/>}
-        <div className="cdc-dashboard-inner-container">
+        {isEditor && <Header config={config} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
+        <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           {/* Title */}
           {title &&
             <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
