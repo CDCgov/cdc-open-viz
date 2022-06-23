@@ -202,16 +202,7 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        {/* {!config.runtime.yAxis.hideTicks && config.orientation === 'horizontal' && (
-                          <Line
-                            from={tick.from}
-                            to={tick.to}
-                            stroke="#333"
-                            display={config.runtime.horizontal ? 'block' : 'none'}
-                          />
-                        )} */}
-
-                        {!config.runtime.yAxis.hideTicks && config.orientation === 'vertical' && (
+                        {!config.runtime.yAxis.hideTicks && (
                           <Line
                             from={tick.from}
                             to={tick.to}
