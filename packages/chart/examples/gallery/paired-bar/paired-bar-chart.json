@@ -1,0 +1,196 @@
+{
+	"type": "chart",
+	"title": "Example Paired Bar Chart",
+	"theme": "theme-slate",
+	"fontSize": "small",
+	"lineDatapointStyle": "hover",
+	"barHasBorder": "false",
+	"isLollipopChart": false,
+	"lollipopShape": "circle",
+	"lollipopColorStyle": "two-tone",
+	"visualizationSubType": null,
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"hideAxis": true,
+		"hideLabel": false,
+		"hideTicks": false,
+		"size": "75",
+		"gridLines": false,
+		"label": "",
+		"numTicks": "6"
+	},
+	"barThickness": 0.35,
+	"height": "400",
+	"xAxis": {
+		"type": "categorical",
+		"hideAxis": false,
+		"hideLabel": false,
+		"hideTicks": false,
+		"size": "56",
+		"tickRotation": "0",
+		"max": "15000",
+		"dataKey": "Age Group",
+		"label": "Age Group"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"show": true,
+		"indexLabel": "Region"
+	},
+	"orientation": "horizontal",
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"reverseLabelOrder": false,
+		"hide": false,
+		"label": "Region "
+	},
+	"exclusions": {
+		"active": false,
+		"keys": []
+	},
+	"palette": "qualitative-soft",
+	"isPaletteReversed": false,
+	"labels": false,
+	"dataFormat": {
+		"commas": true,
+		"suffix": " per 100k"
+	},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Region": "West Coast",
+			"Age Group": "<15",
+			"Cases Per 100K": "7428"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "15-24",
+			"Cases Per 100K": "5176"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "25-34",
+			"Cases Per 100K": "5624"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "35-44",
+			"Cases Per 100K": "10756"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "45-54",
+			"Cases Per 100K": "8256"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "55-64",
+			"Cases Per 100K": "1235"
+		},
+		{
+			"Region": "West Coast",
+			"Age Group": "65+",
+			"Cases Per 100K": "730"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "<15",
+			"Cases Per 100K": "5714"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "15-24",
+			"Cases Per 100K": "3588"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "25-34",
+			"Cases Per 100K": "3410"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "35-44",
+			"Cases Per 100K": "7478"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "45-54",
+			"Cases Per 100K": "5633"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "55-64",
+			"Cases Per 100K": "810"
+		},
+		{
+			"Region": "East Coast",
+			"Age Group": "65+",
+			"Cases Per 100K": "402"
+		}
+	],
+	"dataFileName": "Paired-Bar-Chart-Example-Data.csv",
+	"dataFileSourceType": "file",
+	"dataDescription": {
+		"horizontal": false,
+		"series": true,
+		"singleRow": false,
+		"seriesKey": "Region",
+		"xKey": "Age Group",
+		"valueKey": "Cases Per 100K"
+	},
+	"formattedData": [
+		{
+			"Age Group": "<15",
+			"West Coast": "7428",
+			"East Coast": "5714"
+		},
+		{
+			"Age Group": "15-24",
+			"West Coast": "5176",
+			"East Coast": "3588"
+		},
+		{
+			"Age Group": "25-34",
+			"West Coast": "5624",
+			"East Coast": "3410"
+		},
+		{
+			"Age Group": "35-44",
+			"West Coast": "10756",
+			"East Coast": "7478"
+		},
+		{
+			"Age Group": "45-54",
+			"West Coast": "8256",
+			"East Coast": "5633"
+		},
+		{
+			"Age Group": "55-64",
+			"West Coast": "1235",
+			"East Coast": "810"
+		},
+		{
+			"Age Group": "65+",
+			"West Coast": "730",
+			"East Coast": "402"
+		}
+	],
+	"visualizationType": "Paired Bar",
+	"series": [
+		{
+			"dataKey": "West Coast",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "East Coast",
+			"type": "Bar"
+		}
+	],
+	"filters": [],
+	"barHeight": "23"
+}
