@@ -1,0 +1,1592 @@
+{
+	"general": {
+		"title": "Example World Data Map",
+		"subtext": "",
+		"territoriesLabel": "Territories",
+		"type": "data",
+		"geoType": "world",
+		"headerColor": "theme-purple",
+		"showSidebar": true,
+		"showTitle": true,
+		"geoBorderColor": "darkGray",
+		"showDownloadButton": true,
+		"expandDataTable": true,
+		"backgroundColor": "#f5f5f5",
+		"language": "en",
+		"hasRegions": false,
+		"fullBorder": false,
+		"showDownloadMediaButton": false,
+		"displayAsHex": false,
+		"displayStateLabels": false
+	},
+	"type": "map",
+	"color": "pinkpurple",
+	"columns": {
+		"geo": {
+			"dataTable": true,
+			"label": "",
+			"name": "Country",
+			"tooltip": false
+		},
+		"primary": {
+			"dataTable": true,
+			"label": "",
+			"name": "Rate",
+			"prefix": "",
+			"suffix": "",
+			"tooltip": true
+		},
+		"navigate": {
+			"dataTable": false,
+			"name": "URL",
+			"tooltip": false
+		},
+		"geosInRegion": {
+			"name": ""
+		},
+		"additionalColumn1": {
+			"label": "Category",
+			"dataTable": true,
+			"tooltips": false,
+			"prefix": "",
+			"suffix": "",
+			"name": "Category",
+			"tooltip": false
+		}
+	},
+	"legend": {
+		"numberOfItems": 5,
+		"position": "bottom",
+		"title": "Legend Title",
+		"description": "Legend Text",
+		"type": "equalnumber",
+		"specialClasses": [],
+		"descriptions": {},
+		"unified": false,
+		"singleColumn": false,
+		"dynamicDescription": false,
+		"separateZero": false
+	},
+	"filters": [
+		{
+			"values": [
+				"Category 1",
+				"Category 2",
+				"Category 3",
+				"Category 4",
+				"Category 5"
+			],
+			"columnName": "Category",
+			"active": "Category 2"
+		}
+	],
+	"dataTable": {
+		"title": "Data Table",
+		"forceDisplay": true
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true
+	},
+	"data": [
+		{
+			"Country": "Afghanistan",
+			"Rate": "10",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Åland",
+			"Rate": "59",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Albania",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Algeria",
+			"Rate": "15",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "American Samoa",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Andorra",
+			"Rate": "99",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Angola",
+			"Rate": "75",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Anguilla",
+			"Rate": "62",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Antigua and Barbuda",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Argentina",
+			"Rate": "23",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Armenia",
+			"Rate": "48",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Aruba",
+			"Rate": "22",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Australia",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Austria",
+			"Rate": "91",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Azerbaijan",
+			"Rate": "57",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Bahamas",
+			"Rate": "64",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Bahrain",
+			"Rate": "60",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Bangladesh",
+			"Rate": "95",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Barbados",
+			"Rate": "88",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Belarus",
+			"Rate": "1",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Belgium",
+			"Rate": "29",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Belize",
+			"Rate": "46",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Benin",
+			"Rate": "85",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Bermuda",
+			"Rate": "63",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Bhutan",
+			"Rate": "38",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Bolivia",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Bonaire, Sint Eustatius and Saba",
+			"Rate": "37",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Bosnia and Herzegovina",
+			"Rate": "35",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Botswana",
+			"Rate": "52",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Bouvet Island",
+			"Rate": "29",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Brazil",
+			"Rate": "20",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Brunei",
+			"Rate": "33",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Bulgaria",
+			"Rate": "12",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Burkina Faso",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Burundi",
+			"Rate": "2",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Cabo Verde",
+			"Rate": "11",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Cambodia",
+			"Rate": "55",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Cameroon",
+			"Rate": "14",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Canada",
+			"Rate": "89",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Cayman Islands",
+			"Rate": "21",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Central African Republic",
+			"Rate": "70",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Chad",
+			"Rate": "84",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Chile",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "China",
+			"Rate": "97",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Christmas Island",
+			"Rate": "45",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Cocos (Keeling) Islands",
+			"Rate": "5",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Colombia",
+			"Rate": "92",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Comoros",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Congo",
+			"Rate": "63",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Democratic Republic of the Congo",
+			"Rate": "21",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Cook Islands",
+			"Rate": "0",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Costa Rica",
+			"Rate": "64",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Côte d'Ivoire",
+			"Rate": "56",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Croatia",
+			"Rate": "78",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Cuba",
+			"Rate": "74",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Curaçao",
+			"Rate": "26",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Cyprus",
+			"Rate": "31",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Czechia",
+			"Rate": "22",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Denmark",
+			"Rate": "2",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Djibouti",
+			"Rate": "51",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Dominica",
+			"Rate": "84",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Dominican Republic",
+			"Rate": "58",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Ecuador",
+			"Rate": "52",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Egypt",
+			"Rate": "29",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "El Salvador",
+			"Rate": "70",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Equatorial Guinea",
+			"Rate": "9",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Eritrea",
+			"Rate": "13",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Estonia",
+			"Rate": "17",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Eswatini",
+			"Rate": "9",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Ethiopia",
+			"Rate": "7",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Falkland Islands",
+			"Rate": "18",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Faroe Islands",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Fiji",
+			"Rate": "60",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Finland",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "France",
+			"Rate": "72",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "French Guiana",
+			"Rate": "5",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "French Polynesia",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "French Southern Territories",
+			"Rate": "2",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Gabon",
+			"Rate": "71",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Gambia",
+			"Rate": "32",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Georgia",
+			"Rate": "39",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Germany",
+			"Rate": "48",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Ghana",
+			"Rate": "74",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Gibraltar",
+			"Rate": "17",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Greece",
+			"Rate": "37",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Greenland",
+			"Rate": "15",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Grenada",
+			"Rate": "42",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Guadeloupe",
+			"Rate": "17",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Guam",
+			"Rate": "11",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Guatemala",
+			"Rate": "49",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Guernsey",
+			"Rate": "32",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Guinea",
+			"Rate": "27",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Guinea-Bissau",
+			"Rate": "41",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Guyana",
+			"Rate": "33",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Haiti",
+			"Rate": "41",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Heard Island and McDonald Islands",
+			"Rate": "4",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Vatican",
+			"Rate": "63",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Honduras",
+			"Rate": "18",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Hong Kong",
+			"Rate": "32",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Hungary",
+			"Rate": "66",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Iceland",
+			"Rate": "36",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "India",
+			"Rate": "36",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Indonesia",
+			"Rate": "0",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Iran",
+			"Rate": "85",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Iraq",
+			"Rate": "75",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Ireland",
+			"Rate": "0",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Isle of Man",
+			"Rate": "85",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Israel",
+			"Rate": "99",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Italy",
+			"Rate": "51",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Jamaica",
+			"Rate": "61",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Japan",
+			"Rate": "5",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Jersey",
+			"Rate": "0",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Jordan",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Kazakhstan",
+			"Rate": "15",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Kenya",
+			"Rate": "43",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Kiribati",
+			"Rate": "16",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "North Korea",
+			"Rate": "85",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "South Korea",
+			"Rate": "60",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Kuwait",
+			"Rate": "97",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Kyrgyzstan",
+			"Rate": "31",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Laos",
+			"Rate": "8",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Latvia",
+			"Rate": "86",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Lebanon",
+			"Rate": "58",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Lesotho",
+			"Rate": "87",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Liberia",
+			"Rate": "67",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Libya",
+			"Rate": "60",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Liechtenstein",
+			"Rate": "55",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Lithuania",
+			"Rate": "56",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Luxembourg",
+			"Rate": "31",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Macao",
+			"Rate": "63",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Madagascar",
+			"Rate": "44",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Malawi",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Malaysia",
+			"Rate": "81",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Maldives",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Mali",
+			"Rate": "8",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Malta",
+			"Rate": "89",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Marshall Islands",
+			"Rate": "1",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Martinique",
+			"Rate": "50",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Mauritania",
+			"Rate": "1",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Mauritius",
+			"Rate": "26",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Mayotte",
+			"Rate": "61",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Mexico",
+			"Rate": "45",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Micronesia",
+			"Rate": "89",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Moldova",
+			"Rate": "82",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Monaco",
+			"Rate": "72",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Mongolia",
+			"Rate": "51",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Montenegro",
+			"Rate": "22",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Montserrat",
+			"Rate": "20",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Morocco",
+			"Rate": "40",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Mozambique",
+			"Rate": "3",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Burma",
+			"Rate": "2",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Namibia",
+			"Rate": "26",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Nauru",
+			"Rate": "89",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Nepal",
+			"Rate": "70",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Netherlands",
+			"Rate": "93",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "New Caledonia",
+			"Rate": "21",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "New Zealand",
+			"Rate": "5",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Nicaragua",
+			"Rate": "43",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Niger",
+			"Rate": "23",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Nigeria",
+			"Rate": "17",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Niue",
+			"Rate": "11",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Norfolk Island",
+			"Rate": "47",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "North Macedonia",
+			"Rate": "4",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Northern Mariana Islands",
+			"Rate": "21",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Norway",
+			"Rate": "4",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Oman",
+			"Rate": "65",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Pakistan",
+			"Rate": "85",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Palau",
+			"Rate": "66",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Panama",
+			"Rate": "89",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Papua New Guinea",
+			"Rate": "16",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Paraguay",
+			"Rate": "49",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Peru",
+			"Rate": "37",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Philippines",
+			"Rate": "1",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Pitcairn",
+			"Rate": "14",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Poland",
+			"Rate": "62",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Portugal",
+			"Rate": "92",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Puerto Rico",
+			"Rate": "77",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Qatar",
+			"Rate": "19",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Réunion",
+			"Rate": "28",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Romania",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Russia",
+			"Rate": "40",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Rwanda",
+			"Rate": "51",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Saint Barthélemy",
+			"Rate": "13",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Saint Helena",
+			"Rate": "91",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Saint Kitts and Nevis",
+			"Rate": "64",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Saint Lucia",
+			"Rate": "90",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "St-Martin",
+			"Rate": "58",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Saint Pierre and Miquelon",
+			"Rate": "93",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Saint Vincent and the Grenadines",
+			"Rate": "15",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Samoa",
+			"Rate": "80",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "San Marino",
+			"Rate": "90",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Sao Tome and Principe",
+			"Rate": "49",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Saudi Arabia",
+			"Rate": "77",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Senegal",
+			"Rate": "33",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Serbia",
+			"Rate": "18",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Seychelles",
+			"Rate": "42",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Sierra Leone",
+			"Rate": "52",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Singapore",
+			"Rate": "68",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Sint Maarten",
+			"Rate": "12",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Slovakia",
+			"Rate": "12",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Slovenia",
+			"Rate": "50",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Solomon Islands",
+			"Rate": "54",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Somalia",
+			"Rate": "1",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "South Africa",
+			"Rate": "77",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "South Georgia and the South Sandwich Islands",
+			"Rate": "77",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "South Sudan",
+			"Rate": "48",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Spain",
+			"Rate": "75",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Sri Lanka",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Sudan",
+			"Rate": "69",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Suriname",
+			"Rate": "73",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Svalbard and Jan Mayen",
+			"Rate": "16",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Sweden",
+			"Rate": "83",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Switzerland",
+			"Rate": "84",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Syria",
+			"Rate": "55",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Taiwan",
+			"Rate": "59",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Tajikistan",
+			"Rate": "45",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Tanzania",
+			"Rate": "43",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Thailand",
+			"Rate": "22",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Timor-Leste",
+			"Rate": "93",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Togo",
+			"Rate": "54",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Tokelau",
+			"Rate": "26",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Tonga",
+			"Rate": "54",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Trinidad and Tobago",
+			"Rate": "55",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Tunisia",
+			"Rate": "57",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Turkey",
+			"Rate": "15",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Turkmenistan",
+			"Rate": "45",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Turks and Caicos Islands",
+			"Rate": "96",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Tuvalu",
+			"Rate": "87",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Uganda",
+			"Rate": "12",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Ukraine",
+			"Rate": "61",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "United Arab Emirates",
+			"Rate": "91",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "United Kingdom",
+			"Rate": "27",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "United States of America",
+			"Rate": "82",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "United States Minor Outlying Islands",
+			"Rate": "56",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Uruguay",
+			"Rate": "76",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Uzbekistan",
+			"Rate": "4",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Vanuatu",
+			"Rate": "39",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Venezuela",
+			"Rate": "24",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Vietnam",
+			"Rate": "38",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Virgin Islands (British)",
+			"Rate": "35",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Virgin Islands (U.S.)",
+			"Rate": "33",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Wallis and Futuna",
+			"Rate": "23",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "Kosovo",
+			"Rate": "5",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		},
+		{
+			"Country": "Western Sahara",
+			"Rate": "63",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 5"
+		},
+		{
+			"Country": "Yemen",
+			"Rate": "42",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 1"
+		},
+		{
+			"Country": "Zambia",
+			"Rate": "17",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 2"
+		},
+		{
+			"Country": "Zimbabwe",
+			"Rate": "36",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 3"
+		},
+		{
+			"Country": "British Indian Ocean Territory",
+			"Rate": "14",
+			"URL": "https://www.cdc.gov/",
+			"Category": "Category 4"
+		}
+	],
+	"sharing": {
+		"enabled": false,
+		"dataHost": "wcms-wp.cdc.gov",
+		"configUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/world-data-map-example.json"
+	},
+	"language": "en",
+	"usingWidgetLoader": true,
+	"accessibleStatus": "Filter undefined value has been changed to Category 2, please reference the data table to see updated values.",
+	"dataFileName": "updated-wcms-world-data-map-example.csv",
+	"dataFileSourceType": "file"
+}

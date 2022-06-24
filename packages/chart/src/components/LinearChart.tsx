@@ -194,7 +194,7 @@ export default function LinearChart() {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               const belowBarPaddingFromTop = 9;
-              return (
+              return ( 
                 <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
                     return (
@@ -202,16 +202,7 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        {!config.runtime.yAxis.hideTicks && config.orientation === 'horizontal' && (
-                          <Line
-                            from={tick.from}
-                            to={tick.to}
-                            stroke="#333"
-                            display={config.runtime.horizontal ? 'block' : 'none'}
-                          />
-                        )}
-
-                        {!config.runtime.yAxis.hideTicks && config.orientation === 'vertical' && (
+                        {!config.runtime.yAxis.hideTicks && (
                           <Line
                             from={tick.from}
                             to={tick.to}
@@ -249,7 +240,7 @@ export default function LinearChart() {
                             >{tick.formattedValue}</Text>
                         }
 
-                        { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.xAxis.hideLabel &&
+                        { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
                             <Text
                               transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
@@ -273,7 +264,7 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
-                  { (!config.yAxis.hideAxis && config.orientation === 'vertical') || (!config.xAxis.hideAxis && config.orientation === 'horizontal') && (
+                  { (!config.yAxis.hideAxis) && (
                   <Line
                     from={props.axisFromPoint}
                     to={props.axisToPoint}
@@ -390,14 +381,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        {!config.runtime.xAxis.hideTicks &&
+                        {!config.runtime.yAxis.hideTicks &&
                           <Line
                             from={tick.from}
                             to={tick.to}
                             stroke="#333"
                           />
                         }
-                        {!config.runtime.xAxis.hideLabel &&
+                        {!config.runtime.yAxis.hideLabel &&
                           <Text
                             transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
                             verticalAnchor="start"
@@ -410,7 +401,7 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
-                  {!config.runtime.xAxis.hideAxis &&
+                  {!config.runtime.yAxis.hideAxis &&
                     <Line
                       from={props.axisFromPoint}
                       to={props.axisToPoint}
@@ -443,14 +434,14 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-                        {!config.runtime.xAxis.hideTicks &&
+                        {!config.runtime.yAxis.hideTicks &&
                           <Line
                             from={tick.from}
                             to={tick.to}
                             stroke="#333"
                           />
                         }
-                        {!config.runtime.xAxis.hideLabel &&
+                        {!config.runtime.yAxis.hideLabel &&
                           <Text
                             transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
                             verticalAnchor="start"
@@ -463,7 +454,7 @@ export default function LinearChart() {
                       </Group>
                     );
                   })}
-                  {!config.runtime.xAxis.hideAxis &&
+                  {!config.runtime.yAxis.hideAxis &&
                     <Line
                       from={props.axisFromPoint}
                       to={props.axisToPoint}
@@ -478,7 +469,7 @@ export default function LinearChart() {
                         textAnchor={'middle'}
                         stroke="#333"
                       >
-                      {config.runtime.xAxis.label}
+                      {config.runtime.yAxis.label}
                     </Text>
                   </Group>
                 </>
