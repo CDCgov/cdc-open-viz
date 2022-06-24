@@ -15,6 +15,7 @@ const NavigationMenu = ({
       navigationHandler(urlString);
     }
   };
+
   let navSelect; let
     navGo;
 

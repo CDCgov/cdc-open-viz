@@ -1269,15 +1269,27 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
-    let handleMapTabbing;
 
-    if (general.showSidebar) {
-        handleMapTabbing = '#legend'
-    } else if (state.general.title && !state.general.type === 'navigation') {
-        handleMapTabbing = `#dataTableSection__${state.general.title.replace(/\s/g, "")}`;
-    } else if (state.general.type === 'navigation') {
-        handleMapTabbing = `#dropdown-${Math.floor(Math.random() * 100) + 1}`;
+    const handleMapTabbing = () => {
+        let tabbingID;
+
+        if (general.showSidebar) {
+            tabbingID = '#legend'
+        }
+        
+        if (state.general.title && !state.general.type === 'navigation') {
+            tabbingID = `#dataTableSection__${state.general.title.replace(/\s/g, "")}`;
+        }
+        
+        if (state.general.type === 'navigation') {
+            tabbingID = `#dropdown-${Date.now()}`;
+        }
+
+        return tabbingID || '#!';
+
     }
+
+    console.log("config", handleMapTabbing());
     
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1331,7 +1343,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing()}>
                         Skip Over Map Container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
@@ -1388,7 +1400,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 				</section>
 				{'navigation' === general.type && (
                     <NavigationMenu
-                        mapTabbingID={handleMapTabbing}
+                        mapTabbingID={handleMapTabbing()}
 						displayGeoName={displayGeoName}
 						data={runtimeData}
 						options={general}
