@@ -1,0 +1,220 @@
+{
+	"type": "chart",
+	"title": "Lollipop Style Horizontal Bar Chart - Number of Spills Occurring in the Home",
+	"theme": "theme-blue",
+	"fontSize": "medium",
+	"lineDatapointStyle": "hover",
+	"barHasBorder": "false",
+	"isLollipopChart": true,
+	"lollipopShape": "circle",
+	"lollipopColorStyle": "two-tone",
+	"visualizationSubType": "horizontal",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"hideAxis": true,
+		"hideLabel": false,
+		"hideTicks": false,
+		"size": "13",
+		"gridLines": false,
+		"type": "chart",
+		"title": "Lollipop Style Horizontal Bar Chart",
+		"theme": "theme-blue",
+		"fontSize": "medium",
+		"lineDatapointStyle": "hover",
+		"barHasBorder": "false",
+		"isLollipopChart": false,
+		"lollipopShape": "circle",
+		"lollipopColorStyle": "two-tone",
+		"visualizationSubType": "horizontal",
+		"padding": {
+			"left": 5,
+			"right": 5
+		},
+		"yAxis": {
+			"size": 50,
+			"gridLines": false
+		},
+		"barThickness": 0.35,
+		"height": 260,
+		"xAxis": {
+			"type": "categorical",
+			"size": 75,
+			"tickRotation": 0,
+			"dataKey": "Vehicle"
+		},
+		"table": {
+			"label": "Data Table",
+			"expanded": true,
+			"show": true
+		},
+		"legend": {
+			"behavior": "isolate",
+			"position": "right"
+		},
+		"exclusions": {
+			"active": false,
+			"keys": []
+		},
+		"palette": "qualitative-bold",
+		"labels": false,
+		"dataFormat": {},
+		"confidenceKeys": {},
+		"data": [
+			{
+				"Group": "Combined Total of Group A",
+				"Vehicle": "100",
+				"Home": "120",
+				"Work": "140",
+				"Office": "120"
+			},
+			{
+				"Group": "Combined Total of Group B",
+				"Vehicle": "150",
+				"Home": "140",
+				"Work": "100",
+				"Office": "90"
+			},
+			{
+				"Group": "Combined Total of Group C",
+				"Vehicle": "90",
+				"Home": "90",
+				"Work": "80",
+				"Office": "80"
+			},
+			{
+				"Group": "Combined Total of Group D",
+				"Vehicle": "70",
+				"Home": "60",
+				"Work": "50",
+				"Office": "70"
+			}
+		],
+		"dataFileName": "CSV_Source_Example_for_Horizontal_Bar_viz-cdcwp1619811744363.csv",
+		"dataFileSourceType": "file",
+		"visualizationType": "Bar",
+		"runtime": {
+			"seriesLabels": {
+				"Vehicle": "Vehicle"
+			},
+			"seriesLabelsAll": [
+				"Vehicle"
+			],
+			"originalXAxis": {
+				"type": "categorical",
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Vehicle"
+			},
+			"seriesKeys": [
+				"Vehicle"
+			],
+			"xAxis": {
+				"size": 50,
+				"gridLines": false
+			},
+			"yAxis": {
+				"type": "categorical",
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Vehicle"
+			},
+			"horizontal": true,
+			"uniqueId": 1651765968212,
+			"editorErrorMessage": ""
+		},
+		"description": "Subtext can be added here for options like citing data sources or insight into reading the bar chart.",
+		"series": [
+			{
+				"dataKey": "Vehicle",
+				"type": "Bar"
+			}
+		],
+		"barHeight": 25,
+		"barPadding": 40,
+		"labelPlacement": "Below Bar",
+		"displayNumbersOnBar": true,
+		"numTicks": "9",
+		"label": "Number of Accidents"
+	},
+	"barThickness": 0.35,
+	"height": 212,
+	"xAxis": {
+		"type": "categorical",
+		"hideAxis": true,
+		"hideLabel": true,
+		"hideTicks": true,
+		"size": "16",
+		"tickRotation": 0,
+		"max": "160",
+		"dataKey": "Group"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"show": true
+	},
+	"orientation": "horizontal",
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"hide": true,
+		"label": "Accident Location",
+		"reverseLabelOrder": false
+	},
+	"exclusions": {
+		"active": false,
+		"keys": []
+	},
+	"palette": "qualitative-bold",
+	"isPaletteReversed": false,
+	"labels": false,
+	"dataFormat": {},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Group": "Combined Total of Group A",
+			"Vehicle": "100",
+			"Home": "120",
+			"Work": "140",
+			"Office": "120"
+		},
+		{
+			"Group": "Combined Total of Group B",
+			"Vehicle": "150",
+			"Home": "140",
+			"Work": "100",
+			"Office": "90"
+		},
+		{
+			"Group": "Combined Total of Group C",
+			"Vehicle": "90",
+			"Home": "90",
+			"Work": "80",
+			"Office": "80"
+		},
+		{
+			"Group": "Combined Total of Group D",
+			"Vehicle": "70",
+			"Home": "60",
+			"Work": "50",
+			"Office": "70"
+		}
+	],
+	"dataFileName": "CSV_Source_Example_for_Horizontal_Bar_viz-cdcwp1619811744363.csv",
+	"dataFileSourceType": "file",
+	"visualizationType": "Bar",
+	"description": "Subtext can be added here for options like citing data sources or insight into reading the bar chart.",
+	"series": [
+		{
+			"dataKey": "Home",
+			"type": "Bar"
+		}
+	],
+	"barHeight": 6,
+	"barPadding": 47,
+	"filters": [],
+	"lollipopSize": "medium"
+}
