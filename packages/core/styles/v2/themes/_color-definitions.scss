@@ -30,12 +30,16 @@ $theme: (
         border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
       }
 
-      // TODO: 
-      // Refactor to get out of data-bite-inner 
-      // when data bite doesn't have a title add border top to content container
-      .cdc-data-bite-inner-container:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
+      // when component doesn't have a title add border top
+      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
         border-top: 1px solid string.unquote(nth($theme-colors, 1));
       }
+      
+      // should probably be in color definitions but logically makes sense here.
+      .cove-component__inner:not(.component--has-title) .cove-component__content {
+        border-top: 1px solid #ccc;
+      }
+
       .cove-component__header {
         border-color: string.unquote(nth($theme-colors, 2));
       }

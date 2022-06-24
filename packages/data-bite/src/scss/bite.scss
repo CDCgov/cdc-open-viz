@@ -2,7 +2,7 @@
 
 &.is-editor {
   position: relative;
-  .cdc-data-bite-inner-container {
+  .cove-component__inner {
     margin: 3em auto 0;
     max-width: 35em;
   }
@@ -117,16 +117,15 @@
   }
 }
 
-
-
-.cdc-data-bite-inner-container {
+// TODO after v2 refactor remove header reference colors
+// Use .font-color/.bg-color, etc. in color definitions or something similar
+// Remove box shadows if we're no longer using them
+.cove-component__inner {
 
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
   }
-
-  // Visual: Borders
 
   // General: Bite Style > Graphic
   .bite__style--graphic {
@@ -393,9 +392,5 @@
         }
       }
     }
-  }
-
-  .bite:not(.bite--hideBackgroundColor) {
-    background-color: $lightestGray;
   }
 }

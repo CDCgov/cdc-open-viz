@@ -280,6 +280,11 @@ const WaffleChart = ({ config, isEditor }) => {
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   let contentClasses = ['cove-component__content']
+
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   
   !config.visual.border && contentClasses.push('no-borders');
   config.visual.accent && contentClasses.push('component--has-accent')
@@ -288,7 +293,8 @@ const WaffleChart = ({ config, isEditor }) => {
   config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
 
   return (
-    <>
+    <div className={innerContainerClasses.join(' ')}>
+      <>
       {title &&
       <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
         {parse(title)}
@@ -324,6 +330,7 @@ const WaffleChart = ({ config, isEditor }) => {
         </div>
       </div>
     </>
+  </div>
   )
 }
 

@@ -434,7 +434,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     
-    let innerContainerClasses = ['cdc-data-bite-inner-container']
+    let innerContainerClasses = ['cove-component__inner']
     config.title && innerContainerClasses.push('component--has-title')
     config.subtext && innerContainerClasses.push('component--has-subtext')
     config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
