@@ -1,0 +1,739 @@
+{
+	"general": {
+		"geoType": "us",
+		"geoBorderColor": "darkGray",
+		"headerColor": "theme-cyan",
+		"showTitle": true,
+		"showSidebar": true,
+		"showDownloadButton": true,
+		"showDownloadMediaButton": false,
+		"displayAsHex": false,
+		"displayStateLabels": false,
+		"territoriesLabel": "Territories",
+		"language": "en",
+		"hasRegions": false,
+		"expandDataTable": false,
+		"fullBorder": false,
+		"type": "data",
+		"statePicked": {
+			"fipsCode": "01",
+			"stateName": "Alabama"
+		},
+		"subtext": "Use map subtext to explain any special classes, map data sources, and keys to interpret map. \nSuch as: <br>\n\"*\" represents states that did not participate <br>\n\"N/A\" represents data that was not compiled",
+		"title": "Scale-Based Categorical Map with Special Classes"
+	},
+	"type": "map",
+	"color": "orangered",
+	"columns": {
+		"geo": {
+			"name": "STATE",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"dataTable": false,
+			"tooltip": true,
+			"prefix": "",
+			"suffix": "",
+			"name": "Frequency",
+			"label": "Frequency"
+		},
+		"navigate": {
+			"name": ""
+		}
+	},
+	"legend": {
+		"descriptions": {},
+		"specialClasses": [
+			{
+				"key": "Frequency",
+				"value": "*",
+				"label": "*"
+			},
+			{
+				"key": "Frequency",
+				"value": "NA",
+				"label": "N/A"
+			}
+		],
+		"unified": false,
+		"singleColumn": true,
+		"dynamicDescription": false,
+		"type": "category",
+		"numberOfItems": 3,
+		"position": "side",
+		"title": "Legend",
+		"categoryValuesOrder": [
+			"Daily",
+			"Weekly",
+			"Monthly",
+			"NA",
+			"*"
+		]
+	},
+	"filters": [],
+	"dataTable": {
+		"title": "Data Table",
+		"forceDisplay": true,
+		"limitHeight": false
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true
+	},
+	"data": [
+		{
+			"STATE": "AL",
+			"Frequency": "Daily",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "al",
+			"statename": "Alabama",
+			"stateId": "1",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "AK",
+			"Frequency": "Weekly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ak",
+			"statename": "Alaska",
+			"stateId": "2",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "AS",
+			"Frequency": "Monthly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "as",
+			"statename": "American Samoa",
+			"stateId": "60",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "AZ",
+			"Frequency": "NA",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "az",
+			"statename": "Arizona",
+			"stateId": "4",
+			"timeIntervalDataVal": "0",
+			"color": "special2"
+		},
+		{
+			"STATE": "AR",
+			"Frequency": "NA",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ar",
+			"statename": "Arkansas",
+			"stateId": "5",
+			"timeIntervalDataVal": "0",
+			"color": "special2"
+		},
+		{
+			"STATE": "CA",
+			"Frequency": "*",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ca",
+			"statename": "California",
+			"stateId": "6",
+			"timeIntervalDataVal": "0",
+			"color": "special1"
+		},
+		{
+			"STATE": "CO",
+			"Frequency": "Daily",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "co",
+			"statename": "Colorado",
+			"stateId": "8",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "CT",
+			"Frequency": "Weekly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ct",
+			"statename": "Connecticut",
+			"stateId": "9",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "DE",
+			"Frequency": "Monthly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "de",
+			"statename": "Delaware",
+			"stateId": "10",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "DC",
+			"Frequency": "Daily",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "dc",
+			"statename": "District of Columbia",
+			"stateId": "11",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "FL",
+			"Frequency": "Weekly",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "fl",
+			"statename": "Florida",
+			"stateId": "12",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "GA",
+			"Frequency": "Monthly",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ga",
+			"statename": "Georgia",
+			"stateId": "13",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "GU",
+			"Frequency": "Daily",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "gu",
+			"statename": "Guam",
+			"stateId": "66",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "HI",
+			"Frequency": "Weekly",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "hi",
+			"statename": "Hawaii",
+			"stateId": "15",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "ID",
+			"Frequency": "Monthly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "id",
+			"statename": "Idaho",
+			"stateId": "16",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "IL",
+			"Frequency": "Daily",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "il",
+			"statename": "Illinois",
+			"stateId": "17",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "IN",
+			"Frequency": "Weekly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "in",
+			"statename": "Indiana",
+			"stateId": "18",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "IA",
+			"Frequency": "Monthly",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ia",
+			"statename": "Iowa",
+			"stateId": "19",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "KS",
+			"Frequency": "Daily",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ks",
+			"statename": "Kansas",
+			"stateId": "20",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "KY",
+			"Frequency": "*",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ky",
+			"statename": "Kentucky",
+			"stateId": "21",
+			"timeIntervalDataVal": "0",
+			"color": "special1"
+		},
+		{
+			"STATE": "LA",
+			"Frequency": "*",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "la",
+			"statename": "Louisiana",
+			"stateId": "22",
+			"timeIntervalDataVal": "0",
+			"color": "special1"
+		},
+		{
+			"STATE": "ME",
+			"Frequency": "Daily",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "me",
+			"statename": "Maine",
+			"stateId": "23",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "MH",
+			"Frequency": "Weekly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mh",
+			"statename": "Marshall Islands",
+			"stateId": "68",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "MD",
+			"Frequency": "Monthly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "md",
+			"statename": "Maryland",
+			"stateId": "24",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "MA",
+			"Frequency": "Daily",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ma",
+			"statename": "Massachusetts",
+			"stateId": "25",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "MI",
+			"Frequency": "Weekly",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mi",
+			"statename": "Michigan",
+			"stateId": "26",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "FM",
+			"Frequency": "Monthly",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "fm",
+			"statename": "Micronesia",
+			"stateId": "71",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "MN",
+			"Frequency": "Daily",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mn",
+			"statename": "Minnesota",
+			"stateId": "27",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "MS",
+			"Frequency": "Weekly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ms",
+			"statename": "Mississippi",
+			"stateId": "28",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "MO",
+			"Frequency": "Monthly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mo",
+			"statename": "Missouri",
+			"stateId": "29",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "MT",
+			"Frequency": "Daily",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mt",
+			"statename": "Montana",
+			"stateId": "30",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "NE",
+			"Frequency": "Weekly",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ne",
+			"statename": "Nebraska",
+			"stateId": "31",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "NV",
+			"Frequency": "Monthly",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nv",
+			"statename": "Nevada",
+			"stateId": "32",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "NH",
+			"Frequency": "Daily",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nh",
+			"statename": "New Hampshire",
+			"stateId": "33",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "NJ",
+			"Frequency": "Weekly",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nj",
+			"statename": "New Jersey",
+			"stateId": "34",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "NM",
+			"Frequency": "Monthly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nm",
+			"statename": "New Mexico",
+			"stateId": "35",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "NY",
+			"Frequency": "Daily",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ny",
+			"statename": "New York",
+			"stateId": "36",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "NC",
+			"Frequency": "Weekly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nc",
+			"statename": "North Carolina",
+			"stateId": "37",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "ND",
+			"Frequency": "Monthly",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "nd",
+			"statename": "North Dakota",
+			"stateId": "38",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "MP",
+			"Frequency": "Daily",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "mp",
+			"statename": "Northern Mariana Islands",
+			"stateId": "69",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "OH",
+			"Frequency": "Weekly",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "oh",
+			"statename": "Ohio",
+			"stateId": "39",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "OK",
+			"Frequency": "Monthly",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ok",
+			"statename": "Oklahoma",
+			"stateId": "40",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "OR",
+			"Frequency": "Daily",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "or",
+			"statename": "Oregon",
+			"stateId": "41",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "PW",
+			"Frequency": "Weekly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "pw",
+			"statename": "Palau",
+			"stateId": "70",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "PA",
+			"Frequency": "Monthly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "pa",
+			"statename": "Pennsylvania",
+			"stateId": "42",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "PR",
+			"Frequency": "Daily",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "pr",
+			"statename": "Puerto Rico",
+			"stateId": "72",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "RI",
+			"Frequency": "Weekly",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ri",
+			"statename": "Rhode Island",
+			"stateId": "44",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "SC",
+			"Frequency": "Monthly",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "sc",
+			"statename": "South Carolina",
+			"stateId": "45",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "SD",
+			"Frequency": "Daily",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "sd",
+			"statename": "South Dakota",
+			"stateId": "46",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "TN",
+			"Frequency": "Weekly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "tn",
+			"statename": "Tennessee",
+			"stateId": "47",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "TX",
+			"Frequency": "Monthly",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "tx",
+			"statename": "Texas",
+			"stateId": "48",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "UT",
+			"Frequency": "Daily",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "ut",
+			"statename": "Utah",
+			"stateId": "49",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "VT",
+			"Frequency": "Weekly",
+			"Rating": "82",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "vt",
+			"statename": "Vermont",
+			"stateId": "50",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "VI",
+			"Frequency": "Monthly",
+			"Rating": "84",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "vi",
+			"statename": "Virgin Islands",
+			"stateId": "78",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "VA",
+			"Frequency": "Daily",
+			"Rating": "96",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "va",
+			"statename": "Virginia",
+			"stateId": "51",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "WA",
+			"Frequency": "Weekly",
+			"Rating": "77",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "wa",
+			"statename": "Washington",
+			"stateId": "53",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		},
+		{
+			"STATE": "WV",
+			"Frequency": "Monthly",
+			"Rating": "97",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "wv",
+			"statename": "West Virginia",
+			"stateId": "54",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color1"
+		},
+		{
+			"STATE": "WI",
+			"Frequency": "Daily",
+			"Rating": "92",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "wi",
+			"statename": "Wisconsin",
+			"stateId": "55",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color3"
+		},
+		{
+			"STATE": "WY",
+			"Frequency": "Weekly",
+			"Rating": "85",
+			"URL": "https://www.cdc.gov/",
+			"stateabbreviation": "wy",
+			"statename": "Wyoming",
+			"stateId": "56",
+			"timeIntervalDataVal": "0",
+			"color": "class3_color2"
+		}
+	],
+	"dataFileName": "Scale-Based Categorical Map.csv",
+	"dataFileSourceType": "file"
+}
