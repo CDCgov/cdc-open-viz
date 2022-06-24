@@ -1270,26 +1270,33 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     if (!mapProps.data || !state.data) return <Loading />;
 
+    const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading;
+
     const handleMapTabbing = () => {
         let tabbingID;
 
+        // 1) skip to legend
         if (general.showSidebar) {
             tabbingID = '#legend'
         }
         
-        if (state.general.title && !state.general.type === 'navigation') {
-            tabbingID = `#dataTableSection__${state.general.title.replace(/\s/g, "")}`;
+        // 2) skip to data table if it exists and not a navigation map
+        if (hasDataTable && !general.showSidebar) {
+            tabbingID = `#dataTableSection__${Date.now()}`;
         }
         
+        // 3) if its a navigation map skip to the dropdown.
         if (state.general.type === 'navigation') {
             tabbingID = `#dropdown-${Date.now()}`;
         }
 
+        // 4) handle other options
         return tabbingID || '#!';
 
     }
 
-    console.log("config", handleMapTabbing());
+    const tabId = handleMapTabbing()
+
     
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
@@ -1343,7 +1350,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing()}>
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
@@ -1400,7 +1407,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 				</section>
 				{'navigation' === general.type && (
                     <NavigationMenu
-                        mapTabbingID={handleMapTabbing()}
+                        mapTabbingID={tabId}
 						displayGeoName={displayGeoName}
 						data={runtimeData}
 						options={general}
@@ -1427,6 +1434,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						mapTitle={general.title}
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
+                        tabbingId={tabId}
 					/>
 				)}
 				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
