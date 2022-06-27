@@ -63,5 +63,9 @@ export default {
   },
   runtime: {
     editorErrorMessage: []
+  },
+  visual: {
+    minBubbleSize: 1,
+    maxBubbleSize: 20
   }
 };

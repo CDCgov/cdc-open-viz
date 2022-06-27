@@ -2307,6 +2307,22 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
+									<TextField
+										type='number'
+										value={state.visual.minBubbleSize}
+										section='visual'
+										fieldName='minBubbleSize'
+										label='Minimum Bubble Size'
+										updateField={updateField}
+									/>
+									<TextField
+										type='number'
+										value={state.visual.maxBubbleSize}
+										section='visual'
+										fieldName='maxBubbleSize'
+										label='Maximum Bubble Size'
+										updateField={updateField}
+									/>
 								</AccordionItemPanel>
 							</AccordionItem>
 						</Accordion>
