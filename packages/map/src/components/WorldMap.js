@@ -9,6 +9,7 @@ import topoJSON from '../data/world-topo.json';
 import ZoomableGroup from './ZoomableGroup';
 import Geo from './Geo'
 import CityList from './CityList';
+import BubbleList from './BubbleList';
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -69,6 +70,7 @@ const WorldMap = (props) => {
   };
 
   const constructGeoJsx = (geographies) => {
+    console.log('geos', geographies)
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       const geoKey = geo.properties.iso
 
@@ -95,7 +97,7 @@ const WorldMap = (props) => {
       const strokeWidth = .9
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors && legendColors[0] !== '#000000') {
+      if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
 
           styles = {
@@ -144,6 +146,20 @@ const WorldMap = (props) => {
       displayGeoName={displayGeoName}
       applyLegendToRow={applyLegendToRow}
     />)
+
+    // Bubbles
+    if(state.general.type === 'bubble') {
+      geosJsx.push(
+        <BubbleList
+          key="bubbles"
+          data={data}
+          state={state}
+          projection={projection}
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+        />
+      )
+    }
 
     return geosJsx;
   };

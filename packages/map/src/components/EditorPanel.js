@@ -386,6 +386,20 @@ const EditorPanel = (props) => {
 							},
 						});
 						break;
+					case 'bubble':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								showSidebar: false,
+								type: 'bubble',
+							},
+							tooltips: {
+								...state.tooltips,
+								appearanceType: 'hover',
+							},
+						});
+						break;
 					default:
 						console.warn('Map type not set');
 						break;
@@ -1199,14 +1213,14 @@ const EditorPanel = (props) => {
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-                        Map Type
-                        <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
+												Map Type
+												<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+												</Tooltip.Content>
+												</Tooltip>
+											</span>
 											<select
 												value={state.general.geoType}
 												onChange={(event) => {
@@ -1248,6 +1262,7 @@ const EditorPanel = (props) => {
 										>
 											<option value='data'>Data</option>
 											<option value='navigation'>Navigation</option>
+											{state.general.geoType === 'world' && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
 									{/* SubType */}
