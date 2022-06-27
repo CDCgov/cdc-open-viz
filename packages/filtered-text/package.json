@@ -26,13 +26,16 @@
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
   "peerDependencies": {
-      "react": ">=16.8",
-      "react-dom": ">=16"
+    "react": ">=16.8",
+    "react-dom": ">=16"
   },
   "resolutions": {
     "@types/react": "17.x"
   },
   "dependencies": {
-    "@cdc/core": "^1.1.2"
+    "@cdc/core": "^1.1.2",
+    "html-react-parser": "^2.0.0",
+    "papaparse": "^5.3.2",
+    "use-debounce": "^8.0.1"
   }
 }

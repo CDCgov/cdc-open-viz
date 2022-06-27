@@ -1,5 +1,6 @@
 {
   "type": "filtered-text",
   "title": "Filtered Text",
-  "theme": "theme-blue"
+  "theme": "theme-blue",
+	"url":"28-filterText-sex-ageGroup-no-values.csv"
 }
