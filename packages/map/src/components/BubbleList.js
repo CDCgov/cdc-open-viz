@@ -1,22 +1,15 @@
 import React from 'react'
 import * as d3 from 'd3';
+import ConfigureTab from '../../../editor/src/components/ConfigureTab';
 
 export const BubbleList = ({data, state, projection, applyLegendToRow, applyTooltipsToGeo}) => {
-	
-	const Bubble = Object.freeze({
-		minSize: 25,
-		maxSize: 75
-	})
 
 	// Add a scale for bubble size
 	var size = d3.scaleLinear()
 		.domain([1, 100])  // What's in the data
-		.range([Bubble.minSize, Bubble.maxSize])
+		.range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
 	const countryList = Object.values(data);
-
-
-	
 	
 	const countries = countryList.map( (country, index) => {
 		if(!country.latitude || !country.longitude) return;
