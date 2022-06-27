@@ -1,35 +1,41 @@
 import React from 'react'
-import * as d3 from 'd3';
-import ConfigureTab from '../../../editor/src/components/ConfigureTab';
+import { scaleLinear } from 'd3-scale';
+import { countryCoordinates } from '../data/country-coordinates';
 
-export const BubbleList = ({data, state, projection, applyLegendToRow, applyTooltipsToGeo}) => {
+export const BubbleList = ({data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo}) => {
 
-	// Add a scale for bubble size
-	var size = d3.scaleLinear()
-		.domain([1, 100])  // What's in the data
+	const countryCodes = Object.keys(dataImport)
+	const data = Object.values(dataImport)
+	const maxDataValue = Math.max(...data.map(d => d[state.columns.primary.name]))
+
+	// Set bubble sizes
+	var size = scaleLinear()
+		.domain([1, maxDataValue])
 		.range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
-	const countryList = Object.values(data);
-	
-	const countries = countryList.map( (country, index) => {
-		if(!country.latitude || !country.longitude) return;
-		const countryName = country.Country;
+	// Start looping through the countries to create the bubbles.
+	const countries = data.map( (country, index) => {
+
+		// get coordinates from ISO
+		let coordinates = countryCoordinates[country.uid]
+
+		if(!coordinates) return;
+
+		const countryName = country[state.columns.geo.name];
 		const toolTip = applyTooltipsToGeo(countryName, country);
 		const legendColors = applyLegendToRow(country);
-		console.log('legend', legendColors)
-		if (legendColors === false) {
-			return true;
-		}
+		
+		if(legendColors === false) return;
 	
-		let transform = `translate(${projection([country.longitude, country.latitude])})`
+		let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
 		const circle = (
 			<circle
 				data-tip={toolTip}
 				data-for="tooltip"
 				className="bubble"
-				cx={ (country) => projection([country.longitude, country.latitude])[0] }
-				cy={ (country) => projection([country.longitude, country.latitude])[1] }
+				cx={ projection(coordinates[1], coordinates[0])[0] }
+				cy={ projection(coordinates[1], coordinates[0])[1] }
 				r={ size(country.Data) }
 				fill={legendColors[0]}
 				stroke={legendColors[0]}
@@ -40,8 +46,6 @@ export const BubbleList = ({data, state, projection, applyLegendToRow, applyTool
 			/>
 		);
 
-		console.log('c2', country)
-			console.log('t', transform)
 		return (
 			<>
 			{circle}
