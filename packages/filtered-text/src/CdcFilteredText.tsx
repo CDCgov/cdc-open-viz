@@ -82,6 +82,7 @@ const CdcFilteredText:FC<Props> = (props) => {
 
     //Optionally filter the data based on the user's filter
     let filteredData = stateData;
+  
     filters.map((filter) => {
       if ( filter.columnName && filter.columnValue ) {
       return filteredData = filteredData.filter(function (e) {
@@ -89,7 +90,7 @@ const CdcFilteredText:FC<Props> = (props) => {
         });
       } else {
       
-        return false
+        return null
       }
     })
 
@@ -105,26 +106,33 @@ useEffect(()=>{
 
   let content = (<Loading/>)
 
+let filterClasses = ["cove","cove-component","cove-component__content","filtered-text"]
+  config?.visual?.border && filterClasses.push('component--has-borderColorTheme');
+  config?.visual?.accent && filterClasses.push('component--has-accent');
+  config?.visual?.background && filterClasses.push('component--has-background');
+  config?.visual?.hideBackgroundColor && filterClasses.push('component--hideBackgroundColor');
+  
+  let innerContainerClasses = [' cove-component__content']
+  config.title && innerContainerClasses.push('component--has-title')
+
   if (loading === false) {
     let body = (
-      <>
-        <div className="cove-component filtered-text">
-          <div className="cove-component__content">
+         <>
+        {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
+        <div className={filterClasses.join(' ')} >
             <div className="cove-component__content-wrap">
-            {title && <div className="cove-component__header">{parse(title)}</div>}
-             {filteredData.map((el,i)=>{
+             {filteredData.slice(0,1).map((el,i)=>{
               return (
                 <p key={i} > {parse(el.Text)} </p>
               )
             })}  
             </div>
           </div>
-        </div>
-      </>
+          </>
     )
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme} `} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>

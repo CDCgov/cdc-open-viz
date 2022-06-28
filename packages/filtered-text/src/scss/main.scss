@@ -1,19 +1,2 @@
 @import '~@cdc/core/styles/v2/main';
-
-.cove {
-	.filtered-text {
-		.cove-component__content {
-			background-color: rgb(154, 173, 227);
-			border: none;
-		}
-		&.cove-component {
-			box-shadow: none;
-		}
-	}
-	.filtered-header{
-		color:rgba(6, 6, 6, 0.705);
-		font-size: 22px;
-	}
-}
-
-
+@import './editor-panel.scss';

@@ -12,9 +12,9 @@ export default {
 	}],
 	visual:{
 		hideBackgroundColor:false,
-		background:'',
+		background:false,
 		roundedBorders:false,
-		accent:'',
+		accent:false,
 		border:false
 	}
 }
