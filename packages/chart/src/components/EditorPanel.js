@@ -844,7 +844,7 @@ const EditorPanel = () => {
                     }/>
                   </div>
                  
-                  {(config.orientation === 'horizontal' && config.visualizationType !== 'Paired Bar') ?  // horizontal - x is vertical y is horizontal
+                  {(config.orientation === 'horizontal') ?  // horizontal - x is vertical y is horizontal
                     <>
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
@@ -852,7 +852,7 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
-                    : (config.visualizationType !=='Pie' || config.visualizationType === 'Paired Bar') &&
+                    : (config.visualizationType !=='Pie') &&
                     <>
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
@@ -961,7 +961,7 @@ const EditorPanel = () => {
                       {config.yAxis.labelPlacement !== 'Below Bar' &&
                         <TextField value={config.xAxis.tickRotation} type="number" min="0" section="xAxis" fieldName="tickRotation" label="Tick rotation (Degrees)" className="number-narrow" updateField={updateField}/>
                       }
-                      {(config.orientation === 'horizontal' && !config.orientation === 'horizontal') ?
+                      {(config.orientation === 'horizontal') ?
                         <>
                           <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField}/>
                           <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField}/>
