@@ -1,0 +1,909 @@
+{
+	"general": {
+		"title": "Map Title",
+		"subtext": "Map subtext: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+		"type": "data",
+		"geoType": "us",
+		"headerColor": "theme-cyan",
+		"showSidebar": true,
+		"showTitle": true,
+		"showDownloadButton": true,
+		"expandDataTable": false,
+		"backgroundColor": "#f5f5f5",
+		"geoBorderColor": "darkGray",
+		"territoriesLabel": "Territories",
+		"language": "en",
+		"hasRegions": false
+	},
+	"columns": {
+		"geo": {
+			"dataTable": true,
+			"label": "",
+			"name": "STATE",
+			"tooltip": false
+		},
+		"primary": {
+			"dataTable": true,
+			"label": "Rate",
+			"name": "Rate",
+			"prefix": "",
+			"suffix": "",
+			"tooltip": true
+		},
+		"navigate": {
+			"dataTable": false,
+			"name": "URL",
+			"tooltip": false
+		},
+		"geosInRegion": {
+			"name": ""
+		}
+	},
+	"legend": {
+		"numberOfItems": 4,
+		"position": "side",
+		"title": "Legend Title",
+		"description": "Legend Text",
+		"type": "equalnumber",
+		"specialClasses": [],
+		"geosPerColor": {},
+		"unified": false,
+		"descriptions": {
+			"0,0": [
+				"This is a dynamic legend text for \"Female\" selection."
+			],
+			"0,1": [
+				"This is a dynamic legend text for \"Male\" selection."
+			]
+		},
+		"singleColumn": false,
+		"dynamicDescription": true
+	},
+	"data": [
+		{
+			"STATE": "AL",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "AK",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "AS",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "AZ",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "AR",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "CA",
+			"Rate": 13,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "CO",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "CT",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "DE",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "DC",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "FL",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "GA",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "GU",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "HI",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "ID",
+			"Rate": 8,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "IL",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "IN",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "IA",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "KS",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "KY",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "LA",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "ME",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "MH",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "MD",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "MA",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "MI",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "FM",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "MN",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "MS",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "MO",
+			"Rate": 11,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "MT",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "NE",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "NV",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "NH",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "NJ",
+			"Rate": 28,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "NM",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "NY",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "NC",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "ND",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "MP",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "OH",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "OK",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "OR",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "PW",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "PA",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "PR",
+			"Rate": 6,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "RI",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "SC",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "SD",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "TN",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "TX",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "VT",
+			"Rate": 9,
+			"Gender": "Female",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "VI",
+			"Rate": 17,
+			"Gender": "Female",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "VA",
+			"Rate": 20,
+			"Gender": "Female",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "WA",
+			"Rate": 22,
+			"Gender": "Female",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "WV",
+			"Rate": 10,
+			"Gender": "Female",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "WI",
+			"Rate": 12,
+			"Gender": "Female",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "WY",
+			"Rate": 14,
+			"Gender": "Female",
+			"Mood": "Blah",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "AL",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "AK",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "AS",
+			"Rate": 14,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "AZ",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "AR",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "CA",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "CO",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "CT",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "DE",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "DC",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "FL",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "GA",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "GU",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "HI",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "ID",
+			"Rate": 8,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "IL",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "IN",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "IA",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "KS",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "KY",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "LA",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "ME",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "MH",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "MD",
+			"Rate": 14,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "MA",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "MI",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "FM",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "MN",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "MS",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "MO",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "MT",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "NE",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "NV",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "NH",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "NJ",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "NM",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "NY",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "NC",
+			"Rate": 14,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "ND",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "MP",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "OH",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "OK",
+			"Rate": 13,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "OR",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "PW",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "PA",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "PR",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "RI",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "SC",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "SD",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "TN",
+			"Rate": 9,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "TX",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "VT",
+			"Rate": 20,
+			"Gender": "Male",
+			"Mood": "Jubilant",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": "VI",
+			"Rate": 17,
+			"Gender": "Male",
+			"Mood": "Peeved",
+			"URL": "http:\/\/www.amazon.com"
+		},
+		{
+			"STATE": "VA",
+			"Rate": 24,
+			"Gender": "Male",
+			"Mood": "Bitter",
+			"URL": "http:\/\/www.zappos.com"
+		},
+		{
+			"STATE": "WA",
+			"Rate": 22,
+			"Gender": "Male",
+			"Mood": "Chillin'",
+			"URL": "http:\/\/www.nytimes.com"
+		},
+		{
+			"STATE": "WV",
+			"Rate": 10,
+			"Gender": "Male",
+			"Mood": "Sad",
+			"URL": "http:\/\/www.npr.org"
+		},
+		{
+			"STATE": "WI",
+			"Rate": 12,
+			"Gender": "Male",
+			"Mood": "Happy",
+			"URL": "http:\/\/guardian.co.uk"
+		},
+		{
+			"STATE": "WY",
+			"Rate": 14,
+			"Gender": "Male",
+			"Mood": "Blah",
+			"URL": "http:\/\/telegraph.co.uk"
+		},
+		{
+			"STATE": null
+		}
+	],
+	"filters": [
+		{
+			"values": [
+				"Female",
+				"Male"
+			],
+			"columnName": "Gender",
+			"active": "Female",
+			"label": "Gender"
+		}
+	],
+	"sharing": {
+		"enabled": true,
+		"title": "Filterable Rate Map Example",
+		"description": "Social media description",
+		"url": "https:\/\/www.cdc.gov\/wcms\/4.0\/cdc-wp\/data-presentation\/examples\/example-numeric-maps-filterable.html",
+		"dataHost": "wcms-wp.cdc.gov",
+		"configUrl": "\/wcms\/4.0\/cdc-wp\/data-presentation\/page-elements\/gender-rate-map.json"
+	},
+	"dataTable": {
+		"title": "Data Table"
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true
+	},
+	"color": "yelloworangebrown",
+	"usingWidgetLoader": true,
+	"type": "map"
+}

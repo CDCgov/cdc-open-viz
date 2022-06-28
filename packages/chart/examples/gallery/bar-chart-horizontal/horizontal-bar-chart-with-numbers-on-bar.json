@@ -1,0 +1,198 @@
+{
+	"type": "chart",
+	"title": "Example of Horizontal Bar Chart with Numbers on Bar",
+	"theme": "theme-blue",
+	"fontSize": "medium",
+	"lineDatapointStyle": "hover",
+	"barHasBorder": "true",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": 50,
+		"gridLines": false,
+		"type": "chart",
+		"title": "Example of Horizontal Bar Chart with Numbers on Bar",
+		"theme": "theme-blue",
+		"fontSize": "medium",
+		"lineDatapointStyle": "hover",
+		"barHasBorder": "true",
+		"padding": {
+			"left": 5,
+			"right": 5
+		},
+		"yAxis": {
+			"size": 50,
+			"gridLines": false,
+			"label": "Number of Accidents"
+		},
+		"barThickness": "0.5",
+		"height": 450,
+		"xAxis": {
+			"size": 75,
+			"tickRotation": 0,
+			"dataKey": "Injury Type",
+			"label": "Injury Type"
+		},
+		"table": {
+			"label": "Data Table",
+			"expanded": false,
+			"show": true
+		},
+		"legend": {
+			"behavior": "isolate",
+			"position": "right",
+			"label": "Accident Year"
+		},
+		"palette": "qualitative-bold",
+		"labels": false,
+		"dataFormat": {},
+		"confidenceKeys": {},
+		"data": [
+			{
+				"2017": "12",
+				"2018": "8",
+				"Injury Type": "Falling"
+			},
+			{
+				"2017": "25",
+				"2018": "10",
+				"Injury Type": "Machinery"
+			},
+			{
+				"2017": "1",
+				"2018": "0",
+				"Injury Type": "Alergic Reaction"
+			},
+			{
+				"2017": "3",
+				"2018": "4",
+				"Injury Type": "Chemical"
+			},
+			{
+				"2017": "3",
+				"2018": "2",
+				"Injury Type": "Burns"
+			}
+		],
+		"dataFileName": "job_place_injury_2 years_FINAL.json",
+		"dataFileSourceType": "file",
+		"visualizationType": "Bar",
+		"visualizationSubType": "horizontal",
+		"series": [
+			{
+				"dataKey": "2017",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "2018",
+				"type": "Bar"
+			}
+		],
+		"runtime": {
+			"seriesLabels": {
+				"2017": "2017",
+				"2018": "2018"
+			},
+			"seriesLabelsAll": [
+				"2017",
+				"2018"
+			],
+			"originalXAxis": {
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Injury Type",
+				"label": "Injury Type"
+			},
+			"seriesKeys": [
+				"2017",
+				"2018"
+			],
+			"xAxis": {
+				"size": 50,
+				"gridLines": false,
+				"label": "Number of Accidents"
+			},
+			"yAxis": {
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Injury Type",
+				"label": "Injury Type"
+			},
+			"horizontal": true,
+			"uniqueId": 1635525153525,
+			"editorErrorMessage": ""
+		},
+		"barPadding": 40,
+		"barHeight": 25,
+		"labelPlacement": "Below Bar",
+		"displayNumbersOnBar": true
+	},
+	"barThickness": "0.5",
+	"height": 450,
+	"xAxis": {
+		"size": 75,
+		"tickRotation": 0,
+		"dataKey": "Injury Type",
+		"label": "Injury Type"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"show": true
+	},
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"label": "Accident Year"
+	},
+	"palette": "qualitative-bold",
+	"labels": false,
+	"dataFormat": {},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"2017": "12",
+			"2018": "8",
+			"Injury Type": "Falling"
+		},
+		{
+			"2017": "25",
+			"2018": "10",
+			"Injury Type": "Machinery"
+		},
+		{
+			"2017": "1",
+			"2018": "0",
+			"Injury Type": "Alergic Reaction"
+		},
+		{
+			"2017": "3",
+			"2018": "4",
+			"Injury Type": "Chemical"
+		},
+		{
+			"2017": "3",
+			"2018": "2",
+			"Injury Type": "Burns"
+		}
+	],
+	"dataFileName": "job_place_injury_2 years_FINAL.json",
+	"dataFileSourceType": "file",
+	"visualizationType": "Bar",
+	"visualizationSubType": "horizontal",
+	"series": [
+		{
+			"dataKey": "2017",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "2018",
+			"type": "Bar"
+		}
+	],
+	"barPadding": 40,
+	"barHeight": 25,
+	"description": "    Also note that the border around the bars has been added in the Visualization Editor"
+}

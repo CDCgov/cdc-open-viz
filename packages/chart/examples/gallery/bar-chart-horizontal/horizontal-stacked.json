@@ -1,0 +1,248 @@
+{
+	"type": "chart",
+	"title": "Example Stacked Horizontal Bar Chart",
+	"theme": "theme-blue",
+	"fontSize": "small",
+	"lineDatapointStyle": "hover",
+	"barHasBorder": "true",
+	"isLollipopChart": false,
+	"lollipopShape": "circle",
+	"lollipopColorStyle": "two-tone",
+	"visualizationSubType": "stacked",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"hideAxis": true,
+		"hideLabel": false,
+		"hideTicks": false,
+		"size": "13",
+		"gridLines": false,
+		"type": "chart",
+		"title": "",
+		"theme": "theme-blue",
+		"fontSize": "medium",
+		"lineDatapointStyle": "hover",
+		"barHasBorder": "false",
+		"isLollipopChart": false,
+		"lollipopShape": "circle",
+		"lollipopColorStyle": "two-tone",
+		"visualizationSubType": "stacked",
+		"padding": {
+			"left": 5,
+			"right": 5
+		},
+		"yAxis": {
+			"hideAxis": false,
+			"hideLabel": false,
+			"hideTicks": false,
+			"size": 50,
+			"gridLines": false
+		},
+		"barThickness": 0.35,
+		"height": 260,
+		"xAxis": {
+			"type": "categorical",
+			"hideAxis": false,
+			"hideLabel": false,
+			"hideTicks": false,
+			"size": 75,
+			"tickRotation": 0,
+			"dataKey": "Year"
+		},
+		"table": {
+			"label": "Data Table",
+			"expanded": true,
+			"show": true
+		},
+		"orientation": "horizontal",
+		"legend": {
+			"behavior": "isolate",
+			"position": "right"
+		},
+		"exclusions": {
+			"active": false,
+			"keys": []
+		},
+		"palette": "qualitative-bold",
+		"isPaletteReversed": false,
+		"labels": false,
+		"dataFormat": {},
+		"confidenceKeys": {},
+		"data": [
+			{
+				"Year": "2015",
+				"Data 1": "25",
+				"Data 2": "20",
+				"Data 3": "55"
+			},
+			{
+				"Year": "2016",
+				"Data 1": "35",
+				"Data 2": "30",
+				"Data 3": "35"
+			},
+			{
+				"Year": "2017",
+				"Data 1": "22",
+				"Data 2": "38",
+				"Data 3": "40"
+			},
+			{
+				"Year": "2018",
+				"Data 1": "40",
+				"Data 2": "40",
+				"Data 3": "20"
+			}
+		],
+		"dataFileName": "JSON_Source_Data_Example_Viz_Stacked.json",
+		"dataFileSourceType": "file",
+		"visualizationType": "Bar",
+		"runtime": {
+			"seriesLabels": {
+				"Data 1": "Data 1",
+				"Data 2": "Data 2",
+				"Data 3": "Data 3"
+			},
+			"seriesLabelsAll": [
+				"Data 1",
+				"Data 2",
+				"Data 3"
+			],
+			"originalXAxis": {
+				"type": "categorical",
+				"hideAxis": false,
+				"hideLabel": false,
+				"hideTicks": false,
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Year"
+			},
+			"seriesKeys": [
+				"Data 1",
+				"Data 2",
+				"Data 3"
+			],
+			"xAxis": {
+				"hideAxis": false,
+				"hideLabel": false,
+				"hideTicks": false,
+				"size": 50,
+				"gridLines": false
+			},
+			"yAxis": {
+				"type": "categorical",
+				"hideAxis": false,
+				"hideLabel": false,
+				"hideTicks": false,
+				"size": 75,
+				"tickRotation": 0,
+				"dataKey": "Year"
+			},
+			"horizontal": true,
+			"uniqueId": 1654259674387,
+			"editorErrorMessage": ""
+		},
+		"series": [
+			{
+				"dataKey": "Data 1",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "Data 2",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "Data 3",
+				"type": "Bar"
+			}
+		],
+		"barHeight": 25,
+		"barPadding": 40,
+		"labelPlacement": "Below Bar",
+		"displayNumbersOnBar": true,
+		"label": ""
+	},
+	"barThickness": 0.35,
+	"height": 288,
+	"xAxis": {
+		"type": "categorical",
+		"hideAxis": true,
+		"hideLabel": true,
+		"hideTicks": true,
+		"size": "45",
+		"tickRotation": 0,
+		"dataKey": "Year",
+		"label": "Year"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": false,
+		"show": true,
+		"indexLabel": "Data Type"
+	},
+	"orientation": "horizontal",
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"reverseLabelOrder": false
+	},
+	"exclusions": {
+		"active": false,
+		"keys": []
+	},
+	"palette": "qualitative-soft",
+	"isPaletteReversed": false,
+	"labels": false,
+	"dataFormat": {
+		"suffix": "%"
+	},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Year": "2015",
+			"Data 1": "25",
+			"Data 2": "20",
+			"Data 3": "55"
+		},
+		{
+			"Year": "2016",
+			"Data 1": "35",
+			"Data 2": "30",
+			"Data 3": "35"
+		},
+		{
+			"Year": "2017",
+			"Data 1": "22",
+			"Data 2": "38",
+			"Data 3": "40"
+		},
+		{
+			"Year": "2018",
+			"Data 1": "40",
+			"Data 2": "40",
+			"Data 3": "20"
+		}
+	],
+	"dataFileName": "JSON_Source_Data_Example_Viz_Stacked.json",
+	"dataFileSourceType": "file",
+	"visualizationType": "Bar",
+	"series": [
+		{
+			"dataKey": "Data 1",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 2",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 3",
+			"type": "Bar"
+		}
+	],
+	"barHeight": 32,
+	"barPadding": 40,
+	"description": "Subtext"
+}
