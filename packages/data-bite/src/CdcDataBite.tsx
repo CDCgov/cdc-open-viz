@@ -1,4 +1,4 @@
-import React, { useEffect,  useState, useCallback,FC } from 'react';
+import React, { useEffect,  useState, useCallback,FC, memo } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
@@ -40,9 +40,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    general: { isCompactStyle }
   } = config;
-
 
 
   const transform = new DataTransform()
@@ -261,10 +261,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
       return formattedValue
     }
-  
-  
-
-  
 
     let dataBite:string|number = '';
     
@@ -436,18 +432,24 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         isBottom = true
         break;
     }
-    config?.visual?.border && biteClasses.push('bite--has-border');
-    config?.visual?.accent && biteClasses.push('bite--has-accent');
-    config?.visual?.background && biteClasses.push('bite--has-background');
-    config?.visual?.hideBackgroundColor && biteClasses.push('bite--hideBackgroundColor');
-    
-    let innerContainerClasses = ['cdc-data-bite-inner-container']
-    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
-    config.title && innerContainerClasses.push('bite--has-title')
-    config.subtext && innerContainerClasses.push('bite--has-subtext')
-    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-    config.shadow && innerContainerClasses.push('shadow')
 
+    
+    let innerContainerClasses = ['cove-component__inner']
+    config.title && innerContainerClasses.push('component--has-title')
+    config.subtext && innerContainerClasses.push('component--has-subtext')
+    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+    config.general.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+    let contentClasses = ['cove-component__content'];
+    !config.visual.border && contentClasses.push('no-borders');
+    config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+    config.visual.accent && contentClasses.push('component--has-accent');
+    config.visual.background && contentClasses.push('component--has-background');
+    config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+    // ! these two will be retired.
+    config.shadow && innerContainerClasses.push('shadow')
+    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
@@ -456,9 +458,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
-            {title && <div className="bite-header">{parse(title)}</div>}
+            {title && <div className="cove-component__header">{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className="bite-content-container" >
+              <div className={ contentClasses.join(' ')} >
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className="bite-content">
@@ -471,7 +473,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                         {parse(biteBody)}
                       </p>
                       {showBite && 'end' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
-                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      {subtext && !isCompactStyle && <p className="bite-subtext">{parse(subtext)}</p>}
                       </div>
                     </Fragment>
                 </div>
@@ -486,6 +488,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   }
 
   let classNames = [
+    'cove',
     'cdc-open-viz-module',
     'type-data-bite',
     currentViewport,
