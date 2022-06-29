@@ -608,7 +608,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {config.table && config.table.show && config.data && <DataTable data={config.data} config={config}/>}
           {config.table && config.table.show && config.datasets && Object.keys(config.datasets).map(datasetKey => (
             <div className="multi-table-container" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-              <DataTable data={config.datasets[datasetKey].data} config={config} datasetName={datasetKey}></DataTable>
+              <DataTable data={config.datasets[datasetKey].data} config={config}></DataTable>
             </div>
           ))}
 
