@@ -17,6 +17,7 @@ let projection = geoMercator()
 
 const handleZoomIn = (position, setPosition) => {
   if (position.zoom >= 4) return;
+  console.log('position', position)
   setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
 };
 
@@ -69,8 +70,11 @@ const WorldMap = (props) => {
     setPosition(position);
   };
 
+  const handleCircleClick = (coordinates) => {
+    setPosition( (pos) => ({coordinates: coordinates, zoom: 3}) )
+  }
+
   const constructGeoJsx = (geographies) => {
-    console.log('geos', geographies)
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       const geoKey = geo.properties.iso
 
@@ -157,6 +161,7 @@ const WorldMap = (props) => {
           projection={projection}
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
+          handleCircleClick={handleCircleClick}
         />
       )
     }
@@ -175,6 +180,7 @@ const WorldMap = (props) => {
           projection={projection}
           width={880}
           height={500}
+          style={{ transition: 'all 1s ease-in-out' }}
         >
           <Mercator
             data={world}
@@ -183,7 +189,7 @@ const WorldMap = (props) => {
           </Mercator>
         </ZoomableGroup>
       </svg>
-      {state.general.type === 'data' && <ZoomControls position={position} setPosition={setPosition} />}
+      {state.general.type === 'data' || state.general.type === 'bubble' && <ZoomControls position={position} setPosition={setPosition} />}
     </ErrorBoundary>
   );
 };

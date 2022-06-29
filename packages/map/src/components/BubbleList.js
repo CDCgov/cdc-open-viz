@@ -1,11 +1,11 @@
-import React from 'react'
+import React, {memo} from 'react'
 import { scaleLinear } from 'd3-scale';
 import { countryCoordinates } from '../data/country-coordinates';
 
-export const BubbleList = ({data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo}) => {
+export const BubbleList = ({data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, position, setPosition}) => {
 
-	const countryCodes = Object.keys(dataImport)
-	const data = Object.values(dataImport)
+	const countryCodes = Object.keys(dataImport) // only the country codes, possibly nice for lookups
+	const data = Object.values(dataImport) // all country data
 	const maxDataValue = Math.max(...data.map(d => d[state.columns.primary.name]))
 
 	// Set bubble sizes
@@ -31,17 +31,18 @@ export const BubbleList = ({data: dataImport, state, projection, applyLegendToRo
 
 		const circle = (
 			<circle
+				key={`circle-${countryName.replace(' ', '')}`}
 				data-tip={toolTip}
 				data-for="tooltip"
 				className="bubble"
-				cx={ projection(coordinates[1], coordinates[0])[0] }
-				cy={ projection(coordinates[1], coordinates[0])[1] }
+				cx={ Number(projection(coordinates[1], coordinates[0])[0]) || 0  } // || 0 handles error on loads where the data isn't ready
+				cy={ Number(projection(coordinates[1], coordinates[0])[1]) || 0 }
 				r={ size(country.Data) }
 				fill={legendColors[0]}
 				stroke={legendColors[0]}
 				strokeWidth={3}
 				fillOpacity={.4}
-				title="Click for more information"
+				onClick={() => handleCircleClick([coordinates[1], coordinates[0]])}
 				transform={transform}
 			/>
 		);
@@ -54,4 +55,4 @@ export const BubbleList = ({data: dataImport, state, projection, applyLegendToRo
 	})
 	return countries;
 }
-export default BubbleList
+export default memo(BubbleList)
