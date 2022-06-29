@@ -31,7 +31,9 @@ const DataTable = (props) => {
     displayGeoName,
     navigationHandler,
     viewport,
-    formatLegendLocation
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -343,7 +345,7 @@ const DataTable = (props) => {
               return (
                 <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell">
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ () => setFilteredCountryCode(cell.row.original)}>
                       {cell.render('Cell')}
                     </td>
                   ))}
