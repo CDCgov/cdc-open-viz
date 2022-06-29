@@ -355,14 +355,14 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       singleFilter.values.forEach((filterOption, index) => {
         values.push(<option
-          key={index}
+          key={`${singleFilter.key}-option-${index}`}
           value={filterOption}
         >{filterOption}
         </option>)
       })
 
       return (
-        <section className="dashboard-filters-section" key={index}>
+        <section className="dashboard-filters-section" key={`${singleFilter.key}-filtersection-${index}`}>
           <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
           <select
             id={`filter-${index}`}
@@ -532,9 +532,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
             return (
               <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
-                {row.map((col, index) => {
+                {row.map((col, colIndex) => {
                   if (col.width) {
-                    if (!col.widget) return <div className={`dashboard-col dashboard-col-${col.width}`}></div>
+                    if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`dashboard-col dashboard-col-${col.width}`}></div>
 
                     let visualizationConfig = { ...config.visualizations[col.widget] }
 
@@ -548,7 +548,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                     const setsSharedFilter = !config.sharedFilters || config.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
 
                     return (
-                      <React.Fragment key={`vis__${index}`}>
+                      <React.Fragment key={`vis__${index}__${colIndex}`}>
                         <div className={`dashboard-col dashboard-col-${col.width}`}>
                           {visualizationConfig.type === 'chart' && (
                             <CdcChart
@@ -599,7 +599,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                       </React.Fragment>
                     )
                   }
-                  return <></>
+                  return <React.Fragment key={`vis__${index}__${colIndex}`}></React.Fragment>
                 })}
               </div>)
           })}
