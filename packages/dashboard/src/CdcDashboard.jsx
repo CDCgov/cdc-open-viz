@@ -59,6 +59,9 @@ const addVisualization = (type, subType) => {
     case 'markup-include':
       newVisualizationConfig.visualizationType = type
       break
+    default:
+      newVisualizationConfig.visualizationType = type
+      break
   }
 
   return newVisualizationConfig
@@ -107,10 +110,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (!dataset && config.dataUrl) {
       dataset = await fetchRemoteData(config.dataUrl)
 
-      if (data && config.dataDescription) {
+      if (dataset && config.dataDescription) {
         try {
-          data = transform.autoStandardize(data)
-          data = transform.developerStandardize(data, config.dataDescription)
+          dataset = transform.autoStandardize(data)
+          dataset = transform.developerStandardize(data, config.dataDescription)
         } catch (e) {
           //Data not able to be standardized, leave as is
         }
@@ -226,8 +229,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
           newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, (dataOverride || data))
-          if(newConfig.visualizations[visualizationKeys[j]].dataKey){
-            newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+          if(newConfig.visualizations[visualizationKeys[i]].dataKey){
+            newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[i]].dataKey][0][filter.columnName]
           }
         }
 
@@ -334,7 +337,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       let newFilteredData = {}
       Object.keys(config.visualizations).forEach(key => {
-        newFilteredData[key] = filterData(dashboardConfig.sharedFilters, config.visualizations[key].formattedData || data[config.visualizations[key].dataKey])
+        let applicableFilters = dashboardConfig.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(key) !== -1)
+        if(applicableFilters.length > 0){
+          newFilteredData[key] = filterData(applicableFilters, config.visualizations[key].formattedData || data[config.visualizations[key].dataKey])
+        }
       })
 
       setFilteredData(newFilteredData)
@@ -491,6 +497,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               {dataTable}
             </>
             break
+          default:
+            body = <></>
+            break
         }
       }
     })
@@ -513,7 +522,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           {/* Title */}
           {title &&
-            <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
+            <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
           {config.dashboard.sharedFilters && <Filters/>}
@@ -536,7 +545,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                       visualizationConfig.formattedData = visualizationConfig.data
                     }
 
-                    const setsSharedFilter = !config.sharedFilters || config.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
+                    const setsSharedFilter = !config.sharedFilters || config.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
 
                     return (
                       <React.Fragment key={`vis__${index}`}>
@@ -590,6 +599,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                       </React.Fragment>
                     )
                   }
+                  return <></>
                 })}
               </div>)
           })}
