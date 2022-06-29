@@ -1,12 +1,20 @@
-import React, {memo} from 'react'
+import React, {memo, useState, useEffect} from 'react'
 import { scaleLinear } from 'd3-scale';
 import { countryCoordinates } from '../data/country-coordinates';
 
-export const BubbleList = ({data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, position, setPosition}) => {
+export const BubbleList = (
+	{
+		data: dataImport,
+		state,
+		projection,
+		applyLegendToRow,
+		applyTooltipsToGeo,
+		handleCircleClick,
+		runtimeData
+	}) => {
 
-	const countryCodes = Object.keys(dataImport) // only the country codes, possibly nice for lookups
-	const data = Object.values(dataImport) // all country data
-	const maxDataValue = Math.max(...data.map(d => d[state.columns.primary.name]))
+	const [data, setData] = useState(Object.values(dataImport))
+	const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
 
 	// Set bubble sizes
 	var size = scaleLinear()
@@ -14,10 +22,12 @@ export const BubbleList = ({data: dataImport, state, projection, applyLegendToRo
 		.range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
 	// Start looping through the countries to create the bubbles.
-	const countries = data.map( (country, index) => {
+	const countries = runtimeData && Object.values(runtimeData).map( (country, index) => {
 
 		// get coordinates from ISO
-		let coordinates = countryCoordinates[country.uid]
+		country.coordinates = countryCoordinates[country.uid]
+
+		let {coordinates} = country
 
 		if(!coordinates) return;
 
@@ -42,15 +52,16 @@ export const BubbleList = ({data: dataImport, state, projection, applyLegendToRo
 				stroke={legendColors[0]}
 				strokeWidth={3}
 				fillOpacity={.4}
-				onClick={() => handleCircleClick([coordinates[1], coordinates[0]])}
+				onClick={() => handleCircleClick(country)}
 				transform={transform}
+				style={{ transition: 'all .25s ease-in-out' }}
 			/>
 		);
 
 		return (
-			<>
+			<g key={`group-${countryName.replace(' ', '')}`}>
 			{circle}
-			</>
+			</g>
 		)
 	})
 	return countries;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, {  useEffect, memo } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -10,14 +10,28 @@ import ZoomableGroup from './ZoomableGroup';
 import Geo from './Geo'
 import CityList from './CityList';
 import BubbleList from './BubbleList';
+import { compressSpaces } from 'canvg';
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
+// TODO Refactor - state should be set together here to avoid rerenders
+// Resets to original data & zooms out
+const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
+  let reRun = generateRuntimeData(state)
+  setRuntimeData(reRun)
+  setState({
+    ...state,
+    focusedCountry: false,
+    mapPosition: { coordinates: [0, 30], zoom: 1 }
+  })
+}
+
+
+
 const handleZoomIn = (position, setPosition) => {
   if (position.zoom >= 4) return;
-  console.log('position', position)
   setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
 };
 
@@ -26,7 +40,7 @@ const handleZoomOut = (position, setPosition) => {
   setPosition((pos) => ({ ...pos, zoom: pos.zoom / 1.5 }));
 };
 
-const ZoomControls = ({position, setPosition}) => (
+const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, generateRuntimeData}) => (
   <div className="zoom-controls" data-html2canvas-ignore>
     <button onClick={() => handleZoomIn(position, setPosition)}>
       <svg
@@ -47,6 +61,11 @@ const ZoomControls = ({position, setPosition}) => (
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
     </button>
+    {state.general.type === 'bubble' &&
+      <button onClick={ () => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className="reset">
+          Reset Filters
+      </button>
+    }
   </div>
 );
 
@@ -59,20 +78,27 @@ const WorldMap = (props) => {
     applyLegendToRow,
     displayGeoName,
     supportedCountries,
-    rebuildTooltips
+    rebuildTooltips,
+    setState,
+    setRuntimeData,
+    generateRuntimeData,
+    setFilteredCountryCode,
+    position,
+    setPosition
   } = props;
 
-  const [position, setPosition] = useState({ coordinates: [0, 30], zoom: 1 });
+
+  // TODO Refactor - state should be set together here to avoid rerenders
+  const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
+    let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
+    setFilteredCountryCode(newRuntimeData[0].uid)
+  }
 
   useEffect(() => rebuildTooltips());
 
   const handleMoveEnd = (position) => {
     setPosition(position);
   };
-
-  const handleCircleClick = (coordinates) => {
-    setPosition( (pos) => ({coordinates: coordinates, zoom: 3}) )
-  }
 
   const constructGeoJsx = (geographies) => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
@@ -156,12 +182,13 @@ const WorldMap = (props) => {
       geosJsx.push(
         <BubbleList
           key="bubbles"
-          data={data}
+          data={state.data}
+          runtimeData={data}
           state={state}
           projection={projection}
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
-          handleCircleClick={handleCircleClick}
+          handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
         />
       )
     }
@@ -180,7 +207,6 @@ const WorldMap = (props) => {
           projection={projection}
           width={880}
           height={500}
-          style={{ transition: 'all 1s ease-in-out' }}
         >
           <Mercator
             data={world}
@@ -189,7 +215,15 @@ const WorldMap = (props) => {
           </Mercator>
         </ZoomableGroup>
       </svg>
-      {state.general.type === 'data' || state.general.type === 'bubble' && <ZoomControls position={position} setPosition={setPosition} />}
+      { (state.general.type === 'data' || state.general.type === 'bubble') && 
+        <ZoomControls
+          position={position}
+          setPosition={setPosition}
+          setRuntimeData={setRuntimeData}
+          state={state} 
+          setState={setState}
+          generateRuntimeData={generateRuntimeData} />
+      }
     </ErrorBoundary>
   );
 };
