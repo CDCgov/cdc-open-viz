@@ -15,11 +15,9 @@ import { Base64 } from 'js-base64';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import Context from '../ConfigContext';
+export default function DataTable(props) {
 
-export default function DataTable() {
-
-  const { data, config } = useContext<any>(Context);
+  const { data, config } = props;
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
@@ -60,26 +58,24 @@ export default function DataTable() {
       return [{
           Header : 'No Data Found'
       }];
+    } else {
+      Object.keys(data[0]).map((key) => {
+          const newCol = {
+            Header: key,
+            Cell: ({ row }) => {
+              return (
+                <>
+                  {row.original[key]}
+                </>
+              );
+            },
+            id: key,
+            canSort: true
+          };
+
+          newTableColumns.push(newCol);
+      });
     }
-
-    // else {
-    //   Object.keys(data[0]).map((key) => {
-    //       const newCol = {
-    //         Header: key,
-    //         Cell: ({ row }) => {
-    //           return (
-    //             <>
-    //               {row.original[key]}
-    //             </>
-    //           );
-    //         },
-    //         id: key,
-    //         canSort: true
-    //       };
-
-    //       newTableColumns.push(newCol);
-    //   });
-    // }
 
     return newTableColumns;
   }, [config]);
@@ -125,6 +121,7 @@ export default function DataTable() {
     <ErrorBoundary component="DataTable">
       <section className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
+            role="button"
             className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
             onClick={() => { setTableExpanded(!tableExpanded); }}
             tabIndex={0}
