@@ -143,6 +143,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
             dataKey: dataKey,
             updateDescriptionProp
           }}/>}
+          {configureData.formattedData && <button style={{margin: '1em'}} className="cove-button" onClick={() => overlay?.actions.toggleOverlay()}>Continue</button>}
         </Modal.Content>
       </Modal>
     )
