@@ -52,7 +52,7 @@
 	},
 	"filters": [],
 	"dataTable": {
-		"title": "",
+		"title": "Data Table",
 		"forceDisplay": true
 	},
 	"tooltips": {
