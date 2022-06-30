@@ -105,6 +105,7 @@ const Sidebar = (props) => {
         <select
           id={`filter-${idx}`}
           className="filter-select"
+          aria-label="select filter"
           value={singleFilter.active}
           onChange={(val) => {
             changeFilterActive(idx, val.target.value);
