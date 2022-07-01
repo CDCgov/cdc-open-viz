@@ -10,7 +10,8 @@ export const BubbleList = (
 		applyLegendToRow,
 		applyTooltipsToGeo,
 		handleCircleClick,
-		runtimeData
+		runtimeData,
+		displayGeoName
 	}) => {
 
 	const [data, setData] = useState(Object.values(dataImport))
@@ -29,14 +30,14 @@ export const BubbleList = (
 
 		let {coordinates} = country
 
-		if(!coordinates) return;
+		if(!coordinates) return true;
 
-		const countryName = country[state.columns.geo.name];
+		const countryName = displayGeoName(country[state.columns.geo.name]);
 		const toolTip = applyTooltipsToGeo(countryName, country);
 		const legendColors = applyLegendToRow(country);
 		
-		if(legendColors === false) return;
-	
+		if(legendColors[0] === '#000000') return true;
+
 		let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
 		const circle = (
@@ -48,19 +49,20 @@ export const BubbleList = (
 				cx={ Number(projection(coordinates[1], coordinates[0])[0]) || 0  } // || 0 handles error on loads where the data isn't ready
 				cy={ Number(projection(coordinates[1], coordinates[0])[1]) || 0 }
 				r={ size(country.Data) }
-				fill={legendColors[0]}
-				stroke={legendColors[0]}
+				fill={legendColors[0] === '#000000' ? 'transparent' : legendColors[0] }
+				stroke={legendColors[0] === '#000000' ? 'transparent' : legendColors[0]}
 				strokeWidth={3}
 				fillOpacity={.4}
 				onClick={() => handleCircleClick(country)}
 				transform={transform}
-				style={{ transition: 'all .25s ease-in-out' }}
+				style={{ transition: 'all .25s ease-in-out', cursor: "pointer" }}
 			/>
 		);
+	
 
 		return (
 			<g key={`group-${countryName.replace(' ', '')}`}>
-			{circle}
+				{circle}
 			</g>
 		)
 	})

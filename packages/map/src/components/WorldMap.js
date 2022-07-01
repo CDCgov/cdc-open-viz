@@ -42,7 +42,7 @@ const handleZoomOut = (position, setPosition) => {
 
 const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, generateRuntimeData}) => (
   <div className="zoom-controls" data-html2canvas-ignore>
-    <button onClick={() => handleZoomIn(position, setPosition)}>
+    <button onClick={() => handleZoomIn(position, setPosition)} aria-label="Zoom In">
       <svg
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -52,7 +52,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
     </button>
-    <button onClick={() => handleZoomOut(position, setPosition)}>
+    <button onClick={() => handleZoomOut(position, setPosition)} aria-label="Zoom Out">
       <svg
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -62,7 +62,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
       </svg>
     </button>
     {state.general.type === 'bubble' &&
-      <button onClick={ () => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className="reset">
+      <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className="reset" aria-label="Reset Zoom and Map Filters">
           Reset Filters
       </button>
     }
@@ -188,6 +188,7 @@ const WorldMap = (props) => {
           projection={projection}
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
+          displayGeoName={displayGeoName}
           handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
         />
       )
