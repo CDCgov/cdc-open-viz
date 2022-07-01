@@ -117,8 +117,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     let legendMemo = useRef(new Map())
 
     useEffect(() => {
-        console.log('filteredCountryCodeChanged', filteredCountryCode)
-
         try {
             if (filteredCountryCode) {
                 const filteredCountryObj = runtimeData[filteredCountryCode]
@@ -126,9 +124,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 const long = coordinates[1]
                 const lat = coordinates[0]
                 const reversedCoordinates = [long, lat];
-                const tmpData = {
-                    [filteredCountryCode]: filteredCountryObj
-                }
                 
                 setState({
                     ...state,
@@ -900,7 +895,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 const column = state.columns[columnKey]
 
                 if (true === column.tooltip) {
-
                     let label = column.label.length > 0 ? column.label : '';
 
                     let value;
@@ -1371,7 +1365,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
 				)}
-				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
+                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
 					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
 						{parse(title)}
 					</div>
