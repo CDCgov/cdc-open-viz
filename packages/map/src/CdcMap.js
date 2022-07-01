@@ -125,11 +125,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 const coordinates = filteredCountryObj.coordinates
                 const long = coordinates[1]
                 const lat = coordinates[0]
-    
                 const reversedCoordinates = [long, lat];
-    
-                console.log('coordinates', reversedCoordinates)
-    
                 const tmpData = {
                     [filteredCountryCode]: filteredCountryObj
                 }
