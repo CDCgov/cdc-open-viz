@@ -36,8 +36,7 @@ export const BubbleList = (
 		const toolTip = applyTooltipsToGeo(countryName, country);
 		const legendColors = applyLegendToRow(country);
 		
-		if(legendColors[0] === '#000000') return true;
-
+		let primaryKey = state.columns.primary.name
 		let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
 		const circle = (
@@ -48,9 +47,9 @@ export const BubbleList = (
 				className="bubble"
 				cx={ Number(projection(coordinates[1], coordinates[0])[0]) || 0  } // || 0 handles error on loads where the data isn't ready
 				cy={ Number(projection(coordinates[1], coordinates[0])[1]) || 0 }
-				r={ size(country.Data) }
-				fill={legendColors[0] === '#000000' ? 'transparent' : legendColors[0] }
-				stroke={legendColors[0] === '#000000' ? 'transparent' : legendColors[0]}
+				r={ Number(size(country[primaryKey])) }
+				fill={legendColors[0] }
+				stroke={legendColors[0]}
 				strokeWidth={3}
 				fillOpacity={.4}
 				onClick={() => handleCircleClick(country)}
