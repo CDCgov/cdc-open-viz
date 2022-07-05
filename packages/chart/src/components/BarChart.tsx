@@ -110,7 +110,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   <>
                     <style>
                       {`
-                         #barStack${barStack.index}-${bar.index} rect{
+                         #barStack${barStack.index}-${bar.index} rect,
+                         #barStack${barStack.index}-${bar.index} foreignObject{
                           animation-delay: ${barStack.index}.2s;
                           transform-origin: ${barThicknessAdjusted/2}px ${bar.y + bar.height}px
                         }
@@ -357,9 +358,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         <>
                         <style>
                           {`
-                            
-                            .Bar #barGroup${barGroup.index} {
-                              transform-origin: ${barWidth/2}px ${barY + barHeight}px
+                            .Bar #barGroup${barGroup.index},
+                            .Combo #barGroup${barGroup.index} {
+                              transform-origin: 0 ${barY + barHeight}px
                             }
                             
                             `}

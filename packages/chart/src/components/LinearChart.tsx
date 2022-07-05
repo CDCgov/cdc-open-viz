@@ -23,17 +23,18 @@ export default function LinearChart() {
   let [ width ] = dimensions;
   const {minValue,maxValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>((!config.animate));
 
   const triggerRef = useRef();
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
 
-  if( dataRef?.isIntersecting && config.animate && ! animatedChart ) {
+  if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
     console.log('dataref', dataRef.isIntersecting);
     console.log('animatedChart', animatedChart);
     setTimeout(() => {
-      setAnimatedChart(true);
+      setAnimatedChartPlayed(true);
     }, 500);
   }
 
@@ -158,10 +159,20 @@ export default function LinearChart() {
     ReactTooltip.rebuild();
   });
 
+  // console.log('config.animateReplay', ! config.animateReplay)
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className={`linear ${config.visualizationType} ${animatedChart ? 'animated' : ''}`}>
+      <svg
+          width={width}
+          height={height}
+          className={`
+            linear 
+            ${config.visualizationType} 
+            ${config.animate && config.animateReplay !== false  ? 'animated' : ''}
+            ${config.animate && animatedChartPlayed ? 'animate' : ''}
+            `}
+      >
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null

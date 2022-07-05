@@ -225,7 +225,7 @@ const EditorPanel = () => {
 
   const sortableItemStyles = {
     animate: false,
-    animateReplay: false,
+    animateReplay: true,
     display: 'block',
     boxSizing: 'border-box',
     border: '1px solid #D1D1D1',

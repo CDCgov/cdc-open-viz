@@ -1,6 +1,9 @@
 {
     "title": "Planet Radius (Combo Example)",
     "dataUrl":  "/examples/planet-example-data.json",
+    "animate": true,
+    "animateReplay": true,
+
     "visualizationType": "Bar",
 	"visualizationSubType": "horizontal",
     "isLollipopChart": false,
