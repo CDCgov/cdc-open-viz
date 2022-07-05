@@ -25,7 +25,8 @@ const iconHash = {
   'us' : <UsaIcon />,
   'us-county': <UsaIcon />,
   'world' : <WorldIcon />,
-  'single-state': <AlabamaIcon />
+  'single-state': <AlabamaIcon />,
+  'filtered-text' :  <UsaIcon />,
 }
 
 const labelHash = {
@@ -38,7 +39,9 @@ const labelHash = {
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
   'world' : 'World',
-  'single-state': 'U.S. State'
+  'single-state': 'U.S. State',
+  'filtered-text':'Filtered Text'
+
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {

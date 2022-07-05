@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState, FC } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import DataTransform from '@cdc/core/components/DataTransform'
 import Loading from '@cdc/core/components/Loading'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
@@ -14,7 +15,7 @@ interface Props {
 	config?: object,
 	isDashboard?: boolean,
 	isEditor?: boolean,
-	setConfig?: any
+	setConfig?: Function
 }
 
 type Defaults = typeof defaults;
@@ -22,7 +23,8 @@ type Defaults = typeof defaults;
 const CdcFilteredText:FC<Props> = (props) => {
 
 	const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
-
+  
+  const transform = new DataTransform()
   // Default States
   const [ config, setConfig ] = useState<Defaults>({ ...defaults })
   const [ loading, setLoading ] = useState(true)
@@ -46,22 +48,22 @@ const CdcFilteredText:FC<Props> = (props) => {
     setConfig(newConfig)
   }
 
-  const loadConfig = useCallback(async () => {
-    let response = configObj || await (await fetch(configUrl)).json()
-    let responseData = response.data ?? {}
+  // const loadConfig = useCallback(async () => {
+  //   let response = configObj || await (await fetch(configUrl)).json()
+  //   let responseData = response.data ?? {}
 
-    if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-      responseData = await dataString.json()
-    }
+  //   if (response.dataUrl) {
+  //     const dataString = await fetch(response.dataUrl)
+  //     responseData = await dataString.json()
+  //   }
 
-    response.data = responseData
+  //   response.data = responseData
 
-    updateConfig({ ...defaults, ...response })
-    setLoading(false)
-  }, [])
+  //   updateConfig({ ...defaults, ...response })
+  //   setLoading(false)
+  // }, [])
 
-  const fetchRemoteData = async(url)=>{
+  const fetchRemoteData = async(url)=>{  
    try{
     const data = await fetch(url)
     .then(response => response.text())
@@ -73,12 +75,36 @@ const CdcFilteredText:FC<Props> = (props) => {
       })
       return parsedCsv.data
     })
-   setStateData(data)
+   return data
    }catch(err){
     console.warn('err :>> ', err);
    }
   }
+  const loadConfig = async () => {
+    if(!loading) setLoading(true)
 
+    let response = configObj || await (await fetch(configUrl)).json();
+    // If data is included through a URL, fetch that and store
+    let responseData = response.data ?? {}
+
+    if (response.dataUrl) {
+      let newData = await fetchRemoteData(response.dataUrl)
+      if(newData && response.dataDescription) {
+          newData = transform.autoStandardize(newData);
+          newData = transform.developerStandardize(newData, response.dataDescription);
+      }
+
+      if(newData) {
+        responseData = newData;
+      }
+    }
+
+    response.data = responseData;
+    setStateData(response.data)
+    updateConfig({ ...defaults, ...response });
+
+    setLoading(false);
+  }
 
     //Optionally filter the data based on the user's filter
     let filteredData = stateData;
@@ -94,16 +120,10 @@ const CdcFilteredText:FC<Props> = (props) => {
       }
     })
 
-
-// load csv  data
-useEffect(()=>{
-  fetchRemoteData('../examples/sex-ageGroup-with-values.csv')
-},[])
   //Load initial config
   useEffect(() => {
-    loadConfig().catch((err) => console.log(err))
+   loadConfig().catch((err) => console.log(err))
   }, [])
-
   let content = (<Loading/>)
 
 let filterClasses = ["cove","cove-component","cove-component__content","filtered-text"]
@@ -118,14 +138,15 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
   if (loading === false) {
     let body = (
          <>
-        {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
+        {/* {title && <header className={`cove-component__header ${config.theme} `}>{title}</header>} */}
         <div className={filterClasses.join(' ')} >
             <div className="cove-component__content-wrap">
-             {filteredData.slice(0,1).map((el,i)=>{
+             {/* {filteredData.slice(0,1).map((el,i)=>{
               return (
-                <p key={i} > {parse(el.Text)} </p>
+                <p key={i} > {el.Text} </p>
               )
-            })}  
+            })}   */}
+            sdsdcsd
             </div>
           </div>
           </>
