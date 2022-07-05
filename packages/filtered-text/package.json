@@ -19,8 +19,8 @@
   },
   "scripts": {
     "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcMap --env folderName=map -c ../../webpack.config.js",
-    "prepublishOnly": "lerna run --scope @cdc/map build"
+    "build": "npx webpack --mode production --env packageName=CdcFilteredText --env  folderName=filtered-text -c ../../webpack.config.js",
+    "prepublishOnly": "lerna run --scope @cdc/filtered-text build"
   },
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"

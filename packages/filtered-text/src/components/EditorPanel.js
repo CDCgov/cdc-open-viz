@@ -103,20 +103,11 @@ const EditorPanel = memo((props) => {
 		stateData:data,
 		setParentConfig,
 		isDashboard
-	} = useContext(ConfigContext)
+	} = useContext(ConfigContext) 
 
 	const [displayPanel, setDisplayPanel] = useState(true)
 	const [showConfigConfirm, setShowConfigConfirm] = useState(false)
 
-	const showTextColumnOptions = ()=>{
-		let res = [];
-		data.forEach((el,i)=>{
-			console.log('el[i]', el)
-			//res.push(el[i])
-		})
-	//console.log('res', res)
-	return res
-	}
 
 	const updateField = (section, subsection, fieldName, newValue) => {
 		// Top level
@@ -273,7 +264,7 @@ const EditorPanel = memo((props) => {
 			</Accordion.Section>
 		</Accordion>
 		<Accordion>
-			<Accordion.Section title="Data">
+			{/* <Accordion.Section title="Data">
 			<Select value={config.fontSize} fieldName="fontSize" label="Text Column" updateField={updateField} options={getColumns()} />
 			{config.filters &&
 			<ul className="filters-list">
@@ -310,7 +301,7 @@ const EditorPanel = memo((props) => {
                     </div>
                   }
                   <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
-			</Accordion.Section>
+			</Accordion.Section> */}
 		</Accordion>
 		<Accordion>
 			<Accordion.Section title="Visual">
@@ -321,11 +312,11 @@ const EditorPanel = memo((props) => {
 				<CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
 				<label >
 				<span className="edit-label">Theme</span>
-				<ul className="color-palette">
+				{/* <ul className="color-palette">
 					{headerColors.map( (palette) => (
 					<li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette} />
 					))}
-				</ul>
+				</ul> */}
 				</label>
 			</Accordion.Section>
 		</Accordion>
