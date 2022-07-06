@@ -145,6 +145,10 @@ header + .map-container.full-border {
 		&:active {
 			transform: scale(0.9);
 		}
+		svg {
+			height: 1.75em;
+			width: 1.75em;
+		}
 	}
 	> button:first-child {
 		margin-right: 0.25em;
@@ -155,6 +159,10 @@ header + .map-container.full-border {
 	.zoom-controls > button:not(.reset) {
 		height: 2.5em;
 		width: 2.5em;
+		svg {
+			height: 2.5em;
+			width: 2.5em;
+		}
 	}
 }
 

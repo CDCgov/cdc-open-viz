@@ -17,6 +17,8 @@ export const BubbleList = (
 	const [data, setData] = useState(Object.values(dataImport))
 	const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
 
+	const clickTolerance = 10;
+
 	// Set bubble sizes
 	var size = scaleLinear()
 		.domain([1, maxDataValue])
@@ -39,6 +41,8 @@ export const BubbleList = (
 		let primaryKey = state.columns.primary.name
 		let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
+		let pointerX, pointerY;
+
 		const circle = (
 			<circle
 				key={`circle-${countryName.replace(' ', '')}`}
@@ -52,7 +56,22 @@ export const BubbleList = (
 				stroke={legendColors[0]}
 				strokeWidth={3}
 				fillOpacity={.4}
-				onClick={() => handleCircleClick(country)}
+				onPointerDown={(e) => {
+					pointerX = e.clientX; 
+					pointerY = e.clientY;
+				}}
+				onPointerUp={(e) => {
+					if(pointerX && pointerY &&
+						e.clientX > (pointerX - clickTolerance) &&
+						e.clientX < (pointerX + clickTolerance) &&
+						e.clientY > (pointerY - clickTolerance) &&
+						e.clientY < (pointerY + clickTolerance)
+					){ 
+						handleCircleClick(country)
+						pointerX = undefined;
+						pointerY = undefined;
+					}
+				}}
 				transform={transform}
 				style={{ transition: 'all .25s ease-in-out', cursor: "pointer" }}
 			/>
