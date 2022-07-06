@@ -16,7 +16,25 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
 
-// TODO Refactor - state should be set together here to avoid rerenders
+const WorldMap = (props) => {
+  const {
+    state,
+    applyTooltipsToGeo,
+    data,
+    geoClickHandler,
+    applyLegendToRow,
+    displayGeoName,
+    supportedCountries,
+    rebuildTooltips,
+    setState,
+    setRuntimeData,
+    generateRuntimeData,
+    setFilteredCountryCode,
+    position,
+    setPosition
+  } = props;
+
+  // TODO Refactor - state should be set together here to avoid rerenders
 // Resets to original data & zooms out
 const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
   let reRun = generateRuntimeData(state)
@@ -26,10 +44,8 @@ const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
     focusedCountry: false,
     mapPosition: { coordinates: [0, 30], zoom: 1 }
   })
+  setFilteredCountryCode('')
 }
-
-
-
 const handleZoomIn = (position, setPosition) => {
   if (position.zoom >= 4) return;
   setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
@@ -68,25 +84,6 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
     }
   </div>
 );
-
-const WorldMap = (props) => {
-  const {
-    state,
-    applyTooltipsToGeo,
-    data,
-    geoClickHandler,
-    applyLegendToRow,
-    displayGeoName,
-    supportedCountries,
-    rebuildTooltips,
-    setState,
-    setRuntimeData,
-    generateRuntimeData,
-    setFilteredCountryCode,
-    position,
-    setPosition
-  } = props;
-
 
   // TODO Refactor - state should be set together here to avoid rerenders
   const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
