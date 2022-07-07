@@ -42,7 +42,7 @@ const DataTable = (props) => {
 
   const [ready, setReady] = useState(false)
 
-  const fileName = `${mapTitle}.csv`;
+  const fileName = `${mapTitle || 'data-table'}.csv`;
 
 
   // Catch all sorting method used on load by default but also on user click
