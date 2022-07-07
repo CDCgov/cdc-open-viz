@@ -1411,8 +1411,7 @@ const EditorPanel = (props) => {
 										</select>
 									</label>
 
-									{'navigation' !== state.general.type && (
-                    <>
+				{'navigation' !== state.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
                         <label>
 												<span className='edit-label column-heading'>
@@ -1527,6 +1526,39 @@ const EditorPanel = (props) => {
                           </li>
                         </ul>
                       </fieldset>
+				)}
+
+
+
+					  {state.general.type === 'bubble' && state.legend.type === 'category' && (
+						<fieldset className='primary-fieldset edit-block'>
+                        	<label>
+								<span className='edit-label column-heading'>
+                          			Category Column
+									<Tooltip style={{textTransform: 'none'}}>
+										<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+										<Tooltip.Content>
+											<p>Select the source column containing the categorical bubble values to be mapped.</p>
+										</Tooltip.Content>
+									</Tooltip>
+								</span>
+								<select
+									value={
+									state.columns.categorical
+										? state.columns.categorical.name
+										: columnsOptions[0]
+									}
+									onChange={(event) => {
+									editColumn('categorical', 'name', event.target.value);
+									}}
+								>
+									{columnsOptions}
+								</select>
+                        	</label>
+						</fieldset>
+					)}
+
+					{'navigation' !== state.general.type && (
                       <fieldset className="primary-fieldset edit-block">
                         <label>
                           <span className='edit-label'>
@@ -1582,8 +1614,7 @@ const EditorPanel = (props) => {
                           Add Special Class
                         </button>
                       </fieldset>
-                    </>
-									)}
+					)}
 
 									<label className='edit-block navigate column-heading'>
 										<span className='edit-label column-heading'>
