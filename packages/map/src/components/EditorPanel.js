@@ -1956,7 +1956,7 @@ const EditorPanel = (props) => {
                         </span>
 											</label>
 										)}
-										{filtersJSX.length > 0 && (
+										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
 											<label className='checkbox'>
 												<input
 													type='checkbox'
