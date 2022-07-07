@@ -19,6 +19,7 @@ import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
 import initialState from './data/initial-state';
+import { countryCoordinates } from './data/country-coordinates';
 
 // Sass
 import './scss/main.scss';
@@ -120,7 +121,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         try {
             if (filteredCountryCode) {
                 const filteredCountryObj = runtimeData[filteredCountryCode]
-                const coordinates = filteredCountryObj.coordinates
+                const coordinates = countryCoordinates[filteredCountryCode]
                 const long = coordinates[1]
                 const lat = coordinates[0]
                 const reversedCoordinates = [long, lat];
@@ -160,8 +161,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }, [state.mapPosition, setPosition]);
 
     const setZoom = (reversedCoordinates) => {
-        console.log('setting zoom')
-        console.log('state', state)
         setState({
             ...state,
             mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
@@ -845,7 +844,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
             if (false === state.legend.specialClasses.includes(String(value))) {
-                formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
+                formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
             }
         }
 

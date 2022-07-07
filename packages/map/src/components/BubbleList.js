@@ -27,10 +27,7 @@ export const BubbleList = (
 	// Start looping through the countries to create the bubbles.
 	const countries = runtimeData && Object.values(runtimeData).map( (country, index) => {
 
-		// get coordinates from ISO
-		country.coordinates = countryCoordinates[country.uid]
-
-		let {coordinates} = country
+		let coordinates = countryCoordinates[country.uid]
 
 		if(!coordinates) return true;
 
