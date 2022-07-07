@@ -29,7 +29,6 @@ const WorldMap = (props) => {
     setState,
     setRuntimeData,
     generateRuntimeData,
-    filteredCountryCode,
     setFilteredCountryCode,
     position,
     setPosition
@@ -187,7 +186,6 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
-          filteredCountryCode={filteredCountryCode}
           handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
         />
       )

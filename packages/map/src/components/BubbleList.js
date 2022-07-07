@@ -11,8 +11,7 @@ export const BubbleList = (
 		applyTooltipsToGeo,
 		handleCircleClick,
 		runtimeData,
-		displayGeoName,
-		filteredCountryCode
+		displayGeoName
 	}) => {
 
 	const [data, setData] = useState(Object.values(dataImport))
@@ -41,7 +40,7 @@ export const BubbleList = (
 
 		let pointerX, pointerY;
 
-		const circle = (!filteredCountryCode || filteredCountryCode === country.uid) && (
+		const circle = (
 			<circle
 				key={`circle-${countryName.replace(' ', '')}`}
 				data-tip={toolTip}
