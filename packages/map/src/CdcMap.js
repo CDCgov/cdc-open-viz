@@ -120,7 +120,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     useEffect(() => {
         try {
             if (filteredCountryCode) {
-                const filteredCountryObj = runtimeData[filteredCountryCode]
                 const coordinates = countryCoordinates[filteredCountryCode]
                 const long = coordinates[1]
                 const lat = coordinates[0]
@@ -135,22 +134,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         } catch(e) {
             console.error('Failed to set world map zoom.')
         }
-
-    }, [filteredCountryCode]);
-
-    useEffect(() => {
-
-        setTimeout( () => {
-            if (filteredCountryCode) {
-                const filteredCountryObj = runtimeData[filteredCountryCode]
-    
-                const tmpData = {
-                    [filteredCountryCode]: filteredCountryObj
-                }
-    
-                setRuntimeData(tmpData)
-            }
-        }, 100)
 
     }, [filteredCountryCode]);
 
