@@ -244,9 +244,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
     }
 
-    if (Object.keys(newFilteredData).length > 0) {
-      setFilteredData(newFilteredData)
-    }
+    setFilteredData(newFilteredData)
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
