@@ -378,16 +378,24 @@ export default function DataImport() {
 
   const removeDataset = (datasetKey) => {
     let newDatasets = {...config.datasets};
+    let newVisualizations = {...config.visualizations};
+
+    Object.keys(newVisualizations).forEach(vizKey => {
+      if(newVisualizations[vizKey].dataKey === datasetKey) {
+        delete newVisualizations[vizKey].dataKey;
+      }
+    });
 
     delete newDatasets[datasetKey];
 
-    setConfig({...config, datasets: newDatasets});
+    setConfig({...config, datasets: newDatasets, visualizations: newVisualizations});
   }
 
   const renameDataset = (oldName, newName) => {
     if(oldName === newName) return;
 
     let newDatasets = {...config.datasets};
+    let newVisualizations = {...config.visualizations};
 
     let suffix = 2;
     let originalName = newName;
@@ -399,7 +407,13 @@ export default function DataImport() {
     newDatasets[newName] = newDatasets[oldName];
     delete newDatasets[oldName];
 
-    setConfig({...config, datasets: newDatasets});
+    Object.keys(newVisualizations).forEach(vizKey => {
+      if(newVisualizations[vizKey].dataKey === oldName) {
+        newVisualizations[vizKey].dataKey = newName;
+      }
+    });
+
+    setConfig({...config, datasets: newDatasets, visualizations: newVisualizations});
   }
 
   let previewData, configureData, readyToConfigure = false;
