@@ -347,18 +347,3 @@
   }
 }
 
-.stack{
-  &__not-rounded{
-    border-radius: 0 !important;
-  }
-  &__vertical-0{
-    &.standard{ border-radius:  0 0 8px 8px !important;}
-    &.shallow{border-radius: 0 0 5px 5px !important;}
-    &.finger{border-radius:  0 0 15px 15px !important;}
-  }
-  &__horizontal-0{
-    &.standard{border-radius:  8px 0px 0px 8px !important;}
-    &.shallow{border-radius:  5px 0px 0px 5px !important;}
-    &.finger{border-radius:  15px 0px 0px 15px !important;}
-  } 
-}
