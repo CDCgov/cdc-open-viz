@@ -51,7 +51,7 @@ export const BubbleList = (
 				r={ Number(size(country[primaryKey])) }
 				fill={legendColors[0] }
 				stroke={legendColors[0]}
-				strokeWidth={2}
+				strokeWidth={1.25}
 				fillOpacity={.4}
 				onPointerDown={(e) => {
 					pointerX = e.clientX; 
