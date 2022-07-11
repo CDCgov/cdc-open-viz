@@ -614,30 +614,58 @@ export default function CdcChart(
     if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
     if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
 
+    console.log('config', config)
+
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend />}
+        {!missingRequiredSections() && !config.newViz && (
+          <div className="cdc-chart-inner-container">
+            {/* Title */}
+
+            {title && (
+              <div
+                role="heading"
+                className={`chart-title ${config.theme}`}
+                aria-level={2}
+              >
+                {config.general && (
+                  <sup className="super_title">
+                    {config.general.super_title}
+                  </sup>
+                )}
+                <div>{parse(title)}</div>
+              </div>
+            )}
+            <a
+              id="skip-chart-container"
+              className="cdcdataviz-sr-only-focusable"
+              href={handleChartTabbing}
+            >
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            {config.filters && <Filters />}
+            {/* Visualization */}
+            {config.general && <section className="intro_text">{config.general.intro_text}</section>}
+            <div
+              className={`chart-container${
+                config.legend.hide ? " legend-hidden" : ""
+              }${lineDatapointClass}${barBorderClass}`}
+            >
+              {chartComponents[visualizationType]}
+              {/* Legend */}
+              {!config.legend.hide && <Legend />}
+            </div>
+            {/* Description */}
+            {description && <div className="subtext">{parse(description)}</div>}
+            {/* Data Table */}
+            {config.xAxis.dataKey && config.table.show && <DataTable />}
+            {config.general && <section className="footnotes">{config.general.footnotes}</section>}
           </div>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
-        </div>}
+        )}
       </>
-    )
+    );
   }
 
   const contextValues = {

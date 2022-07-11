@@ -682,7 +682,41 @@ const EditorPanel = () => {
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
                   }
                   {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
-                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField}/>
+                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
+                  
+                  <TextField
+										value={config.super_title || ''}
+										updateField={updateField}
+										section='general'
+										fieldName='super_title'
+										label='Super Title'
+										placeholder='Super Title'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                        <p>Super Title</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+										}
+                  />
+                  
+                  <TextField
+										type='textarea'
+										value={config.intro_text}
+										updateField={updateField}
+										section='general'
+										fieldName='intro_text'
+										label='Intro Text'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                        <p>Intro Text</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+										}
+									/>
 
                   <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
@@ -691,7 +725,24 @@ const EditorPanel = () => {
                         <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
                       </Tooltip.Content>
                     </Tooltip>
-                  }/>
+                  } />
+                  
+                  <TextField
+										type='textarea'
+										value={config.footnotes}
+										updateField={updateField}
+										section='general'
+										fieldName='footnotes'
+										label='Footnotes'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                        <p>Footnotes</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+										}
+									/>
 
                   {config.visualizationSubType !== 'horizontal' &&
                     <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField}/>

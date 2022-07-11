@@ -220,5 +220,15 @@
   [tabIndex]:focus {
     outline-color: rgb(0, 95, 204)
   }
+
+  section.intro_text {
+    padding: 15px;
+  }
+
+  section.footnotes {
+    border-top: 1px solid #DDD;
+    margin-top: 70px;
+    padding: 15px;
+  }
   
 }
