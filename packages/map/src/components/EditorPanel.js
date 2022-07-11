@@ -1305,20 +1305,51 @@ const EditorPanel = (props) => {
 								</AccordionItemHeading>
 								<AccordionItemPanel>
 									<TextField
-										value={state.general.title}
+										value={general.title}
 										updateField={updateField}
 										section='general'
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										value={general.super_title || ''}
+										updateField={updateField}
+										section='general'
+										fieldName='super_title'
+										label='Super Title'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Super Title</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.introtext}
+										updateField={updateField}
+										section='general'
+										fieldName='intro_text'
+										label='Intro Text'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Intro Text</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
 									/>
 									<TextField
 										type='textarea'
@@ -1327,14 +1358,30 @@ const EditorPanel = (props) => {
 										section='general'
 										fieldName='subtext'
 										label='Subtext'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.footnotes}
+										updateField={updateField}
+										section='general'
+										fieldName='footnotes'
+										label='Footnotes'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Footnotes</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
 									/>
 									{'us' === state.general.geoType && (
 										<TextField
