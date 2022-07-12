@@ -1271,7 +1271,7 @@ const EditorPanel = (props) => {
 										>
 											<option value='data'>Data</option>
 											<option value='navigation'>Navigation</option>
-											{state.general.geoType === 'world' && <option value="bubble">Bubble</option>}
+											{state.general.geoType === 'world' || state.general.geoType === 'us' && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
 									{/* SubType */}
