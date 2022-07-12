@@ -264,7 +264,7 @@ const EditorPanel = memo((props) => {
 			</Accordion.Section>
 		</Accordion>
 		<Accordion>
-			{/* <Accordion.Section title="Data">
+			<Accordion.Section title="Data">
 			<Select value={config.fontSize} fieldName="fontSize" label="Text Column" updateField={updateField} options={getColumns()} />
 			{config.filters &&
 			<ul className="filters-list">
@@ -301,7 +301,7 @@ const EditorPanel = memo((props) => {
                     </div>
                   }
                   <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
-			</Accordion.Section> */}
+			</Accordion.Section>
 		</Accordion>
 		<Accordion>
 			<Accordion.Section title="Visual">
