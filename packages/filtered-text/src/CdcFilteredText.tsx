@@ -138,14 +138,14 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
   if (loading === false) {
     let body = (
          <>
-        {/* {title && <header className={`cove-component__header ${config.theme} `}>{title}</header>} */}
+        {title && <header className={`cove-component__header ${config.theme} `}>{title}</header>}
         <div className={filterClasses.join(' ')} >
             <div className="cove-component__content-wrap">
-             {/* {filteredData.slice(0,1).map((el,i)=>{
+             {filteredData.slice(0,1).map((el,i)=>{
               return (
                 <p key={i} > {el.Text} </p>
               )
-            })}   */}
+            })}  
             sdsdcsd
             </div>
           </div>
@@ -159,6 +159,8 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
       </div>
     )
   }
+
+  console.log('Hello')
 
   return (
     <ErrorBoundary component="CdcFilteredText">
