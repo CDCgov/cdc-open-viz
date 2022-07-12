@@ -187,7 +187,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
-          handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
+          //handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
         />
       )
     }
