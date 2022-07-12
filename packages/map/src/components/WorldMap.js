@@ -31,10 +31,11 @@ const WorldMap = (props) => {
     generateRuntimeData,
     setFilteredCountryCode,
     position,
-    setPosition
+    setPosition,
+    hasZoom
   } = props;
 
-  // TODO Refactor - state should be set together here to avoid rerenders
+// TODO Refactor - state should be set together here to avoid rerenders
 // Resets to original data & zooms out
 const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
   let reRun = generateRuntimeData(state)
@@ -196,32 +197,53 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
 
   return (
     <ErrorBoundary component="WorldMap">
-      <svg viewBox="0 0 880 500">
-        <ZoomableGroup
-          zoom={position.zoom}
-          center={position.coordinates}
-          onMoveEnd={handleMoveEnd}
-          maxZoom={4}
-          projection={projection}
-          width={880}
-          height={500}
-        >
-          <Mercator
-            data={world}
+      {hasZoom ? (
+        <svg viewBox="0 0 880 500">
+          <ZoomableGroup
+            zoom={position.zoom}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={4}
+            projection={projection}
+            width={880}
+            height={500}
           >
-            {({features}) => constructGeoJsx(features)}
-          </Mercator>
-        </ZoomableGroup>
-      </svg>
-      { (state.general.type === 'data' || state.general.type === 'bubble') && 
+            <Mercator
+              data={world}
+            >
+              {({ features }) => constructGeoJsx(features)}
+            </Mercator>
+          </ZoomableGroup>
+        </svg>
+      ) :
+        <svg viewBox="0 0 880 500">
+          <ZoomableGroup
+            zoom={1}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={0}
+            projection={projection}
+            width={880}
+            height={500}
+          >
+            <Mercator
+              data={world}
+            >
+              {({ features }) => constructGeoJsx(features)}
+            </Mercator>
+          </ZoomableGroup>
+        </svg>
+      }
+      {(state.general.type === 'data' || state.general.type === 'bubble' && hasZoom) &&
         <ZoomControls
           position={position}
           setPosition={setPosition}
           setRuntimeData={setRuntimeData}
-          state={state} 
+          state={state}
           setState={setState}
           generateRuntimeData={generateRuntimeData} />
       }
+
     </ErrorBoundary>
   );
 };

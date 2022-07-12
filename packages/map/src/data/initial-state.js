@@ -17,7 +17,8 @@ export default {
     type: 'data',
     palette:{
       isReversed:false
-    }
+    },
+    allowMapZoom: true
   },
   
   type: "map",
