@@ -14,8 +14,11 @@ export const BubbleList = (
 		displayGeoName
 	}) => {
 
-	const [data, setData] = useState(Object.values(dataImport))
 	const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
+	
+	// sort runtime data. Smaller bubbles should appear on top.
+	const sortedRuntimeData = Object.values(runtimeData).sort((a, b) => a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1 )
+	if(!sortedRuntimeData) return;
 
 	const clickTolerance = 10;
 
@@ -25,7 +28,7 @@ export const BubbleList = (
 		.range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
 	// Start looping through the countries to create the bubbles.
-	const countries = runtimeData && Object.values(runtimeData).map( (country, index) => {
+	const countries = sortedRuntimeData && sortedRuntimeData.map( (country, index) => {
 
 		let coordinates = countryCoordinates[country.uid]
 
