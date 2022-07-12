@@ -221,7 +221,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
             newConfig.dashboard.sharedFilters[i].values = filterValues
             if(newConfig.visualizations[visualizationKeys[j]].dataKey){
-              newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+              newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
             }
             break
           }
@@ -230,7 +230,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
           newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, (dataOverride || data))
           if(newConfig.visualizations[visualizationKeys[i]].dataKey){
-            newConfig.dashboard.sharedFilters[i].active = (dataOverride || data)[newConfig.visualizations[visualizationKeys[i]].dataKey][0][filter.columnName]
+            newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || (dataOverride || data)[newConfig.visualizations[visualizationKeys[i]].dataKey][0][filter.columnName]
           }
         }
 
@@ -409,6 +409,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       visualizationConfig.data = filteredData && filteredData[visualizationKey] ? filteredData[visualizationKey] : data[dataKey]
       if (visualizationConfig.formattedData) {
+        visualizationConfig.originalFormattedData = visualizationConfig.formattedData;
         visualizationConfig.formattedData = visualizationConfig.data
       }
 
@@ -425,7 +426,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           setConfig(newConfig)
         }
 
-        const updateConfig = (newConfig) => updateChildConfig(visualizationKey, newConfig)
+        const updateConfig = (newConfig) => {
+          let dataCorrectedConfig = visualizationConfig.originalFormattedData ? {...newConfig, formattedData: visualizationConfig.originalFormattedData} : newConfig;
+          updateChildConfig(visualizationKey, dataCorrectedConfig)
+        }
 
         let dataTable
         if(config.table && config.table.show && config.datasets && visualizationConfig.dataKey){
