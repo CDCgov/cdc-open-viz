@@ -43,21 +43,6 @@ const Chart = () => {
   const [ colorScale, setColorScale ] = useState(null)
   const [ seriesHighlight, setSeriesHighlight ] = useState([])
 
-  const filterData = (filters, data) => {
-    let filteredData = []
-
-    data.forEach((row) => {
-      let add = true
-      filters.forEach((filter) => {
-        if (row[filter.columnName] !== filter.active) {
-          add = false
-        }
-      })
-      if (add) filteredData.push(row)
-    })
-    return filteredData
-  }
-
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (data && config.xAxis && config.runtime?.seriesKeys) {
@@ -98,6 +83,21 @@ const Chart = () => {
 
     configActions.setMissingRequiredSections(!config.xAxis.dataKey)
   }, [ config.series, config.xAxis.dataKey, config.yAxis.dataKey ])
+
+  const filterData = (filters, data) => {
+    let filteredData = []
+
+    data.forEach((row) => {
+      let add = true
+      filters.forEach((filter) => {
+        if (row[filter.columnName] !== filter.active) {
+          add = false
+        }
+      })
+      if (add) filteredData.push(row)
+    })
+    return filteredData
+  }
 
   // Gets filer values from dataset
   const generateValuesForFilter = (columnName, data) => {
@@ -355,7 +355,7 @@ const Chart = () => {
                theme={config.theme}
       // table={<DataTable/>}
     >
-      <Suspense fallback={<RenderFallback text="Rendering chart..." loadSpinSize={75}/>}>
+      <Suspense fallback={<RenderFallback style={{height: 418}} text="Rendering chart..." loadSpinSize={75}/>}>
         <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
           <a className="sr-only" href={handleChartTabbing}>
             Skip Over Chart Container

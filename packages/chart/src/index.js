@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import { render } from 'react-dom'
 
-import { GlobalContextProvider } from '@cdc/core/context/GlobalContext'
+import { GlobalContextProvider, useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { ConfigContextProvider } from '@cdc/core/context/ConfigContext'
 
 import CdcChart from './CdcChart'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 
 const ChartWrapper = ({ domContainer }) => {
+  const { view } = useGlobalContext()
+
   const demoData = [
     {
       file: '/examples/planet-example-config.json',
@@ -63,7 +65,7 @@ const ChartWrapper = ({ domContainer }) => {
 
   return (
     <>
-      {isDevmode ?
+      {isDevmode && view === 'editor' ?
         <>
           <div className="cove--developer-mode">
             <InputSelect options={demoData.map(demo => demo.name)} value={defaultConfig.name} onChange={(e) => onChangeConfig(e)}/>

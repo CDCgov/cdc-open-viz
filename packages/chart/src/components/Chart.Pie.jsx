@@ -8,19 +8,13 @@ import ReactTooltip from 'react-tooltip'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({ startAngle, endAngle })
 
-export default function ChartPie() {
-  const {
-    transformedData: data,
-    config,
-    dimensions,
-    seriesHighlight,
-    colorScale,
-    formatNumber,
-    currentViewport
-  } = useConfigContext()
+const ChartPie = ({ dimensions, seriesHighlight, colorScale, formatNumber }) => {
+  const { view } = useGlobalContext()
+  const { config, data } = useConfigContext()
 
   const [ filteredData, setFilteredData ] = useState(undefined)
 
@@ -56,7 +50,7 @@ export default function ChartPie() {
     return (
       <>
         {transitions.map(
-          ({item: arc,props,key}) => {
+          ({ item: arc, props, key }) => {
             let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
             let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${arc.data[config.runtime.xAxis.dataKey]}` : arc.data[config.runtime.xAxis.dataKey]
 
@@ -83,7 +77,7 @@ export default function ChartPie() {
           },
         )}
         {transitions.map(
-          ({item: arc, key}) => {
+          ({ item: arc, key }) => {
             const [ centroidX, centroidY ] = path.centroid(arc)
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
@@ -109,9 +103,9 @@ export default function ChartPie() {
     )
   }
 
-  let [ width ] = dimensions
+  let { width } = dimensions
 
-  if (config && config.legend && !config.legend.hide && currentViewport === 'lg') {
+  if (config && config.legend && !config.legend.hide && view === 'lg') {
     width = width * 0.73
   }
 
@@ -124,7 +118,7 @@ export default function ChartPie() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg className="cove-chart__visualization" width={width} height={height}>
+      <svg className="cove-chart__visualization--chart-pie" width={width} height={height}>
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
@@ -144,3 +138,5 @@ export default function ChartPie() {
     </ErrorBoundary>
   )
 }
+
+export default ChartPie

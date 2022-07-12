@@ -20,6 +20,7 @@ import Chart from './components/Chart'
 import EditorPanels from './components/EditorPanels'
 
 import './scss/cove-chart.scss'
+import Ghost from '@cdc/core/components/elements/Ghost'
 
 //Visualization
 const CdcChart = ({ configObj, configUrlObj }) => {
@@ -34,21 +35,22 @@ const CdcChart = ({ configObj, configUrlObj }) => {
 
   return (
     <ErrorBoundary component="CdcChart">
-      <>
-        {loadingConfig ?
-          <p>Build skeleton here</p> :
-          <>
-            {view === 'editor' ?
-              <>
-                <Editor EditorPanels={EditorPanels}>
-                  <Chart config={config}/>
-                </Editor>
-              </> :
+      {view === 'editor' ?
+        <>
+          {loadingConfig ?
+            <Ghost display="editor"/> :
+            <Editor EditorPanels={EditorPanels}>
               <Chart/>
-            }
-          </>
-        }
-      </>
+            </Editor>
+          }
+        </> :
+        <>
+          {loadingConfig ?
+            <></> :
+            <Chart/>
+          }
+        </>
+      }
     </ErrorBoundary>
   )
 }

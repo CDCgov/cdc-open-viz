@@ -10,10 +10,11 @@ const RenderFallback = ({
                           text = 'Rendering visualization...',
                           loadSpinSize = 85,
                           loadSpinColor = '#005eaa',
-                          loadSpinOpacity = 30
+                          loadSpinOpacity = 30,
+                          style
                         }) => {
   return (
-    <div className="cove-render">
+    <div className="cove-render" style={style}>
       <div className="cove-render__content">
         <div className={`cove-render__text${fadeEffect ? ' cove-render__text--animate' : ''}`}>
           {text}

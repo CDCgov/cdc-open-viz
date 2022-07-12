@@ -63,6 +63,7 @@ $editorAnimationTimer: 400ms;
   border-radius: 999px;
   box-shadow: 5px 5px 10px 0 rgb(0 0 0 / 15%);
   user-select: none;
+  z-index: 1;
 
   @at-root {
     .cove-editor:not(.panel-shown) #{&} {
