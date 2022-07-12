@@ -183,6 +183,15 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+			case 'allowMapZoom':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						allowMapZoom: value
+					},
+				})
+				break;
 			case 'showTitle':
 				setState({
 					...state,
@@ -1308,14 +1317,14 @@ const EditorPanel = (props) => {
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+										<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+											<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+											</Tooltip.Content>
+										</Tooltip>
+										}
 									/>
 									<TextField
 										type='textarea'
@@ -1324,14 +1333,14 @@ const EditorPanel = (props) => {
 										section='general'
 										fieldName='subtext'
 										label='Subtext'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+											</Tooltip.Content>
+											</Tooltip>
+										}
 									/>
 									{'us' === state.general.geoType && (
 										<TextField
@@ -2354,6 +2363,16 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/>
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.allowMapZoom}
+											onChange={(event) => {
+												handleEditorChanges('allowMapZoom', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Allow Map Zooming</span>
+									</label>
 								</AccordionItemPanel>
 							</AccordionItem>
 						</Accordion>
