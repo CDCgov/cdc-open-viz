@@ -1334,7 +1334,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         setFilteredCountryCode,
         filteredCountryCode,
         position,
-        setPosition
+        setPosition,
+        hasZoom : state.general.allowMapZoom
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
