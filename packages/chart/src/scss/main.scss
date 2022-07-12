@@ -1,19 +1,20 @@
 @import '~@cdc/core/styles/base';
 @import "~@cdc/core/styles/heading-colors";
-@import 'mixins';
-@import 'variables';
 
 .form-container {
   overflow-y: auto;
 }
 
-.d-flex { display: flex; }
+.d-flex {
+  display: flex;
+}
+
 .flex-column-reverse {
   flex-direction: column-reverse;
 }
 
 .cdc-open-viz-module.type-chart {
-  @import 'DataTable';
+  @import 'data-table';
   @import 'editor-panel';
 
   .visually-hidden {
@@ -29,35 +30,6 @@
 
     &::before {
       content: '\21BB';
-    }
-  }
-
-  .btn {
-    background: #005eaa;
-    color: #fff !important;
-    border: 0;
-    padding: .4em .8em;
-    display: block;
-    border-radius: 5px;
-    transition: .1s all;
-    cursor: pointer;
-
-    &[disabled] {
-      opacity: 0.5;
-      z-index: -1;
-      position: relative;
-    }
-  }
-
-  .warning-icon {
-    position: relative;
-    top: 2px;
-    width: 15px;
-    height: 15px;
-    margin-left: 5px;
-
-    path {
-      fill: #d8000c;
     }
   }
 
@@ -251,7 +223,8 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section, .chart-container {
+    .filters-section,
+    .chart-container {
       margin-left: 1em;
       margin-right: 1em;
     }
@@ -325,13 +298,13 @@
       }
     }
   }
+
   [tabindex]:focus-visible {
     outline: 2px solid rgb(0, 95, 204) !important;
   }
 }
 
 #paired-bar-legend {
-
   text-align: center;
 
   div {

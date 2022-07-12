@@ -16,15 +16,6 @@ export default {
     left: 5,
     right: 5
   },
-  yAxis: {
-    hideAxis: false,
-    hideLabel: false,
-    hideTicks: false,
-    size: 50,
-    gridLines: false,
-    min: undefined,
-    max:undefined
-  },
   barThickness: 0.35,
   barHeight: 25,
   height: 300,
@@ -36,7 +27,16 @@ export default {
     size: 75,
     tickRotation: 0,
     min: undefined,
-    max:undefined
+    max: undefined
+  },
+  yAxis: {
+    hideAxis: false,
+    hideLabel: false,
+    hideTicks: false,
+    size: 50,
+    gridLines: false,
+    min: undefined,
+    max: undefined
   },
   table: {
     label: 'Data Table',

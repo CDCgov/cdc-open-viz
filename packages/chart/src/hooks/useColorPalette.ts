@@ -5,22 +5,22 @@ const SEQUENTIAL = 'SEQUENTIAL';
 const SEQUENTIAL_REVERSE = 'SEQUENTIAL_REVERSE';  
 export const GET_PALETTE = 'GET_PALETTE';
 
-
 //  types & interfaces 
 interface State {
     readonly filteredPallets:string[]
     readonly filteredQualitative:string[]
     readonly isPaletteReversed:boolean;
     paletteName:string|undefined
-   }
-   interface Action<Palettes> {
+}
+   
+interface Action<Palettes> {
     type:
       | 'SEQUENTIAL'
       | 'SEQUENTIAL_REVERSE'
       | 'GET_PALETTE'
     payload: Palettes;
     paletteName?:string
-  };
+}
 
 // create initial state
 const initialState:State = {

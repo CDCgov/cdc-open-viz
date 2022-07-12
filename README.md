@@ -1,26 +1,39 @@
 # CDC OpenViz
 
-CDC OpenViz is a collection of React components and related packages centered around data visualization. These components are used to power visualizations across cdc.gov and affiliated projects.
+CDC OpenViz is a collection of React components and related packages centered around data visualization. These components are used to power visualizations across cdc.gov, and affiliated projects.
 
-This project is still under heavy initial development with the roadmap extending into late 2021.
+This project is currently under heavy initial development.
 
-| Package | Description |
-| --- | ----------- |
-| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | React component for visualizing tabular data on a map of the United States or the world. |
-| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) | React component for visualizing data with a chart. |
-| [@cdc/editor](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor) | React component for importing data and creating a map or chart configuration. |
-| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard) | React component to build and display multiple data visualizations. |
-| [@cdc/data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) | React component for bringing attention to and visualizing a smaller data point. |
+| Package | Docs | Description |
+| --- | --------- | ----------- |
+| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) | [CdcChart](https://cdcgov.github.io/cdc-open-viz/) |React component for visualizing data with a chart. |
+| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard) | [CdcDashboard](https://cdcgov.github.io/cdc-open-viz/) | React component to build and display multiple data visualizations. |
+| [@cdc/data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) | [CdcDataBite](https://cdcgov.github.io/cdc-open-viz/) | React component for bringing attention to and visualizing a smaller data point. |
+| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | [CdcMap](https://cdcgov.github.io/cdc-open-viz/) | React component for visualizing tabular data on a map of the United States or the world. |
+| [@cdc/markup-include](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/markup-include) | [CdcMarkupInclude](https://cdcgov.github.io/cdc-open-viz/) | React component for importing HTML markup data from a separate source link. |
+| [@cdc/waffle-chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/waffle-chart) | [CdcWaffleChart](https://cdcgov.github.io/cdc-open-viz/) | React component for displaying a percentage value on a filled grid chart, aka "waffle chart". |
+| [@cdc/wizard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/wizard) | [CdcWizard](https://cdcgov.github.io/cdc-open-viz/) | React component for importing data and creating a map or chart configuration. |
 
 ## Setup <a name="setup"></a>
 
-This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [yarn](https://yarnpkg.com/) for package management. Make sure you have yarn installed before beginning. To work on individual packages you must setup the entire monorepo.
+This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme). 
+
+All packages use [yarn](https://yarnpkg.com/) for package management; it must be installed before beginning. To install yarn, run the following command (requires [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)):
+
+```
+npm install --global yarn
+```
+
+To work on individual packages, you must set up the entire OpenViz monorepo.
 
 1. Start by cloning this repo and running `yarn install` at the root. 
-2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-3. (If using Windows) Change the import from 'react-table' to 'react-table/src' in the DataTable component of these pacakges: Map, Chart, Editor, Dashboard (TODO: fix this)
-4. Run `lerna run build` to build all of the packages in the correct order.
+2. Run `lerna bootstrap` and Lerna will initialize all subrepository packages for you.
+4. Run `lerna run build` to build all packages in the correct order *.
 5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
+
+> *&nbsp; **[Windows]** There is a known issue with `react-table` imports failing on Windows environments. This will be resolved in a later release.
+>
+> Dirty fix: Change the import from 'react-table' to 'react-table/src' in the DataTable component of these pacakges: Map, Chart, Wizard, Dashboard
 
 ## Development Guidelines
 
@@ -28,7 +41,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is 
 
 ### Each package is designed to be imported as a module by another project.
   * This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
-  * We don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
+  * Since every project using OpenViz is expected to be importing React already, we don't include `react` or `react-dom` as dependencies in any package; these are listed as `peerDependencies` instead.
   * We avoid adding any CDC specific functionality (ex. metrics calls) or logos in these packages, that should go in our wrapper codebase.
 
 This pattern of packages being imported by another project is implemented internally at CDC. We have a wrapper codebase that imports these packages. The bundle generated from that wrapper is then served on pages.
@@ -41,14 +54,17 @@ These shared elements are stored in the root of this repository. This ensures th
 
 ### Each package has its own version number.
 
-Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
+Sometimes we need to make fixes or add features to a specific package for our day-to-day operations at cdc.gov, which lends itself to different version numbers for each package.
 
 ### Tips for creating a new package.
-  * When creating a new package, use lowercase for the folder name and don't use any kind of prefix.
-  * The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
-  * Lerna has specific commands to add packages - you can't just create the folder inside `/packages/`. If you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
-  * New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
-  * Respect the guidelines above and ask someone if you're unsure of something.
+  * When creating a new package, use lowercase or lower-kebab-case for the folder name; do not append any sort of prefix.
+  * The name of the package in `package.json` should be scoped with `@cdc/`. 
+    * Example: If you're creating a new package named `foo`, the folder path would be `packages/foo` and the package name would be `@cdc/foo`.
+  * You can't just create the folder inside `/packages/`. Lerna has specific commands to add new packages:
+    * If you're starting from scratch, use [`lerna create`](https://www.npmjs.com/package/@lerna/create)
+    * If you're importing a package that's already been created, use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
+  * New packages should have their version start at 1.0.0 through development. Once published, follow the [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) for subsequent releases.
+  * Respect the guidelines above, and ask someone if you're unsure of something. We're here to help!
 ----
 <details>
   <summary><strong>Legal Notices</strong></summary>

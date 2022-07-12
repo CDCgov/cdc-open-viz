@@ -11,14 +11,14 @@ import PropTypes from 'prop-types'
 import Icon from './Icon'
 import Tooltip from './Tooltip'
 
-import '../../styles/v2/components/accordion.scss'
+import '../../styles/v2/components/ui/accordion.scss'
 
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = () => null
 
-const Accordion = ({children}) => {
+const Accordion = ({ children }) => {
   const childNodes = Children.toArray(children)
-  const accordionSections = childNodes.filter(child => child?.type === AccordionSection)
+  const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || children
 
   return (
     <AccordionComponent allowZeroExpanded={true}>
@@ -26,15 +26,17 @@ const Accordion = ({children}) => {
         <AccordionItem className="cove-accordion__item" key={index}>
           <AccordionItemHeading className="cove-accordion__heading">
             <AccordionItemButton className="cove-accordion__button">
-              {section.props.title}
-              {section.props.tooltipText
+              <span className="cove-accordion__button--text">
+                {section.props.label}{section.props.warnIf ? <Icon display="warningCircle" size={14}/> : null}
+              </span>
+              {section.props.tooltip
                 ? (
                   <Tooltip position="bottom">
                     <Tooltip.Target>
                       <Icon display="question" size={14}/>
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      {section.props.tooltipText}
+                      {section.props.tooltip}
                     </Tooltip.Content>
                   </Tooltip>
                 )
@@ -55,10 +57,15 @@ const Accordion = ({children}) => {
 Accordion.Section = AccordionSection
 
 Accordion.Section.propTypes = {
+  /* Show warning if supplied statement or value is truthy */
+  warnIf: PropTypes.any,
   /* Title for the accordion label*/
-  title: PropTypes.string,
+  label: PropTypes.string,
   /* Tooltip for the accordion label*/
-  tooltipText: PropTypes.object
+  tooltip: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string
+  ])
 }
 
 export default Accordion

@@ -1,254 +1,277 @@
 @import "../utils/variables";
 @import "../themes/index";
 
+$editorAnimationTimer: 400ms;
+
 .cove-editor {
   display: grid;
-  grid-template-columns: auto 1fr;
   grid-template-areas: "panel content";
+  grid-template-columns: auto 1fr;
+  position: relative;
   height: 100vh;
+  transform: scale(1); //Set baseline for fixed position
+  overflow: hidden;
+}
 
-  .cove-editor__panel {
-    grid-area: panel;
-    width: $editorWidth;
-    transition: width 500ms ease;
-    font-size: 15px;
-    background: #fff;
-    border-right: 1px solid #c2c2c2;
-    overflow-x: hidden;
-    overflow-y: auto;
-    z-index: 7;
-  }
+.cove-editor__toggle {
+  position: absolute;
+  top: 0.5rem;
+  left: 309px;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #000;
+  background-color: #f2f2f2;
+  border: 0;
+  border-radius: 999px;
+  transition: left 300ms ease 60ms, background-color 200ms ease;
+  box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+  user-select: none;
+  cursor: pointer;
+  z-index: 8;
 
-  .cove-editor__heading {
-    font-size: 1.125em;
-    user-select: none;
-    padding: .625rem 1.125rem;
-  }
-
-  .cove-editor__panel-container {
-    width: $editorWidth;
-    min-width: $editorWidth;
-  }
-
-  .cove-editor__content {
-    grid-area: content;
-
-    .cove-editor__content-wrap {
-      margin: 3em auto 0;
-      max-width: 35em;
-    }
-  }
-
-  .cove-editor--toggle {
+  &:before {
+    content: "\00ab";
     position: absolute;
-    top: 10px;
-    left: 307px;
-    width: 25px;
-    height: 25px;
-    background-color: #f2f2f2;
-    border-radius: 60px;
-    color: #000;
-    font-size: 1em;
-    border: 0;
-    cursor: pointer;
-    transition: left 400ms ease 65ms, background-color 200ms ease;
-    box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
     user-select: none;
-    z-index: 8;
+  }
+
+  &.collapsed {
+    left: 1rem;
+    margin-left: 0;
 
     &:before {
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      position: absolute;
-      content: "\00ab";
+      content: "\00bb";
     }
+  }
 
-    &.collapsed {
-      left: 1em;
-      margin-left: 0;
-
-      &:before {
-        content: "\00bb";
-      }
-    }
-
-    &:hover {
-      background-color: #ffffff
-    }
+  &:hover {
+    background-color: #fff
   }
 }
 
 .cove-editor__panel {
-  &.hidden {
-    width: 0;
-  }
+  grid-area: panel;
+  position: relative;
+  width: 0;
+  max-height: 100vh;
+  padding-top: 2.5rem;
+  background-color: #fff;
+  border-right: 1px solid #c2c2c2;
+  transition: width $editorAnimationTimer ease;
+  overflow: hidden;
+  z-index: 7;
 
-  .two-col-inputs {
-    display: flex;
-    margin-top: 1em;
-    justify-content: space-between;
-
-    > label {
-      width: 48%;
-      margin-top: 0 !important
+  @at-root {
+    .cove-editor.panel-shown #{&} {
+      width: $editorWidth;
     }
   }
+}
 
+.cove-editor__panel-heading {
+  position: absolute;
+  top: 0;
+  width: $editorWidth;
+  padding: .5rem 1.125rem;
+  font-size: 1.125em;
+  line-height: 1.5rem;
+  color: #fff;
+  background-color: $mediumGray;
+  user-select: none;
+  z-index: 1;
+}
+
+.cove-editor__panel-container {
+  width: $editorWidth - 1px;
+  min-width: $editorWidth - 1px;
+  height: 100%;
+  overflow: hidden auto;
+}
+
+.cove-editor__panel-config {}
+
+.cove-editor__divider {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 0;
+  border-top: 1px solid #e2e2e2;
+}
+
+.cove-editor__content {
+  display: flex;
+  grid-area: content;
+  justify-content: center;
+  position: relative;
+  background-color: #fff;
+  transition: background-color $editorAnimationTimer $transition-expo-out;
+  overflow: hidden auto;
+
+  @at-root {
+    .cove-editor.panel-shown #{&} {
+      background-color: #e7e7e7;
+    }
+  }
+}
+
+.cove-editor__content-wrap--x {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  min-width: 35rem;
+  max-width: 50%;
+  min-height: 100vh;
+  margin-right: auto;
+  margin-left: auto;
+  transition: max-width $editorAnimationTimer $transition-expo-out;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      width: 1px;
+      height: 100%;
+      top: 0;
+      display: block;
+      position: absolute;
+      background-image: repeating-linear-gradient(0deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -1px;
+    }
+  }
+}
+
+.cove-editor__content-wrap--y {
+  position: relative;
+  width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 50%;
+      width: 100vw;
+      height: 1px;
+      background-image: repeating-linear-gradient(90deg, #949da4, #949da4 18px, transparent 18px, transparent 26px);
+      transform: translateX(-50%);
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      top: -1px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      bottom: -1px;
+    }
+  }
+}
+
+.cove-editor__grid-caret--top {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-right-width: 2px;
+      border-bottom-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+.cove-editor__grid-caret--bottom {
+  @at-root {
+    .cove-editor__content[data-grid] #{&}::before,
+    .cove-editor__content[data-grid] #{&}::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: -20px;
+      width: 14px;
+      height: 14px;
+      border-color: #949da4;
+      border-style: solid;
+      border-width: 0;
+      transition: opacity $editorAnimationTimer ease;
+      opacity: 0;
+    }
+
+    .cove-editor__content[data-grid] #{&}::before {
+      left: -20px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .cove-editor__content[data-grid] #{&}::after {
+      right: -20px;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .cove-editor.panel-shown #{&}::before,
+    .cove-editor.panel-shown #{&}::after {
+      opacity: 1;
+    }
+  }
+}
+
+// TODO: What is this stuff? -----------------------------------------------
+.TODO-make-components {
   .divider-heading {
     display: block;
+    margin-top: 1em;
     font-size: 1em;
-    margin-top: 1em;
-  }
-
-  .series-list {
-    list-style: none;
-    border: $lightGray 1px solid;
-
-    &:empty {
-      border: none !important
-    }
-
-    li {
-      padding: .3em .5em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: .9em;
-
-      &:hover {
-        background-color: $lightestGray;
-      }
-
-      span {
-        font-size: .8em;
-        color: #f00;
-        cursor: pointer;
-      }
-
-      + li {
-        border-top: $lightGray 1px solid;
-      }
-    }
-  }
-
-  .form-container {
-    border-right: $lightGray 1px solid;
-    flex-grow: 1;
-  }
-
-  .guidance-link {
-    margin: 2em 1em 0;
-    padding: .75em 1em;
-
-    svg {
-      width: 60px;
-      color: $blue;
-      margin-right: 1rem;
-      height: 60px; // IE11
-      path {
-        fill: currentColor;
-      }
-    }
-  }
-
-  h2 {
-    background: #565656;
-    color: #fff;
-    font-size: 1.1em;
-    padding: .6em 1em;
-    position: relative;
-    border-bottom: #565656 3px solid;
-    z-index: 3;
-  }
-
-  fieldset {
-    display: block;
-  }
-
-  .primary-fieldset {
-    padding: 0;
-    margin: 0;
-    border: 0;
-  }
-
-  ul.column-edit {
-    list-style: none;
-    padding-left: 0;
-
-    li {
-      margin-top: 1em;
-    }
-
-    .three-col {
-      display: flex;
-      justify-content: space-between;
-
-      > label {
-        margin-top: 0;
-        width: 30%;
-        display: inline-block;
-
-        input[type="text"], input[type="number"] {
-          width: 50px;
-        }
-      }
-    }
-  }
-
-  .remove-column {
-    margin: 0 auto;
-    color: #C32B2B;
-    font-size: .7em;
-    font-weight: bold;
-    line-height: 1.6em;
-    text-decoration: underline;
-    text-transform: uppercase;
-    border: 0;
-    border-radius: 5px;
-    transition: .1s all;
-    float: right;
-    outline: 0;
-    cursor: pointer;
-  }
-
-  .edit-block {
-    padding-left: 1em;
-    border: 0;
-    border-left: rgba(0, 0, 0, 0.2) 4px solid;
-    transition: .2s all;
-
-    &:not(:first-child) {
-      margin-top: 2em;
-    }
-
-    input[type="text"], input[type="number"] {
-      font-size: 1em;
-    }
-
-    label {
-      margin-top: 0;
-    }
-
-    label + label {
-      margin-top: 1em;
-    }
-
-    &:hover {
-      border-left: rgba(0, 0, 0, 0.7) 4px solid;
-      transition: .2s all;
-    }
-  }
-
-  span.subtext {
-    display: block;
-    color: rgba(0, 0, 0, .5);
-    text-transform: none;
-    font-weight: normal;
-  }
-
-  .btn {
-    margin-top: 1em;
   }
 
   .sort-list {
@@ -262,21 +285,21 @@
     li > div {
       display: block;
       box-sizing: border-box;
+      padding: .4em .6em;
+      margin-bottom: .3em;
+      font-size: .8em;
+      background: #F1F1F1;
       border: 1px solid #D1D1D1;
       border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-bottom: .3em;
       cursor: move;
     }
   }
 
   .info {
-    font-size: .8em;
-    line-height: 1.4em;
-    font-style: italic;
     padding-top: 10px;
+    font-size: .8em;
+    font-style: italic;
+    line-height: 1.4em;
   }
 
   .react-tags__search {
@@ -307,18 +330,18 @@
   .react-tags__selected-tag {
     display: inline-block;
     box-sizing: border-box;
-    border: 1px solid #D1D1D1;
-    border-radius: 2px;
-    background: #F1F1F1;
     padding: .4em .6em;
-    font-size: .8em;
     margin-right: .3em;
     margin-bottom: .3em;
+    font-size: .8em;
+    background: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    border-radius: 2px;
 
     &::after {
       content: '\2715';
-      color: #AAA;
       margin-left: 8px;
+      color: #AAA;
     }
 
     &:hover,
@@ -333,11 +356,11 @@
 
     input {
       max-width: 100%;
-      margin: 0;
-      outline: none;
       padding: .5em .3em;
+      margin: 0;
       font-size: inherit;
       line-height: inherit;
+      outline: none;
     }
 
     input::-ms-clear {
@@ -358,8 +381,8 @@
     width: 100%;
 
     ul {
-      margin: 4px -1px;
       padding: 0;
+      margin: 4px -1px;
       list-style: none;
       background: white;
       border: 1px solid #D1D1D1;
@@ -368,12 +391,12 @@
     }
 
     li {
-      border-bottom: 1px solid #ddd;
       padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
 
       &:hover {
-        cursor: pointer;
         background: #eee;
+        cursor: pointer;
       }
 
       &.is-active {
@@ -386,9 +409,9 @@
       }
 
       mark {
+        font-weight: 600;
         text-decoration: underline;
         background: none;
-        font-weight: 600;
       }
     }
   }
@@ -410,18 +433,18 @@
   }
 
   .advanced-toggle-link {
-    padding-top: 1em;
     display: block;
+    padding-top: 1em;
     text-align: left;
-    cursor: pointer;
-    color: rgba(0, 0, 0, .5);
     text-decoration: underline;
+    color: rgba(0, 0, 0, .5);
+    cursor: pointer;
 
     span {
-      text-decoration: none;
       display: inline-block;
-      font-family: monospace;
       padding-right: 5px;
+      font-family: monospace;
+      text-decoration: none;
     }
 
     &:hover {
@@ -430,58 +453,11 @@
   }
 
   textarea {
-    height: 400px;
+    box-sizing: border-box;
     width: 100%;
-    font-size: .9em;
+    height: 400px;
     padding: .5em;
     font-family: monospace;
-    box-sizing: border-box
-  }
-}
-
-// -------------------------------------------------------------------------------
-
-ul.color-palette {
-  display: flex;
-  max-width: 100%;
-  padding: 0;
-  list-style: none;
-  flex-wrap: wrap;
-
-  li {
-    display: flex;
-    width: 21px;
-    height: 21px;
-    border-radius: 40px;
-    margin-right: 4px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-
-    .click-target {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-
-    &.selected {
-      border: rgba(0, 0, 0, .8) 2px solid;
-    }
-
-    span {
-      width: 33.3%;
-    }
-  }
-
-  @at-root .header #{&} {
-    li {
-      width: 21px;
-      height: 21px;
-      border-radius: 40px;
-      margin-right: 2.8px;
-    }
+    font-size: .9em;
   }
 }

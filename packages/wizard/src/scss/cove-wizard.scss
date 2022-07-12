@@ -1,0 +1,123 @@
+@import "~@cdc/core/styles/v2/utils/variables";
+@import "~@cdc/core/styles/v2/themes/color-definitions";
+
+:root {
+  --wizardTabsHeight: 48px;
+}
+
+.cove-wizard {
+  height: 100%;
+}
+
+.cove-wizard__grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+
+  .cove-wizard__grid--left {
+    background-color: $white;
+    border-right: $lightGray 1px solid;
+    overflow-y: auto;
+  }
+
+  .cove-wizard__grid--right {
+    background-color: $lightestGray;
+    overflow-x: auto;
+  }
+}
+
+.cove-wizard__data,
+.cove-wizard__data-preview {
+  padding: 2rem;
+}
+
+.cove-wizard__data-samples {
+  padding-left: 0;
+  font-size: .8rem;
+  list-style: none;
+  margin-bottom: 2rem;
+
+  li {
+    margin-bottom: 0.25rem;
+    color: $blue;
+    text-decoration: underline;
+    cursor: pointer
+  }
+}
+
+.cove-wizard__data-designer {
+  height: calc(100% - var(--wizardTabsHeight));
+}
+
+.cove-wizard__data-designer__source {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-bottom: 1.5rem;
+}
+
+.cove-wizard__data-designer__button {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  overflow: hidden;
+  cursor: pointer;
+
+  strong {
+    font-weight: bold;
+  }
+
+  .cove-card {
+    position: relative;
+    border: 0;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border: 1px solid $lightGray;
+      border-radius: 0.25rem;
+    }
+  }
+
+  &.active {
+    .cove-card::after {
+      border: 2px solid #005eaa;
+    }
+  }
+
+  p {
+    font-size: .8rem;
+    margin-bottom: 1rem;
+  }
+
+  table + table {
+    margin-top: 1em;
+  }
+
+  table {
+    margin: auto;
+    font-size: .8rem;
+    background-color: #fff;
+    border: 1px solid $lightGray;
+    border-collapse: collapse;
+
+    th {
+      color: white;
+      text-align: left;
+      background-color: $primary;
+    }
+
+    th, td {
+      padding: 0 5px;
+      border-top: 1px solid $lightGray;
+      border-bottom: 1px solid $lightGray;
+    }
+  }
+}

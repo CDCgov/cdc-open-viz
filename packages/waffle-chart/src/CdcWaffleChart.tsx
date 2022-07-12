@@ -13,8 +13,6 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
-import './scss/main.scss'
-
 const themeColor = {
   'theme-blue': '#005eaa',
   'theme-purple': '#712177',
@@ -287,33 +285,31 @@ const WaffleChart = ({ config, isEditor }) => {
       </header>
       }
       <div className="cove-component__content">
-        <div className="cove-component__content-wrap">
-          <div
-            className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-            <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-              <svg width={setRatio()} height={setRatio()}>
-                <Group>
-                  {buildWaffle()}
-                </Group>
-              </svg>
-            </div>
-            {(dataPercentage || content) &&
+        <div
+          className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+          <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
+            <svg width={setRatio()} height={setRatio()}>
+              <Group>
+                {buildWaffle()}
+              </Group>
+            </svg>
+          </div>
+          {(dataPercentage || content) &&
             <div className="cove-waffle-chart__data">
               {dataPercentage &&
-              <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
-                {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
-              </div>
+                <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
+                  {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
+                </div>
               }
               <div className="cove-waffle-chart__data--text">{parse(content)}</div>
             </div>
-            }
-          </div>
-          {subtext &&
+          }
+        </div>
+        {subtext &&
           <div className="cove-waffle-chart__subtext">
             {parse(subtext)}
           </div>
-          }
-        </div>
+        }
       </div>
     </>
   )

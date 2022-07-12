@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import LoadSpin from '../ui/LoadSpin'
 
-import '../../styles/v2/components/button.scss'
+import '../../styles/v2/components/element/button.scss'
 
 const Button = ({
                   style,
@@ -66,7 +66,7 @@ const Button = ({
       setChildrenWidth(ghostSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
       setLoadtextWidth(ghostLoaderSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
 
-      //Remove ghost objects form document
+      //Remove ghost objects from document
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }

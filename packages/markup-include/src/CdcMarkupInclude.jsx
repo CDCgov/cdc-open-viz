@@ -3,6 +3,7 @@ import axios from 'axios'
 import parse from 'html-react-parser'
 import { Markup } from 'interweave'
 
+import { GlobalContextProvider } from '@cdc/core/components/context/GlobalContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
@@ -10,14 +11,13 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
-import './scss/main.scss'
-
 const CdcMarkupInclude = (
   {
     configUrl,
     config: configObj,
     isDashboard = false,
     isEditor = false,
+    isWizard = false,
     setConfig: setParentConfig
   }
 ) => {
@@ -94,7 +94,7 @@ const CdcMarkupInclude = (
 
     if (config.srcUrl) {
       if (config.srcUrl === '#example') {
-        setUrlMarkup('<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p> <br> <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. </p><br><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>')
+        setUrlMarkup('<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>Document</title></head><body><h1>Header</h1><p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p><br/><p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.</p><br/><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>')
       } else {
         try {
           await axios
@@ -138,17 +138,17 @@ const CdcMarkupInclude = (
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch((err) => console.log(err))
+    loadConfig().catch((err) => console.error(err))
   }, [])
 
   //Reload config if config object provided/updated
   useEffect(() => {
-    loadConfig().catch((err) => console.log(err))
+    loadConfig().catch((err) => console.error(err))
   }, [ configObj?.data ])
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch((err) => console.log(err))
+    loadConfigMarkupData().catch((err) => console.error(err))
   }, [ loadConfigMarkupData ])
 
   let content = (<Loading/>)
@@ -158,38 +158,53 @@ const CdcMarkupInclude = (
       <>
         <div className="cove-component markup-include">
           {title &&
-            <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-              {parse(title)} {isDashboard}
-            </header>
+          <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+            {parse(title)}
+          </header>
           }
           <div className="cove-component__content">
-            <div className="cove-component__content-wrap">
-              {!markupError && urlMarkup &&
-                <Markup content={parseBodyMarkup(urlMarkup)}/>
-              }
-              {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
-            </div>
+            {!markupError && urlMarkup &&
+              <Markup content={parseBodyMarkup(urlMarkup)}/>
+            }
+            {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
           </div>
         </div>
       </>
     )
 
-    content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
-        {!isEditor && body}
-      </div>
-    )
+    content = isEditor ? (
+      <EditorPanel>
+        {body}
+      </EditorPanel>
+    ) : body
   }
 
-  return (
-    <ErrorBoundary component="CdcMarkupInclude">
-      <ConfigContext.Provider
-        value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
-        {content}
-      </ConfigContext.Provider>
-    </ErrorBoundary>
+  const contextValues = {
+    config,
+    updateConfig,
+    loading,
+    data: config.data,
+    setParentConfig,
+    isDashboard
+  }
+
+  const component = (
+    <>
+      <ErrorBoundary component="CdcMarkupInclude">
+        <ConfigContext.Provider
+          value={contextValues}>
+          {content}
+        </ConfigContext.Provider>
+      </ErrorBoundary>
+    </>
   )
+
+  return isWizard ?
+    component : (
+      <GlobalContextProvider>
+        {component}
+      </GlobalContextProvider>
+    )
 }
 
 export default CdcMarkupInclude

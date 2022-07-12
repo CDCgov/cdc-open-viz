@@ -1,0 +1,74 @@
+@import "../../utils/variables";
+@import "../../themes/color-definitions";
+
+.cove-guidance-block {
+  display: block;
+  position: relative;
+  padding: .75rem 1rem;
+  margin-left: 5px;
+  text-decoration: none;
+  color: #444;
+  border: $lightGray 1px solid;
+  border-left: none;
+  border-radius: 0 0.1875rem 0.1875rem 0;
+  transition: all 200ms $transition-expo-out;
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -5px;
+    width: 5px;
+    background: $blue;
+    border-radius: 0.1875rem 0 0 0.1875rem;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #444;
+    background: $lightestGray;
+    transition: .2s all;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    margin: -4px;
+    border-radius: 0.1875rem;
+    outline: 2px solid transparent;
+    transition: outline 200ms $transition-expo-out;
+    pointer-events: none;
+    inset: 0;
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+
+    &:after {
+      outline: 2px solid rgba(161, 161, 161, 0.6);
+    }
+  }
+
+  svg {
+    width: 60px;
+    margin-right: 1rem;
+    color: $blue;
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.cove-guidance-block__header {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.cove-guidance-block__content {
+  font-size: .875rem;
+}

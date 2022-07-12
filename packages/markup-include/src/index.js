@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import { GlobalContextProvider } from '@cdc/core/components/context/GlobalContext'
 import CdcMarkupInclude from './CdcMarkupInclude'
 
 const domContainers = document.querySelectorAll('.react-container')

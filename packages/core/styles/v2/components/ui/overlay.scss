@@ -1,0 +1,80 @@
+@import "../../utils/variables";
+@import "../../themes";
+
+.cove-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+
+  &.animate-in {
+    .cove-overlay__bg {
+      animation: fadeIn 400ms $transition-expo-out 0s 1 forwards;
+    }
+
+    .cove-overlay__container {
+      animation: fadeInUp 700ms $transition-expo-out 50ms 1 forwards;
+    }
+  }
+
+  &.animate-out {
+    .cove-overlay__bg {
+      animation: fadeOut 400ms $transition-expo-out 0s 1 forwards;
+    }
+
+    .cove-overlay__container {
+      transform: translateY(0);
+      animation: fadeOut 400ms $transition-expo-out 0s 1 forwards;
+    }
+  }
+
+  &.show {
+    .cove-overlay__bg {
+      opacity: 1
+    }
+
+    .cove-overlay__container {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+.cove-overlay__bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cove-overlay__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.cove-overlay__container {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  transform: translateY(25px);
+  opacity: 0;
+  z-index: 1;
+}
+
+.overlay-error {
+  .cove-overlay__container {
+    animation: shake-horizontal 400ms 1 ease-in-out;
+  }
+}

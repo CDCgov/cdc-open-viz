@@ -1,6 +1,7 @@
 @import '../themes/color-definitions';
 
 .cove {
+  height: 100vh;
   margin: 0;
   font: 1em/1.6 system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
   font-weight: 400;
@@ -19,15 +20,37 @@
 
   .sr-only,
   .sr-only-focusable:not(:focus) {
+    display: flex;
     position: absolute !important;
+    clip: rect(0, 0, 0, 0) !important;
     width: 1px !important;
     height: 1px !important;
     padding: 0 !important;
     margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border: 0 !important;
-    display: flex;
+    overflow: hidden !important;
+  }
+}
+
+.cove--developer-mode {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1rem 4rem;
+  z-index: 1;
+
+  .cove-input {
+    color: #767e85;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 2px solid #d9dbdd;
+    border-radius: 0;
+
+    &:active,
+    &:focus {
+      border: 0;
+      border-bottom: 2px solid #005eaa;
+    }
   }
 }

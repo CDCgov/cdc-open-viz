@@ -17,20 +17,19 @@ import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
-import InputToggle from '@cdc/core/components/inputs/InputToggle';
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
-
-import MapIcon from '../images/map-folded.svg'; // TODO: Move to Icon component
-import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'; // TODO: Move to Icon component
-import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'; // TODO: Move to Icon component
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'; // TODO: Move to Icon component
-import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'; // TODO: Move to Icon component
-
+import MapIcon from '../images/map-folded.svg';
+import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
+import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
+import colorPalettes from '@cdc/core/data/colorPalettes';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
+
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import InputSlider from '@cdc/core/components/inputs/InputSlider';
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -1099,7 +1098,7 @@ const EditorPanel = (props) => {
 
 	useEffect(()=>{
 		if(paletteName) handleEditorChanges('color',paletteName)
-	},[paletteName]) // dont add handleEditorChanges as a dependency even if it requires
+	},[paletteName]) // TODO: dont add handleEditorChanges as a dependency even if it requires
 
 	useEffect(() => {
 		const parsedData = convertStateToConfig();
@@ -1333,7 +1332,10 @@ const EditorPanel = (props) => {
                       <Tooltip style={{textTransform: 'none'}}>
                         <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+                          <p>Enter supporting text to display below the data visualization, if applicable.<br/>
+                          <br/>
+                            <small>The following HTML tags are supported: strong, em, sup, and sub.</small>
+                          </p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
@@ -2021,7 +2023,7 @@ const EditorPanel = (props) => {
                         <Tooltip style={{textTransform: 'none'}}>
                           <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Enter a description of the data table to be read by screen readers.</p>
+                            <p>Text that describes the data table for screen</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -2269,8 +2271,7 @@ const EditorPanel = (props) => {
 									<label>
 										<span className='edit-label'>Map Color Palette</span>
 									</label>
-									{/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-									<InputToggle type='3d' section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} />
+									<InputSlider type='3d' section="general" subsection="palette" fieldName='isReversed'  size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
 										<span>Sequential</span>
 									<ul className='color-palette'>
 										{filteredPallets

@@ -11,7 +11,7 @@ $red: #f74242;
   width: 350px;
   border-right: #C7C7C7 1px solid;
   position: fixed;
-  top: 6em;
+  top: 3em;
   bottom: 0;
   z-index: 1;
   overflow-y: auto;
@@ -225,6 +225,11 @@ $red: #f74242;
   .btn-configure {
     width: 14em;
     margin-left: 0.5em;
+  }
+
+  .dataset-selector {
+    margin: 0 0.5em;
+    max-width: 10em;
   }
 
   .drag-icon,

@@ -1,0 +1,19 @@
+.cove-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: auto;
+
+  @media all and (-ms-high-contrast: none) {
+    height: 30px;
+  }
+
+  > svg {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    pointer-events: none;
+  }
+}

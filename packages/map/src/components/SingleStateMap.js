@@ -5,7 +5,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from "d3-geo";
 import { feature, mesh } from "topojson-client";
 import { CustomProjection } from '@visx/geo';
-import colorPalettes from '../../../core/data/colorPalettes';
+import colorPalettes from '@cdc/core/data/colorPalettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 import testJSON from '../data/dfc-map.json';
 
@@ -107,7 +107,7 @@ const SingleStateMap = (props) => {
   const projection = geoAlbersUsaTerritories().translate([WIDTH/2, HEIGHT/2])
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
-  
+
   const [stateToShow, setStateToShow ] = useState( null )
   const [countiesToShow, setCountiesToShow] = useState( null )
   const [translate, setTranslate] = useState()
@@ -130,19 +130,19 @@ const SingleStateMap = (props) => {
 		let countiesFound = counties.filter( c => c.id.substring(0,2) === state.general.statePicked.fipsCode)
 
 		setCountiesToShow(countiesFound)
-    
+
 		const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 		const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], statePickedData)
 		const newScale = newProjection.scale();
 		const newScaleWithHypot = newScale / 1070;
-		
+
 		let [x, y] = newProjection.translate()
 		x = (x - WIDTH/2);
 		y = (y - HEIGHT/2);
 
 		setTranslate([x,y])
 		setScale(newScaleWithHypot)
-		
+
 	  }
   }, [state.general.statePicked]);
 
@@ -154,7 +154,7 @@ const SingleStateMap = (props) => {
     if (abbr === 'NJ') x += 3
     if(undefined === abbr) return null
     let [dx, dy] = offsets[geo.properties.name]
-  
+
     return (
       <>
         <line className="abbrLine" x1={x} y1={y} x2={x + dx} y2={y + dy} stroke="black" strokeWidth={1} />
@@ -179,7 +179,7 @@ const SingleStateMap = (props) => {
 			return s.id === statePassed.id
 		})
 
-		
+
 		// const stateLine = path(mesh(testJSON, lines ))
 		let stateLines = path(mesh(testJSON, geo[0]))
         return (
@@ -200,7 +200,7 @@ const SingleStateMap = (props) => {
     };
 
 	const countyOutput = ( counties.map(( county ) => {
-    
+
 
     // Map the name from the geo data with the appropriate key for the processed data
     let geoKey = county.id;
@@ -208,7 +208,7 @@ const SingleStateMap = (props) => {
     if(!geoKey) return;
 
 		let countyPath = path(county);
-    
+
     let geoData = data[county.id];
     let legendColors;
 
@@ -223,7 +223,7 @@ const SingleStateMap = (props) => {
     if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null;
 
     const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
-    
+
     if (legendColors && legendColors[0] !== '#000000') {
 
 
@@ -247,7 +247,7 @@ const SingleStateMap = (props) => {
             <g
               data-for="tooltip"
               data-tip={tooltip}
-              key={`key--${county.id}`}         
+              key={`key--${county.id}`}
               className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -266,7 +266,7 @@ const SingleStateMap = (props) => {
       <g
         data-for="tooltip"
         data-tip={tooltip}
-        key={`key--${county.id}`}         
+        key={`key--${county.id}`}
         className={`county county--${geoDisplayName.split(" ").join("")}`}
         style={{ fill : '#e6e6e6'}}
       >
@@ -296,20 +296,20 @@ const SingleStateMap = (props) => {
 		{stateToShow &&
 			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" className="svg-container">
 				<rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white"></rect>
-				<CustomProjection 
-					data={ [{states: stateToShow, counties: countiesToShow }] } 
+				<CustomProjection
+					data={ [{states: stateToShow, counties: countiesToShow }] }
 					// translate={translate}
-					// scale={scale} 
+					// scale={scale}
 					projection={geoAlbersUsaTerritories}
 					fitExtent={[[[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], stateToShow]}
 					>
 					{ ({ features, projection }) => {
 					return (
-						<g 
-						id="mapGroup" 
-						className="countyMapGroup" 
-						transform={`translate(${translate}) scale(${scale})`} 
-						data-scale="" 
+						<g
+						id="mapGroup"
+						className="countyMapGroup"
+						transform={`translate(${translate}) scale(${scale})`}
+						data-scale=""
 						key="countyMapGroup">
 						{ constructGeoJsx(features, geoAlbersUsaTerritories) }
 						</g>

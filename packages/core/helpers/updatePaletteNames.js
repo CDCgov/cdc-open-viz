@@ -1,5 +1,3 @@
-
-
   export function updatePaletteNames (colorPalettes){
     // this function adds REVERSE keyword to each palette
     delete colorPalettes.qualitative9 // delete palette before reversing
@@ -9,7 +7,7 @@
 
      if (!paletteStr.endsWith('reverse') ){
        let palette = paletteStr.concat('reverse'); // add to the end of the string "reverse"
-       palettereversed[palette] = [...hexCodeArr].reverse();  // reverses arrays elements and create new keys on object
+       palettereversed[palette] = [...hexCodeArr].reverse();  // Reverses array elements and create new keys on object
      }else{
       palettereversed = {...colorPalettes}
      }
