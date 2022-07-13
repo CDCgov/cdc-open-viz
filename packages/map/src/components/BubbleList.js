@@ -39,7 +39,7 @@ export const BubbleList = (
 
 			const countryName = displayGeoName(country[state.columns.geo.name]);
 			const toolTip = applyTooltipsToGeo(countryName, country);
-			const legendColors = state.customColors || applyLegendToRow(country);
+			const legendColors = applyLegendToRow(country);
 			
 			let primaryKey = state.columns.primary.name
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
@@ -104,7 +104,7 @@ export const BubbleList = (
 
 			stateName = displayGeoName(stateName);
 			const toolTip = applyTooltipsToGeo(stateName, item);
-			const legendColors = state.customColors || applyLegendToRow(item);
+			const legendColors = applyLegendToRow(item);
 
 
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
