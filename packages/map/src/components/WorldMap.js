@@ -87,6 +87,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
 
   // TODO Refactor - state should be set together here to avoid rerenders
   const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
+    if(!state.general.allowMapZoom) return;
     let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
     setFilteredCountryCode(newRuntimeData[0].uid)
   }

@@ -183,6 +183,15 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+			case 'toggleExtraBubbleBorder':
+				setState({
+					...state,
+					visual: {
+						...state.visual,
+						extraBubbleBorder: value
+					}
+				})
+				break;
 			case 'allowMapZoom':
 				setState({
 					...state,
@@ -2373,6 +2382,18 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Allow Map Zooming</span>
 									</label>
+									{state.general.type === 'bubble' &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.visual.extraBubbleBorder}
+												onChange={(event) => {
+													handleEditorChanges('toggleExtraBubbleBorder', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Bubble Map has exra border</span>
+										</label>
+									}
 								</AccordionItemPanel>
 							</AccordionItem>
 						</Accordion>
