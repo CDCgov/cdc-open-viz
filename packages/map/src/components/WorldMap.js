@@ -10,7 +10,6 @@ import ZoomableGroup from './ZoomableGroup';
 import Geo from './Geo'
 import CityList from './CityList';
 import BubbleList from './BubbleList';
-import { compressSpaces } from 'canvg';
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
@@ -187,7 +186,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
-          //handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
+          handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
         />
       )
     }
@@ -199,6 +198,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
     <ErrorBoundary component="WorldMap">
       {hasZoom ? (
         <svg viewBox="0 0 880 500">
+          <rect data-test="test" height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill="white"/>
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}

@@ -1028,13 +1028,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         const dict = {
-            "District of Columbia" : "Washington D.C."
+            "District of Columbia" : "Washington D.C.",
+            "Congo": "Republic of the Congo"
         }
 
         if(true === Object.keys(dict).includes(value)) {
             value = dict[value]
         }
-
         return titleCase(value);
     }
 
