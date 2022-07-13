@@ -11,7 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
+import { GlobalContextProvider } from '@cdc/core/context/GlobalContext'
 import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'

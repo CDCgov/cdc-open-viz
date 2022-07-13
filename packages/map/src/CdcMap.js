@@ -16,7 +16,7 @@ import Canvg from 'canvg'
 
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
-import ExternalIcon from './images/external-link.svg'
+import ExternalIcon from '@cdc/core/assets/icon-link-external.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes } from './data/supported-geos'
 import initialState from './data/initial-state'
 
@@ -26,12 +26,12 @@ import './scss/btn.scss'
 
 // Images
 // TODO: Move to Icon component
-import DownloadImg from './images/icon-download-img.svg'
-import DownloadPdf from './images/icon-download-pdf.svg'
+import DownloadImg from '@cdc/core/assets/icon-download-img.svg'
+import DownloadPdf from '@cdc/core/assets/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading'
-import DataTransform from '@cdc/core/components/DataTransform'
+import DataTransform from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'

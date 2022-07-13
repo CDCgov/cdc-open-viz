@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
 import Modal from '@cdc/core/components/ui/Modal'
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
+//import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import Column from './Column'
@@ -126,12 +126,12 @@ const RowMenu = ({ rowIdx, row }) => {
         Row Settings
       </Modal.Header>
       <Modal.Content>
-        <InputToggle
+        {/*<InputToggle
           label="Visualizations in this row should be equal height"
           fieldName={`toggleEqualHeight${rowIdx}`}
           value={row.equalHeight ? row.equalHeight : false}
           updateField={rowItemsHeight}
-        ></InputToggle>
+        ></InputToggle>*/}
       </Modal.Content>
     </Modal>
   )

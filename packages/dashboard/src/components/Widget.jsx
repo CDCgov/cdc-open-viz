@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
 import { DataTransform } from '@cdc/core/helpers/dataTransform'

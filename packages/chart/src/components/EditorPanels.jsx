@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 //Hooks
-import useColorPalette from '../hooks/useColorPalette'
+import { useColorPalette } from '../hooks/useColorPalette'
 import useReduceData from '../hooks/useReduceData'
 
 //Helpers

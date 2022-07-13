@@ -7,7 +7,7 @@ import ConfigContext from '../ConfigContext'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
 
-import '@cdc/core/styles/v2/components/accordion.scss'
+import '@cdc/core/styles/v2/components/ui/accordion.scss'
 import '@cdc/core/styles/v2/components/editor.scss'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]

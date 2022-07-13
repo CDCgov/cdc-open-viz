@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 
 const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfig, subEditor = null}) => {

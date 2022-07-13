@@ -4,7 +4,7 @@ import { csvParse } from 'd3'
 import { useDebounce } from 'use-debounce'
 import axios from 'axios'
 
-import { useGlobalContext } from '@cdc/core/components/context/GlobalContext'
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import WizardContext from '../WizardContext'
 
 import {
@@ -14,7 +14,7 @@ import {
   DEMO_TABLE_MULTI_ROW
 } from './demo-data/demoTables'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import Modal from '@cdc/core/components/ui/Modal'
 import GuidanceBlock from '@cdc/core/components/elements/GuidanceBlock'
 import Button from '@cdc/core/components/elements/Button'

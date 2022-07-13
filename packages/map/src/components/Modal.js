@@ -1,5 +1,5 @@
 import React from 'react';
-import closeIcon from '../images/close.svg?inline';
+import closeIcon from '@cdc/core/assets/icon-close.svg?inline';
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
 //TODO: Where is this being used? Transfer to new Modal component?

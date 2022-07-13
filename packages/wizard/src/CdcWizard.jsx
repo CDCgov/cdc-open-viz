@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 
-import { GlobalContextProvider } from '@cdc/core/components/context/GlobalContext'
+import { GlobalContextProvider } from '@cdc/core/context/GlobalContext'
 import WizardContext from './WizardContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'

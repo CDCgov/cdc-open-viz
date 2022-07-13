@@ -5,7 +5,7 @@ import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
 } from 'react-table';
 import Papa from 'papaparse';
-import ExternalIcon from '../images/external-link.svg'; // TODO: Move to Icon component
+import ExternalIcon from '@cdc/core/assets/icon-link-external.svg';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import LegendCircle from '@cdc/core/components/LegendCircle';

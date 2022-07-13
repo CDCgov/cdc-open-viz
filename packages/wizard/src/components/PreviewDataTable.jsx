@@ -16,7 +16,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import WizardContext from '../WizardContext'
 
-import '@cdc/core/styles/v2/components/data-table.scss'
+import '@cdc/core/styles/v2/components/element/data-table.scss'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [ filterValue, setFilterValue ] = useState(globalFilter)
