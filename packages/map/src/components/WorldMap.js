@@ -198,7 +198,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
     <ErrorBoundary component="WorldMap">
       {hasZoom ? (
         <svg viewBox="0 0 880 500">
-          <rect data-test="test" height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill="white"/>
+          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill="white"/>
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
