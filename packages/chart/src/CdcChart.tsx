@@ -488,6 +488,10 @@ export default function CdcChart(
                   className += ' inactive'
                 }
 
+                if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) && config.legend.behavior === 'isolate' ) {
+                  className += ' invisible'
+                }
+
                 return (
                   <LegendItem
                     className={className}
