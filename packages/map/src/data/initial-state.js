@@ -67,7 +67,8 @@ export default {
   },
   visual: {
     minBubbleSize: 1,
-    maxBubbleSize: 20
+    maxBubbleSize: 20,
+    extraBubbleBorder: false
   },
   mapPosition: 
     { coordinates: [0, 30], zoom: 1 }
