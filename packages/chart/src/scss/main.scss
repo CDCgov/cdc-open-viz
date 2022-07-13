@@ -143,6 +143,11 @@
         opacity: .5;
         transition: .2s all;
       }
+      
+      &.invisible{
+        opacity: 0;
+        transition: .2s all;
+      }
     }
   }
 
