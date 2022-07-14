@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos';
+import { scaleLinear } from 'd3-scale';
 
 const CityList = (({
   data,
@@ -24,6 +25,18 @@ const CityList = (({
 
     setCitiesData(citiesDictionary);
   }, [data]);
+
+  if (state.general.type === 'bubble') {
+    const maxDataValue = Math.max(...state.data.map(d => d[state.columns.primary.name]))
+    const sortedRuntimeData = Object.values(data).sort((a, b) => a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1)
+    if (!sortedRuntimeData) return;
+
+    // Set bubble sizes
+    var size = scaleLinear()
+      .domain([1, maxDataValue])
+      .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
+
+  }
 
   const cityList = Object.keys(citiesData).filter((c) => undefined !== data[c]);
 
@@ -61,15 +74,22 @@ const CityList = (({
 
     const radius = state.general.geoType === 'us' ? 8 : 4;
 
+    const additionalProps = {
+      fillOpacity: state.general.type === 'bubble' ? .4 : 1
+    }
+
+    console.log('size', geoData )
+
     const circle = (
       <circle
         data-tip={toolTip}
         data-for="tooltip"
         cx={0}
         cy={0}
-        r={radius}
+        r={ state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius}
         title="Click for more information"
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
+       {...additionalProps}
       />
     );
 
