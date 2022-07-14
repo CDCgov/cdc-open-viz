@@ -146,37 +146,72 @@ export const BubbleList = (
 
 			let pointerX, pointerY;
 			const circle = (
-				<circle
-					key={`circle-${stateName.replace(' ', '')}`}
-					data-tip={toolTip}
-					data-for="tooltip"
-					className="bubble"
-					cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
-					cy={projection(coordinates)[1] || 0}
-					r={Number(size(item[primaryKey]))}
-					fill={legendColors[0]}
-					stroke={legendColors[0]}
-					strokeWidth={1.25}
-					fillOpacity={.4}
-					onPointerDown={(e) => {
-						pointerX = e.clientX;
-						pointerY = e.clientY;
-					}}
-					onPointerUp={(e) => {
-						if (pointerX && pointerY &&
-							e.clientX > (pointerX - clickTolerance) &&
-							e.clientX < (pointerX + clickTolerance) &&
-							e.clientY > (pointerY - clickTolerance) &&
-							e.clientY < (pointerY + clickTolerance)
-						) {
-							handleCircleClick(state)
-							pointerX = undefined;
-							pointerY = undefined;
-						}
-					}}
-					transform={transform}
-					style={{ transition: 'all .25s ease-in-out', cursor: "pointer" }}
-				/>
+				<>
+					<circle
+						key={`circle-${stateName.replace(' ', '')}`}
+						data-tip={toolTip}
+						data-for="tooltip"
+						className="bubble"
+						cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
+						cy={projection(coordinates)[1] || 0}
+						r={Number(size(item[primaryKey]))}
+						fill={legendColors[0]}
+						stroke={legendColors[0]}
+						strokeWidth={1.25}
+						fillOpacity={.4}
+						onPointerDown={(e) => {
+							pointerX = e.clientX;
+							pointerY = e.clientY;
+						}}
+						onPointerUp={(e) => {
+							if (pointerX && pointerY &&
+								e.clientX > (pointerX - clickTolerance) &&
+								e.clientX < (pointerX + clickTolerance) &&
+								e.clientY > (pointerY - clickTolerance) &&
+								e.clientY < (pointerY + clickTolerance)
+							) {
+								handleCircleClick(state)
+								pointerX = undefined;
+								pointerY = undefined;
+							}
+						}}
+						transform={transform}
+						style={{ transition: 'all .25s ease-in-out', cursor: "pointer" }}
+					/>
+					{ state.visual.extraBubbleBorder &&
+						<circle
+						key={`circle-${stateName.replace(' ', '')}`}
+						data-tip={toolTip}
+						data-for="tooltip"
+						className="bubble"
+						cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
+						cy={projection(coordinates)[1] || 0}
+						r={Number(size(item[primaryKey]) + 1)}
+						fill={"transparent"}
+						stroke={"white"}
+						strokeWidth={.5}
+						fillOpacity={.4}
+						onPointerDown={(e) => {
+							pointerX = e.clientX;
+							pointerY = e.clientY;
+						}}
+						onPointerUp={(e) => {
+							if (pointerX && pointerY &&
+								e.clientX > (pointerX - clickTolerance) &&
+								e.clientX < (pointerX + clickTolerance) &&
+								e.clientY > (pointerY - clickTolerance) &&
+								e.clientY < (pointerY + clickTolerance)
+							) {
+								handleCircleClick(state)
+								pointerX = undefined;
+								pointerY = undefined;
+							}
+						}}
+						transform={transform}
+						style={{ transition: 'all .25s ease-in-out', cursor: "pointer" }}
+						/>
+					}
+				</>
 			);
 
 
