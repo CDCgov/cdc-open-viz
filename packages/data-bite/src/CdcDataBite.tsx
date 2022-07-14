@@ -456,7 +456,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
+            {config.general && (
+                  <sup className="super_title">
+                    {config.general.super_title}
+                  </sup>
+            )}
+            {/* {config.general && <section className="intro_text">{config.general.intro_text}</section>} */}
             {title && <div className="bite-header">{parse(title)}</div>}
+            
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className="bite-content-container" >
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
