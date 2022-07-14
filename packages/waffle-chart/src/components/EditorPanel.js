@@ -198,7 +198,7 @@ const EditorPanel = memo((props) => {
         />
 
         <InputText
-          value={"Super Title"}
+          value={(config.general && config.general.super_title) || ""}
           updateField={updateField}
           section="general"
           fieldName="super_title"
@@ -218,7 +218,7 @@ const EditorPanel = memo((props) => {
 
         <InputText
           type="textarea"
-          value={"Intro Text"}
+          value={(config.general && config.general.intro_text) || ""}
           updateField={updateField}
           section="general"
           fieldName="intro_text"

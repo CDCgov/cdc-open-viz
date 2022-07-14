@@ -352,7 +352,7 @@ const EditorPanel = memo(() => {
                   />
 
                   <TextField
-                    value={"Super Title"}
+                    value={config.super_title || ''}
                     updateField={updateField}
                     section="general"
                     fieldName="super_title"
@@ -375,7 +375,7 @@ const EditorPanel = memo(() => {
 
                   <TextField
                     type="textarea"
-                    value={"Intro Text"}
+                    value={config.intro_text}
                     updateField={updateField}
                     section="general"
                     fieldName="intro_text"
