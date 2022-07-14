@@ -2372,16 +2372,18 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/>
-									<label className='checkbox'>
-										<input
-											type='checkbox'
-											checked={state.general.allowMapZoom}
-											onChange={(event) => {
-												handleEditorChanges('allowMapZoom', event.target.checked);
-											}}
-										/>
-										<span className='edit-label'>Allow Map Zooming</span>
-									</label>
+									{state.general.geoType === 'world' &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.general.allowMapZoom}
+												onChange={(event) => {
+													handleEditorChanges('allowMapZoom', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Allow Map Zooming</span>
+										</label>
+									}
 									{state.general.type === 'bubble' &&
 										<label className='checkbox'>
 											<input

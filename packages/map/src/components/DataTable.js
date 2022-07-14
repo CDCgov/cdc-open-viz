@@ -345,7 +345,7 @@ const DataTable = (props) => {
               return (
                 <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => state.general.type === 'bubble' ? setFilteredCountryCode(cell.row.original) : true }>
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom) ? setFilteredCountryCode(cell.row.original) : true }>
                       {cell.render('Cell')}
                     </td>
                   ))}
