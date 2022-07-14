@@ -321,7 +321,6 @@ const UsaMap = (props) => {
           applyLegendToRow={applyLegendToRow}
           applyTooltipsToGeo={applyTooltipsToGeo}
           displayGeoName={displayGeoName}
-          //handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData)}
         />
       )
     }
