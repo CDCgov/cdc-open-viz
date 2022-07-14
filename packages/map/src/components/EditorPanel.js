@@ -2391,7 +2391,7 @@ const EditorPanel = (props) => {
 													handleEditorChanges('toggleExtraBubbleBorder', event.target.checked);
 												}}
 											/>
-											<span className='edit-label'>Bubble Map has exra border</span>
+											<span className='edit-label'>Bubble Map has extra border</span>
 										</label>
 									}
 								</AccordionItemPanel>
