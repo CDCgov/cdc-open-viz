@@ -49,6 +49,12 @@ header + .map-container.full-border {
 			flex-direction: row;
 		}
 	}
+	// Bubble Specific
+	.map-container.bubble {
+		&.side {
+			flex-direction: row;
+		}
+	}
 }
 
 .geography-container {
