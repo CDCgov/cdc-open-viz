@@ -352,50 +352,6 @@ const EditorPanel = memo(() => {
                   />
 
                   <TextField
-                    value={config.super_title || ''}
-                    updateField={updateField}
-                    section="general"
-                    fieldName="super_title"
-                    label="Super Title"
-                    placeholder="Super Title"
-                    tooltip={
-                      <Tooltip style={{ textTransform: "none" }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display="question"
-                            style={{ marginLeft: "0.5rem" }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Super Title</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <TextField
-                    type="textarea"
-                    value={config.intro_text}
-                    updateField={updateField}
-                    section="general"
-                    fieldName="intro_text"
-                    label="Intro Text"
-                    tooltip={
-                      <Tooltip style={{ textTransform: "none" }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display="question"
-                            style={{ marginLeft: "0.5rem" }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Intro Text</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <TextField
                     type="textarea"
                     value={config.biteBody}
                     fieldName="biteBody"
@@ -439,28 +395,6 @@ const EditorPanel = memo(() => {
                             visualization, if applicable. The following HTML
                             tags are supported: strong, em, sup, and sub.
                           </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <TextField
-                    type="textarea"
-                    value={"Foootnotes"}
-                    updateField={updateField}
-                    section="general"
-                    fieldName="footnotes"
-                    label="Footnotes"
-                    tooltip={
-                      <Tooltip style={{ textTransform: "none" }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display="question"
-                            style={{ marginLeft: "0.5rem" }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Footnotes</p>
                         </Tooltip.Content>
                       </Tooltip>
                     }
