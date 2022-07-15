@@ -183,6 +183,24 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+			case 'toggleExtraBubbleBorder':
+				setState({
+					...state,
+					visual: {
+						...state.visual,
+						extraBubbleBorder: value
+					}
+				})
+				break;
+			case 'allowMapZoom':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						allowMapZoom: value
+					},
+				})
+				break;
 			case 'showTitle':
 				setState({
 					...state,
@@ -379,6 +397,20 @@ const EditorPanel = (props) => {
 								...state.general,
 								showSidebar: false,
 								type: 'navigation',
+							},
+							tooltips: {
+								...state.tooltips,
+								appearanceType: 'hover',
+							},
+						});
+						break;
+					case 'bubble':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								showSidebar: false,
+								type: 'bubble',
 							},
 							tooltips: {
 								...state.tooltips,
@@ -1199,14 +1231,14 @@ const EditorPanel = (props) => {
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-                        Map Type
-                        <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
+												Map Type
+												<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+												</Tooltip.Content>
+												</Tooltip>
+											</span>
 											<select
 												value={state.general.geoType}
 												onChange={(event) => {
@@ -1248,6 +1280,7 @@ const EditorPanel = (props) => {
 										>
 											<option value='data'>Data</option>
 											<option value='navigation'>Navigation</option>
+											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
 									{/* SubType */}
@@ -1293,14 +1326,14 @@ const EditorPanel = (props) => {
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+										<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+											<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+											</Tooltip.Content>
+										</Tooltip>
+										}
 									/>
 									<TextField
 										type='textarea'
@@ -1309,14 +1342,14 @@ const EditorPanel = (props) => {
 										section='general'
 										fieldName='subtext'
 										label='Subtext'
-                    tooltip={
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+											</Tooltip.Content>
+											</Tooltip>
+										}
 									/>
 									{'us' === state.general.geoType && (
 										<TextField
@@ -1396,8 +1429,7 @@ const EditorPanel = (props) => {
 										</select>
 									</label>
 
-									{'navigation' !== state.general.type && (
-                    <>
+				{'navigation' !== state.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
                         <label>
 												<span className='edit-label column-heading'>
@@ -1512,6 +1544,39 @@ const EditorPanel = (props) => {
                           </li>
                         </ul>
                       </fieldset>
+				)}
+
+
+
+					  {state.general.type === 'bubble' && state.legend.type === 'category' && (
+						<fieldset className='primary-fieldset edit-block'>
+                        	<label>
+								<span className='edit-label column-heading'>
+                          			Category Column
+									<Tooltip style={{textTransform: 'none'}}>
+										<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+										<Tooltip.Content>
+											<p>Select the source column containing the categorical bubble values to be mapped.</p>
+										</Tooltip.Content>
+									</Tooltip>
+								</span>
+								<select
+									value={
+									state.columns.categorical
+										? state.columns.categorical.name
+										: columnsOptions[0]
+									}
+									onChange={(event) => {
+									editColumn('categorical', 'name', event.target.value);
+									}}
+								>
+									{columnsOptions}
+								</select>
+                        	</label>
+						</fieldset>
+					)}
+
+					{'navigation' !== state.general.type && (
                       <fieldset className="primary-fieldset edit-block">
                         <label>
                           <span className='edit-label'>
@@ -1567,8 +1632,7 @@ const EditorPanel = (props) => {
                           Add Special Class
                         </button>
                       </fieldset>
-                    </>
-									)}
+					)}
 
 									<label className='edit-block navigate column-heading'>
 										<span className='edit-label column-heading'>
@@ -1900,17 +1964,17 @@ const EditorPanel = (props) => {
 													}}
 												/>
 												<span className='edit-label'>
-                          Dynamic Legend Description
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Dynamic Legend Description
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
 											</label>
 										)}
-										{filtersJSX.length > 0 && (
+										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
 											<label className='checkbox'>
 												<input
 													type='checkbox'
@@ -1920,14 +1984,14 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-                          Unified Legend
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Unified Legend
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
 											</label>
 										)}
 									</AccordionItemPanel>
@@ -2292,6 +2356,46 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
+									<TextField
+										type='number'
+										value={state.visual.minBubbleSize}
+										section='visual'
+										fieldName='minBubbleSize'
+										label='Minimum Bubble Size'
+										updateField={updateField}
+									/>
+									<TextField
+										type='number'
+										value={state.visual.maxBubbleSize}
+										section='visual'
+										fieldName='maxBubbleSize'
+										label='Maximum Bubble Size'
+										updateField={updateField}
+									/>
+									{state.general.geoType === 'world' &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.general.allowMapZoom}
+												onChange={(event) => {
+													handleEditorChanges('allowMapZoom', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Allow Map Zooming</span>
+										</label>
+									}
+									{state.general.type === 'bubble' &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.visual.extraBubbleBorder}
+												onChange={(event) => {
+													handleEditorChanges('toggleExtraBubbleBorder', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Bubble Map has extra border</span>
+										</label>
+									}
 								</AccordionItemPanel>
 							</AccordionItem>
 						</Accordion>
