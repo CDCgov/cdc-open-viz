@@ -271,7 +271,7 @@ export const supportedCountries = {
   CCK: ['Cocos (Keeling) Islands', 'Cocos (Keeling) Islands (Australia)'],
   COL: ['Colombia'],
   COM: ['Comoros'],
-  COG: ['Congo', 'Congo, Republic of the'],
+  COG: ['Congo', 'Congo, Republic of the', 'Republic of the Congo'],
   COD: ['Democratic Republic of the Congo', 'Congo, Democratic Republic of the', 'Congo, the Democratic Republic of the', 'Dem. Rep. Congo'],
   COK: ['Cook Islands', 'Cook Is.', 'Cook Islands (New Zealand)'],
   CRI: ['Costa Rica'],

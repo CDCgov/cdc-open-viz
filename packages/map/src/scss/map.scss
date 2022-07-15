@@ -49,6 +49,12 @@ header + .map-container.full-border {
 			flex-direction: row;
 		}
 	}
+	// Bubble Specific
+	.map-container.bubble {
+		&.side {
+			flex-direction: row;
+		}
+	}
 }
 
 .geography-container {
@@ -110,7 +116,23 @@ header + .map-container.full-border {
 	bottom: 2em;
 	left: 1em;
 	z-index: 4;
-	> button {
+	> button.reset {
+		margin-left: 5px;
+		background: rgba(0, 0, 0, 0.65);
+		transition: 0.2s all;
+		color: #fff;
+		&:hover {
+			background: rgba(0, 0, 0, 0.8);
+			transition: 0.2s all;
+		}
+		&:active {
+			transform: scale(0.9);
+		}
+		&:focus {
+			background: #005eaa;
+		}
+	}
+	> button:not(.reset) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -129,6 +151,10 @@ header + .map-container.full-border {
 		&:active {
 			transform: scale(0.9);
 		}
+		svg {
+			height: 1.75em;
+			width: 1.75em;
+		}
 	}
 	> button:first-child {
 		margin-right: 0.25em;
@@ -136,9 +162,13 @@ header + .map-container.full-border {
 }
 
 @include breakpointClass(sm) {
-	.zoom-controls > button {
+	.zoom-controls > button:not(.reset) {
 		height: 2.5em;
 		width: 2.5em;
+		svg {
+			height: 2.5em;
+			width: 2.5em;
+		}
 	}
 }
 

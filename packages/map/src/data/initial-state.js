@@ -17,7 +17,8 @@ export default {
     type: 'data',
     palette:{
       isReversed:false
-    }
+    },
+    allowMapZoom: true
   },
   
   type: "map",
@@ -63,5 +64,12 @@ export default {
   },
   runtime: {
     editorErrorMessage: []
-  }
+  },
+  visual: {
+    minBubbleSize: 1,
+    maxBubbleSize: 20,
+    extraBubbleBorder: false
+  },
+  mapPosition: 
+    { coordinates: [0, 30], zoom: 1 }
 };
