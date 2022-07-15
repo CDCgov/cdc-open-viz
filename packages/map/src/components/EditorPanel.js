@@ -1964,14 +1964,14 @@ const EditorPanel = (props) => {
 													}}
 												/>
 												<span className='edit-label'>
-                          Dynamic Legend Description
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Dynamic Legend Description
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
 											</label>
 										)}
 										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
@@ -1984,14 +1984,14 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-                          Unified Legend
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Unified Legend
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
 											</label>
 										)}
 									</AccordionItemPanel>

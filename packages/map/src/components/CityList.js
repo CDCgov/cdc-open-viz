@@ -78,8 +78,6 @@ const CityList = (({
       fillOpacity: state.general.type === 'bubble' ? .4 : 1
     }
 
-    console.log('size', geoData )
-
     const circle = (
       <circle
         data-tip={toolTip}
