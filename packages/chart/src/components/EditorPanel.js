@@ -808,7 +808,7 @@ useEffect(()=>{
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.xAxis.max}  section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto'  updateField={updateField} />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
                     : (config.visualizationType !=='Pie') &&
@@ -816,9 +816,9 @@ useEffect(()=>{
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.yAxis.max||''} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='update max value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
-                      <TextField value={config.yAxis.min} type='number' label='update min value' placeholder='Auto' onChange={(e)=>onMinChangeHandler(e)}  />
+                      <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.minMsg}</span>
                     </>
                   }
