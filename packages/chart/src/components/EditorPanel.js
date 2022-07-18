@@ -189,7 +189,7 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context)
 
-  const {minValue,maxValue} = useReduceData(config,data)
+  const {minValue,maxValue} = useReduceData(config,unfilteredData);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
@@ -607,9 +607,9 @@ const EditorPanel = () => {
  };
 
 useEffect(()=>{
-   validateMinValue();
+  validateMinValue();
    validateMaxValue();
-},[config,data,minValue,maxValue]);
+},[minValue,maxValue,config]);
 
   return (
     <ErrorBoundary component="EditorPanel">
