@@ -559,95 +559,58 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Add a data series'
   }
 
-  const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
-  const [warningMsg,updateWarningMsg] = useState({maxMsg:'',minMsg:''})
-  
-  const onMaxChangeHandler = (e) => {
-    const enteredValue = Number(e.target.value);
+  const section = config.orientation==='horizontal'  ? 'xAxis' : 'yAxis';
+  const [warningMsg,setWarningMsg] = useState({maxMsg:'',minMsg:''});
 
-    var existPositiveValue;
-    const maxVal = Number(maxValue)
+  const validateMaxValue = () => {
+    const enteredValue = config[section].max;
+    let existPositiveValue = false;
+    let message = '';
 
-    // loop through series keys
    if (config.runtime.seriesKeys) {
      for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
        existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
-     }
+     };
+   };
+
+   switch(true){
+     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue):
+       message = 'Max value must be more than '+ maxValue;
+       break;
+     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && !existPositiveValue):
+       message = 'Value must be more than or equal to 0';
+       break;
+     default : message = '' ;
    }
+    setWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:message}});
+  };
 
- 
-   
-   // input < max && a positive number exists
-   if (enteredValue < maxVal && existPositiveValue) {
-       updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Max value must be more than '+ maxValue}})
-   }
-   
-   // input < max && all numbers negatice
-   if (enteredValue < maxVal && !existPositiveValue) {
-       updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Value must be more than or equal to 0'}})
-   }
 
-    // input >= max
-  if (enteredValue >= maxVal) {
-      updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-      updateField(section, null, 'max', String(enteredValue))
-    }
-   
-   if (!enteredValue) {
-     updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-   }
- }
+  const validateMinValue = ()=>{
+   const enteredValue = config[section].min;
+   let minVal = Number(minValue); 
+   let message = '';
 
- const onMinChangeHandler = (e) => {
-   const enteredValue = Number(e.target.value);
-   let minVal = Number(minValue)
+  switch(true){
+    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+      message = 'Value must be less than ' + minValue;
+      break; 
+    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+      message = 'Value must be less than or equal to 0';
+      break; 
+    case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
+      message = 'Value must be less than ' + minValue; 
+      break;
+    default : message = ''
+  };
+    setWarningMsg(function (prevMsg) { return {...prevMsg, minMsg: message}});
+ };
 
-   if (config.visualizationType === 'Line') {
+useEffect(()=>{
+   validateMinValue();
+   validateMaxValue();
+},[config,data,minValue,maxValue]);
 
-     if (enteredValue > minVal) {
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: 'Value must be less than ' + minValue}})
-       
-      } 
-     if(enteredValue <=  minVal){
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: '' } })
-       updateField(section, null, 'min',String(enteredValue))
-     }
-   }
-
-   if(config.visualizationType !== 'Line'){
-
-     if (minVal >=0 &&  enteredValue > 0  ) {
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: 'Value must be less than or equal to 0' }})
-     } 
-     if(minVal < 0 && enteredValue > minVal ){
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: 'Value must be less than ' + minValue}})
-     }
-     if((enteredValue <= 0 && minVal >=0 ) || (enteredValue <= minVal && minVal < 0)){
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: "" }})
-       updateField(section, null, 'min',String(enteredValue))
-     }
- }
-   if (!enteredValue) {
-     updateWarningMsg(function (prevMsg) { return {...prevMsg, minMsg: ''}})
-     updateField(section, null, 'min',undefined)
-   }
- }
-
- useEffect(() => {
-   if (config[section].max && Number(config[section].max) < Number(maxValue)) {
-     updateWarningMsg(function (prevMsg) {return {...prevMsg, maxMsg: `Entered value ${config[section].max} is not valid `}})
-     updateField(section,null,'max',undefined)
-   } 
- }, [maxValue,config])
- 
- useEffect(() => {
-     if (config[section].min &&( Number(config[section].min) > Number(minValue))) {
-       updateWarningMsg(function (prevMsg) { return { ...prevMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-       updateField(section,null,'min',undefined);
-    }
- }, [minValue,config])
- console.log(config)
-  
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm/>}
