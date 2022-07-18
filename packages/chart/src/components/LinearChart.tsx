@@ -36,13 +36,16 @@ export default function LinearChart() {
   let xScale;
   let yScale;
   let seriesScale;
+  const {max:configMax,min:configMin} = config.runtime.yAxis;
+  const isMaxValid = parseFloat(configMax)  >= parseFloat(maxValue);
+  const isMinValid = ((parseFloat(configMin) <= 0 && parseFloat(minValue) >=0) || (parseFloat(configMin) <= minValue && minValue < 0));
 
   if (data) {
-    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
-    let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
+    let min = configMin && isMinValid ? configMin : minValue;
+    let max = configMax && isMaxValid ? configMax : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
-      min = 0;
+      min = 0; 
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
