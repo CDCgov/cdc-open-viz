@@ -199,11 +199,6 @@ const EditorPanel = () => {
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
  },[dispatch,config.palette]);
 
-  useEffect(() => {
-    dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [ dispatch, config.palette ])
-
-
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
