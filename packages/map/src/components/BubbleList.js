@@ -185,12 +185,12 @@ export const BubbleList = (
 					{ state.visual.extraBubbleBorder &&
 						<circle
 						key={`circle-${stateName.replace(' ', '')}`}
-						// data-tip={toolTip}
-						// data-for="tooltip"
+						data-tip={toolTip}
+						data-for="tooltip"
 						className="bubble"
-						cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
-						cy={projection(coordinates)[1] || 0}
-						r={Number(size(item[primaryKey]) + 1)}
+						cx={ projection(coordinates)[0] || 0 } // || 0 handles error on loads where the data isn't ready
+						cy={ projection(coordinates)[1] || 0 }
+						r={ Number(size(item[primaryKey])) + 1 }
 						fill={"transparent"}
 						stroke={"white"}
 						strokeWidth={.5}
