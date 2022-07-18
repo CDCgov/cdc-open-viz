@@ -27,16 +27,28 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
 
-  const isStacked = config.visualizationSubType === 'stacked';
   const isRounded = config.barStyle==='rounded';
+  const isStacked = config.visualizationSubType === 'stacked'
   const tipRounding =  config.tipRounding ;
-  const roundingStyle = config.roundingStyle;
   const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
-  let style = {};
-  if(isHorizontal  && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`0  ${radius} ${radius} 0`} : {borderRadius: radius};
-  if(!isHorizontal && isRounded && isStacked ) style = tipRounding==='top'  ? {borderRadius:`${radius} ${radius} 0 0  `}:tipRounding==='full'  && config.runtime.seriesKeys.length>1  ? {borderRadius:`${radius} ${radius} 0 0 `} : {borderRadius: radius};
-  if(isHorizontal  && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:`0 ${radius} ${radius} 0  `}:tipRounding==='full'  ? {borderRadius:radius}:{};
-  if(!isHorizontal && isRounded && !isStacked) style = tipRounding==='top'  ? {borderRadius:` ${radius} ${radius} 0 0 `}:tipRounding==='full'  ? {borderRadius:radius}:{};
+  const stackCount = config.runtime.seriesKeys.length;
+ 
+  const applyRadius = (index:number)=>{
+    if(index === undefined || index === null || !isRounded) return;
+    let style = {};
+    
+    if((isStacked && index+1 === stackCount) || !isStacked){
+      style = isHorizontal ? {borderRadius:`0 ${radius}  ${radius}  0`} : {borderRadius:`${radius} ${radius} 0 0`};
+    };
+    if(tipRounding === 'full' && isStacked && index === 0 && stackCount > 1){
+      style = isHorizontal ? {borderRadius:`${radius} 0 0 ${radius}`} : {borderRadius:`0 0 ${radius} ${radius}`};
+   };
+    if(tipRounding === 'full' && ((isStacked && index === 0 && stackCount === 1) || !isStacked)){
+      style = {borderRadius:radius};  
+   };
+   
+   return style;
+ }
 
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null);
@@ -106,6 +118,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let barThickness = xMax / barStack.bars.length;
               let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
+              const style = applyRadius(barStack.index)
+             
               return (
               <Group key={`bar-stack-${barStack.index}-${bar.index}`}>
               <Text
@@ -119,7 +133,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               </Text>
               <foreignObject 
                 key={`bar-stack-${barStack.index}-${bar.index}`}
-                className={`${isRounded && barStacks.length > 1 ? ` ${roundingStyle} stack-vertical-${tipRounding}-${barStack.index}` : ''}`}
                 x={barThickness * bar.index + offset}
                 y={bar.y}
                 width={barThicknessAdjusted}
@@ -164,8 +177,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     const barsPerGroup = config.series.length;
                     let barHeight = config.barHeight ? config.barHeight : 25;
                     let barPadding = barHeight;
-
-                    config.barHeight = Number(config.barHeight)
+                    const style = applyRadius(barStack.index);
                     
                     if (orientation=== "horizontal") {
   
@@ -193,13 +205,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     return (
                       <Group key={index}>
                           <foreignObject
-                          className={`${isRounded && barStacks.length > 1 ? ` ${roundingStyle} stack-horizontal-${tipRounding}-${barStack.index}` : ''}`}
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
                           y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
                           height={config.barHeight}
-                          stroke="#333"
                           style={{background:bar.color,border:`${config.barBorderThickness ||1}px solid #333`,...style}}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
@@ -341,6 +351,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    const style = applyRadius(index)
+
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
