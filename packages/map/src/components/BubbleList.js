@@ -2,6 +2,7 @@ import React, {memo, useState, useEffect} from 'react'
 import { scaleLinear } from 'd3-scale';
 import { countryCoordinates } from '../data/country-coordinates';
 import stateCoordinates from '../data/state-coordinates';
+import ReactTooltip from 'react-tooltip'
 
 export const BubbleList = (
 	{
@@ -15,6 +16,9 @@ export const BubbleList = (
 		displayGeoName
 	}) => {
 
+	useEffect(() => {
+		ReactTooltip.hide()
+	}, [runtimeData]);
 
 	const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
 	
@@ -52,7 +56,7 @@ export const BubbleList = (
 						key={`circle-${countryName.replace(' ', '')}`}
 						data-tip={toolTip}
 						data-for="tooltip"
-						className="bubble"
+						className={`bubble country--${countryName}`}
 						cx={ Number(projection(coordinates[1], coordinates[0])[0]) || 0  } // || 0 handles error on loads where the data isn't ready
 						cy={ Number(projection(coordinates[1], coordinates[0])[1]) || 0 }
 						r={ Number(size(country[primaryKey])) }
@@ -181,8 +185,8 @@ export const BubbleList = (
 					{ state.visual.extraBubbleBorder &&
 						<circle
 						key={`circle-${stateName.replace(' ', '')}`}
-						data-tip={toolTip}
-						data-for="tooltip"
+						// data-tip={toolTip}
+						// data-for="tooltip"
 						className="bubble"
 						cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
 						cy={projection(coordinates)[1] || 0}
@@ -224,4 +228,4 @@ export const BubbleList = (
 		return bubbles;
 	}
 }
-export default memo(BubbleList)
+export default BubbleList
