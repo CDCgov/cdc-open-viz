@@ -22,8 +22,8 @@ export default {
     hideTicks: false,
     size: 50,
     gridLines: false,
-    min: undefined,
-    max:undefined
+    min:'',
+    max:'',
   },
   barThickness: 0.35,
   barHeight: 25,
@@ -35,8 +35,8 @@ export default {
     hideTicks: false,
     size: 75,
     tickRotation: 0,
-    min: undefined,
-    max:undefined
+    min: '',
+    max:'',
   },
   table: {
     label: 'Data Table',
