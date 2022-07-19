@@ -19,6 +19,7 @@ import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
 import initialState from './data/initial-state';
+import { countryCoordinates } from './data/country-coordinates';
 
 // Sass
 import './scss/main.scss';
@@ -53,6 +54,7 @@ const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
+
 
 const generateColorsArray = (color = '#000000', special = false) => {
     let colorObj = chroma(color)
@@ -109,7 +111,61 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
+    const [filteredCountryCode, setFilteredCountryCode] = useState()
+    const [position, setPosition] = useState(state.mapPosition);
+
+    
     let legendMemo = useRef(new Map())
+
+    useEffect(() => {
+        try {
+            if (filteredCountryCode) {
+                const filteredCountryObj = runtimeData[filteredCountryCode]
+                const coordinates = countryCoordinates[filteredCountryCode]
+                const long = coordinates[1]
+                const lat = coordinates[0]
+                const reversedCoordinates = [long, lat];
+                
+                setState({
+                    ...state,
+                    mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+                })
+                
+            }
+        } catch(e) {
+            console.error('Failed to set world map zoom.')
+        }
+
+    }, [filteredCountryCode]);
+
+    useEffect(() => {
+
+        setTimeout( () => {
+            if (filteredCountryCode) {
+                const filteredCountryObj = runtimeData[filteredCountryCode]
+    
+                const tmpData = {
+                    [filteredCountryCode]: filteredCountryObj
+                }
+    
+                setRuntimeData(tmpData)
+            }
+        }, 100)
+
+    }, [filteredCountryCode]);
+
+    useEffect(() => {
+        if (state.mapPosition) {
+            setPosition(state.mapPosition)
+        }
+    }, [state.mapPosition, setPosition]);
+
+    const setZoom = (reversedCoordinates) => {
+        setState({
+            ...state,
+            mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        })
+    };
 
 
 
@@ -120,17 +176,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
-
-    // *******START SCREEN READER DEBUG*******
-    // const focusedElement = useActiveElement();
-
-    // useEffect(() => {
-    //     if (focusedElement) {
-    //         focusedElement.value && console.log(focusedElement.value);
-    //     }
-    //     console.log(focusedElement);
-    // }, [focusedElement])
-    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -198,6 +243,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const
             primaryCol = obj.columns.primary.name,
+            isBubble = obj.general.type === 'bubble',
+            categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
             type = obj.legend.type,
             number = obj.legend.numberOfItems,
             result = [];
@@ -326,7 +373,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
-                let value = row[primaryCol]
+                let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol] 
 
                 if(undefined === value) continue
 
@@ -572,7 +619,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     })
 
     // Calculates what's going to be displayed on the map and data table at render.
-    const generateRuntimeData = useCallback((obj, filters, hash) => {
+    const generateRuntimeData = useCallback((obj, filters, hash, test) => {
         const result = {}
 
         if(hash) {
@@ -584,6 +631,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         
 
         obj.data.forEach(row => {
+
+            if(test) {
+                console.log('object', obj)
+                console.log('row', row) 
+            }
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
             // When on a single state map filter runtime data by state
@@ -792,7 +844,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
             if (false === state.legend.specialClasses.includes(String(value))) {
-                formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
+                formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
             }
         }
 
@@ -839,14 +891,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         
         toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-        if('data' === state.general.type && undefined !== row) {
+        if( ('data' === state.general.type || state.general.type === 'bubble') && undefined !== row) {
             toolTipText += `<dl>`
 
             Object.keys(state.columns).forEach((columnKey) => {
                 const column = state.columns[columnKey]
 
                 if (true === column.tooltip) {
-
                     let label = column.label.length > 0 ? column.label : '';
 
                     let value;
@@ -979,13 +1030,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         const dict = {
-            "District of Columbia" : "Washington D.C."
+            "District of Columbia" : "Washington D.C.",
+            "Congo": "Republic of the Congo"
         }
 
         if(true === Object.keys(dict).includes(value)) {
             value = dict[value]
         }
-
         return titleCase(value);
     }
 
@@ -1121,6 +1172,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         init()
     }, [])
 
+    // useEffect(() => {
+    //     if(state.focusedCountry && state.data) {
+    //         let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === state.focusedCountry[state.columns.geo.name])
+    //         let temp = {
+    //             ...state,
+    //             data: newRuntimeData
+    //         }
+    //         setRuntimeData(temp)
+    //     }
+
+    // }, [state.focusedCountry]);
+
     useEffect(() => {
         if (state.data) {
             let newData = generateRuntimeData(state);
@@ -1176,7 +1239,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             geo: state.columns.geo.name,
             primary: state.columns.primary.name,
             data: state.data,
-            ...runtimeFilters
+            ...runtimeFilters,
+            mapPosition: state.mapPosition
         })
 
         // Data
@@ -1212,6 +1276,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, runtimeData)
             setRuntimeLegend(legend)
         }
+
     }, [runtimeData])
 
     if(config) {
@@ -1266,6 +1331,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray,
         titleCase,
         setState,
+        setRuntimeData,
+        generateRuntimeData,
+        setFilteredCountryCode,
+        filteredCountryCode,
+        position,
+        setPosition,
+        hasZoom : state.general.allowMapZoom
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
@@ -1439,6 +1511,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						mapTitle={general.title}
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
+                        setFilteredCountryCode={setFilteredCountryCode}
                         tabbingId={tabId}
 					/>
                 )}
