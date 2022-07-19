@@ -1297,7 +1297,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const tabId = handleMapTabbing()
 
-    
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1324,10 +1323,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
-						{parse(title)}
+                    <div role='heading' aria-level="2" className={'map-title ' + general.headerColor} tabIndex="0">
+                        <sup className="superTitle">{general.superTitle}</sup>
+						<div>{parse(title)}</div>
 					</div>
-				</header>
+                </header>
+                {general.intro_text &&
+                    <section className="introText">
+                        {general.intro_text}
+                    </section>
+                }
 				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
@@ -1436,9 +1441,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         formatLegendLocation={formatLegendLocation}
                         tabbingId={tabId}
 					/>
-				)}
-				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>}
+                )}
+                
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                {general.footnotes && <section className="footnotes">{general.footnotes}</section>}
+            </section>}
+            
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>
