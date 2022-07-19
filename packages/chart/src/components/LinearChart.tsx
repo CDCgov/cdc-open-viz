@@ -472,7 +472,7 @@ export default function LinearChart() {
                         textAnchor={'middle'}
                         stroke="#333"
                       >
-                      {config.runtime.yAxis.label}
+                      {config.runtime.xAxis.label}
                     </Text>
                   </Group>
                 </>
