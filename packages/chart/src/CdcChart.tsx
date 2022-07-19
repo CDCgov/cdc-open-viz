@@ -614,8 +614,6 @@ export default function CdcChart(
     if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
     if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
 
-    console.log('config', config)
-
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -630,9 +628,7 @@ export default function CdcChart(
                 aria-level={2}
               >
                 {config.general && (
-                  <sup className="super_title">
-                    {config.general.super_title}
-                  </sup>
+                  <sup className="superTitle">{config.general.superTitle}</sup>
                 )}
                 <div>{parse(title)}</div>
               </div>
@@ -647,7 +643,7 @@ export default function CdcChart(
             {/* Filters */}
             {config.filters && <Filters />}
             {/* Visualization */}
-            {config.general && <section className="intro_text">{config.general.intro_text}</section>}
+            {config.general?.introText && <section className="introText">{config.general.introText}</section>}
             <div
               className={`chart-container${
                 config.legend.hide ? " legend-hidden" : ""
@@ -661,7 +657,7 @@ export default function CdcChart(
             {description && <div className="subtext">{parse(description)}</div>}
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && <DataTable />}
-            {config.general && <section className="footnotes">{config.general.footnotes}</section>}
+            {config.general?.footnotes && <section className="footnotes">{config.general.footnotes}</section>}
           </div>
         )}
       </>

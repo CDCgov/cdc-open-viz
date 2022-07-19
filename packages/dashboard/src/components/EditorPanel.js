@@ -302,7 +302,7 @@ const EditorPanel = memo(() => {
                     value={"Super Title"}
                     updateField={updateField}
                     section="general"
-                    fieldName="super_title"
+                    fieldName="superTitle"
                     label="Super Title"
                     placeholder="Super Title"
                     tooltip={
