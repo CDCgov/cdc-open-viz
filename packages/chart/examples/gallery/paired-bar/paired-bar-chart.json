@@ -19,7 +19,7 @@
 		"hideTicks": false,
 		"size": "75",
 		"gridLines": false,
-		"label": "",
+		"label": "Value Axis",
 		"numTicks": "6"
 	},
 	"barThickness": 0.35,
