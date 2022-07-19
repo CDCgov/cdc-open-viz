@@ -268,87 +268,243 @@ const EditorPanel = memo(() => {
 
   return (
     <ErrorBoundary component="EditorPanel">
-      {config.runtime && config.runtime.editorErrorMessage && <Error /> }
-      <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={() => setDisplayPanel(!displayPanel) }></button>
-      <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'}>
+      {config.runtime && config.runtime.editorErrorMessage && <Error />}
+      <button
+        className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`}
+        title={displayPanel ? `Collapse Editor` : `Expand Editor`}
+        onClick={() => setDisplayPanel(!displayPanel)}
+      ></button>
+      <section
+        className={
+          displayPanel ? "editor-panel cove" : "hidden editor-panel cove"
+        }
+      >
         <div className="heading-2">Configure</div>
         <section className="form-container">
           <form>
             <Accordion allowZeroExpanded={true}>
-              <AccordionItem> {/* General */}
+              <AccordionItem>
+                {" "}
+                {/* General */}
                 <AccordionItemHeading>
-                  <AccordionItemButton>
-                    General
-                  </AccordionItemButton>
+                  <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <TextField value={config.dashboard.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
-                  <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} tooltip={
-                    <Tooltip style={{textTransform: 'none'}}>
-                      <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }/>
+                  <TextField
+                    value={config.dashboard.title}
+                    section="dashboard"
+                    fieldName="title"
+                    label="Title"
+                    updateField={updateField}
+                  />
+
+                  <TextField
+                    value={"Super Title"}
+                    updateField={updateField}
+                    section="general"
+                    fieldName="superTitle"
+                    label="Super Title"
+                    placeholder="Super Title"
+                    tooltip={
+                      <Tooltip style={{ textTransform: "none" }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display="question"
+                            style={{ marginLeft: "0.5rem" }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Super Title</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+
+                  <TextField
+                    type="textarea"
+                    value={"Intro Text"}
+                    updateField={updateField}
+                    section="general"
+                    fieldName="intro_text"
+                    label="Intro Text"
+                    tooltip={
+                      <Tooltip style={{ textTransform: "none" }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display="question"
+                            style={{ marginLeft: "0.5rem" }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Intro Text</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+
+                  <TextField
+                    type="textarea"
+                    value={config.dashboard.description}
+                    section="dashboard"
+                    fieldName="description"
+                    label="Description"
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: "none" }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display="question"
+                            style={{ marginLeft: "0.5rem" }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Enter supporting text to display below the data
+                            visualization, if applicable. The following HTML
+                            tags are supported: strong, em, sup, and sub.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+
+                  <TextField
+                    type="textarea"
+                    value={"Foootnotes"}
+                    updateField={updateField}
+                    section="general"
+                    fieldName="footnotes"
+                    label="Footnotes"
+                    tooltip={
+                      <Tooltip style={{ textTransform: "none" }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display="question"
+                            style={{ marginLeft: "0.5rem" }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>Footnotes</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Filters
-                  </AccordionItemButton>
+                  <AccordionItemButton>Filters</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <ul className="filters-list">
-                    {config.dashboard.filters && config.dashboard.filters.map((filter, index) => (
-                        <fieldset className="edit-block" key={filter.columnName + index}>
-                          <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
+                    {config.dashboard.filters &&
+                      config.dashboard.filters.map((filter, index) => (
+                        <fieldset
+                          className="edit-block"
+                          key={filter.columnName + index}
+                        >
+                          <button
+                            type="button"
+                            className="remove-column"
+                            onClick={() => {
+                              removeFilter(index);
+                            }}
+                          >
+                            Remove
+                          </button>
                           <label>
-                            <span className="edit-label column-heading">Filter</span>
-                            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                            <span className="edit-label column-heading">
+                              Filter
+                            </span>
+                            <select
+                              value={filter.columnName}
+                              onChange={(e) => {
+                                updateFilterProp(
+                                  "columnName",
+                                  index,
+                                  e.target.value
+                                );
+                              }}
+                            >
                               <option value="">- Select Option -</option>
                               {getColumns().map((dataKey) => (
-                                <option value={dataKey} key={dataKey}>{dataKey}</option>
+                                <option value={dataKey} key={dataKey}>
+                                  {dataKey}
+                                </option>
                               ))}
                             </select>
                           </label>
                           <label>
-                            <span className="edit-label column-heading">Label</span>
-                            <input type="text" value={filter.label} onChange={(e) => {updateFilterProp('label', index, e.target.value)}}/>
+                            <span className="edit-label column-heading">
+                              Label
+                            </span>
+                            <input
+                              type="text"
+                              value={filter.label}
+                              onChange={(e) => {
+                                updateFilterProp(
+                                  "label",
+                                  index,
+                                  e.target.value
+                                );
+                              }}
+                            />
                           </label>
                         </fieldset>
-                      )
-                    )}
+                      ))}
                   </ul>
 
-                  <button type="button" onClick={addNewFilter} className="btn btn-primary">Add Filter</button>
+                  <button
+                    type="button"
+                    onClick={addNewFilter}
+                    className="btn btn-primary"
+                  >
+                    Add Filter
+                  </button>
                 </AccordionItemPanel>
               </AccordionItem>
               <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>
-                    Data Table
-                  </AccordionItemButton>
+                  <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <CheckBox value={config.table.show} section="table" fieldName="show" label="Show Table" updateField={updateField}  />
-                  <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField} />
-                  <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField} />
-                  <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField} />
+                  <CheckBox
+                    value={config.table.show}
+                    section="table"
+                    fieldName="show"
+                    label="Show Table"
+                    updateField={updateField}
+                  />
+                  <CheckBox
+                    value={config.table.expanded}
+                    section="table"
+                    fieldName="expanded"
+                    label="Expanded by Default"
+                    updateField={updateField}
+                  />
+                  <CheckBox
+                    value={config.table.download}
+                    section="table"
+                    fieldName="download"
+                    label="Display Download Button"
+                    updateField={updateField}
+                  />
+                  <TextField
+                    value={config.table.label}
+                    section="table"
+                    fieldName="label"
+                    label="Label"
+                    updateField={updateField}
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
-           </Accordion>
+            </Accordion>
           </form>
         </section>
-        <ReactTooltip
-            html={true}
-            multiline={true}
-            className="helper-tooltip"
-          />
+        <ReactTooltip html={true} multiline={true} className="helper-tooltip" />
       </section>
     </ErrorBoundary>
-  )
+  );
 })
 
 export default EditorPanel;

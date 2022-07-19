@@ -18,7 +18,9 @@ export default {
     palette:{
       isReversed:false
     },
-    allowMapZoom: true
+    allowMapZoom: true,
+    hideGeoColumnInTooltip: false,
+    hidePrimaryColumnInTooltip: false
   },
   
   type: "map",

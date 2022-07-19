@@ -189,7 +189,7 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context)
 
-  const {minValue,maxValue} = useReduceData(config,data)
+  const {minValue,maxValue} = useReduceData(config,unfilteredData);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
@@ -198,11 +198,6 @@ const EditorPanel = () => {
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
  },[dispatch,config.palette]);
-
-  useEffect(() => {
-    dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [ dispatch, config.palette ])
-
 
   const filterOptions = [
     {
@@ -427,13 +422,12 @@ const EditorPanel = () => {
     return unique ? [ ...new Set(values) ] : values
   }
 
-  // when to show lollipop checkbox.
-  // update as the need grows (ie. vertical bars, divergeing, etc.)
-  const showLollipopCheckbox = () => {
-    if (config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular') && config.visualizationSubType !== 'stacked') {
-      return true
+ 
+  const showBarStyleOptions = ()=>{
+    if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation==='horizontal' || config.orientation==='vertical') ) {
+      return ['flat','rounded','lollipop']
     } else {
-      return false
+      return ['flat','rounded']
     }
   }
 
@@ -493,6 +487,16 @@ const EditorPanel = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ config ])
+  
+  // Set paired bars to be horizontal, even though that option doesn't display
+  useEffect(() => {
+    if(config.visualizationType === 'Paired Bar') {
+        updateConfig({
+          ...config,
+          orientation: 'horizontal'
+      })
+    }
+  }, []);
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
@@ -555,94 +559,58 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Add a data series'
   }
 
-  const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
-  const [warningMsg,updateWarningMsg] = useState({maxMsg:'',minMsg:''})
-  
-  const onMaxChangeHandler = (e) => {
-     const enteredValue = e.target.value;
+  const section = config.orientation==='horizontal'  ? 'xAxis' : 'yAxis';
+  const [warningMsg,setWarningMsg] = useState({maxMsg:'',minMsg:''});
 
-     var existPositiveValue;
-     let value;
+  const validateMaxValue = () => {
+    const enteredValue = config[section].max;
+    let existPositiveValue = false;
+    let message = '';
 
-     // loop through series keys
-    if (config.runtime.seriesKeys) {
-      for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
-      }
-    }
+   if (config.runtime.seriesKeys) {
+     for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
+       existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
+     };
+   };
 
-     // input >= max
-    if (Number(enteredValue) >= maxValue) {
-        value = enteredValue
-        updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-    }
-    
-    // input < max && a positive number exists
-    if (Number(enteredValue)< maxValue && existPositiveValue) {
-        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Max value must be more than '+ maxValue}})
-    }
-    
-    // input < max && all numbers negatice
-    if (Number(enteredValue) < maxValue && !existPositiveValue) {
-        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Value must be more than or equal to 0'}})
-    }
-    updateField(section, null, 'max', value)
-    
-    if (!enteredValue.length) {
-      updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-    }
-  }
-  
-  const onMinChangeHandler = (e) => {
-    const enteredValue = e.target.value;
-    let value;
-    if (config.visualizationType === 'Line') {
-      if (Number(enteredValue) > minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than ' + minValue}})
-      } else {
-        value = enteredValue
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' } })
-      }
-      } else {
-        if (Number(enteredValue) > minValue) {
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than '+ minValue }})
-        } else if (Number(enteredValue) > 0  ) {
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than or equal to 0' }})
-        } else {
-          value = enteredValue
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' }})
-        }
-       
-      }
-      updateField(section, null, 'min', value)
+   switch(true){
+     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue):
+       message = 'Max value must be more than '+ maxValue;
+       break;
+     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && !existPositiveValue):
+       message = 'Value must be more than or equal to 0';
+       break;
+     default : message = '' ;
+   }
+    setWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:message}});
+  };
 
-      if (!enteredValue.length) {
-        updateWarningMsg(function (presMsg) { return {...presMsg, minMsg: ''}})
-      }
-    }
-  
 
-  useEffect(() => {
-    if (config[section].max && config[section].max < maxValue) {
-      updateField(section,null,'max',maxValue)
-      updateWarningMsg(function (presMsg) {return {...presMsg, maxMsg: `Entered value ${config[section].max} is not valid `}})
-    } 
-  }, [data,maxValue])
-  
-  useEffect(() => {
-    if (config.visualizationType === 'Line') {
-      if (config[section].min && config[section].min > minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-        updateField(section,null,'min',minValue)
-      }
-    } else {
-      if (config[section].min && config[section].min < minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-        updateField(section,null,'min',minValue)
-      }
-    }
-  }, [data,minValue])
-  
+  const validateMinValue = ()=>{
+   const enteredValue = config[section].min;
+   let minVal = Number(minValue); 
+   let message = '';
+
+  switch(true){
+    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+      message = 'Value must be less than ' + minValue;
+      break; 
+    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+      message = 'Value must be less than or equal to 0';
+      break; 
+    case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
+      message = 'Value must be less than ' + minValue; 
+      break;
+    default : message = ''
+  };
+    setWarningMsg(function (prevMsg) { return {...prevMsg, minMsg: message}});
+ };
+
+useEffect(()=>{
+  validateMinValue();
+   validateMaxValue();
+},[minValue,maxValue,config]);
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm/>}
@@ -663,24 +631,53 @@ const EditorPanel = () => {
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
+                  {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
+                  {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.roundingStyle||'standard'} fieldName="roundingStyle" label="rounding style" updateField={updateField} options={['standard','shallow','finger']}/>}
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
                     <Select value={config.yAxis.labelPlacement || 'Below Bar'} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={[ 'Below Bar', 'On Date/Category Axis' ]}/>
                   }
-                  {(showLollipopCheckbox()) &&
-                    <CheckBox value={config.isLollipopChart} fieldName="isLollipopChart" label="Use lollipop styling" updateField={updateField} tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' ) ? (
+                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
+                  ): config.visualizationType !== 'Pie' &&  (
+                    <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField}/>
+                  )}
+                  {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
+                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
+                  
+                  <TextField
+										value={config.superTitle || ''}
+										updateField={updateField}
+										section='general'
+										fieldName='superTitle'
+										label='Super Title'
+										placeholder='Super Title'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
-                          <p>Select this option to replace each bar with a line and a dot at the end.</p>
+                        <p>Super Title</p>
                         </Tooltip.Content>
                       </Tooltip>
-                    }/>
-                  }
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
-                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
-                  }
-                  {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
-                  <TextField value={config.title} fieldName="title" label="Title" updateField={updateField}/>
+										}
+                  />
+                  
+                  <TextField
+										type='textarea'
+										value={config.introText}
+										updateField={updateField}
+										section='general'
+										fieldName='introText'
+										label='Intro Text'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                        <p>Intro Text</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+										}
+									/>
 
                   <TextField type="textarea" value={config.description} fieldName="description" label="Subtext" updateField={updateField} tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
@@ -689,7 +686,24 @@ const EditorPanel = () => {
                         <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
                       </Tooltip.Content>
                     </Tooltip>
-                  }/>
+                  } />
+                  
+                  <TextField
+										type='textarea'
+										value={config.footnotes}
+										updateField={updateField}
+										section='general'
+										fieldName='footnotes'
+										label='Footnotes'
+										tooltip={
+                      <Tooltip style={{textTransform: 'none'}}>
+                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Content>
+                        <p>Footnotes</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+										}
+									/>
 
                   {config.visualizationSubType !== 'horizontal' &&
                     <TextField type="number" value={config.height} fieldName="height" label="Chart Height" updateField={updateField}/>
@@ -847,17 +861,17 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.xAxis.max}  section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto'  updateField={updateField} />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
-                    : config.visualizationType !=='Pie' &&
+                    : (config.visualizationType !=='Pie') &&
                     <>
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.yAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='update max value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
-                      <TextField value={config.yAxis.min} type='number' label='update min value' placeholder='Auto' onChange={(e)=>onMinChangeHandler(e)}  />
+                      <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.minMsg}</span>
                     </>
                   }
@@ -1171,7 +1185,7 @@ const EditorPanel = () => {
 
                   <Select value={config.fontSize} fieldName="fontSize" label="Font Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
 
-                  {config.series?.some(series => series.type === 'Bar') &&
+                  {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') &&
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
@@ -1253,9 +1267,6 @@ const EditorPanel = () => {
 
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      {config.orientation !== 'horizontal' &&
-                        <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField}/>
-                      }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
