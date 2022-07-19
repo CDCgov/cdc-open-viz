@@ -231,6 +231,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       { displayNumbersOnBar && textWidth + 50 < bar.width &&
                           <Text
+                            display={displayBar ? 'block' : 'none'}
                             x={ bar.x + barStack.bars[bar.index].width / 2 } // padding
                             y={ textPosition - 5 - config.barHeight/2 }
                             fill={ labelColor }
@@ -478,6 +479,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                            (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                             (
                                 <Text
+                                  display={displayBar ? 'block' : 'none'}
                                   x={ bar.y - 5 } // padding
                                   y={ config.isLollipopChart ? offset : (config.barHeight / 2 ) + config.barHeight * (barGroup.bars.length - bar.index - 1) }
                                   fill={ labelColor }
@@ -489,6 +491,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )
                             : (
                                 <Text
+                                  display={displayBar ? 'block' : 'none'}
                                   x={ `${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0 ) }`} // padding
                                   y={ config.isLollipopChart ? 0 : (config.barHeight / 2 ) + config.barHeight * (barGroup.bars.length - bar.index - 1)}
                                   fill={ '#000000'}
@@ -510,6 +513,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                               (
                                   <Text
+                                    display={displayBar ? 'block' : 'none'}
                                     x={ bar.y - 5 } // padding
                                     y={ 
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
@@ -524,6 +528,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               )
                               : (
                                   <Text
+                                    display={displayBar ? 'block' : 'none'}
                                     x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
                                     y={ 
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
