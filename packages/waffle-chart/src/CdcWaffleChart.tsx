@@ -282,7 +282,7 @@ const WaffleChart = ({ config, isEditor }) => {
   return (
     <>
       {title &&
-      <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
         {parse(title)}
       </header>
       }
@@ -390,7 +390,7 @@ const CdcWaffleChart = (
   //Reload config if config object provided/updated
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
-  }, [ configObj?.data ])
+  }, [])
 
   let content = (<Loading/>)
 
@@ -409,13 +409,17 @@ const CdcWaffleChart = (
 
     let body = (
       <div className="cove-component waffle-chart" ref={outerContainerRef}>
-        <WaffleChart config={config} isEditor={isEditor}/>
+        <WaffleChart config={config} isEditor={isEditor} />
       </div>
-    )
+    );
 
     content = (
       <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+        {isEditor &&
+          <EditorPanel>
+            {body}
+          </EditorPanel>
+        }
         {!isEditor && body}
       </div>
     )
