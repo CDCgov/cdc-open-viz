@@ -392,6 +392,13 @@ export default function CdcChart(
   const formatNumber = (num) => {
     let original = num;
     let prefix = config.dataFormat.prefix;
+
+    let stringFormattingOptions = {
+      useGrouping: config.dataFormat.commas ? true : false,
+      minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
+      maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+    };
+
     num = numberFromString(num);
 
     if(isNaN(num)) {
@@ -408,8 +415,7 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    num = num.toLocaleString('en-US', stringFormattingOptions)
 
     let result = ""
 
@@ -611,27 +617,51 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend />}
+        {!missingRequiredSections() && !config.newViz && (
+          <div className="cdc-chart-inner-container">
+            {/* Title */}
+
+            {title && (
+              <div
+                role="heading"
+                className={`chart-title ${config.theme}`}
+                aria-level={2}
+              >
+                {config.general && (
+                  <sup className="superTitle">{config.general.superTitle}</sup>
+                )}
+                <div>{parse(title)}</div>
+              </div>
+            )}
+            <a
+              id="skip-chart-container"
+              className="cdcdataviz-sr-only-focusable"
+              href={handleChartTabbing}
+            >
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            {config.filters && <Filters />}
+            {/* Visualization */}
+            {config.general?.introText && <section className="introText">{config.general.introText}</section>}
+            <div
+              className={`chart-container${
+                config.legend.hide ? " legend-hidden" : ""
+              }${lineDatapointClass}${barBorderClass}`}
+            >
+              {chartComponents[visualizationType]}
+              {/* Legend */}
+              {!config.legend.hide && <Legend />}
+            </div>
+            {/* Description */}
+            {description && <div className="subtext">{parse(description)}</div>}
+            {/* Data Table */}
+            {config.xAxis.dataKey && config.table.show && <DataTable />}
+            {config.general?.footnotes && <section className="footnotes">{config.general.footnotes}</section>}
           </div>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
-        </div>}
+        )}
       </>
-    )
+    );
   }
 
   const contextValues = {

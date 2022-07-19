@@ -1,3 +1,5 @@
+@use "sass:string";
+
 @mixin breakpoint($class) {
   @if $class == xs {
     @media (max-width: 767px) { @content; }
@@ -65,4 +67,47 @@
   }
   @import "data-table";
   @import "global";
+}
+
+$theme: (
+        'amber':  ('#fbab18', '#ffd54f', '#ffecb3', '#fff7e1'),
+        'blue':   ('#005eaa', '#88c3ea', '#c0e9ff', '#edf9ff'),
+        'brown':  ('#705043', '#ad907b', '#d7ccc8', '#f2ebe8'),
+        'cyan':   ('#006778', '#65b0bd', '#cce5e9', '#ebf5f6'),
+        'green':  ('#4b830d', '#84bc49', '#dcedc8', '#f1f8e9'),
+        'indigo': ('#26418f', '#92a6dd', '#dee8ff', '#f2f6ff'),
+        'orange': ('#bb4d00', '#ffad42', '#ffe97d', '#fff4cf'),
+        'pink':   ('#af4448', '#e57373', '#ffc2c2', '#ffe7e7'),
+        'purple': ('#712177', '#b890bb', '#e3d3e4', '#f7f2f7'),
+        'slate':  ('#29434e', '#7e9ba5', '#b6c6d2', '#e2e8ed'),
+        'teal':   ('#00695c', '#4ebaaa', '#ceece7', '#ebf7f5' )
+);
+
+.cdc-open-viz-module {
+  @each $theme-name, $theme-colors in $theme {
+
+    &.theme-#{$theme-name} {
+
+      // if the bite has a border always show borders on the edges
+      .bite.bite--has-border {
+        border-left: 1px solid string.unquote(nth($theme-colors, 1)) !important;
+        border-right: 1px solid string.unquote(nth($theme-colors, 1)) !important;
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      // if the bite has borders and no title on top add the border on top
+      .cdc-data-bite-inner-container:not(.bite--has-title) .bite.bite--has-border {
+        border-top: 1px solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      // Left border Color
+      .bite.bite--has-accent {
+        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      .bite.bite--has-background:not(.bite--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3)) !important;
+      }
+    }
+  }
 }

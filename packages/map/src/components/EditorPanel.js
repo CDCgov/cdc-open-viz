@@ -198,7 +198,22 @@ const EditorPanel = (props) => {
 					general: {
 						...state.general,
 						allowMapZoom: value
-					},
+					}
+				})
+				break;
+			case 'hideGeoColumnInTooltip':
+				setState({
+					...state,
+					[property]: value
+				})
+				break;
+			case 'hidePrimaryColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
 				})
 				break;
 			case 'showTitle':
@@ -1320,19 +1335,50 @@ const EditorPanel = (props) => {
 								</AccordionItemHeading>
 								<AccordionItemPanel>
 									<TextField
-										value={state.general.title}
+										value={general.title}
 										updateField={updateField}
 										section='general'
 										fieldName='title'
 										label='Title'
 										placeholder='Map Title'
 										tooltip={
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-											</Tooltip.Content>
-										</Tooltip>
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										value={general.superTitle || ''}
+										updateField={updateField}
+										section='general'
+										fieldName='superTitle'
+										label='Super Title'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Super Title</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.introtext}
+										updateField={updateField}
+										section='general'
+										fieldName='intro_text'
+										label='Intro Text'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Intro Text</p>
+												</Tooltip.Content>
+											</Tooltip>
 										}
 									/>
 									<TextField
@@ -1344,10 +1390,26 @@ const EditorPanel = (props) => {
 										label='Subtext'
 										tooltip={
 											<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
 												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-											</Tooltip.Content>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.footnotes}
+										updateField={updateField}
+										section='general'
+										fieldName='footnotes'
+										label='Footnotes'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Footnotes</p>
+												</Tooltip.Content>
 											</Tooltip>
 										}
 									/>
@@ -2225,6 +2287,29 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Show Title</span>
 									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hideGeoColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hideGeoColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Geography Column Name in Tooltip</span>
+									</label>
+
+									<label className='checkbox'>
+										<input
+											type='checkbox'
+											checked={state.general.hidePrimaryColumnInTooltip || false}
+											onChange={(event) => {
+												handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked);
+											}}
+										/>
+										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
+									</label>
+
 									{'navigation' !== state.general.type && (
 										<label className='checkbox'>
 											<input

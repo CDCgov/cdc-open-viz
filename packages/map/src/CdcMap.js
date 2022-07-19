@@ -875,19 +875,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
         let toolTipText = '';
+        
+        // Adds geo label, ie State: Georgia
         let stateOrCounty = 
             state.general.geoType === 'us' ? 'State: ' : 
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
+
         if (state.general.geoType === 'us-county') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
-            //supportedStatesFipsCodes[]
-            toolTipText += `<strong>State:  ${stateName}</strong><br/>`;
+            toolTipText +=  !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>` ;
         }
         
-        toolTipText += `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>`
+        toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
         if( ('data' === state.general.type || state.general.type === 'bubble') && undefined !== row) {
             toolTipText += `<dl>`
@@ -914,7 +916,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
 
                     if(0 < value.length) { // Only spit out the tooltip if there's a value there
-                        toolTipText += `<div><dt>${label}</dt><dd>${value}</dd></div>`
+                        toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
                     }
 
                 }
@@ -1340,8 +1342,33 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     if (!mapProps.data || !state.data) return <Loading />;
 
-    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
-    
+    const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading;
+
+    const handleMapTabbing = () => {
+        let tabbingID;
+
+        // 1) skip to legend
+        if (general.showSidebar) {
+            tabbingID = '#legend'
+        }
+        
+        // 2) skip to data table if it exists and not a navigation map
+        if (hasDataTable && !general.showSidebar) {
+            tabbingID = `#dataTableSection__${Date.now()}`;
+        }
+        
+        // 3) if its a navigation map skip to the dropdown.
+        if (state.general.type === 'navigation') {
+            tabbingID = `#dropdown-${Date.now()}`;
+        }
+
+        // 4) handle other options
+        return tabbingID || '#!';
+
+    }
+
+    const tabId = handleMapTabbing()
+
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1367,11 +1394,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
 				)}
-                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
-						{parse(title)}
+				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
+                    <div role='heading' aria-level="2" className={'map-title ' + general.headerColor} tabIndex="0">
+                        <sup className="superTitle">{general.superTitle}</sup>
+						<div>{parse(title)}</div>
 					</div>
-				</header>
+                </header>
+                {general.intro_text &&
+                    <section className="introText">
+                        {general.intro_text}
+                    </section>
+                }
 				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
@@ -1394,7 +1427,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
 					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
@@ -1450,7 +1483,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					)}
 				</section>
 				{'navigation' === general.type && (
-					<NavigationMenu
+                    <NavigationMenu
+                        mapTabbingID={tabId}
 						displayGeoName={displayGeoName}
 						data={runtimeData}
 						options={general}
@@ -1478,10 +1512,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
                         setFilteredCountryCode={setFilteredCountryCode}
+                        tabbingId={tabId}
 					/>
-				)}
-				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>}
+                )}
+                
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                {general.footnotes && <section className="footnotes">{general.footnotes}</section>}
+            </section>}
+            
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>
