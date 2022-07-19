@@ -1321,10 +1321,10 @@ const EditorPanel = (props) => {
 										}
 									/>
 									<TextField
-										value={general.super_title || ''}
+										value={general.superTitle || ''}
 										updateField={updateField}
 										section='general'
-										fieldName='super_title'
+										fieldName='superTitle'
 										label='Super Title'
 										tooltip={
 											<Tooltip style={{textTransform: 'none'}}>

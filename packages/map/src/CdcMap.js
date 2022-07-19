@@ -1323,13 +1323,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
 				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-                    <div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
-                        <sup className="super_title">{general.super_title}</sup>
+                    <div role='heading' aria-level="2" className={'map-title ' + general.headerColor} tabIndex="0">
+                        <sup className="superTitle">{general.superTitle}</sup>
 						<div>{parse(title)}</div>
 					</div>
                 </header>
                 {general.intro_text &&
-                    <section className="intro_text">
+                    <section className="introText">
                         {general.intro_text}
                     </section>
                 }

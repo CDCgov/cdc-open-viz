@@ -685,10 +685,10 @@ const EditorPanel = () => {
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   
                   <TextField
-										value={config.super_title || ''}
+										value={config.superTitle || ''}
 										updateField={updateField}
 										section='general'
-										fieldName='super_title'
+										fieldName='superTitle'
 										label='Super Title'
 										placeholder='Super Title'
 										tooltip={
@@ -703,10 +703,10 @@ const EditorPanel = () => {
                   
                   <TextField
 										type='textarea'
-										value={config.intro_text}
+										value={config.introText}
 										updateField={updateField}
 										section='general'
-										fieldName='intro_text'
+										fieldName='introText'
 										label='Intro Text'
 										tooltip={
                       <Tooltip style={{textTransform: 'none'}}>
