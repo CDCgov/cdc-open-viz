@@ -18,6 +18,7 @@ export default {
   },
   yAxis: {
     hideAxis: false,
+    displayNumbersOnBar:false,
     hideLabel: false,
     hideTicks: false,
     size: 50,
