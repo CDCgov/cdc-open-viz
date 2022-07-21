@@ -257,8 +257,6 @@ export default function DataImport() {
     const rounded = new Date(date.getTime() - (date.getTime() % round));
     const trimmedDate = rounded.toString().replace(/\s+/g, "");
 
-    console.log('externalUrl', externalURL);
-
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
