@@ -34,10 +34,22 @@ const getMinValueFromData = ()=> {
  
     return min;
 };
+
+const findPositiveNum = ():boolean=>{
+  // loop throught provided data to find positve number in arr based on series keys.
+  let existPositiveValue = false;
+  if (config.runtime.seriesKeys) {
+    for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
+      existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
+    };
+  };
+  return existPositiveValue;
+};
     
     const maxValue = getMaxValueFromData();
-    const minValue = getMinValueFromData()
-  return {minValue,maxValue}
+    const minValue = getMinValueFromData();
+    const existPositiveValue = findPositiveNum();
+  return {minValue,maxValue,existPositiveValue};
 }
 
 export default useReduceData
