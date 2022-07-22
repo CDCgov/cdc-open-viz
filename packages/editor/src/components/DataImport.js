@@ -236,7 +236,8 @@ export default function DataImport() {
                 ...tempConfig,
                 data: text, // new data
                 dataFileName: fileSource, // new file source
-                dataFileSourceType: fileSourceType// new file source type
+                dataFileSourceType: fileSourceType, // new file source type
+                formattedData: transform.developerStandardize(text, config.dataDescription)
               })
             }
           } else {
@@ -268,7 +269,8 @@ export default function DataImport() {
               ...tempConfig,
               data: text, // new data
               dataFileName: fileSource, // new file source
-              dataFileSourceType: fileSourceType// new file source type
+              dataFileSourceType: fileSourceType, // new file source type
+              formattedData: transform.developerStandardize(text, config.dataDescription)// new file source type
             })
           }
         }
