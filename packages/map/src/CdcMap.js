@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import * as d3 from 'd3';
 
 // IE11
 import 'core-js/stable'
@@ -475,42 +476,109 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Equal Number
-        if(type === 'equalnumber') {
-            let numberOfRows = dataSet.length
+        if (type === 'equalnumber') {
+            // start work on changing legend functionality
+            // FALSE === ignore old version for now.
+            if (!state.general.showEqualNumber) {
+                let numberOfRows = dataSet.length
 
-            let remainder
-            let changingNumber = legendNumber
+                let remainder
+                let changingNumber = legendNumber
 
-            let chunkAmt
+                let chunkAmt
 
-            // Loop through the array until it has been split into equal subarrays
-            while ( numberOfRows > 0 ) {
-                remainder = numberOfRows % changingNumber
+                // Loop through the array until it has been split into equal subarrays
+                while (numberOfRows > 0) {
+                    remainder = numberOfRows % changingNumber
 
-                chunkAmt = Math.floor(numberOfRows / changingNumber)
+                    chunkAmt = Math.floor(numberOfRows / changingNumber)
 
-                if (remainder > 0) {
-                    chunkAmt += 1
+                    if (remainder > 0) {
+                        chunkAmt += 1
+                    }
+
+                    let removedRows = dataSet.splice(0, chunkAmt);
+
+                    let min = removedRows[0][primaryCol],
+                        max = removedRows[removedRows.length - 1][primaryCol]
+
+                        console.log('removed', removedRows)
+
+                    removedRows.forEach(row => {
+                        newLegendMemo.set(hashObj(row), result.length)
+                    })
+
+                    console.log(newLegendMemo)
+
+                    result.push({
+                        min,
+                        max
+                    })
+                    console.log(result)
+                    result[result.length - 1].color = applyColorToLegend(result.length - 1)
+
+                    changingNumber -= 1
+                    numberOfRows -= chunkAmt
                 }
+            } else {
+                // get nums
+                let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
+                domainNums = d3.extent(domainNums)
+                let colors = colorPalettes[state.color]
+                let colorRange = colors.slice(0, state.legend.numberOfItems + 1)
+                console.log('color range', colorRange)
 
-                let removedRows = dataSet.splice(0, chunkAmt);
+                let scale = d3.scaleQuantile()
+                    .domain(dataSet.map(item => item[state.columns.primary.name])) // min/max values
+                    .range(colorRange) // set range to our colors array
 
-                let min = removedRows[0][primaryCol],
-                    max = removedRows[removedRows.length - 1][primaryCol]
+                // Area Below: Quantize
+                // let domain = scale.domain()
+                //let lengthBetween = (domain[1] - domain[0]) / scale.range().length;
+                // let breaks = d3.range(0, scale.range().length).map(function (i) { return Math.round(i * lengthBetween) ; });
+                // Area Above: Quantize
 
-                removedRows.forEach(row => {
-                    newLegendMemo.set( hashObj(row), result.length )
+                let breaks = scale.quantiles().map(item => Math.floor(item));
+                console.log(breaks.length)
+
+                if (state.legend?.separateZero) {
+                    breaks.unshift(1)
+                }
+                
+                console.log('br', breaks)
+
+                breaks.map( (item, index) => {
+
+                    // // if first item is zero and zero is seperated
+                    
+                    result.push({
+                        min: (index === 0 && !state.legend.separateZero ) ? 0 : (index === 0 && state.legend.separateZero) ? 1 : item,
+                        max: index + 1 === breaks.length ? domainNums[1] : (breaks[index + 1] - 1),
+                        color: scale(item)
+                    })
+                    
+                    
+                    dataSet.forEach(row => {
+                        let number = row[state.columns.primary.name]
+                        
+                        console.log('breaks', breaks)
+                        console.log('result', result)
+                        console.log('index', index)
+                        console.log('number', number)
+
+                        console.log('min', result[index].min)
+                        console.log('max', result[index].max)
+
+                        let updated = state.legend.separateZero ? index + 1 : index;
+
+                        if(number >= result[updated].min && number <= result[updated].max) {
+                            newLegendMemo.set(hashObj(row), index)
+                        }
+                    })
+
+
                 })
 
-                result.push({
-                    min,
-                    max
-                })
-
-                result[result.length - 1].color = applyColorToLegend(result.length - 1)
-
-                changingNumber -= 1
-                numberOfRows -= chunkAmt
             }
         }
 

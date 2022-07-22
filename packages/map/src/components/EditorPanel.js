@@ -183,6 +183,17 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+
+			case 'showEqualNumber':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						showEqualNumber: value
+					}
+				})
+				break;
+
 			case 'toggleExtraBubbleBorder':
 				setState({
 					...state,
@@ -1816,16 +1827,22 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-                          Separate Zero
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>For numeric data, you can separate the zero value as its own data class.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Separate Zero
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>For numeric data, you can separate the zero value as its own data class.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
+
 											</label>
 										)}
+										{/* Temp Checkbox */}
+										<label className="checkbox mt-4">
+											<input type="checkbox" checked={ state.general.showEqualNumber } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
+											<span className="edit-label">Show New Equal Number</span>
+										</label>
 										{'category' !== legend.type && (
 											<label>
 												<span className='edit-label'>
