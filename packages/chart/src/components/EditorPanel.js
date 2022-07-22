@@ -189,7 +189,7 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context)
 
-  const {minValue,maxValue} = useReduceData(config,unfilteredData);
+  const {minValue,maxValue,existPositiveValue} = useReduceData(config,unfilteredData);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
@@ -564,20 +564,13 @@ const EditorPanel = () => {
 
   const validateMaxValue = () => {
     const enteredValue = config[section].max;
-    let existPositiveValue = false;
     let message = '';
-
-   if (config.runtime.seriesKeys) {
-     for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
-       existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
-     };
-   };
 
    switch(true){
      case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue):
        message = 'Max value must be more than '+ maxValue;
        break;
-     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && !existPositiveValue):
+     case (enteredValue  && parseFloat(enteredValue) < 0 && !existPositiveValue):
        message = 'Value must be more than or equal to 0';
        break;
      default : message = '' ;
