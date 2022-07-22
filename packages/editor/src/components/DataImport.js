@@ -145,7 +145,6 @@ export default function DataImport() {
 
       const newUrl = new URL(fileName);
       newUrl.searchParams.append("v", trimmedDate);
-      // `${externalURL}?v=${trimmedDate}`
 
       fileSourceType = "url";
       try {
