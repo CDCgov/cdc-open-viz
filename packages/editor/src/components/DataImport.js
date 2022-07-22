@@ -50,6 +50,8 @@ export default function DataImport() {
 
   const [ addingDataset, setAddingDataset ] = useState(true);
 
+  const [ editingDataset, setEditingDataset ] = useState();
+
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
@@ -134,12 +136,12 @@ export default function DataImport() {
     return responseBlob
   }
 
-  const onDrop = ([ uploadedFile ]) => loadData(uploadedFile)
+  const onDrop = ([ uploadedFile ]) => loadData(uploadedFile, editingDataset, editingDataset)
 
   /**
    * Handle loading data
    */
-  const loadData = async (fileBlob = null, fileName) => {
+  const loadData = async (fileBlob = null, fileName, editingDatasetKey) => {
     let fileData = fileBlob
     let fileSource = fileData?.path ?? fileName ?? null
     let fileSourceType = 'file'
@@ -214,7 +216,7 @@ export default function DataImport() {
 
               Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
 
-              newDatasets[fileSource] = {
+              newDatasets[editingDatasetKey || fileSource] = {
                 data: text, // new data
                 dataFileSize: fileSize,
                 dataFileName: fileSource, // new file source
@@ -250,7 +252,7 @@ export default function DataImport() {
 
             Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
 
-            newDatasets[fileSource] = {
+            newDatasets[editingDatasetKey || fileSource] = {
               data: text, // new data
               dataFileSize: fileSize,
               dataFileName: fileSource, // new file source
@@ -271,6 +273,9 @@ export default function DataImport() {
           }
         }
 
+        if(editingDataset){
+          setEditingDataset(undefined);
+        }
         setAddingDataset(false);
       } catch (err) {
         setErrors(err)
@@ -316,7 +321,7 @@ export default function DataImport() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
-  const loadFileFromUrl = (url) => {
+  const loadFileFromUrl = (url, editingDatasetKey) => {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
 
     return (
@@ -326,7 +331,7 @@ export default function DataImport() {
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
                  aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
-                  onClick={() => loadData(null, externalURL)}>Load
+                  onClick={() => loadData(null, externalURL, editingDatasetKey)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
@@ -439,7 +444,7 @@ export default function DataImport() {
             <table>
               <thead>
                 <tr>
-                  <th>Name</th><th>Size</th><th>Type</th><th colSpan="3">Actions</th>
+                  <th>Name</th><th>Size</th><th>Type</th><th colSpan="4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -449,6 +454,13 @@ export default function DataImport() {
                     <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                     <td>{config.datasets[datasetKey].dataFileFormat}</td>
                     <td><button className="btn btn-primary" onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+                    <td><button className="btn btn-primary" onClick={() => {
+                      if(editingDataset === datasetKey){
+                        setEditingDataset(undefined);
+                      } else {
+                        setEditingDataset(datasetKey);
+                      }
+                    }}>Edit Data</button></td>
                     <td><button className="btn btn-primary" onClick={() => removeDataset(datasetKey)}>X</button></td>
                   </tr>
                 ))}
@@ -498,10 +510,10 @@ export default function DataImport() {
           </>
         )}
 
-        {addingDataset && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+        {(editingDataset || addingDataset) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
-            <div className="heading-3">Add Dataset</div>
-            <Tabs>
+            <div className="heading-3">{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+            <Tabs startingTab={editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? 1 : 0}>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
                 {sharepath &&
                   <p className="alert--info">
@@ -519,7 +531,7 @@ export default function DataImport() {
                 </div>
               </TabPane>
               <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon"/>}>
-                {loadFileFromUrl(externalURL)}
+                {loadFileFromUrl(editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? config.datasets[editingDataset].dataFileName : externalURL, editingDataset)}
               </TabPane>
             </Tabs>
             {errors && (errors.map ? errors.map((message, index) => (
@@ -534,15 +546,15 @@ export default function DataImport() {
             <span className="heading-3">Load Sample Data:</span>
             <ul className="sample-data-list">
               <li
-                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
+                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>United
                 States Sample Data #1
               </li>
               <li
-                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
+                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}>Chart
                 Sample Data
               </li>
               <li
-                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
+                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}>United
                 States Counties Sample Data
               </li>
             </ul>
