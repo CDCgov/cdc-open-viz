@@ -320,6 +320,7 @@ export default function DataImport() {
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps: getRootProps2, getInputProps: getInputProps2, isDragActive: isDragActive2 } = useDropzone({ onDrop })
 
   const loadFileFromUrl = (url, editingDatasetKey) => {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
@@ -478,10 +479,10 @@ export default function DataImport() {
                   {config.dataFileSourceType === 'file' && (
                     <div className="data-source-options">
                       <div
-                        className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
-                        <input {...getInputProps()} />
+                        className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
+                        <input {...getInputProps2()} />
                         {
-                          isDragActive ?
+                          isDragActive2 ?
                             <p>Drop file here</p> :
                             <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
                         }
