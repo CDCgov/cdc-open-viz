@@ -18,6 +18,7 @@ export default {
     palette:{
       isReversed:false
     },
+    allowMapZoom: true,
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false
   },
@@ -65,5 +66,12 @@ export default {
   },
   runtime: {
     editorErrorMessage: []
-  }
+  },
+  visual: {
+    minBubbleSize: 1,
+    maxBubbleSize: 20,
+    extraBubbleBorder: false
+  },
+  mapPosition: 
+    { coordinates: [0, 30], zoom: 1 }
 };
