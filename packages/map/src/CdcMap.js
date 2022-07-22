@@ -525,54 +525,68 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
-                let colorRange = colors.slice(0, state.legend.numberOfItems + 1)
-                console.log('color range', colorRange)
+                let colorRange = colors.slice(0, state.legend.numberOfItems)
+                console.log('color range', state.legend.numberOfItems)
 
                 let scale = d3.scaleQuantile()
-                    .domain(dataSet.map(item => item[state.columns.primary.name])) // min/max values
+                    .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
+                    //.domain(domainNums)
                     .range(colorRange) // set range to our colors array
 
-                // Area Below: Quantize
-                // let domain = scale.domain()
-                //let lengthBetween = (domain[1] - domain[0]) / scale.range().length;
-                // let breaks = d3.range(0, scale.range().length).map(function (i) { return Math.round(i * lengthBetween) ; });
-                // Area Above: Quantize
-
-                let breaks = scale.quantiles().map(item => Math.floor(item));
-                console.log(breaks.length)
+                let breaks = scale.quantiles();
+                breaks = breaks.map( item => Math.round(item))
+                console.log('break', breaks)
 
                 if (state.legend?.separateZero) {
                     breaks.unshift(1)
+                } else {
+                    breaks.unshift(0)
                 }
                 
                 console.log('br', breaks)
 
                 breaks.map( (item, index) => {
 
-                    // // if first item is zero and zero is seperated
+                    let min = breaks[index] + 1;
+                    let max = breaks[index + 1];
+
+                    console.log('index', index)
+                    console.log('min', min)
+                    console.log('max', max)
+
+                    const setMin = () => {
+                        if(index === 0 && !state.legend.separateZero) {
+                            min = 0;
+                        }
+    
+                        if(index === 0 && state.legend.separateZero) {
+                            min = 1;
+                        }
+                    } 
+
+                    const setMax = () => {
+                        if(index + 1 === breaks.length) {
+                            max = domainNums[1]
+                        }
+                    }
+
+                    setMin()
+                    setMax()
                     
                     result.push({
-                        min: (index === 0 && !state.legend.separateZero ) ? 0 : (index === 0 && state.legend.separateZero) ? 1 : item,
-                        max: index + 1 === breaks.length ? domainNums[1] : (breaks[index + 1] - 1),
+                        min,
+                        max,
                         color: scale(item)
                     })
                     
                     
-                    dataSet.forEach(row => {
+                    dataSet.forEach( (row, dataIndex) => {
                         let number = row[state.columns.primary.name]
                         
-                        console.log('breaks', breaks)
-                        console.log('result', result)
-                        console.log('index', index)
-                        console.log('number', number)
-
-                        console.log('min', result[index].min)
-                        console.log('max', result[index].max)
-
                         let updated = state.legend.separateZero ? index + 1 : index;
 
                         if(number >= result[updated].min && number <= result[updated].max) {
-                            newLegendMemo.set(hashObj(row), index)
+                            newLegendMemo.set(hashObj(row), updated)
                         }
                     })
 
