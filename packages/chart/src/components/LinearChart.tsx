@@ -49,7 +49,8 @@ export default function LinearChart() {
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
-     max = maxValue
+      // if all values in data are negative set max = 0
+      max = existPositiveValue ? maxValue : 0;
     }
     
     //Adds Y Axis data padding if applicable
