@@ -502,19 +502,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     let min = removedRows[0][primaryCol],
                         max = removedRows[removedRows.length - 1][primaryCol]
 
-                        console.log('removed', removedRows)
-
                     removedRows.forEach(row => {
                         newLegendMemo.set(hashObj(row), result.length)
                     })
-
-                    console.log(newLegendMemo)
 
                     result.push({
                         min,
                         max
                     })
-                    console.log(result)
+
                     result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
                     changingNumber -= 1
@@ -525,8 +521,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
-                let colorRange = colors.slice(0, state.legend.numberOfItems)
-                console.log('color range', state.legend.numberOfItems)
+                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
 
                 let scale = d3.scaleQuantile()
                     .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
@@ -535,7 +530,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 let breaks = scale.quantiles();
                 breaks = breaks.map( item => Math.round(item))
-                console.log('break', breaks)
 
                 if (state.legend?.separateZero) {
                     breaks.unshift(1)
@@ -543,16 +537,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     breaks.unshift(0)
                 }
                 
-                console.log('br', breaks)
-
                 breaks.map( (item, index) => {
 
                     let min = breaks[index] + 1;
                     let max = breaks[index + 1];
-
-                    console.log('index', index)
-                    console.log('min', min)
-                    console.log('max', max)
 
                     const setMin = () => {
                         if(index === 0 && !state.legend.separateZero) {
