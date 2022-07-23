@@ -125,7 +125,7 @@ const UsaMap = (props) => {
 
     if (legendColors) {
       // Use white text if the background is dark, and dark grey if it's light
-      if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
+      if (chroma.contrast(textColor, legendColors[0]) < 3.5) {
         textColor = '#202020';
       }
 
@@ -171,7 +171,7 @@ const UsaMap = (props) => {
       let textColor = "#FFF"
 
       // Dynamic text color
-      if (chroma.contrast(textColor, bgColor) < 4.5 ) {
+      if (chroma.contrast(textColor, bgColor) < 3.5 ) {
         textColor = '#202020';
       }
 
