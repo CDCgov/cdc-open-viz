@@ -479,7 +479,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (type === 'equalnumber') {
             // start work on changing legend functionality
             // FALSE === ignore old version for now.
-            if (!state.general.showEqualNumber) {
+            if (false) {
                 let numberOfRows = dataSet.length
 
                 let remainder

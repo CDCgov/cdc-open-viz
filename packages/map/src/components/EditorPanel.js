@@ -1839,10 +1839,10 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
-										<label className="checkbox mt-4">
+										{/* <label className="checkbox mt-4">
 											<input type="checkbox" checked={ state.general.showEqualNumber } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
 											<span className="edit-label">Show New Equal Number</span>
-										</label>
+										</label> */}
 										{'category' !== legend.type && (
 											<label>
 												<span className='edit-label'>
