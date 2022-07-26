@@ -20,7 +20,7 @@ import useReduceData from '../hooks/useReduceData';
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
   let [ width ] = dimensions;
-  const {minValue,maxValue} = useReduceData(config,data)
+  const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
@@ -36,20 +36,24 @@ export default function LinearChart() {
   let xScale;
   let yScale;
   let seriesScale;
-  const {max:configMax,min:configMin} = config.runtime.yAxis;
-  const isMaxValid = parseFloat(configMax)  >= parseFloat(maxValue);
-  const isMinValid = ((parseFloat(configMin) <= 0 && parseFloat(minValue) >=0) || (parseFloat(configMin) <= minValue && minValue < 0));
+
+   // desctructure users enetered value from initial state config.
+  const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
+  // validation for for min/max that user entered;
+  const isMaxValid = existPositiveValue ? parseFloat(enteredMaxValue)  >= parseFloat(maxValue) : parseFloat(enteredMaxValue)  >= 0; 
+  const isMinValid = ((parseFloat(enteredMinValue) <= 0 && parseFloat(minValue) >=0) || (parseFloat(enteredMinValue) <= minValue && minValue < 0));
 
   if (data) {
-    let min = configMin && isMinValid ? configMin : minValue;
-    let max = configMax && isMaxValid ? configMax : Number.MIN_VALUE;
+    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue;
+    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0; 
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
-     max = maxValue
+      // if all values in data are negative set max = 0
+      max = existPositiveValue ? maxValue : 0;
     }
     
     //Adds Y Axis data padding if applicable
