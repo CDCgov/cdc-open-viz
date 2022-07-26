@@ -182,7 +182,22 @@ const colorPalettes2 = {
     '#2171B5',
     '#084594',
   ],
-
+  'sequential-blue-2':[
+    '#D5F6F9',
+    '#99E2ED',
+    '#5FB6D1',
+    '#3189B0',
+    '#116091',
+    '#0A3E72'
+  ],
+  'sequential-orange':[
+    '#FFEFCF',
+    '#FFD49C',
+    '#F7A866',
+    '#EB7723',
+    '#B95117',
+    '#862B0B'
+   ],
   'sequential-green': [
     '#C7E9C0',
     '#A1D99B',
@@ -190,7 +205,7 @@ const colorPalettes2 = {
     '#41AB5D',
     '#238B45',
     '#005A32',
-  ],
+  ]
 };
 
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)  // adds reverse keyword to eact palette
