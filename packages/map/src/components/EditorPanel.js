@@ -1839,16 +1839,18 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
-										<label className="checkbox mt-4">
-											<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
-											<span className="edit-label">Use new quantile legend</span>
-											<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-													<Tooltip.Content>
-													<p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-												</Tooltip.Content>
-											</Tooltip>
-										</label>
+										{state.legend.type === 'equalnumber' &&
+											<label className="checkbox mt-4">
+												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
+												<span className="edit-label">Use new quantile legend</span>
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+														<Tooltip.Content>
+														<p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
+													</Tooltip.Content>
+												</Tooltip>
+											</label>
+										}
 										{'category' !== legend.type && (
 											<label>
 												<span className='edit-label'>

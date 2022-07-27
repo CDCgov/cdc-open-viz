@@ -14,9 +14,6 @@
 	},
 	"color": "redreverse",
 	"columns": {
-		"categorical": {
-			"name": "Category"
-		},
 		"geo": {
 			"name": "State",
 			"label": "Location",
@@ -41,11 +38,7 @@
 		"numberOfItems": 1,
 		"position": "side",
 		"title": "Legend Title",
-		"description": "Legend Text",
-		"type": "category",
-		"specialClasses": [
-			"N/A"
-		]
+		"description": "Legend Text"
 	},
 	"data": [
 		{
