@@ -182,7 +182,7 @@ const colorPalettes2 = {
     '#2171B5',
     '#084594',
   ],
-  'sequential-blue-2':[
+  'sequential-blue-2-(MPX)':[
     '#D5F6F9',
     '#99E2ED',
     '#5FB6D1',
@@ -190,7 +190,7 @@ const colorPalettes2 = {
     '#116091',
     '#0A3E72'
   ],
-  'sequential-orange':[
+  'sequential-orange-(MPX)':[
     '#FFEFCF',
     '#FFD49C',
     '#F7A866',
