@@ -479,7 +479,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (type === 'equalnumber') {
             // start work on changing legend functionality
             // FALSE === ignore old version for now.
-            if (false) {
+            if (!state.general.equalNumberOptIn) {
                 let numberOfRows = dataSet.length
 
                 let remainder
@@ -572,6 +572,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         let number = row[state.columns.primary.name]
                         
                         let updated = state.legend.separateZero ? index + 1 : index;
+
+                        if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
 
                         if(number >= result[updated].min && number <= result[updated].max) {
                             newLegendMemo.set(hashObj(row), updated)
