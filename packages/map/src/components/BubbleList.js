@@ -46,6 +46,8 @@ export const BubbleList = (
 
 			let pointerX, pointerY;
 
+			if( !projection(coordinates) ) return true;
+
 			const circle = (
 				<>
 					<circle
@@ -143,6 +145,8 @@ export const BubbleList = (
 
 
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
+
+			if ( !projection(coordinates) ) return true;
 
 			let pointerX, pointerY;
 			const circle = (
