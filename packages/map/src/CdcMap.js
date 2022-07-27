@@ -531,15 +531,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let breaks = scale.quantiles();
                 breaks = breaks.map( item => Math.round(item))
 
-                let canShiftZero = () => {
-                    let hasZeroInData = d3.extent(domainNums)?.[0] === 0
-                    console.log('shifting zero', hasZeroInData && state.legend.separateZero)
-                    return hasZeroInData && state.legend.separateZero
-                }
 
-                console.log('domain', domainNums)
-
-                if (canShiftZero()) {
+                if (state.legend.separateZero) {
+                    breaks.unshift(0)
                     breaks.unshift(1)
                 } else {
                     breaks.unshift(d3.extent(domainNums)?.[0])
@@ -552,17 +546,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     const setMin = () => {
                         // in starting position and zero in the data
-                        if(index === 0 && canShiftZero()) {
+                        if(index === 0 && state.legend.separateZero) {
                             min = 0;
                         }
 
-                        if(index === 0 && !canShiftZero()) {
+                        if(index === 0 && !state.legend.separateZero) {
                             min = domainNums[0]
                         }
 
                     } 
 
                     const setMax = () => {
+                        if(index === 0 && state.legend.separateZero) {
+                            max = 0;
+                        }
+
                         if(index + 1 === breaks.length) {
                             max = domainNums[1]
                         }
@@ -570,7 +568,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     setMin()
                     setMax()
-                    console.log('breaks', breaks)
+
                     result.push({
                         min,
                         max,
@@ -581,7 +579,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     dataSet.forEach( (row, dataIndex) => {
                         let number = row[state.columns.primary.name]
                         
-                        let updated = canShiftZero() ? index + 1 : index;
+                        let updated = state.legend.separateZero ? index : index;
 
                         if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
 
