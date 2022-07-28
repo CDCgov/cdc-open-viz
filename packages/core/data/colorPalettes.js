@@ -145,6 +145,33 @@ const colorPalettesMap = {
     '#c31b1f',
     '#c31b1f',
   ],
+
+
+
+  'sequential-blue-2(MPX)':[
+  '#F5FEFF',
+  '#E1FBFF',
+  '#C0F2FD',
+  '#94E2ED',
+  '#5EBAD4',
+  '#3695BE',
+  '#2273A0',
+  '#0E5181',
+  '#093460',
+  ],
+
+'sequential-orange(MPX)':[
+   '#FFFDF0',
+   '#FFF7DC',
+   '#FFE9C2',
+   '#FFD097',
+   '#F7A866',
+   '#EB7723',
+   '#B95117',
+   '#853209',
+   '#661F00'
+]
+
 };
 
 // * ============= Palettes for Chart project ==========  * //
