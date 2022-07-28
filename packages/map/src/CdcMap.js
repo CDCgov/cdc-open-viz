@@ -1289,8 +1289,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const { general, tooltips, dataTable } = state
     const { title = '', subtext = '' } = general
     
-    console.log('dataTable', dataTable);
-
     // Outer container classes
     let outerContainerClasses = [
         'cdc-open-viz-module',
