@@ -55,8 +55,7 @@ module.exports = (env = {}, { mode }) => {
     optimization: {
       minimizer: [new TerserPlugin({
         extractComments: false,
-      })],
-      minimize: true
+      })]
     },
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
