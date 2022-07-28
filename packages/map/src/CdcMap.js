@@ -518,11 +518,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 }
             } else {
                 // get nums
+                let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
+                console.log('hasZeroInData', hasZeroInData)
+                if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
+
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
                 let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
-
                 let scale = d3.scaleQuantile()
                     .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
                     //.domain(domainNums)
@@ -531,18 +534,21 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let breaks = scale.quantiles();
                 breaks = breaks.map( item => Math.round(item))
 
+                console.log('breaks', breaks)
+                console.log('d', domainNums)
 
-                if (state.legend.separateZero) {
-                    breaks.unshift(0)
-                    breaks.unshift(1)
-                } else {
-                    breaks.unshift(d3.extent(domainNums)?.[0])
-                }
+                
+                // always start with domain beginning breakpoint
+                breaks.unshift(d3.extent(domainNums)?.[0])
+                
+                if (state.legend.separateZero && !hasZeroInData) {
+                    breaks.splice(1, 0, 1);
+                } 
                 
                 breaks.map( (item, index) => {
 
-                    let min = breaks[index] + 1;
-                    let max = breaks[index + 1];
+                    let min = breaks[index];
+                    let max = breaks[index + 1] - 1;
 
                     const setMin = () => {
                         // in starting position and zero in the data
@@ -568,7 +574,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                     setMin()
                     setMax()
+                    console.log('res', result)
 
+                    if(index === 0 && result[index]?.max === 0 && state.legend.separateZero) return true;
                     result.push({
                         min,
                         max,
