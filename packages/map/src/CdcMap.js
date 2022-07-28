@@ -1287,7 +1287,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
-    const { title = '', subtext = ''} = general
+    const { title = '', subtext = '' } = general
+    
+    console.log('dataTable', dataTable);
 
     // Outer container classes
     let outerContainerClasses = [
@@ -1507,7 +1509,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						displayGeoName={displayGeoName}
 						applyLegendToRow={applyLegendToRow}
 						tableTitle={dataTable.title}
-						indexTitle={dataTable.indexTitle}
+						indexTitle={dataTable.indexLabel}
 						mapTitle={general.title}
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
