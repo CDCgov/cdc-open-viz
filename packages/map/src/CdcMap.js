@@ -1189,13 +1189,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...configObj
         }
 
+        const round = 1000 * 60 * 15;
+        const date = new Date();
+        let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl)
+            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
