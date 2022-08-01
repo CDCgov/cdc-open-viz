@@ -433,7 +433,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         switch (visualizationConfig.type) {
           case 'chart':
-            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
+            body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
               <CdcChart
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -444,7 +444,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'map':
-            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
+            body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
               <CdcMap
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -457,7 +457,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             break
           case 'data-bite':
             visualizationConfig = { ...visualizationConfig, newViz: true }
-            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
+            body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
               <CdcDataBite
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -468,7 +468,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'waffle-chart':
-            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
+            body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
               <CdcWaffleChart
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -479,7 +479,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             </>
             break
           case 'markup-include':
-            body = <><Header config={visualizationConfig} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
+            body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
               <CdcMarkupInclude
                 key={visualizationKey}
                 config={visualizationConfig}
@@ -499,7 +499,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header config={config} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
+          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
           <div className="layout-container">
             <VisualizationsPanel/>
             <Grid/>
@@ -510,7 +510,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   } else {
     body = (
       <>
-        {isEditor && <Header config={config} setConfig={updateConfig} tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
+        {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           {/* Title */}
           {title &&
