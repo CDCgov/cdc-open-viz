@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+
+import ConfigContext from '../ConfigContext'
 
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
 
-const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfig, subEditor = null}) => {
+const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null}) => {
+
+  const {
+    config,
+    updateConfig,
+    setParentConfig
+  } = useContext(ConfigContext);
 
   const { overlay } = useGlobalContext()
 
   const [ columns, setColumns ] = useState([])
 
   const changeConfigValue = (parentObj, key, value) => {
+
     let newConfig = {...config};
     if(!newConfig[parentObj]) newConfig[parentObj] = {};
     newConfig[parentObj][key] = value;
-    setConfig(config)
+
+    updateConfig(newConfig)
   }
 
   const setTab = (index) => {
@@ -30,7 +40,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfi
 
     dashboardConfig.sharedFilters[index][name] = value;
 
-    setConfig({...config, dashboard: dashboardConfig});
+    updateConfig({...config, dashboard: dashboardConfig});
 
     overlay?.actions.openOverlay(filterModal(dashboardConfig.sharedFilters[index], index))
   }
@@ -42,7 +52,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfi
 
     dashboardConfig.sharedFilters.push({key: 'Dashboard Filter ' + (dashboardConfig.sharedFilters.length + 1), values: []});
 
-    setConfig({...config, dashboard: dashboardConfig});
+    updateConfig({...config, dashboard: dashboardConfig});
 
   }
 
@@ -51,7 +61,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfi
 
     dashboardConfig.sharedFilters.splice(index, 1);
 
-    setConfig({...config, dashboard: dashboardConfig});
+    updateConfig({...config, dashboard: dashboardConfig});
 
     overlay?.actions.toggleOverlay();
   }
@@ -70,6 +80,35 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, config, setConfi
     }
 
   }
+
+  const convertStateToConfig = (type = "JSON") => {
+    let strippedState = JSON.parse(JSON.stringify(config))
+    delete strippedState.newViz
+    delete strippedState.runtime
+
+    if(type === "JSON") {
+      return JSON.stringify( strippedState )
+    }
+
+    return strippedState
+  }
+
+  useEffect(() => {
+    const parsedData = convertStateToConfig()
+
+    // Emit the data in a regular JS event so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+
+    window.dispatchEvent(event)
+
+    // Pass up to Editor if needed
+    if(setParentConfig) {
+      const newConfig = convertStateToConfig("object")
+      setParentConfig(newConfig)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config]);
 
   useEffect(() => {
     const runSetColumns = async () => {
