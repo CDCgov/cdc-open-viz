@@ -1462,11 +1462,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
                 <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
 						{parse(title)}
 					</div>
 				</header>
-				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+				<section 
+                    role="button"
+                    tabIndex="0"
+                    className={mapContainerClasses.join(' ')} 
+                    onClick={(e) => closeModal(e)}
+                    onKeyDown={(e) => { if (e.keyCode === 13) { closeModal(e) } }}
+                    >
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
 							<div className='map-downloads__ui btn-group'>

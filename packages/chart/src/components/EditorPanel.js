@@ -14,6 +14,7 @@ import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
 import Context from '../context'
 import WarningImage from '../images/warning.svg'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { useColorPalette } from '../hooks/useColorPalette'
@@ -1298,6 +1299,7 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
+          <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
         </section>
       </section>
     </ErrorBoundary>
