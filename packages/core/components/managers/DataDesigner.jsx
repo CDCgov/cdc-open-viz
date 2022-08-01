@@ -79,7 +79,7 @@ const DataDesigner = (props) => {
               <div className="mb-1">Which property in the dataset represents which series the row is describing?</div>
               <select onChange={(e) => {
                 updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
-              }} value={configureData.dataDescription.seriesKey}>
+              }} defaultValue={configureData.dataDescription.seriesKey}>
                 <option value="">Choose an option</option>
                 {Object.keys(configureData.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
               </select>
@@ -126,7 +126,7 @@ const DataDesigner = (props) => {
                     <div className="mb-1">Which property in the dataset represents which series the row is describing?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'seriesKey', e.target.value)
-                    }}>
+                    }} defaultValue={configureData.dataDescription.seriesKey}>
                       <option value="">Choose an option</option>
                       {Object.keys(configureData.data[0]).map((value, index) => (
                         <option value={value} key={index}>{value}</option>
@@ -137,7 +137,7 @@ const DataDesigner = (props) => {
                     <div className="mb-1">Which property in the dataset represents the values for the category/date axis or map geography?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'xKey', e.target.value)
-                    }}>
+                    }} defaultValue={configureData.dataDescription.xKey}>
                       <option value="">Choose an option</option>
                       {Object.keys(configureData.data[0]).map((value, index) => (
                         <option value={value} key={index}>{value}</option>
@@ -148,7 +148,7 @@ const DataDesigner = (props) => {
                     <div className="mb-1">Which property in the dataset represents the numeric value?</div>
                     <select onChange={(e) => {
                       updateDescriptionProp(visualizationKey, dataKey, 'valueKey', e.target.value)
-                    }}>
+                    }} defaultValue={configureData.dataDescription.valueKey}>
                       <option value="">Choose an option</option>
                       {Object.keys(configureData.data[0]).map((value, index) => (
                         <option value={value} key={index}>{value}</option>
