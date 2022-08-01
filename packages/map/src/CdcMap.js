@@ -1189,13 +1189,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...configObj
         }
 
+        const round = 1000 * 60 * 15;
+        const date = new Date();
+        let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl)
+            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
@@ -1458,11 +1462,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
 				)}
                 <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
 						{parse(title)}
 					</div>
 				</header>
-				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+				<section 
+                    role="button"
+                    tabIndex="0"
+                    className={mapContainerClasses.join(' ')} 
+                    onClick={(e) => closeModal(e)}
+                    onKeyDown={(e) => { if (e.keyCode === 13) { closeModal(e) } }}
+                    >
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
 							<div className='map-downloads__ui btn-group'>
