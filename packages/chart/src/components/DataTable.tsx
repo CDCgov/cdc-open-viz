@@ -133,9 +133,10 @@ export default function DataTable() {
     <ErrorBoundary component="DataTable">
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`}  className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
+            role="button"
             className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
-            onClick={() => { setTableExpanded(!tableExpanded); }}
             tabIndex={0}
+            onClick={() => { setTableExpanded(!tableExpanded); }}
             onKeyDown={(e) => { if (e.keyCode === 13) { setTableExpanded(!tableExpanded); } }}
           >
             {config.table.label}
