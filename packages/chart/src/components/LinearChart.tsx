@@ -18,7 +18,7 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -264,7 +264,7 @@ export default function LinearChart() {
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {tick.formattedValue}
+                              {formatNumber(tick.formattedValue)}
                             </Text>
                         }
 
@@ -336,7 +336,7 @@ export default function LinearChart() {
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                         )}
 
@@ -402,7 +402,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
@@ -455,7 +455,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
                           </Text>
                         }
                       </Group>
