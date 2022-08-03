@@ -375,7 +375,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
-                let value = (isBubble || isData) && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol] 
+                let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol]
                 if(undefined === value) continue
 
                 if(false === uniqueValues.has(value)) {
