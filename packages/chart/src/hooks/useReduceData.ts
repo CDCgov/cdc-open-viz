@@ -1,30 +1,41 @@
 
 function useReduceData(config,data) {
 
-const getMaxValueFromData = ()=>{
-    let max;  // will hold max number from data.
+const getMaxValueFromData = () => {
+  let max; // will hold max number from data.
+  if (
+    config.visualizationType === "Bar" &&
+    config.visualizationSubType === "stacked"
+  ) {
+    const yTotals = data.reduce((allTotals, xValue) => {
+      const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
+        yTotal += Number(xValue[k]);
+        return yTotal;
+      }, 0);
 
-    if (config.visualizationType === 'Bar' && config.visualizationSubType === 'stacked') {
-        const yTotals = data.reduce((allTotals, xValue) => {
-          const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-            yTotal += Number(xValue[k]);
-            return yTotal;
-          }, 0);
-          allTotals.push(totalYValues);
-          if(totalYValues > max){
-            max = totalYValues;
-          }
-          return allTotals;
-        }, [] as number[]);
-
-        max = Math.max(...yTotals);
-      } else if(config.visualizationType === 'Bar' && config.confidenceKeys && config.confidenceKeys.upper) {
-        max = Math.max(...data.map((d) => Number(d[config.confidenceKeys.upper])));
-      } else {
-        max = Math.max(...data.map((d) => Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))));
+      allTotals.push(totalYValues);
+      if (totalYValues > max) {
+        max = totalYValues;
       }
+      return allTotals;
+    }, [] as number[]);
 
-      return max;
+    max = Math.max(...yTotals);
+  } else if (
+    config.visualizationType === "Bar" &&
+    config.series &&
+    config.series.dataKey
+  ) {
+    max = Math.max(...data.map((d) => Number(d[config.series.dataKey])));
+  } else {
+    max = Math.max(
+      ...data.map((d) =>
+        Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))
+      )
+    );
+  }
+
+  return max;
 };
     
 const getMinValueFromData = ()=> {
@@ -45,6 +56,8 @@ const findPositiveNum = ():boolean=>{
   };
   return existPositiveValue;
 };
+  
+  
     
     const maxValue = getMaxValueFromData();
     const minValue = getMinValueFromData();
