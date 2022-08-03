@@ -1579,7 +1579,7 @@ const EditorPanel = (props) => {
 
 
 
-					  { (state.general.type === 'bubble' || state.general.type === 'data') && state.legend.type === 'category' && (
+					  { (state.general.type === 'bubble') && state.legend.type === 'category' && (
 						<fieldset className='primary-fieldset edit-block'>
                         	<label>
 								<span className='edit-label column-heading'>
