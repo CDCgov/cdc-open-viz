@@ -815,7 +815,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const displayDataAsText = (value, columnName) => {
-        if(value === null || value === "" ) {
+        if(value === null || value === "" || value === undefined ) {
             return ""
         }
 
