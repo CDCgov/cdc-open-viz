@@ -17,7 +17,7 @@ export const BubbleList = (
 
 
 	const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
-	
+	const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1;
 	// sort runtime data. Smaller bubbles should appear on top.
 	const sortedRuntimeData = Object.values(runtimeData).sort((a, b) => a[state.columns.primary.name] < b[state.columns.primary.name] ? 1 : -1 )
 	if(!sortedRuntimeData) return;
@@ -26,7 +26,7 @@ export const BubbleList = (
 
 	// Set bubble sizes
 	var size = scaleLinear()
-		.domain([1, maxDataValue])
+		.domain([hasBubblesWithZeroOnMap, maxDataValue])
 		.range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
 	// Start looping through the countries to create the bubbles.
@@ -42,6 +42,8 @@ export const BubbleList = (
 			const legendColors = applyLegendToRow(country);
 			
 			let primaryKey = state.columns.primary.name
+			if (Math.floor(Number(size(country[primaryKey]))) === 0 && !state.visual.showBubbleZeros) return;
+
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
 			let pointerX, pointerY;
@@ -131,6 +133,11 @@ export const BubbleList = (
 		const bubbles = sortedRuntimeData && sortedRuntimeData.map( (item, index) => {
 			let stateData = stateCoordinates[item.uid]
 			let primaryKey = state?.columns?.primary?.name
+			if ( Number(size(item[primaryKey])) === 0) return;
+
+			// Return if hiding zeros on the map
+			if(Math.floor(Number(size(item[primaryKey]))) === 0 && !state.visual.showBubbleZeros ) return;
+
 			if(!stateData) return true;
 			let longitude = Number( stateData.Longitude);
 			let latitude = Number( stateData.Latitude);
