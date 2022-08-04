@@ -736,7 +736,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
             if(row[obj.columns.primary.name]) {
-                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
+                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
             }
 
             // If this is a navigation only map, skip if it doesn't have a URL
