@@ -42,6 +42,8 @@ export const BubbleList = (
 			const legendColors = applyLegendToRow(country);
 			
 			let primaryKey = state.columns.primary.name
+			if (Math.floor(Number(size(country[primaryKey]))) === 0 && !state.visual.showBubbleZeros) return;
+
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
 			let pointerX, pointerY;
