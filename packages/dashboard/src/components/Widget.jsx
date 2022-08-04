@@ -21,7 +21,9 @@ const iconHash = {
   'us': <Icon display="mapUsa" base/>,
   'us-county': <Icon display="mapUsa" base/>,
   'world': <Icon display="mapWorld" base/>,
-  'single-state': <Icon display="mapAl" base/>
+  'single-state': <Icon display="mapAl" base/>,
+  'gear': <Icon display="gear" base/>,
+  'tools': <Icon display="tools" base/>
 }
 
 const labelHash = {
@@ -167,11 +169,11 @@ const Widget = ({ data = {}, addVisualization, type }) => {
           {data.rowIdx !== undefined && (
             <div className="widget-menu">
               {data.dataKey && data.dataDescription && data.formattedData &&
-                <button className="btn btn-configure" onClick={editWidget}>Configure Visualization</button>
+                <button title="Configure Visualization" className="btn btn-configure" onClick={editWidget}>{iconHash['tools']}</button>
               }
-              <button className="btn btn-configure" onClick={() => {
+              <button title="Configure Data" className="btn btn-configure" onClick={() => {
                 overlay?.actions.openOverlay(dataDesignerModal(data))
-              }}>Configure Data</button>
+              }}>{iconHash['gear']}</button>
               <div className="widget-menu-item" onClick={deleteWidget}>
                 <Icon display="close" base/>
               </div>
