@@ -42,7 +42,7 @@ export const BubbleList = (
 			const legendColors = applyLegendToRow(country);
 			
 			let primaryKey = state.columns.primary.name
-			if (Math.floor(Number(size(country[primaryKey]))) === 0 && !state.visual.showBubbleZeros) return;
+			if ((Math.floor(Number(size(country[primaryKey]))) === 0 || country[primaryKey] === "") && !state.visual.showBubbleZeros) return;
 
 			let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -135,8 +135,10 @@ export const BubbleList = (
 			let primaryKey = state?.columns?.primary?.name
 			if ( Number(size(item[primaryKey])) === 0) return;
 
+			if (item[primaryKey] === null) item[primaryKey] = ""
+
 			// Return if hiding zeros on the map
-			if(Math.floor(Number(size(item[primaryKey]))) === 0 && !state.visual.showBubbleZeros ) return;
+			if( (Math.floor(Number(size(item[primaryKey]))) === 0 || item[primaryKey] === "" )&& !state.visual.showBubbleZeros ) return;
 
 			if(!stateData) return true;
 			let longitude = Number( stateData.Longitude);
