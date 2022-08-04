@@ -1,12 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { csvParse } from 'd3'
-import { useDebounce } from 'use-debounce'
+
+// Third Party
 import axios from 'axios'
+import { csvParse } from 'd3'
+import { useDropzone } from 'react-dropzone'
+import { useDebounce } from 'use-debounce'
 
-import { useGlobalContext } from '@cdc/core/components/context/GlobalContext'
-import WizardContext from '../WizardContext'
+// Context
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
+import WizardContext from '../context/WizardContext'
 
+// Helpers
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+
+// Consts
 import {
   DEMO_TABLE_VERTICAL,
   DEMO_TABLE_HORIZONTAL,
@@ -14,34 +22,34 @@ import {
   DEMO_TABLE_MULTI_ROW
 } from './demo-data/demoTables'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
-import Modal from '@cdc/core/components/ui/Modal'
-import GuidanceBlock from '@cdc/core/components/elements/GuidanceBlock'
+// Components - Core
 import Button from '@cdc/core/components/elements/Button'
+import Card from '@cdc/core/components/elements/Card'
+import GuidanceBlock from '@cdc/core/components/elements/GuidanceBlock'
 import Icon from '@cdc/core/components/ui/Icon'
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import InputGroup from '@cdc/core/components/inputs/InputGroup'
 import InputText from '@cdc/core/components/inputs/InputText'
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
-import Card from '@cdc/core/components/elements/Card'
+import Modal from '@cdc/core/components/ui/Modal'
 
-import Tabs from './Tabs'
+// Components - Local
 import PreviewDataTable from './PreviewDataTable'
+import Tabs from './Tabs'
 
+// Data
 import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
 const DataImport = () => {
-  const { overlay } = useGlobalContext()
+  const { overlay, globalActions } = useGlobalContext()
+  const { config, configActions } = useConfigContext()
 
   const {
-    config,
-    setConfig,
     errors,
     setErrors,
     errorMessages,
     maxFileSize,
-    setGlobalActive,
     tempConfig,
     setTempConfig
   } = useContext(WizardContext)
@@ -61,19 +69,16 @@ const DataImport = () => {
 
   useEffect(() => {
     if (false !== keepURL) {
-      setConfig({ ...config, dataUrl: debouncedExternalURL || externalURL })
+      configActions.setConfig({ ...config, dataUrl: debouncedExternalURL || externalURL })
     } else {
       let newConfig = { ...config }
       delete newConfig.dataUrl
-      setConfig(newConfig)
+      configActions.setConfig(newConfig)
     }
   }, [ debouncedExternalURL, keepURL ])
 
-  /**
-   * Check to see all series for the viz exists in the new dataset
-   */
+  /* Check to see all series for the viz exists in the new dataset */
   const dataExists = (newData, oldSeries, oldAxisX) => {
-
     // Loop through old series to make sure each exists in the new data
     oldSeries.map((currentValue, index, newData) => {
       if (!newData.find(element => element.dataKey === currentValue.dataKey)) {
@@ -82,11 +87,7 @@ const DataImport = () => {
     })
 
     // Is the X Axis still in the dataset?
-    if (newData.columns.indexOf(oldAxisX) < 0) {
-      return false
-    }
-
-    return true
+    return newData.columns.indexOf(oldAxisX) >= 0
   }
 
   const loadExternal = async () => {
@@ -118,7 +119,6 @@ const DataImport = () => {
           }
         })
     } catch (err) {
-      console.error(err)
       const error = err.toString()
 
       if (Object.values(errorMessages).includes(err)) {
@@ -204,7 +204,7 @@ const DataImport = () => {
 
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
-            setConfig({
+            configActions.setConfig({
               ...config,
               ...tempConfig,
               data: text, // new data
@@ -219,7 +219,7 @@ const DataImport = () => {
             }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?')
           }
         } else {
-          setConfig({ ...config, data: text, dataFileName: fileSource, dataFileSourceType: fileSourceType })
+          configActions.setConfig({ ...config, data: text, dataFileName: fileSource, dataFileSourceType: fileSourceType })
         }
       } catch (err) {
         setErrors(err)
@@ -243,14 +243,14 @@ const DataImport = () => {
 
     if (tempConfig !== null) setTempConfig(null)
 
-    setConfig(newConfig)
+    configActions.setConfig(newConfig)
   }, [])
 
   const updateDescriptionProp = (key, value) => {
     let dataDescription = { ...config.dataDescription, [key]: value }
     let formattedData = transform.developerStandardize(config.data, dataDescription)
 
-    setConfig({ ...config, formattedData, dataDescription })
+    configActions.setConfig({ ...config, formattedData, dataDescription })
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -328,7 +328,7 @@ const DataImport = () => {
   const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
     config.newViz = true
     setTempConfig(null)
-    setConfig(config)
+    configActions.setConfig(config)
   }
 
   const resetButton = () => {
@@ -346,7 +346,7 @@ const DataImport = () => {
         <div className="cove-wizard__data">
           {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
             <>
-              <Tabs className="mb-4">
+              <Tabs>
                 <Tabs.Content title="Upload File" icon={<Icon className="mr-1" display="fileUpload"/>} className="mt-4">
                   <div
                     className={`cove-file-selector${isDragActive ? ' drag-active' : ''}`} {...getRootProps()}>
@@ -364,6 +364,10 @@ const DataImport = () => {
                 </Tabs.Content>
               </Tabs>
 
+              <small className="mt-1 mb-4">
+                Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
+              </small>
+
               {errors && (errors.map ? errors.map((message, index) => (
                 <div className="cove-alert__error mt-1" key={index}>
                   <span>{message}</span>
@@ -374,19 +378,6 @@ const DataImport = () => {
                   />
                 </div>
               )) : errors.message)}
-
-              <small className="mt-2 mb-4">
-                Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
-              </small>
-
-              <Button className="mt-4" role="loader" loading={isLoading} onClick={() => {
-                setIsLoading(true)
-                setTimeout(() => {
-                  setIsLoading(false)
-                }, 2000)
-              }}>Test load here</Button>
-              <br/>
-              <br/>
 
               <div className="cove-heading--3 mb-0">Load Sample Data:</div>
               <ul className="cove-wizard__data-samples">
@@ -404,54 +395,7 @@ const DataImport = () => {
                 </li>
               </ul>
 
-              <div className="grid grid-gap-1">
-                <div className="col-6 row-2" style={{ background: 'red' }}>
-                  <div>Hello</div>
-                </div>
-                <div className="col-6 row-1" style={{ background: 'green' }}>
-                  <div>Another section</div>
-                </div>
-                <div className="col-6 row-1" style={{ background: 'blue' }}>
-                  <div>World</div>
-                  <div>How</div>
-                  <div>Are</div>
-                  <div>Things?</div>
-                </div>
-              </div>
-
-              <br/>
-              <br/>
-              <div className="mb-2">
-                <InputText label={'Test'}/>
-              </div>
-
-              <div className="mb-2">
-                <InputText label={'Test 2'} type="textarea"/>
-              </div>
-
-              <div className="mb-2">
-                <InputText label={'Test 2'} type="number"/>
-              </div>
-
-              <InputGroup flow="left" label={<><Icon className="mr-1" display="upload"/> There is text here</>}
-                          className="mb-2">
-                <InputText type="text" label="bob"/>
-              </InputGroup>
-
-              <InputGroup flow="right" label="Test label text" className="mb-2">
-                <InputText type="text"/>
-              </InputGroup>
-
-              <InputGroup flow="center" label="@" className="mb-2">
-                <InputText type="text" placeholder="User"/>
-                <InputText type="text" placeholder="Server"/>
-              </InputGroup>
-
-              <br/>
-              <br/>
-
-              <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html"
-                             bob="sagat" bill="murray">
+              <GuidanceBlock className="mb-2" linkTo="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/index.html">
                 <GuidanceBlock.Title>
                   Get Help
                 </GuidanceBlock.Title>
@@ -659,8 +603,8 @@ const DataImport = () => {
                   )}
                 </>
               )}
-              <div style={{textAlign: 'right'}}>
-                <Button className="mt-2" onClick={() => setGlobalActive(1)}
+              <div style={{ textAlign: 'right' }}>
+                <Button className="mt-2" onClick={() => globalActions.setGlobalContext(state => ({ ...state, wizardActiveTab: 1 }))}
                         disabled={!config.formattedData}>
                   Select your visualization type &raquo;
                 </Button>

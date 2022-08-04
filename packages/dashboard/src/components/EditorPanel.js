@@ -240,7 +240,7 @@ const EditorPanel = memo(() => {
                   <TextField value={config.dashboard.title} section="dashboard" fieldName="title" label="Title" updateField={updateField} />
                   <TextField type="textarea" value={config.dashboard.description} section="dashboard" fieldName="description" label="Description" updateField={updateField} tooltip={
                     <Tooltip style={{textTransform: 'none'}}>
-                      <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                      <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                       <Tooltip.Content>
                         <p>Enter supporting text to display below the data visualization, if applicable.<br/>
                           <br/>

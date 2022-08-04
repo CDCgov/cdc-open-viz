@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useCallback, useState, useRef } from 'react'
 
-//Helpers
+// Helpers
 import getViewport from '../helpers/getViewport'
 
-//Styles
+// Styles
 import '../styles/v2/main.scss'
 
 export const GlobalContext = createContext({
@@ -15,17 +15,19 @@ export const GlobalContext = createContext({
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export const GlobalContextProvider = ({ children }) => {
-  const [ globalContextData, setGlobalContextData ] = useState({}) //Needs empty object to assign settings
+  const [ globalContext, setGlobalContext ] = useState({}) //Needs empty object to assign settings
+  const [ viewMode, setViewMode ] = useState('component')
+  const [ editorMode ] = useState(window.location.href.includes('editor=true'))
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
-  //Overlay Actions -----------------------------------
+  // Overlay Actions -----------------------------------
   const openOverlay = (obj, disableBgClose = false) => {
     let payload = { object: obj, show: true, disableBgClose: disableBgClose }
-    setGlobalContextData(context => ({ ...context, overlay: { ...payload } }))
+    setGlobalContext(context => ({ ...context, overlay: { ...payload } }))
   }
 
   const toggleOverlay = (display = false) => {
-    setGlobalContextData(context => ({
+    setGlobalContext(context => ({
       ...context,
       overlay: {
         ...context.overlay,
@@ -34,13 +36,10 @@ export const GlobalContextProvider = ({ children }) => {
     }))
   }
 
-  //General Actions & Data -----------------------------------
-  const isEditor = () => window.location.href.includes('editor=true') ? 'editor' : false
-  const isDashboard = false
-  const getView = (isEditor() || isDashboard) || 'component'
-  const getOS = navigator.userAgent.indexOf("Win") !== -1 ? "Win" : navigator.userAgent.indexOf("Mac") !== -1 ? "MacOS" : null
+  // General Actions & Data -----------------------------------
+  const getOS = navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
-  //Observe and register changes to viewport size
+  // Observe and register changes to viewport size
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width } = entry.contentRect
@@ -48,26 +47,29 @@ export const GlobalContextProvider = ({ children }) => {
     }
   })
 
-  //Create viewport size observer callback
+  // Create viewport size observer callback
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
       resizeObserver.observe(node)
     }
   }, [])
 
-  //Build Context
+  // Build Context
   const globalSettings = {
-    os: getOS,
-    view: getView,
-    viewport: currentViewport,
-    dimensions: globalContextData.dimensions,
     globalActions: {
-      setGlobalContextData
+      setGlobalContext,
+      setViewMode
     },
+    globalContext,
+    os: getOS,
+    viewMode,
+    editorMode,
+    viewport: currentViewport,
+    dimensions: globalContext.dimensions,
     overlay: {
-      object: globalContextData.overlay?.object || null,
-      show: globalContextData.overlay?.show || false,
-      disableBgClose: globalContextData.overlay?.disableBgClose || false,
+      object: globalContext.overlay?.object || null,
+      show: globalContext.overlay?.show || false,
+      disableBgClose: globalContext.overlay?.disableBgClose || false,
       actions: {
         openOverlay,
         toggleOverlay

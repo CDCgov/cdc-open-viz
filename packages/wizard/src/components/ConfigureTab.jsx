@@ -1,23 +1,27 @@
 import React, { Suspense, lazy, useContext } from 'react'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import WizardContext from '../WizardContext'
+// Context
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
+import WizardContext from '../context/WizardContext'
 
+// Components - Core
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
+// Lazy Load Components
 const CdcDashboard = lazy(() => import('@cdc/dashboard'))
 const CdcMap = lazy(() => import('@cdc/map'))
 const CdcChart = lazy(() => import('@cdc/chart'))
-const CdcDataBite = lazy(() => import('@cdc/data-bite'))
+const CdcDataByte = lazy(() => import('@cdc/data-byte'))
 const CdcWaffleChart = lazy(() => import('@cdc/waffle-chart'))
 const CdcMarkupInclude = lazy(() => import('@cdc/markup-include'))
 
 const ConfigureTab = ({ containerEl }) => {
-  const { config, setTempConfig, hostname } = useContext(WizardContext)
+  const { config } = useConfigContext()
+  const { setTempConfig, hostname } = useContext(WizardContext)
 
   let { type } = config
 
   const baseProps = {
-    isEditor: true,
-    isWizard: true,
     config: config,
     setConfig: setTempConfig
   }
@@ -35,9 +39,9 @@ const ConfigureTab = ({ containerEl }) => {
       name: 'CdcDashboard',
       object: <CdcDashboard {...baseProps}/>
     },
-    'data-bite': {
-      name: 'CdcDataBite',
-      object: <CdcDataBite {...baseProps}/>
+    'data-byte': {
+      name: 'CdcDataByte',
+      object: <CdcDataByte {...baseProps}/>
     },
     'waffle-chart': {
       name: 'CdcWaffleChart',

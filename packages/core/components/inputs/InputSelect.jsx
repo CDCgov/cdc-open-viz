@@ -16,7 +16,7 @@ import '../../styles/v2/components/input/index.scss'
 const InputSelect = (
   {
     label,
-    options,
+    options = [ '' ],
     initial,
     initialDisabled = true,
     initialSnap,
@@ -34,19 +34,27 @@ const InputSelect = (
 
   const inputRef = useRef(null)
 
-  let optionsJsx = options.map((option, index) => {
-    if (option === Object(option)) { //Handle Object entry with key/value pair
-      for (const [ optionKey, optionValue ] of Object.entries(option)) {
-        return <option value={optionValue} key={index}>{optionValue}</option>
-      }
-    } else { //Handle Array entry
-      return <option value={option} key={index}>{option}</option>
+  let optionsJsx = null
+
+  // Generate the select dropdown options
+  if (options instanceof Array) {
+    // Handle an Array entry
+    optionsJsx = options.map((option, index) => <option value={option} key={index}>{option}</option>)
+  } else if (options === Object(options)) {
+    // All arrays are objects, but not all objects are arrays.
+    // Validate that the remaining non-array value is an object type
+    // and handle an Object entry using its key/value pairs.
+    let optionsArr = []
+    for (let [ optionKey, optionValue ] of Object.entries(options)) {
+      optionsArr.push(<option value={optionKey} key={optionKey}>{optionValue}</option>)
     }
-    return null
-  })
+    optionsJsx = optionsArr
+  }
 
   //Add custom, initial option
-  if (initial) optionsJsx.unshift(<option value="" disabled={initialDisabled || null} key={initial}>{initial}</option>)
+  if (optionsJsx && (initial || initialDisabled)) optionsJsx.unshift(
+    <option value="" hidden={initialDisabled || null} disabled={initialDisabled || null} key="default">{initial}</option>
+  )
 
   const isInitial = (checkValue) => {
     return initial && (checkValue === initial || checkValue === '')
@@ -78,12 +86,15 @@ const InputSelect = (
           {label}
         </Label>
       }
-      <select className={`cove-input${required && !inlineValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
-              value={value} onChange={(e) => onChangeHandler(e)} {...attributes}
-              ref={inputRef}
-      >
-        {optionsJsx.map(option => (option))}
-      </select>
+      {optionsJsx ?
+        <select className={`cove-input${required && !inlineValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
+                value={value} onChange={(e) => onChangeHandler(e)} {...attributes}
+                ref={inputRef}
+        >
+          {optionsJsx.map(option => (option))}
+        </select> :
+        <p className="mb-2"><i>No options are available...</i></p>
+      }
     </>
   )
 }
@@ -91,7 +102,10 @@ const InputSelect = (
 InputSelect.propTypes = {
   label: PropTypes.string,
   value: PropTypes.any,
-  options: PropTypes.array,
+  options: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object
+  ]),
   initial: PropTypes.string,
   initialDisabled: PropTypes.bool,
   /** Snap returns to the initial value, regardless of previous selection **/

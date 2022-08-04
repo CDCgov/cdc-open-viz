@@ -1,32 +1,26 @@
 import React, { useContext, useEffect } from 'react'
 
-import WizardContext from '../WizardContext'
+// Context
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
+import WizardContext from '../context/WizardContext'
 
-import DashboardIcon from '@cdc/core/assets/dashboard.svg'
-import BarIcon from '@cdc/core/assets/chart-bar-solid.svg'
-import LineIcon from '@cdc/core/assets/chart-line-solid.svg'
-import PieIcon from '@cdc/core/assets/chart-pie-solid.svg'
-import GlobeIcon from '@cdc/core/assets/world-graphic.svg'
-import UsaIcon from '@cdc/core/assets/usa-graphic.svg'
-import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg'
-import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
-import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg'
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg'
-import PairedBarIcon from '@cdc/core/assets/paired-bar.svg'
+// Components - Core
+import Icon from '@cdc/core/components/ui/Icon'
+
 
 const ChooseTab = () => {
-  const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(WizardContext)
+  const { globalActions } = useGlobalContext()
+  const { tempConfig, setTempConfig } = useContext(WizardContext)
+  const { config, configActions } = useConfigContext()
 
   useEffect(() => {
     if (tempConfig !== null) {
-      setConfig(tempConfig)
+      configActions.setConfig(tempConfig)
       setTempConfig(null)
     }
   })
 
-  /**
-   * IconButton component
-   */
   const IconButton = ({ icon, label, type, subType, barType }) => {
     let isSubType = false
 
@@ -39,7 +33,7 @@ const ChooseTab = () => {
       isSubType = (subType === config.visualizationType)
     }
 
-    if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
+    if (type === 'dashboard' || type === 'data-byte' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
 
     let classNames = (config.type === type && isSubType) ? 'active' : ''
 
@@ -68,35 +62,39 @@ const ChooseTab = () => {
         newConfig.visualizationType = subType
       }
 
-      setConfig(newConfig)
-      setGlobalActive(2)
+      configActions.setConfig(newConfig)
+      globalActions.setGlobalContext(state => ({ ...state, wizardActiveTab: 2 }))
     }
 
-    return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span
-      className="mt-1">{label}</span></button>)
+    return (
+      <button className={classNames} onClick={() => setTypes()} aria-label={label}>
+        <Icon display={icon}/>
+        <span className="mt-1">{label}</span>
+      </button>
+    )
   }
 
   return (
     <div className="choose-vis">
       <div className="heading-2">General</div>
       <ul className="grid">
-        <li><IconButton label="Dashboard" type="dashboard" icon={<DashboardIcon/>}/></li>
-        <li><IconButton label="Data Bite" type="data-bite" icon={<DataBiteIcon/>}/></li>
-        <li><IconButton label="Waffle Chart" type="waffle-chart" icon={<WaffleChartIcon/>}/></li>
-        <li><IconButton label="Markup Include" type="markup-include" icon={<MarkupIncludeIcon/>}/></li>
+        <li><IconButton label="Dashboard" type="dashboard" icon="dashboard"/></li>
+        <li><IconButton label="Data Byte" type="data-byte" icon="databyte"/></li>
+        <li><IconButton label="Waffle Chart" type="waffle-chart" icon="grid"/></li>
+        <li><IconButton label="Markup Include" type="markup-include" icon="code"/></li>
       </ul>
       <div className="heading-2">Charts</div>
       <ul className="grid">
-        <li><IconButton label="Bar" type="chart" subType="Bar" icon={<BarIcon/>}/></li>
-        <li><IconButton label="Line" type="chart" subType="Line" icon={<LineIcon/>}/></li>
-        <li><IconButton label="Pie" type="chart" subType="Pie" icon={<PieIcon/>}/></li>
-        <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon={<PairedBarIcon/>}/></li>
+        <li><IconButton label="Bar" type="chart" subType="Bar" icon="chartBar"/></li>
+        <li><IconButton label="Line" type="chart" subType="Line" icon="chartLine"/></li>
+        <li><IconButton label="Pie" type="chart" subType="Pie" icon="chartPie"/></li>
+        <li><IconButton label="Paired Bar" type="chart" subType="Paired Bar" icon="chartBarPaired"/></li>
       </ul>
       <div className="heading-2">Maps</div>
       <ul className="grid">
-        <li><IconButton label="United States (State- or County-Level)" type="map" subType="us" icon={<UsaIcon/>}/></li>
-        <li><IconButton label="World" type="map" subType="world" icon={<GlobeIcon/>}/></li>
-        <li><IconButton label="U.S. State" type="map" subType="single-state" icon={<AlabamaGraphic/>}/></li>
+        <li><IconButton label="United States (State- or County-Level)" type="map" subType="us" icon="mapUsa"/></li>
+        <li><IconButton label="World" type="map" subType="world" icon="mapWorld"/></li>
+        <li><IconButton label="U.S. State" type="map" subType="single-state" icon="mapAl"/></li>
       </ul>
     </div>
   )

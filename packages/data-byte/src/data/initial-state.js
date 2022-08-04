@@ -1,13 +1,13 @@
 export default {
-    type: "data-bite",
+    type: "data-byte",
     data: [],
-    dataBite: "",
+    dataByte: "",
     dataFunction: "",
     dataColumn: "",
-    bitePosition: "Left",
-    biteFontSize: 24,
+    bytePosition: "Left",
+    byteFontSize: 24,
     fontSize: "medium",
-    biteBody: "",
+    byteBody: "",
     imageData: {
       display: "none",
       url: "",
@@ -20,7 +20,7 @@ export default {
         prefix: "",
         suffix: "%"
     },
-    biteStyle: "graphic",
+    byteStyle: "graphic",
     filters: [],
     subtext: "",
     title: "",

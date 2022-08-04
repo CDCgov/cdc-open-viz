@@ -19,7 +19,7 @@ const Label = ({name, tooltip, style, children, className, ...attributes}) => {
       {tooltip && <>
         <Tooltip>
           <Tooltip.Target>
-            <Icon display="question"/>
+            <Icon display="questionCircle"/>
           </Tooltip.Target>
           <Tooltip.Content>
             {typeof tooltip === 'object'

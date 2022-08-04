@@ -5,7 +5,7 @@ import GridIcon from '../images/icon-grid.svg';
 import CodeIcon from '../images/icon-code.svg';
 import EditIcon from '../images/icon-edit.svg';
 import MoveIcon from '../images/icon-move.svg';
-import BiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
+import ByteIcon from '@cdc/core/assets/data-byte-graphic.svg';
 import BarIcon from '@cdc/core/assets/chart-bar-solid.svg';
 import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
@@ -16,7 +16,7 @@ import AlabamaIcon from '@cdc/core/assets/alabama-graphic.svg';
 import Context from '../context';
 
 const iconHash = {
-  'data-bite' : <BiteIcon />,
+  'data-byte' : <ByteIcon />,
   'Bar': <BarIcon />,
   'waffle-chart' : <GridIcon />,
   'markup-include' : <CodeIcon />,
@@ -29,7 +29,7 @@ const iconHash = {
 }
 
 const labelHash = {
-  'data-bite': 'Data Bite',
+  'data-byte': 'Data Byte',
   'waffle-chart' : 'Waffle Chart',
   'markup-include' : 'Markup Include',
   'Bar' : 'Bar',

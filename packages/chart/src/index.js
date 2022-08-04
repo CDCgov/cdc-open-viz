@@ -7,7 +7,7 @@ import { ConfigContextProvider } from '@cdc/core/context/ConfigContext'
 import CdcChart from './CdcChart'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 
-const ChartWrapper = ({ domContainer }) => {
+const ComponentWrapper = ({ domContainer }) => {
   const { view } = useGlobalContext()
 
   const demoData = [
@@ -72,7 +72,7 @@ const ChartWrapper = ({ domContainer }) => {
           </div>
           <CdcChart configUrlObj={demoConfig}/>
         </> :
-        <CdcChart configUrlObj={domContainer.attributes['data-config'].value}/>
+        <CdcChart configUrlObj={domContainer.attributes['data-config']?.value || defaultConfig.file}/>
       }
     </>
   )
@@ -84,7 +84,7 @@ domContainers.forEach((domContainer) => {
     <React.StrictMode>
       <GlobalContextProvider>
         <ConfigContextProvider>
-          <ChartWrapper domContainer={domContainer}/>
+          <ComponentWrapper domContainer={domContainer}/>
         </ConfigContextProvider>
       </GlobalContextProvider>
     </React.StrictMode>,

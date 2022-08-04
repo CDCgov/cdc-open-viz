@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
@@ -29,7 +29,7 @@ const InputText = (
   //Input will only accept either an inline value from the element, or a value from a connected config key
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
-  const [ debouncedValue ] = useDebounce(value, 500)
+  const [ debouncedValue ] = useDebounce(value, 300)
 
   const inputRef = useRef(null)
 
@@ -63,11 +63,9 @@ const InputText = (
     return inBounds
   }
 
-  // This is some subtext that I found here
-
-  //TODO: COVE Refactor - Expand to support source onChange events
+  //TODO: COVE Refactor - Expand to support any additional onChange events included with the call to this component
   const onChange = (e) => {
-    switch(type) {
+    switch (type) {
       case 'number':
         if (isNumberWithinBounds(e.target.value)) {
           setValue(e.target.value)
@@ -81,7 +79,7 @@ const InputText = (
   }
 
   let inputAttrs = {
-    className: `cove-input${className ? ' ' + className : ''}`,
+    className: `cove-input${'textarea' === type ? ' cove-input--textarea' : ''}${className ? ' ' + className : ''}`,
     type,
     placeholder,
     onChange,
@@ -89,9 +87,8 @@ const InputText = (
   }
 
   let formElement = 'textarea' === type
-    ? (<textarea {...inputAttrs} ref={inputRef}>{value}</textarea>)
+    ? (<textarea {...inputAttrs} ref={inputRef} value={value}/>)
     : (<input {...inputAttrs} value={value} ref={inputRef}/>)
-
 
   return (
     <>

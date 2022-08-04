@@ -21,7 +21,7 @@
     "@cdc/chart": "^1.3.2",
     "@cdc/core": "^1.1.2",
     "@cdc/dashboard": "^1.1.2",
-    "@cdc/data-bite": "^1.1.2",
+    "@cdc/data-byte": "^1.1.2",
     "@cdc/waffle-chart": "^1.0.0",
     "@cdc/markup-include": "^1.0.0",
     "@cdc/map": "^2.6.2",

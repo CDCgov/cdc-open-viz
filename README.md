@@ -4,15 +4,15 @@ CDC OpenViz is a collection of React components and related packages centered ar
 
 This project is currently under heavy initial development.
 
-| Package | Docs | Description |
-| --- | --------- | ----------- |
-| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) | [CdcChart](https://cdcgov.github.io/cdc-open-viz/) |React component for visualizing data with a chart. |
-| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard) | [CdcDashboard](https://cdcgov.github.io/cdc-open-viz/) | React component to build and display multiple data visualizations. |
-| [@cdc/data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) | [CdcDataBite](https://cdcgov.github.io/cdc-open-viz/) | React component for bringing attention to and visualizing a smaller data point. |
-| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map) | [CdcMap](https://cdcgov.github.io/cdc-open-viz/) | React component for visualizing tabular data on a map of the United States or the world. |
+| Package                                                                                         | Docs                                                       | Description |
+|-------------------------------------------------------------------------------------------------|------------------------------------------------------------| ----------- |
+| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart)                   | [CdcChart](https://cdcgov.github.io/cdc-open-viz/)         |React component for visualizing data with a chart. |
+| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard)           | [CdcDashboard](https://cdcgov.github.io/cdc-open-viz/)     | React component to build and display multiple data visualizations. |
+| [@cdc/data-byte](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-byte)           | [CdcDataByte](https://cdcgov.github.io/cdc-open-viz/)      | React component for bringing attention to and visualizing a smaller data point. |
+| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map)                       | [CdcMap](https://cdcgov.github.io/cdc-open-viz/)           | React component for visualizing tabular data on a map of the United States or the world. |
 | [@cdc/markup-include](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/markup-include) | [CdcMarkupInclude](https://cdcgov.github.io/cdc-open-viz/) | React component for importing HTML markup data from a separate source link. |
-| [@cdc/waffle-chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/waffle-chart) | [CdcWaffleChart](https://cdcgov.github.io/cdc-open-viz/) | React component for displaying a percentage value on a filled grid chart, aka "waffle chart". |
-| [@cdc/wizard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/wizard) | [CdcWizard](https://cdcgov.github.io/cdc-open-viz/) | React component for importing data and creating a map or chart configuration. |
+| [@cdc/waffle-chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/waffle-chart)     | [CdcWaffleChart](https://cdcgov.github.io/cdc-open-viz/)   | React component for displaying a percentage value on a filled grid chart, aka "waffle chart". |
+| [@cdc/wizard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/wizard)                 | [CdcWizard](https://cdcgov.github.io/cdc-open-viz/)        | React component for importing data and creating a map or chart configuration. |
 
 ## Setup <a name="setup"></a>
 

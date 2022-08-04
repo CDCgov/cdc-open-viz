@@ -1,37 +1,71 @@
-.cove-alert__error {
-  display: flex;
-  justify-content: space-between;
-  padding: .3rem 1rem;
-  font-size: .9rem;
-  background: #FFC2C2;
+@mixin cove-alert-link-darken ($color) {
+  color: darken(saturate($color, 38.48), 19.02)
+}
+
+.cove-alert {
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  border: 1px solid transparent;
   border-radius: 0.1875rem;
 
   strong {
     font-weight: 600;
   }
 
-  p {
-    margin: 0;
-  }
-
-  .cove-alert__error-dismiss {
-    flex-shrink: 0;
-    font-size: .8rem;
-    cursor: pointer;
+  code {
+    padding: 0.125rem 0.25rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
+    font-style: italic;
   }
 }
 
-.cove-alert__warning {
-  padding: .75rem 1rem;
-  margin: 1rem 0;
-  font-size: 0.8rem;
-  color: #D8000C;
-  background-color: #FFD2D2;
-  border: #D8000C 1px solid;
-  border-radius: 0.1875rem;
+//TODO - COVE Refactor: Add 'code' bgcolor styles to additional alerts
 
-  strong {
-    display: block;
-    font-weight: 600;
+.cove-alert--basic {
+  color: #383d41;
+  background-color: #e2e3e5;
+  border-color: #d6d8db;
+  a {
+    @include cove-alert-link-darken(#383d41);
+  }
+}
+
+.cove-alert--info {
+  color: #004085;
+  background-color: #dbf1ff;
+  border-color: #b8daff;
+  a {
+    @include cove-alert-link-darken(#004085);
+  }
+  code {
+    background-color: rgb(0 94 170 / 16%);
+  }
+}
+
+.cove-alert--success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  a {
+    @include cove-alert-link-darken(#155724);
+  }
+}
+
+.cove-alert--error {
+  color: #9e3e47;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  a {
+    @include cove-alert-link-darken(#9e3e47);
+  }
+}
+
+.cove-alert--caution {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+  a {
+    @include cove-alert-link-darken(#856404);
   }
 }

@@ -32,6 +32,7 @@ $componentBorderRadius: 3px;
   background-color: #fff;
   border: solid 1px #ccc;
   border-radius: $componentBorderRadius;
+  overflow: hidden;
 
   @at-root {
     .cove-component__header + #{&} {

@@ -75,6 +75,7 @@ $editorAnimationTimer: 400ms;
 .cove-editor__panel-heading {
   position: absolute;
   top: 0;
+  right: 0;
   width: $editorWidth;
   padding: .5rem 1.125rem;
   font-size: 1.125em;
@@ -86,6 +87,7 @@ $editorAnimationTimer: 400ms;
 }
 
 .cove-editor__panel-container {
+  float: right;
   width: $editorWidth - 1px;
   min-width: $editorWidth - 1px;
   height: 100%;

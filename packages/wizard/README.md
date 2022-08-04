@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@cdc/wizard)](https://www.npmjs.com/package/@cdc/wizard)
 
-React component for creating configurations for the [dashboard](https://github.com/CDCgov/cdc-open-viz/tree/integration/main/dashboard), [map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map), [chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) and [data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) packages. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
+React component for creating configurations for the [dashboard](https://github.com/CDCgov/cdc-open-viz/tree/integration/main/dashboard), [map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map), [chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) and [data-byte](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-byte) packages. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 
 **Examples**
 * [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)

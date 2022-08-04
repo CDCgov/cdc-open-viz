@@ -4,6 +4,9 @@
   align-items: center;
   width: 1em;
   height: auto;
+  font-size: 1em;
+  line-height: .05em;
+  vertical-align: -0.075em;
 
   @media all and (-ms-high-contrast: none) {
     height: 30px;

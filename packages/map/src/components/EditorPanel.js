@@ -950,7 +950,7 @@ const EditorPanel = (props) => {
 					<span className='edit-label column-heading'>
 						Filter Column{' '}
             <Tooltip style={{textTransform: 'none'}}>
-              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+              <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
               <Tooltip.Content>
                 <p>Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.</p>
               </Tooltip.Content>
@@ -1160,7 +1160,7 @@ const EditorPanel = (props) => {
 											<span className='edit-label column-heading'>
                         Map Type
                         <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
                             <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
                           </Tooltip.Content>
@@ -1254,7 +1254,7 @@ const EditorPanel = (props) => {
 										placeholder='Map Title'
                     tooltip={
                       <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
                           <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
                         </Tooltip.Content>
@@ -1270,7 +1270,7 @@ const EditorPanel = (props) => {
 										label='Subtext'
                     tooltip={
                       <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
                           <p>Enter supporting text to display below the data visualization, if applicable.<br/>
                           <br/>
@@ -1307,7 +1307,7 @@ const EditorPanel = (props) => {
 										<span className='edit-label column-heading'>
                       Geography
                       <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
                           <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
                         </Tooltip.Content>
@@ -1330,7 +1330,7 @@ const EditorPanel = (props) => {
 												<span className='edit-label column-heading'>
                           Data Column
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>Select the source column containing the categorical or numeric values to be mapped.</p>
                             </Tooltip.Content>
@@ -1358,7 +1358,7 @@ const EditorPanel = (props) => {
                           updateField={updateField}
                           tooltip={
                             <Tooltip style={{textTransform: 'none'}}>
-                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                               <Tooltip.Content>
                                 <p>Enter a data label for use in tooltips and the data table.</p>
                               </Tooltip.Content>
@@ -1444,7 +1444,7 @@ const EditorPanel = (props) => {
                           <span className='edit-label'>
                             Special Classes
                             <Tooltip style={{textTransform: 'none'}}>
-                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                               <Tooltip.Content>
                                 <p>For secondary values such as "NA", the system can automatically color-code them in shades of gray, one shade for each special class.</p>
                               </Tooltip.Content>
@@ -1501,7 +1501,7 @@ const EditorPanel = (props) => {
 										<span className='edit-label column-heading'>
                       Navigation
                       <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
                           <p>To provide end users with navigation functionality, select the source column containing the navigation URLs.</p>
                         </Tooltip.Content>
@@ -1524,7 +1524,7 @@ const EditorPanel = (props) => {
                         <span className="edit-label">
                           Additional Columns
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
                             </Tooltip.Content>
@@ -1679,7 +1679,7 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>
                           Separate Zero
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>For numeric data, you can separate the zero value as its own data class.</p>
                             </Tooltip.Content>
@@ -1692,7 +1692,7 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>
                           Number of Items
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>For numeric maps, select the number of data classes. Do not include designated special classes.</p>
                             </Tooltip.Content>
@@ -1720,7 +1720,7 @@ const EditorPanel = (props) => {
 													<span className='edit-label'>
                             Category Order
                             <Tooltip style={{textTransform: 'none'}}>
-                              <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                              <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                               <Tooltip.Content>
                                 <p>Drag map categories into preferred legend order. </p>
                               </Tooltip.Content>
@@ -1827,7 +1827,7 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>
                           Dynamic Legend Description
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
                             </Tooltip.Content>
@@ -1847,7 +1847,7 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>
                           Unified Legend
                           <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                            <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                             <Tooltip.Content>
                               <p>For a map with filters, check this option if you want the high and low values in the legend to be based on <em>all</em> mapped values.</p>
                             </Tooltip.Content>
@@ -1908,7 +1908,7 @@ const EditorPanel = (props) => {
 											placeholder='Location'
                       tooltip={
                         <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
                             <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
                           </Tooltip.Content>
@@ -1924,7 +1924,7 @@ const EditorPanel = (props) => {
 											placeholder='Data Table'
                       tooltip={
                         <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
                             <p>Text that describes the data table for screen</p>
                           </Tooltip.Content>
@@ -1947,7 +1947,7 @@ const EditorPanel = (props) => {
 											<span className='edit-label'>
                         Show Table
                         <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
                           </Tooltip.Content>
@@ -2011,7 +2011,7 @@ const EditorPanel = (props) => {
 										<span className='edit-label'>
 											Detail displays on{' '}
                       <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                        <Tooltip.Target><Icon display="questionCircle" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
                         <Tooltip.Content>
                           <p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>
                         </Tooltip.Content>

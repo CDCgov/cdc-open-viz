@@ -26,7 +26,7 @@ import ListGroup from '@cdc/core/components/elements/ListGroup'
 import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
-const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
+const themeColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
 const Regions = () => {
   const { config, configActions } = useConfigContext()
@@ -127,7 +127,6 @@ const EditorPanels = () => {
     //TODO: COVE Refactor - Dear god, standardize this..
     const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
     if (config[section].max && config[section].max < maxValue) {
-      console.log('running updateField')
       configActions.updateField([section, 'max'], maxValue)
       updateWarningMsg(function (presMsg) {
         return { ...presMsg, maxMsg: `Entered value ${config[section].max} is not valid ` }
@@ -143,7 +142,6 @@ const EditorPanels = () => {
         updateWarningMsg(function (presMsg) {
           return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid` }
         })
-        console.log('running updateField')
         configActions.updateField([section, 'min'], minValue)
       }
     } else {
@@ -151,7 +149,6 @@ const EditorPanels = () => {
         updateWarningMsg(function (presMsg) {
           return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid` }
         })
-        console.log('running updateField')
         configActions.updateField([section, 'min'], minValue)
       }
     }
@@ -339,9 +336,7 @@ const EditorPanels = () => {
 
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
+    if (false === missingRequiredSections()) delete strippedState.newViz
     delete strippedState.runtime
     return strippedState
   }
@@ -846,7 +841,7 @@ const EditorPanels = () => {
         <InputSelect label="Line Datapoint Style" options={[ 'hidden', 'hover', 'always show' ]} configField="lineDatapointStyle"/>
       }
 
-      <ColorPicker label="Header Theme" colors={headerColors}
+      <ColorPicker label="Theme Colors" colors={themeColors}
                    tooltip="Select the theme color for the component" colorTooltip/>
 
       <InputSlider size="medium" label="Reverse Colors"
@@ -854,7 +849,7 @@ const EditorPanels = () => {
                    labelPosition="top"
                    configField="isPaletteReversed"/>
 
-      {/*<ColorPicker label="Sequential" colors={headerColors}
+      {/*<ColorPicker label="Sequential" colors={themeColors}
                    tooltip="Select the theme color for the component" colorTooltip/>
 
       <Label>Sequential</Label>

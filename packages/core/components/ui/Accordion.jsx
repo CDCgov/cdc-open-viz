@@ -33,7 +33,7 @@ const Accordion = ({ children }) => {
                 ? (
                   <Tooltip position="bottom">
                     <Tooltip.Target>
-                      <Icon display="question" size={14}/>
+                      <Icon display="questionCircle" size={14}/>
                     </Tooltip.Target>
                     <Tooltip.Content>
                       {section.props.tooltip}

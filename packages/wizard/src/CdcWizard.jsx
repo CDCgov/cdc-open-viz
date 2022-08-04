@@ -1,78 +1,68 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 
-// IE11
-import 'core-js/stable'
-import ResizeObserver from 'resize-observer-polyfill'
+// Context
+import { useGlobalContext } from '@cdc/core/context/GlobalContext'
+import { useConfigContext } from '@cdc/core/context/ConfigContext'
+import WizardContext from './context/WizardContext'
 
-import { GlobalContextProvider } from '@cdc/core/components/context/GlobalContext'
-import WizardContext from './WizardContext'
+// Hooks
+import useLoadConfig from '@cdc/core/hooks/useLoadConfig'
 
+//Components - Core
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
-import getViewport from '@cdc/core/helpers/getViewport'
 
-import DataImport from './components/DataImport'
-import ChooseTab from './components/ChooseTab'
-import ConfigureTab from './components/ConfigureTab'
-import Tabs from './components/Tabs'
+//Components - Local
+import Wizard from './components/Wizard'
 
+// Styles
 import './scss/cove-wizard.scss'
 
-const CdcWizard = ({ config: configObj = { newViz: true }, hostname, containerEl }) => {
-  const [ config, setConfig ] = useState(configObj)
+//Visualization
+const CdcWizard = ({ configObj = { newViz: true }, configUrlObj, hostname, containerEl }) => {
+  const [ loadingConfig ] = useLoadConfig(configObj, configUrlObj)
+
+  const { globalActions } = useGlobalContext()
+  const { config } = useConfigContext()
+
   const [ tempConfig, setTempConfig ] = useState(null)
   const [ errors, setErrors ] = useState([])
 
-  const [ currentViewport, setCurrentViewport ] = useState('lg')
-  const [ dimensions, setDimensions ] = useState([])
-
+  // Calculate the starting tab for Wizard
   let startingTab = 0
+  if (config.data && config.type) startingTab = 2
 
-  if (config.data && config.type) {
-    startingTab = 2
-    startingTab = 2
-  }
+  // Set global Wizard component settings
+  useEffect(() => {
+    // Set view mode to wizard
+    globalActions.setViewMode('wizard')
 
-  const [ globalActive, setGlobalActive ] = useState(startingTab)
-
-  const resizeObserver = new ResizeObserver(([ container ]) => {
-    let { width, height } = container.contentRect
-    let newViewport = getViewport(width)
-
-    setDimensions([ width, height ])
-    setCurrentViewport(newViewport)
-  })
-
-  const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
+    // Set starting tab for Wizard in global context state
+    globalActions.setGlobalContext(state => ({ ...state, wizardActiveTab: startingTab }))
   }, [])
 
+  // Event emit Temp Config options:
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
     if (null !== tempConfig) {
-      const parsedData = JSON.stringify(tempConfig)
-      // Emit the data in a regular JS event so it can be consumed by anything.
-      const event = new CustomEvent('updateVizConfig', { detail: parsedData })
+      const parsedConfig = JSON.stringify(tempConfig)
+      // Emit the config in a regular JS event, so it can be consumed by anything.
+      const event = new CustomEvent('updateVizConfig', { detail: parsedConfig })
       window.dispatchEvent(event)
     }
   }, [ tempConfig ])
 
+  // Event emit Config options:
   useEffect(() => {
-    const parsedData = JSON.stringify(config)
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
+    const parsedConfig = JSON.stringify(config)
+    // Emit the data in a regular JS event, so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedConfig })
     window.dispatchEvent(event)
   }, [ config ])
 
-  useEffect(() => {
-    if (globalActive > -1) {
-      setGlobalActive(-1)
-    }
-  }, [ globalActive ])
-
   const maxFileSize = 10 // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
+  // TODO: COVE Refactor - Move these to global error management system
   const errorMessages = {
     emptyCols: 'It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.',
     emptyData: 'Your data file is empty.',
@@ -86,41 +76,25 @@ const CdcWizard = ({ config: configObj = { newViz: true }, hostname, containerEl
   }
 
   const state = {
-    config,
-    setConfig,
+    containerEl,
     errors,
-    setErrors,
     errorMessages,
-    maxFileSize,
     hostname,
-    globalActive,
-    setGlobalActive,
-    tempConfig,
-    setTempConfig
+    maxFileSize,
+    setErrors,
+    setTempConfig,
+    tempConfig
   }
 
   return (
-    <GlobalContextProvider>
+    <ErrorBoundary component="CdcWizard">
       <WizardContext.Provider value={state}>
-        <div className={`cove-wizard ${currentViewport}`} ref={outerContainerRef}>
-          <Tabs startingTab={globalActive} fullsize>
-            {/* top-level */}
-            <Tabs.Content title="1. Import Data" className="cove-wizard__data-designer">
-              <DataImport/>
-            </Tabs.Content>
-            <Tabs.Content title="2. Choose Visualization Type" className="choose-type"
-                          disableRule={!config.data && !config.formattedData}>
-              <ChooseTab/>
-            </Tabs.Content>
-            <Tabs.Content title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-              <ConfigureTab containerEl={containerEl}/>
-            </Tabs.Content>
-          </Tabs>
-        </div>
+        {loadingConfig ? <></> : <Wizard hostname={hostname} containerEl={containerEl}/>}
       </WizardContext.Provider>
       <OverlayFrame/>
-    </GlobalContextProvider>
+    </ErrorBoundary>
   )
 }
+
 
 export default CdcWizard

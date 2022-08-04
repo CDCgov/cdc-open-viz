@@ -1,17 +1,17 @@
 {
-  "name": "@cdc/data-bite",
+  "name": "@cdc/data-byte",
   "version": "1.1.2",
   "description": "React component for displaying a single piece of data in a card module",
-  "main": "dist/cdcdatabite",
+  "main": "dist/cdcdatabyte",
   "scripts": {
     "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcDataBite --env folderName=data-bite -c ../../webpack.config.js",
-    "prepublishOnly": "lerna run --scope @cdc/data-bite build"
+    "build": "npx webpack --mode production --env packageName=CdcDataByte --env folderName=data-byte -c ../../webpack.config.js",
+    "prepublishOnly": "lerna run --scope @cdc/data-byte build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/data-bite"
+    "directory": "packages/data-byte"
   },
   "author": "cooms13 <dmo7@cdc.gov>",
   "bugs": {
@@ -24,13 +24,7 @@
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "html-react-parser": "1.4.9",
-    "react-accessible-accordion": "^3.3.4",
-    "react-beautiful-dnd": "^13.0.0",
-    "react-select": "^3.0.8",
-    "react-tooltip": "4.2.8",
-    "use-debounce": "^6.0.1",
-    "whatwg-fetch": "^3.6.2",
-    "papaparse": "^5.3.0"
+    "react-beautiful-dnd": "^13.0.0"
   },
   "peerDependencies": {
     "react": "^17.0.2",

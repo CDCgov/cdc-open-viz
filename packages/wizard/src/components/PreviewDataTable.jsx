@@ -14,9 +14,9 @@ import InputGroup from '@cdc/core/components/inputs/InputGroup'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import WizardContext from '../WizardContext'
+import WizardContext from '../context/WizardContext'
 
-import '@cdc/core/styles/v2/components/data-table.scss'
+import '@cdc/core/styles/v2/components/element/data-table.scss'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [ filterValue, setFilterValue ] = useState(globalFilter)
@@ -62,11 +62,11 @@ const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => (
 const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }) => (
   <footer className="cove-data-table__footer">
     <div className="cove-data-table__pagination">
-      <Button title="Previous Page" className="px-2 py-1 mr-1" onClick={() => previousPage()} disabled={!canPreviousPage} flexCenter>
-        <Icon display="caretUp" size={10} style={{transform: "rotate(-90deg)"}}/>
+      <Button title="Previous Page" className="px-2 mr-1" onClick={() => previousPage()} disabled={!canPreviousPage} flexCenter>
+        <Icon display="caretUp" size={18} style={{ transform: 'rotate(-90deg)' }}/>
       </Button>
-      <Button title="Next Page" className="px-2 py-1 mr-1" onClick={() => nextPage()} disabled={!canNextPage} flexCenter>
-        <Icon display="caretUp" size={10} style={{transform: "rotate(90deg)"}}/>
+      <Button title="Next Page" className="px-2 mr-1" onClick={() => nextPage()} disabled={!canNextPage} flexCenter>
+        <Icon display="caretUp" size={18} style={{ transform: 'rotate(90deg)' }}/>
       </Button>
       <span className="cove-data-table__pagination--index">
         Page{' '} {pageNumber} of {totalPages}
@@ -97,7 +97,7 @@ const PreviewDataTable = ({ data }) => {
     })
   }, [ tableData ])
 
-  // This adds a columns property just like the D3 function for JSON parsing.
+  // This adds a column's property just like the D3 function for JSON parsing.
   const generateColumns = useCallback((data) => {
     let columns = []
 
@@ -119,7 +119,7 @@ const PreviewDataTable = ({ data }) => {
   }, [])
 
   useEffect(() => {
-    if (!data) return
+    if (!data || (Array.isArray(data) && data.length === 0)) return
 
     let newData = [ ...data ]
 
@@ -163,18 +163,18 @@ const PreviewDataTable = ({ data }) => {
         <div className="cove-data-table__table-wrapper">
           <table className="cove-data-table__table" role="table">
             <thead>
-              <tr role="row">
-                <th scope="col" colSpan="1" role="columnheader"/>
-                <th scope="col" colSpan="1" role="columnheader"/>
-              </tr>
+            <tr role="row">
+              <th scope="col" colSpan="1" role="columnheader"/>
+              <th scope="col" colSpan="1" role="columnheader"/>
+            </tr>
             </thead>
             <tbody>
-              {[...Array(10)].map((e, i) => (
-                <tr role="row" key={i}>
-                  <td role="cell"/>
-                  <td role="cell"/>
-                </tr>
-              ))}
+            {[ ...Array(10) ].map((e, i) => (
+              <tr role="row" key={i}>
+                <td role="cell"/>
+                <td role="cell"/>
+              </tr>
+            ))}
             </tbody>
           </table>
         </div>

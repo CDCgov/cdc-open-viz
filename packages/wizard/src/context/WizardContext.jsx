@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 
 const WizardContext = createContext();
-
-WizardContext.displayName = 'WizardState';
+WizardContext.displayName = 'WizardContext';
 
 export default WizardContext;
