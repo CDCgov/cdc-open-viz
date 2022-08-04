@@ -185,6 +185,19 @@ const EditorPanel = (props) => {
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
 
+			// change these to be more generic.
+			// updateVisualPropertyValue
+			// updateGeneralPropertyValue, etc.
+			case 'showBubbleZeros':
+				setState({
+					...state,
+					visual: {
+						...state.visual,
+						showBubbleZeros: value
+					}
+				})
+				break;
+
 			case 'showEqualNumber':
 				setState({
 					...state,
@@ -2440,6 +2453,18 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/>
+									{state.general.geoType === 'world' || state.general.geoType === 'us' &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.visual.showBubbleZeros}
+												onChange={(event) => {
+													handleEditorChanges('showBubbleZeros', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+										</label>
+									}
 									{state.general.geoType === 'world' &&
 										<label className='checkbox'>
 											<input
