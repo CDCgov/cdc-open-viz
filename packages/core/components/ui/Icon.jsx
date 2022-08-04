@@ -25,6 +25,8 @@ import iconQuestion from '../../assets/icon-question-circle.svg'
 import iconUpload from '../../assets/icon-upload.svg'
 import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
+import iconGear from '../../assets/icon-gear.svg'
+import iconTools from '../../assets/icon-tools.svg'
 
 import '../../styles/v2/components/icon.scss'
 
@@ -52,7 +54,9 @@ const iconHash = {
   'question': iconQuestion,
   'upload': iconUpload,
   'warningCircle': iconWarningCircle,
-  'warningTriangle': iconWarningTriangle
+  'warningTriangle': iconWarningTriangle,
+  'gear': iconGear,
+  'tools': iconTools
 }
 
 const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {
