@@ -813,12 +813,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
     }
-
+console.log(state.legend)
     const displayDataAsText = (value, columnName) => {
         if(value === null || value === "" || value === undefined ) {
             return ""
         }
-
+        if(typeof value === 'string' && value.length > 0 && state.legend.type==='equalnumber'){
+            return value
+        }
+ 
         let formattedValue = value
 
         let columnObj = state.columns[columnName]
