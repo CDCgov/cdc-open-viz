@@ -1034,6 +1034,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         const dict = {
             "Washington D.C." : "District of Columbia",
             "WASHINGTON DC":"District of Columbia",
+            "DC":"District of Columbia",
             "WASHINGTON DC.":"District of Columbia",
             "Congo": "Republic of the Congo"
         }
