@@ -1,10 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// Components
 import Icon from '../ui/Icon'
 import Tooltip from '../ui/Tooltip'
 
-import '../../styles/v2/components/element/label.scss'
+// Styles
+import '../../styles/components/element/label.scss'
 
 const Label = ({name, tooltip, style, children, className, ...attributes}) => {
 

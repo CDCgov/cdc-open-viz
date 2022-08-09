@@ -38,7 +38,7 @@ const CdcWizard = ({ configObj = { newViz: true }, configUrlObj, hostname, conta
     globalActions.setViewMode('wizard')
 
     // Set starting tab for Wizard in global context state
-    globalActions.setGlobalContext(state => ({ ...state, wizardActiveTab: startingTab }))
+    globalActions.setWizardActiveTab(startingTab)
   }, [])
 
   // Event emit Temp Config options:

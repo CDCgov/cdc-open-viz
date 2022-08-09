@@ -1,15 +1,15 @@
 import React from 'react'
 
-//Context
+// Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-//Components
+// Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
+import AlertBox from '@cdc/core/components/ui/AlertBox'
 import ColorPicker from '@cdc/core/components/ui/ColorPicker'
 import EditorPanelGlobal from '@cdc/core/components/EditorPanelGlobal'
-import InputText from '@cdc/core/components/inputs/InputText'
-import AlertBox from '@cdc/core/components/ui/AlertBox'
 import Icon from '@cdc/core/components/ui/Icon'
+import InputText from '@cdc/core/components/inputs/InputText'
 
 const themeColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 

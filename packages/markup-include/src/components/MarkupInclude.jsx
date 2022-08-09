@@ -7,7 +7,7 @@ import { Markup } from 'interweave'
 //Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-//Components
+//Components - Core
 import AlertBox from '@cdc/core/components/ui/AlertBox'
 import Component from '@cdc/core/components/Component'
 
@@ -51,10 +51,12 @@ const CdcMarkupInclude = () => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Document</title>
+        <title>Demo Markup</title>
       </head>
       <body>
-        <h1>Header</h1>
+        <h1>Demo Markup</h1>
+        <br/>
+        <img style="float: right; overflow: hidden; border-radius: 5px; margin: 0 0 1.5rem 1.5rem" src="https://picsum.photos/250/150">
         <p>
           Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. 
           Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. 
@@ -129,7 +131,7 @@ const CdcMarkupInclude = () => {
     return hasBody ? parse[1] : parse
   }
 
-  //Refetch the markup content whenever config is updated
+  // Refetch the markup content whenever config is updated
   useEffect(() => {
     loadConfigMarkupData().catch((err) => console.error(err))
   }, [ loadConfigMarkupData ])

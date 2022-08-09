@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 
-//Context
+// Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-//Components
+// Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import ColorPicker from '@cdc/core/components/ui/ColorPicker'
@@ -15,21 +15,13 @@ import Label from '@cdc/core/components/elements/Label'
 import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
-//Constants
+// Constants
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../consts'
 
 const themeColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
 const EditorPanels = () => {
-  const { config, configActions, data, missingRequiredSections } = useConfigContext()
-
-  /*useEffect(() => {
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-
-      setParentConfig(newConfig)
-    }
-  }, [ config ])*/
+  const { config, configActions, data } = useConfigContext()
 
   useEffect(() => {
     //Verify comparate data type
@@ -46,15 +38,6 @@ const EditorPanels = () => {
       configActions.updateConfig({ ...config, invalidComparate: false })
     }
   }, [ config.dataConditionalOperator, config.dataConditionalComparate ])
-
-  const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
-    delete strippedState.runtime
-    return strippedState
-  }
 
   // Filters -----------------------------------------------
   const addNewFilter = () => {
@@ -113,14 +96,14 @@ const EditorPanels = () => {
         <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled/>
 
         <Label>Data Conditional</Label>
-        <div className="grid grid-gap-2 mb-3">
-          <div className="col-4">
+        <div className="cove-grid cove-grid--gap--2 mb-3">
+          <div className="cove-grid__col--4">
             <InputSelect className="mb-0" options={getColumns()} configField="dataConditionalColumn" initialDisabled/>
           </div>
-          <div className="col-4">
+          <div className="cove-grid__col--4">
             <InputSelect className="mb-0" options={DATA_OPERATORS} configField="dataConditionalOperator" initialDisabled/>
           </div>
-          <div className="col-4">
+          <div className="cove-grid__col--4">
             <InputText className="mb-0" configField="dataConditionalComparate"/>
           </div>
         </div>
@@ -136,11 +119,11 @@ const EditorPanels = () => {
         <InputCheckbox label="Select from data" size="small" configField="customDenom"/>
 
         {!config.customDenom &&
-          <div className="grid grid-gap-2 mb-3">
-            <div className="col-6">
+          <div className="cove-grid cove-grid--gap--2 mb-3">
+            <div className="cove-grid__col--6">
               <InputText className="mb-0" configField="dataDenom"/>
             </div>
-            <div className="col-6">
+            <div className="cove-grid__col--6">
               <small>default (100)</small>
             </div>
           </div>
@@ -155,14 +138,14 @@ const EditorPanels = () => {
 
       <hr className="cove-editor__divider"/>
 
-      <div className="grid grid-gap-2 mb-3">
-        <div className="col-4">
+      <div className="cove-grid cove-grid--gap--2 mb-3">
+        <div className="cove-grid__col--4">
           <InputText label="Prefix" className="mb-0" configField="prefix"/>
         </div>
-        <div className="col-4">
+        <div className="cove-grid__col--4">
           <InputText label="Suffix" className="mb-0" configField="suffix"/>
         </div>
-        <div className="col-4">
+        <div className="cove-grid__col--4">
           <InputText label="Round" className="mb-0" type="number" configField="roundToPlace"/>
         </div>
       </div>
@@ -203,11 +186,11 @@ const EditorPanels = () => {
     <Accordion.Section label="Visual">
       <InputSelect label="Shape" options={[ 'circle', 'square', 'person' ]} configField="shape"/>
 
-      <div className="grid grid-gap-2 mb-3">
-        <div className="col-6">
+      <div className="cove-grid cove-grid--gap--2 mb-3">
+        <div className="cove-grid__col--6">
           <InputText label="Width" className="mb-0" type="number" configField="nodeWidth"/>
         </div>
-        <div className="col-6">
+        <div className="cove-grid__col--6">
           <InputText label="Spacer" className="mb-0" type="number" configField="nodeSpacer"/>
         </div>
       </div>
@@ -215,11 +198,11 @@ const EditorPanels = () => {
       <InputSelect label="Layout" options={[ 'horizontal', 'vertical' ]} configField="orientation"/>
 
       <Label>Data Point Font Size</Label>
-      <div className="grid grid-gap-2 mb-3">
-        <div className="col-6">
+      <div className="cove-grid cove-grid--gap--2 mb-3">
+        <div className="cove-grid__col--6">
           <InputText className="mb-0" type="number" configField="fontSize"/>
         </div>
-        <div className="col-6">
+        <div className="cove-grid__col--6" style={{ display: 'flex', alignItems: 'center' }}>
           <small>default (50px)</small>
         </div>
       </div>

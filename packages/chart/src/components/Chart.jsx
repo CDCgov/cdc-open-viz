@@ -1,11 +1,10 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 
 //Third Party
 import { LegendItem, LegendLabel, LegendOrdinal } from '@visx/legend'
 import { scaleOrdinal } from '@visx/scale'
 
 //Context
-import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
 //Data
@@ -15,20 +14,20 @@ import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalette
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import { capitalizeFirstLetter } from '@cdc/core/helpers/coveHelpers'
 
-//Components
+//Components - Core
 import Button from '@cdc/core/components/elements/Button'
 import Component from '@cdc/core/components/Component'
-import DataTable from './DataTable'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import RenderFallback from '@cdc/core/components/loaders/RenderFallback'
 
-//Lazy Loads
-const LinearChart = lazy(() => import('./Chart.Linear'))
-const PieChart = lazy(() => import('./Chart.Pie'))
+//Components - Local
+import ChartLinear from './Chart.Linear'
+import ChartPie from './Chart.Pie'
+// import DataTable from './DataTable'
 
 //Visualization
 const Chart = () => {
-  const { dimensions } = useGlobalContext()
+  const [ dimensions, setDimensions ] = useState({})
+
   const { config, configActions, data, missingRequiredSections } = useConfigContext()
   const { legend, title, description } = config
 
@@ -83,6 +82,32 @@ const Chart = () => {
 
     configActions.setMissingRequiredSections(!config.xAxis.dataKey)
   }, [ config.series, config.xAxis.dataKey, config.yAxis.dataKey ])
+
+  // NOTE: Hardcoding the resize observer here for
+  // charts to reference instead of GlobalContext;
+  // GlobalContext is unavailable to Charts when consumed by Wizard.
+
+  // Observe and register changes to viewport size
+  const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+      let { width, height } = entry.contentRect
+
+      // Adjust width based on legend display
+      // TODO: Add variations for responsive screen sizes
+      if (config && config.legend && !config.legend.hide) {
+        width = width * 0.73
+      }
+
+      setDimensions({ width, height })
+    }
+  })
+
+  // Create viewport size observer callback
+  const outerContainerRef = useCallback(node => {
+    if (node !== null) {
+      resizeObserver.observe(node)
+    }
+  }, [])
 
   const filterData = (filters, data) => {
     let filteredData = []
@@ -342,11 +367,11 @@ const Chart = () => {
   }
 
   const chartList = {
-    'Paired Bar': <LinearChart {...chartProps}/>,
-    'Bar': <LinearChart {...chartProps}/>,
-    'Line': <LinearChart {...chartProps}/>,
-    'Combo': <LinearChart {...chartProps}/>,
-    'Pie': <PieChart {...chartProps}/>
+    'Paired Bar': <ChartLinear {...chartProps}/>,
+    'Bar': <ChartLinear {...chartProps}/>,
+    'Line': <ChartLinear {...chartProps}/>,
+    'Combo': <ChartLinear {...chartProps}/>,
+    'Pie': <ChartPie {...chartProps}/>
   }
 
   return (
@@ -355,21 +380,18 @@ const Chart = () => {
                theme={config.theme}
       // table={<DataTable/>}
     >
-      <Suspense fallback={<RenderFallback style={{height: 418}} text="Rendering chart..." loadSpinSize={75}/>}>
-        <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-          <a className="sr-only" href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {config.filters && <Filters/>}
-          {missingRequiredSections && <>Missing data in sections</>}
-          {!loadingDependencies && !missingRequiredSections && !config.newViz && (<>
-            <div className="cove-chart__visualization" flow={config.legend.position === 'left' ? 'right' : 'left'}>
-              {chartList[config.visualizationType]}
-            </div>
-            {!config.legend.hide && <Legend/>}
-          </>)}
-        </div>
-      </Suspense>
+      <div className={`cove-chart__container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`} ref={outerContainerRef}>
+        <a className="sr-only" href={handleChartTabbing}>
+          Skip Over Chart Container
+        </a>
+        {config.filters && <Filters/>}
+        {!loadingDependencies && !missingRequiredSections && !config.newViz && (<>
+          <div className="cove-chart__visualization" flow={config.legend.position === 'left' ? 'right' : 'left'}>
+            {chartList[config.visualizationType]}
+          </div>
+          {!config.legend.hide && <Legend/>}
+        </>)}
+      </div>
     </Component>
   )
 }

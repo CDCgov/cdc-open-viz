@@ -180,8 +180,6 @@ const WaffleChart = () => {
     }
 
     waffleNumerator = numerFunctionList[dataFunction]
-    console.log('functionList', numerFunctionList)
-    console.log('waffleNumerator', waffleNumerator)
 
     // Calculate denominator ------------------
     let waffleDenominator = null

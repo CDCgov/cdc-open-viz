@@ -1,12 +1,13 @@
 import React, { Children, useState, useEffect } from 'react'
 
+// Styles
 import '../scss/cove-tabs.scss'
 
-//Define the "slots" to be populated by subcomponents
+// Define the "slots" to be populated by subcomponents
 const TabsContent = () => null
 
+// Component
 const Tabs = ({ children, startingTab = 0, className, changeTab = null, fullsize, ...attributes }) => {
-
   const [ active, setActive ] = useState(startingTab)
 
   const setActiveTab = (disabled, index) => {

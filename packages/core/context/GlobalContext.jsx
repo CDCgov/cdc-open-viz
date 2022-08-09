@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useCallback, useState, useRef } from 'react'
+import React, { createContext, useContext, useCallback, useState } from 'react'
 
 // Helpers
 import getViewport from '../helpers/getViewport'
 
 // Styles
-import '../styles/v2/main.scss'
+import '../styles/main.scss'
 
 export const GlobalContext = createContext({
   dimensions: {
@@ -15,8 +15,9 @@ export const GlobalContext = createContext({
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export const GlobalContextProvider = ({ children }) => {
-  const [ globalContext, setGlobalContext ] = useState({}) //Needs empty object to assign settings
+  const [ globalContext, setGlobalContext ] = useState({}) // Needs an empty object to assign new settings
   const [ viewMode, setViewMode ] = useState('component')
+  const [ wizardActiveTab, setWizardActiveTab ] = useState(0)
   const [ editorMode ] = useState(window.location.href.includes('editor=true'))
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
@@ -54,31 +55,29 @@ export const GlobalContextProvider = ({ children }) => {
     }
   }, [])
 
-  // Build Context
-  const globalSettings = {
-    globalActions: {
-      setGlobalContext,
-      setViewMode
-    },
-    globalContext,
-    os: getOS,
-    viewMode,
-    editorMode,
-    viewport: currentViewport,
-    dimensions: globalContext.dimensions,
-    overlay: {
-      object: globalContext.overlay?.object || null,
-      show: globalContext.overlay?.show || false,
-      disableBgClose: globalContext.overlay?.disableBgClose || false,
-      actions: {
-        openOverlay,
-        toggleOverlay
-      }
-    }
-  }
-
   return (
-    <GlobalContext.Provider value={globalSettings}>
+    <GlobalContext.Provider value={{
+      globalActions: {
+        setGlobalContext,
+        setViewMode,
+        setWizardActiveTab
+      },
+      os: getOS,
+      viewMode,
+      wizardActiveTab,
+      editorMode,
+      viewport: currentViewport,
+      dimensions: globalContext.dimensions,
+      overlay: {
+        object: globalContext.overlay?.object || null,
+        show: globalContext.overlay?.show || false,
+        disableBgClose: globalContext.overlay?.disableBgClose || false,
+        actions: {
+          openOverlay,
+          toggleOverlay
+        }
+      }
+    }}>
       <div className={'cove' + (currentViewport ? ' ' + currentViewport : '')} ref={outerContainerRef}>
         {children}
       </div>

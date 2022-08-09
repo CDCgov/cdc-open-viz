@@ -1,25 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-//Context
-import { useGlobalContext } from '../context/GlobalContext'
+// Context
 import { useConfigContext } from '../context/ConfigContext'
 
-//Data
+// Data
 import { COVE_BREAKPOINTS as breakpoints } from '../data/const'
 
-//Components
+// Components - Local
 import Accordion from './ui/Accordion'
 import Button from './elements/Button'
 import Icon from './ui/Icon'
-
-//Styles
-import '../styles/v2/components/editor.scss'
-import '../styles/v2/components/element/editor-utils.scss'
 import SplashError from './ui/SplashError'
 
-const Editor = ({ EditorPanels, children }) => {
-  const { os } = useGlobalContext()
+// Styles
+import '../styles/components/editor.scss'
+import '../styles/components/element/editor-utils.scss'
+
+const Editor = ({ EditorPanels, children, setParentConfig }) => {
   const { config: contextConfig, configActions, missingRequiredSections } = useConfigContext()
 
   const [ config, setConfig ] = useState(contextConfig) // Update when config entries change - forces refresh of editor
@@ -27,12 +25,20 @@ const Editor = ({ EditorPanels, children }) => {
   const [ displayGrid, setDisplayGrid ] = useState(false)
   const [ viewportPreview, setViewportPreview ] = useState(null)
   const [ rotateAnimation, setRotateAnimation ] = useState(false)
+  const [ showConfirm, setShowConfirm ] = useState(false)
 
   const [ previewDimensions, setPreviewDimensions ] = useState({})
 
   const resetIcon = useRef(null)
   const editorPanelRef = useRef(null)
   const componentContainerRef = useRef(null)
+
+  const convertStateToConfig = () => {
+    let strippedState = JSON.parse(JSON.stringify(config))
+    delete strippedState.newViz
+
+    return strippedState
+  }
 
   useEffect(() => {
     document.addEventListener('keydown', onKeypress)
@@ -43,9 +49,22 @@ const Editor = ({ EditorPanels, children }) => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [ viewportPreview ])
 
+  // If missing any required config settings,
+  // show the confirmation to set updated config
+  useEffect(() => {
+    if (missingRequiredSections) setShowConfirm(true)
+  }, [ missingRequiredSections ])
+
   useEffect(() => {
     setConfig({ ...contextConfig })
   }, [ contextConfig ])
+
+  // Pass config up to Wizard if needed
+  useEffect(() => {
+    if (setParentConfig) setParentConfig(convertStateToConfig())
+  }, [ config ])
+
+  const os = navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
   const viewportPreviewController = useCallback((breakpoint) => {
     return setViewportPreview(prevState => prevState !== breakpoint ? breakpoint : null)
@@ -54,17 +73,17 @@ const Editor = ({ EditorPanels, children }) => {
   const onKeypress = (key) => {
     if (key.code === 'Escape') setDisplayPanel(display => !display)
 
-    if (!editorPanelRef.current.contains(document.activeElement)) {
-      if (key.code === 'KeyG') setDisplayGrid(display => !display)
-      if (key.code === 'KeyR') resetPreview()
+    const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
 
-      const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
-
-      if (viewportCommandKey) {
-        key.preventDefault()
-        const keyIndex = key.key - 1
-        if (keyIndex <= breakpoints.length)
-          viewportPreviewController(breakpoints[keyIndex])
+    if (viewportCommandKey) {
+      key.preventDefault()
+      const keyIndex = key.key - 1
+      if (keyIndex <= breakpoints.length)
+        viewportPreviewController(breakpoints[keyIndex])
+    } else {
+      if (!editorPanelRef.current.contains(document.activeElement)) {
+        if (key.code === 'KeyG') setDisplayGrid(display => !display)
+        if (key.code === 'KeyR') resetPreview()
       }
     }
   }
@@ -83,10 +102,10 @@ const Editor = ({ EditorPanels, children }) => {
     resizeObserver.observe(componentContainerRef.current)
 
     return () => {
-      if (!resizeObserver) return;
-      resizeObserver.disconnect();
-      resizeObserver = null;
-    };
+      if (!resizeObserver) return
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
   }, [])
 
   const onBackClick = () => {
@@ -94,11 +113,9 @@ const Editor = ({ EditorPanels, children }) => {
   }
 
   const Confirm = () => {
-    const confirmDone = (e) => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      configActions.updateConfig(newConfig)
+    const confirmDone = () => {
+      configActions.updateConfig(convertStateToConfig())
+      setShowConfirm(false)
     }
 
     return (
@@ -106,7 +123,7 @@ const Editor = ({ EditorPanels, children }) => {
         <section className="cove-splash__waiting__container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display the preview.</p>
-          <Button className="mt-2 mx-auto" disabled={missingRequiredSections} onClick={() => confirmDone}>I'm Done</Button>
+          <Button className="mt-2 mx-auto" disabled={missingRequiredSections} onClick={() => confirmDone()}>I'm Done</Button>
         </section>
       </section>
     )
@@ -135,7 +152,6 @@ const Editor = ({ EditorPanels, children }) => {
   return (
     <div className={`cove-editor${displayPanel ? ' panel-shown' : ''}`}>
       {/* TODO: COVE Refactor - Change other component's config.newViz to check for undefined vs self? */}
-      {config.newViz && <Confirm/>}
       <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
               title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
       <section className="cove-editor__panel" tabIndex={0} ref={editorPanelRef}>
@@ -149,6 +165,7 @@ const Editor = ({ EditorPanels, children }) => {
         </div>
       </section>
       <div className="cove-editor__content" data-grid={displayGrid || null}>
+        {showConfirm && <Confirm/>}
         <div className="cove-editor__content-wrap--x" style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}>
           <div className="cove-editor__content-wrap--y">
             <div className="cove-editor-utils__breakpoints--px">
@@ -184,13 +201,22 @@ const Editor = ({ EditorPanels, children }) => {
         </div>
         <div className="cove-editor-utils__breakpoints">
           <ul className={`cove-editor-utils__breakpoints-list${viewportPreview ? ' has-active' : ''}`}>
+            <li className="cove-editor-utils__breakpoints-item" onClick={() => {
+              setDisplayGrid(display => !display)
+            }}>
+              <div className="cove-editor-utils__breakpoints-grid">
+                <Icon display="squareGrid"/>
+              </div>
+            </li>
             {breakpoints.map((breakpoint, index) => (
               <li className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`} onClick={() => viewportPreviewController(breakpoint)} key={index}>{breakpoint}px</li>
             ))}
             <li className="cove-editor-utils__breakpoints-item" onClick={() => {
               resetPreview()
             }}>
-              <div className="reset" ref={resetIcon}><Icon display="rotateLeft"/></div>
+              <div className="cove-editor-utils__breakpoints-reset" ref={resetIcon}>
+                <Icon display="rotateLeft"/>
+              </div>
             </li>
           </ul>
         </div>

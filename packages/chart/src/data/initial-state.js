@@ -1,6 +1,6 @@
 export default {
   type: 'chart',
-  title: '',
+  title: 'Chart Title',
   theme: 'theme-blue',
   fontSize: 'medium',
   lineDatapointStyle: 'hover',

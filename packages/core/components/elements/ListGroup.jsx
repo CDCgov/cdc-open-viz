@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
+// Components
 import Icon from '../ui/Icon'
 import InputSelect from '../inputs/InputSelect'
 import Label from './Label'
 import Tooltip from '../ui/Tooltip'
 
-import '../../styles/v2/components/element/list-group.scss'
+// Styles
+import '../../styles/components/element/list-group.scss'
 
 const MAX_TEXT_WIDTH = 250
 const MAX_TEXT_SELECT_WIDTH = 150

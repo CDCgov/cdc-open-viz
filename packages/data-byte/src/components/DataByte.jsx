@@ -118,19 +118,19 @@ const DataByte = () => {
     const applyPrecision = (value) => {
       // first validation
       if (value === undefined || value === null) {
-        console.error('Enter correct value to "applyPrecision()" function ')
+        console.error('A numerical value must be supplied to applyPrecision()')
         return
       }
       // second validation
       if (Number.isNaN(value)) {
-        console.error(' Argunment isNaN, "applyPrecision()" function ')
+        console.error('Argument isNaN, cannot process applyPrecision()')
         return
       }
       let result = value
       let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
       //  ROUND FIELD  going -1,-2,-3 numbers
       if (roundToPlace < 0) {
-        console.error(' ROUND field is below "0", "applyPrecision()" function ')
+        console.error('ROUND field is below "0", cannot process applyPrecision()')
         return
       }
       if (typeof roundToPlace === 'number' && roundToPlace > -1) {
@@ -142,12 +142,12 @@ const DataByte = () => {
     const getColumnSum = (arr) => {
       // first validation
       if (arr === undefined || arr === null) {
-        console.error('Enter valid value for getColumnSum function ')
+        console.error('Enter valid value for getColumnSum()')
         return
       }
       // second validation
       if (arr.length === 0 || !Array.isArray(arr)) {
-        console.error('Arguments are not valid getColumnSum function ')
+        console.error('Arguments are not valid getColumnSum()')
         return
       }
       let sum = 0
@@ -412,27 +412,26 @@ const DataByte = () => {
 
   return (
     <Component className="cove-data-byte" title={title} theme={theme}>
-      {missingRequiredSections && <>Missing data in sections</>}
       {!missingRequiredSections && !config.newViz && (<>
         <div className={`cove-data-byte__container${fontSize ? ' font-' + fontSize : ''}`} flow={byteFlow}>
-            {showByte && 'graphic' === byteStyle && isTop && <Callout/>}
-            {isTop && <DataImage/>}
-            <div className="cove-data-byte__content">
-              {showByte && 'title' === byteStyle &&
-                <div className="cove-data-byte__value" style={{ fontSize: byteFontSize + 'px' }}>{calculateDataByte()}</div>
+          {showByte && 'graphic' === byteStyle && isTop && <Callout/>}
+          {isTop && <DataImage/>}
+          <div className="cove-data-byte__content">
+            {showByte && 'title' === byteStyle &&
+              <div className="cove-data-byte__value" style={{ fontSize: byteFontSize + 'px' }}>{calculateDataByte()}</div>
+            }
+            <p className="cove-data-byte__text">
+              {showByte && 'body' === byteStyle &&
+                <span className="cove-data-byte__value mr-1" style={{ fontSize: byteFontSize + 'px' }}>{calculateDataByte()}</span>
               }
-              <p className="cove-data-byte__text">
-                {showByte && 'body' === byteStyle &&
-                  <span className="cove-data-byte__value mr-1" style={{ fontSize: byteFontSize + 'px' }}>{calculateDataByte()}</span>
-                }
-                {parse(byteBody)}
-              </p>
-              {subtext &&
-                <p className="cove-data-byte__subtext">{parse(subtext)}</p>
-              }
-            </div>
-            {isBottom && <DataImage/>}
-            {showByte && 'graphic' === byteStyle && !isTop && <Callout/>}
+              {parse(byteBody)}
+            </p>
+            {subtext &&
+              <p className="cove-data-byte__subtext">{parse(subtext)}</p>
+            }
+          </div>
+          {isBottom && <DataImage/>}
+          {showByte && 'graphic' === byteStyle && !isTop && <Callout/>}
         </div>
       </>)}
     </Component>

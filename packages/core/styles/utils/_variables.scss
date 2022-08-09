@@ -1,0 +1,10 @@
+$cove-breakpoints: (
+        xs: 480px,
+        sm: 768px,
+        md: 960px,
+        lg: 1170px,
+        xl: 1280px
+);
+$editorWidth: 350px;
+$wizardTabsHeight: 48px;
+$transition-expo-out: cubic-bezier(0.16, 1, 0.3, 1);

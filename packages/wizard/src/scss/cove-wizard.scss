@@ -1,5 +1,5 @@
-@import "~@cdc/core/styles/v2/utils/variables";
-@import "~@cdc/core/styles/v2/themes/color-definitions";
+@import "~@cdc/core/styles/utils/variables";
+@import "~@cdc/core/styles/themes/color-definitions";
 
 :root {
   --wizardTabsHeight: 48px;
@@ -34,15 +34,18 @@
 
 .cove-wizard__data-samples {
   padding-left: 0;
-  font-size: .8rem;
-  list-style: none;
   margin-bottom: 2rem;
+  list-style: none;
+  font-size: .8rem;
 
   li {
     margin-bottom: 0.25rem;
-    color: $blue;
-    text-decoration: underline;
-    cursor: pointer
+
+    > span {
+      text-decoration: underline;
+      color: $blue;
+      cursor: pointer;
+    }
   }
 }
 
@@ -93,8 +96,8 @@
   }
 
   p {
-    font-size: .8rem;
     margin-bottom: 1rem;
+    font-size: .8rem;
   }
 
   table + table {
@@ -103,14 +106,14 @@
 
   table {
     margin: auto;
+    border-collapse: collapse;
     font-size: .8rem;
     background-color: #fff;
     border: 1px solid $lightGray;
-    border-collapse: collapse;
 
     th {
-      color: white;
       text-align: left;
+      color: white;
       background-color: $primary;
     }
 
@@ -119,5 +122,54 @@
       border-top: 1px solid $lightGray;
       border-bottom: 1px solid $lightGray;
     }
+  }
+}
+
+.cove-wizard__viz-selection {
+  display: flex;
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 4rem;
+  list-style-type: none;
+}
+
+.cove-wizard__viz-selection__btn {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 150px;
+  margin-right: 2rem;
+  color: #333;
+  background-color: #ececec;
+  border: 0;
+  border-radius: 3px;
+  outline: none;
+  transition: all 400ms $transition-expo-out;
+  cursor: pointer;
+
+  &.active {
+    color: #fff;
+    background-color: #2a7aba;
+    transition: all 400ms $transition-expo-out;
+  }
+
+  &:not(.active):hover {
+    background-color: #fff;
+    box-shadow: 0 0 0 2px #2a7aba inset;
+  }
+
+  > * {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .cove-icon {
+    width: 100%;
+    max-width: 80px;
+    height: 100%;
+    max-height: 60px;
+    margin-bottom: 1rem;
   }
 }

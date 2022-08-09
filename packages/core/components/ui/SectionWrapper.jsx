@@ -1,8 +1,10 @@
 import React from 'react'
 
+// Components
 import Label from '../elements/Label'
 
-import '../../styles/v2/components/ui/section-wrapper.scss'
+// Styles
+import '../../styles/components/ui/section-wrapper.scss'
 
 const SectionWrapper = ({ label, tooltip, children }) => {
   return (

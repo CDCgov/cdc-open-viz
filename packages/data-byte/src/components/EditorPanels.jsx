@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
-//Context
+// Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-//Components
+// Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import ColorPicker from '@cdc/core/components/ui/ColorPicker'
@@ -13,25 +13,25 @@ import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputText from '@cdc/core/components/inputs/InputText'
 import Label from '@cdc/core/components/elements/Label'
 import SectionBlock from '@cdc/core/components/ui/SectionBlock'
-
-//Constants
-import { BYTE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS } from '../consts'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
+
+// Constants
+import { BYTE_LOCATIONS, DATA_FUNCTIONS, DATA_OPERATORS, IMAGE_POSITIONS } from '../consts'
 
 const themeColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
 const EditorPanels = () => {
-  const { config, configActions, data, missingRequiredSections } = useConfigContext()
+  const { config, configActions, data } = useConfigContext()
 
-  const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) {
-      delete strippedState.newViz
-    }
-    delete strippedState.runtime
+  const requiredSections = [
+    config.dataColumn,
+    config.dataFunction
+  ]
 
-    return strippedState
-  }
+  useEffect(() => {
+    if (requiredSections) configActions.setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+  }, [ config ])
+
 
   // Filters -----------------------------------------------
   const addNewFilter = () => {
@@ -150,24 +150,24 @@ const EditorPanels = () => {
   )
   const panelData = (
     <Accordion.Section label="Data" warnIf={(!config.dataColumn || !config.dataFunction)}>
-      <div className="grid grid-gap-2">
-        <div className="col-6">
-          <InputSelect label="Data Column" options={getColumns()} configField="dataColumn" initialDisabled/>
+      <div className="cove-grid cove-grid--gap--2">
+        <div className="cove-grid__col--6">
+          <InputSelect label="Data Column" options={getColumns()} configField="dataColumn" initialDisabled required/>
         </div>
-        <div className="col-6">
-          <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled/>
+        <div className="cove-grid__col--6">
+          <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled required/>
         </div>
       </div>
 
       <SectionWrapper label="Number Formatting">
-        <div className="grid grid-gap-2">
-          <div className="col-4">
+        <div className="cove-grid cove-grid--gap--2">
+          <div className="cove-grid__col--4">
             <InputText label="Prefix" configField={[ 'dataFormat', 'prefix' ]}/>
           </div>
-          <div className="col-4">
+          <div className="cove-grid__col--4">
             <InputText label="Suffix" configField={[ 'dataFormat', 'suffix' ]}/>
           </div>
-          <div className="col-4">
+          <div className="cove-grid__col--4">
             <InputText label="Round" configField={[ 'dataFormat', 'roundToPlace' ]} type="number" min="0" max="99"/>
           </div>
         </div>
@@ -249,9 +249,9 @@ const EditorPanels = () => {
 
                   <Label>{'Image #' + (index + 1)}</Label>
 
-                  <div className="grid grid-gap-2">
-                    <div className="col-4">If Value</div>
-                    <div className="col-4">
+                  <div className="cove-grid cove-grid--gap--2">
+                    <div className="cove-grid__col--4">If Value</div>
+                    <div className="cove-grid__col--4">
                       {/*<select value={option.arguments[0]?.operator || ''} onChange={(e) => {
                         updateDynamicImage('operator', index, 0, e.target.value)
                       }}>
@@ -264,7 +264,7 @@ const EditorPanels = () => {
                         updateDynamicImage('operator', index, 0, e.target.value)
                       }} initialDisabled/>
                     </div>
-                    <div className="col-4">
+                    <div className="cove-grid__col--4">
                       {/*<input type="number" value={option.arguments[0]?.threshold || ''} onChange={(e) => {
                         updateDynamicImage('threshold', index, 0, e.target.value)
                       }}/>*/}
@@ -294,11 +294,11 @@ const EditorPanels = () => {
 
                   {option.secondArgument && true === option.secondArgument &&
                     <>
-                      <div className="grid grid-gap-2 mb-2">
-                        <div className="col-4">
+                      <div className="cove-grid cove-grid--gap--2 mb-2">
+                        <div className="cove-grid__col--4">
                           If Value
                         </div>
-                        <div className="col-4">
+                        <div className="cove-grid__col--4">
                           {/*<select value={option.arguments[1]?.operator || ''} onChange={(e) => {
                             setDynamicArgument(index, 'operator', e.target.value)
                           }}>
@@ -311,7 +311,7 @@ const EditorPanels = () => {
                             setDynamicArgument(index, 'operator', e.target.value)
                           }}/>
                         </div>
-                        <div className="col-4">
+                        <div className="cove-grid__col--4">
                           {/*<input type="number" value={option.arguments[1]?.threshold || ''} onChange={(e) => {
                             setDynamicArgument(index, 'threshold', e.target.value)
                           }}/>*/}

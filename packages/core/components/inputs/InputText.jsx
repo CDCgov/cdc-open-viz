@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react'
+
+// Third Party
 import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
+// Context
 import { useConfigContext } from '../../context/ConfigContext'
 
+// Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
 
+// Components
 import Label from '../elements/Label'
 
-import '../../styles/v2/components/input/index.scss'
+// Styles
+import '../../styles/components/input/index.scss'
 
 const InputText = (
   {

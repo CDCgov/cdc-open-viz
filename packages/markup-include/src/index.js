@@ -1,14 +1,17 @@
 import React, { useState } from 'react'
 import { render } from 'react-dom'
 
+// Context
 import { GlobalContextProvider, useGlobalContext } from '@cdc/core/context/GlobalContext'
-import { ConfigContextProvider } from '@cdc/core/context/ConfigContext'
 
-import CdcMarkupInclude from './CdcMarkupInclude'
+// Components - Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 
+// Components - Local
+import CdcMarkupInclude from './CdcMarkupInclude'
+
 const ComponentWrapper = ({ domContainer }) => {
-  const { view } = useGlobalContext()
+  const { editorMode } = useGlobalContext()
 
   const demoData = [
     {
@@ -29,12 +32,14 @@ const ComponentWrapper = ({ domContainer }) => {
 
   return (
     <>
-      {isDevmode && view === 'editor' ?
+      {isDevmode && editorMode ?
         <>
-          <div className="cove--developer-mode">
-            <InputSelect options={demoData.map(demo => demo.name)} value={defaultConfig.name} onChange={(e) => onChangeConfig(e)}/>
-          </div>
-          <CdcMarkupInclude configUrlObj={demoConfig}/>
+          {demoData.length > 1 &&
+            <div className="cove--developer-mode">
+              <InputSelect options={demoData.map(demo => demo.name)} value={defaultConfig.name} onChange={(e) => onChangeConfig(e)}/>
+            </div>
+          }
+          <CdcMarkupInclude configUrlObj={demoConfig} editorMode={editorMode}/>
         </> :
         <CdcMarkupInclude configUrlObj={domContainer.attributes['data-config']?.value || defaultConfig.file}/>
       }
@@ -47,9 +52,7 @@ domContainers.forEach((domContainer) => {
   render(
     <React.StrictMode>
       <GlobalContextProvider>
-        <ConfigContextProvider>
-          <ComponentWrapper domContainer={domContainer}/>
-        </ConfigContextProvider>
+        <ComponentWrapper domContainer={domContainer}/>
       </GlobalContextProvider>
     </React.StrictMode>,
     domContainer,

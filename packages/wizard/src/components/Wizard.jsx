@@ -5,33 +5,32 @@ import { useGlobalContext } from '@cdc/core/context/GlobalContext'
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
 // Components - Local
-import DataImport from './DataImport'
-import ChooseTab from './ChooseTab'
-import ConfigureTab from './ConfigureTab'
 import Tabs from './Tabs'
+import TabData from './Tab.Data'
+import TabVizSelect from './Tab.Viz.Select'
+import TabVizConfigure from './Tab.Viz.Configure'
 
 
 const Wizard = () => {
-  const { globalContext, globalActions } = useGlobalContext()
+  const { globalActions, wizardActiveTab } = useGlobalContext()
   const { config } = useConfigContext()
 
-  useEffect(() => {
-    if (globalContext.wizardActiveTab > -1) {
-      globalActions.setGlobalContext(state => ({ ...state, wizardActiveTab: -1 }))
+/*  useEffect(() => {
+    if (wizardActiveTab > -1) {
+      globalActions.setWizardActiveTab(-1)
     }
-  }, [ globalContext.wizardActiveTab ])
-
+  }, [ wizardActiveTab ])*/
 
   return (
-    <Tabs startingTab={globalContext.wizardActiveTab} fullsize>
+    <Tabs startingTab={wizardActiveTab} fullsize>
       <Tabs.Content title="1. Import Data" className="cove-wizard__data-designer">
-        <DataImport/>
+        <TabData/>
       </Tabs.Content>
-      <Tabs.Content title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
-        <ChooseTab/>
+      <Tabs.Content title="2. Choose Visualization Type" disableRule={!config.data && !config.formattedData}>
+        <TabVizSelect/>
       </Tabs.Content>
-      <Tabs.Content title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
-        <ConfigureTab/>
+      <Tabs.Content title="3. Configure" disableRule={null === config.data || !config.type}>
+        <TabVizConfigure/>
       </Tabs.Content>
     </Tabs>
 

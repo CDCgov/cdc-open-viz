@@ -1,4 +1,6 @@
 import React, { Children } from 'react'
+
+// Third Party
 import {
   Accordion as AccordionComponent,
   AccordionItem,
@@ -8,10 +10,12 @@ import {
 } from 'react-accessible-accordion'
 import PropTypes from 'prop-types'
 
+// Components
 import Icon from './Icon'
 import Tooltip from './Tooltip'
 
-import '../../styles/v2/components/ui/accordion.scss'
+// Styles
+import '../../styles/components/ui/accordion.scss'
 
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = () => null
@@ -20,6 +24,8 @@ const Accordion = ({ children }) => {
   const childNodes = Children.toArray(children)
   const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || children
 
+  const warningIcon = <Icon className="cove-icon--warning" display="warningCircle" size={14}/>
+
   return (
     <AccordionComponent allowZeroExpanded={true}>
       {accordionSections && accordionSections.map((section, index) => (
@@ -27,7 +33,7 @@ const Accordion = ({ children }) => {
           <AccordionItemHeading className="cove-accordion__heading">
             <AccordionItemButton className="cove-accordion__button">
               <span className="cove-accordion__button--text">
-                {section.props.label}{section.props.warnIf ? <Icon display="warningCircle" size={14}/> : null}
+                {section.props.label}{section.props.warnIf ? warningIcon : null}
               </span>
               {section.props.tooltip
                 ? (

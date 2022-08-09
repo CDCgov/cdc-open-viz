@@ -1,7 +1,10 @@
 import React from 'react'
+
+//Third Party
 import PropTypes from 'prop-types'
 
-import '../../styles/v2/components/ui/section-block.scss'
+// Styles
+import '../../styles/components/ui/section-block.scss'
 
 const SectionBlock = ({ children, ...attributes }) => {
   return (

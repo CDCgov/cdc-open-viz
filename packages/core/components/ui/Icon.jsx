@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// Icons
 import iconCaretDown from '../../assets/icon-caret-down.svg'
 import iconCaretFilledDown from '../../assets/icon-caret-filled-down.svg'
 import iconCaretFilledUp from '../../assets/icon-caret-filled-up.svg'
@@ -36,11 +37,13 @@ import iconMove from '../../assets/icon-move.svg'
 import iconPlus from '../../assets/icon-plus.svg'
 import iconQuestionCircle from '../../assets/icon-question-circle.svg'
 import iconRotateLeft from '../../assets/icon-rotate-left.svg'
+import iconSquareGrid from '../../assets/icon-square-grid.svg'
 import iconUpload from '../../assets/icon-upload.svg'
 import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 
-import '../../styles/v2/components/ui/icon.scss'
+// Styles
+import '../../styles/components/ui/icon.scss'
 
 const iconHash = {
   'caretDown': iconCaretDown,
@@ -78,6 +81,7 @@ const iconHash = {
   'plus': iconPlus,
   'questionCircle': iconQuestionCircle,
   'rotateLeft': iconRotateLeft,
+  'squareGrid': iconSquareGrid,
   'upload': iconUpload,
   'warningCircle': iconWarningCircle,
   'warningTriangle': iconWarningTriangle

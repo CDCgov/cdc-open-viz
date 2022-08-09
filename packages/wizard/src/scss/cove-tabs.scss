@@ -1,5 +1,5 @@
-@import "~@cdc/core/styles/v2/utils/variables";
-@import "~@cdc/core/styles/v2/themes/color-definitions";
+@import "~@cdc/core/styles/utils/variables";
+@import "~@cdc/core/styles/themes/color-definitions";
 
 .cove-tabs {
   height: 100%;
@@ -68,6 +68,10 @@
 
     &::after {
       display: none;
+    }
+
+    &:last-child {
+      border-right: none;
     }
 
     &.active {

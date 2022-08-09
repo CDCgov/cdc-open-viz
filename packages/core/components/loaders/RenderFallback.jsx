@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// Components
 import LoadSpin from '../ui/LoadSpin'
 
-import '../../styles/v2/components/ui/render.scss'
+// Styles
+import '../../styles/components/ui/render.scss'
 
 const RenderFallback = ({
                           fadeEffect = true,

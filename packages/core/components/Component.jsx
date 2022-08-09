@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import parse from 'html-react-parser'
 
-//Context
+// Context
 import { useGlobalContext } from '../context/GlobalContext'
 
-//Styles
-import '../styles/v2/components/component.scss'
+// Styles
+import '../styles/components/component.scss'
 
 const Component = (props) => {
   const { globalActions } = useGlobalContext()
@@ -17,7 +17,7 @@ const Component = (props) => {
       for (let entry of entries) {
         let { width, height } = entry.contentRect
 
-        globalActions.setGlobalContext(context => ({ ...context, dimensions: { width, height } }))
+        if (globalActions) globalActions.setGlobalContext(context => ({ ...context, dimensions: { width, height } }))
       }
     })
     if (node !== null) resizeComponentObserver.observe(node)

@@ -1,4 +1,6 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
+
+// Third Party
 import { useDebounce } from 'use-debounce'
 import {
   useTable,
@@ -9,14 +11,19 @@ import {
   usePagination
 } from 'react-table'
 
+// Helpers
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
+
+// Context
+import WizardContext from '../context/WizardContext'
+
+// Components
 import InputGroup from '@cdc/core/components/inputs/InputGroup'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 
-import WizardContext from '../context/WizardContext'
-
-import '@cdc/core/styles/v2/components/element/data-table.scss'
+// Styles
+import '@cdc/core/styles/components/element/data-table.scss'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
   const [ filterValue, setFilterValue ] = useState(globalFilter)
@@ -48,11 +55,11 @@ const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) =
 
 const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => (
   <header className="cove-data-table__header">
-    <div className="grid">
-      <div className="col-6">
+    <div className="cove-grid">
+      <div className="cove-grid__col--6">
         <h2 className="cove-heading--2 align-self-center mb-0">Data Preview</h2>
       </div>
-      <div className="col-6">
+      <div className="cove-grid__col--6">
         <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
       </div>
     </div>

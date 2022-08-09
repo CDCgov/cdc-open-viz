@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
-//Context
+// Context
 import { useConfigContext } from '../../context/ConfigContext'
 
-//Helpers
+// Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
 
-//Components
+// Components
 import Label from '../elements/Label'
 
-//Styles
-import '../../styles/v2/components/input/index.scss'
+// Styles
+import '../../styles/components/input/index.scss'
 
 const InputSlider = (
   {

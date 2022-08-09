@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react'
 
-//Third party
+// Third party
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
-//Hooks
+// Hooks
 import useColorPalette from '../hooks/useColorPalette'
 import useReduceData from '../hooks/useReduceData'
 
-//Helpers
-import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
-
-//Context
+// Context
 import { useConfigContext } from '@cdc/core/context/ConfigContext'
 
-//Components
+// Helpers
+import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
+
+// Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import ColorPicker from '@cdc/core/components/ui/ColorPicker'
@@ -61,20 +61,20 @@ const Regions = () => {
           }}>Remove</Button>
           <InputText label="Region Label" configField="label" i={index}/>
 
-          <div className="grid grid-gap-2">
-            <div className="col-6">
+          <div className="cove-grid cove-grid--gap--2">
+            <div className="cove-grid__col--6">
               <InputText label="Text Color" fieldName="color" onChange={(e) => regionUpdate('color', e.target.value, index)}/>
             </div>
-            <div className="col-6">
+            <div className="cove-grid__col--6">
               <InputText label="Background" fieldName="background" onChange={(e) => regionUpdate('background', e.target.value, index)}/>
             </div>
           </div>
 
-          <div className="grid grid-gap-2">
-            <div className="col-6">
+          <div className="cove-grid cove-grid--gap--2">
+            <div className="cove-grid__col--6">
               <InputText label="From Value" fieldName="from" onChange={(e) => regionUpdate('from', e.target.value, index)}/>
             </div>
-            <div className="col-6">
+            <div className="cove-grid__col--6">
               <InputText label="To Value" fieldName="to" onChange={(e) => regionUpdate('to', e.target.value, index)}/>
             </div>
           </div>
@@ -91,11 +91,21 @@ const Regions = () => {
 }
 
 const EditorPanels = () => {
-  const { config, configActions, data, missingRequiredSections } = useConfigContext()
+  const { config, configActions, data } = useConfigContext()
 
   const [ warningMsg, updateWarningMsg ] = useState({ maxMsg: '', minMsg: '' })
   const { minValue, maxValue } = useReduceData(config, data)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
+
+  const requiredSections = [
+    (!config.series || config.series.length === 0) || (config.visualizationType === 'Paired Bar' && config.series.length < 2),
+    config.visualizationType === 'Pie' && !config.yAxis.dataKey,
+    config.xAxis.dataKey
+  ]
+
+  useEffect(() => {
+    if (requiredSections) configActions.setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+  }, [ config ])
 
   useEffect(() => {
     if (paletteName) {
@@ -106,13 +116,6 @@ const EditorPanels = () => {
   useEffect(() => {
     dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
   }, [ dispatch, config.palette ])
-
-  /*useEffect(() => {
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
-  }, [ config ])*/
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
@@ -332,13 +335,6 @@ const EditorPanels = () => {
   const showLollipopCheckbox = () => {
     // When to show lollipop checkbox. Update as the need grows (ie. vertical bars, diverging, etc.)
     return config.visualizationType === 'Bar' && (config.orientation === 'horizontal' || config.orientation === 'regular') && config.visualizationSubType !== 'stacked'
-  }
-
-  const convertStateToConfig = () => {
-    let strippedState = JSON.parse(JSON.stringify(config))
-    if (false === missingRequiredSections()) delete strippedState.newViz
-    delete strippedState.runtime
-    return strippedState
   }
 
   const ErrorWithLolliopChart = ({ message }) => {
@@ -565,8 +561,8 @@ const EditorPanels = () => {
         <InputCheckbox className="mt-1" label="Add commas" configField={[ 'dataFormat', 'commas' ]}/>
         <InputText label="Round to decimal point" type="number" min={0} configField={[ 'dataFormat', 'roundTo' ]}/>
 
-        <div className="grid grid-gap-2">
-          <div className="col-6">
+        <div className="cove-grid cove-grid--gap--2">
+          <div className="cove-grid__col--6">
             <InputText label="Prefix" tooltip={
               <>
                 {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
@@ -574,7 +570,7 @@ const EditorPanels = () => {
               </>
             } configField={[ 'dataFormat', 'prefix' ]}/>
           </div>
-          <div className="col-6">
+          <div className="cove-grid__col--6">
             <InputText label="Suffix" tooltip={
               <>
                 {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}

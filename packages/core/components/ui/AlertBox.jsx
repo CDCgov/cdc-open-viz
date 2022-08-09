@@ -1,7 +1,10 @@
 import React from 'react'
+
+// Third Party
 import PropTypes from 'prop-types'
 
-import '../../styles/v2/components/ui/alert.scss'
+// Styles
+import '../../styles/components/ui/alert.scss'
 
 const AlertBox = ({type = 'primary', inline = false, children}) => {
   return (

@@ -7,12 +7,12 @@ import { useConfigContext } from '../../context/ConfigContext'
 //Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
 
-//Components
+// Components
 import Icon from '../ui/Icon'
 import Label from '../elements/Label'
 
-//Styles
-import '../../styles/v2/components/input/index.scss'
+// Styles
+import '../../styles/components/input/index.scss'
 
 const InputCheckbox = (
   {

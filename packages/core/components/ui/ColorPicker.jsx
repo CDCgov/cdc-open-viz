@@ -1,11 +1,14 @@
 import React from 'react'
 
+// Context
 import { useConfigContext } from '../../context/ConfigContext'
 
+// Components
 import Label from '../elements/Label'
 import Tooltip from './Tooltip'
 
-import '../../styles/v2/components/ui/color-picker.scss'
+// Styles
+import '../../styles/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
   const { config, configActions } = useConfigContext()

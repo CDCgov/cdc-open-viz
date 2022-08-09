@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 // Context
-import { useGlobalContext } from '@cdc/core/context/GlobalContext'
+import { ConfigContextProvider } from '@cdc/core/context/ConfigContext'
 
 // Data
 import defaults from './data/initial-state'
@@ -21,34 +21,52 @@ import EditorPanels from './components/EditorPanels'
 // Styles
 import './scss/cove-waffle-chart.scss'
 
-// Visualization
-const CdcWaffleChart = ({ configObj, configUrlObj }) => {
-  const { view } = useGlobalContext()
-
+const DataProxy = ({ configObj, configUrlObj, setParentConfig, editorMode, isConsumed }) => {
   const [ loadingConfig, reloadConfig ] = useLoadConfig(configObj, configUrlObj, defaults)
 
   useEffect(() => {
     reloadConfig()
   }, [ configObj, configUrlObj ])
 
+  return (<>
+    {isConsumed ?
+      <>
+        {loadingConfig ?
+          <Ghost display="editor"/> :
+          <Editor EditorPanels={EditorPanels} setParentConfig={setParentConfig}>
+            <WaffleChart/>
+          </Editor>
+        }
+      </> :
+      <>
+        {editorMode ?
+          <>
+            {loadingConfig ?
+              <Ghost display="editor"/> :
+              <Editor EditorPanels={EditorPanels}>
+                <WaffleChart/>
+              </Editor>
+            }
+          </> :
+          <>
+            {loadingConfig ?
+              <></> :
+              <WaffleChart/>
+            }
+          </>
+        }
+      </>
+    }
+  </>)
+}
+
+// Visualization
+const CdcWaffleChart = ({ configObj, configUrlObj, setConfig: setParentConfig, editorMode, isConsumed }) => {
   return (
     <ErrorBoundary component="CdcWaffleChart">
-      {view === 'editor' ?
-        <>
-          {loadingConfig ?
-            <Ghost display="editor"/> :
-            <Editor EditorPanels={EditorPanels}>
-              <WaffleChart/>
-            </Editor>
-          }
-        </> :
-        <>
-          {loadingConfig ?
-            <></> :
-            <WaffleChart/>
-          }
-        </>
-      }
+      <ConfigContextProvider>
+        <DataProxy configObj={configObj} configUrlObj={configUrlObj} setParentConfig={setParentConfig} editorMode={editorMode} isConsumed={isConsumed}/>
+      </ConfigContextProvider>
     </ErrorBoundary>
   )
 }

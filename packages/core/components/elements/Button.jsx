@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
+// Components
 import LoadSpin from '../ui/LoadSpin'
 
-import '../../styles/v2/components/element/button.scss'
+// Styles
+import '../../styles/components/element/button.scss'
 
 const Button = ({
                   style,

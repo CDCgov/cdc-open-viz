@@ -1,7 +1,10 @@
 import React from 'react'
+
+// Third Party
 import ReactTooltip from 'react-tooltip'
 
-import '../../styles/v2/components/ui/tooltip.scss'
+// Styles
+import '../../styles/components/ui/tooltip.scss'
 
 const TooltipTarget = () => null
 const TooltipContent = () => null

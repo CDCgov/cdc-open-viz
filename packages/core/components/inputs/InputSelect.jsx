@@ -1,17 +1,17 @@
 import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-//Context
+// Context
 import { useConfigContext } from '../../context/ConfigContext'
 
-//Helpers
+// Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
 
-//Components
+// Components
 import Label from '../elements/Label'
 
-//Styles
-import '../../styles/v2/components/input/index.scss'
+// Styles
+import '../../styles/components/input/index.scss'
 
 const InputSelect = (
   {
@@ -53,7 +53,7 @@ const InputSelect = (
 
   //Add custom, initial option
   if (optionsJsx && (initial || initialDisabled)) optionsJsx.unshift(
-    <option value="" hidden={initialDisabled || null} disabled={initialDisabled || null} key="default">{initial}</option>
+    <option value="" hidden={(initialDisabled && value !== '') || null} disabled={initialDisabled || null} key="default">{initial}</option>
   )
 
   const isInitial = (checkValue) => {
@@ -87,7 +87,7 @@ const InputSelect = (
         </Label>
       }
       {optionsJsx ?
-        <select className={`cove-input${required && !inlineValue ? ' cove-input--warning' : ''}${className ? ' ' + className : ''}`}
+        <select className={`cove-input${required && (value === undefined || value === '') ? ' cove-input--error' : ''}${className ? ' ' + className : ''}`}
                 value={value} onChange={(e) => onChangeHandler(e)} {...attributes}
                 ref={inputRef}
         >

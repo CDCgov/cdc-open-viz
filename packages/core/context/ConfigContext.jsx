@@ -46,9 +46,9 @@ export const ConfigContextProvider = ({ children }) => {
     // then push the runtime function to ConfigContext
     if (runtimeInjection && !configRuntime) setConfigRuntime(() => runtimeInjection)
 
-    //TODO: COVE Refactor - Use newData variable as base to filter and exclude returned data
-    //setExcludedData
-    //setFilteredData
+    // TODO: COVE Refactor - Use newData variable as base to filter and exclude returned data
+    // setExcludedData
+    // setFilteredData
 
     setConfig({ ...newConfig })
   }
@@ -62,7 +62,7 @@ export const ConfigContextProvider = ({ children }) => {
     updateConfig(newConfig)
   }
 
-  //Build Context
+  // Build Context
   const configContext = {
     config,
     configDefaults,

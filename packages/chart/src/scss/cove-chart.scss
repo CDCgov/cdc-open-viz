@@ -1,6 +1,6 @@
-@import '~@cdc/core/styles/v2/utils/_variables.scss';
-@import '~@cdc/core/styles/v2/themes/_color-definitions.scss';
-@import '~@cdc/core/styles/v2/utils/_breakpoints.scss';
+@import '~@cdc/core/styles/utils/_variables.scss';
+@import '~@cdc/core/styles/themes/_color-definitions.scss';
+@import '~@cdc/core/styles/utils/_breakpoints.scss';
 
 .cove-chart {}
 
@@ -97,8 +97,11 @@
   }
 
   @at-root {
-    .cove-chart__legend-container #{&}:last-of-type {
-      margin-bottom: 0 !important; //Needed to override visx
+    .cove-chart__legend-container:not(.reverse) #{&}:last-of-type {
+      margin-bottom: 0 !important; //Override visx
+    }
+    .cove-chart__legend-container.reverse #{&}:first-of-type {
+      margin-bottom: 0 !important; //Override visx - reverse
     }
   }
 }
@@ -116,5 +119,11 @@
 
   &:hover {
     background: rgba(0, 0, 0, .15);
+  }
+}
+
+.cove-chart__visualization {
+  .visx-axis-bottom .bottom-axis > .visx-line {
+    shape-rendering: geometricprecision; //Resolve issue with bottom axis line disappearing at certain widths
   }
 }
