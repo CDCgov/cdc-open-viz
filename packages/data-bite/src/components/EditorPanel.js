@@ -369,6 +369,7 @@ const EditorPanel = memo(() => {
                     </li>
                   </ul>
                   <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
+                  <CheckBox value={config.dataFormat.ignoreZeros} section="dataFormat" fieldName="ignoreZeros" label="Ignore Zeros" updateField={updateField} />
                   <hr className="accordion__divider" />
 
                   <label style={{marginBottom: '1rem'}}>

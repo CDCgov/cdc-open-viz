@@ -170,6 +170,16 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return String(result)
     }
 
+    // filter null and 0 out from count data
+    const getColumnCount = (arr:(string|number)[]) => {
+      if(config.dataFormat.ignoreZeros) {
+        numericalData = numericalData.filter( item => item && item)
+        return numericalData.length
+      } else {
+        return numericalData.length
+      }
+    }
+
     const getColumnSum = (arr:(string|number)[]) => {
       // first validation
       if(arr===undefined || arr===null){
@@ -296,7 +306,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
-        dataBite = numericalData.length;
+        dataBite = getColumnCount(numericalData);
         break;
       case DATA_FUNCTION_SUM:
         dataBite = getColumnSum(numericalData);
