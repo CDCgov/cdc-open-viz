@@ -173,6 +173,52 @@ const colorPalettes2 = {
     '#FF7F00',
     '#ACA9EB',
   ],
+  qualitative1: [
+    "#a6cee3",
+    "#1f78b4",
+    "#b2df8a",
+    "#33a02c",
+    "#fb9a99",
+    "#e31a1c",
+    "#6a3d9a",
+    "#cab2d6",
+    "#E31A90",
+    "#15017A",
+    "#C2C0FC",
+  ],
+
+  qualitative2: [
+    "#7fc97f",
+    "#beaed4",
+    "#ff9",
+    "#386cb0",
+    "#f0027f",
+    "#bf5b17",
+    "#666",
+    "#fedab8",
+  ],
+
+  qualitative3: [
+    "#1b9e77",
+    "#d95f02",
+    "#7570b3",
+    "#e7298a",
+    "#66a61e",
+    "#e6ab02",
+    "#a6761d",
+    "#666",
+  ],
+
+  qualitative4: [
+    "#e41a1c",
+    "#377eb8",
+    "#4daf4a",
+    "#984ea3",
+    "#ff7f00",
+    "#ff3",
+    "#a65628",
+    "#f781bf",
+  ],
 
   'sequential-blue': [
     '#C6DBEF',
