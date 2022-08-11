@@ -20,7 +20,6 @@
 .cove-waffle-chart__visualization {
   box-sizing: content-box;
   padding-right: 1rem;
-  margin-bottom: 1rem;
 }
 
 .cove-waffle-chart__data {
@@ -30,6 +29,7 @@
 }
 
 .cove-waffle-chart__subtext {
+  margin-top: 1rem;
   font-size: 0.75em;
   font-weight: bold;
   font-style: italic;

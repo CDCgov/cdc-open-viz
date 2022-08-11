@@ -23,6 +23,11 @@ const themeColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 const EditorPanels = () => {
   const { config, configActions, data } = useConfigContext()
 
+  // No sections required, setting to false
+  useEffect(() => {
+    configActions.setMissingRequiredSections(false)
+  }, [])
+
   useEffect(() => {
     //Verify comparate data type
     let operators = [ '<', '>', '<=', '>=' ]

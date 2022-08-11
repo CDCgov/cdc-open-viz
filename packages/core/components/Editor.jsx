@@ -25,7 +25,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
   const [ displayGrid, setDisplayGrid ] = useState(false)
   const [ viewportPreview, setViewportPreview ] = useState(null)
   const [ rotateAnimation, setRotateAnimation ] = useState(false)
-  const [ showConfirm, setShowConfirm ] = useState(false)
+  const [ showConfirm, setShowConfirm ] = useState()
 
   const [ previewDimensions, setPreviewDimensions ] = useState({})
 
@@ -36,30 +36,39 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
   const convertStateToConfig = () => {
     let strippedState = JSON.parse(JSON.stringify(config))
     delete strippedState.newViz
-
     return strippedState
   }
 
+  // Set and clean up the event listener for the hotkeys
   useEffect(() => {
     document.addEventListener('keydown', onKeypress)
     return () => document.removeEventListener('keydown', onKeypress)
   }, [])
 
+  // Toggle the grid display with the viewport preview
   useEffect(() => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [ viewportPreview ])
 
-  // If missing any required config settings,
-  // show the confirmation to set updated config
-  useEffect(() => {
-    if (missingRequiredSections) setShowConfirm(true)
-  }, [ missingRequiredSections ])
-
+  // Update the local config object, if the component config context changes
   useEffect(() => {
     setConfig({ ...contextConfig })
   }, [ contextConfig ])
 
-  // Pass config up to Wizard if needed
+  // If missing any required sections, enable the confirmation window,
+  // and keep active until receiving confirmation.
+  useEffect(() => {
+    if (missingRequiredSections === true) setShowConfirm(true)
+    if (missingRequiredSections === false && showConfirm === undefined) setShowConfirm(false)
+  }, [ missingRequiredSections, showConfirm ])
+
+  // If there is no longer a confirmation, update the component's config.
+  useEffect(() => {
+    if (showConfirm === false) configActions.updateConfig(convertStateToConfig())
+  }, [ showConfirm ])
+
+  // If a subcomponent of Wizard or Dashboard, pass config
+  // up to said parent, if the component's config is updated.
   useEffect(() => {
     if (setParentConfig) setParentConfig(convertStateToConfig())
   }, [ config ])
@@ -113,10 +122,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
   }
 
   const Confirm = () => {
-    const confirmDone = () => {
-      configActions.updateConfig(convertStateToConfig())
-      setShowConfirm(false)
-    }
+    const confirmDone = () => setShowConfirm(false)
 
     return (
       <section className="cove-splash__waiting">

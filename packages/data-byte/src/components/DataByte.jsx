@@ -85,32 +85,6 @@ const DataByte = () => {
     }
   }*/
 
-  /*const loadConfig = async () => {
-    let response = configObj || await (await fetch(configUrl)).json()
-
-    // If data is included through a URL, fetch that and store
-    let responseData = response.data ?? {}
-
-    if (response.dataUrl) {
-      let newData = await fetchRemoteData(response.dataUrl)
-
-      if (newData && response.dataDescription) {
-        newData = transform.autoStandardize(newData)
-        newData = transform.developerStandardize(newData, response.dataDescription)
-      }
-
-      if (newData) {
-        responseData = newData
-      }
-    }
-
-    response.data = responseData
-
-    updateConfig({ ...defaults, ...response })
-
-    setLoading(false)
-  }*/
-
   const calculateDataByte = () => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) return ''

@@ -252,7 +252,6 @@ const WaffleChart = () => {
 
   return (
     <Component className="cove-waffle-chart" title={title} theme={theme}>
-      {missingRequiredSections && <>Missing data in sections</>}
       {!missingRequiredSections && !config.newViz && (<>
         <div
           className={`cove-waffle-chart__container${orientation === 'vertical' ? ' cove-waffle-chart__container--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
