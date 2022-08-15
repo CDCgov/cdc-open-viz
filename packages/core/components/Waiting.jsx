@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/waiting.scss';
+//import '../styles/waiting.scss';
 
 export default ({ requiredColumns, className }) => (
   <section className={className}>

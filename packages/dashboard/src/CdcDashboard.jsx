@@ -19,7 +19,7 @@ import Dashboard from './components/Dashboard'
 import EditorPanels from './components/EditorPanels'
 
 // Styles
-import './scss/cove-markup-include.scss'
+//import './scss/cove-markup-include.scss'
 
 // Visualization
 const DataProxy = ({ configObj, configUrlObj, setParentConfig, editorMode, isConsumed }) => {

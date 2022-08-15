@@ -417,7 +417,7 @@
         }
         &:after {
           content: " ";
-          background: url('../images/inactive-checkmark.svg') no-repeat;
+          //background: url('../images/inactive-checkmark.svg') no-repeat;
           width: 14px;
           height: 14px;
           background-size: 14px;
@@ -462,7 +462,7 @@
           }
           &:after {
             content: " ";
-            background-image: url(../images/active-checkmark.svg);
+            //background-image: url(../images/active-checkmark.svg);
             opacity: 1;
             transition: .2s opacity;
           }

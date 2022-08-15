@@ -24,7 +24,7 @@ export default function DataTable() {
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
-  const DownloadButton = memo(({ data }: any) => {
+  const DownloadButton = memo(({ data }) => {
     const fileName = `${config.title ? config.title.substring(0, 50) : 'cdc-open-viz'}.csv`;
 
     const csvData = Papa.unparse(data);
