@@ -412,16 +412,66 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const applyLocaleString = (value:string):string=>{
+    if(value===undefined || value===null) return ;
+    
+    if(Number.isNaN(value)|| typeof value ==='number') {
+    value = String(value)
+  }
+  const language = 'en-US'
+  let formattedValue = parseFloat(value).toLocaleString(language, {
+    useGrouping: true,
+    maximumFractionDigits: 6
+  })
+    // Add back missing .0 in e.g. 12.0
+  const match = value.match(/\.\d*?(0*)$/)
+
+  if (match){
+  formattedValue += (/[1-9]/).test(match[0]) ? match[1] : match[0]
+  };
+
+  return formattedValue as string
+}
+
+const applyPrecision =(value:number|string):string => {
+  // first validation
+    if(value === undefined || value===null){
+      console.error('Enter correct value to "applyPrecision()" function ')
+      return ;
+    }  
+    // second validation 
+    if(Number.isNaN(value)){
+    console.error(' Argunment isNaN, "applyPrecision()" function ')
+    return;
+    }
+  let result:number|string = value
+  let roundToPlace = Number(config.dataFormat.roundTo) // default equals to 0
+//  ROUND FIELD  going -1,-2,-3 numbers
+  if(roundToPlace<0) {
+    console.error(' ROUND field is below "0", "applyPrecision()" function ')
+    return;
+  }
+  if(typeof roundToPlace ==='number'  && roundToPlace > -1 ){
+    result = Number(result).toFixed(roundToPlace);   // returns STRING
+  }
+    return String(result)
+}
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+  
+    if(num === null || num ===undefined){
+      return  ""
+    }
+ 
     let original = num;
-    let prefix = config.dataFormat.prefix;
-    num = numberFromString(num);
-
     if(isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return
+      return 
     }
+
+    let prefix = config.dataFormat.prefix;
+    num = numberFromString(String(num));
 
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
@@ -432,12 +482,12 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+   if (config.dataFormat.roundTo) num = applyPrecision(num)
+   if (config.dataFormat.commas) num = applyLocaleString(num)
 
     let result = ""
 
-    if(prefix) {
+    if(prefix) { 
       result += prefix
     }
 
@@ -447,7 +497,7 @@ export default function CdcChart(
       result += config.dataFormat.suffix
     }
 
-    return result
+    return String(result)
   };
 
   // Destructure items from config for more readable JSX
