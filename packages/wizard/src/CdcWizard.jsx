@@ -75,7 +75,7 @@ const CdcWizard = ({ configObj = { newViz: true }, configUrlObj, hostname, conta
     fileTooLarge: `File is too large. Maximum file size is ${maxFileSize}MB.`
   }
 
-  const state = {
+  const wizardContext = {
     containerEl,
     errors,
     errorMessages,
@@ -88,7 +88,7 @@ const CdcWizard = ({ configObj = { newViz: true }, configUrlObj, hostname, conta
 
   return (
     <ErrorBoundary component="CdcWizard">
-      <WizardContext.Provider value={state}>
+      <WizardContext.Provider value={wizardContext}>
         {loadingConfig ? <></> : <Wizard hostname={hostname} containerEl={containerEl}/>}
       </WizardContext.Provider>
       <OverlayFrame/>

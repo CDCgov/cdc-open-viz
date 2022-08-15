@@ -97,10 +97,11 @@ const EditorPanels = () => {
   const { minValue, maxValue } = useReduceData(config, data)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
 
+  // Requred sections target evaluation is truthy
   const requiredSections = [
-    (!config.series || config.series.length === 0) || (config.visualizationType === 'Paired Bar' && config.series.length < 2),
-    config.visualizationType === 'Pie' && !config.yAxis.dataKey,
-    config.xAxis.dataKey
+    config.visualizationType === 'Paired Bar' ? config.series.length < 2 : (config.series && config.series.length > 0), // If paired bar chart and length is less than 2, or if config has series + minimum one item
+    config.visualizationType === 'Pie' ? !!config.yAxis.dataKey : true, // If Pie chart, and yAxis data key exists, else just resolve true
+    !!config.xAxis.dataKey // If datakey exists and is not empty, null, or undefined
   ]
 
   useEffect(() => {
@@ -157,20 +158,11 @@ const EditorPanels = () => {
     }
   }, [ data, minValue ])
 
-  const filterOptions = [
-    {
-      label: 'Ascending Alphanumeric',
-      value: 'asc'
-    },
-    {
-      label: 'Descending Alphanumeric',
-      value: 'desc'
-    },
-    {
-      label: 'Custom',
-      value: 'cust'
-    }
-  ]
+  const filterOptions = {
+    'asc': 'Ascending Alphanumeric',
+    'desc': 'Descending Alphanumeric',
+    'cust': 'Custom'
+  }
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle,
@@ -407,7 +399,7 @@ const EditorPanels = () => {
         return { ...presMsg, maxMsg: 'Value must be more than or equal to 0' }
       })
     }
-    console.log('running updateField')
+
     configActions.updateField([section, 'max'], value)
 
     if (!enteredValue.length) {
@@ -449,7 +441,7 @@ const EditorPanels = () => {
         })
       }
     }
-    console.log('running updateField')
+
     configActions.updateField([section, 'min'], value)
 
     if (!enteredValue.length) {
@@ -528,7 +520,7 @@ const EditorPanels = () => {
       {/*TODO: COVE Refactor - This is broken*/}
       <InputSelect label="Add Data Series" options={getColumns()} initial="Select" initialSnap={true} onChange={(e) => {
         if (e.target.value !== '' && e.target.value !== 'Select') addNewSeries(e.target.value)
-      }}/>
+      }} required={(!config.series || config.series.length === 0)}/>
 
       {config.series && config.series.length <= 1 && config.visualizationType === 'Bar' && (
         <>
@@ -736,7 +728,7 @@ const EditorPanels = () => {
             removeFilter(index)
           }}>Remove</Button>
 
-          <InputSelect label="Filter" options={getColumns()} initial="- Select Option -" onChange={(e) => {
+          <InputSelect label="Filter" options={getColumns()} initial="Select Option" onChange={(e) => {
             updateFilterProp('columnName', index, e.target.value)
           }} value={filter.columnName}/>
 
@@ -788,7 +780,7 @@ const EditorPanels = () => {
       {!config.filters &&
         <p className="mb-2" style={{ textAlign: 'center' }}>There are currently no filters.</p>
       }
-      <Button onClick={addNewFilter} fluid>Add Filter</Button>
+      <Button onClick={() => addNewFilter()} fluid>Add Filter</Button>
     </Accordion.Section>
   )
 

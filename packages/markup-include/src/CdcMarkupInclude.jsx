@@ -13,10 +13,11 @@ import useLoadConfig from '@cdc/core/hooks/useLoadConfig'
 import Editor from '@cdc/core/components/Editor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Ghost from '@cdc/core/components/elements/Ghost'
+import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 
 // Components - Local
-import MarkupInclude from './components/MarkupInclude'
 import EditorPanels from './components/EditorPanels'
+import MarkupInclude from './components/MarkupInclude'
 
 // Styles
 import './scss/cove-markup-include.scss'
@@ -66,6 +67,7 @@ const CdcMarkupInclude = ({ configObj, configUrlObj, setConfig: setParentConfig,
     <ErrorBoundary component="CdcMarkupInclude">
       <ConfigContextProvider>
         <DataProxy configObj={configObj} configUrlObj={configUrlObj} setParentConfig={setParentConfig} editorMode={editorMode} isConsumed={isConsumed}/>
+        <OverlayFrame/>
       </ConfigContextProvider>
     </ErrorBoundary>
   )

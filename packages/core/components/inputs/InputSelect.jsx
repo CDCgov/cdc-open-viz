@@ -24,13 +24,13 @@ const InputSelect = (
     tooltip,
 
     configField,
-    value: inlineValue,
+    value: inlineValue = '',
     onChange, className, ...attributes
   }
 ) => {
   const { config, configActions } = useConfigContext()
 
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) || '' : inlineValue)
 
   const inputRef = useRef(null)
 
@@ -41,7 +41,6 @@ const InputSelect = (
     // Handle an Array entry
     optionsJsx = options.map((option, index) => <option value={option} key={index}>{option}</option>)
   } else if (options === Object(options)) {
-    // All arrays are objects, but not all objects are arrays.
     // Validate that the remaining non-array value is an object type
     // and handle an Object entry using its key/value pairs.
     let optionsArr = []
@@ -73,6 +72,8 @@ const InputSelect = (
     }
 
     // Resets selected option to default if initialSnap is set
+    // Used for multiple select options to add one, snap back to start, and allow another option to be selected;
+    // Examples: adding filtered data keys, attaching multiple data sets, etc.
     if (initialSnap && isInitial('')) setValue('')
   }
 

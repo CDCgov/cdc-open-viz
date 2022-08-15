@@ -13,10 +13,11 @@ import useLoadConfig from '@cdc/core/hooks/useLoadConfig'
 import Editor from '@cdc/core/components/Editor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Ghost from '@cdc/core/components/elements/Ghost'
+import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 
 // Components - Local
-import WaffleChart from './components/WaffleChart'
 import EditorPanels from './components/EditorPanels'
+import WaffleChart from './components/WaffleChart'
 
 // Styles
 import './scss/cove-waffle-chart.scss'
@@ -66,6 +67,7 @@ const CdcWaffleChart = ({ configObj, configUrlObj, setConfig: setParentConfig, e
     <ErrorBoundary component="CdcWaffleChart">
       <ConfigContextProvider>
         <DataProxy configObj={configObj} configUrlObj={configUrlObj} setParentConfig={setParentConfig} editorMode={editorMode} isConsumed={isConsumed}/>
+        <OverlayFrame/>
       </ConfigContextProvider>
     </ErrorBoundary>
   )

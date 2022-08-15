@@ -7,8 +7,8 @@ import Overlay from './Overlay'
 const OverlayFrame = () => {
   const { overlay } = useGlobalContext()
   return (
-    <Overlay disableBgClose={overlay.disableBgClose}>
-      { overlay.object }
+    <Overlay disableBgClose={overlay?.disableBgClose}>
+      { overlay?.object }
     </Overlay>
   )
 }
