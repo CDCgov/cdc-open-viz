@@ -341,11 +341,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
           // Optional 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
-     return dataBite
+     return dataFormat.prefix + dataBite + dataFormat.suffix
     } else { 
       //Rounding and formatting for ranges happens earlier.
 
-      return dataBite
+      return dataFormat.prefix + dataBite + dataFormat.suffix
     }
   }
 
