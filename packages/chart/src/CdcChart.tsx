@@ -440,9 +440,8 @@ const match = value.match(/\.\d*?(0*)$/)
     num = numberFromString(num);
     
     if(isNaN(num)) {
-      console.log(num)
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return num
+      return 
     }
 
     if (!config.dataFormat) return num;
