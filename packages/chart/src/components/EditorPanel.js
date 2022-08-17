@@ -38,7 +38,6 @@ const TextField = memo(({label, tooltip, section = null, subsection = null, fiel
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
   const onChange = (e) => {
-
     if ('number' !== type || min === null) {
       setValue(e.target.value)
     } else {
@@ -309,19 +308,25 @@ const EditorPanel = () => {
   const addNewFilter = () => {
     let filters = config.filters ? [ ...config.filters ] : []
 
-    filters.push({ values: [] })
+    filters.push({ values: [] });
 
-    updateConfig({ ...config, filters })
+    updateConfig({ ...config, filters });
   }
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [ ...config.series ] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
-    updateConfig({ ...config, series: newSeries })
+    newSeries.push({ dataKey: seriesKey, type: 'Bar' });
+    updateConfig({ ...config, series: newSeries });
+  }
+
+  const sortSeries = (e) => {
+    const series = config.series[0].dataKey
+    const sorted = data.sort((a, b) => a[series] - b[series]);
+    const newData = e === "asc" ? sorted : sorted.reverse();
+    updateConfig({ ...config }, newData);
   }
 
   const removeSeries = (seriesKey) => {
-
 
     let series = [ ...config.series ]
     let seriesIndex = -1
@@ -422,7 +427,6 @@ const EditorPanel = () => {
     return unique ? [ ...new Set(values) ] : values
   }
 
- 
   const showBarStyleOptions = ()=>{
     if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation==='horizontal' || config.orientation==='vertical') ) {
       return ['flat','rounded','lollipop']
@@ -537,8 +541,8 @@ const EditorPanel = () => {
       </section>
     )
   }
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
 
+  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [ movedItem ] = filterOrder.splice(idx1, 1)
     filterOrder.splice(idx2, 0, movedItem)
@@ -601,7 +605,7 @@ const EditorPanel = () => {
 
 useEffect(()=>{
   validateMinValue();
-   validateMaxValue();
+  validateMaxValue();
 },[minValue,maxValue,config]);
 
   return (
@@ -792,6 +796,14 @@ useEffect(()=>{
                         <Select value={config.confidenceKeys.lower || ''} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()}/>
                       </>
                     )}
+
+                    <Select
+                      fieldName="visualizationType"
+                      label="Rank by Value"
+                      initial="Select"
+                      onChange={(e) => sortSeries(e.target.value)}
+                      options={['asc', 'desc']} />
+                    
                   </AccordionItemPanel>
                 </AccordionItem>
               }

@@ -205,6 +205,7 @@ export default function CdcChart(
         }
       }
     }
+    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -218,6 +219,7 @@ export default function CdcChart(
           add = false;
         }
       });
+
       if(add) filteredData.push(row);
     });
     return filteredData;
@@ -399,9 +401,10 @@ export default function CdcChart(
       maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
     };
 
+    if (typeof num === "string") return num;
     num = numberFromString(num);
-
-    if(isNaN(num)) {
+    
+    if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
       return
     }
@@ -410,8 +413,7 @@ export default function CdcChart(
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
+      if(num < cutoff) { 
         num = cutoff;
       }
     }
