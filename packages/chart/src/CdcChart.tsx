@@ -390,32 +390,6 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
-  const applyLocaleString = (value: string): string => {
-    if (value === undefined || value === null) return;
-
-    if (Number.isNaN(value) || typeof value === "number") {
-      value = String(value);
-    }
-
-    const language = "en-US";
-
-    let formattedValue = parseFloat(value).toLocaleString(language, {
-      useGrouping: true,
-
-      maximumFractionDigits: 6,
-    });
-
-    // Add back missing .0 in e.g. 12.0
-
-    const match = value.match(/\.\d*?(0*)$/);
-
-    if (match) {
-      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
-    }
-
-    return formattedValue as string;
-  };
-
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
     let original = num;
@@ -428,7 +402,7 @@ export default function CdcChart(
     };
 
     if (typeof num === "string") return num;
-    num = applyLocaleString(num);
+    num = numberFromString(num);
     
     if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
