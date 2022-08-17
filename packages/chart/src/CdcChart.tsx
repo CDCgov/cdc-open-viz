@@ -29,8 +29,8 @@ import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
 ) {
 
   const transform = new DataTransform();
@@ -52,19 +52,25 @@ export default function CdcChart(
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const cacheBustingString = () => {
+      const round = 1000 * 60 * 15;
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+  }
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
+    if (response.dataUrl) {
+
       try {
         const regex = /(?:\.([^.]+))?$/
 
         const ext = (regex.exec(response.dataUrl)[1])
         if ('csv' === ext) {
-            data = await fetch(response.dataUrl)
+            data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
                 .then(response => response.text())
                 .then(responseText => {
                     const parsedCsv = Papa.parse(responseText, {
@@ -77,7 +83,7 @@ export default function CdcChart(
         }
 
         if ('json' === ext) {
-            data = await fetch(response.dataUrl)
+            data = await fetch(response.dataUrl  + `?v=${cacheBustingString()}`)
                 .then(response => response.json())
         }
       } catch {
