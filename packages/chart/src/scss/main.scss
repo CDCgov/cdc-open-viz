@@ -346,3 +346,13 @@
     margin: 0.25em;
   }
 }
+
+.isEditor.type-sparkline .cdc-chart-inner-container {
+    margin: 3em auto 0;
+    max-width: 60%;
+}
+
+.type-sparkline.isEditor {
+  position: relative;
+
+}

@@ -26,6 +26,8 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
+import SparkLine from './components/SparkLine';
+
 import './scss/main.scss';
 
 export default function CdcChart(
@@ -455,6 +457,7 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
+    'Spark Line' : <SparkLine />,
     'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
@@ -647,7 +650,7 @@ export default function CdcChart(
           <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
             {chartComponents[visualizationType]}
             {/* Legend */}
-            {!config.legend.hide && <Legend />}
+            {(!config.legend.hide && config.visualizationType !== "Spark Line") && <Legend />}
           </div>
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
@@ -658,7 +661,12 @@ export default function CdcChart(
     )
   }
 
+  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
+  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
+
   const contextValues = {
+    getXAxisData,
+    getYAxisData,
     config,
     rawData: stateData ?? {},
     excludedData: excludedData,
@@ -683,7 +691,7 @@ export default function CdcChart(
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize} ${config.visualizationType === "Spark Line" && `type-sparkline`} ${isEditor && `isEditor spacing-wrapper`}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
         {body}
       </div>
     </Context.Provider>

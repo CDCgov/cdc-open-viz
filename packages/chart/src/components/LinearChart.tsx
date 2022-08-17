@@ -11,6 +11,7 @@ import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
 import PairedBarChart from './PairedBarChart';
+import SparkLine from './SparkLine';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -91,25 +92,25 @@ export default function LinearChart() {
     }
 
       
-  if(config.visualizationType === 'Paired Bar') {
+    if(config.visualizationType === 'Paired Bar') {
 
 
-    let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
-    let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
+      let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
+      let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
 
-    // group one
-    var g1xScale = scaleLinear<number>({
-      domain: [0, Math.max(groupOneMax,groupTwoMax) ],
-      range: [xMax/2, 0]
-    })
-  
-    // group 2
-    var g2xScale = scaleLinear<number>({
-      domain: g1xScale.domain(),
-      range: [xMax / 2, xMax]
-    })
+      // group one
+      var g1xScale = scaleLinear<number>({
+        domain: [0, Math.max(groupOneMax,groupTwoMax) ],
+        range: [xMax/2, 0]
+      })
+    
+      // group 2
+      var g2xScale = scaleLinear<number>({
+        domain: g1xScale.domain(),
+        range: [xMax / 2, xMax]
+      })
 
-  }
+    }
   }
 
   
@@ -158,108 +159,110 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
+          {config.visualizationType !== "Spark Line" &&
             <AxisLeft
-            scale={yScale}
-            left={config.runtime.yAxis.size}
-            label={config.runtime.yAxis.label}
-            stroke="#333"
-            numTicks={config.runtime.yAxis.numTicks || undefined}
-          >
-            {props => {
-              const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
-              const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
-              const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
-              const belowBarPaddingFromTop = 9;
-              return (
-                <Group className="left-axis">
-                  {props.ticks.map((tick, i) => {
-                    return (
-                      <Group
-                        key={`vx-tick-${tick.value}-${i}`}
-                        className={'vx-axis-tick'}
-                      >
-                        {!config.runtime.yAxis.hideTicks && (
-                        <Line
-                          from={tick.from}
-                          to={tick.to}
-                          stroke="#333"
-                          display={config.runtime.horizontal ? 'none' : 'block'}
-                        />
-                        )}
-                        { config.runtime.yAxis.gridLines ? (
+              scale={yScale}
+              left={config.runtime.yAxis.size}
+              label={config.runtime.yAxis.label}
+              stroke="#333"
+              numTicks={config.runtime.yAxis.numTicks || undefined}
+            >
+              {props => {
+                const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
+                const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+                const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
+                const belowBarPaddingFromTop = 9;
+                return (
+                  <Group className="left-axis">
+                    {props.ticks.map((tick, i) => {
+                      return (
+                        <Group
+                          key={`vx-tick-${tick.value}-${i}`}
+                          className={'vx-axis-tick'}
+                        >
+                          {!config.runtime.yAxis.hideTicks && (
                           <Line
-                            from={{x: tick.from.x + xMax, y: tick.from.y}}
-                            to={tick.from}
-                            stroke="rgba(0,0,0,0.3)"
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'none' : 'block'}
                           />
-                          ) : ''
-                        }
+                          )}
+                          { config.runtime.yAxis.gridLines ? (
+                            <Line
+                              from={{x: tick.from.x + xMax, y: tick.from.y}}
+                              to={tick.from}
+                              stroke="rgba(0,0,0,0.3)"
+                            />
+                            ) : ''
+                          }
 
-                        {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
-                            // 17 is a magic number from the offset in barchart.
-                            <Fragment> 
-                            <Text
-                              transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
-                              textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
-                             </Fragment>
-                        }
+                          {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
+                              // 17 is a magic number from the offset in barchart.
+                              <Fragment> 
+                              <Text
+                                transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                                verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                                textAnchor={"end"}
+                              >{tick.formattedValue}</Text>
+                              </Fragment>
+                          }
 
-                        { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
-                            // 17 is a magic number from the offset in barchart.
-                            <Text
-                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
-                              textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
-                        }
+                          { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
+                              // 17 is a magic number from the offset in barchart.
+                              <Text
+                                transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                                verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                                textAnchor={"end"}
+                              >{tick.formattedValue}</Text>
+                          }
 
 
-                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
-                            <Text
-                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
-                              textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                            >
-                              {tick.formattedValue}
-                            </Text>
-                        }
+                          { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
+                              <Text
+                                x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                                y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                                verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                                textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                              >
+                                {tick.formattedValue}
+                              </Text>
+                          }
 
-                      </Group>
-                    );
-                  })}
-                  {!config.yAxis.hideAxis &&  (
-                  <Line
-                    from={props.axisFromPoint}
-                    to={props.axisToPoint}
-                    stroke="#333"
-                  />
-                  )}
-                  { yScale.domain()[0] < 0 && (
+                        </Group>
+                      );
+                    })}
+                    {!config.yAxis.hideAxis &&  (
                     <Line
-                      from={{x: props.axisFromPoint.x, y: yScale(0)}}
-                      to={{x: xMax, y: yScale(0)}}
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
                       stroke="#333"
                     />
-                  )}
-                  <Text
-                    className="y-label"
-                    textAnchor="middle"
-                    verticalAnchor="start"
-                    transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
-                    fontWeight="bold"
-                  >
-                    {props.label}
-                  </Text>
-                </Group>
-              );
-            }}
-          </AxisLeft>
+                    )}
+                    { yScale.domain()[0] < 0 && (
+                      <Line
+                        from={{x: props.axisFromPoint.x, y: yScale(0)}}
+                        to={{x: xMax, y: yScale(0)}}
+                        stroke="#333"
+                      />
+                    )}
+                    <Text
+                      className="y-label"
+                      textAnchor="middle"
+                      verticalAnchor="start"
+                      transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
+                      fontWeight="bold"
+                    >
+                      {props.label}
+                    </Text>
+                  </Group>
+                );
+              }}
+            </AxisLeft>
+          }
 
           {/* X axis */}
-          {config.visualizationType !== 'Paired Bar' && (
+          {config.visualizationType !== 'Paired Bar' && config.visualizationType !== "Spark Line" && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
