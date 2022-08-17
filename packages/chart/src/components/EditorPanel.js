@@ -661,7 +661,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
@@ -1299,7 +1299,9 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
-          <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          {config.type !== 'Spark Line' &&
+            <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          }
         </section>
       </section>
     </ErrorBoundary>
