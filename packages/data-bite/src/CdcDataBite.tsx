@@ -115,13 +115,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
+    const round = 1000 * 60 * 15;
+    const date = new Date();
+    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       let newData = await fetchRemoteData(response.dataUrl)
-
-      if(newData && response.dataDescription) {
+      
+      if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
           newData = transform.developerStandardize(newData, response.dataDescription);
       }
