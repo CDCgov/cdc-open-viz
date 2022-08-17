@@ -205,6 +205,7 @@ export default function CdcChart(
         }
       }
     }
+    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -218,6 +219,7 @@ export default function CdcChart(
           add = false;
         }
       });
+
       if(add) filteredData.push(row);
     });
     return filteredData;
@@ -388,6 +390,32 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const applyLocaleString = (value: string): string => {
+    if (value === undefined || value === null) return;
+
+    if (Number.isNaN(value) || typeof value === "number") {
+      value = String(value);
+    }
+
+    const language = "en-US";
+
+    let formattedValue = parseFloat(value).toLocaleString(language, {
+      useGrouping: true,
+
+      maximumFractionDigits: 6,
+    });
+
+    // Add back missing .0 in e.g. 12.0
+
+    const match = value.match(/\.\d*?(0*)$/);
+
+    if (match) {
+      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
+    }
+
+    return formattedValue as string;
+  };
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
     let original = num;
@@ -399,9 +427,10 @@ export default function CdcChart(
       maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
     };
 
-    num = numberFromString(num);
-
-    if(isNaN(num)) {
+    if (typeof num === "string") return num;
+    num = applyLocaleString(num);
+    
+    if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
       return
     }
@@ -410,8 +439,7 @@ export default function CdcChart(
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
+      if(num < cutoff) { 
         num = cutoff;
       }
     }
