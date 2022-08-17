@@ -55,10 +55,15 @@ export default function CdcChart(
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
+    const round = 1000 * 60 * 15;
+    const date = new Date();
+    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
+    if (response.dataUrl) {
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       try {
         const regex = /(?:\.([^.]+))?$/
 
