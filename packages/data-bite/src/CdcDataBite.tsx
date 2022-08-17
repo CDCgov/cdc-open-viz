@@ -121,8 +121,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
-    console.log()
-
     if (response.dataUrl) {
       response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       let newData = await fetchRemoteData(response.dataUrl);
