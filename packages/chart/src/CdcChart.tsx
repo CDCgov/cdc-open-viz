@@ -388,8 +388,15 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+    if(num === undefined || num ===null) return "";
+    // check if value contains any letters
+    if(/^[A-Za-z]+$/.test(num)) return String(num);
+    // check if value contains comma and remove it. later will add comma below.
+    if(/[,/]/g.test(num))  num = num.replaceAll(',', '');
+ 
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -403,7 +410,7 @@ export default function CdcChart(
 
     if(isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return
+      return num
     }
 
     if (!config.dataFormat) return num;
@@ -429,7 +436,7 @@ export default function CdcChart(
       result += config.dataFormat.suffix
     }
 
-    return result
+    return String(result)
   };
 
   // Destructure items from config for more readable JSX
