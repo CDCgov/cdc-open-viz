@@ -402,7 +402,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
+                            {formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
@@ -455,7 +455,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
+                            { formatNumber(tick.formattedValue)}
                           </Text>
                         }
                       </Group>
