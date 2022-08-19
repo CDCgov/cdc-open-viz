@@ -407,10 +407,7 @@ export default function CdcChart(
     if(/[A-Za-z]+/g.test(num)) return String(num);
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
-    //if(String(num).indexOf('-') !== -1)  num = num.replaceAll('-', '');
-    // let sliced =""
-    // num = num.replaceAll('-','')
-    
+  
     let original = num;
     let prefix = config.dataFormat.prefix;
 
