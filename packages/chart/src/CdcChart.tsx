@@ -384,6 +384,13 @@ export default function CdcChart(
     }
   };
 
+  function checkIfValidDate(str) {
+    // Regular expression to check if string is valid date
+    const regexExp = /(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/gi;
+  
+    return regexExp.test(str);
+  }
+
   const formatDate = (date: Date) => {
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
@@ -392,11 +399,16 @@ export default function CdcChart(
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
     if(num === undefined || num ===null) return "";
+    // check if value is Date format
+    if(checkIfValidDate(num)) return String(num)
     // check if value contains any letters
-    if(/^[A-Za-z]+$/.test(num)) return String(num);
+    if(/[A-Za-z]+/g.test(num)) return String(num);
     // check if value contains comma and remove it. later will add comma below.
-    if(/[,/]/g.test(num))  num = num.replaceAll(',', '');
- 
+    if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
+    //if(String(num).indexOf('-') !== -1)  num = num.replaceAll('-', '');
+    // let sliced =""
+    // num = num.replaceAll('-','')
+    
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -410,7 +422,7 @@ export default function CdcChart(
 
     if(isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return num
+      return 
     }
 
     if (!config.dataFormat) return num;
