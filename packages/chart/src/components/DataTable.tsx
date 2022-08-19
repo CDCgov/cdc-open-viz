@@ -169,7 +169,7 @@ export default function DataTable() {
                           : column.render('Header')
                         }
                         <button>
-                          <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                          <span className="cdcdataviz-sr-only">{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header') } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
                         </button>
                         <div {...column.getResizerProps()} className="resizer" />
                       </th>
