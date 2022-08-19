@@ -420,7 +420,6 @@ export default function CdcChart(
       maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
     };
 
-    if (typeof num === "string") return num;
     num = numberFromString(num);
     
     if (isNaN(num)) {
