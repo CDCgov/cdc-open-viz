@@ -3,6 +3,7 @@ import { animated, useTransition, interpolate } from 'react-spring';
 import ReactTooltip from 'react-tooltip';
 
 import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
+import chroma from "chroma-js";
 import { Group } from '@visx/group';
 import { Text } from '@visx/text';
 
@@ -22,6 +23,8 @@ export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
+
+  
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
@@ -45,6 +48,7 @@ export default function PieChart() {
         leave: enterUpdateTransition,
       },
     );
+
     return (
       <>
         {transitions.map(
@@ -89,24 +93,34 @@ export default function PieChart() {
             item: PieArcDatum<Datum>;
             props: PieStyles;
             key: string;
-          }) => {
+            }) => {
+           
             const [centroidX, centroidY] = path.centroid(arc);
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
+
+            let textColor = "#FFF";
+            if (chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
+              textColor = "000";
+            }
 
             return (
               <animated.g key={key}>
                 {hasSpaceForLabel && (
-
-                    <Text
-                      fill="white"
-                      x={centroidX}
-                      y={centroidY}
-                      dy=".33em"
-                      textAnchor="middle"
-                      pointerEvents="none"
-                    >
-                      {Math.round((arc.endAngle - arc.startAngle) * 180 / Math.PI / 360 * 100) + '%'}
-                    </Text>
+                  <Text
+                    style={{ fill: textColor }}
+                    x={centroidX}
+                    y={centroidY}
+                    dy=".33em"
+                    textAnchor="middle"
+                    pointerEvents="none"
+                  >
+                    {Math.round(
+                      (((arc.endAngle - arc.startAngle) * 180) /
+                        Math.PI /
+                        360) *
+                        100
+                    ) + "%"}
+                  </Text>
                 )}
               </animated.g>
             );
