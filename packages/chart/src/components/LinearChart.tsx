@@ -18,7 +18,7 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -202,7 +202,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                              </Fragment>
                         }
 
@@ -212,7 +212,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
 
@@ -223,7 +223,7 @@ export default function LinearChart() {
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {tick.formattedValue}
+                              {formatNumber(tick.value)}
                             </Text>
                         }
 
@@ -295,7 +295,7 @@ export default function LinearChart() {
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                         )}
 
@@ -358,7 +358,7 @@ export default function LinearChart() {
                           textAnchor={'end'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                       </Group>
                     );
