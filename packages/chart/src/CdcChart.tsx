@@ -418,8 +418,66 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const checkIfValidDate = (str)=> {
+    // Regular expression to check if string is valid date
+    const regexExp = /(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/gi;
+  
+    return regexExp.test(str);
+  };
+
+  const applyPrecision = (value: number | string): string => {
+    // first validation
+    if (value === undefined || value === null) {
+      console.error('Enter correct value to "applyPrecision()" function ');
+      return;
+    }
+    // second validation
+    if (Number.isNaN(value)) {
+      console.error(' Argunment isNaN, "applyPrecision()" function ');
+      return;
+    }
+    let result: number | string = value;
+    let roundToPlace = Number(config.dataFormat.roundTo)
+ 
+    if (roundToPlace < 0) {
+      console.error(' ROUND field is below "0", "applyPrecision()" function ');
+      return;
+    }
+    if (typeof roundToPlace === 'number' && roundToPlace > -1) {
+      result = Number(result).toFixed(roundToPlace); // returns STRING
+    }
+    return String(result);
+  };
+  
+  const applyLocaleString = (value: string): string => {
+    if (value === undefined || value === null) return;
+    if (Number.isNaN(value) || typeof value === 'number') {
+      value = String(value);
+    }
+    const language = 'en-US';
+    let formattedValue = parseFloat(value).toLocaleString(language, {
+      useGrouping: true,
+      maximumFractionDigits: 6,
+    });
+    // Add back missing .0 in e.g. 12.0
+    const match = value.match(/\.\d*?(0*)$/);
+  
+    if (match) {
+      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
+    }
+    return formattedValue;
+  };
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+        // check if value is Date format
+    if(checkIfValidDate(num)) return String(num)
+    // check if value contains any letters
+    if(/[A-Za-z]+/g.test(num)) return String(num);
+    // check if value contains comma and remove it. later will add comma below.
+    if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
+   
+
     let original = num;
     let prefix = config.dataFormat.prefix;
     num = numberFromString(num);
@@ -438,8 +496,8 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    if (config.dataFormat.roundTo) num =applyPrecision(num)
+    if (config.dataFormat.commas) num = applyLocaleString(num)
 
     let result = ""
 
@@ -452,7 +510,7 @@ export default function CdcChart(
     if(config.dataFormat.suffix) {
       result += config.dataFormat.suffix
     }
-
+  
     return result
   };
 
