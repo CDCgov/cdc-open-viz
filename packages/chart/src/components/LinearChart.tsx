@@ -234,7 +234,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                              </Fragment>
                         }
 
@@ -244,7 +244,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
                         { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.yAxis.hideLabel &&
@@ -253,7 +253,7 @@ export default function LinearChart() {
                               transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
 
@@ -264,7 +264,7 @@ export default function LinearChart() {
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {formatNumber(tick.formattedValue)}
+                              {formatNumber(tick.value)}
                             </Text>
                         }
 
@@ -402,7 +402,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
+                            {formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
@@ -455,7 +455,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : formatNumber(tick.formattedValue)}
+                            { formatNumber(tick.formattedValue)}
                           </Text>
                         }
                       </Group>

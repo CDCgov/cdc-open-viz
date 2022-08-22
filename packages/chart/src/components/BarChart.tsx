@@ -166,8 +166,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar, index) => {
                     
-                    let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index].name}`
+                    let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${formatNumber(data[bar.index][bar.key])}` : `${bar.key}: ${formatNumber(data[bar.index][bar.key])}`
+                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index][config.runtime.originalXAxis.dataKey]}`
+
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
@@ -247,7 +248,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                             }
                           >
-                            {  data[bar.index][bar.key]}
+                            { formatNumber( data[bar.index][bar.key])}
                           </Text>
                       }
                       </Group>

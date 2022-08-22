@@ -56,6 +56,6 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: {},
+  dataFormat: {commas:false,prefix:'',suffix:""},
   confidenceKeys: {}
 }
