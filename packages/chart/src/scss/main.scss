@@ -352,7 +352,15 @@
     max-width: 60%;
 }
 
+.cdc-open-viz-module.type-chart.lg.type-sparkline .chart-container > svg {
+  width: 100%;
+}
+
 .type-sparkline.isEditor {
   position: relative;
 
+}
+
+.type-sparkline .subtext {
+  margin-bottom: 15px;
 }

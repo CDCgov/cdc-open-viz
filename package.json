@@ -67,5 +67,8 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
+  },
+  "dependencies": {
+    "@visx/responsive": "^2.10.0"
   }
 }

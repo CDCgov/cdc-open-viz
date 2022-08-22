@@ -1,7 +1,7 @@
 {
 	"type": "chart",
 	"title": "Example Spark Line",
-	"theme": "theme-green",
+	"theme": "theme-blue",
 	"fontSize": "medium",
 	"height": "375",
 	"compact": true,
@@ -101,5 +101,6 @@
 			"dataKey": "Data 1",
 			"type": "Bar"
 		}
-	]
+	],
+	"description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
 }

@@ -7,6 +7,8 @@ import 'whatwg-fetch'
 
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
+
 import { timeParse, timeFormat } from 'd3-time-format';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
@@ -457,7 +459,6 @@ export default function CdcChart(
 
   // Select appropriate chart type
   const chartComponents = {
-    'Spark Line' : <SparkLine />,
     'Paired Bar' : <LinearChart />,
     'Bar' : <LinearChart />,
     'Line' : <LinearChart />,
@@ -630,6 +631,11 @@ export default function CdcChart(
   let lineDatapointClass = ''
   let barBorderClass = ''
 
+  let sparkLineStyles = {
+    width: '100%',
+    height: '150px',
+  }
+
   if(false === loading) {
     if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
     if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
@@ -648,14 +654,35 @@ export default function CdcChart(
           {config.filters && <Filters />}
           {/* Visualization */}
           <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
+            
+            {/* All charts except sparkline */}
+            {config.visualizationType !== "Spark Line" && 
+              chartComponents[visualizationType]
+            }
+
+            {/* Sparkline */}
+            {config.visualizationType === "Spark Line" && (
+              <div style={sparkLineStyles}>
+              <ParentSize>
+                {(parent) => (
+                  <>
+                    { description && <div className="subtext">{parse(description)}</div>}
+                    <SparkLine width={parent.width} height={parent.height} />
+                  </>
+                )}
+                </ParentSize>
+                </div>
+            )
+            }
+
+
             {/* Legend */}
             {(!config.legend.hide && config.visualizationType !== "Spark Line") && <Legend />}
           </div>
           {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
+          { (description && config.visualizationType !== "Spark Line") && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
+          { (config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line") && <DataTable />}
         </div>}
       </>
     )

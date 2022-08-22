@@ -15,15 +15,18 @@ import useReduceData from '../hooks/useReduceData';
 
 import Context from '../context';
 
-export default function SparkLine() {
-	const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale } = useContext(Context);
-	let [width] = dimensions;
-	const { minValue, maxValue } = useReduceData(config, data)
-	if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
-		width = width * 0.73;
-	}
+export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
-	const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
+	console.log('parentWidth', parentWidth)
+	console.log('parentHeight', parentHeight)
+	const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale } = useContext(Context);
+	let width = parentWidth
+	const { minValue, maxValue } = useReduceData(config, data)
+	// if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
+	// 	width = width * 0.73;
+	// }
+	const margin = ({ top: 10, right: 10, bottom: 10, left: 10 })
+	const height = parentHeight;
 
 	const xMax = width - config.runtime.yAxis.size;
 	const yMax = height - config.runtime.xAxis.size;
@@ -77,10 +80,13 @@ export default function SparkLine() {
 
 			yScale = scaleLinear({
 				domain: [min, max],
-				range: [yMax, 0]
+				range: [yMax - margin.bottom, margin.top]
 			});
 
-			xScale = scalePoint({ domain: xAxisDataMapped, range: [0, xMax], padding: 0.5 });
+			xScale = scalePoint({ 
+				domain: xAxisDataMapped, 
+				range: [margin.left, width - margin.right]
+			});
 
 			seriesScale = scalePoint({
 				domain: (config.runtime.barSeriesKeys || config.runtime.seriesKeys),
@@ -88,26 +94,6 @@ export default function SparkLine() {
 			});
 		}
 
-
-		if (config.visualizationType === 'Paired Bar') {
-
-
-			let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
-			let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
-
-			// group one
-			var g1xScale = scaleLinear < number > ({
-				domain: [0, Math.max(groupOneMax, groupTwoMax)],
-				range: [xMax / 2, 0]
-			})
-
-			// group 2
-			var g2xScale = scaleLinear < number > ({
-				domain: g1xScale.domain(),
-				range: [xMax / 2, xMax]
-			})
-
-		}
 	}
 
 
@@ -119,9 +105,9 @@ export default function SparkLine() {
 	return (
 		<ErrorBoundary component="LineChart">
 			<svg width={width} height={height} className="sparkline">
-				<Group left={config.runtime.yAxis.size}>
 					{(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
 						<Group
+							height={parentHeight}
 							key={`series-${seriesKey}`}
 							opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
 							display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
@@ -174,7 +160,6 @@ export default function SparkLine() {
 						</Group>
 					))
 					}
-				</Group>
 			</svg>
 		</ErrorBoundary>
 		
