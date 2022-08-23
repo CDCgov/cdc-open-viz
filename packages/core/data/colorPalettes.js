@@ -145,6 +145,33 @@ const colorPalettesMap = {
     "#c31b1f",
     "#c31b1f",
   ],
+
+
+
+  'sequential-blue-2(MPX)':[
+  '#F5FEFF',
+  '#E1FBFF',
+  '#C0F2FD',
+  '#94E2ED',
+  '#5EBAD4',
+  '#3695BE',
+  '#2273A0',
+  '#0E5181',
+  '#093460',
+  ],
+
+'sequential-orange(MPX)':[
+   '#FFFDF0',
+   '#FFF7DC',
+   '#FFE9C2',
+   '#FFD097',
+   '#F7A866',
+   '#EB7723',
+   '#B95117',
+   '#853209',
+   '#661F00'
+]
+
 };
 
 // * ============= Palettes for Chart project ==========  * //
@@ -228,7 +255,22 @@ const colorPalettes2 = {
     '#2171B5',
     '#084594',
   ],
-
+  'sequential-blue-2-(MPX)':[
+    '#D5F6F9',
+    '#99E2ED',
+    '#5FB6D1',
+    '#3189B0',
+    '#116091',
+    '#0A3E72'
+  ],
+  'sequential-orange-(MPX)':[
+    '#FFEFCF',
+    '#FFD49C',
+    '#F7A866',
+    '#EB7723',
+    '#B95117',
+    '#862B0B'
+   ],
   'sequential-green': [
     '#C7E9C0',
     '#A1D99B',
@@ -236,7 +278,7 @@ const colorPalettes2 = {
     '#41AB5D',
     '#238B45',
     '#005A32',
-  ],
+  ]
 };
 
 export const colorPalettesChart = updatePaletteNames(colorPalettes2)  // adds reverse keyword to eact palette

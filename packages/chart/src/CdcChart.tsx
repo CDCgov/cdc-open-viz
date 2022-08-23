@@ -8,6 +8,7 @@ import 'whatwg-fetch'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import { timeParse, timeFormat } from 'd3-time-format';
+import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
@@ -28,8 +29,8 @@ import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
 ) {
 
   const transform = new DataTransform();
@@ -51,16 +52,45 @@ export default function CdcChart(
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const cacheBustingString = () => {
+      const round = 1000 * 60 * 15;
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+  }
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
+    if (response.dataUrl) {
 
-      data = await dataString.json();
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = (regex.exec(response.dataUrl)[1])
+        if ('csv' === ext) {
+            data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+                .then(response => response.text())
+                .then(responseText => {
+                    const parsedCsv = Papa.parse(responseText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    })
+                    return parsedCsv.data
+                })
+        }
+
+        if ('json' === ext) {
+            data = await fetch(response.dataUrl  + `?v=${cacheBustingString()}`)
+                .then(response => response.json())
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${response.dataUrl}`);
+        data = [];
+      }
+
       if(response.dataDescription) {
         data = transform.autoStandardize(data);
         data = transform.developerStandardize(data, response.dataDescription);
@@ -315,7 +345,7 @@ export default function CdcChart(
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if(stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = colorPalettes[config.palette]
+      let palette = config.customColors || colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
@@ -397,17 +427,61 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const applyPrecision = (value: number | string): string => {
+    // first validation
+    if (value === undefined || value === null) {
+      console.error('Enter correct value to "applyPrecision()" function ');
+      return;
+    }
+    // second validation
+    if (Number.isNaN(value)) {
+      console.error(' Argunment isNaN, "applyPrecision()" function ');
+      return;
+    }
+    let result: number | string = value;
+    let roundToPlace = Number(config.dataFormat.roundTo)
+ 
+    if (roundToPlace < 0) {
+      console.error(' ROUND field is below "0", "applyPrecision()" function ');
+      return;
+    }
+    if (typeof roundToPlace === 'number' && roundToPlace > -1) {
+      result = Number(result).toFixed(roundToPlace); // returns STRING
+    }
+    return String(result);
+  };
+  
+  const applyLocaleString = (value: string): string => {
+    if (value === undefined || value === null) return;
+    if (Number.isNaN(value) || typeof value === 'number') {
+      value = String(value);
+    }
+    const language = 'en-US';
+    let formattedValue = parseFloat(value).toLocaleString(language, {
+      useGrouping: true,
+      maximumFractionDigits: 6,
+    });
+    // Add back missing .0 in e.g. 12.0
+    const match = value.match(/\.\d*?(0*)$/);
+  
+    if (match) {
+      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
+    }
+    return formattedValue;
+  };
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
-    if(num === undefined || num ===null) return "";
-    // check if value is Date format
+        // check if value is Date format
     if(checkIfValidDate(num)) return String(num)
-    // check if value contains any letters
+    // check if value is range data ex: 0-10
+    if(String(num).indexOf('-')!==0 && String(num).indexOf('-')!==-1) return num;
+     // check if value contains any letters
     if(/[A-Za-z]+/g.test(num)) return String(num);
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
-  
+   
+
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -432,7 +506,8 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    num = num.toLocaleString('en-US', stringFormattingOptions)
+    if (config.dataFormat.roundTo) num =applyPrecision(num)
+    if (config.dataFormat.commas) num = applyLocaleString(num)
 
     let result = ""
 
