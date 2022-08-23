@@ -148,7 +148,15 @@ export default function DataImport() {
 
     // Get the raw data as text from the file
     if (null === fileData) {
-      fileSourceType = 'url'
+      // const round = 1000 * 60 * 15;
+      // const date = new Date();
+      // const rounded = new Date(date.getTime() - (date.getTime() % round));
+      // const trimmedDate = rounded.toString().replace(/\s+/g, "");
+
+      const newUrl = new URL(fileName);
+      // newUrl.searchParams.append("v", trimmedDate);
+
+      fileSourceType = "url";
       try {
         fileData = await loadExternal()
         fileSource = externalURL

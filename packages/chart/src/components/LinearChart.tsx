@@ -18,9 +18,9 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
   let [ width ] = dimensions;
-  const {minValue,maxValue} = useReduceData(config,data)
+  const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
@@ -37,16 +37,23 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
+   // desctructure users enetered value from initial state config.
+  const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
+  // validation for for min/max that user entered;
+  const isMaxValid = existPositiveValue ? parseFloat(enteredMaxValue)  >= parseFloat(maxValue) : parseFloat(enteredMaxValue)  >= 0; 
+  const isMinValid = ((parseFloat(enteredMinValue) <= 0 && parseFloat(minValue) >=0) || (parseFloat(enteredMinValue) <= minValue && minValue < 0));
+
   if (data) {
-    let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
-    let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
+    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue;
+    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
-      min = 0;
+      min = 0; 
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
-     max = maxValue
+      // if all values in data are negative set max = 0
+      max = existPositiveValue ? maxValue : 0;
     }
     
     //Adds Y Axis data padding if applicable
@@ -226,7 +233,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                              </Fragment>
                         }
 
@@ -236,7 +243,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
                         { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.yAxis.hideLabel &&
@@ -245,7 +252,7 @@ export default function LinearChart() {
                               transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
 
@@ -256,7 +263,7 @@ export default function LinearChart() {
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {tick.formattedValue}
+                              {formatNumber(tick.value)}
                             </Text>
                         }
 
@@ -328,7 +335,7 @@ export default function LinearChart() {
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                         )}
 
@@ -394,7 +401,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                            {formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
@@ -447,7 +454,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {config.dataFormat.commas ? tick.formattedValue.toLocaleString() : tick.formattedValue}
+                            { formatNumber(tick.formattedValue)}
                           </Text>
                         }
                       </Group>
@@ -468,7 +475,7 @@ export default function LinearChart() {
                         textAnchor={'middle'}
                         stroke="#333"
                       >
-                      {config.runtime.yAxis.label}
+                      {config.runtime.xAxis.label}
                     </Text>
                   </Group>
                 </>

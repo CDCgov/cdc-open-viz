@@ -32,7 +32,8 @@ const DataTable = (props) => {
     navigationHandler,
     viewport,
     formatLegendLocation,
-    tabbingId
+    tabbingId,
+    setFilteredCountryCode
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -41,7 +42,7 @@ const DataTable = (props) => {
 
   const [ready, setReady] = useState(false)
 
-  const fileName = `${mapTitle}.csv`;
+  const fileName = `${mapTitle || 'data-table'}.csv`;
 
 
   // Catch all sorting method used on load by default but also on user click
@@ -344,7 +345,7 @@ const DataTable = (props) => {
               return (
                 <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell">
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
                       {cell.render('Cell')}
                     </td>
                   ))}
