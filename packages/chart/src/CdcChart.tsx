@@ -220,20 +220,6 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
-    // Check for duplicate x axis values in data
-    if(!currentData) currentData = newExcludedData;
-
-    let uniqueXValues = {};
-
-    if(newConfig.visualizationType !== 'Paired Bar') {
-      for(let i = 0; i < currentData.length; i++) {
-        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-        } else {
-          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
-        }
-      }
-    }
     // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };

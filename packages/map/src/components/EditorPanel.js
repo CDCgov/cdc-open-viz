@@ -10,25 +10,20 @@ import ReactTooltip from 'react-tooltip';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDebounce } from 'use-debounce';
 
-import colorPalettes from '../../../core/data/colorPalettes';
+import colorPalettes from '@cdc/core/data/colorPalettes';
 import { supportedStatesFipsCodes } from '../data/supported-geos';
 import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
-import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../../../core/data/colorPalettes';
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg';
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg';
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
-import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
