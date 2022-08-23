@@ -8,6 +8,7 @@ import 'whatwg-fetch'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import { timeParse, timeFormat } from 'd3-time-format';
+import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
@@ -29,8 +30,8 @@ import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
 ) {
 
   const transform = new DataTransform();
@@ -52,14 +53,44 @@ export default function CdcChart(
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const cacheBustingString = () => {
+      const round = 1000 * 60 * 15;
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+  }
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
-      data = await fetchRemoteData(response.dataUrl);
+    if (response.dataUrl) {
+
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = (regex.exec(response.dataUrl)[1])
+        if ('csv' === ext) {
+            data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+                .then(response => response.text())
+                .then(responseText => {
+                    const parsedCsv = Papa.parse(responseText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    })
+                    return parsedCsv.data
+                })
+        }
+
+        if ('json' === ext) {
+            data = await fetch(response.dataUrl  + `?v=${cacheBustingString()}`)
+                .then(response => response.json())
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${response.dataUrl}`);
+        data = [];
+      }
 
       if(response.dataDescription) {
         data = transform.autoStandardize(data);
@@ -189,6 +220,21 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
+    // Check for duplicate x axis values in data
+    if(!currentData) currentData = newExcludedData;
+
+    let uniqueXValues = {};
+
+    if(newConfig.visualizationType !== 'Paired Bar') {
+      for(let i = 0; i < currentData.length; i++) {
+        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
+          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
+        } else {
+          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
+        }
+      }
+    }
+    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -202,6 +248,7 @@ export default function CdcChart(
           add = false;
         }
       });
+
       if(add) filteredData.push(row);
     });
     return filteredData;
@@ -281,7 +328,7 @@ export default function CdcChart(
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if(stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = colorPalettes[config.palette]
+      let palette = config.customColors || colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
@@ -352,12 +399,72 @@ export default function CdcChart(
     }
   };
 
+  function checkIfValidDate(str) {
+    // Regular expression to check if string is valid date
+    const regexExp = /(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/gi;
+  
+    return regexExp.test(str);
+  }
+
   const formatDate = (date: Date) => {
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const applyPrecision = (value: number | string): string => {
+    // first validation
+    if (value === undefined || value === null) {
+      console.error('Enter correct value to "applyPrecision()" function ');
+      return;
+    }
+    // second validation
+    if (Number.isNaN(value)) {
+      console.error(' Argunment isNaN, "applyPrecision()" function ');
+      return;
+    }
+    let result: number | string = value;
+    let roundToPlace = Number(config.dataFormat.roundTo)
+ 
+    if (roundToPlace < 0) {
+      console.error(' ROUND field is below "0", "applyPrecision()" function ');
+      return;
+    }
+    if (typeof roundToPlace === 'number' && roundToPlace > -1) {
+      result = Number(result).toFixed(roundToPlace); // returns STRING
+    }
+    return String(result);
+  };
+  
+  const applyLocaleString = (value: string): string => {
+    if (value === undefined || value === null) return;
+    if (Number.isNaN(value) || typeof value === 'number') {
+      value = String(value);
+    }
+    const language = 'en-US';
+    let formattedValue = parseFloat(value).toLocaleString(language, {
+      useGrouping: true,
+      maximumFractionDigits: 6,
+    });
+    // Add back missing .0 in e.g. 12.0
+    const match = value.match(/\.\d*?(0*)$/);
+  
+    if (match) {
+      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
+    }
+    return formattedValue;
+  };
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+        // check if value is Date format
+    if(checkIfValidDate(num)) return String(num)
+    // check if value is range data ex: 0-10
+    if(String(num).indexOf('-')!==0 && String(num).indexOf('-')!==-1) return num;
+     // check if value contains any letters
+    if(/[A-Za-z]+/g.test(num)) return String(num);
+    // check if value contains comma and remove it. later will add comma below.
+    if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
+   
+
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -368,22 +475,22 @@ export default function CdcChart(
     };
 
     num = numberFromString(num);
-
-    if(isNaN(num)) {
+    
+    if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return
+      return 
     }
 
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
+      if(num < cutoff) { 
         num = cutoff;
       }
     }
-    num = num.toLocaleString('en-US', stringFormattingOptions)
+    if (config.dataFormat.roundTo) num =applyPrecision(num)
+    if (config.dataFormat.commas) num = applyLocaleString(num)
 
     let result = ""
 
@@ -397,7 +504,7 @@ export default function CdcChart(
       result += config.dataFormat.suffix
     }
 
-    return result
+    return String(result)
   };
 
   // Destructure items from config for more readable JSX
@@ -585,27 +692,51 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend />}
+        {!missingRequiredSections() && !config.newViz && (
+          <div className="cdc-chart-inner-container">
+            {/* Title */}
+
+            {title && (
+              <div
+                role="heading"
+                className={`chart-title ${config.theme}`}
+                aria-level={2}
+              >
+                {config.general && (
+                  <sup className="superTitle">{config.general.superTitle}</sup>
+                )}
+                <div>{parse(title)}</div>
+              </div>
+            )}
+            <a
+              id="skip-chart-container"
+              className="cdcdataviz-sr-only-focusable"
+              href={handleChartTabbing}
+            >
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            {config.filters && <Filters />}
+            {/* Visualization */}
+            {config.general?.introText && <section className="introText">{config.general.introText}</section>}
+            <div
+              className={`chart-container${
+                config.legend.hide ? " legend-hidden" : ""
+              }${lineDatapointClass}${barBorderClass}`}
+            >
+              {chartComponents[visualizationType]}
+              {/* Legend */}
+              {!config.legend.hide && <Legend />}
+            </div>
+            {/* Description */}
+            {description && <div className="subtext">{parse(description)}</div>}
+            {/* Data Table */}
+            {config.xAxis.dataKey && config.table.show && <DataTable />}
+            {config.general?.footnotes && <section className="footnotes">{config.general.footnotes}</section>}
           </div>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
-        </div>}
+        )}
       </>
-    )
+    );
   }
 
   const contextValues = {

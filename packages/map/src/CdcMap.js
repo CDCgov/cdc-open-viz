@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import * as d3 from 'd3';
 
 // IE11
 import 'core-js/stable'
@@ -18,6 +19,7 @@ import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg'; // TODO: Move to Icon component
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
 import initialState from './data/initial-state';
+import { countryCoordinates } from './data/country-coordinates';
 
 // Sass
 import './scss/main.scss';
@@ -53,6 +55,7 @@ const territoryKeys = Object.keys(supportedTerritories)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
+
 
 const generateColorsArray = (color = '#000000', special = false) => {
     let colorObj = chroma(color)
@@ -109,7 +112,61 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [runtimeData, setRuntimeData] = useState({init: true})
     const [modal, setModal] = useState(null)
     const [accessibleStatus, setAccessibleStatus] = useState('')
+    const [filteredCountryCode, setFilteredCountryCode] = useState()
+    const [position, setPosition] = useState(state.mapPosition);
+
+    
     let legendMemo = useRef(new Map())
+
+    useEffect(() => {
+        try {
+            if (filteredCountryCode) {
+                const filteredCountryObj = runtimeData[filteredCountryCode]
+                const coordinates = countryCoordinates[filteredCountryCode]
+                const long = coordinates[1]
+                const lat = coordinates[0]
+                const reversedCoordinates = [long, lat];
+                
+                setState({
+                    ...state,
+                    mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+                })
+                
+            }
+        } catch(e) {
+            console.error('Failed to set world map zoom.')
+        }
+
+    }, [filteredCountryCode]);
+
+    useEffect(() => {
+
+        setTimeout( () => {
+            if (filteredCountryCode) {
+                const filteredCountryObj = runtimeData[filteredCountryCode]
+    
+                const tmpData = {
+                    [filteredCountryCode]: filteredCountryObj
+                }
+    
+                setRuntimeData(tmpData)
+            }
+        }, 100)
+
+    }, [filteredCountryCode]);
+
+    useEffect(() => {
+        if (state.mapPosition) {
+            setPosition(state.mapPosition)
+        }
+    }, [state.mapPosition, setPosition]);
+
+    const setZoom = (reversedCoordinates) => {
+        setState({
+            ...state,
+            mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
+        })
+    };
 
 
 
@@ -120,17 +177,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCurrentViewport(newViewport)
         }
     });
-
-    // *******START SCREEN READER DEBUG*******
-    // const focusedElement = useActiveElement();
-
-    // useEffect(() => {
-    //     if (focusedElement) {
-    //         focusedElement.value && console.log(focusedElement.value);
-    //     }
-    //     console.log(focusedElement);
-    // }, [focusedElement])
-    // *******END SCREEN READER DEBUG*******
 
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
@@ -198,6 +244,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const
             primaryCol = obj.columns.primary.name,
+            isData = obj.general.type === 'data',
+            isBubble = obj.general.type === 'bubble',
+            categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
             type = obj.legend.type,
             number = obj.legend.numberOfItems,
             result = [];
@@ -326,8 +375,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
-                let value = row[primaryCol]
-
+                let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol]
                 if(undefined === value) continue
 
                 if(false === uniqueValues.has(value)) {
@@ -428,42 +476,129 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Equal Number
-        if(type === 'equalnumber') {
-            let numberOfRows = dataSet.length
+        if (type === 'equalnumber') {
+            // start work on changing legend functionality
+            // FALSE === ignore old version for now.
+            if (!state.general.equalNumberOptIn) {
+                let numberOfRows = dataSet.length
 
-            let remainder
-            let changingNumber = legendNumber
+                let remainder
+                let changingNumber = legendNumber
 
-            let chunkAmt
+                let chunkAmt
 
-            // Loop through the array until it has been split into equal subarrays
-            while ( numberOfRows > 0 ) {
-                remainder = numberOfRows % changingNumber
+                // Loop through the array until it has been split into equal subarrays
+                while (numberOfRows > 0) {
+                    remainder = numberOfRows % changingNumber
 
-                chunkAmt = Math.floor(numberOfRows / changingNumber)
+                    chunkAmt = Math.floor(numberOfRows / changingNumber)
 
-                if (remainder > 0) {
-                    chunkAmt += 1
+                    if (remainder > 0) {
+                        chunkAmt += 1
+                    }
+
+                    let removedRows = dataSet.splice(0, chunkAmt);
+
+                    let min = removedRows[0][primaryCol],
+                        max = removedRows[removedRows.length - 1][primaryCol]
+
+                    removedRows.forEach(row => {
+                        newLegendMemo.set(hashObj(row), result.length)
+                    })
+
+                    result.push({
+                        min,
+                        max
+                    })
+
+                    result[result.length - 1].color = applyColorToLegend(result.length - 1)
+
+                    changingNumber -= 1
+                    numberOfRows -= chunkAmt
                 }
+            } else {
+                // get nums
+                let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
+                let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
+                console.log('hasZeroInData', hasZeroInData)
+                if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
 
-                let removedRows = dataSet.splice(0, chunkAmt);
+                domainNums = d3.extent(domainNums)
+                let colors = colorPalettes[state.color]
+                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
+                let scale = d3.scaleQuantile()
+                    .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
+                    //.domain(domainNums)
+                    .range(colorRange) // set range to our colors array
 
-                let min = removedRows[0][primaryCol],
-                    max = removedRows[removedRows.length - 1][primaryCol]
+                let breaks = scale.quantiles();
+                breaks = breaks.map( item => Math.round(item))
 
-                removedRows.forEach(row => {
-                    newLegendMemo.set( hashObj(row), result.length )
+                console.log('breaks', breaks)
+                console.log('d', domainNums)
+
+                
+                // always start with domain beginning breakpoint
+                breaks.unshift(d3.extent(domainNums)?.[0])
+                
+                if (state.legend.separateZero && !hasZeroInData) {
+                    breaks.splice(1, 0, 1);
+                } 
+                
+                breaks.map( (item, index) => {
+
+                    let min = breaks[index];
+                    let max = breaks[index + 1] - 1;
+
+                    const setMin = () => {
+                        // in starting position and zero in the data
+                        if(index === 0 && state.legend.separateZero) {
+                            min = 0;
+                        }
+
+                        if(index === 0 && !state.legend.separateZero) {
+                            min = domainNums[0]
+                        }
+
+                    } 
+
+                    const setMax = () => {
+                        if(index === 0 && state.legend.separateZero) {
+                            max = 0;
+                        }
+
+                        if(index + 1 === breaks.length) {
+                            max = domainNums[1]
+                        }
+                    }
+
+                    setMin()
+                    setMax()
+                    console.log('res', result)
+
+                    if(index === 0 && result[index]?.max === 0 && state.legend.separateZero) return true;
+                    result.push({
+                        min,
+                        max,
+                        color: scale(item)
+                    })
+                    
+                    
+                    dataSet.forEach( (row, dataIndex) => {
+                        let number = row[state.columns.primary.name]
+                        
+                        let updated = state.legend.separateZero ? index : index;
+
+                        if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
+
+                        if(number >= result[updated].min && number <= result[updated].max) {
+                            newLegendMemo.set(hashObj(row), updated)
+                        }
+                    })
+
+
                 })
 
-                result.push({
-                    min,
-                    max
-                })
-
-                result[result.length - 1].color = applyColorToLegend(result.length - 1)
-
-                changingNumber -= 1
-                numberOfRows -= chunkAmt
             }
         }
 
@@ -572,7 +707,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     })
 
     // Calculates what's going to be displayed on the map and data table at render.
-    const generateRuntimeData = useCallback((obj, filters, hash) => {
+    const generateRuntimeData = useCallback((obj, filters, hash, test) => {
         const result = {}
 
         if(hash) {
@@ -584,6 +719,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
         obj.data.forEach(row => {
+
+            if(test) {
+                console.log('object', obj)
+                console.log('row', row) 
+            }
             if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
             // When on a single state map filter runtime data by state
@@ -596,7 +736,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
             if(row[obj.columns.primary.name]) {
-                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
+                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
             }
 
             // If this is a navigation only map, skip if it doesn't have a URL
@@ -761,12 +901,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
     }
-
     const displayDataAsText = (value, columnName) => {
-        if(value === null) {
+        if(value === null || value === "" || value === undefined ) {
             return ""
         }
-
+        if(typeof value === 'string' && value.length > 0 && state.legend.type==='equalnumber'){
+            return value
+        }
+ 
         let formattedValue = value
 
         let columnObj = state.columns[columnName]
@@ -792,7 +934,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
             if (false === state.legend.specialClasses.includes(String(value))) {
-                formattedValue = columnObj.prefix + formattedValue + columnObj.suffix
+                formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
             }
         }
 
@@ -839,14 +981,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         
         toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-        if('data' === state.general.type && undefined !== row) {
+        if( ('data' === state.general.type || state.general.type === 'bubble') && undefined !== row) {
             toolTipText += `<dl>`
 
             Object.keys(state.columns).forEach((columnKey) => {
                 const column = state.columns[columnKey]
 
                 if (true === column.tooltip) {
-
                     let label = column.label.length > 0 ? column.label : '';
 
                     let value;
@@ -940,13 +1081,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         const dict = {
-            "District of Columbia" : "Washington D.C."
+            "Washington D.C." : "District of Columbia",
+            "WASHINGTON DC":"District of Columbia",
+            "DC":"District of Columbia",
+            "WASHINGTON DC.":"District of Columbia",
+            "Congo": "Republic of the Congo"
         }
 
         if(true === Object.keys(dict).includes(value)) {
             value = dict[value]
         }
-
         return titleCase(value);
     }
 
@@ -1015,13 +1159,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...configObj
         }
 
+        const round = 1000 * 60 * 15;
+        const date = new Date();
+        let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl)
+            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
@@ -1086,6 +1234,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         init()
     }, [])
 
+    // useEffect(() => {
+    //     if(state.focusedCountry && state.data) {
+    //         let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === state.focusedCountry[state.columns.geo.name])
+    //         let temp = {
+    //             ...state,
+    //             data: newRuntimeData
+    //         }
+    //         setRuntimeData(temp)
+    //     }
+
+    // }, [state.focusedCountry]);
+
     useEffect(() => {
         if (state.data) {
             let newData = generateRuntimeData(state);
@@ -1141,7 +1301,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             geo: state.columns.geo.name,
             primary: state.columns.primary.name,
             data: state.data,
-            ...runtimeFilters
+            ...runtimeFilters,
+            mapPosition: state.mapPosition
         })
 
         // Data
@@ -1177,6 +1338,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, runtimeData)
             setRuntimeLegend(legend)
         }
+
     }, [runtimeData])
 
     if(config) {
@@ -1187,8 +1349,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
-    const { title = '', subtext = ''} = general
-
+    const { title = '', subtext = '' } = general
+    
     // Outer container classes
     let outerContainerClasses = [
         'cdc-open-viz-module',
@@ -1231,6 +1393,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         generateColorsArray,
         titleCase,
         setState,
+        setRuntimeData,
+        generateRuntimeData,
+        setFilteredCountryCode,
+        filteredCountryCode,
+        position,
+        setPosition,
+        hasZoom : state.general.allowMapZoom
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
@@ -1262,7 +1431,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     const tabId = handleMapTabbing()
 
-    
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1288,12 +1456,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
 				)}
-				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0">
+                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
 						{parse(title)}
 					</div>
 				</header>
-				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+				<section 
+                    role="button"
+                    tabIndex="0"
+                    className={mapContainerClasses.join(' ')} 
+                    onClick={(e) => closeModal(e)}
+                    onKeyDown={(e) => { if (e.keyCode === 13) { closeModal(e) } }}
+                    >
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
 							<div className='map-downloads__ui btn-group'>
@@ -1395,15 +1569,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						displayGeoName={displayGeoName}
 						applyLegendToRow={applyLegendToRow}
 						tableTitle={dataTable.title}
-						indexTitle={dataTable.indexTitle}
+						indexTitle={dataTable.indexLabel}
 						mapTitle={general.title}
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
+                        setFilteredCountryCode={setFilteredCountryCode}
                         tabbingId={tabId}
 					/>
-				)}
-				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>}
+                )}
+                
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                {general.footnotes && <section className="footnotes">{general.footnotes}</section>}
+            </section>}
+            
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>
