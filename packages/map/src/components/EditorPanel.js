@@ -13,7 +13,6 @@ import { useDebounce } from 'use-debounce';
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import MapIcon from '../images/map-folded.svg';
 import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
 import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
@@ -29,6 +28,8 @@ import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
 
@@ -183,6 +184,40 @@ const EditorPanel = (props) => {
 
 	const handleEditorChanges = async (property, value) => {
 		switch (property) {
+
+			// change these to be more generic.
+			// updateVisualPropertyValue
+			// updateGeneralPropertyValue, etc.
+			case 'showBubbleZeros':
+				setState({
+					...state,
+					visual: {
+						...state.visual,
+						showBubbleZeros: value
+					}
+				})
+				break;
+
+			case 'showEqualNumber':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						equalNumberOptIn: value
+					}
+				})
+				break;
+
+			case 'hideGeoColumnInTooltip':
+				setState({
+					...state,
+					general: {
+						...state.general,
+						[property]: value
+					}
+				})
+				break;
+
 			case 'toggleExtraBubbleBorder':
 				setState({
 					...state,
@@ -1610,7 +1645,7 @@ const EditorPanel = (props) => {
 
 
 
-					  {state.general.type === 'bubble' && state.legend.type === 'category' && (
+					  { (state.general.type === 'bubble') && state.legend.type === 'category' && (
 						<fieldset className='primary-fieldset edit-block'>
                         	<label>
 								<span className='edit-label column-heading'>
@@ -1878,16 +1913,30 @@ const EditorPanel = (props) => {
 													}
 												/>
 												<span className='edit-label'>
-                          Separate Zero
-                          <Tooltip style={{textTransform: 'none'}}>
-                            <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>For numeric data, you can separate the zero value as its own data class.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </span>
+												Separate Zero
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+													<Tooltip.Content>
+													<p>For numeric data, you can separate the zero value as its own data class.</p>
+													</Tooltip.Content>
+												</Tooltip>
+												</span>
+
 											</label>
 										)}
+										{/* Temp Checkbox */}
+										{state.legend.type === 'equalnumber' &&
+											<label className="checkbox mt-4">
+												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
+												<span className="edit-label">Use new quantile legend</span>
+												<Tooltip style={{textTransform: 'none'}}>
+													<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+														<Tooltip.Content>
+														<p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
+													</Tooltip.Content>
+												</Tooltip>
+											</label>
+										}
 										{'category' !== legend.type && (
 											<label>
 												<span className='edit-label'>
@@ -2457,6 +2506,18 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/>
+									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.visual.showBubbleZeros}
+												onChange={(event) => {
+													handleEditorChanges('showBubbleZeros', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+										</label>
+									}
 									{state.general.geoType === 'world' &&
 										<label className='checkbox'>
 											<input
@@ -2485,48 +2546,8 @@ const EditorPanel = (props) => {
 							</AccordionItem>
 						</Accordion>
 					</form>
-					<a
-						href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html'
-						target='_blank'
-						rel='noopener noreferrer'
-						className='guidance-link'
-					>
-						<MapIcon />
-						<div>
-							<span className='heading-3'>Get Maps Help</span>
-							<p>Examples and documentation</p>
-						</div>
-					</a>
-					<div className='advanced'>
-						<span className='advanced-toggle-link' onClick={() => setAdvancedToggle(!advancedToggle)}>
-							<span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options
-						</span>
-						{advancedToggle && (
-							<React.Fragment>
-								<section className='error-box py-2 px-3 my-2'>
-									<div>
-										<strong className='pt-1'>Warning</strong>
-										<p>This can cause serious errors in your map.</p>
-									</div>
-								</section>
-								<p className='pb-2'>
-									This tool displays the actual map configuration{' '}
-									<acronym title='JavaScript Object Notation'>JSON</acronym> that is generated by this
-									editor and allows you to edit properties directly and apply them.
-								</p>
-								<textarea
-									value={configTextboxValue}
-									onChange={(event) => setConfigTextbox(event.target.value)}
-								/>
-								<button
-									className='btn full-width'
-									onClick={() => loadConfig(JSON.parse(configTextboxValue))}
-								>
-									Apply
-								</button>
-							</React.Fragment>
-						)}
-					</div>
+					<AdvancedEditor loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
+
 				</section>
 			</section>
 		</ErrorBoundary>
