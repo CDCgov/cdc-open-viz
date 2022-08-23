@@ -15,7 +15,11 @@
 
 .cove-data-table__table-heading {
   padding: 0.5em 0.7em;
-  background: url('../../assets/icon-minus.svg'), rgba(0, 0, 0, 0.05) right .7em center / 15px 15px no-repeat;
+  //TODO find fix
+  //background-image: url(~@cdc/core/assets/icon-minus.svg);
+  background-size: 15px 15px; // Need to define both for IE11
+  background-position: right .7em center;
+  background-repeat: no-repeat;
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
@@ -26,7 +30,8 @@
   }
 
   &.collapsed {
-    background-image: url('../../assets/icon-plus.svg');
+    //TODO find fix
+    //background-image: url(~@cdc/core/core/assets/icon-plus.svg);
     border-bottom: $lightGray 1px solid;
   }
 }
@@ -146,11 +151,13 @@
   }
 
   .sort-asc {
-    background-image: url('../../assets/icon-caret-filled-up.svg');
+    //TODO find fix
+    //background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
   }
 
   .sort-desc {
-    background-image: url('../../assets/icon-caret-filled-down.svg');
+    //TODO find fix
+    //background-image: url(~@cdc/core/assets/icon-caret-filled-down.svg);
   }
 
   .resizer {

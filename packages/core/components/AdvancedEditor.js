@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import MapIcon from '../assets/map-folded.svg'
-import ChartIcon from '../assets/chart-bar-solid.svg';
+import ChartIcon from '../assets/icon-chart-bar.svg';
 import MarkupIncludeIcon from '../assets/icon-code.svg';
 
 
