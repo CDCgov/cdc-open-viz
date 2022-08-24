@@ -88,7 +88,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     if( isRounded || config.barStyle==='flat' ){
     updateConfig({ ...config, isLollipopChart:false })
     }
-  },[config.barStyle])
+  }, [config.barStyle])
+
+  config.runtime.seriesKeys.sort().reverse();
 
   return (
     <ErrorBoundary component="BarChart">
