@@ -181,7 +181,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
             </ul>
             <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
               <option value="">- Select Option -</option>
-              {Object.keys(config.visualizations).filter(vizKey => !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
+              {Object.keys(config.visualizations).filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
                 <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{vizKey}</option>
               ))}
             </select>
