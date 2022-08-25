@@ -14,7 +14,7 @@ import { BarStackHorizontal } from '@visx/shape';
 
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes,formatDate,parseDate } = useContext<any>(Context);
   const { orientation, visualizationSubType } = config;
   const isHorizontal = orientation === 'horizontal';
 
@@ -26,6 +26,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const isLabelOnBar = config.yAxis.labelPlacement === "On Bar";
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const isRounded = config.barStyle==='rounded';
   const isStacked = config.visualizationSubType === 'stacked'
@@ -105,8 +106,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             color={colorScale}
           >
             {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              const xAxisValue = config.runtime.xAxis.type==='date' ? formatDate(parseDate( data[bar.index][config.runtime.xAxis.dataKey])) :  data[bar.index][config.runtime.xAxis.dataKey]
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue;
 
               const tooltip = `<div>
               ${yAxisTooltip}<br />
@@ -165,9 +167,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barStacks) =>
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar, index) => {
-                    
+                    const xAxisValue =  config.runtime.yAxis.type==='date'  ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${formatNumber(data[bar.index][bar.key])}` : `${bar.key}: ${formatNumber(data[bar.index][bar.key])}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index][config.runtime.originalXAxis.dataKey]}`
+                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
 
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
@@ -321,7 +323,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
                     let yAxisValue = formatNumber(bar.value);
-                    let xAxisValue = data[barGroup.index][config.runtime.originalXAxis.dataKey];
+                    let xAxisValue = config.runtime[section].type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                     if(config.runtime.horizontal){
                       let tempValue = yAxisValue;
