@@ -14,9 +14,6 @@
 	},
 	"color": "redreverse",
 	"columns": {
-		"categorical": {
-			"name": "Category"
-		},
 		"geo": {
 			"name": "State",
 			"label": "Location",
@@ -41,11 +38,7 @@
 		"numberOfItems": 1,
 		"position": "side",
 		"title": "Legend Title",
-		"description": "Legend Text",
-		"type": "category",
-		"specialClasses": [
-			"N/A"
-		]
+		"description": "Legend Text"
 	},
 	"data": [
 		{
@@ -332,7 +325,7 @@
 		},
 		{
 			"State": "California",
-			"Cases": "1",
+			"Cases": "0",
 			"Category": "Has not historically reported monkeypox",
 			"AsOf": "11 Jul 2022 5:00 PM EDT"
 		},
@@ -344,13 +337,13 @@
 		},
 		{
 			"State": "Florida",
-			"Cases": "13",
+			"Cases": null,
 			"Category": "Has not historically reported monkeypox",
 			"AsOf": "11 Jul 2022 5:00 PM EDT"
 		},
 		{
 			"State": "South Dakota",
-			"Cases": "1552",
+			"Cases": "",
 			"Category": "Has not historically reported monkeypox",
 			"AsOf": "11 Jul 2022 5:00 PM EDT"
 		},

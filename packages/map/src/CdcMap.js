@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import * as d3 from 'd3';
 
 // IE11
 import 'core-js/stable'
@@ -243,6 +244,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
         const
             primaryCol = obj.columns.primary.name,
+            isData = obj.general.type === 'data',
             isBubble = obj.general.type === 'bubble',
             categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
             type = obj.legend.type,
@@ -373,8 +375,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             for(let i = 0; i < dataSet.length; i++) {
                 let row = dataSet[i]
-                let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol] 
-
+                let value = isBubble && categoricalCol && row[categoricalCol] ? row[categoricalCol] : row[primaryCol]
                 if(undefined === value) continue
 
                 if(false === uniqueValues.has(value)) {
@@ -475,42 +476,129 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
 
         // Equal Number
-        if(type === 'equalnumber') {
-            let numberOfRows = dataSet.length
+        if (type === 'equalnumber') {
+            // start work on changing legend functionality
+            // FALSE === ignore old version for now.
+            if (!state.general.equalNumberOptIn) {
+                let numberOfRows = dataSet.length
 
-            let remainder
-            let changingNumber = legendNumber
+                let remainder
+                let changingNumber = legendNumber
 
-            let chunkAmt
+                let chunkAmt
 
-            // Loop through the array until it has been split into equal subarrays
-            while ( numberOfRows > 0 ) {
-                remainder = numberOfRows % changingNumber
+                // Loop through the array until it has been split into equal subarrays
+                while (numberOfRows > 0) {
+                    remainder = numberOfRows % changingNumber
 
-                chunkAmt = Math.floor(numberOfRows / changingNumber)
+                    chunkAmt = Math.floor(numberOfRows / changingNumber)
 
-                if (remainder > 0) {
-                    chunkAmt += 1
+                    if (remainder > 0) {
+                        chunkAmt += 1
+                    }
+
+                    let removedRows = dataSet.splice(0, chunkAmt);
+
+                    let min = removedRows[0][primaryCol],
+                        max = removedRows[removedRows.length - 1][primaryCol]
+
+                    removedRows.forEach(row => {
+                        newLegendMemo.set(hashObj(row), result.length)
+                    })
+
+                    result.push({
+                        min,
+                        max
+                    })
+
+                    result[result.length - 1].color = applyColorToLegend(result.length - 1)
+
+                    changingNumber -= 1
+                    numberOfRows -= chunkAmt
                 }
+            } else {
+                // get nums
+                let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
+                let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
+                console.log('hasZeroInData', hasZeroInData)
+                if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
 
-                let removedRows = dataSet.splice(0, chunkAmt);
+                domainNums = d3.extent(domainNums)
+                let colors = colorPalettes[state.color]
+                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
+                let scale = d3.scaleQuantile()
+                    .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
+                    //.domain(domainNums)
+                    .range(colorRange) // set range to our colors array
 
-                let min = removedRows[0][primaryCol],
-                    max = removedRows[removedRows.length - 1][primaryCol]
+                let breaks = scale.quantiles();
+                breaks = breaks.map( item => Math.round(item))
 
-                removedRows.forEach(row => {
-                    newLegendMemo.set( hashObj(row), result.length )
+                console.log('breaks', breaks)
+                console.log('d', domainNums)
+
+                
+                // always start with domain beginning breakpoint
+                breaks.unshift(d3.extent(domainNums)?.[0])
+                
+                if (state.legend.separateZero && !hasZeroInData) {
+                    breaks.splice(1, 0, 1);
+                } 
+                
+                breaks.map( (item, index) => {
+
+                    let min = breaks[index];
+                    let max = breaks[index + 1] - 1;
+
+                    const setMin = () => {
+                        // in starting position and zero in the data
+                        if(index === 0 && state.legend.separateZero) {
+                            min = 0;
+                        }
+
+                        if(index === 0 && !state.legend.separateZero) {
+                            min = domainNums[0]
+                        }
+
+                    } 
+
+                    const setMax = () => {
+                        if(index === 0 && state.legend.separateZero) {
+                            max = 0;
+                        }
+
+                        if(index + 1 === breaks.length) {
+                            max = domainNums[1]
+                        }
+                    }
+
+                    setMin()
+                    setMax()
+                    console.log('res', result)
+
+                    if(index === 0 && result[index]?.max === 0 && state.legend.separateZero) return true;
+                    result.push({
+                        min,
+                        max,
+                        color: scale(item)
+                    })
+                    
+                    
+                    dataSet.forEach( (row, dataIndex) => {
+                        let number = row[state.columns.primary.name]
+                        
+                        let updated = state.legend.separateZero ? index : index;
+
+                        if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
+
+                        if(number >= result[updated].min && number <= result[updated].max) {
+                            newLegendMemo.set(hashObj(row), updated)
+                        }
+                    })
+
+
                 })
 
-                result.push({
-                    min,
-                    max
-                })
-
-                result[result.length - 1].color = applyColorToLegend(result.length - 1)
-
-                changingNumber -= 1
-                numberOfRows -= chunkAmt
             }
         }
 
@@ -648,7 +736,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
 
             if(row[obj.columns.primary.name]) {
-                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name])
+                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
             }
 
             // If this is a navigation only map, skip if it doesn't have a URL
@@ -1106,13 +1194,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...configObj
         }
 
+        const round = 1000 * 60 * 15;
+        const date = new Date();
+        let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl)
+            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
@@ -1399,18 +1491,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
 				)}
-				<header className={general.showTitle === true ? '' : 'hidden'} aria-hidden='true'>
-                    <div role='heading' aria-level="2" className={'map-title ' + general.headerColor} tabIndex="0">
-                        <sup className="superTitle">{general.superTitle}</sup>
-						<div>{parse(title)}</div>
+                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
+					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
+						{parse(title)}
 					</div>
-                </header>
-                {general.intro_text &&
-                    <section className="introText">
-                        {general.intro_text}
-                    </section>
-                }
-				<section className={mapContainerClasses.join(' ')} onClick={(e) => closeModal(e)}>
+				</header>
+				<section 
+                    role="button"
+                    tabIndex="0"
+                    className={mapContainerClasses.join(' ')} 
+                    onClick={(e) => closeModal(e)}
+                    onKeyDown={(e) => { if (e.keyCode === 13) { closeModal(e) } }}
+                    >
 					{general.showDownloadMediaButton === true && (
 						<div className='map-downloads' data-html2canvas-ignore>
 							<div className='map-downloads__ui btn-group'>
