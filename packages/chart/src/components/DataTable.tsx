@@ -24,7 +24,7 @@ export default function DataTable() {
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
-
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
@@ -73,7 +73,7 @@ export default function DataTable() {
 
     data.forEach((d) => {
         const newCol = {
-          Header: config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
+          Header: config.runtime[section].type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
             return (
               <>

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect,useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -14,7 +14,7 @@ import PairedBarChart from './PairedBarChart';
 import SparkLine from './SparkLine';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-
+import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
@@ -38,6 +38,15 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
+<<<<<<< HEAD
+=======
+   // desctructure users enetered value from initial state config.
+  const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
+  // validation for for min/max that user entered;
+  const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0; 
+  const isMinValid = ((numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >=0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0));
+
+>>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
   if (data) {
     let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
@@ -165,7 +174,11 @@ export default function LinearChart() {
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
             stroke="#333"
+<<<<<<< HEAD
             tickFormat={(tick)=> config.runtime.yAxis.type ==='date' ? formatDate(parseDate(tick)) : config.orientation==='vertical' ? formatNumber(tick) : tick }
+=======
+            tickFormat={config.yAxis.type ==='date' ? formatDate : formatNumber}
+>>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
@@ -277,7 +290,11 @@ export default function LinearChart() {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
+<<<<<<< HEAD
             tickFormat={tick=> config.runtime.xAxis.type === 'date' ?  formatDate(tick) : config.orientation ==='horizontal' ? formatNumber(tick) : tick}
+=======
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate :formatNumber}
+>>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
@@ -412,6 +429,7 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
+<<<<<<< HEAD
                         <Line
                           from={tick.from}
                           to={tick.to}
@@ -425,6 +443,25 @@ export default function LinearChart() {
                         >
                           {tick.formattedValue}
                         </Text>
+=======
+                        {!config.runtime.yAxis.hideTicks &&
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                          />
+                        }
+                        {!config.runtime.yAxis.hideLabel &&
+                          <Text
+                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
+                            verticalAnchor="start"
+                            textAnchor={'end'}
+                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                          >
+                            {tick.formattedValue}
+                          </Text>
+                        }
+>>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
                       </Group>
                     );
                   })}
