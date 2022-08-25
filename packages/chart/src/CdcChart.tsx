@@ -375,9 +375,10 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const parseDate = (dateString: string) => {
-    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
+    let date = timeParse(config.runtime[section].dateParseFormat)(dateString);
     if(!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`;
       return new Date();
@@ -386,28 +387,19 @@ export default function CdcChart(
     }
   };
 
-  function checkIfValidDate(str) {
-    // Regular expression to check if string is valid date
-    const regexExp = /(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/gi;
-  
-    return regexExp.test(str);
-  }
 
   const formatDate = (date: Date) => {
-    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
+    return timeFormat(config.runtime[section].dateDisplayFormat)(date);
   };
-
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
     if(num === undefined || num ===null) return "";
-    // check if value is Date format
-    if(checkIfValidDate(num)) return String(num)
-    // check if value contains any letters
-    if(/[A-Za-z]+/g.test(num)) return String(num);
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
-  
+    // if num is NaN return num
+    if(isNaN(num)) return num ;
+
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -421,7 +413,7 @@ export default function CdcChart(
     
     if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return 
+      return original
     }
 
     if (!config.dataFormat) return num;
@@ -445,7 +437,6 @@ export default function CdcChart(
     if(config.dataFormat.suffix) {
       result += config.dataFormat.suffix
     }
-
     return String(result)
   };
 
@@ -701,7 +692,7 @@ export default function CdcChart(
     setParentConfig,
     missingRequiredSections,
     setEditing,
-    setFilteredData
+    setFilteredData,
   }
 
   return (
