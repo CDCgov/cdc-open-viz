@@ -144,6 +144,12 @@ export default function CdcDashboard(
     }
   }
 
+   const cacheBustingString = () => {
+     const round = 1000 * 60 * 15;
+     const date = new Date();
+     return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+   };
+
   const loadConfig = async (configObj) => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -152,11 +158,12 @@ export default function CdcDashboard(
 
     // If a dataUrl property exists, always pull from that.
     if (newState.dataUrl) {
+      
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'https://' + hostname + newState.dataUrl
       }
 
-      let newData = await fetchRemoteData(newState.dataUrl)
+      let newData = await fetchRemoteData(newState.dataUrl + `?v=${cacheBustingString()}`)
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
