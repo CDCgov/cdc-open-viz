@@ -70,7 +70,8 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips,
     titleCase,
-    handleCircleClick
+    handleCircleClick,
+    setSharedFilterValue
   } = props;
 
   // "Choose State" options
@@ -139,6 +140,7 @@ const UsaMap = (props) => {
       styles = {
         color: textColor,
         fill: legendColors[0],
+        opacity: setSharedFilterValue && setSharedFilterValue !== territoryData[state.columns.geo.name] ? .5 : 1,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1],
@@ -240,6 +242,7 @@ const UsaMap = (props) => {
 
         styles = {
           fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
+          opacity: setSharedFilterValue && setSharedFilterValue !== geoData[state.columns.geo.name] ? .5 : 1,
           cursor: 'default',
           '&:hover': {
             fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6',

@@ -100,7 +100,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname}) => {
 
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
@@ -1399,6 +1399,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         filteredCountryCode,
         position,
         setPosition,
+        setSharedFilterValue,
         hasZoom : state.general.allowMapZoom
     }
 

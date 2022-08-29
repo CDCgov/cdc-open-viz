@@ -413,7 +413,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         visualizationConfig.formattedData = visualizationConfig.data
       }
 
-      const setsSharedFilter = !config.sharedFilters || config.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
+      const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
+      const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey)[0].active : undefined
 
       if (visualizationConfig.editing) {
         subVisualizationEditing = true
@@ -439,7 +440,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 config={visualizationConfig}
                 isEditor={true}
                 setConfig={updateConfig}
-                setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true}
+                setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                isDashboard={true}
               />
             </>
             break
@@ -451,6 +453,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 isEditor={true}
                 setConfig={updateConfig}
                 setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                setSharedFilterValue={setSharedFilterValue}
                 isDashboard={true}
               />
             </>
@@ -537,7 +540,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                       visualizationConfig.formattedData = visualizationConfig.data
                     }
 
-                    const setsSharedFilter = !config.sharedFilters || config.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+                    const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+                    const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
 
                     return (
                       <React.Fragment key={`vis__${index}__${colIndex}`}>
@@ -563,6 +567,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                                 updateChildConfig(col.widget, newConfig)
                               }}
                               setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                              setSharedFilterValue={setSharedFilterValue}
                               isDashboard={true}
                             />
                           )}
