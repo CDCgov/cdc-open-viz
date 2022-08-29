@@ -287,6 +287,7 @@ export default function DataImport() {
           setEditingDataset(undefined);
         }
         setAddingDataset(false);
+        setExternalURL('');
       } catch (err) {
         setErrors(err)
       }
