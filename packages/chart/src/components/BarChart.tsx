@@ -33,7 +33,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const tipRounding =  config.tipRounding ;
   const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
   const stackCount = config.runtime.seriesKeys.length;
- 
+
   const applyRadius = (index:number)=>{
     if(index === undefined || index === null || !isRounded) return;
     let style = {};
@@ -228,7 +228,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor="start"
                             verticalAnchor="start"
                           >
-                           {formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                           {isHorizontal ? xAxisValue : formatNumber(xAxisValue)}
                           </Text>
                       }
 
@@ -250,7 +250,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                             }
                           >
-                            { formatNumber( data[bar.index][bar.key])}
+                            {formatNumber(data[bar.index][bar.key])}
                           </Text>
                       }
                       </Group>
@@ -455,7 +455,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ "#000" }
                                   textAnchor="start"
                                   verticalAnchor="end"
-                                >{formatNumber(yAxisValue)}</Text>
+                                >{yAxisValue}</Text>
                               <Text
                                   x={ bar.y + horizBarLabelPadding }
                                   y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
@@ -475,7 +475,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
-                          >{formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                          >{config.runtime[section].type==='date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
                         </Text>
 
                         { (displayNumbersOnBar) ?
