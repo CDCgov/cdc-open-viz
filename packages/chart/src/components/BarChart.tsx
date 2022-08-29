@@ -14,7 +14,7 @@ import { BarStackHorizontal } from '@visx/shape';
 
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes,formatDate,parseDate } = useContext<any>(Context);
   const { orientation, visualizationSubType } = config;
   const isHorizontal = orientation === 'horizontal';
 
@@ -26,6 +26,30 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const isLabelOnBar = config.yAxis.labelPlacement === "On Bar";
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
+
+  const isRounded = config.barStyle==='rounded';
+  const isStacked = config.visualizationSubType === 'stacked'
+  const tipRounding =  config.tipRounding ;
+  const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
+  const stackCount = config.runtime.seriesKeys.length;
+
+  const applyRadius = (index:number)=>{
+    if(index === undefined || index === null || !isRounded) return;
+    let style = {};
+    
+    if((isStacked && index+1 === stackCount) || !isStacked){
+      style = isHorizontal ? {borderRadius:`0 ${radius}  ${radius}  0`} : {borderRadius:`${radius} ${radius} 0 0`};
+    };
+    if(tipRounding === 'full' && isStacked && index === 0 && stackCount > 1){
+      style = isHorizontal ? {borderRadius:`${radius} 0 0 ${radius}`} : {borderRadius:`0 0 ${radius} ${radius}`};
+   };
+    if(tipRounding === 'full' && ((isStacked && index === 0 && stackCount === 1) || !isStacked)){
+      style = {borderRadius:radius};  
+   };
+   
+   return style;
+ }
 
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null);
@@ -75,8 +99,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             color={colorScale}
           >
             {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              const xAxisValue = config.runtime.xAxis.type==='date' ? formatDate(parseDate( data[bar.index][config.runtime.xAxis.dataKey])) :  data[bar.index][config.runtime.xAxis.dataKey]
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue;
 
               const tooltip = `<div>
               ${yAxisTooltip}<br />
@@ -135,9 +160,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barStacks) =>
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar, index) => {
-                    
-                    let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index].name}`
+                    const xAxisValue =  config.runtime.yAxis.type==='date'  ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
+                    let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${formatNumber(data[bar.index][bar.key])}` : `${bar.key}: ${formatNumber(data[bar.index][bar.key])}`
+                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
+
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
@@ -198,12 +224,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor="start"
                             verticalAnchor="start"
                           >
-                           {formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                           {isHorizontal ? xAxisValue : formatNumber(xAxisValue)}
                           </Text>
                       }
 
                       { displayNumbersOnBar && textWidth + 50 < bar.width &&
                           <Text
+                            display={displayBar ? 'block' : 'none'}
                             x={ bar.x + barStack.bars[bar.index].width / 2 } // padding
                             y={ textPosition - 5 - config.barHeight/2 }
                             fill={ labelColor }
@@ -219,7 +246,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                             }
                           >
-                            {  data[bar.index][bar.key]}
+                            {formatNumber(data[bar.index][bar.key])}
                           </Text>
                       }
                       </Group>
@@ -292,7 +319,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
                     let yAxisValue = formatNumber(bar.value);
-                    let xAxisValue = data[barGroup.index][config.runtime.originalXAxis.dataKey];
+                    let xAxisValue = config.runtime[section].type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                     if(config.runtime.horizontal){
                       let tempValue = yAxisValue;
@@ -420,7 +447,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ "#000" }
                                   textAnchor="start"
                                   verticalAnchor="end"
-                                >{formatNumber(yAxisValue)}</Text>
+                                >{yAxisValue}</Text>
                               <Text
                                   x={ bar.y + horizBarLabelPadding }
                                   y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
@@ -440,13 +467,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
-                          >{formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                          >{config.runtime[section].type==='date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
                         </Text>
 
                         { (displayNumbersOnBar) ?
                            (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                             (
                                 <Text
+                                  display={displayBar ? 'block' : 'none'}
                                   x={ bar.y - 5 } // padding
                                   y={ config.isLollipopChart ? offset : (config.barHeight / 2 ) + config.barHeight * (barGroup.bars.length - bar.index - 1) }
                                   fill={ labelColor }
@@ -458,6 +486,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )
                             : (
                                 <Text
+                                  display={displayBar ? 'block' : 'none'}
                                   x={ `${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0 ) }`} // padding
                                   y={ config.isLollipopChart ? 0 : (config.barHeight / 2 ) + config.barHeight * (barGroup.bars.length - bar.index - 1)}
                                   fill={ '#000000'}
@@ -479,6 +508,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             (textWidth + 100 < bar.y && !config.isLollipopChart) ?
                               (
                                   <Text
+                                    display={displayBar ? 'block' : 'none'}
                                     x={ bar.y - 5 } // padding
                                     y={ 
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
@@ -493,6 +523,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               )
                               : (
                                   <Text
+                                    display={displayBar ? 'block' : 'none'}
                                     x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
                                     y={ 
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
