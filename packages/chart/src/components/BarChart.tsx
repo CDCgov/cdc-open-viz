@@ -467,7 +467,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
-                          >{config.runtime[section].type==='date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                          >{config.runtime.yAxis.type==='date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
                         </Text>
 
                         { (displayNumbersOnBar) ?
