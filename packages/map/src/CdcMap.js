@@ -306,6 +306,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // Default to "bluegreen" color scheme if the passed color isn't valid
             let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
+            // Handle Region Maps need for a 10th color
+            if( general.geoType === 'us-region' && mapColorPalette.length < 10 ) {
+                if(!general.palette.isReversed) {
+                    mapColorPalette.push( chroma(mapColorPalette[8]).darken(0.75).hex() )
+                } else {
+                    mapColorPalette.unshift( chroma(mapColorPalette[0]).darken(0.75).hex() )
+                }
+            }
+
             let colorIdx = legendIdx - specialClasses
 
             // Special Classes (No Data)
