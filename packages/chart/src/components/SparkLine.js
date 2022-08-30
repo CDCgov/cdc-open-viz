@@ -96,6 +96,19 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
 	}
 
+	let innerContainerClasses = ['cove-component__inner']
+	config.title && innerContainerClasses.push('component--has-title')
+	config.subtext && innerContainerClasses.push('component--has-subtext')
+	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+	let contentClasses = ['cove-component__content'];
+	contentClasses.push('sparkline')
+	!config.visual?.border && contentClasses.push('no-borders');
+	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+	config.visual?.accent && contentClasses.push('component--has-accent');
+	config.visual?.background && contentClasses.push('component--has-background');
+	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
 
 
 	useEffect(() => {
@@ -104,7 +117,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
 	return (
 		<ErrorBoundary component="LineChart">
-			<svg width={width} height={height} className="sparkline">
+			<svg width={width} height={height} className={contentClasses.join(' ')}>
 					{(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
 						<Group
 							height={parentHeight}

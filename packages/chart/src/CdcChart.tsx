@@ -646,7 +646,7 @@ export default function CdcChart(
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
           {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
+          {title && <div role="heading" className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>{parse(title)}</div>}
           <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
             Skip Over Chart Container
           </a>

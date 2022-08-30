@@ -1273,6 +1273,14 @@ const EditorPanel = () => {
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
                   }
+
+                  <div className="cove-accordion__panel-section">
+                    <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                    <CheckBox value={config.visual?.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                    <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                    <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                    <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
