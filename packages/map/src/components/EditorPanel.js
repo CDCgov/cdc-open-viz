@@ -1943,13 +1943,13 @@ const EditorPanel = (props) => {
 														)}
 													</Droppable>
 												</DragDropContext>
-												{editorCatOrder.length >= 9 && (
+												{editorCatOrder.length >= 10 && (
 													<section className='error-box my-2'>
 														<div>
 															<strong className='pt-1'>Warning</strong>
 															<p>
-																The maximum number of categorical legend items is 9. If
-																your data has more than 9 categories your map will not
+																The maximum number of categorical legend items is 10. If
+																your data has more than 10 categories your map will not
 																display properly.
 															</p>
 														</div>

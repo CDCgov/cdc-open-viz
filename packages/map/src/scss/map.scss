@@ -216,3 +216,57 @@ header + .map-container.full-border {
 	top: 10px;
 	right: 10px;
 }
+
+//Region Maps
+#region-1-label,
+#region-2-label,
+#region-3-label,
+#region-4-label,
+#region-5-label,
+#region-6-label,
+#region-7-label,
+#region-8-label,
+#region-9-label,
+#region-10-label {
+	background: #fff;
+}
+
+#region-1-label {
+	transform: translate(90%, 32%);
+}
+
+#region-2-label {
+	transform: translate(84%, 41%);
+}
+
+#region-3-label {
+	transform: translate(78%, 55%);
+}
+
+#region-4-label {
+	transform: translate(70%, 75%);
+}
+
+#region-5-label {
+	transform: translate(65%, 52%);
+}
+
+#region-6-label {
+	transform: translate(45%, 80%);
+}
+
+#region-7-label {
+	transform: translate(52%, 55%);
+}
+
+#region-8-label {
+	transform: translate(35%, 40%);
+}
+
+#region-9-label {
+	transform: translate(18%, 65%);
+}
+
+#region-10-label {
+	transform: translate(15%, 35%);
+}
