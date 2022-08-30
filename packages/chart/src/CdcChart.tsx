@@ -446,7 +446,7 @@ export default function CdcChart(
     // check if value is range data ex: 0-10
     if(String(num).indexOf('-')!==0 && String(num).indexOf('-')!==-1) return num;
      // check if value contains any letters
-    if(/[A-Za-z]+/g.test(num)) return String(num);
+    if(/[^0-9]+/g.test(num)) return String(num);
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
    
