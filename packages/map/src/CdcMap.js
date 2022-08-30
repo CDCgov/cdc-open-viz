@@ -18,7 +18,16 @@ import Canvg from 'canvg';
 // Data
 import colorPalettes from '../../core/data/colorPalettes';
 import ExternalIcon from './images/external-link.svg';
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
+import {
+    supportedStates,
+    supportedTerritories,
+    supportedCountries,
+    supportedCounties,
+    supportedCities,
+    supportedStatesFipsCodes,
+    stateFipsToTwoDigit,
+    supportedRegions
+} from './data/supported-geos';
 import initialState from './data/initial-state';
 import { countryCoordinates } from './data/country-coordinates';
 
@@ -43,6 +52,7 @@ import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import UsaRegionMap from './components/UsaRegionMap'; // Future: Lazy
 import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
@@ -52,6 +62,7 @@ import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
+const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
@@ -213,6 +224,25 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 }
             }
 
+            if("us-region" === obj.general.geoType && obj.columns.geo.name) {
+
+                // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+
+                let geoName = '';
+                if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
+
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
+
+                console.log('geoName', geoName)
+
+                // Regions
+                uid = regionKeys.find( (key) => supportedRegions[key].includes(geoName) )
+
+
+            }
+
             // World Check
             if("world" === obj.general.geoType) {
                 const geoName = row[obj.columns.geo.name]
@@ -268,7 +298,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             6: [ 0, 2, 3, 4, 5, 7 ],
             7: [ 0, 2, 3, 4, 5, 6, 7 ],
             8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ],
+            10: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
         }
 
         const applyColorToLegend = (legendIdx) => {
@@ -385,7 +416,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     uniqueValues.get(value).push(hashObj(row))
                 }
 
-                if(count === 9) break // Can only have 9 categorical items for now
+                if(count === 10) break // Can only have 10 categorical items for now
             }
 
             let sorted = [...uniqueValues.keys()]
@@ -1339,7 +1370,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
             const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data) 
+            setRuntimeData(data)
         }
 
         // Legend
@@ -1514,7 +1545,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                     <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
                                 {'us' === general.geoType && (
-                                    <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                  <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'us-region' === general.geoType && (
+                                  <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
                                 {'world' === general.geoType && (
                                     <WorldMap supportedCountries={supportedCountries} {...mapProps} />
