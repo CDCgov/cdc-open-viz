@@ -21,6 +21,37 @@ $theme: (
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
     }
+
+     &.theme-#{$theme-name} {
+
+      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
+        border-left: 1px solid string.unquote(nth($theme-colors, 1));
+        border-right: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      // when component doesn't have a title add border top
+      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
+        border-top: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+      
+      // should probably be in color definitions but logically makes sense here.
+      .cove-component__inner:not(.component--has-title) .cove-component__content {
+        border-top: 1px solid #ccc;
+      }
+
+      .cove-component__header {
+        border-color: string.unquote(nth($theme-colors, 2));
+      }
+
+      .cove-component__content.component--has-accent {
+        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3));
+      }
+    }
   }
 }
 
