@@ -10,6 +10,7 @@ import LineIcon from '@cdc/core/assets/chart-line-solid.svg'
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg'
 import GlobeIcon from '@cdc/core/assets/world-graphic.svg'
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg'
+import UsaRegionIcon from '@cdc/core/assets/usa-region-graphic.svg'
 import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg'
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
 import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg'
@@ -209,7 +210,7 @@ export default function ChooseTab() {
         <li>
           <Tooltip position="right">
             <Tooltip.Target>
-              <IconButton label="United States Regions" type="map" subType="us-region" icon={<UsaIcon/>}/>
+              <IconButton label="United States (HHS Regions)" type="map" subType="us-region" icon={<UsaRegionIcon/>}/>
             </Tooltip.Target>
             <Tooltip.Content>
               Present a U.S. choropleth map at state or county level.
