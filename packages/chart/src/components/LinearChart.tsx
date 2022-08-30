@@ -194,7 +194,7 @@ export default function LinearChart() {
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
             stroke="#333"
-            tickFormat={config.yAxis.type ==='date' ? formatDate : formatNumber}
+            tickFormat={(tick)=> config.runtime.yAxis.type ==='date' ? formatDate(parseDate(tick)) : config.orientation==='vertical' ? formatNumber(tick) : tick }
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
@@ -306,7 +306,7 @@ export default function LinearChart() {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
-            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate :formatNumber}
+            tickFormat={tick=> config.runtime.xAxis.type === 'date' ?  formatDate(tick) : config.orientation ==='horizontal' ? formatNumber(tick) : tick}
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
