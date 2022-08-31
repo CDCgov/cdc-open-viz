@@ -220,8 +220,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             }
 
             newConfig.dashboard.sharedFilters[i].values = filterValues
-            if(newConfig.visualizations[visualizationKeys[j]].dataKey){
-              newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || (dataOverride || data)[newConfig.visualizations[visualizationKeys[j]].dataKey][0][filter.columnName]
+            if(filterValues.length > 0){
+              newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0];
             }
             break
           }
@@ -229,8 +229,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
         if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
           newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, (dataOverride || data))
-          if(newConfig.visualizations[visualizationKeys[i]].dataKey){
-            newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || (dataOverride || data)[newConfig.visualizations[visualizationKeys[i]].dataKey][0][filter.columnName]
+          if(newConfig.dashboard.sharedFilters[i].values.length > 0){
+            newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0];
           }
         }
 
