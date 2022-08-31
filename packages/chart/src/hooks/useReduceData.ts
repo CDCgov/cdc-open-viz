@@ -4,7 +4,7 @@ function useReduceData(config,data) {
 const getMaxValueFromData = () => {
   let max; // will hold max number from data.
   if (
-    config.visualizationType === "Bar" &&
+    (config.visualizationType === "Bar" || config.visualizationType === "Combo") &&
     config.visualizationSubType === "stacked"
   ) {
     const yTotals = data.reduce((allTotals, xValue) => {

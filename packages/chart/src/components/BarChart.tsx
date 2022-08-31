@@ -14,7 +14,7 @@ import { BarStackHorizontal } from '@visx/shape';
 
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes,formatDate,parseDate } = useContext<any>(Context);
   const { orientation, visualizationSubType } = config;
   const isHorizontal = orientation === 'horizontal';
 
@@ -26,13 +26,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const isLabelOnBar = config.yAxis.labelPlacement === "On Bar";
   const isLabelMissing = !config.yAxis.labelPlacement;
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar;
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const isRounded = config.barStyle==='rounded';
   const isStacked = config.visualizationSubType === 'stacked'
   const tipRounding =  config.tipRounding ;
   const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
   const stackCount = config.runtime.seriesKeys.length;
- 
+
   const applyRadius = (index:number)=>{
     if(index === undefined || index === null || !isRounded) return;
     let style = {};
@@ -105,8 +106,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             color={colorScale}
           >
             {barStacks => barStacks.reverse().map(barStack => barStack.bars.map(bar => {
+              const xAxisValue = config.runtime.xAxis.type==='date' ? formatDate(parseDate( data[bar.index][config.runtime.xAxis.dataKey])) :  data[bar.index][config.runtime.xAxis.dataKey]
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}` : formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${data[bar.index][config.runtime.xAxis.dataKey]}` : data[bar.index][config.runtime.xAxis.dataKey]
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue;
 
               const tooltip = `<div>
               ${yAxisTooltip}<br />
@@ -165,9 +167,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {(barStacks) =>
                 barStacks.map((barStack) =>
                   barStack.bars.map((bar, index) => {
-                    
+                    const xAxisValue =  config.runtime.yAxis.type==='date'  ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${formatNumber(data[bar.index][bar.key])}` : `${bar.key}: ${formatNumber(data[bar.index][bar.key])}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index][config.runtime.originalXAxis.dataKey]}`
+                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
 
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
@@ -226,7 +228,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor="start"
                             verticalAnchor="start"
                           >
-                           {formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                           {isHorizontal ? xAxisValue : formatNumber(xAxisValue)}
                           </Text>
                       }
 
@@ -248,7 +250,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }
                             }
                           >
-                            { formatNumber( data[bar.index][bar.key])}
+                            {formatNumber(data[bar.index][bar.key])}
                           </Text>
                       }
                       </Group>
@@ -321,7 +323,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
 
                     let yAxisValue = formatNumber(bar.value);
-                    let xAxisValue = data[barGroup.index][config.runtime.originalXAxis.dataKey];
+                    let xAxisValue = config.runtime[section].type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
                     if(config.runtime.horizontal){
                       let tempValue = yAxisValue;
@@ -453,7 +455,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ "#000" }
                                   textAnchor="start"
                                   verticalAnchor="end"
-                                >{formatNumber(yAxisValue)}</Text>
+                                >{yAxisValue}</Text>
                               <Text
                                   x={ bar.y + horizBarLabelPadding }
                                   y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
@@ -473,7 +475,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
-                          >{formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
+                          >{config.runtime.yAxis.type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) :isHorizontal?data[barGroup.index][config.runtime.originalXAxis.dataKey]: formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
                         </Text>
 
                         { (displayNumbersOnBar) ?
