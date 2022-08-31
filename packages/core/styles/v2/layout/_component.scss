@@ -1,6 +1,6 @@
 .cove-component {
   border-radius: 3px;
-  box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px;
+  // box-shadow: rgba(0, 0, 0, 0.2) 3px 6px 10px; // no box shadows
 }
 
 .cove-component__header {
@@ -20,6 +20,10 @@
   border: solid 1px #ccc;
   border-top: none;
   border-radius: 0 0 3px 3px;
+
+  &.no-borders {
+    border: none;
+  }
 }
 
 .cove-component__content-wrap {

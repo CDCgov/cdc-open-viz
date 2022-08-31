@@ -31,6 +31,9 @@
 
       .cove-waffle-chart__data {
         text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: space-between;
       }
     }
   }

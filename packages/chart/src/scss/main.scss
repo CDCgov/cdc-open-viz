@@ -17,6 +17,8 @@
   @import 'DataTable';
   @import 'editor-panel';
 
+  border-radius: 3px;
+
   .visually-hidden {
     position: fixed;
     left: -10000px;
@@ -70,6 +72,9 @@
     font-size: 1.1em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
+
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 
     em {
       font-style: italic;
@@ -252,7 +257,7 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section, .chart-container {
+    .filters-section, .chart-container:not(.sparkline) {
       margin-left: 1em;
       margin-right: 1em;
     }
@@ -348,6 +353,7 @@
   }
 }
 
+
 .isEditor.type-sparkline .cdc-chart-inner-container {
     margin: 3em auto 0;
     max-width: 60%;
@@ -357,14 +363,22 @@
   width: 100%;
 }
 
-.type-sparkline {
+.cdc-open-viz-module.type-chart.type-sparkline {
 
-  .cove-component__content {
-    padding-bottom: 35px;
+  .chart-title:not(:empty) {
+    margin-bottom: 0 !important;
+  }
+
+  .cove-component__content .chart-container {
+    padding: 1em;
   }
 
   .cove-component__content:not(.no-borders) {
       border: 1px solid $lightGray;
+  }
+
+  .subtext {
+    margin-top: 0px;
   }
 
   .isEditor {
@@ -375,4 +389,13 @@
     margin-bottom: 15px;
   }
 
+}
+
+.cdc-open-viz-module .cove-component__content.sparkline {
+  padding: 1em;
+}
+
+.cove-component__content.sparkline {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
 }

@@ -17,6 +17,7 @@ $theme: (
 // .type-sparkline class used for creating sparklines
 // once v2 is released plz update html structure
 // to use .cove
+.type-waffle-chart,
 .type-data-bite,
 .type-sparkline,
 .cove {
@@ -25,6 +26,8 @@ $theme: (
     .theme-#{$theme-name} {
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
+      border-bottom-style: solid;
+      border-bottom-width: 4px;
     }
 
      &.theme-#{$theme-name} {

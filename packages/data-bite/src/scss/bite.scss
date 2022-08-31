@@ -110,8 +110,9 @@
   padding: 0 1em;
   left: 0;
   top: 0;
-  line-height: 2.2em;
+  padding: 0.6rem 0.8rem;
   color: white;
+  font-size:1.1em;
   &:empty {
     min-height: 5px;
   }
@@ -127,6 +128,17 @@
     border-top: none;
     background: $lightestGray;
     border: solid 1px $lightGray;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+
+    &-header {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+
+    &.no-borders {
+      border: none;
+    }
 
     &.shadow {
       box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;

@@ -661,7 +661,7 @@ export default function CdcChart(
       <>
         {isEditor && <EditorPanel />}
         {!missingRequiredSections() && !config.newViz && <div className={`cdc-chart-inner-container`}>
-          <div className={`${contentClasses.join(' ')}`}>
+          <>
             {/* Title */}
             {title && <div role="heading" className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>{parse(title)}</div>}
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
@@ -670,7 +670,7 @@ export default function CdcChart(
             {/* Filters */}
             {config.filters && <Filters />}
             {/* Visualization */}
-            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
+            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               
               {/* All charts except sparkline */}
               {config.visualizationType !== "Spark Line" && 
@@ -696,12 +696,13 @@ export default function CdcChart(
               {(!config.legend.hide && config.visualizationType !== "Spark Line") && <Legend />}
 
             </div>
-          </div>
+          </>
           {/* Description */}
           { (description && config.visualizationType !== "Spark Line") && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
           { (config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line") && <DataTable />}
-        </div>}
+        </div>
+        }
       </>
     )
   }

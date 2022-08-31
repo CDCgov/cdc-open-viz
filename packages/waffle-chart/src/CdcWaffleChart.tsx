@@ -279,43 +279,68 @@ const WaffleChart = ({ config, isEditor }) => {
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
+
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+  let contentClasses = ['cove-component__content'];
+  !config.visual?.border && contentClasses.push('no-borders');
+  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+  config.visual?.accent && contentClasses.push('component--has-accent');
+  config.visual?.background && contentClasses.push('component--has-background');
+  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+  // ! these two will be retired.
+  config.shadow && innerContainerClasses.push('shadow')
+  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+
   return (
-    <>
-      {title &&
-      <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-        {parse(title)}
-      </header>
-      }
-      <div className="cove-component__content">
-        <div className="cove-component__content-wrap">
-          <div
-            className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-            <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-              <svg width={setRatio()} height={setRatio()}>
-                <Group>
-                  {buildWaffle()}
-                </Group>
-              </svg>
-            </div>
-            {(dataPercentage || content) &&
-            <div className="cove-waffle-chart__data">
-              {dataPercentage &&
-              <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
-                {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
+    <div className={innerContainerClasses.join(' ')}>
+      <>
+        {title &&
+        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+          {parse(title)}
+        </header>
+        }
+        <div className={contentClasses.join(' ')}>
+          <div className="cove-component__content-wrap">
+            <div
+              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+              <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
+                <svg width={setRatio()} height={setRatio()}>
+                  <Group>
+                    {buildWaffle()}
+                  </Group>
+                </svg>
+              </div>
+              {(dataPercentage || content) &&
+              <div className="cove-waffle-chart__data">
+                {dataPercentage &&
+                <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
+                  {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
+                </div>
+                }
+                <div className="cove-waffle-chart__data--text" >{parse(content)}</div>
+                {subtext &&
+                  <div className="cove-waffle-chart__subtext">
+                    {parse(subtext)}
+                  </div>
+                }
               </div>
               }
-              <div className="cove-waffle-chart__data--text">{parse(content)}</div>
+            </div>
+            {subtext &&
+            <div className="cove-waffle-chart__subtext">
+              {parse(subtext)}
             </div>
             }
           </div>
-          {subtext &&
-          <div className="cove-waffle-chart__subtext">
-            {parse(subtext)}
-          </div>
-          }
         </div>
-      </div>
-    </>
+      </>
+    </div>
   )
 }
 
@@ -407,14 +432,18 @@ const CdcWaffleChart = (
       classNames.push('is-editor')
     }
 
+    let bodyClasses = ['cove-component', 'waffle-chart']
+
+    
+
     let body = (
-      <div className="cove-component waffle-chart" ref={outerContainerRef}>
+      <div className={`cove-component waffle-chart ${bodyClasses.join(' ')}`} ref={outerContainerRef}>
         <WaffleChart config={config} isEditor={isEditor}/>
       </div>
     )
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme}`} style={isDashboard ? { marginTop: '3rem' } : null}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>
