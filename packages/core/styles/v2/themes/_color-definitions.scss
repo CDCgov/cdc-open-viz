@@ -17,6 +17,7 @@ $theme: (
 // .type-sparkline class used for creating sparklines
 // once v2 is released plz update html structure
 // to use .cove
+.type-data-bite,
 .type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {

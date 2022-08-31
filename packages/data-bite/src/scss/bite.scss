@@ -345,5 +345,19 @@
         }
       }
     }
+
+    // General: Compact View
+    &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+      align-items: center;
+      p.bite-text {
+        margin-bottom: 0;
+      }
+    }
+
+    &.bite--isCompactStyle .bite .cove-component__content {
+      align-items: center;
+    }
+
+    .cove-component__header + .bite { border-top: 0; }
   }
 }

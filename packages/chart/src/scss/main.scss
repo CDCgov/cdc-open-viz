@@ -357,11 +357,22 @@
   width: 100%;
 }
 
-.type-sparkline.isEditor {
-  position: relative;
+.type-sparkline {
 
-}
+  .cove-component__content {
+    padding-bottom: 35px;
+  }
 
-.type-sparkline .subtext {
-  margin-bottom: 15px;
+  .cove-component__content:not(.no-borders) {
+      border: 1px solid $lightGray;
+  }
+
+  .isEditor {
+    position: relative;
+  }
+
+  .subtext {
+    margin-bottom: 15px;
+  }
+
 }
