@@ -232,41 +232,61 @@ header + .map-container.full-border {
 }
 
 #region-1-label {
-	transform: translate(90%, 32%);
+	transform: translate(90%, 22%);
 }
 
 #region-2-label {
-	transform: translate(84%, 41%);
+	transform: translate(83%, 33%);
 }
 
 #region-3-label {
-	transform: translate(78%, 55%);
+	transform: translate(75%, 45%);
 }
 
 #region-4-label {
-	transform: translate(70%, 75%);
+	transform: translate(68%, 70%);
 }
 
 #region-5-label {
-	transform: translate(65%, 52%);
+	transform: translate(65%, 44%);
 }
 
 #region-6-label {
-	transform: translate(45%, 80%);
+	transform: translate(45%, 75%);
 }
 
 #region-7-label {
-	transform: translate(52%, 55%);
+	transform: translate(53%, 47%);
 }
 
 #region-8-label {
-	transform: translate(35%, 40%);
+	transform: translate(35%, 30%);
 }
 
 #region-9-label {
-	transform: translate(18%, 65%);
+	transform: translate(18%, 58%);
 }
 
 #region-10-label {
-	transform: translate(15%, 35%);
+	transform: translate(15%, 28%);
+}
+
+#region-2-territories,
+#region-9-territories {
+	text {
+		font-weight: bold;
+		font-size: 14px;
+	}
+}
+
+#region-2-territories {
+	transform: translate(86%, 40%);
+}
+
+#region-9-territories {
+	transform: translate(4%, 72%);
+
+	.region-9-row2 {
+		transform: translateY(34px);
+	}
 }
