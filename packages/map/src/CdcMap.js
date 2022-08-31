@@ -235,8 +235,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     geoName = geoName.toUpperCase()
                 }
 
-                console.log('geoName', geoName)
-
                 // Regions
                 uid = regionKeys.find( (key) => supportedRegions[key].includes(geoName) )
 
