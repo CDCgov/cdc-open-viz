@@ -40,7 +40,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    general: { isCompactStyle }
   } = config;
 
 
@@ -359,6 +360,23 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
   }
 
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+  let contentClasses = ['cove-component__content'];
+  !config.visual?.border && contentClasses.push('no-borders');
+  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+  config.visual?.accent && contentClasses.push('component--has-accent');
+  config.visual?.background && contentClasses.push('component--has-background');
+  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+  // ! these two will be retired.
+  config.shadow && innerContainerClasses.push('shadow')
+  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
       if (node !== null) {
@@ -457,18 +475,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className="cdc-data-bite-inner-container">
             {title && <div className="bite-header">{parse(title)}</div>}
-            <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className="bite-content-container">
+            <div className={`bite ${biteClasses.join(' ')} ${contentClasses.join(' ')}`}>
+              <div className={`bite-content-container ${innerContainerClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
-                <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                <div className={`bite-content`}>
+                  {showBite && 'title' === biteStyle && <div className="bite-value cove-component__header" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
                       <p className="bite-text">
                         {showBite && 'body' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
                         {parse(biteBody)}
                       </p>
-                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      {subtext && !isCompactStyle && <p className="bite-subtext">{parse(subtext)}</p>}
                     </Fragment>
                 </div>
                 {isBottom && <DataImage />}
