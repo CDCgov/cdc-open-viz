@@ -35,8 +35,6 @@ const UsaRegionMap = (props) => {
     handleCircleClick
   } = props;
 
-  console.log('data[geoKey]', data)
-
   // "Choose State" options
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(unitedStates)
@@ -173,8 +171,6 @@ const UsaRegionMap = (props) => {
 
       const geoData = data[geoKey];
 
-      console.log('geoKey', geoKey)
-
       let legendColors;
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
@@ -203,6 +199,16 @@ const UsaRegionMap = (props) => {
           styles.cursor = 'pointer'
         }
 
+        const TerratoryRect = (props) => {
+          const { posX = 0, tName } = props
+          return (
+            <>
+            <rect x={posX} width="36" height="24" rx="6" fill="#fff" stroke="#E6E6E6" strokeWidth="2" />
+            <text x={posX + 8} y="16">{tName}</text>
+            </>
+          )
+        }
+
         return (
           <g
             data-for="tooltip"
@@ -224,6 +230,27 @@ const UsaRegionMap = (props) => {
               <circle fill="#fff" stroke="#999" cx="15" cy="15" r="15"/>
               <text fill="#333" x="15px" y="20px" textAnchor="middle">{index+1}</text>
             </g>
+            {geoKey === 'region 2' &&
+              <g id="region-2-territories">
+                <TerratoryRect tName="PU" />
+                <TerratoryRect posX={45} tName="VI" />
+              </g>
+            }
+
+            { geoKey === 'region 9' &&
+              <g id="region-9-territories">
+                <g className="region-9-row1">
+                  <TerratoryRect tName="AS" />
+                  <TerratoryRect posX={45} tName="GU" />
+                  <TerratoryRect posX={90} tName="MP" />
+                </g>
+                <g className="region-9-row2">
+                  <TerratoryRect tName="FM" />
+                  <TerratoryRect posX={45} tName="PW" />
+                  <TerratoryRect posX={90} tName="MH" />
+                </g>
+              </g>
+            }
             {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
           </g>
         )
@@ -254,7 +281,7 @@ const UsaRegionMap = (props) => {
     <ErrorBoundary component="UsaRegionMap">
       <svg viewBox="0 0 880 500">
 
-        <Mercator data={focusedStates} scale={620} translate={[1500, 775]}>
+        <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
         </Mercator>
 
