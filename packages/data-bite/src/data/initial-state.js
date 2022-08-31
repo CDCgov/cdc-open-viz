@@ -27,7 +27,7 @@ export default {
     theme: "theme-blue",
     shadow: false,
     visual: {
-      border: true,
+      border: false,
       accent: false,
       background: false,
       hideBackgroundColor: false,
