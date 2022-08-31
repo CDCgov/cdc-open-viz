@@ -393,8 +393,6 @@ export default function CdcChart(
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
-        // check if value is Date format
-    if(checkIfValidDate(num)) return String(num)
     // check if value is range data ex: 0-10
     if(String(num).indexOf('-')!==0 && String(num).indexOf('-')!==-1) return num;
      // check if value contains any letters
