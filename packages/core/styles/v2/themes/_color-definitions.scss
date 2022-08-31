@@ -14,6 +14,10 @@ $theme: (
         'teal':   ('#00695c', '#4ebaaa', '#ceece7', '#ebf7f5' )
 );
 
+// .type-sparkline class used for creating sparklines
+// once v2 is released plz update html structure
+// to use .cove
+.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
