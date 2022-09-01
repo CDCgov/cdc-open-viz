@@ -11,29 +11,53 @@ import parse from 'html-react-parser';
 import './scss/main.scss'
 
 interface Props {
-	configUrl?: string,
+	configUrl: string,
 	config?: object,
 	isDashboard?: boolean,
 	isEditor?: boolean,
 	setConfig?: Function
 }
-
 type Defaults = typeof defaults;
 
 const CdcFilteredText:FC<Props> = (props) => {
 
-	const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+	const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props;
   
-  const transform = new DataTransform()
+  const transform = new DataTransform();
   // Default States
-  const [ config, setConfig ] = useState<Defaults>({ ...defaults })
-  const [ loading, setLoading ] = useState(true)
+  const [ config, setConfig ] = useState<Defaults>(defaults);
+  const [ loading, setLoading ] = useState(true);
   const [stateData, setStateData] = useState<Array<any>>(config.data || []);
-  let {
-    title,
-    filters
-  } = config
+  const [excludedData, setExcludedData] = useState<Array<Object>>();
+  let {title,filters} = config;
+
   // Default Functions
+
+  const loadConfig = async () => {
+    let response = configObj || await (await fetch(configUrl)).json();
+    // If data is included through a URL, fetch that and store
+    let data = response.formattedData || response.data || {};
+
+    if(response.dataUrl) {
+      const dataString = await fetch(response.dataUrl);
+
+      data = await dataString.json();
+      if(response.dataDescription) {
+        data = transform.autoStandardize(data);
+        data = transform.developerStandardize(data, response.dataDescription);
+      }
+    }
+
+    if(data) {
+      setStateData(data)
+      setExcludedData(data)
+    }
+
+    let newConfig = {...config,...response};
+    updateConfig(newConfig);
+    setLoading(false)
+  };
+
   const updateConfig = (newConfig) => {
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
@@ -46,64 +70,6 @@ const CdcFilteredText:FC<Props> = (props) => {
 
     newConfig.runtime.editorErrorMessage = ''
     setConfig(newConfig)
-  }
-
-  // const loadConfig = useCallback(async () => {
-  //   let response = configObj || await (await fetch(configUrl)).json()
-  //   let responseData = response.data ?? {}
-
-  //   if (response.dataUrl) {
-  //     const dataString = await fetch(response.dataUrl)
-  //     responseData = await dataString.json()
-  //   }
-
-  //   response.data = responseData
-
-  //   updateConfig({ ...defaults, ...response })
-  //   setLoading(false)
-  // }, [])
-
-  const fetchRemoteData = async(url)=>{  
-   try{
-    const data = await fetch(url)
-    .then(response => response.text())
-    .then(responseText => {
-      const parsedCsv = Papa.parse(responseText, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true
-      })
-      return parsedCsv.data
-    })
-   return data
-   }catch(err){
-    console.warn('err :>> ', err);
-   }
-  }
-  const loadConfig = async () => {
-    if(!loading) setLoading(true)
-
-    let response = configObj || await (await fetch(configUrl)).json();
-    // If data is included through a URL, fetch that and store
-    let responseData = response.data ?? {}
-
-    if (response.dataUrl) {
-      let newData = await fetchRemoteData(response.dataUrl)
-      if(newData && response.dataDescription) {
-          newData = transform.autoStandardize(newData);
-          newData = transform.developerStandardize(newData, response.dataDescription);
-      }
-
-      if(newData) {
-        responseData = newData;
-      }
-    }
-
-    response.data = responseData;
-    setStateData(response.data)
-    updateConfig({ ...defaults, ...response });
-
-    setLoading(false);
   }
 
     //Optionally filter the data based on the user's filter
@@ -119,6 +85,7 @@ const CdcFilteredText:FC<Props> = (props) => {
         return null
       }
     })
+
 
   //Load initial config
   useEffect(() => {
@@ -140,15 +107,14 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
          <>
         {title && <header className={`cove-component__header ${config.theme} `}>{title}</header>}
         <div className={filterClasses.join(' ')} >
-            <div className="cove-component__content-wrap">
-             {filteredData.slice(0,1).map((el,i)=>{
-              return (
-                <p key={i} > {el.Text} </p>
-              )
-            })}  
-            sdsdcsd
-            </div>
+          <div className="cove-component__content-wrap">
+            {filteredData.slice(0,1).map((el,i)=>{
+            return (
+              <p key={i} > {el.Text} </p>
+            )
+          })}  
           </div>
+        </div>
           </>
     )
 
@@ -159,13 +125,20 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
       </div>
     )
   }
-
-  console.log('Hello')
+  const values={
+    config, 
+    updateConfig,
+    loading, 
+    setParentConfig,
+    isDashboard,
+    stateData,
+    unfilteredData:stateData
+  }
 
   return (
     <ErrorBoundary component="CdcFilteredText">
       <ConfigContext.Provider
-        value={{ config, updateConfig, loading, setParentConfig, isDashboard,stateData }}>
+        value={values}>
         {content}
       </ConfigContext.Provider>
     </ErrorBoundary>
