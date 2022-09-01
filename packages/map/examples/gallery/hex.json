@@ -1,0 +1,413 @@
+{
+	"general": {
+		"geoType": "us",
+		"geoBorderColor": "darkGray",
+		"headerColor": "theme-blue",
+		"showTitle": true,
+		"showSidebar": true,
+		"showDownloadButton": true,
+		"showDownloadMediaButton": false,
+		"displayAsHex": true,
+		"displayStateLabels": false,
+		"territoriesLabel": "Territories",
+		"language": "en",
+		"hasRegions": false,
+		"expandDataTable": false,
+		"fullBorder": false,
+		"type": "data",
+		"title": "Hex Map of the United States of America",
+		"subtext": "- Clarification Text Added Here -\n( * ) State Data Under Minimum\n( NA ) State Data Not Collected"
+	},
+	"type": "map",
+	"color": "pinkpurple",
+	"columns": {
+		"geo": {
+			"name": "STATE",
+			"label": "Location",
+			"tooltip": false,
+			"dataTable": true
+		},
+		"primary": {
+			"dataTable": true,
+			"tooltip": true,
+			"prefix": "",
+			"suffix": "",
+			"name": "Rate",
+			"label": ""
+		},
+		"navigate": {
+			"name": "STATE"
+		}
+	},
+	"legend": {
+		"descriptions": {},
+		"specialClasses": [],
+		"unified": false,
+		"singleColumn": true,
+		"dynamicDescription": false,
+		"type": "equalnumber",
+		"numberOfItems": 5,
+		"position": "side",
+		"title": "Legend"
+	},
+	"filters": [],
+	"dataTable": {
+		"title": "Data Table",
+		"forceDisplay": true
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true
+	},
+	"data": [
+		{
+			"STATE": "AL",
+			"Rate": 10,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "AK",
+			"Rate": 12,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "AS",
+			"Rate": 14,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "AZ",
+			"Rate": 9,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "AR",
+			"Rate": 17,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "CA",
+			"Rate": "*",
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "CO",
+			"Rate": 22,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "CT",
+			"Rate": 10,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "DE",
+			"Rate": 12,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "DC",
+			"Rate": "14",
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "FL",
+			"Rate": 9,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "GA",
+			"Rate": 17,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "GU",
+			"Rate": 20,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "HI",
+			"Rate": 22,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "ID",
+			"Rate": "*",
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "IL",
+			"Rate": 12,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "IN",
+			"Rate": 14,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "IA",
+			"Rate": 9,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "KS",
+			"Rate": "NA",
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "KY",
+			"Rate": 20,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "LA",
+			"Rate": 22,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "ME",
+			"Rate": 10,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MH",
+			"Rate": 12,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MD",
+			"Rate": "*",
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MA",
+			"Rate": 9,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MI",
+			"Rate": 17,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "FM",
+			"Rate": 20,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MN",
+			"Rate": 22,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MS",
+			"Rate": 10,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MO",
+			"Rate": 11,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MT",
+			"Rate": 14,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NE",
+			"Rate": 9,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NV",
+			"Rate": 17,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NH",
+			"Rate": 20,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NJ",
+			"Rate": 28,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NM",
+			"Rate": 10,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NY",
+			"Rate": 12,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "NC",
+			"Rate": 14,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "ND",
+			"Rate": 9,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "MP",
+			"Rate": 17,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "OH",
+			"Rate": "NA",
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "OK",
+			"Rate": 22,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "OR",
+			"Rate": 10,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "PW",
+			"Rate": 12,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "PA",
+			"Rate": 14,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "PR",
+			"Rate": 6,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "RI",
+			"Rate": 17,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "SC",
+			"Rate": 20,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "SD",
+			"Rate": 22,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "TN",
+			"Rate": 10,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "TX",
+			"Rate": 12,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "VT",
+			"Rate": 9,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "VI",
+			"Rate": 17,
+			"Location": "Vehicle",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "VA",
+			"Rate": 20,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "WA",
+			"Rate": 22,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "WV",
+			"Rate": 10,
+			"Location": "School",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "WI",
+			"Rate": 12,
+			"Location": "Work",
+			"URL": "https://www.cdc.gov/"
+		},
+		{
+			"STATE": "WY",
+			"Rate": 14,
+			"Location": "Home",
+			"URL": "https://www.cdc.gov/"
+		}
+	]
+}

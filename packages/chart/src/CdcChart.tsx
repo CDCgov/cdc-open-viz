@@ -8,6 +8,7 @@ import 'whatwg-fetch'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
 import { timeParse, timeFormat } from 'd3-time-format';
+import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
@@ -28,8 +29,8 @@ import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
 ) {
 
   const transform = new DataTransform();
@@ -51,16 +52,45 @@ export default function CdcChart(
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const cacheBustingString = () => {
+      const round = 1000 * 60 * 15;
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+  }
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
-      const dataString = await fetch(response.dataUrl);
+    if (response.dataUrl) {
 
-      data = await dataString.json();
+      try {
+        const regex = /(?:\.([^.]+))?$/
+
+        const ext = (regex.exec(response.dataUrl)[1])
+        if ('csv' === ext) {
+            data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
+                .then(response => response.text())
+                .then(responseText => {
+                    const parsedCsv = Papa.parse(responseText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    })
+                    return parsedCsv.data
+                })
+        }
+
+        if ('json' === ext) {
+            data = await fetch(response.dataUrl  + `?v=${cacheBustingString()}`)
+                .then(response => response.json())
+        }
+      } catch {
+        console.error(`Cannot parse URL: ${response.dataUrl}`);
+        data = [];
+      }
+
       if(response.dataDescription) {
         data = transform.autoStandardize(data);
         data = transform.developerStandardize(data, response.dataDescription);
@@ -205,6 +235,7 @@ export default function CdcChart(
         }
       }
     }
+    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -218,6 +249,7 @@ export default function CdcChart(
           add = false;
         }
       });
+
       if(add) filteredData.push(row);
     });
     return filteredData;
@@ -313,7 +345,7 @@ export default function CdcChart(
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if(stateData && config.xAxis && config.runtime.seriesKeys) {
-      let palette = colorPalettes[config.palette]
+      let palette = config.customColors || colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
 
       while(numberOfKeys > palette.length) {
@@ -373,9 +405,10 @@ export default function CdcChart(
   const highlightReset = () => {
     setSeriesHighlight([]);
   }
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const parseDate = (dateString: string) => {
-    let date = timeParse(config.runtime.xAxis.dateParseFormat)(dateString);
+    let date = timeParse(config.runtime[section].dateParseFormat)(dateString);
     if(!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`;
       return new Date();
@@ -384,12 +417,19 @@ export default function CdcChart(
     }
   };
 
+
   const formatDate = (date: Date) => {
-    return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
+    return timeFormat(config.runtime[section].dateDisplayFormat)(date);
   };
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+    if(num === undefined || num ===null) return "";
+    // check if value contains comma and remove it. later will add comma below.
+    if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
+    // if num is NaN return num
+    if(isNaN(num)) return num ;
+
     let original = num;
     let prefix = config.dataFormat.prefix;
 
@@ -400,18 +440,17 @@ export default function CdcChart(
     };
 
     num = numberFromString(num);
-
-    if(isNaN(num)) {
+    
+    if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
-      return
+      return original
     }
 
     if (!config.dataFormat) return num;
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
+      if(num < cutoff) { 
         num = cutoff;
       }
     }
@@ -428,8 +467,7 @@ export default function CdcChart(
     if(config.dataFormat.suffix) {
       result += config.dataFormat.suffix
     }
-
-    return result
+    return String(result)
   };
 
   // Destructure items from config for more readable JSX
@@ -617,27 +655,51 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          {config.filters && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend />}
+        {!missingRequiredSections() && !config.newViz && (
+          <div className="cdc-chart-inner-container">
+            {/* Title */}
+
+            {title && (
+              <div
+                role="heading"
+                className={`chart-title ${config.theme}`}
+                aria-level={2}
+              >
+                {config.general && (
+                  <sup className="superTitle">{config.general.superTitle}</sup>
+                )}
+                <div>{parse(title)}</div>
+              </div>
+            )}
+            <a
+              id="skip-chart-container"
+              className="cdcdataviz-sr-only-focusable"
+              href={handleChartTabbing}
+            >
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            {config.filters && <Filters />}
+            {/* Visualization */}
+            {config.general?.introText && <section className="introText">{config.general.introText}</section>}
+            <div
+              className={`chart-container${
+                config.legend.hide ? " legend-hidden" : ""
+              }${lineDatapointClass}${barBorderClass}`}
+            >
+              {chartComponents[visualizationType]}
+              {/* Legend */}
+              {!config.legend.hide && <Legend />}
+            </div>
+            {/* Description */}
+            {description && <div className="subtext">{parse(description)}</div>}
+            {/* Data Table */}
+            {config.xAxis.dataKey && config.table.show && <DataTable />}
+            {config.general?.footnotes && <section className="footnotes">{config.general.footnotes}</section>}
           </div>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
-        </div>}
+        )}
       </>
-    )
+    );
   }
 
   const contextValues = {
@@ -660,7 +722,7 @@ export default function CdcChart(
     setParentConfig,
     missingRequiredSections,
     setEditing,
-    setFilteredData
+    setFilteredData,
   }
 
   return (
