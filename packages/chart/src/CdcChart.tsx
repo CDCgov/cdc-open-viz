@@ -649,7 +649,7 @@ export default function CdcChart(
 
   let sparkLineStyles = {
     width: '100%',
-    height: '150px',
+    height: '100px',
   }
 
   if(false === loading) {
@@ -679,16 +679,18 @@ export default function CdcChart(
 
               {/* Sparkline */}
               {config.visualizationType === "Spark Line" && (
-                <div style={sparkLineStyles}>
-                <ParentSize>
-                  {(parent) => (
-                    <>
-                      { description && <div className="subtext">{parse(description)}</div>}
-                      <SparkLine width={parent.width} height={parent.height} />
-                    </>
-                  )}
-                  </ParentSize>
+                <>
+                  { description && <div className="subtext">{parse(description)}</div>}
+                  <div style={sparkLineStyles}>
+                    <ParentSize>
+                      {(parent) => (
+                        <>
+                          <SparkLine width={parent.width} height={parent.height} />
+                        </>
+                      )}
+                    </ParentSize>
                   </div>
+                </>
               )
               }
 

@@ -5,6 +5,8 @@ import { Group } from '@visx/group';
 import { LinePath } from '@visx/shape';
 import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
+import { AxisBottom } from '@visx/axis';
+
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
@@ -17,19 +19,17 @@ import Context from '../context';
 
 export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
-	console.log('parentWidth', parentWidth)
-	console.log('parentHeight', parentHeight)
 	const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale } = useContext(Context);
 	let width = parentWidth
 	const { minValue, maxValue } = useReduceData(config, data)
 	// if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
 	// 	width = width * 0.73;
 	// }
-	const margin = ({ top: 10, right: 10, bottom: 10, left: 10 })
+	const margin = ({ top: 5, right: 10, bottom: 10, left: 10 })
 	const height = parentHeight;
 
 	const xMax = width - config.runtime.yAxis.size;
-	const yMax = height - config.runtime.xAxis.size;
+	const yMax = height - margin.top - 20;
 
 	const getXAxisData = (d) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
 	const getYAxisData = (d, seriesKey) => d[seriesKey];
@@ -37,6 +37,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 	let xScale;
 	let yScale;
 	let seriesScale;
+
 
 	if (data) {
 		let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
@@ -96,16 +97,27 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
 	}
 
+	const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]];
+
+
 	useEffect(() => {
 		ReactTooltip.rebuild();
 	});
 
 	return (
 		<ErrorBoundary component="LineChart">
-			<svg width={width} height={height} className={'sparkline'}>
+			<svg
+				//viewBox={`0 0 ${width} ${height}`}
+				width={width} 
+				height={height} 
+				className={'sparkline'}
+				>
 					{(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
+						<>
 						<Group
+							className='sparkline-group'
 							height={parentHeight}
+							top={margin.top}
 							key={`series-${seriesKey}`}
 							opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
 							display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
@@ -156,6 +168,23 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 								shapeRendering="geometricPrecision"
 							/>
 						</Group>
+						<AxisBottom
+							top={yMax + margin.top}
+							hideAxisLine
+							hideTicks
+							scale={xScale}
+							tickValues={ handleSparkLineTicks }
+							tickFormat={formatDate}
+							stroke={'black'}
+							tickStroke={'black'}
+							tickLabelProps={() => ({
+								fill: 'black',
+								fontSize: 11,
+								textAnchor: 'middle',
+							})}
+							
+							/>
+							</>
 					))
 					}
 			</svg>
