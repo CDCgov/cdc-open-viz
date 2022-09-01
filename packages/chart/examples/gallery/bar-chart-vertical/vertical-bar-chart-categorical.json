@@ -1,0 +1,80 @@
+{
+	"type": "chart",
+	"title": "Categorical Bar Chart",
+	"theme": "theme-blue",
+	"fontSize": "medium",
+	"height": 300,
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": "71",
+		"gridLines": true,
+		"label": "Y-Axis Example Label"
+	},
+	"barThickness": "0.5",
+	"xAxis": {
+		"size": "58",
+		"tickRotation": 0,
+		"dataKey": "Location",
+		"label": "X-Axis Example Label"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": true
+	},
+	"legend": {
+		"behavior": "highlight",
+		"position": "right",
+		"label": "Sample Groups"
+	},
+	"palette": "qualitative-bold",
+	"labels": false,
+	"dataFormat": {
+		"suffix": " "
+	},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Location": "Vehicle",
+			"Group A": "100",
+			"Group B": "150",
+			"Group C": "90"
+		},
+		{
+			"Location": "Home",
+			"Group A": "120",
+			"Group B": "140",
+			"Group C": "90"
+		},
+		{
+			"Location": "Work",
+			"Group A": "140",
+			"Group B": "100",
+			"Group C": "80"
+		},
+		{
+			"Location": "Office",
+			"Group A": "120",
+			"Group B": "90",
+			"Group C": "80"
+		}
+	],
+	"visualizationType": "Bar",
+	"series": [
+		{
+			"dataKey": "Group A",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Group B",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Group C",
+			"type": "Bar"
+		}
+	],
+	"description": "This example shows a Standard Categorical (Non-Time-Based) Bar Chart created in the visualization editor in WCMS"
+}

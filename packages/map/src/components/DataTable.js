@@ -31,7 +31,9 @@ const DataTable = (props) => {
     displayGeoName,
     navigationHandler,
     viewport,
-    formatLegendLocation
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -40,7 +42,7 @@ const DataTable = (props) => {
 
   const [ready, setReady] = useState(false)
 
-  const fileName = `${mapTitle}.csv`;
+  const fileName = `${mapTitle || 'data-table'}.csv`;
 
 
   // Catch all sorting method used on load by default but also on user click
@@ -286,7 +288,7 @@ const DataTable = (props) => {
   if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
@@ -343,7 +345,7 @@ const DataTable = (props) => {
               return (
                 <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell">
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
                       {cell.render('Cell')}
                     </td>
                   ))}
