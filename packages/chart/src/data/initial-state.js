@@ -52,5 +52,10 @@ export default {
   isPaletteReversed: false,
   labels: false,
   dataFormat: {},
-  confidenceKeys: {}
+  confidenceKeys: {},
+  visual: {
+    border: true,
+    accent: true,
+    background: true
+  }
 }
