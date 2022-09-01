@@ -48,7 +48,7 @@ export default function DataImport() {
 
   const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
 
-  const [ addingDataset, setAddingDataset ] = useState(true);
+  const [ addingDataset, setAddingDataset ] = useState(config.type === 'dashboard' || !config.data);
 
   const [ editingDataset, setEditingDataset ] = useState();
 
