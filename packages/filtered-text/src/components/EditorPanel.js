@@ -265,29 +265,29 @@ const EditorPanel = memo((props) => {
 		</Accordion>
 		<Accordion>
 			<Accordion.Section title="Data">
-			<Select value={config.fontSize} fieldName="fontSize" label="Text Column" updateField={updateField} options={getColumns()} />
+			<Select value={config.fontSize} fieldName="textColumn" label="Text Column" updateField={updateField} options={getColumns()} />
 			{config.filters &&
 			<ul className="filters-list">
 			{config.filters.map((filter, index) => (
 				<fieldset className="edit-block" key={index}>
 					<button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
 					<label>
-					<span className="edit-label column-heading">Column</span>
-					<select value={filter.columnName ? filter.columnName : ''} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
-						<option value="">- Select Option -</option>
-						{getColumns().map((dataKey, index) => (
-						<option value={dataKey} key={index}>{dataKey}</option>
-						))}
-					</select>
+						<span className="edit-label column-heading">Column</span>
+						<select value={filter.columnName ? filter.columnName : ''} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+							<option value="">- Select Option -</option>
+							{getColumns().map((dataKey, index) => (
+							<option value={dataKey} key={index}>{dataKey}</option>
+							))}
+						</select>
 					</label>
 					<label>
-					<span className="edit-label column-heading">Column Value</span>
-					<select value={filter.columnValue} onChange={(e) => {updateFilterProp('columnValue', index, e.target.value)}}>
-						<option value="">- Select Option -</option>
-						{getFilterColumnValues(index).map((dataKey, index) => (
-						<option value={dataKey} key={index}>{dataKey}</option>
-						))}
-					</select>
+						<span className="edit-label column-heading">Column Value</span>
+						<select value={filter.columnValue} onChange={(e) => {updateFilterProp('columnValue', index, e.target.value)}}>
+							<option value="">- Select Option -</option>
+							{getFilterColumnValues(index).map((dataKey, index) => (
+							<option value={dataKey} key={index}>{dataKey}</option>
+							))}
+						</select>
 					</label>
 				</fieldset>
 				))}
