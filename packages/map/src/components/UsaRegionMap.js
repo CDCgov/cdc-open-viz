@@ -232,7 +232,7 @@ const UsaRegionMap = (props) => {
             </g>
             {geoKey === 'region 2' &&
               <g id="region-2-territories">
-                <TerratoryRect tName="PU" />
+                <TerratoryRect tName="PR" />
                 <TerratoryRect posX={45} tName="VI" />
               </g>
             }
