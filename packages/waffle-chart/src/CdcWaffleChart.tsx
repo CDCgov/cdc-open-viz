@@ -437,7 +437,7 @@ const CdcWaffleChart = (
     
 
     let body = (
-      <div className={`cove-component waffle-chart ${bodyClasses.join(' ')}`} ref={outerContainerRef}>
+      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
         <WaffleChart config={config} isEditor={isEditor}/>
       </div>
     )
