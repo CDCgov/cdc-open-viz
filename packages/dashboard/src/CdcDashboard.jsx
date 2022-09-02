@@ -170,17 +170,19 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       if (newConfig.dashboard.sharedFilters[i].setBy === key) {
         newConfig.dashboard.sharedFilters[i].active = datum[newConfig.dashboard.sharedFilters[i].columnName]
-
-        Object.keys(newConfig.visualizations).forEach(visualizationKey => {
-          if (newConfig.dashboard.sharedFilters[i].usedBy.indexOf(visualizationKey) !== -1) {
-            const visualization = newConfig.visualizations[visualizationKey]
-
-            newFilteredData[visualizationKey] = filterData(newConfig.dashboard.sharedFilters, visualization.formattedData || data[visualization.dataKey])
-          }
-        })
         break
       }
     }
+
+    Object.keys(newConfig.visualizations).forEach(visualizationKey => {
+      let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1);
+      
+      if (applicableFilters.length > 0) {
+        const visualization = newConfig.visualizations[visualizationKey]
+        
+        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
+      }
+    })
 
     setFilteredData(newFilteredData)
     setConfig(newConfig)
@@ -233,13 +235,13 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0];
           }
         }
+      })
 
-        if (newConfig.dashboard.sharedFilters[i].usedBy) {
-          visualizationKeys.forEach(visualizationKey => {
-            if (newConfig.dashboard.sharedFilters[i].usedBy.indexOf(visualizationKey) !== -1) {
-              newFilteredData[visualizationKey] = filterData(newConfig.dashboard.sharedFilters, newConfig.visualizations[visualizationKey].formattedData || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
-            }
-          })
+      visualizationKeys.forEach(visualizationKey => {
+        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1);
+
+        if (applicableFilters.length > 0) {
+          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
         }
       })
     }
