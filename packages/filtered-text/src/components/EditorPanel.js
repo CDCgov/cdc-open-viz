@@ -6,107 +6,23 @@ import ConfigContext from '../ConfigContext'
 
 import Accordion from '@cdc/core/components/ui/Accordion'
 import InputText from '@cdc/core/components/inputs/InputText'
-import { useDebounce } from 'use-debounce'
+import Button from '@cdc/core/components/elements/Button'
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import InputSelect from '@cdc/core/components/inputs/InputSelect'
+import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
+
 
 import '@cdc/core/styles/v2/components/editor.scss';
 
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
-const TextField = memo(({label, section = null, subsection = null, fieldName, updateField, value: stateValue, tooltip, type = "input", i = null, min = null, max = null, ...attributes}) => {
-	const [ value, setValue ] = useState(stateValue);
-  
-	const [ debouncedValue ] = useDebounce(value, 500);
-  
-	useEffect(() => {
-	  if('string' === typeof debouncedValue && stateValue !== debouncedValue ) {
-		updateField(section, subsection, fieldName, debouncedValue, i)
-	  }
-	}, [debouncedValue, section, subsection, fieldName, i, stateValue, updateField])
-  
-	let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`;
-  
-	const onChange = (e) => {
-	  //TODO: This block gives a warning/error in the console, but it still works.
-	  if('number' !== type || min === null){
-		setValue(e.target.value);
-	  } else {
-		if(!e.target.value || ( parseFloat(min) <= parseFloat(e.target.value ) & parseFloat(max) >= parseFloat(e.target.value))) {
-		  setValue(e.target.value);
-		} else {
-		  setValue(min.toString());
-		}
-	  }                                                                                
-	};
-  
-	let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value} />
-  
-	if('textarea' === type) {
-	  formElement = (
-		<textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
-	  )
-	}
-  
-	if('number' === type) {
-	  formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value} />
-	}
-  
-	return (
-	  <>
-		{label && label.length > 0 &&
-		  <label>
-			<span className="edit-label column-heading">{label}{tooltip}</span>
-			{formElement}
-		  </label>
-		}
-		{(!label || label.length === 0) && formElement}
-	  </>
-	)
-  })
-
-  const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
-	<label className="checkbox">
-	  <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
-	  <span className="edit-label">{label}</span>
-	</label>
-  ))
-  
-  const Select = memo(({label, value, options, fieldName, section = null, subsection = null, required = false, updateField, initial: initialValue, ...attributes}) => {
-	let optionsJsx = '';
-	if ( Array.isArray(options)) { //Handle basic array
-	  optionsJsx = options.map(optionName => <option value={optionName} key={optionName}>{optionName}</option>)
-	} else { //Handle object with value/name pairs
-	  optionsJsx = [];
-	  for (const [optionValue, optionName] of Object.entries(options)) {
-		optionsJsx.push(<option value={optionValue} key={optionValue}>{optionName}</option>)
-	  }
-	}
-  
-	if(initialValue) {
-	  optionsJsx.unshift(<option value="" key="initial">{initialValue}</option>)
-	}
-  
-	return (
-	  <label>
-		<span className="edit-label">{label}</span>
-		<select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => { updateField(section, subsection, fieldName, event.target.value) }} {...attributes}>
-		  {optionsJsx}
-		</select>
-	  </label>
-	)
-  })
 
 const EditorPanel = memo((props) => {
-	const {
-		config,
-		updateConfig,
-		loading,
-		stateData:data,
-		setParentConfig,
-		isDashboard
-	} = useContext(ConfigContext) 
+	const {config,updateConfig,loading,stateData:data,setParentConfig,isDashboard } = useContext(ConfigContext);
 
-	const [displayPanel, setDisplayPanel] = useState(true)
-	const [showConfigConfirm, setShowConfigConfirm] = useState(false)
+	const [displayPanel, setDisplayPanel] = useState(true);
+	const [showConfigConfirm, setShowConfigConfirm] = useState(false);
 
 
 	const updateField = (section, subsection, fieldName, newValue) => {
@@ -121,7 +37,6 @@ const EditorPanel = memo((props) => {
 			updateConfig(updatedConfig)
 			return
 		}
-
 		const isArray = Array.isArray(config[section])
 
 		let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
@@ -146,7 +61,7 @@ const EditorPanel = memo((props) => {
 		return false
 	}
 
-	  // Filters -----------------------------------------------
+	  // Filters -------------------------
 	  const removeFilter = (index) => {
 		let filters = [...config.filters];
 	
@@ -177,7 +92,9 @@ const EditorPanel = memo((props) => {
 			data.map(row => {
 			  return Object.keys(row).forEach(columnName => columns[columnName] = true)
 			 })
-		  }
+		  };
+		  //  remove Text prop
+		if(columns.hasOwnProperty('Text')) delete columns['Text']
 	
 	
 		return Object.keys(columns)
@@ -201,7 +118,6 @@ const EditorPanel = memo((props) => {
 		// Pass up to Editor if needed
 		if (setParentConfig) {
 			const newConfig = convertStateToConfig()
-
 			setParentConfig(newConfig)
 		}
 	}, [config])
@@ -257,71 +173,142 @@ const EditorPanel = memo((props) => {
 		return strippedState
 	}
 	const editorContent = (
-		<> 
 		<Accordion>
-			<Accordion.Section title="General">
-			<TextField value={config.title} fieldName="title" label="Title" placeholder="Title" updateField={updateField} />
-			</Accordion.Section>
-		</Accordion>
-		<Accordion>
-			<Accordion.Section title="Data">
-			<Select value={config.fontSize} fieldName="textColumn" label="Text Column" updateField={updateField} options={getColumns()} />
-			{config.filters &&
-			<ul className="filters-list">
-			{config.filters.map((filter, index) => (
-				<fieldset className="edit-block" key={index}>
-					<button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove</button>
+		  <Accordion.Section title="General">
+			<InputText
+			  value={config.title}
+			  fieldName="title"
+			  label="Title"
+			  placeholder="Waffle Chart Title"
+			  updateField={updateField}
+			/>
+		  </Accordion.Section>
+		  <Accordion.Section title="Data">
+			<div className="cove-accordion__panel-section">
+			  <div className="cove-input-group">
+				<InputSelect
+				  value={config.textColumn || ""}
+				  fieldName="textColumn"
+				  label="Text Column"
+				  updateField={updateField}
+				  initial="Select"
+				  options={getColumns()}
+				/>
+			  </div>
+			</div>
+			<hr className="cove-accordion__divider" />
+	
+			<label style={{ marginBottom: "1rem" }}>
+			  <span className="edit-label">Data Point Filters</span>
+			  <Tooltip style={{ textTransform: "none" }}>
+				<Tooltip.Target>
+				  <Icon display="question" style={{ marginLeft: "0.5rem" }} />
+				</Tooltip.Target>
+				<Tooltip.Content>
+				  <p>
+					To refine the highlighted data point, specify one or more
+					filters (e.g., "Male" and "Female" for a column called "Sex").
+				  </p>
+				</Tooltip.Content>
+			  </Tooltip>
+			</label>
+			{config.filters && (
+			  <ul
+				className="filters-list"
+				style={{ paddingLeft: 0, marginBottom: "1rem" }}
+			  >
+				{config.filters.map((filter, index) => (
+				  <fieldset className="edit-block" key={index}>
+					<button
+					  type="button"
+					  className="remove-column"
+					  onClick={() => {
+						removeFilter(index);
+					  }}
+					>
+					  Remove
+					</button>
 					<label>
-						<span className="edit-label column-heading">Column</span>
-						<select value={filter.columnName ? filter.columnName : ''} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
-							<option value="">- Select Option -</option>
-							{getColumns().map((dataKey, index) => (
-							<option value={dataKey} key={index}>{dataKey}</option>
-							))}
-						</select>
+					  <span className="edit-label column-heading">Column</span>
+					  <select
+						value={filter.columnName}
+						onChange={(e) => {
+						  updateFilterProp("columnName", index, e.target.value);
+						}}
+					  >
+						<option value="">- Select Option -</option>
+						{getColumns().map((dataKey, index) => (
+						  <option value={dataKey} key={index}>
+							{dataKey}
+						  </option>
+						))}
+					  </select>
 					</label>
 					<label>
-						<span className="edit-label column-heading">Column Value</span>
-						<select value={filter.columnValue} onChange={(e) => {updateFilterProp('columnValue', index, e.target.value)}}>
-							<option value="">- Select Option -</option>
-							{getFilterColumnValues(index).map((dataKey, index) => (
-							<option value={dataKey} key={index}>{dataKey}</option>
-							))}
-						</select>
+					  <span className="edit-label column-heading">
+						Column Value
+					  </span>
+					  <select
+						value={filter.columnValue}
+						onChange={(e) => {
+						  updateFilterProp("columnValue", index, e.target.value);
+						}}
+					  >
+						<option value="">- Select Option -</option>
+						{getFilterColumnValues(index).map((dataKey, index) => (
+						  <option value={dataKey} key={index}>
+							{dataKey}
+						  </option>
+						))}
+					  </select>
 					</label>
-				</fieldset>
+				  </fieldset>
 				))}
-			</ul>
-                  }
-                  {(!config.filters || config.filters.length === 0) &&
-                    <div>
-                      <fieldset className="edit-block">
-                        <p style={{textAlign: "center"}}>There are currently no filters.</p>
-                      </fieldset>
-                    </div>
-                  }
-                  <button type="button" onClick={addNewFilter} className="btn full-width">Add Filter</button>
-			</Accordion.Section>
+			  </ul>
+			)}
+			<Button onClick={addNewFilter} fluid>
+			  Add Filter
+			</Button>
+		  </Accordion.Section>
+		  <Accordion.Section title="Visual">
+	
+			<InputSelect
+			  value={config.fontSize}
+			  fieldName="fontSize"
+			  label="Font Size"
+			  updateField={updateField}
+			  options={["small", "medium", "large"]}
+			/>
+	
+			<label>
+			  <span className="edit-label">Theme</span>
+			  <ul className="color-palette">
+				{headerColors.map((palette) => (
+				  <li
+					title={palette}
+					key={palette}
+					onClick={() => {
+					  updateConfig({ ...config, theme: palette });
+					}}
+					className={
+					  config.theme === palette ? "selected " + palette : palette
+					}
+				  ></li>
+				))}
+			  </ul>
+			</label>
+			
+			<div className="cove-accordion__panel-section">
+			  <InputCheckbox inline size='small' value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+			  <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
+			  <InputCheckbox size='small' value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+			  <InputCheckbox size='small' value={config.visual.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+			  <InputCheckbox size='small' value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+			</div>
+		  </Accordion.Section>
 		</Accordion>
-		<Accordion>
-			<Accordion.Section title="Visual">
-				<Select value={config.fontSize} fieldName="fontSize" label="Overall Font Size" updateField={updateField} options={['small', 'medium', 'large']} />
-				<CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
-				<CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
-				<CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
-				<CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
-				<label >
-				<span className="edit-label">Theme</span>
-				{/* <ul className="color-palette">
-					{headerColors.map( (palette) => (
-					<li title={ palette } key={ palette } onClick={ () => { updateConfig({...config, theme: palette})}} className={ config.theme === palette ? "selected " + palette : palette} />
-					))}
-				</ul> */}
-				</label>
-			</Accordion.Section>
-		</Accordion>
-		</>
-	)
+	  );
+
 
 	if (loading) return null
 
@@ -350,4 +337,4 @@ const EditorPanel = memo((props) => {
 	)
 })
 
-export default EditorPanel
+export default EditorPanel;
