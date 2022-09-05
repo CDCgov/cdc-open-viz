@@ -73,19 +73,31 @@ const CdcFilteredText:FC<Props> = (props) => {
   }
 
     //Optionally filter the data based on the user's filter
-    let filteredData = stateData;
-  
-    filters.map((filter) => {
-      if ( filter.columnName && filter.columnValue ) {
-      return filteredData = filteredData.filter(function (e) {
-          return e[filter.columnName] === filter.columnValue;
-        });
-      } else {
-      
-        return null
-      }
-    })
 
+
+    const filterByTextColumn = ()=>{
+    let filteredData =[]
+
+      if(filters.length){
+        filters.map((filter) => {
+           if ( filter.columnName && filter.columnValue ) {
+           return filteredData = stateData.filter(function (e) {
+               return e[filter.columnName] === filter.columnValue;
+             });
+           } else {
+             return null;
+           }
+         })
+       }else{
+         // filter by textColumn if selected
+          return filteredData = stateData.filter((e,index)=> {
+          return e[config.textColumn] && index===0
+        })
+       }
+     
+       return filteredData
+    };
+   
 
   //Load initial config
   useEffect(() => {
@@ -105,17 +117,23 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
   if (loading === false) {
     let body = (
          <>
-        {title && <header className={`cove-component__header ${config.theme} `}>{title}</header>}
+        {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
         <div className={filterClasses.join(' ')} >
           <div className="cove-component__content-wrap">
-            {filteredData.slice(0,1).map((el,i)=>{
-            return (
-              <p key={i} > {el.Text} </p>
-            )
+            {filterByTextColumn().slice(0,1).map((el,i)=>{
+              if(el.text || el.Text){
+                return (
+                  <p  key={i} > {parse(el.Text || el.text)} </p>
+                )
+              }else{
+                return (
+                  <p  key={i} > {parse(el[config.textColumn] ||"")} </p>
+                )
+              }
           })}  
           </div>
         </div>
-          </>
+        </>
     )
 
     content = (
