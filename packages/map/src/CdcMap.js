@@ -127,6 +127,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     const [filteredCountryCode, setFilteredCountryCode] = useState()
     const [position, setPosition] = useState(state.mapPosition);
+    const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
+    const [container, setContainer] = useState()
 
     
     let legendMemo = useRef(new Map())
@@ -814,6 +816,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (node !== null) {
             resizeObserver.observe(node);
         }
+        setContainer(node)
     },[]);
 
     const mapSvg = useRef(null);
@@ -1302,8 +1305,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // Initial load
     useEffect(() => {
         init()
-        publish('cove_loaded', { loadConfigHasRun: true })
     }, [])
+
+    useEffect(() => {
+        if (state && !coveLoadedHasRan && container) {
+            publish('cove_loaded', { config: state })
+            setCoveLoadedHasRan(true)
+        }
+    }, [state, container]);
 
     // useEffect(() => {
     //     if(state.focusedCountry && state.data) {

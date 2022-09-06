@@ -336,6 +336,8 @@ const CdcWaffleChart = (
   const [ loading, setLoading ] = useState(true)
 
   const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const [ container, setContainer ] = useState()
 
   // Default Functions
   const updateConfig = (newConfig) => {
@@ -382,13 +384,20 @@ const CdcWaffleChart = (
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
-    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+        publish('cove_loaded', { config: config })
+        setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   //Reload config if config object provided/updated
   useEffect(() => {

@@ -105,6 +105,10 @@ export default function CdcDashboard(
 
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
+
   const { title, description } = config ? (config.dashboard || config) : {}
 
   // Supports JSON or CSV
@@ -221,6 +225,10 @@ export default function CdcDashboard(
     return values
   }
 
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   const updateConfig = (newConfig, dataOverride = null) => {
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
@@ -258,7 +266,6 @@ export default function CdcDashboard(
   // Load data when component first mounts
   useEffect(() => {
     loadConfig(config)
-    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
   // Pass up to <CdcEditor /> if it exists when config state changes
@@ -267,6 +274,13 @@ export default function CdcDashboard(
       setParentConfig(config)
     }
   }, [ config ])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -334,6 +348,7 @@ export default function CdcDashboard(
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   // Prevent render if loading

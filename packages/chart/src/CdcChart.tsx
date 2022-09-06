@@ -50,6 +50,8 @@ export default function CdcChart(
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
   const [parentElement, setParentElement] = useState(false)
   const [externalFilters, setExternalFilters] = useState([]);
+  const [container, setContainer] = useState()
+  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
@@ -109,7 +111,6 @@ export default function CdcChart(
     let newConfig = {...defaults, ...response}
     if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data);
-    publish('cove_loaded', { config: newConfig })
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
@@ -316,6 +317,8 @@ export default function CdcChart(
     if (node !== null) {
         resizeObserver.observe(node);
     }
+
+    setContainer(node)
   },[]);
 
   function isEmpty(obj) {
@@ -326,6 +329,17 @@ export default function CdcChart(
   useEffect(() => {
     loadConfig();
   }, []);
+
+  /**
+   * When cove has a config and container ref publish the cove_loaded event.
+   */
+  useEffect(() => {
+    if(container && !isEmpty(config) && !coveLoadedEventRan) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedEventRan(true)
+    }
+
+  }, [container, config]);
   
 
 /**

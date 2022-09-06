@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useRef } from 'react'
 import axios from 'axios'
 import parse from 'html-react-parser'
 import { Markup } from 'interweave'
@@ -32,6 +32,8 @@ const CdcMarkupInclude = (
   const [ urlMarkup, setUrlMarkup ] = useState('')
   const [ markupError, setMarkupError ] = useState(null)
   const [ errorMessage, setErrorMessage ] = useState(null)
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const container = useRef();
 
   let {
     title
@@ -144,6 +146,13 @@ const CdcMarkupInclude = (
     publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
+
   //Reload config if config object provided/updated
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
@@ -159,7 +168,7 @@ const CdcMarkupInclude = (
   if (loading === false) {
     let body = (
       <>
-        <div className="cove-component markup-include">
+        <div className="cove-component markup-include" ref={container}>
           {title &&
             <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
               {parse(title)} {isDashboard}
