@@ -13,6 +13,8 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
+import { publish } from '@cdc/core/helpers/events';
+
 import './scss/main.scss'
 
 const themeColor = {
@@ -385,6 +387,7 @@ const CdcWaffleChart = (
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
   //Reload config if config object provided/updated

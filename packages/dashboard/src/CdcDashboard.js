@@ -32,6 +32,8 @@ import Papa from 'papaparse'
 
 import './scss/main.scss'
 
+import { publish } from '@cdc/core/helpers/events'
+
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
     newViz: true,
@@ -256,6 +258,7 @@ export default function CdcDashboard(
   // Load data when component first mounts
   useEffect(() => {
     loadConfig(config)
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
   // Pass up to <CdcEditor /> if it exists when config state changes

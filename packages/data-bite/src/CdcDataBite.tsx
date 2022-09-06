@@ -15,6 +15,9 @@ import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import { Fragment } from 'react';
 
+import { publish } from '@cdc/core/helpers/events'
+
+
 type DefaultsType = typeof defaults
 interface Props{
   configUrl?: string,
@@ -374,6 +377,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   // Initial load
   useEffect(() => {
     loadConfig()
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
   if(configObj && config && configObj.data !== config.data){

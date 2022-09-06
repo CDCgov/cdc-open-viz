@@ -12,6 +12,8 @@ import defaults from './data/initial-state'
 
 import './scss/main.scss'
 
+import { publish } from '@cdc/core/helpers/events';
+
 const CdcMarkupInclude = (
   {
     configUrl,
@@ -139,6 +141,7 @@ const CdcMarkupInclude = (
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
   //Reload config if config object provided/updated
