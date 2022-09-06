@@ -35,16 +35,6 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
     }
   }
 
-  const updateFilterProp = (name, index, value) => {
-    let dashboardConfig = {...config.dashboard};
-
-    dashboardConfig.sharedFilters[index][name] = value;
-
-    updateConfig({...config, dashboard: dashboardConfig});
-
-    overlay?.actions.openOverlay(filterModal(dashboardConfig.sharedFilters[index], index))
-  }
-
   const addNewFilter = () => {
     let dashboardConfig = {...config.dashboard};
 
@@ -64,21 +54,6 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
     updateConfig({...config, dashboard: dashboardConfig});
 
     overlay?.actions.toggleOverlay();
-  }
-
-  const addFilterUsedBy = (filter, index, value) => {
-    if(!filter.usedBy) filter.usedBy = [];
-    filter.usedBy.push(value);
-    updateFilterProp('usedBy', index, filter.usedBy);
-  }
-
-  const removeFilterUsedBy = (filter, index, value) => {
-    let usedByIndex = filter.usedBy.indexOf(value);
-    if(usedByIndex !== -1){
-      filter.usedBy.splice(usedByIndex, 1);
-      updateFilterProp('usedBy', index, filter.usedBy);
-    }
-
   }
 
   const convertStateToConfig = (type = "JSON") => {
@@ -141,55 +116,93 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
     runSetColumns()
   }, [config.datasets]);
 
-  const filterModal = (filter, index) => (
-    <Modal>
-      <Modal.Content>
-        <fieldset className="shared-filter-modal" key={filter.columnName + index}>
-          <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove Filter</button>
-          <label>
-            <span className="edit-label column-heading">Filter: </span>
-            <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
-              <option value="">- Select Option -</option>
-              {columns.map((dataKey) => (
-                <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>{dataKey}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span className="edit-label column-heading">Label: </span>
-            <input type="text" value={filter.key} onChange={(e) => {updateFilterProp('key', index, e.target.value)}}/>
-          </label>
-          <label>
-            <span className="edit-label column-heading">Show Dropdown</span>
-            <input type="checkbox" defaultChecked={filter.showDropdown === true} onChange={(e) => {updateFilterProp('showDropdown', index, !filter.showDropdown)}}/>
-          </label>
-          <label>
-            <span className="edit-label column-heading">Set By: </span>
-            <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
-              <option value="">- Select Option -</option>
-              {Object.keys(config.visualizations).map((vizKey) => (
-                <option value={vizKey} key={`set-by-select-item-${vizKey}`}>{vizKey}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span className="edit-label column-heading">Used By:</span>
-            <ul>
-              {filter.usedBy && filter.usedBy.map(vizKey => (
-                <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
-              ))}
-            </ul>
-            <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
-              <option value="">- Select Option -</option>
-              {Object.keys(config.visualizations).filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
-                <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{vizKey}</option>
-              ))}
-            </select>
-          </label>
-        </fieldset>
-      </Modal.Content>
-    </Modal>
-  )
+  const filterModal = (filter, index) => {
+
+    const saveChanges = () => {
+      let tempConfig = {...config.dashboard};
+      tempConfig.sharedFilters[index] = filter;
+
+      updateConfig({...config, dashboard: tempConfig});
+  
+      overlay?.actions.toggleOverlay()
+    }
+
+    const updateFilterProp = (name, index, value) => {
+      let newFilter = {...filter};
+
+      newFilter[name] = value;
+
+      overlay?.actions.openOverlay(filterModal(newFilter, index))
+    }
+
+    const addFilterUsedBy = (filter, index, value) => {
+      if(!filter.usedBy) filter.usedBy = [];
+      filter.usedBy.push(value);
+      updateFilterProp('usedBy', index, filter.usedBy);
+    }
+  
+    const removeFilterUsedBy = (filter, index, value) => {
+      let usedByIndex = filter.usedBy.indexOf(value);
+      if(usedByIndex !== -1){
+        filter.usedBy.splice(usedByIndex, 1);
+        updateFilterProp('usedBy', index, filter.usedBy);
+      }
+  
+    }
+    
+    return (
+      <Modal>
+        <Modal.Content>
+          <h2>Dashboard Filter Settings</h2>
+          <fieldset className="shared-filter-modal" key={filter.columnName + index}>
+            <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove Filter</button>
+            <label>
+              <span className="edit-label column-heading">Filter: </span>
+              <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
+                <option value="">- Select Option -</option>
+                {columns.map((dataKey) => (
+                  <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>{dataKey}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="edit-label column-heading">Label: </span>
+              <input type="text" value={filter.key} onChange={(e) => {updateFilterProp('key', index, e.target.value)}}/>
+            </label>
+            <label>
+              <span className="edit-label column-heading">Show Dropdown</span>
+              <input type="checkbox" defaultChecked={filter.showDropdown === true} onChange={(e) => {updateFilterProp('showDropdown', index, !filter.showDropdown)}}/>
+            </label>
+            <label>
+              <span className="edit-label column-heading">Set By: </span>
+              <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
+                <option value="">- Select Option -</option>
+                {Object.keys(config.visualizations).map((vizKey) => (
+                  <option value={vizKey} key={`set-by-select-item-${vizKey}`}>{vizKey}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="edit-label column-heading">Used By:</span>
+              <ul>
+                {filter.usedBy && filter.usedBy.map(vizKey => (
+                  <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
+                ))}
+              </ul>
+              <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
+                <option value="">- Select Option -</option>
+                {Object.keys(config.visualizations).filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
+                  <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{vizKey}</option>
+                ))}
+              </select>
+            </label>
+          </fieldset>
+          <button onClick={overlay?.actions.toggleOverlay}>Cancel</button>
+          <button onClick={saveChanges}>Save</button>
+        </Modal.Content>
+      </Modal>
+    )
+  }
 
   return (
     <div aria-level="2" role="heading" className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
