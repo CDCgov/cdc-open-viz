@@ -16,7 +16,8 @@ interface Props {
 	isDashboard?: boolean,
 	isEditor?: boolean,
 	setConfig?: Function
-}
+};
+
 type Defaults = typeof defaults;
 
 const CdcFilteredText:FC<Props> = (props) => {
@@ -49,34 +50,34 @@ const CdcFilteredText:FC<Props> = (props) => {
     }
 
     if(data) {
-      setStateData(data)
-      setExcludedData(data)
+      setStateData(data);
+      setExcludedData(data);
     }
 
     let newConfig = {...config,...response};
     updateConfig(newConfig);
-    setLoading(false)
+    setLoading(false);
   };
 
   const updateConfig = (newConfig) => {
     Object.keys(defaults).forEach(key => {
       if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
+        newConfig[key] = { ...defaults[key], ...newConfig[key] };
       }
     })
 
     newConfig.runtime = {}
-    newConfig.runtime.uniqueId = Date.now()
+    newConfig.runtime.uniqueId = Date.now();
 
-    newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
+    newConfig.runtime.editorErrorMessage = '';
+    setConfig(newConfig);
   }
 
     //Optionally filter the data based on the user's filter
 
 
     const filterByTextColumn = ()=>{
-    let filteredData =[]
+    let filteredData =[];
 
       if(filters.length){
         filters.map((filter) => {
@@ -91,17 +92,17 @@ const CdcFilteredText:FC<Props> = (props) => {
        }else{
          // filter by textColumn if selected
           return filteredData = stateData.filter((e,index)=> {
-          return e[config.textColumn] && index===0
+          return e[config.textColumn] && index===0;
         })
        }
      
-       return filteredData
+       return filteredData;
     };
    
 
   //Load initial config
   useEffect(() => {
-   loadConfig().catch((err) => console.log(err))
+   loadConfig().catch((err) => console.log(err));
   }, [])
   let content = (<Loading/>)
 
