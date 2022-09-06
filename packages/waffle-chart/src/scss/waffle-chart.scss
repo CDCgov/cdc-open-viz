@@ -8,6 +8,10 @@
   }
 }
 
+.cove .waffle-chart .cove-component__header {
+  font-size: unset;
+}
+
 //@each $theme, $color in $theme-colors {
 //  .cdc-waffle-chart.theme-#{$theme} #{&} {
 //    @include set-theme("color", $color);

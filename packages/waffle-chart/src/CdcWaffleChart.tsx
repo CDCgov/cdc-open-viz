@@ -301,9 +301,9 @@ const WaffleChart = ({ config, isEditor }) => {
     <div className={innerContainerClasses.join(' ')}>
       <>
         {title &&
-        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-          {parse(title)}
-        </header>
+        <div className={`cove-component__header chart-title ${config.theme}`} >
+            {parse(title)}
+        </div>
         }
         <div className={contentClasses.join(' ')}>
           <div className="cove-component__content-wrap">
@@ -443,7 +443,7 @@ const CdcWaffleChart = (
     )
 
     content = (
-      <div className={`cove ${config.theme}`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme}`}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>

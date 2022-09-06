@@ -70,20 +70,20 @@ const EditorPanel = memo((props) => {
     updateConfig(updatedConfig)
   }
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   console.log('updating parent')
-  //   console.log(setParentConfig)
-  //   // Pass up to Editor if needed
-  //   if (setParentConfig) {
-  //     const newConfig = convertStateToConfig()
+    console.log('updating parent')
+    console.log(setParentConfig)
+    // Pass up to Editor if needed
+    if (setParentConfig) {
+      const newConfig = convertStateToConfig()
 
-  //     console.log('newConfig', newConfig)
+      console.log('newConfig', newConfig)
 
-  //     setParentConfig(newConfig)
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [ config ])
+      setParentConfig(newConfig)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ config ])
 
   useEffect(()=> {
     if (!showConfigConfirm) {
