@@ -52,6 +52,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
 
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
+
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -372,6 +376,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       if (node !== null) {
           resizeObserver.observe(node);
       }
+      setContainer(node)
   },[]);
 
   // Initial load
@@ -379,6 +384,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     loadConfig()
     publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
+
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   if(configObj && config && configObj.data !== config.data){
     loadConfig();
