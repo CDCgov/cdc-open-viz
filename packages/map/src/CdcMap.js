@@ -59,6 +59,8 @@ import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
 
+import { publish } from '@cdc/core/helpers/events';
+
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
@@ -1300,6 +1302,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // Initial load
     useEffect(() => {
         init()
+        publish('cove_loaded', { loadConfigHasRun: true })
     }, [])
 
     // useEffect(() => {

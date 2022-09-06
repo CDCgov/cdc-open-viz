@@ -26,6 +26,8 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
+
 import './scss/main.scss';
 
 export default function CdcChart(
@@ -46,6 +48,8 @@ export default function CdcChart(
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
+  const [parentElement, setParentElement] = useState(false)
+  const [externalFilters, setExternalFilters] = useState([]);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
@@ -105,9 +109,11 @@ export default function CdcChart(
     let newConfig = {...defaults, ...response}
     if(undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data);
+    publish('cove_loaded', { config: newConfig })
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
+
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -161,7 +167,6 @@ export default function CdcChart(
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData;
-
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
@@ -175,6 +180,7 @@ export default function CdcChart(
           newConfig.filters[index].active = filterValues[0];
 
       });
+
       currentData = filterData(newConfig.filters, newExcludedData);
       setFilteredData(currentData);
     }
@@ -312,27 +318,65 @@ export default function CdcChart(
     }
   },[]);
 
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
   }, []);
+  
 
-  // useEffect(() => {
-  //   if(config.visualizationType === 'Paired Bar') {
-  //     updateConfig({
-  //       ...config,
-  //       yAxis: {
-  //         ...config.yAxis,
-  //         hideAxis: true
-  //       },
-  //       xAxis: {
-  //         ...config.xAxis,
-  //         hideAxis: true
-  //       }
-  //     })
-  //   }
-  // }, [config.visualizationType]);
+/**
+ * Handles filter change events outside of COVE
+ * Updates externalFilters state
+ * Another useEffect listens to externalFilterChanges and updates the config.
+ */
+  useEffect(() => {
 
+    const handleFilterData = (e:CustomEvent) => {
+        let tmp = [];
+        tmp.push(e.detail)
+        setExternalFilters(tmp)
+    }
+    
+    subscribe('cove_filterData', (e:CustomEvent) => handleFilterData(e))
+
+    return () => {
+      unsubscribe('cove_filterData', handleFilterData);
+    }
+
+  }, [config]);
+
+
+/**
+ * Handles changes to externalFilters
+ * For some reason e.detail is returning [order: "asc"] even though
+ * we're not passing that in. The code here checks for an active prop instead of an empty array.
+ */
+  useEffect(() => {
+
+    if(externalFilters[0]) {
+      const hasActiveProperty = externalFilters[0].hasOwnProperty('active')
+
+      if(!hasActiveProperty) {
+        let configCopy = {...config }
+        delete configCopy['filters']
+        setConfig(configCopy)
+        setFilteredData(filterData(externalFilters, excludedData));
+      }
+    }
+
+    if(externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
+      let newConfigHere = {...config, filters: externalFilters }
+      setConfig(newConfigHere)
+      setFilteredData(filterData(externalFilters, excludedData));
+    }
+    
+  }, [externalFilters]);
+
+  
   // Load data when configObj data changes
   if(configObj){
     useEffect(() => {
@@ -616,7 +660,7 @@ export default function CdcChart(
 
     let filterList = '';
     if (config.filters) {
-
+      
       filterList = config.filters.map((singleFilter, index) => {
         const values = [];
         const sortAsc = (a, b) => {
@@ -708,7 +752,7 @@ export default function CdcChart(
             Skip Over Chart Container
           </a>
           {/* Filters */}
-          {config.filters && <Filters />}
+          { (config.filters && !externalFilters ) && <Filters />}
           {/* Visualization */}
           <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
             {chartComponents[visualizationType]}
