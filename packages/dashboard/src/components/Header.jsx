@@ -155,7 +155,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
         <Modal.Content>
           <h2>Dashboard Filter Settings</h2>
           <fieldset className="shared-filter-modal" key={filter.columnName + index}>
-            <button type="button" className="remove-column" onClick={() => {removeFilter(index)}}>Remove Filter</button>
+            <button type="button" className="btn btn-primary remove-column" onClick={() => {removeFilter(index)}}>Remove Filter</button>
             <label>
               <span className="edit-label column-heading">Filter: </span>
               <select value={filter.columnName} onChange={(e) => {updateFilterProp('columnName', index, e.target.value)}}>
@@ -197,8 +197,8 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
               </select>
             </label>
           </fieldset>
-          <button onClick={overlay?.actions.toggleOverlay}>Cancel</button>
-          <button onClick={saveChanges}>Save</button>
+          <button type="button" className="btn btn-primary" style={{display: 'inline-block', 'margin-right': '1em'}} onClick={overlay?.actions.toggleOverlay}>Cancel</button>
+          <button type="button" className="btn btn-primary" style={{display: 'inline-block'}} onClick={saveChanges}>Save</button>
         </Modal.Content>
       </Modal>
     )
