@@ -1554,7 +1554,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						columns={state.columns}
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
-				)}
+                )}
+                {general.introText && <section className="introText">{parse(general.introText)}</section>}
 				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
@@ -1580,7 +1581,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 )}
                 
                 {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-                {general.footnotes && <section className="footnotes">{general.footnotes}</section>}
+                {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
             </section>}
             
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>

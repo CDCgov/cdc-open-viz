@@ -67,10 +67,10 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes}) => (
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
-    <span className="edit-label">{label}</span>
+    <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
   </label>
 ))
 
@@ -307,6 +307,8 @@ const EditorPanel = memo(() => {
   if(loading) {
     return null
   }
+
+  console.log(config,'CONFIG')
 
   return (
     <ErrorBoundary component="EditorPanel">
