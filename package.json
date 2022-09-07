@@ -67,5 +67,8 @@
   },
   "scripts": {
     "publish": "npx lerna publish"
+  },
+  "dependencies": {
+    "@cdc/core": "^1.1.2"
   }
 }
