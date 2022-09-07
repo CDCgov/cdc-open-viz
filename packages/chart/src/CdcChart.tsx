@@ -638,8 +638,8 @@ export default function CdcChart(
                 className={`chart-title ${config.theme}`}
                 aria-level={2}
               >
-                {config.general && (
-                  <sup className="superTitle">{config.general.superTitle}</sup>
+                {config && (
+                  <sup className="superTitle">{parse(config.superTitle || '')}</sup>
                 )}
                 <div>{parse(title)}</div>
               </div>
@@ -654,7 +654,7 @@ export default function CdcChart(
             {/* Filters */}
             {config.filters && <Filters />}
             {/* Visualization */}
-            {config.general?.introText && <section className="introText">{config.general.introText}</section>}
+            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
             <div
               className={`chart-container${
                 config.legend.hide ? " legend-hidden" : ""
@@ -665,10 +665,10 @@ export default function CdcChart(
               {!config.legend.hide && <Legend />}
             </div>
             {/* Description */}
-            {description && <div className="subtext">{parse(description)}</div>}
+            {description && <div className="section-subtext">{parse(description)}</div>}
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && <DataTable />}
-            {config.general?.footnotes && <section className="footnotes">{config.general.footnotes}</section>}
+            {config?.footnotes && <section className="footnotes">{parse(config.footnotes)}</section>}
           </div>
         )}
       </>

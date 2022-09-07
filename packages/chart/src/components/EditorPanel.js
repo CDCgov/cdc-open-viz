@@ -246,6 +246,7 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
+    console.log('fieldName', fieldName)
     // Top level
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
@@ -646,9 +647,8 @@ useEffect(()=>{
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   
                   <TextField
-										value={config.superTitle || ''}
+										value={config.superTitle}
 										updateField={updateField}
-										section='general'
 										fieldName='superTitle'
 										label='Super Title'
 										placeholder='Super Title'
@@ -666,7 +666,6 @@ useEffect(()=>{
 										type='textarea'
 										value={config.introText}
 										updateField={updateField}
-										section='general'
 										fieldName='introText'
 										label='Intro Text'
 										tooltip={
@@ -692,7 +691,6 @@ useEffect(()=>{
 										type='textarea'
 										value={config.footnotes}
 										updateField={updateField}
-										section='general'
 										fieldName='footnotes'
 										label='Footnotes'
 										tooltip={
@@ -1312,7 +1310,7 @@ useEffect(()=>{
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
-                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>
+                  {/* <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/> */}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>

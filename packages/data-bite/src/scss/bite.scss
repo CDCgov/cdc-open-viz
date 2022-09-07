@@ -2,7 +2,7 @@
 
 &.is-editor {
   position: relative;
-  .cdc-data-bite-inner-container {
+  .cove-component__inner {
     margin: 3em auto 0;
     max-width: 35em;
   }
@@ -12,7 +12,7 @@
     color: $primary;
   }
 
-  .bite-header {
+  .cove-component__header {
     background-color: $primary;
   }
 }
@@ -21,7 +21,7 @@
   .bite-value {
     color: $purple-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $purple-primary;
   }
 }
@@ -30,7 +30,7 @@
   .bite-value {
     color: $amber-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $amber-primary;
   }
 }
@@ -39,7 +39,7 @@
   .bite-value {
     color: $orange-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $orange-primary;
   }
 }
@@ -48,7 +48,7 @@
   .bite-value {
     color: $brown-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $brown-primary;
   }
 }
@@ -57,7 +57,7 @@
   .bite-value {
     color: $teal-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $teal-primary;
   }
 }
@@ -66,7 +66,7 @@
   .bite-value {
     color: $pink-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $pink-primary;
   }
 }
@@ -75,7 +75,7 @@
   .bite-value {
     color: $slate-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $slate-primary;
   }
 }
@@ -84,7 +84,7 @@
   .bite-value {
     color: $indigo-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $indigo-primary;
   }
 }
@@ -93,7 +93,7 @@
   .bite-value {
     color: $cyan-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $cyan-primary;
   }
 }
@@ -102,11 +102,11 @@
   .bite-value {
     color: $green-primary;
   }
-  .bite-header {
+  .cove-component__header {
     background-color: $green-primary;
   }
 }
-.bite-header {
+.cove-component__header {
   padding: 0 1em;
   left: 0;
   top: 0;
@@ -117,19 +117,15 @@
   }
 }
 
-
-
-.cdc-data-bite-inner-container {
+// TODO after v2 refactor remove header reference colors
+// Use .font-color/.bg-color, etc. in color definitions or something similar
+// Remove box shadows if we're no longer using them
+.cove-component__inner {
 
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
   }
-
-  // Visual: Borders
-  &.bite--has-title.bite--has-rounded-borders .bite-header { border-top-left-radius: .25rem; border-top-right-radius: .25rem;}
-  &.bite--has-title.bite--has-rounded-borders .bite { border-bottom-left-radius: .25rem; border-bottom-right-radius: .25rem; }
-  &.bite--has-rounded-borders:not(.bite--has-title) .bite { border-radius: .25rem; }
 
   // General: Bite Style > Graphic
   .bite__style--graphic {
@@ -154,21 +150,24 @@
     }
   }
 
-  .bite-header + .bite { border-top: 0; }
+  // General: Compact View
+  &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+    align-items: center;
+    p.bite-text {
+      margin-bottom: 0;
+    }
+  }
+
+  &.bite--isCompactStyle .bite .cove-component__content {
+    align-items: center;
+  }
+
+  .cove-component__header + .bite { border-top: 0; }
   .bite {
     position: relative;
     overflow: hidden;
     border-top: none;
 
-    &:not(.bite--has-border) {
-      border-left: 1px solid transparent;
-      border-right: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-    }
-
-    &:not(.bite--has-accent) {
-        border-left: .5rem solid transparent;
-    }
 
     &-content__text-wrap { 
       height: 100%;
@@ -182,7 +181,7 @@
         color: $primary;
       }
 
-      .bite-header {
+      .cove-component__header {
         background-color: $primary;
       }
     }
@@ -191,7 +190,7 @@
       .bite-value {
         color: $purple-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $purple-primary;
       }
     }
@@ -200,7 +199,7 @@
       .bite-value {
         color: $amber-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $amber-primary;
       }
     }
@@ -209,7 +208,7 @@
       .bite-value {
         color: $orange-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $orange-primary;
       }
     }
@@ -218,7 +217,7 @@
       .bite-value {
         color: $brown-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $brown-primary;
       }
     }
@@ -227,7 +226,7 @@
       .bite-value {
         color: $teal-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $teal-primary;
       }
     }
@@ -236,7 +235,7 @@
       .bite-value {
         color: $pink-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $pink-primary;
       }
     }
@@ -245,7 +244,7 @@
       .bite-value {
         color: $slate-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $slate-primary;
       }
     }
@@ -254,7 +253,7 @@
       .bite-value {
         color: $indigo-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $indigo-primary;
       }
     }
@@ -263,7 +262,7 @@
       .bite-value {
         color: $cyan-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $cyan-primary;
       }
     }
@@ -272,7 +271,7 @@
       .bite-value {
         color: $green-primary;
       }
-      .bite-header {
+      .cove-component__header {
         background-color: $green-primary;
       }
     }
@@ -289,7 +288,7 @@
       border-radius: .3em;
     }
 
-    .bite-content-container {
+    .cove-component__content {
       display: flex;
       padding: 1em;
       justify-content: space-between;
@@ -339,13 +338,13 @@
         width: 33%;
         margin-left: 1.5em;
       }
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: row-reverse;
       }
     }
 
     &.bite-top {
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: column;
 
         .bite-image {
@@ -364,7 +363,7 @@
     }
 
     &.bite-bottom {
-      .bite-content-container {
+      .cove-component__content {
         flex-direction: column;
 
         .bite-image {
@@ -383,7 +382,7 @@
     }
 
     &.bite-back {
-      .bite-content-container {
+      .cove-component__content {
         .bite-image {
           border-radius: 0 0 0.3em 0.3em;
           position: absolute;
@@ -393,9 +392,5 @@
         }
       }
     }
-  }
-
-  .bite:not(.bite--hideBackgroundColor) {
-    background-color: $lightestGray;
   }
 }
