@@ -203,11 +203,21 @@ const UsaRegionMap = (props) => {
           const { posX = 0, tName } = props
           return (
             <>
-            <rect x={posX} width="36" height="24" rx="6" fill="#fff" stroke="#E6E6E6" strokeWidth="2" />
-            <text x={posX + 8} y="16">{tName}</text>
+            <rect x={posX} width="36" height="24" rx="6" stroke="#fff" strokeWidth="1" />
+            <text x={posX + 8} y="17" fill="#fff">{tName}</text>
             </>
           )
         }
+
+        const circleRadius = 15;
+
+        // SIDE CHART EXPERIMENT
+        // const height = state.data[index].Change;
+        // const barHeight = Math.abs(height * 20 );
+        // const barPositive = height > 0;
+        // const barY = barPositive ? -barHeight + 15 : 15;
+        // const baseY = 14;
+        // const barFill = barPositive ? "#fff" : "#fff";
 
         return (
           <g
@@ -227,8 +237,14 @@ const UsaRegionMap = (props) => {
               d={path}
             />
             <g id={`region-${index+1}-label`}>
-              <circle fill="#fff" stroke="#999" cx="15" cy="15" r="15"/>
+              <circle fill="#fff" stroke="#999" cx={circleRadius} cy={circleRadius} r={circleRadius}/>
               <text fill="#333" x="15px" y="20px" textAnchor="middle">{index+1}</text>
+              {/* SIDE CHART EXPERIMENT */}
+              {/*<g y={barY*20}>*/}
+              {/*  <rect x="-20" y={barY} width="10" height={barHeight} fill={barFill} stroke="#333"/>*/}
+              {/*  <rect x="-23" y={baseY} width="16" height="2" fill="#000" />*/}
+              {/*</g>*/}
+              {/* / SIDE CHART EXPERIMENT */}
             </g>
             {geoKey === 'region 2' &&
               <g id="region-2-territories">
