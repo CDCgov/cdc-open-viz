@@ -1308,7 +1308,7 @@ useEffect(()=>{
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
-                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>
+                  {/* <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/> */}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
