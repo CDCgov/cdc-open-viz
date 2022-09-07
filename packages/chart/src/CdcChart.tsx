@@ -692,7 +692,7 @@ export default function CdcChart(
               {!config.legend.hide && <Legend />}
             </div>
             {/* Description */}
-            {description && <div className="subtext">{parse(description)}</div>}
+            {description && <div className="section-subtext">{parse(description)}</div>}
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && <DataTable />}
             {config?.footnotes && <section className="footnotes">{parse(config.footnotes)}</section>}
