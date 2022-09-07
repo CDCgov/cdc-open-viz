@@ -15,6 +15,9 @@ import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import { Fragment } from 'react';
 
+import { publish } from '@cdc/core/helpers/events'
+
+
 type DefaultsType = typeof defaults
 interface Props{
   configUrl?: string,
@@ -48,6 +51,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const transform = new DataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
@@ -369,12 +376,22 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       if (node !== null) {
           resizeObserver.observe(node);
       }
+      setContainer(node)
   },[]);
 
   // Initial load
   useEffect(() => {
     loadConfig()
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
+
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   if(configObj && config && configObj.data !== config.data){
     loadConfig();
