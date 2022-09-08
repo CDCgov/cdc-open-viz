@@ -8,6 +8,10 @@
   }
 }
 
+.cove .waffle-chart .cove-component__header {
+  font-size: unset;
+}
+
 //@each $theme, $color in $theme-colors {
 //  .cdc-waffle-chart.theme-#{$theme} #{&} {
 //    @include set-theme("color", $color);
@@ -31,6 +35,9 @@
 
       .cove-waffle-chart__data {
         text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: space-between;
       }
     }
   }
@@ -55,6 +62,9 @@
   }
 
   .cove-waffle-chart__data {
+
+    font-size: 14px;
+
     @at-root {
       .cove-waffle-chart.font-small #{&} {
         .cove-waffle-chart__data--primary { font-size: 35px; }
@@ -79,7 +89,6 @@
     }
 
     .cove-waffle-chart__data--text {
-      font-weight: 300;
       line-height: 1.25em;
     }
   }

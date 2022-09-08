@@ -18,6 +18,7 @@ import Context from '../context';
 const iconHash = {
   'data-bite' : <BiteIcon />,
   'Bar': <BarIcon />,
+  'Spark Line': <LineIcon />,
   'waffle-chart' : <GridIcon />,
   'markup-include' : <CodeIcon />,
   'Line' : <LineIcon />,
@@ -43,6 +44,8 @@ const labelHash = {
 
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { rows, visualizations, config, updateConfig } = useContext(Context)
+
+  console.log('type', type)
 
   const handleWidgetMove = (item, monitor) => {
       let result = monitor.getDropResult()

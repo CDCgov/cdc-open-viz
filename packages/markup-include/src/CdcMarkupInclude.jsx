@@ -35,6 +35,19 @@ const CdcMarkupInclude = (
   const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
   const container = useRef();
 
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+  let contentClasses = ['cove-component__content'];
+  !config.visual?.border && contentClasses.push('no-borders');
+  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+  config.visual?.accent && contentClasses.push('component--has-accent');
+  config.visual?.background && contentClasses.push('component--has-background');
+  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
   let {
     title
   } = config
@@ -165,16 +178,20 @@ const CdcMarkupInclude = (
 
   let content = (<Loading/>)
 
+  let bodyClasses = [
+    'markup-include',
+  ]
+
   if (loading === false) {
     let body = (
-      <>
-        <div className="cove-component markup-include" ref={container}>
-          {title &&
-            <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
-              {parse(title)} {isDashboard}
-            </header>
-          }
-          <div className="cove-component__content">
+      <div className={ bodyClasses.join(' ')} ref={container}>
+      {title &&
+        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+        {parse(title)} {isDashboard}
+        </header>
+      }
+      <div className={`cove-component__content ${contentClasses.join(' ')}`}>
+        <div className={`${innerContainerClasses.join(' ')}`}>
             <div className="cove-component__content-wrap">
               {!markupError && urlMarkup &&
                 <Markup content={parseBodyMarkup(urlMarkup)}/>
@@ -182,12 +199,12 @@ const CdcMarkupInclude = (
               {markupError && config.srcUrl && <div className="warning">{errorMessage}</div>}
             </div>
           </div>
-        </div>
-      </>
+      </div>
+    </div>
     )
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove markup-include ${config.theme}`}>
         {isEditor && <EditorPanel>{body}</EditorPanel>}
         {!isEditor && body}
       </div>
