@@ -67,10 +67,10 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes}) => (
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
-    <span className="edit-label">{label}</span>
+    <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
   </label>
 ))
 
@@ -344,6 +344,14 @@ const EditorPanel = memo(() => {
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+                  <CheckBox value={config.general.isCompactStyle} section="general" fieldName="isCompactStyle" label="Compact Style" updateField={updateField} tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }} /></Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>Simple data bite style that formats certain elements for a more compact view.</p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  } />
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -441,10 +449,17 @@ const EditorPanel = memo(() => {
                       ))}
                     </ul>
                   </label>
+                  <div className="cove-accordion__panel-section">
+                    <CheckBox value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                    <CheckBox value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                    <CheckBox value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                    <CheckBox value={config.visual.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                    <CheckBox value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {['title', 'body'].includes(config.biteStyle) &&
+              {['title', 'body', 'graphic'].includes(config.biteStyle) &&
                 <AccordionItem> {/*Image & Dynamic Images*/}
                   <AccordionItemHeading>
                     <AccordionItemButton>

@@ -7,6 +7,8 @@ import 'whatwg-fetch'
 
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
+
 import { timeParse, timeFormat } from 'd3-time-format';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
@@ -27,6 +29,8 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
+
+import SparkLine from './components/SparkLine';
 
 import './scss/main.scss';
 
@@ -746,10 +750,31 @@ export default function CdcChart(
     return false;
   };
 
+  let innerContainerClasses = ['cove-component__inner']
+	config.title && innerContainerClasses.push('component--has-title')
+	config.subtext && innerContainerClasses.push('component--has-subtext')
+	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+	let contentClasses = ['cove-component__content'];
+	contentClasses.push('sparkline')
+	!config.visual?.border && contentClasses.push('no-borders');
+	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+	config.visual?.accent && contentClasses.push('component--has-accent');
+	config.visual?.background && contentClasses.push('component--has-background');
+	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+
+
   // Prevent render if loading
   let body = (<Loading />)
   let lineDatapointClass = ''
   let barBorderClass = ''
+
+  let sparkLineStyles = {
+    width: '100%',
+    height: '100px',
+  }
 
   if(false === loading) {
     if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
@@ -759,30 +784,61 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className="cdc-chart-inner-container">
-          {/* Title */}
-          {title && <div role="heading" className={`chart-title ${config.theme}`} aria-level={2}>{parse(title)}</div>}
-          <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
-            Skip Over Chart Container
-          </a>
-          {/* Filters */}
-          { (config.filters && !externalFilters ) && <Filters />}
-          {/* Visualization */}
-          <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass}`}>
-            {chartComponents[visualizationType]}
-            {/* Legend */}
-            {!config.legend.hide && <Legend />}
-          </div>
+        {!missingRequiredSections() && !config.newViz && <div className={`cdc-chart-inner-container`}>
+          <>
+            {/* Title */}
+            {title && <div role="heading" className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>{parse(title)}</div>}
+            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+              Skip Over Chart Container
+            </a>
+            {/* Filters */}
+            { (config.filters && !externalFilters ) && <Filters />}
+            {/* Visualization */}
+            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
+              
+              {/* All charts except sparkline */}
+              {config.visualizationType !== "Spark Line" && 
+                chartComponents[visualizationType]
+              }
+
+              {/* Sparkline */}
+              {config.visualizationType === "Spark Line" && (
+                <>
+                  { description && <div className="subtext">{parse(description)}</div>}
+                  <div style={sparkLineStyles}>
+                    <ParentSize>
+                      {(parent) => (
+                        <>
+                          <SparkLine width={parent.width} height={parent.height} />
+                        </>
+                      )}
+                    </ParentSize>
+                  </div>
+                </>
+              )
+              }
+
+              {/* Legend */}
+              {(!config.legend.hide && config.visualizationType !== "Spark Line") && <Legend />}
+
+            </div>
+          </>
           {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
+          { (description && config.visualizationType !== "Spark Line") && <div className="subtext">{parse(description)}</div>}
           {/* Data Table */}
-          {config.xAxis.dataKey && config.table.show && <DataTable />}
-        </div>}
+          { (config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line") && <DataTable />}
+        </div>
+        }
       </>
     )
   }
 
+  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
+  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
+
   const contextValues = {
+    getXAxisData,
+    getYAxisData,
     config,
     rawData: stateData ?? {},
     excludedData: excludedData,
@@ -805,9 +861,21 @@ export default function CdcChart(
     setFilteredData
   }
 
+  const classes = [
+    'cdc-open-viz-module',
+    'type-chart',
+    `${currentViewport}`,
+    `font-${config.fontSize}`,
+    `${config.theme}`
+  ]
+
+  config.visualizationType === "Spark Line" && classes.push(`type-sparkline`)
+  isEditor && classes.push('spacing-wrapper')
+  isEditor && classes.push('isEditor')
+
   return (
     <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
         {body}
       </div>
     </Context.Provider>

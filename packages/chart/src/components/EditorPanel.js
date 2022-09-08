@@ -661,7 +661,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
@@ -1273,6 +1273,14 @@ const EditorPanel = () => {
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
                   }
+
+                  <div className="cove-accordion__panel-section">
+                    <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                    <CheckBox value={config.visual?.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                    <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                    <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                    <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                  </div>
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1299,7 +1307,9 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
-          <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          {config.type !== 'Spark Line' &&
+            <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          }
         </section>
       </section>
     </ErrorBoundary>

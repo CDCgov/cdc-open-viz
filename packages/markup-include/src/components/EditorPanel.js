@@ -24,7 +24,6 @@ const EditorPanel = memo((props) => {
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ showConfigConfirm, setShowConfigConfirm ] = useState(false)
 
-  console.log('loaded markup-include editor panel')
 
   const updateField = (section, subsection, fieldName, newValue) => {
     // Top level
@@ -130,6 +129,13 @@ const EditorPanel = memo((props) => {
     return strippedState
   }
 
+  const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+    <label className="checkbox">
+      <input type="checkbox" name={fieldName} checked={value} onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes} />
+      <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
+    </label>
+  ))
+
   const editorContent = (
     <Accordion>
       <Accordion.Section title="General">
@@ -153,6 +159,14 @@ const EditorPanel = memo((props) => {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="cove-accordion__panel-section">
+          <CheckBox value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+          <CheckBox value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+          <CheckBox value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+          <CheckBox value={config.visual.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+          <CheckBox value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
         </div>
       </Accordion.Section>
     </Accordion>
