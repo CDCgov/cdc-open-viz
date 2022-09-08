@@ -28,13 +28,15 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
+
 import SparkLine from './components/SparkLine';
 
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
 ) {
 
   const transform = new DataTransform();
@@ -50,25 +52,35 @@ export default function CdcChart(
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
+  const [parentElement, setParentElement] = useState(false)
+  const [externalFilters, setExternalFilters] = useState([]);
+  const [container, setContainer] = useState()
+  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const cacheBustingString = () => {
+      const round = 1000 * 60 * 15;
+      const date = new Date();
+      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+  }
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {};
 
-    if(response.dataUrl) {
+    if (response.dataUrl) {
+
       try {
         const regex = /(?:\.([^.]+))?$/
 
         const ext = (regex.exec(response.dataUrl)[1])
         if ('csv' === ext) {
-            data = await fetch(response.dataUrl)
+            data = await fetch(response.dataUrl + `?v=${cacheBustingString()}`)
                 .then(response => response.text())
                 .then(responseText => {
                     const parsedCsv = Papa.parse(responseText, {
@@ -81,7 +93,7 @@ export default function CdcChart(
         }
 
         if ('json' === ext) {
-            data = await fetch(response.dataUrl)
+            data = await fetch(response.dataUrl  + `?v=${cacheBustingString()}`)
                 .then(response => response.json())
         }
       } catch {
@@ -106,6 +118,7 @@ export default function CdcChart(
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
+
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -159,7 +172,6 @@ export default function CdcChart(
 
     // After data is grabbed, loop through and generate filter column values if there are any
     let currentData;
-
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
@@ -173,6 +185,7 @@ export default function CdcChart(
           newConfig.filters[index].active = filterValues[0];
 
       });
+
       currentData = filterData(newConfig.filters, newExcludedData);
       setFilteredData(currentData);
     }
@@ -308,29 +321,80 @@ export default function CdcChart(
     if (node !== null) {
         resizeObserver.observe(node);
     }
+
+    setContainer(node)
   },[]);
+
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
 
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
   }, []);
 
-  // useEffect(() => {
-  //   if(config.visualizationType === 'Paired Bar') {
-  //     updateConfig({
-  //       ...config,
-  //       yAxis: {
-  //         ...config.yAxis,
-  //         hideAxis: true
-  //       },
-  //       xAxis: {
-  //         ...config.xAxis,
-  //         hideAxis: true
-  //       }
-  //     })
-  //   }
-  // }, [config.visualizationType]);
+  /**
+   * When cove has a config and container ref publish the cove_loaded event.
+   */
+  useEffect(() => {
+    if(container && !isEmpty(config) && !coveLoadedEventRan) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedEventRan(true)
+    }
 
+  }, [container, config]);
+  
+
+/**
+ * Handles filter change events outside of COVE
+ * Updates externalFilters state
+ * Another useEffect listens to externalFilterChanges and updates the config.
+ */
+  useEffect(() => {
+
+    const handleFilterData = (e:CustomEvent) => {
+        let tmp = [];
+        tmp.push(e.detail)
+        setExternalFilters(tmp)
+    }
+    
+    subscribe('cove_filterData', (e:CustomEvent) => handleFilterData(e))
+
+    return () => {
+      unsubscribe('cove_filterData', handleFilterData);
+    }
+
+  }, [config]);
+
+
+/**
+ * Handles changes to externalFilters
+ * For some reason e.detail is returning [order: "asc"] even though
+ * we're not passing that in. The code here checks for an active prop instead of an empty array.
+ */
+  useEffect(() => {
+
+    if(externalFilters[0]) {
+      const hasActiveProperty = externalFilters[0].hasOwnProperty('active')
+
+      if(!hasActiveProperty) {
+        let configCopy = {...config }
+        delete configCopy['filters']
+        setConfig(configCopy)
+        setFilteredData(filterData(externalFilters, excludedData));
+      }
+    }
+
+    if(externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
+      let newConfigHere = {...config, filters: externalFilters }
+      setConfig(newConfigHere)
+      setFilteredData(filterData(externalFilters, excludedData));
+    }
+    
+  }, [externalFilters]);
+
+  
   // Load data when configObj data changes
   if(configObj){
     useEffect(() => {
@@ -416,8 +480,68 @@ export default function CdcChart(
     return timeFormat(config.runtime.xAxis.dateDisplayFormat)(date);
   };
 
+  const checkIfValidDate = (str)=> {
+    // Regular expression to check if string is valid date
+    const regexExp = /(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})/gi;
+  
+    return regexExp.test(str);
+  };
+
+  const applyPrecision = (value: number | string): string => {
+    // first validation
+    if (value === undefined || value === null) {
+      console.error('Enter correct value to "applyPrecision()" function ');
+      return;
+    }
+    // second validation
+    if (Number.isNaN(value)) {
+      console.error(' Argunment isNaN, "applyPrecision()" function ');
+      return;
+    }
+    let result: number | string = value;
+    let roundToPlace = Number(config.dataFormat.roundTo)
+ 
+    if (roundToPlace < 0) {
+      console.error(' ROUND field is below "0", "applyPrecision()" function ');
+      return;
+    }
+    if (typeof roundToPlace === 'number' && roundToPlace > -1) {
+      result = Number(result).toFixed(roundToPlace); // returns STRING
+    }
+    return String(result);
+  };
+  
+  const applyLocaleString = (value: string): string => {
+    if (value === undefined || value === null) return;
+    if (Number.isNaN(value) || typeof value === 'number') {
+      value = String(value);
+    }
+    const language = 'en-US';
+    let formattedValue = parseFloat(value).toLocaleString(language, {
+      useGrouping: true,
+      maximumFractionDigits: 6,
+    });
+    // Add back missing .0 in e.g. 12.0
+    const match = value.match(/\.\d*?(0*)$/);
+  
+    if (match) {
+      formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0];
+    }
+    return formattedValue;
+  };
+
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
+        // check if value is Date format
+    if(checkIfValidDate(num)) return String(num)
+    // check if value is range data ex: 0-10
+    if(String(num).indexOf('-')!==0 && String(num).indexOf('-')!==-1) return num;
+     // check if value contains any letters
+    if(/[A-Za-z]+/g.test(num)) return String(num);
+    // check if value contains comma and remove it. later will add comma below.
+    if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
+   
+
     let original = num;
     let prefix = config.dataFormat.prefix;
     num = numberFromString(num);
@@ -436,8 +560,8 @@ export default function CdcChart(
         num = cutoff;
       }
     }
-    if (config.dataFormat.roundTo) num = num.toFixed(config.dataFormat.roundTo);
-    if (config.dataFormat.commas) num = num.toLocaleString('en-US');
+    if (config.dataFormat.roundTo) num =applyPrecision(num)
+    if (config.dataFormat.commas) num = applyLocaleString(num)
 
     let result = ""
 
@@ -450,7 +574,7 @@ export default function CdcChart(
     if(config.dataFormat.suffix) {
       result += config.dataFormat.suffix
     }
-
+  
     return result
   };
 
@@ -554,7 +678,7 @@ export default function CdcChart(
 
     let filterList = '';
     if (config.filters) {
-
+      
       filterList = config.filters.map((singleFilter, index) => {
         const values = [];
         const sortAsc = (a, b) => {
@@ -668,7 +792,7 @@ export default function CdcChart(
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && <Filters />}
+            { (config.filters && !externalFilters ) && <Filters />}
             {/* Visualization */}
             <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               

@@ -58,6 +58,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, []);
 
+  config.runtime.seriesKeys.sort().reverse();
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
@@ -196,7 +198,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor="start"
                             verticalAnchor="start"
                           >
-                           {data[bar.index][config.runtime.originalXAxis.dataKey]}
+                           {formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
                           </Text>
                       }
 
@@ -418,7 +420,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   fill={ "#000" }
                                   textAnchor="start"
                                   verticalAnchor="end"
-                                >{yAxisValue}</Text>
+                                >{formatNumber(yAxisValue)}</Text>
                               <Text
                                   x={ bar.y + horizBarLabelPadding }
                                   y={ barWidth * (barGroup.bars.length - bar.index - 1) + ( horizBarLabelPadding * 2 ) + onBarTextSpacing }
@@ -438,7 +440,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             y={ config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7   }
                             verticalAnchor={"start"}
                             textAnchor={"start"}
-                          >{yAxisValue}
+                          >{formatNumber(data[bar.index][config.runtime.originalXAxis.dataKey])}
                         </Text>
 
                         { (displayNumbersOnBar) ?
@@ -486,7 +488,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                     textAnchor="end"
                                     verticalAnchor="middle"
                                   >
-                                    { xAxisValue }
+                                    { formatNumber(xAxisValue )}
                                   </Text>
                               )
                               : (
@@ -500,7 +502,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                     textAnchor="start"
                                     verticalAnchor="middle"
                                   >
-                                    { xAxisValue }
+                                    {formatNumber( xAxisValue) }
                                   </Text>
                               )
                             : ""

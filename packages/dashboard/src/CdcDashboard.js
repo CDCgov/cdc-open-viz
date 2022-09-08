@@ -32,6 +32,8 @@ import Papa from 'papaparse'
 
 import './scss/main.scss'
 
+import { publish } from '@cdc/core/helpers/events'
+
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
     newViz: true,
@@ -103,6 +105,10 @@ export default function CdcDashboard(
 
   const [ currentViewport, setCurrentViewport ] = useState('lg')
 
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
+
   const { title, description } = config ? (config.dashboard || config) : {}
 
   // Supports JSON or CSV
@@ -144,6 +150,12 @@ export default function CdcDashboard(
     }
   }
 
+   const cacheBustingString = () => {
+     const round = 1000 * 60 * 15;
+     const date = new Date();
+     return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+   };
+
   const loadConfig = async (configObj) => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -152,11 +164,12 @@ export default function CdcDashboard(
 
     // If a dataUrl property exists, always pull from that.
     if (newState.dataUrl) {
+      
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'https://' + hostname + newState.dataUrl
       }
 
-      let newData = await fetchRemoteData(newState.dataUrl)
+      let newData = await fetchRemoteData(newState.dataUrl + `?v=${cacheBustingString()}`)
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
@@ -212,6 +225,10 @@ export default function CdcDashboard(
     return values
   }
 
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   const updateConfig = (newConfig, dataOverride = null) => {
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
@@ -257,6 +274,13 @@ export default function CdcDashboard(
       setParentConfig(config)
     }
   }, [ config ])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -324,6 +348,7 @@ export default function CdcDashboard(
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   // Prevent render if loading
