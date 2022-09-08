@@ -19,7 +19,7 @@ $theme: (
 // to use .cove
 .type-waffle-chart,
 .type-data-bite,
-.type-sparkline,
+.cdc-open-viz-module.type-chart.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
