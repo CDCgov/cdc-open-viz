@@ -271,7 +271,7 @@ export const supportedCountries = {
   CCK: ['Cocos (Keeling) Islands', 'Cocos (Keeling) Islands (Australia)'],
   COL: ['Colombia'],
   COM: ['Comoros'],
-  COG: ['Congo', 'Congo, Republic of the'],
+  COG: ['Congo', 'Congo, Republic of the', 'Republic of the Congo'],
   COD: ['Democratic Republic of the Congo', 'Congo, Democratic Republic of the', 'Congo, the Democratic Republic of the', 'Dem. Rep. Congo'],
   COK: ['Cook Islands', 'Cook Is.', 'Cook Islands (New Zealand)'],
   CRI: ['Costa Rica'],
@@ -486,6 +486,10 @@ export const supportedTerritories = {
 
 export const supportedCities = {
   'DISTRICT OF COLUMBIA': [-77.036873, 38.907192],
+  'US-DC': [-77.036873, 38.907192],
+  'WASHINGTON D.C.': [-77.036873, 38.907192],
+  'WASHINGTON DC.': [-77.036873, 38.907192],
+  'WASHINGTON DC': [-77.036873, 38.907192],
   'LOS ANGELES COUNTY': [-118.229362, 34.058762],
   MESA: [-111.831474, 33.415184],
   PHOENIX: [-112.074036, 33.448376],

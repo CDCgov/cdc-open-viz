@@ -1,7 +1,7 @@
 import React from 'react';	
 import { render } from 'react-dom';	
 
-import CdcChart from './CdcChart.tsx';	
+import CdcChart from './CdcChart';	
 
 const domContainers = document.querySelectorAll('.react-container');	
 
