@@ -15,6 +15,9 @@ import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import { Fragment } from 'react';
 
+import { publish } from '@cdc/core/helpers/events'
+
+
 type DefaultsType = typeof defaults
 interface Props{
   configUrl?: string,
@@ -49,6 +52,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const transform = new DataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
@@ -116,13 +123,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
+    const round = 1000 * 60 * 15;
+    const date = new Date();
+    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       let newData = await fetchRemoteData(response.dataUrl)
-
-      if(newData && response.dataDescription) {
+      
+      if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
           newData = transform.developerStandardize(newData, response.dataDescription);
       }
@@ -352,11 +364,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
           // Optional 
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
-     return dataBite
+     return dataFormat.prefix + dataBite + dataFormat.suffix
     } else { 
       //Rounding and formatting for ranges happens earlier.
 
-      return dataBite
+      return dataFormat.prefix + dataBite + dataFormat.suffix
     }
   }
 
@@ -382,12 +394,22 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       if (node !== null) {
           resizeObserver.observe(node);
       }
+      setContainer(node)
   },[]);
 
   // Initial load
   useEffect(() => {
     loadConfig()
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
+
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   if(configObj && config && configObj.data !== config.data){
     loadConfig();

@@ -19,7 +19,7 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -197,37 +197,37 @@ export default function LinearChart() {
                             ) : ''
                           }
 
-                          {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
-                              // 17 is a magic number from the offset in barchart.
-                              <Fragment> 
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                                verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
-                                textAnchor={"end"}
-                              >{tick.formattedValue}</Text>
-                              </Fragment>
-                          }
+                        {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Fragment> 
+                            <Text
+                              transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{formatNumber(tick.formattedValue)}</Text>
+                             </Fragment>
+                        }
 
-                          { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
-                              // 17 is a magic number from the offset in barchart.
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
-                                verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
-                                textAnchor={"end"}
-                              >{tick.formattedValue}</Text>
-                          }
+                        { (config.orientation === "horizontal" && config.visualizationSubType === 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{formatNumber(tick.formattedValue)}</Text>
+                        }
 
 
-                          { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
-                              <Text
-                                x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
-                                y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                                verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
-                                textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                              >
-                                {tick.formattedValue}
-                              </Text>
-                          }
+                        { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
+                            <Text
+                              x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                              textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                            >
+                              {formatNumber(tick.value)}
+                            </Text>
+                        }
 
                         </Group>
                       );
@@ -298,7 +298,7 @@ export default function LinearChart() {
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                         )}
 
@@ -361,7 +361,7 @@ export default function LinearChart() {
                           textAnchor={'end'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                         >
-                          {tick.formattedValue}
+                          {formatNumber(tick.formattedValue)}
                         </Text>
                       </Group>
                     );
