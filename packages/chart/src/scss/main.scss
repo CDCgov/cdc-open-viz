@@ -370,6 +370,14 @@
 
 .cdc-open-viz-module.type-chart.type-sparkline {
 
+  .cove-component__content {
+    background: #F2F2F2;
+  }
+
+  .cove-component__content.component--hideBackgroundColor {
+    background: transparent;
+  }
+
   .chart-title:not(:empty) {
     margin-bottom: 0 !important;
   }
@@ -379,7 +387,11 @@
   }
 
   .cove-component__content:not(.no-borders) {
-      border: 1px solid $lightGray;
+    border: 1px solid $lightGray
+  }
+
+  .cove-component__header ~ .cove-component__content:not(.no-borders) {
+    border-top: none !important;
   }
 
   .subtext {
