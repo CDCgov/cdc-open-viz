@@ -137,16 +137,6 @@ export default function ChooseTab() {
             </Tooltip.Content>
           </Tooltip>
         </li>
-        <li>
-          <Tooltip>
-            <Tooltip.Target>
-              <IconButton label="Markup Include" type="markup-include" icon={<MarkupIncludeIcon/>}/>
-            </Tooltip.Target>
-            <Tooltip.Content>
-              Include a snippet of markup data from a specified URL
-            </Tooltip.Content>
-          </Tooltip>
-        </li>
       </ul>
 
       <div className="heading-2">Charts</div>

@@ -26,4 +26,14 @@ export default {
     title: "",
     theme: "theme-blue",
     shadow: false,
+    general: {
+      isCompactStyle: false
+    },
+    visual: {
+      border: true,
+      borderColorTheme: false,
+      hideBackgroundColor: false,
+      accent: false,
+      background: false
+    }
 }
