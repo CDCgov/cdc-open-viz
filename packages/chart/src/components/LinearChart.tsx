@@ -14,7 +14,7 @@ import PairedBarChart from './PairedBarChart';
 import SparkLine from './SparkLine';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-import numberFromString from '@cdc/core/helpers/numberFromString'
+
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
@@ -38,15 +38,6 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
-<<<<<<< HEAD
-=======
-   // desctructure users enetered value from initial state config.
-  const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
-  // validation for for min/max that user entered;
-  const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0; 
-  const isMinValid = ((numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >=0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0));
-
->>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
   if (data) {
     let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
     let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
@@ -174,11 +165,7 @@ export default function LinearChart() {
             left={config.runtime.yAxis.size}
             label={config.runtime.yAxis.label}
             stroke="#333"
-<<<<<<< HEAD
             tickFormat={(tick)=> config.runtime.yAxis.type ==='date' ? formatDate(parseDate(tick)) : config.orientation==='vertical' ? formatNumber(tick) : tick }
-=======
-            tickFormat={config.yAxis.type ==='date' ? formatDate : formatNumber}
->>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
             numTicks={config.runtime.yAxis.numTicks || undefined}
           >
             {props => {
@@ -218,7 +205,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                              </Fragment>
                         }
 
@@ -228,7 +215,7 @@ export default function LinearChart() {
                               transform={`translate(${tick.to.x - 5}, ${ tick.from.y - config.barHeight / 2 - 3 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
                         { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.yAxis.hideLabel &&
@@ -237,7 +224,7 @@ export default function LinearChart() {
                               transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
                               textAnchor={"end"}
-                            >{tick.formattedValue}</Text>
+                            >{formatNumber(tick.formattedValue)}</Text>
                         }
 
 
@@ -248,7 +235,7 @@ export default function LinearChart() {
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
                             >
-                              {tick.formattedValue}
+                              {formatNumber(tick.value)}
                             </Text>
                         }
 
@@ -290,11 +277,7 @@ export default function LinearChart() {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
-<<<<<<< HEAD
             tickFormat={tick=> config.runtime.xAxis.type === 'date' ?  formatDate(tick) : config.orientation ==='horizontal' ? formatNumber(tick) : tick}
-=======
-            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate :formatNumber}
->>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
             scale={xScale}
             stroke="#333"
             tickStroke="#333"
@@ -360,7 +343,7 @@ export default function LinearChart() {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
-            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate :formatNumber}
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
             scale={g1xScale}
             stroke="#333"
             tickStroke="#333"
@@ -391,7 +374,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {tick.formattedValue}
+                            {formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
@@ -412,7 +395,7 @@ export default function LinearChart() {
             top={yMax}
             left={config.runtime.yAxis.size}
             label={config.runtime.xAxis.label}
-            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : config.runtime.xAxis.dataKey !=='Year'? formatNumber : (tick)=>tick}
+            tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : (tick) => tick}
             scale={g2xScale}
             stroke="#333"
             tickStroke="#333"
@@ -429,7 +412,6 @@ export default function LinearChart() {
                         key={`vx-tick-${tick.value}-${i}`}
                         className={'vx-axis-tick'}
                       >
-<<<<<<< HEAD
                         <Line
                           from={tick.from}
                           to={tick.to}
@@ -443,25 +425,6 @@ export default function LinearChart() {
                         >
                           {tick.formattedValue}
                         </Text>
-=======
-                        {!config.runtime.yAxis.hideTicks &&
-                          <Line
-                            from={tick.from}
-                            to={tick.to}
-                            stroke="#333"
-                          />
-                        }
-                        {!config.runtime.yAxis.hideLabel &&
-                          <Text
-                            transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`}
-                            verticalAnchor="start"
-                            textAnchor={'end'}
-                            width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
-                          >
-                            {tick.formattedValue}
-                          </Text>
-                        }
->>>>>>> ff5ba293 (Chart >  fix data formatting & fix number formatting)
                       </Group>
                     );
                   })}
