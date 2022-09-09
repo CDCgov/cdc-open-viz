@@ -2087,7 +2087,7 @@ const EditorPanel = (props) => {
 												</span>
 											</label>
 										)}
-										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
+										{(filtersJSX.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us')  && (
 											<label className='checkbox'>
 												<input
 													type='checkbox'
