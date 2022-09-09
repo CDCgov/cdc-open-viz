@@ -130,8 +130,6 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 				${xAxisTooltip}<br />
 				${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
 				</div>`
-								console.log('index', dataIndex)
-								console.log('configSeries', data)
 
 								let circleRadii = 4.5
 
