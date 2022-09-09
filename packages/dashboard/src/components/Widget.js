@@ -36,6 +36,7 @@ const labelHash = {
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
+  'Spark Line' : 'Spark Line',
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
   'world' : 'World',
