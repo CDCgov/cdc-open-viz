@@ -6,6 +6,7 @@ import { LinePath } from '@visx/shape';
 import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
 import { AxisBottom } from '@visx/axis';
+import { MarkerArrow } from '@visx/marker';
 
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -99,15 +100,13 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
 	const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]];
 
-
 	useEffect(() => {
 		ReactTooltip.rebuild();
 	});
 
 	return (
-		<ErrorBoundary component="LineChart">
+		<ErrorBoundary component="SparkLine">
 			<svg
-				//viewBox={`0 0 ${width} ${height}`}
 				width={width} 
 				height={height} 
 				className={'sparkline'}
@@ -131,6 +130,8 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 				${xAxisTooltip}<br />
 				${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
 				</div>`
+								console.log('index', dataIndex)
+								console.log('configSeries', data)
 
 								let circleRadii = 4.5
 
@@ -144,16 +145,19 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 											textAnchor="middle">
 											{formatNumber(d[seriesKey])}
 										</Text>
-										<circle
-											key={`${seriesKey}-${dataIndex}`}
-											r={circleRadii}
-											cx={xScale(getXAxisData(d))}
-											cy={yScale(getYAxisData(d, seriesKey))}
-											fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-											style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-											data-tip={tooltip}
-											data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-										/>
+
+										{dataIndex + 1 !== data.length &&
+											<circle
+												key={`${seriesKey}-${dataIndex}`}
+												r={circleRadii}
+												cx={xScale(getXAxisData(d))}
+												cy={yScale(getYAxisData(d, seriesKey))}
+												fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+												style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
+												data-tip={tooltip}
+												data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+											/>
+										}
 									</Group>
 								)
 							})}
@@ -166,7 +170,17 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 								strokeWidth={2}
 								strokeOpacity={1}
 								shapeRendering="geometricPrecision"
+								marker-end="url(#arrow)"
+
 							/>
+								<MarkerArrow 
+									id="arrow" 
+									refX={2} 
+									size={6} 
+									marker-end="url(#arrow)"
+									fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+									/>
+
 						</Group>
 						<AxisBottom
 							top={yMax + margin.top}
