@@ -3,52 +3,52 @@
 		{
 			"Current Week Positivity": "20",
 			"State": "REGION 1",
-			"Status": "Production"
+			"Change": "0.2"
 		},
 		{
 			"Current Week Positivity": "27",
 			"State": "region 2",
-			"Status": "Onboarding"
+			"Change": "-0.5"
 		},
 		{
 			"Current Week Positivity": "26",
 			"State": "region 3",
-			"Status": "Production"
+			"Change": "-.08"
 		},
 		{
 			"Current Week Positivity": "30",
 			"State": "region 4",
-			"Status": "Piloting"
+			"Change": "0.8"
 		},
 		{
 			"Current Week Positivity": "14",
 			"State": "region 5",
-			"Status": "Piloting"
+			"Change": "0.5"
 		},
 		{
 			"Current Week Positivity": "25",
 			"State": "region 6",
-			"Status": "Onboarding"
+			"Change": "0.05"
 		},
 		{
 			"Current Week Positivity": "0",
 			"State": "region 7",
-			"Status": "Production"
+			"Change": "0"
 		},
 		{
 			"Current Week Positivity": "14",
 			"State": "region 8",
-			"Status": "Production"
+			"Change": "-1.2"
 		},
 		{
 			"Current Week Positivity": "28",
 			"State": "region 9",
-			"Status": "Production"
+			"Change": "1.5"
 		},
 		{
 			"Current Week Positivity": "12",
 			"State": "region 10",
-			"Status": "Production"
+			"Change": "0.5"
 		}
 	],
 
