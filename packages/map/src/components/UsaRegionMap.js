@@ -201,10 +201,15 @@ const UsaRegionMap = (props) => {
 
         const TerratoryRect = (props) => {
           const { posX = 0, tName } = props
+          let textColor = "#fff"
+
+          if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
+            textColor = '#202020';
+          }
           return (
             <>
-            <rect x={posX} width="36" height="24" rx="6" stroke="#fff" strokeWidth="1" />
-            <text x={posX + 8} y="17" fill="#fff">{tName}</text>
+              <rect x={posX} width="36" height="24" rx="6" stroke="#fff" strokeWidth="1" />
+              <text x={posX + 8} y="17" fill={textColor}>{tName}</text>
             </>
           )
         }
@@ -267,7 +272,6 @@ const UsaRegionMap = (props) => {
                 </g>
               </g>
             }
-            {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
           </g>
         )
       }
