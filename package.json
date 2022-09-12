@@ -69,6 +69,7 @@
     "publish": "npx lerna publish"
   },
   "dependencies": {
-    "@cdc/core": "^1.1.2"
+    "@cdc/core": "^1.1.2",
+    "@visx/legend": "^2.10.0"
   }
 }
