@@ -183,6 +183,7 @@ const EditorPanel = (props) => {
 	};
 
 	const handleEditorChanges = async (property, value) => {
+		
 		switch (property) {
 
 			// change these to be more generic.
@@ -1186,8 +1187,6 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
-	console.log('general', general)
-
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1362,6 +1361,20 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>Display state labels</span>
 											</label>
 										)}
+									{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
+										<label>
+											<span className='edit-label'>Legend Type</span>
+											<select
+												value={legend.type}
+												onChange={(event) => {
+													handleEditorChanges('legendType', event.target.value);
+												}}
+											>
+												<option value='equalnumber'>Equal Number (Quantiles)</option>
+												<option value='equalinterval'>Equal Interval</option>
+											</select>
+											</label>
+											)}
 								</AccordionItemPanel>
 							</AccordionItem>
 							<AccordionItem>
@@ -1890,21 +1903,6 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
-										{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
-										<label>
-											<span className='edit-label'>Legend Type</span>
-											<select
-												value={legend.type}
-												onChange={(event) => {
-													handleEditorChanges('legendType', event.target.value);
-												}}
-											>
-												<option value='equalnumber'>Equal Number</option>
-												<option value='equalinterval'>Equal Interval</option>
-												<option value='category'>Categorical</option>
-											</select>
-											</label>
-											)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
