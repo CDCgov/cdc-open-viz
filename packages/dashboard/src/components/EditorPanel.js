@@ -325,7 +325,7 @@ const EditorPanel = memo(() => {
                     value={"Intro Text"}
                     updateField={updateField}
                     section="general"
-                    fieldName="intro_text"
+                    fieldName="introText"
                     label="Intro Text"
                     tooltip={
                       <Tooltip style={{ textTransform: "none" }}>

@@ -1186,6 +1186,8 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
+	console.log('general', general)
+
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1402,10 +1404,10 @@ const EditorPanel = (props) => {
 									/>
 									<TextField
 										type='textarea'
-										value={general.introtext}
+										value={general.introText}
 										updateField={updateField}
 										section='general'
-										fieldName='intro_text'
+										fieldName='introText'
 										label='Intro Text'
 										tooltip={
 											<Tooltip style={{textTransform: 'none'}}>
