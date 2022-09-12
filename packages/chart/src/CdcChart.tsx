@@ -710,7 +710,7 @@ export default function CdcChart(
 	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
 
 	let contentClasses = ['cove-component__content'];
-	contentClasses.push('sparkline')
+	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
 	!config.visual?.border && contentClasses.push('no-borders');
 	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
 	config.visual?.accent && contentClasses.push('component--has-accent');
