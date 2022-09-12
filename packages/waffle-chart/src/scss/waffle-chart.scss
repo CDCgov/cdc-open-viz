@@ -49,12 +49,13 @@
 
   .cove-waffle-chart__subtext {
     font-style: italic;
-    font-weight: bold;
     font-size: 0.75em;
-    padding: 0 1em 1em;
   }
 
   .cove-waffle-chart__data {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
     @at-root {
       .cove-waffle-chart.font-small #{&} {
         .cove-waffle-chart__data--primary { font-size: 35px; }

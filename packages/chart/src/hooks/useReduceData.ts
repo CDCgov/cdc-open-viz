@@ -1,10 +1,12 @@
 
 function useReduceData(config,data) {
+    // for combo charts check all  Data Series set to Bar;
+  const isBar = config?.series?.every(element=>element?.type === 'Bar');
 
 const getMaxValueFromData = () => {
   let max; // will hold max number from data.
   if (
-    config.visualizationType === "Bar" &&
+    (config.visualizationType === "Bar" || (config.visualizationType === "Combo" && isBar )) &&
     config.visualizationSubType === "stacked"
   ) {
     const yTotals = data.reduce((allTotals, xValue) => {
