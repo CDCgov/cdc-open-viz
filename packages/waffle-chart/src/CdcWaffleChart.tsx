@@ -326,11 +326,6 @@ const WaffleChart = ({ config, isEditor }) => {
                 </div>
                 }
                 <div className="cove-waffle-chart__data--text" >{parse(content)}</div>
-                {subtext &&
-                  <div className="cove-waffle-chart__subtext">
-                    {parse(subtext)}
-                  </div>
-                }
               </div>
               }
             </div>
