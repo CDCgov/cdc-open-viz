@@ -1,6 +1,6 @@
 {
   "name": "@cdc/waffle-chart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React component for displaying a single piece of data in a card module",
   "main": "dist/cdcwafflechart",
   "scripts": {
@@ -20,8 +20,8 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "dependencies": {
+    "@cdc/core": "^1.1.3",
     "@visx/shape": "^2.1.1",
-    "@cdc/core": "^1.1.2",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "html-react-parser": "1.4.9",
