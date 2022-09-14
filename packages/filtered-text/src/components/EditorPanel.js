@@ -93,9 +93,6 @@ const EditorPanel = memo((props) => {
 			  return Object.keys(row).forEach(columnName => columns[columnName] = true)
 			 })
 		  };
-		  //  remove Text prop
-		if(columns.hasOwnProperty('Text')) delete columns['Text']
-	
 	
 		return Object.keys(columns)
 	  }
