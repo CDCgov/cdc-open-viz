@@ -424,7 +424,7 @@ export default function CdcChart(
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
-    if(num === undefined || num ===null) return "";
+    if(num === undefined || num ===null || String(num).length===0) return "";
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
     // if num is NaN return num
