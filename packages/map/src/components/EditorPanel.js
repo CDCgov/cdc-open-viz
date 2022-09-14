@@ -1186,8 +1186,6 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
-	console.log('general', general)
-
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1283,13 +1281,8 @@ const EditorPanel = (props) => {
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-												Map Type
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-												</Tooltip.Content>
-												</Tooltip>
+												Geography Subtype
+												
 											</span>
 											<select
 												value={state.general.geoType}
@@ -1323,7 +1316,15 @@ const EditorPanel = (props) => {
 									)}
 									{/* Type */}
 									<label>
-										<span className='edit-label column-heading'>Map Type</span>
+										<span className='edit-label column-heading'>
+											Map Type
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+												</Tooltip.Content>
+												</Tooltip>
+										</span>
 										<select
 											value={state.general.type}
 											onChange={(event) => {
