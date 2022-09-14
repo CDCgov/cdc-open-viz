@@ -110,8 +110,9 @@
   padding: 0 1em;
   left: 0;
   top: 0;
-  line-height: 2.2em;
+  padding: 0.6rem 0.8rem;
   color: white;
+  font-size:1.1em;
   &:empty {
     min-height: 5px;
   }
@@ -127,6 +128,17 @@
     border-top: none;
     background: $lightestGray;
     border: solid 1px $lightGray;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+
+    &-header {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+
+    &.no-borders {
+      border: none;
+    }
 
     &.shadow {
       box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -265,7 +277,6 @@
 
         .bite-text {
           margin-bottom: 15px;
-          font-size: 0.9em;
           color: #222;
           flex: 1 0 auto;
         }
@@ -345,5 +356,19 @@
         }
       }
     }
+
+    // General: Compact View
+    &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+      align-items: center;
+      p.bite-text {
+        margin-bottom: 0;
+      }
+    }
+
+    &.bite--isCompactStyle .bite .cove-component__content {
+      align-items: center;
+    }
+
+    .cove-component__header + .bite { border-top: 0; }
   }
 }

@@ -14,8 +14,15 @@ export default {
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,
-    type: 'data'
+    type: 'data',
+    palette:{
+      isReversed:false
+    },
+    allowMapZoom: true,
+    hideGeoColumnInTooltip: false,
+    hidePrimaryColumnInTooltip: false
   },
+  
   type: "map",
   color: 'pinkpurple',
   columns: {
@@ -56,5 +63,15 @@ export default {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
     capitalizeLabels: true
-  }
+  },
+  runtime: {
+    editorErrorMessage: []
+  },
+  visual: {
+    minBubbleSize: 1,
+    maxBubbleSize: 20,
+    extraBubbleBorder: false
+  },
+  mapPosition: 
+    { coordinates: [0, 30], zoom: 1 }
 };

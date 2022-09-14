@@ -3,14 +3,15 @@
 	"general": {
 		"title": "Default World Map",
 		"subtext": "",
-		"type": "data",
+		"type": "bubble",
 		"geoType": "world",
 		"headerColor": "theme-blue",
 		"geoBorderColor": "darkGray",
 		"showSidebar": true,
 		"showTitle": true,
 		"showDownloadButton": true,
-		"expandDataTable": true
+		"expandDataTable": true,
+		"equalNumberOptIn": true
 	},
 	"color": "pinkpurple",
 	"columns": {
@@ -40,7 +41,8 @@
 		"title": "Legend Title",
 		"description": "Legend Text",
 		"type": "equalnumber",
-		"specialClasses": ["N/A"]
+		"specialClasses": ["N/A"],
+		"separateZero": true
 	},
 	"data": [
 		{

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useDrag } from 'react-dnd';
 import CloseIcon from '../images/icon-close.svg';
 import GridIcon from '../images/icon-grid.svg';
+import CodeIcon from '../images/icon-code.svg';
 import EditIcon from '../images/icon-edit.svg';
 import MoveIcon from '../images/icon-move.svg';
 import BiteIcon from '@cdc/core/assets/data-bite-graphic.svg';
@@ -10,31 +11,42 @@ import LineIcon from '@cdc/core/assets/chart-line-solid.svg';
 import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import WorldIcon from '@cdc/core/assets/world-graphic.svg';
+import AlabamaIcon from '@cdc/core/assets/alabama-graphic.svg';
 
 import Context from '../context';
 
 const iconHash = {
   'data-bite' : <BiteIcon />,
   'Bar': <BarIcon />,
+  'Spark Line': <LineIcon />,
   'waffle-chart' : <GridIcon />,
+  'markup-include' : <CodeIcon />,
   'Line' : <LineIcon />,
   'Pie' : <PieIcon />,
   'us' : <UsaIcon />,
-  'world' : <WorldIcon />
+  'us-county': <UsaIcon />,
+  'world' : <WorldIcon />,
+  'single-state': <AlabamaIcon />
 }
 
 const labelHash = {
   'data-bite': 'Data Bite',
   'waffle-chart' : 'Waffle Chart',
+  'markup-include' : 'Markup Include',
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
-  'us' : 'United States',
-  'world' : 'World'
+  'Spark Line' : 'Spark Line',
+  'us': 'United States (State- or County-Level)',
+  'us-county': 'United States (State- or County-Level)',
+  'world' : 'World',
+  'single-state': 'U.S. State'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { rows, visualizations, config, updateConfig } = useContext(Context)
+
+  console.log('type', type)
 
   const handleWidgetMove = (item, monitor) => {
       let result = monitor.getDropResult()

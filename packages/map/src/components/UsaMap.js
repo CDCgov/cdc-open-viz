@@ -9,7 +9,7 @@ import hexTopoJSON from '../data/us-hex-topo.json';
 import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
-import { supportedStates, stateToIso  } from '../data/supported-geos';
+import BubbleList from './BubbleList';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -69,7 +69,8 @@ const UsaMap = (props) => {
     displayGeoName,
     supportedTerritories,
     rebuildTooltips,
-    titleCase
+    titleCase,
+    handleCircleClick
   } = props;
 
   // "Choose State" options
@@ -219,9 +220,6 @@ const UsaMap = (props) => {
       let geoKey = geo.properties.iso;
 
       // Manually add Washington D.C. in for Hex maps
-      if(isHex && geoKey === 'US-DC') {
-        geoKey = 'District of Columbia'
-      }
 
       if(!geoKey) return
 
@@ -241,13 +239,13 @@ const UsaMap = (props) => {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
 
         styles = {
-          fill: legendColors[0],
+          fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
           cursor: 'default',
           '&:hover': {
-            fill: legendColors[1],
+            fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6',
           },
           '&:active': {
-            fill: legendColors[2],
+            fill: state.general.type !== 'bubble' ? legendColors[2] : '#e6e6e6',
           },
         };
 
@@ -311,9 +309,25 @@ const UsaMap = (props) => {
       titleCase={titleCase}
     />)
 
+    // Bubbles
+    if (state.general.type === 'bubble') {
+      geosJsx.push(
+        <BubbleList
+          key="bubbles"
+          data={state.data}
+          runtimeData={data}
+          state={state}
+          projection={projection}
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          displayGeoName={displayGeoName}
+        />
+      )
+    }
+
     return geosJsx;
   };
-
+  
   return (
     <ErrorBoundary component="UsaMap">
       <svg viewBox="0 0 880 500">

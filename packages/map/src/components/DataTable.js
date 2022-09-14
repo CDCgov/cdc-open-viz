@@ -15,6 +15,7 @@ import Loading from '@cdc/core/components/Loading';
 
 const DataTable = (props) => {
   const {
+    state,
     tableTitle,
     indexTitle,
     mapTitle,
@@ -30,7 +31,9 @@ const DataTable = (props) => {
     displayGeoName,
     navigationHandler,
     viewport,
-    state
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -39,7 +42,7 @@ const DataTable = (props) => {
 
   const [ready, setReady] = useState(false)
 
-  const fileName = `${mapTitle}.csv`;
+  const fileName = `${mapTitle || 'data-table'}.csv`;
 
 
   // Catch all sorting method used on load by default but also on user click
@@ -161,7 +164,7 @@ const DataTable = (props) => {
           href={URL.createObjectURL(blob)}
           aria-label="Download this data in a CSV file format."
           className={`${headerColor} btn btn-download no-border`}
-          id={mapTitle ? `btn__${mapTitle.replace(/\s/g, '')}` : '#!' }
+          id={`${skipId}`}
           data-html2canvas-ignore
           role="button"
         >
@@ -175,12 +178,19 @@ const DataTable = (props) => {
     const newTableColumns = [];
 
     Object.keys(columns).forEach((column) => {
-      if (columns[column].dataTable === true && '' !== columns[column].name) {
+      if (columns[column].dataTable === true && columns[column].name) {
         const newCol = {
-          Header: columns[column].label || columns[column].name,
+          Header: columns[column].label ? columns[column].label : columns[column].name,
           id: column,
           accessor: (row) => {
             if (runtimeData) {
+              if(state.legend.specialClasses && state.legend.specialClasses.length && typeof state.legend.specialClasses[0] === 'object'){
+                for(let i = 0; i < state.legend.specialClasses.length; i++){
+                  if(String(runtimeData[row][state.legend.specialClasses[i].key]) === state.legend.specialClasses[i].value){
+                    return state.legend.specialClasses[i].label;
+                  }
+                }
+              }
               return runtimeData[row][columns[column].name] ?? null;
             }
 
@@ -196,7 +206,11 @@ const DataTable = (props) => {
 
             const legendColor = applyLegendToRow(rowObj);
 
-            let labelValue = displayGeoName(row.original);
+            if(state.general.geoType !== 'us-county') {
+              var labelValue = displayGeoName(row.original);
+            } else {
+              var labelValue = formatLegendLocation(row.original)
+            }
 
             labelValue = getCellAnchor(labelValue, rowObj);
 
@@ -222,11 +236,11 @@ const DataTable = (props) => {
     });
 
     return newTableColumns;
-  }, [indexTitle, columns, runtimeData, runtimeLegend]);
+  }, [indexTitle, columns, runtimeData,getCellAnchor,displayDataAsText,applyLegendToRow,customSort,displayGeoName,state.legend.specialClasses]);
 
   const tableData = useMemo(
     () => Object.keys(runtimeData).filter((key) => applyLegendToRow(runtimeData[key])).sort((a, b) => customSort(a, b)),
-    [runtimeLegend, runtimeData, applyLegendToRow, customSort]
+    [ runtimeData, applyLegendToRow, customSort]
   );
 
   // Change accessibility label depending on expanded status
@@ -268,13 +282,14 @@ const DataTable = (props) => {
     prepareRow,
   } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns);
 
-  const skipId = mapTitle ? mapTitle?.replace(/\s/g, '') : '#!'
+  const rand = Math.random().toString(16).substr(2, 8);
+  const skipId = `btn__${rand}`
 
   if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section id="dataTableSection" className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
-        <a id='skip-nav' className='cdcdataviz-sr-only' href={`#btn__${skipId}`}>
+      <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+        <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
       <div
@@ -286,39 +301,51 @@ const DataTable = (props) => {
  
         {tableTitle}
       </div>
-      <div className="table-container">
-        <table 
+      <div 
+        className="table-container"
+        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } } 
+      >
+        <table
           height={expanded ? null : 0} {...getTableProps()} 
           aria-live="assertive" 
           className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
           hidden={!expanded}
           aria-rowcount={state?.data.length ? state.data.length : '-1' }
         >
-          <caption className='cdcdataviz-sr-only'>{`Datatable showing data for the ${mapLookup[state.general.geoType]} figure above.`}</caption>
+          <caption className='cdcdataviz-sr-only'>{state.dataTable.caption ?  state.dataTable.caption : `Datatable showing data for the ${mapLookup[state.general.geoType]} figure.`}</caption>
           <thead style={{position: 'sticky', top: 0, zIndex: 999}}>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th tabIndex="0"
+                  <th 
+                    tabIndex="0"
                     title={column.Header}
+                    role="columnheader"
+                    scope="col"
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'}
                     onKeyDown={(e) => { if (e.keyCode === 13) { column.toggleSortBy(); } }}
+                    //aria-sort={column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'none' }
+                    {...(column.isSorted ? column.isSortedDesc ? { 'aria-sort': 'descending' } : { 'aria-sort': 'ascending' } : null)}
+
                   >
                     {column.render('Header')}
+                    <button>
+                      <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                    </button>
                     <div {...column.getResizerProps()} className="resizer" />
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()} style={{ width: '100%', display: 'block', maxHeight: '250px' }}>
+          <tbody {...getTableBodyProps()}>
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps()} role="row">
                   {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()}>
+                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
                       {cell.render('Cell')}
                     </td>
                   ))}
