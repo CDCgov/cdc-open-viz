@@ -2492,7 +2492,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<TextField
+									{(state.general.type === 'bubble') && <><TextField
 										type='number'
 										value={state.visual.minBubbleSize}
 										section='visual'
@@ -2507,7 +2507,7 @@ const EditorPanel = (props) => {
 										fieldName='maxBubbleSize'
 										label='Maximum Bubble Size'
 										updateField={updateField}
-									/>
+									/></>}
 									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
 										<label className='checkbox'>
 											<input
