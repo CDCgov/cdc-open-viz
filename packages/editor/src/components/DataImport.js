@@ -4,21 +4,28 @@ import { csvParse } from 'd3'
 import { useDebounce } from 'use-debounce'
 import { get } from 'axios'
 
+import { DataTransform } from '@cdc/core/components/DataTransform'
+import Modal from '@cdc/core/components/ui/Modal'
+import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+
 import GlobalState from '../context'
-import '../scss/data-import.scss'
+
 import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
-
 import LinkIcon from '../assets/icons/link.svg'
+
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-
 import validMapData from '../../example/valid-data-map.csv'
+
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
+
+import '../scss/data-import.scss'
+import Button from '@cdc/core/components/elements/Button'
+import Icon from '@cdc/core/components/ui/Icon'
 
 export default function DataImport() {
   const {
@@ -30,16 +37,19 @@ export default function DataImport() {
     maxFileSize,
     setGlobalActive,
     tempConfig,
-    setTempConfig
+    setTempConfig,
+    sharepath
   } = useContext(GlobalState)
+
+  const { overlay } = useGlobalContext()
 
   const transform = new DataTransform()
 
-  const [ externalURL, setExternalURL ] = useState('')
+  const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
   const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
 
-  const [ keepURL, setKeepURL ] = useState(config.dataUrl || false)
+  const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
@@ -47,8 +57,12 @@ export default function DataImport() {
   }
 
   useEffect(() => {
-    if (true === keepURL) {
-      setConfig({ ...config, dataUrl: debouncedExternalURL })
+    if (false !== keepURL) {
+      setConfig({ ...config, dataUrl: debouncedExternalURL || externalURL })
+    } else {
+      let newConfig = {...config};
+      delete newConfig.dataUrl;
+      setConfig(newConfig);
     }
   }, [ debouncedExternalURL, keepURL ])
 
@@ -124,7 +138,15 @@ export default function DataImport() {
 
     // Get the raw data as text from the file
     if (null === fileData) {
-      fileSourceType = 'url'
+      // const round = 1000 * 60 * 15;
+      // const date = new Date();
+      // const rounded = new Date(date.getTime() - (date.getTime() % round));
+      // const trimmedDate = rounded.toString().replace(/\s+/g, "");
+
+      const newUrl = new URL(fileName);
+      // newUrl.searchParams.append("v", trimmedDate);
+
+      fileSourceType = "url";
       try {
         fileData = await loadExternal()
         fileSource = externalURL
@@ -237,41 +259,70 @@ export default function DataImport() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const loadFileFromUrl = (url) => {
-    const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+    // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
+
     return (
       <>
         <form className="input-group d-flex" onSubmit={(e) => e.preventDefault()}>
           <input id="external-data" type="text" className="form-control flex-grow-1 border-right-0"
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
-                 aria-describedby="load-data" value={extUrl} onChange={(e) => setExternalURL(e.target.value)}/>
+                 aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
                   onClick={() => loadData(null, externalURL)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" defaultChecked={keepURL} onClick={() => setKeepURL(!keepURL)}/> Always
+          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/> Always
           load from URL (normally will only pull once)
         </label>
       </>
     )
   }
 
+  const warningModal = () => {
+    return (
+      <Modal fontTheme={'light'} headerBgColor={'#d73636'} showClose={false}>
+        <Modal.Header>
+          <center>Warning</center>
+        </Modal.Header>
+        <Modal.Content>
+          <center>
+            <p style={{ fontSize: '1rem' }}>Reseting will remove your data and settings.</p>
+          </center>
+        </Modal.Content>
+        <Modal.Footer>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              marginBottom: '1rem',
+              fontSize: '1rem'
+            }}>
+              Are you sure you want to continue?
+            </p>
+            <Button className="warn" style={{ marginRight: '1rem' }}
+                    onClick={() => overlay.actions.toggleOverlay(false)}
+            >No, Cancel</Button>
+            <Button className="success" onClick={() => {
+              resetEditor({})
+              overlay.actions.toggleOverlay(false)
+            }}>Yes, Continue</Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
   const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
     config.newViz = true
-    const confirmDataReset = window.confirm(message)
-
-    if (confirmDataReset === true) {
-      setTempConfig(null)
-      setConfig(config)
-    }
+    setTempConfig(null)
+    setConfig(config)
   }
 
   const resetButton = () => {
-    return ( //todo convert to modal
-      <button className="btn danger"
-              onClick={() => resetEditor({}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
-        <CloseIcon/>
-      </button>
+    return (
+      <Button className="warn" style={{ height: '2.5rem', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
+              onClick={() => overlay.actions.openOverlay(warningModal(), true)}>
+        Clear <Icon display="close" style={{marginLeft: '0.5rem'}}/>
+      </Button>
     )
   }
 
@@ -282,6 +333,11 @@ export default function DataImport() {
           <div className="load-data-area">
             <Tabs>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
+                {sharepath &&
+                  <p className="alert--info">
+                    The share path set for this website is: {sharepath}
+                  </p>
+                }
                 <div
                   className={isDragActive ? 'drag-active cdcdataviz-file-selector' : 'cdcdataviz-file-selector'} {...getRootProps()}>
                   <input {...getInputProps()} />

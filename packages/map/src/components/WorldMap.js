@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, {  useEffect, memo } from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -9,44 +9,11 @@ import topoJSON from '../data/world-topo.json';
 import ZoomableGroup from './ZoomableGroup';
 import Geo from './Geo'
 import CityList from './CityList';
+import BubbleList from './BubbleList';
 
 const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 
 let projection = geoMercator()
-
-const handleZoomIn = (position, setPosition) => {
-  if (position.zoom >= 4) return;
-  setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
-};
-
-const handleZoomOut = (position, setPosition) => {
-  if (position.zoom <= 1) return;
-  setPosition((pos) => ({ ...pos, zoom: pos.zoom / 1.5 }));
-};
-
-const ZoomControls = ({position, setPosition}) => (
-  <div className="zoom-controls" data-html2canvas-ignore>
-    <button onClick={() => handleZoomIn(position, setPosition)}>
-      <svg
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth="3"
-      >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    </button>
-    <button onClick={() => handleZoomOut(position, setPosition)}>
-      <svg
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth="3"
-      >
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    </button>
-  </div>
-);
 
 const WorldMap = (props) => {
   const {
@@ -57,10 +24,73 @@ const WorldMap = (props) => {
     applyLegendToRow,
     displayGeoName,
     supportedCountries,
-    rebuildTooltips
+    rebuildTooltips,
+    setState,
+    setRuntimeData,
+    generateRuntimeData,
+    setFilteredCountryCode,
+    position,
+    setPosition,
+    hasZoom
   } = props;
 
-  const [position, setPosition] = useState({ coordinates: [0, 30], zoom: 1 });
+// TODO Refactor - state should be set together here to avoid rerenders
+// Resets to original data & zooms out
+const handleReset = (state, setState, setRuntimeData, generateRuntimeData) => {
+  let reRun = generateRuntimeData(state)
+  setRuntimeData(reRun)
+  setState({
+    ...state,
+    focusedCountry: false,
+    mapPosition: { coordinates: [0, 30], zoom: 1 }
+  })
+  setFilteredCountryCode('')
+}
+const handleZoomIn = (position, setPosition) => {
+  if (position.zoom >= 4) return;
+  setPosition((pos) => ({ ...pos, zoom: pos.zoom * 1.5 }));
+};
+
+const handleZoomOut = (position, setPosition) => {
+  if (position.zoom <= 1) return;
+  setPosition((pos) => ({ ...pos, zoom: pos.zoom / 1.5 }));
+};
+
+const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, generateRuntimeData}) => (
+  <div className="zoom-controls" data-html2canvas-ignore>
+    <button onClick={() => handleZoomIn(position, setPosition)} aria-label="Zoom In">
+      <svg
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="3"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+    <button onClick={() => handleZoomOut(position, setPosition)} aria-label="Zoom Out">
+      <svg
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="3"
+      >
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+    {state.general.type === 'bubble' &&
+      <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className="reset" aria-label="Reset Zoom and Map Filters">
+          Reset Filters
+      </button>
+    }
+  </div>
+);
+
+  // TODO Refactor - state should be set together here to avoid rerenders
+  const handleCircleClick = (country, state, setState, setRuntimeData, generateRuntimeData) => {
+    if(!state.general.allowMapZoom) return;
+    let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
+    setFilteredCountryCode(newRuntimeData[0].uid)
+  }
 
   useEffect(() => rebuildTooltips());
 
@@ -95,7 +125,7 @@ const WorldMap = (props) => {
       const strokeWidth = .9
 
       // If a legend applies, return it with appropriate information.
-      if (legendColors && legendColors[0] !== '#000000') {
+      if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
         const tooltip = applyTooltipsToGeo(geoDisplayName, geoData);
 
           styles = {
@@ -145,29 +175,76 @@ const WorldMap = (props) => {
       applyLegendToRow={applyLegendToRow}
     />)
 
+    // Bubbles
+    if(state.general.type === 'bubble') {
+      geosJsx.push(
+        <BubbleList
+          key="bubbles"
+          data={state.data}
+          runtimeData={data}
+          state={state}
+          projection={projection}
+          applyLegendToRow={applyLegendToRow}
+          applyTooltipsToGeo={applyTooltipsToGeo}
+          displayGeoName={displayGeoName}
+          handleCircleClick={(country) => handleCircleClick(country, state, setState, setRuntimeData, generateRuntimeData) }
+        />
+      )
+    }
+
     return geosJsx;
   };
 
   return (
     <ErrorBoundary component="WorldMap">
-      <svg viewBox="0 0 880 500">
-        <ZoomableGroup
-          zoom={position.zoom}
-          center={position.coordinates}
-          onMoveEnd={handleMoveEnd}
-          maxZoom={4}
-          projection={projection}
-          width={880}
-          height={500}
-        >
-          <Mercator
-            data={world}
+      {hasZoom ? (
+        <svg viewBox="0 0 880 500">
+          <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill="white"/>
+          <ZoomableGroup
+            zoom={position.zoom}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={4}
+            projection={projection}
+            width={880}
+            height={500}
           >
-            {({features}) => constructGeoJsx(features)}
-          </Mercator>
-        </ZoomableGroup>
-      </svg>
-      {state.general.type === 'data' && <ZoomControls position={position} setPosition={setPosition} />}
+            <Mercator
+              data={world}
+            >
+              {({ features }) => constructGeoJsx(features)}
+            </Mercator>
+          </ZoomableGroup>
+        </svg>
+      ) :
+        <svg viewBox="0 0 880 500">
+          <ZoomableGroup
+            zoom={1}
+            center={position.coordinates}
+            onMoveEnd={handleMoveEnd}
+            maxZoom={0}
+            projection={projection}
+            width={880}
+            height={500}
+          >
+            <Mercator
+              data={world}
+            >
+              {({ features }) => constructGeoJsx(features)}
+            </Mercator>
+          </ZoomableGroup>
+        </svg>
+      }
+      {(state.general.type === 'data' || state.general.type === 'bubble' && hasZoom) &&
+        <ZoomControls
+          position={position}
+          setPosition={setPosition}
+          setRuntimeData={setRuntimeData}
+          state={state}
+          setState={setState}
+          generateRuntimeData={generateRuntimeData} />
+      }
+
     </ErrorBoundary>
   );
 };

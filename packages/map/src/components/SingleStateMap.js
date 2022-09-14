@@ -5,14 +5,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid, geoPath } from "d3-geo";
 import { feature, mesh } from "topojson-client";
 import { CustomProjection } from '@visx/geo';
-import chroma from 'chroma-js';
-import colorPalettes from '../data/color-palettes';
+import colorPalettes from '../../../core/data/colorPalettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
-import Loading from '@cdc/core/components/Loading';
 import testJSON from '../data/dfc-map.json';
-import { supportedStates, stateToIso  } from '../data/supported-geos';
-
-
 
 const abbrs = {
   Alabama: 'AL',
@@ -123,9 +118,8 @@ const SingleStateMap = (props) => {
   let focusedBorderColor = mapColorPalette[3];
   useEffect(() => rebuildTooltips());
 
-  
   const path = geoPath().projection(projection)
-  
+
   // When choosing a state changes...
   useEffect(() => {
 	  if(state.general.hasOwnProperty('statePicked')) {
@@ -136,7 +130,7 @@ const SingleStateMap = (props) => {
 		let countiesFound = counties.filter( c => c.id.substring(0,2) === state.general.statePicked.fipsCode)
 
 		setCountiesToShow(countiesFound)
-		
+    
 		const projection = geoAlbersUsaTerritories().translate([WIDTH/2,HEIGHT/2])
 		const newProjection = projection.fitExtent([[PADDING, PADDING], [WIDTH - PADDING, HEIGHT - PADDING]], statePickedData)
 		const newScale = newProjection.scale();
@@ -256,6 +250,7 @@ const SingleStateMap = (props) => {
               key={`key--${county.id}`}         
               className={`county county--${geoDisplayName.split(" ").join("")} county--${geoData[state.columns.geo.name]}`}
               css={styles}
+              onClick={() => geoClickHandler(geoDisplayName, geoData)}
             >
               <path
                 tabIndex={-1}

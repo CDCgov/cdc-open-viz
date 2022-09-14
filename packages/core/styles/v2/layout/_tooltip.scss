@@ -1,0 +1,132 @@
+//# Must be loaded outside of Tooltip component for animation availability
+
+$cove-tooltip-bg: #fff;
+$cove-tooltip-color: #333;
+$cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
+
+.cove-tooltip {
+  position: relative;
+}
+
+.cove-tooltip--target {
+  cursor: pointer;
+}
+
+.cove-tooltip__content {
+  max-width: 280px;
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 0.875rem;
+  color: $cove-tooltip-color;
+  background-color: $cove-tooltip-bg;
+  border-radius: 5px;
+  user-select: none;
+  cursor: default;
+  opacity: 0;
+
+  &.place-top {
+    &.has-shadow {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.show {
+      animation: tooltip-btt $cove-tooltip-animation;
+    }
+  }
+
+  &.place-right {
+    &.has-shadow {
+      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.show {
+      animation: tooltip-ltr $cove-tooltip-animation;
+    }
+  }
+
+  &.place-bottom {
+    &.has-shadow {
+      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.show {
+      animation: tooltip-ttb $cove-tooltip-animation;
+    }
+  }
+
+  &.place-left {
+    &.has-shadow {
+      box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.show {
+      animation: tooltip-rtl $cove-tooltip-animation;
+    }
+  }
+}
+
+.interactive {
+  a {
+    pointer-events: all;
+  }
+}
+
+.cove-tooltip--border-0 {
+  border-width: 0;
+}
+
+.cove-tooltip--border-1 {
+  border-width: 1px;
+}
+
+.cove-tooltip--border-2 {
+  border-width: 2px;
+}
+
+@keyframes tooltip-ltr {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltip-rtl {
+  0% {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tooltip-ttb {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tooltip-btt {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

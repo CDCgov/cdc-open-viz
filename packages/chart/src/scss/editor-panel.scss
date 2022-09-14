@@ -1,3 +1,8 @@
+//TODO: Remove after COVE refactor
+.cove {
+  @import "@cdc/core/styles/v2/layout/tooltip.scss";
+}
+
 .editor-panel {
   display: flex;
   flex-direction: column;
@@ -328,10 +333,6 @@
     &.checkbox {
       display: flex;
 
-      span {
-        display: inline;
-      }
-
       input {
         margin-left: 0;
         width: inherit;
@@ -638,6 +639,12 @@
   .react-tags__suggestions li.is-disabled {
     opacity: 0.5;
     cursor: auto;
+  }
+
+  [type="radio"] {
+    border: 1px solid #8c8f94;
+    border-radius: 50%;
+    margin-right: 5px;
   }
 }
 

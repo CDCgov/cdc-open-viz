@@ -53,40 +53,40 @@ export default function DataTable() {
   
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
-    const newTableColumns = []/*[{
-      Header: '',
-      Cell: ({ row }) => {
-        return (
-          <>
-          </>
-        )
-      },
-      id: 'series-label'
-    }];*/
+    const newTableColumns = [];
 
-    Object.keys(data[0]).map((key) => {
-        const newCol = {
-          Header: key,
-          Cell: ({ row }) => {
-            return (
-              <>
-                {row.original[key]}
-              </>
-            );
-          },
-          id: key,
-          canSort: true
-        };
+    // catch no data errors and update the table header.
+    if(data.length === 0) {
+      return [{
+          Header : 'No Data Found'
+      }];
+    }
 
-        newTableColumns.push(newCol);
-    });
+    else {
+      Object.keys(data[0]).map((key) => {
+          const newCol = {
+            Header: key,
+            Cell: ({ row }) => {
+              return (
+                <>
+                  {row.original[key]}
+                </>
+              );
+            },
+            id: key,
+            canSort: true
+          };
+
+          newTableColumns.push(newCol);
+      });
+    }
 
     return newTableColumns;
   }, [config]);
 
   const tableData = useMemo(
-    () => config.data,
-    [config.data]
+    () => data,
+    [data]
   );
 
   // Change accessibility label depending on expanded status
@@ -136,7 +136,7 @@ export default function DataTable() {
             <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
-                {headerGroups.map((headerGroup) => (
+                {headerGroups && headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
                       <th tabIndex="0" {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : 'sort'} title={column.Header}>
@@ -147,20 +147,22 @@ export default function DataTable() {
                   </tr>
                 ))}
               </thead>
-              <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells.map((cell) => (
-                        <td tabIndex="0" {...cell.getCellProps()}>
-                          {cell.render('Cell')}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
+              {rows &&
+                <tbody {...getTableBodyProps()}>
+                  {rows.map((row) => {
+                    prepareRow(row);
+                    return (
+                      <tr {...row.getRowProps()}>
+                        {row.cells && row.cells.map((cell) => (
+                          <td tabIndex="0" {...cell.getCellProps()}>
+                            {cell.render('Cell')}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              }
             </table>
           </div>
           {config.table.download && <DownloadButton data={data} />}

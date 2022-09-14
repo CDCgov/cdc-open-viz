@@ -55,7 +55,7 @@ module.exports = (env = {}, { mode }) => {
     optimization: {
       minimizer: [new TerserPlugin({
         extractComments: false,
-      })],
+      })]
     },
     devtool: mode === 'development' ? 'inline-source-map' : false,
     performance: {
@@ -79,7 +79,7 @@ module.exports = (env = {}, { mode }) => {
         },
     },
     resolve: {
-      extensions: ['*', '.tsx', '.ts', '.js'],
+      extensions: ['*', '.tsx', '.ts', '.jsx', '.js'],
     },
     target: 'web',
     module: {
@@ -98,6 +98,7 @@ module.exports = (env = {}, { mode }) => {
               'dist/cdceditor.js',
               'dist/cdcdatabite.js',
               'dist/cdcwafflechart.js',
+              'dist/cdcmarkupinclude.js',
             ]
 
             let except = [
