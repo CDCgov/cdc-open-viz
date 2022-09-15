@@ -350,7 +350,7 @@
     min-height: 140px;
   }
 
-  .header .color-palette li {
+  .header .color-palette button {
     width: 21px;
     height: 21px;
     border-radius: 40px;
@@ -365,7 +365,7 @@
     list-style: none;
     flex-wrap: wrap;
 
-    li {
+    button {
       width: 45px;
       height: 23px;
       margin-right: 4px;
@@ -375,6 +375,7 @@
       overflow: hidden;
       cursor: pointer;
       position: relative;
+      padding: 0;
 
       .click-target {
         position: absolute;
@@ -390,6 +391,7 @@
 
       span {
         width: 33.3%;
+        height: 100%;
       }
     }
   }
