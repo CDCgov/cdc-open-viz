@@ -165,7 +165,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height}>
+      <svg width={width} height={height} role="img">
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
