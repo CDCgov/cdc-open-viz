@@ -20,7 +20,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -165,7 +165,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height} role="img">
+      <svg width={width} height={height} role="img" aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
