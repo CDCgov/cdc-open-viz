@@ -30,7 +30,8 @@
         fill: currentColor
       }
     }
-    li {
+    button {
+      background: transparent;
       padding: .3em .75em;
       display: flex;
       border: $lightGray 1px solid;
