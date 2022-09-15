@@ -516,7 +516,7 @@ const EditorPanel = () => {
                   {exclusion}
                 </div>
               </div>
-              <span className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</span>
+              <button className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</button>
             </li>
           )
         })}
@@ -750,7 +750,7 @@ const EditorPanel = () => {
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
                                     {config.series.length > 1 &&
-                                      <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
                                 </li>
@@ -765,7 +765,7 @@ const EditorPanel = () => {
                                   </div>
                                 </div>
                                 {config.series.length > 1 &&
-                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                 }
                               </li>
                             )
@@ -1184,10 +1184,21 @@ const EditorPanel = () => {
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, theme: palette })
-                        }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                        </li>
+                        <button 
+                          title={palette}
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, theme: palette })
+                          }} 
+                          onKeyDown={(e) => {
+                            e.preventDefault();
+                            if (e.keyCode === 13) { 
+                              updateConfig({ ...config, theme: palette })
+                            }
+                          }}
+                          className={config.theme === palette ? 'selected ' + palette : palette}>
+                        </button>
                       ))}
                     </ul>
                   </label>
@@ -1213,13 +1224,25 @@ const EditorPanel = () => {
                       }
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          onKeyDown={(e) => {
+                            e.preventDefault();
+                            if (e.keyCode === 13) {
+                              updateConfig({ ...config, palette })
+                            }
+                          }} 
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
@@ -1241,13 +1264,25 @@ const EditorPanel = () => {
 
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          onKeyDown={(e) => {
+                            e.preventDefault();
+                            if (e.keyCode === 13) {
+                              updateConfig({ ...config, palette })
+                            }
+                          }} 
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
