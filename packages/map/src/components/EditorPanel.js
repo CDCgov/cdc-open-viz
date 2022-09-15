@@ -1243,32 +1243,42 @@ const EditorPanel = (props) => {
 											<span>Geography</span>
 										</span>
 										<ul className='geo-buttons'>
-											<li
+											<button
 												className={
 													state.general.geoType === 'us' ||
 													state.general.geoType === 'us-county'
 														? 'active'
 														: ''
 												}
-												onClick={() => handleEditorChanges('geoType', 'us')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'us')
+												}}
 											>
 												<UsaGraphic />
 												<span>United States</span>
-											</li>
-											<li
+											</button>
+											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'world')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'world')
+													}
+												}
 											>
 												<WorldGraphic />
 												<span>World</span>
-											</li>
-											<li
+											</button>
+											<button
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'single-state')}
+												onClick={(e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'single-state')
+												}}
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
-											</li>
+											</button>
 										</ul>
 									</label>
 									{/* Select > State or County Map */}

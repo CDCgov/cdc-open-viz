@@ -1195,12 +1195,6 @@ const EditorPanel = () => {
                             e.preventDefault();
                             updateConfig({ ...config, theme: palette })
                           }} 
-                          onKeyDown={(e) => {
-                            e.preventDefault();
-                            if (e.keyCode === 13) { 
-                              updateConfig({ ...config, theme: palette })
-                            }
-                          }}
                           className={config.theme === palette ? 'selected ' + palette : palette}>
                         </button>
                       ))}
@@ -1235,12 +1229,6 @@ const EditorPanel = () => {
                             e.preventDefault();
                             updateConfig({ ...config, palette })
                           }}
-                          onKeyDown={(e) => {
-                            e.preventDefault();
-                            if (e.keyCode === 13) {
-                              updateConfig({ ...config, palette })
-                            }
-                          }} 
                           className={config.palette === palette ? 'selected' : ''}
                         >
                           <span style={colorOne}></span>
@@ -1275,12 +1263,6 @@ const EditorPanel = () => {
                             e.preventDefault();
                             updateConfig({ ...config, palette })
                           }}
-                          onKeyDown={(e) => {
-                            e.preventDefault();
-                            if (e.keyCode === 13) {
-                              updateConfig({ ...config, palette })
-                            }
-                          }} 
                           className={config.palette === palette ? 'selected' : ''}
                         >
                           <span style={colorOne}></span>
