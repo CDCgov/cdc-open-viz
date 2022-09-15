@@ -349,6 +349,10 @@
     margin-bottom: 0.3em;
   }
 
+  .accordion__panel fieldset:not(:first-child) {
+    margin-top: 1em;
+  }
+
   input[type="text"], input[role="combobox"], input[type="number"], textarea {
     min-width: 100%;
     max-width: 100%; // Doing this prevents width of textarea from being changed
