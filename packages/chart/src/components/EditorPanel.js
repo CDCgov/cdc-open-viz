@@ -712,7 +712,7 @@ const EditorPanel = () => {
                     {config.series && config.series.length !== 0 && (
                       <>
                         <fieldset>
-                          <legend className="edit-label">
+                          <legend className="edit-label float-left">
                             Displaying
                           </legend>
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -991,7 +991,9 @@ const EditorPanel = () => {
                         <>
                           {config.exclusions.keys.length > 0 &&
                             <>
-                              <label><span className="edit-label">Excluded Keys</span></label>
+                              <fieldset>
+                                <legend className="edit-label">Excluded Keys</legend>
+                              </fieldset>
                               <ExclusionsList/>
                             </>
                           }
@@ -1141,12 +1143,12 @@ const EditorPanel = () => {
 
                   {config.isLollipopChart &&
                     <>
-                      <label className="header">
-                        <span className="edit-label">Lollipop Shape</span>
+                      <fieldset className="header">
+                        <legend className="edit-label">Lollipop Shape</legend>
                         <div onChange={(e) => {
                           setLollipopShape(e.target.value)
                         }}>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1155,7 +1157,7 @@ const EditorPanel = () => {
                             />
                             Circle
                           </label>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1166,7 +1168,7 @@ const EditorPanel = () => {
                           </label>
                         </div>
 
-                      </label>
+                      </fieldset>
                       <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={[ 'regular', 'two-tone' ]}/>
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
                     </>

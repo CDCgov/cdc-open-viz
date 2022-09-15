@@ -345,12 +345,25 @@
 
   legend {
     font-weight: normal;
-    float: left;
     margin-bottom: 0.3em;
+  }
+
+  legend + span {
+    float: left;
+  }
+
+  .radio-label {
+    font-weight: normal;
   }
 
   .accordion__panel fieldset:not(:first-child) {
     margin-top: 1em;
+  }
+
+  .accordion__panel fieldset {
+    label:not(:first-child) {
+      margin-top: 0rem;
+    }
   }
 
   input[type="text"], input[role="combobox"], input[type="number"], textarea {
@@ -410,6 +423,10 @@
 
   fieldset {
     display: block;
+
+    .float-left {
+      float: left;
+    }
   }
 
   .primary-fieldset {
@@ -655,7 +672,7 @@
     cursor: auto;
   }
 
-  [type="radio"] {
+  input[type="radio"] {
     border: 1px solid #8c8f94;
     border-radius: 50%;
     margin-right: 5px;
