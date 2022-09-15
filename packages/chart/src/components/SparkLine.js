@@ -107,6 +107,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 	return (
 		<ErrorBoundary component="SparkLine">
 			<svg
+				role="img"
 				width={width} 
 				height={height} 
 				className={'sparkline'}

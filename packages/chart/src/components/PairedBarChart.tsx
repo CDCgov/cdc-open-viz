@@ -66,6 +66,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 	return (width > 0) && (
 		<>
 			<svg
+				role="img"
 				id="cdc-visualization__paired-bar-chart"
 				width={width}
 				height={height}>
