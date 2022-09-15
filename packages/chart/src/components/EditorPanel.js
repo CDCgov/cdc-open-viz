@@ -711,17 +711,17 @@ const EditorPanel = () => {
                     {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
-                        <label>
-                          <span className="edit-label">
+                        <fieldset>
+                          <legend className="edit-label">
                             Displaying
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                        </label>
+                          </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </fieldset>
                         <ul className="series-list">
                           {config.series.map((series, i) => {
 
