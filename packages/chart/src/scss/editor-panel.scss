@@ -310,6 +310,8 @@
     z-index: 3;
   }
 
+
+  legend,
   label {
     text-transform: uppercase;
     display: block;
@@ -339,6 +341,12 @@
         display: inline;
       }
     }
+  }
+
+  legend {
+    font-weight: normal;
+    float: left;
+    margin-bottom: 0.3em;
   }
 
   input[type="text"], input[role="combobox"], input[type="number"], textarea {
