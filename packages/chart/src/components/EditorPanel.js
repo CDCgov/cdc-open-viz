@@ -926,7 +926,9 @@ const EditorPanel = () => {
                             <>
                               {config.exclusions.keys.length > 0 &&
                                 <>
-                                  <label><span className="edit-label">Excluded Keys</span></label>
+                                  <fieldset>
+                                    <legend className="edit-label">Excluded Keys</legend>
+                                  </fieldset>
                                   <ExclusionsList/>
                                 </>
                               }
