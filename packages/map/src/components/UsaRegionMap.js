@@ -32,7 +32,8 @@ const UsaRegionMap = (props) => {
     supportedTerritories,
     rebuildTooltips,
     titleCase,
-    handleCircleClick
+    handleCircleClick,
+    handleMapAriaLabels
   } = props;
 
   // "Choose State" options
@@ -299,7 +300,7 @@ const UsaRegionMap = (props) => {
   
   return (
     <ErrorBoundary component="UsaRegionMap">
-      <svg viewBox="0 0 880 500">
+      <svg viewBox="0 0 880 500" role="img" aria-label={handleMapAriaLabels(state)}>
 
         <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
           {({ features, projection }) => constructGeoJsx(features, projection)}
