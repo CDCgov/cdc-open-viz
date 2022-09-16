@@ -20,7 +20,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
 });
 
 export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport } = useContext<any>(Context);
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
 
@@ -66,7 +66,14 @@ export default function PieChart() {
 
             const tooltip = `<div>
             ${yAxisTooltip}<br />
-            ${xAxisTooltip}<br />`
+            ${xAxisTooltip}<br />
+            Percent: ${Math.round(
+                (((arc.endAngle - arc.startAngle) * 180) /
+                  Math.PI /
+                  360) *
+                  100
+              ) + "%"}
+            `
 
             return (
               <Group key={key} style={{ opacity: (config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1) ? 0.5 : 1 }}>
@@ -165,7 +172,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height}>
+      <svg width={width} height={height} role="img" aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}

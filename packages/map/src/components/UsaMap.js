@@ -10,6 +10,7 @@ import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
 import BubbleList from './BubbleList';
+import { supportedStates } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -70,7 +71,8 @@ const UsaMap = (props) => {
     supportedTerritories,
     rebuildTooltips,
     titleCase,
-    handleCircleClick
+    handleCircleClick,
+    handleMapAriaLabels
   } = props;
 
   // "Choose State" options
@@ -208,7 +210,27 @@ const UsaMap = (props) => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = state.general.displayStateLabels
 
+    // Order alphabetically. Important for accessibility if ever read out loud.
+    geographies.map ( state => {
+      if(!state.feature.properties.iso) return;
+      state.feature.properties.name = titleCase(supportedStates[state.feature.properties.iso][0])
+    })
+
+    geographies.sort( (a,b) => {
+      const first = a.feature.properties.name.toUpperCase(); // ignore upper and lowercase
+      const second = b.feature.properties.name.toUpperCase(); // ignore upper and lowercase
+      if (first < second) {
+        return -1;
+      }
+      if (first > second) {
+        return 1;
+      }
+
+      // names must be equal
+      return 0;
+    })
     const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
+      console.log('geos here', geo)
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
@@ -218,6 +240,7 @@ const UsaMap = (props) => {
 
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.iso;
+      let geoName = geo.properties.name;
 
       // Manually add Washington D.C. in for Hex maps
 
@@ -253,43 +276,44 @@ const UsaMap = (props) => {
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
-
         return (
-          <g
-            data-for="tooltip"
-            data-tip={tooltip}
-            key={key}         
-            className="geo-group"
-            css={styles}
-            onClick={() => geoClickHandler(geoDisplayName, geoData)}
-          >
-            <path
-              tabIndex={-1}
-              className='single-geo'
-              stroke={geoStrokeColor}
-              strokeWidth={1.3}   
-              d={path}
-            />
-            {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+          <g data-name={geoName} key={key}>
+            <g
+              data-for="tooltip"
+              data-tip={tooltip}
+              className="geo-group"
+              css={styles}
+              onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            >
+              <path
+                tabIndex={-1}
+                className='single-geo'
+                stroke={geoStrokeColor}
+                strokeWidth={1.3}   
+                d={path}
+              />
+              {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+            </g>
           </g>
         )
       }
 
       // Default return state, just geo with no additional information
       return (
-        <g
-        key={key}
-          className="geo-group"
-          css={styles}
-        >
-          <path
-            tabIndex={-1}
-            className='single-geo'
-            stroke={geoStrokeColor}
-            strokeWidth={1.3}
-            d={path}
-          />
-          {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+        <g data-name={geoName} key={key}>
+          <g
+            className="geo-group"
+            css={styles}
+          >
+            <path
+              tabIndex={-1}
+              className='single-geo'
+              stroke={geoStrokeColor}
+              strokeWidth={1.3}
+              d={path}
+            />
+            {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
+          </g>
         </g>
       )
     });
@@ -330,7 +354,11 @@ const UsaMap = (props) => {
   
   return (
     <ErrorBoundary component="UsaMap">
-      <svg viewBox="0 0 880 500">
+      <svg 
+        viewBox="0 0 880 500" 
+        role="img" 
+        aria-label={handleMapAriaLabels(state)}
+      >
         {state.general.displayAsHex ?
             (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
               {({ features, projection }) => constructGeoJsx(features, projection)}

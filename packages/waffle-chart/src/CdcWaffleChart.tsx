@@ -299,6 +299,19 @@ const WaffleChart = ({ config, isEditor }) => {
   config.shadow && innerContainerClasses.push('shadow')
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
+  const handleWaffleChartAriaLabel = (state, testing = false) => {
+        if(testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state);
+        try {
+            let ariaLabel = 'Waffle chart';
+            if(state.title) {
+                ariaLabel += ` with the title: ${state.title}`
+            }
+            return ariaLabel;
+        } catch(e) {
+            console.error(e.message)
+        }
+  }
+
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
@@ -312,7 +325,7 @@ const WaffleChart = ({ config, isEditor }) => {
             <div
               className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
               <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-                <svg width={setRatio()} height={setRatio()}>
+                <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
                   <Group>
                     {buildWaffle()}
                   </Group>

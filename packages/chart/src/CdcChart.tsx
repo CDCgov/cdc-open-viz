@@ -67,6 +67,27 @@ export default function CdcChart(
       const date = new Date();
       return new Date(date.getTime() - (date.getTime() % round)).toISOString();
   }
+
+  const handleChartAriaLabels = (state, testing = false) => {
+      if(testing) console.log(`handleChartAriaLabels Testing On:`, state);
+      try {
+          if(!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state');
+          let ariaLabel = '';
+
+          if(state.visualizationType) {
+            ariaLabel += `${state.visualizationType} chart`
+          }
+
+          if(state.title && state.visualizationType) {
+              ariaLabel += ` with the title: ${state.title}`
+          }
+
+          return ariaLabel;
+      } catch(e) {
+          console.error(e.message)
+      }
+  }
+
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
@@ -608,7 +629,7 @@ export default function CdcChart(
                   </LegendItem>
                 )
               })}
-              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
             </div>
           )}
         </LegendOrdinal>
@@ -812,6 +833,7 @@ export default function CdcChart(
     missingRequiredSections,
     setEditing,
     setFilteredData,
+    handleChartAriaLabels
   }
 
   const classes = [
