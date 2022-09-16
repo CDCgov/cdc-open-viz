@@ -122,7 +122,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear" role="img" aria-label={handleChartAriaLabels(config)}>
+      <svg width={width} height={height} className="linear" role="img" aria-label={handleChartAriaLabels(config)} tabIndex={0}>
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null

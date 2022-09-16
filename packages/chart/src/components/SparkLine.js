@@ -112,6 +112,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 				width={width} 
 				height={height} 
 				className={'sparkline'}
+				tabIndex={0}
 				>
 					{(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
 						<>
