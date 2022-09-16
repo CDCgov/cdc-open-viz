@@ -1581,9 +1581,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
                         Skip Over Map Container
                     </a>
-					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+					<section className='geography-container' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
-                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                            <section className='geography-container' ref={mapSvg}>
                                 {modal && (
                                     <Modal
                                         type={general.type}
