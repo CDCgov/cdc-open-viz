@@ -69,7 +69,9 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 				role="img"
 				id="cdc-visualization__paired-bar-chart"
 				width={width}
-				height={height}>
+				height={height}
+				tabIndex={0}
+				>
 				<Group top={0} left={config.xAxis.size}>
 					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map(d => {
 						let barWidth = (xScale(d[config.series[0].dataKey]))

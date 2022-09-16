@@ -325,7 +325,7 @@ const WaffleChart = ({ config, isEditor }) => {
             <div
               className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
               <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-                <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)}>
+                <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
                   <Group>
                     {buildWaffle()}
                   </Group>
