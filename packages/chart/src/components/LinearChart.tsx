@@ -23,19 +23,22 @@ export default function LinearChart() {
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
-  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>((!config.animate));
+  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
 
   const triggerRef = useRef();
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
 
+  // If the chart is in view and set to animate and it has not already played
   if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
-    console.log('dataref', dataRef.isIntersecting);
-    console.log('animatedChart', animatedChart);
     setTimeout(() => {
-      setAnimatedChartPlayed(true);
+      setAnimatedChart(true);
     }, 500);
+
+    setTimeout(() => {
+      setAnimatedChartPlayed(!animatedChartPlayed);
+    }, 600);
   }
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -169,7 +172,13 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear">
+      <svg
+        width={width}
+        height={height}
+        // If the chart is set to not replay the filter and has already animated, don't add the animated class
+        // className={`linear ${(config.animate) || (config.animateReplay  && animatedChartPlayed) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
+        className={`linear ${(config.animate) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
+      >
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
