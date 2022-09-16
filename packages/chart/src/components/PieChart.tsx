@@ -66,7 +66,14 @@ export default function PieChart() {
 
             const tooltip = `<div>
             ${yAxisTooltip}<br />
-            ${xAxisTooltip}<br />`
+            ${xAxisTooltip}<br />
+            Percent: ${Math.round(
+                (((arc.endAngle - arc.startAngle) * 180) /
+                  Math.PI /
+                  360) *
+                  100
+              ) + "%"}
+            `
 
             return (
               <Group key={key} style={{ opacity: (config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1) ? 0.5 : 1 }}>
