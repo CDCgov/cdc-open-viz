@@ -19,7 +19,7 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -122,7 +122,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear">
+      <svg width={width} height={height} className="linear" role="img" aria-label={handleChartAriaLabels(config)} tabIndex={0}>
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null

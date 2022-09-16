@@ -516,7 +516,7 @@ const EditorPanel = () => {
                   {exclusion}
                 </div>
               </div>
-              <span className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</span>
+              <button className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</button>
             </li>
           )
         })}
@@ -711,17 +711,17 @@ const EditorPanel = () => {
                     {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
-                        <label>
-                          <span className="edit-label">
+                        <fieldset>
+                          <legend className="edit-label float-left">
                             Displaying
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                        </label>
+                          </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </fieldset>
                         <ul className="series-list">
                           {config.series.map((series, i) => {
 
@@ -750,7 +750,7 @@ const EditorPanel = () => {
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
                                     {config.series.length > 1 &&
-                                      <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
                                 </li>
@@ -765,7 +765,7 @@ const EditorPanel = () => {
                                   </div>
                                 </div>
                                 {config.series.length > 1 &&
-                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                 }
                               </li>
                             )
@@ -926,7 +926,9 @@ const EditorPanel = () => {
                             <>
                               {config.exclusions.keys.length > 0 &&
                                 <>
-                                  <label><span className="edit-label">Excluded Keys</span></label>
+                                  <fieldset>
+                                    <legend className="edit-label">Excluded Keys</legend>
+                                  </fieldset>
                                   <ExclusionsList/>
                                 </>
                               }
@@ -989,7 +991,9 @@ const EditorPanel = () => {
                         <>
                           {config.exclusions.keys.length > 0 &&
                             <>
-                              <label><span className="edit-label">Excluded Keys</span></label>
+                              <fieldset>
+                                <legend className="edit-label">Excluded Keys</legend>
+                              </fieldset>
                               <ExclusionsList/>
                             </>
                           }
@@ -1139,12 +1143,12 @@ const EditorPanel = () => {
 
                   {config.isLollipopChart &&
                     <>
-                      <label className="header">
-                        <span className="edit-label">Lollipop Shape</span>
+                      <fieldset className="header">
+                        <legend className="edit-label">Lollipop Shape</legend>
                         <div onChange={(e) => {
                           setLollipopShape(e.target.value)
                         }}>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1153,7 +1157,7 @@ const EditorPanel = () => {
                             />
                             Circle
                           </label>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1164,7 +1168,7 @@ const EditorPanel = () => {
                           </label>
                         </div>
 
-                      </label>
+                      </fieldset>
                       <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={[ 'regular', 'two-tone' ]}/>
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
                     </>
@@ -1184,10 +1188,15 @@ const EditorPanel = () => {
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, theme: palette })
-                        }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                        </li>
+                        <button 
+                          title={palette}
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, theme: palette })
+                          }} 
+                          className={config.theme === palette ? 'selected ' + palette : palette}>
+                        </button>
                       ))}
                     </ul>
                   </label>
@@ -1213,13 +1222,19 @@ const EditorPanel = () => {
                       }
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
@@ -1241,13 +1256,19 @@ const EditorPanel = () => {
 
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>

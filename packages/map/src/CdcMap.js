@@ -183,8 +183,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
     };
 
-
-
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -1222,6 +1220,41 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
+    const handleMapAriaLabels = (state = '', testing = false) => {
+        if(testing) console.log(`handleMapAriaLabels Testing On: ${state}`);
+        try {
+            if(!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state');
+            let ariaLabel = '';
+            switch(state.general.geoType) {
+                case 'world':
+                    ariaLabel += 'World map'
+                    break;
+                case 'us':
+                    ariaLabel += 'United States map'
+                    break;
+                case 'us-county':
+                    ariaLabel += `United States county map`
+                    break;
+                case 'single-state':
+                    ariaLabel += `${state.general.statePicked.stateName} county map`
+                    break;
+                case 'us-region':
+                    ariaLabel += `United States HHS Region map`
+                    break;
+                default:
+                    ariaLabel = 'Data visualization container'
+                    break;
+            }
+
+            if(state.general.title) {
+                ariaLabel += ` with the title: ${state.general.title}`
+            }
+            return ariaLabel;
+        } catch(e) {
+            console.error(e.message)
+        }
+    }
+
     const loadConfig = async (configObj) => { 
         // Set loading flag
         if(!loading) setLoading(true)
@@ -1479,7 +1512,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         filteredCountryCode,
         position,
         setPosition,
-        hasZoom : state.general.allowMapZoom
+        hasZoom : state.general.allowMapZoom,
+        handleMapAriaLabels
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
@@ -1547,9 +1581,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
                         Skip Over Map Container
                     </a>
-					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+					<section className='geography-container' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
-                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                            <section className='geography-container' ref={mapSvg}>
                                 {modal && (
                                     <Modal
                                         type={general.type}
