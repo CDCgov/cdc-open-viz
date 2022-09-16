@@ -33,7 +33,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const tipRounding =  config.tipRounding ;
   const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
   const stackCount = config.runtime.seriesKeys.length;
-
+  console.log('animatedChart', animatedChart)
   const applyRadius = (index:number)=>{
     if(index === undefined || index === null || !isRounded) return;
     let style = {};
@@ -194,8 +194,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barHeight = config.barHeight ? config.barHeight : 25;
                     let barPadding = barHeight;
 
-                    // config.barHeight = Number(config.barHeight)
-
+                    config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index);
 
                     if (orientation=== "horizontal") {
@@ -225,6 +224,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       <Group key={index}>
                           <foreignObject
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
+                          className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
                           x={bar.x}
                           y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
@@ -376,14 +376,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     return (
                         <>
-                        <style>
+                          {/* This feels gross but inline transition was not working well*/}
+                          <style>
                           {`
-                            .Bar #barGroup${barGroup.index},
+                            .linear #barGroup${barGroup.index},
                             .Combo #barGroup${barGroup.index} {
-                              transform-origin: 0 ${barY + barHeight}px
+                              transform-origin: 0 ${barY + barHeight}px;
                             }
-                            
-                            `}
+                          `}
                         </style>
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
@@ -397,6 +397,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </Text>
                       <foreignObject
                         id={`barGroup${barGroup.index}`}
+                        className="tets"
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0) : barY }
@@ -422,11 +423,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           key={`circle--${bar.index}`}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          style={{ 'opacity': 1, filter: 'unset' }}
+                          style={{ 'opacity': `${config.animate ? 0 : 1}`, filter: 'unset' }}
                         />
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
-                        <rect 
+                        <rect
                           x={
                             (orientation === 'horizontal' && bar.y > 10) ? bar.y - lollipopShapeSize / 2 : (orientation === 'horizontal' && bar.y < 10) ? 0 :
                             (orientation !== 'horizontal') ? offset - lollipopBarWidth / 2 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25
