@@ -68,6 +68,7 @@ aside {
       padding: 0;
       display: flex;
       flex-wrap: wrap;
+      button { font-size: unset; background: transparent; }
       li {
         flex-shrink: 0;
         display: inline-block;
