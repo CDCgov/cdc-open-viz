@@ -629,7 +629,7 @@ export default function CdcChart(
                   </LegendItem>
                 )
               })}
-              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
             </div>
           )}
         </LegendOrdinal>
