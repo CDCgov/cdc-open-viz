@@ -39,7 +39,7 @@ const Tooltip = ({
         onMouseLeave={e => ReactTooltip.hide(e.target)}
         onFocus={(e) => ReactTooltip.show(e.target)}
         onBlur={(e) => ReactTooltip.hide(e.target)}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', border: 'none' }}
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </button>
