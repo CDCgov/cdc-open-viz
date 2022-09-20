@@ -53,7 +53,7 @@ export default function CdcChart(
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
   const [parentElement, setParentElement] = useState(false)
-  const [externalFilters, setExternalFilters] = useState([]);
+  const [externalFilters, setExternalFilters] = useState(null);
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
 
@@ -396,7 +396,7 @@ export default function CdcChart(
  */
   useEffect(() => {
 
-    if(externalFilters[0]) {
+    if(externalFilters && externalFilters[0]) {
       const hasActiveProperty = externalFilters[0].hasOwnProperty('active')
 
       if(!hasActiveProperty) {
@@ -407,7 +407,7 @@ export default function CdcChart(
       }
     }
 
-    if(externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
+    if(externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
       let newConfigHere = {...config, filters: externalFilters }
       setConfig(newConfigHere)
       setFilteredData(filterData(externalFilters, excludedData));
