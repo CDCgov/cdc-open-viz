@@ -2507,18 +2507,20 @@ const EditorPanel = (props) => {
 											<span className='edit-label'>Bubble Map has extra border</span>
 										</label>
 									}
-									<label>
-										<span className='edit-label'>City Style</span>
-										<select
-											value={state.visual.cityStyle || false}
-											onChange={(event) => {
-												handleEditorChanges('handleCityStyle', event.target.value);
-											}}
-										>
-											<option value='circle'>Circle</option>
-											<option value='pin'>Pin</option>
-										</select>
-									</label>
+									{state.general.geoType === 'us' &&
+										<label>
+											<span className='edit-label'>City Style</span>
+											<select
+												value={state.visual.cityStyle || false}
+												onChange={(event) => {
+													handleEditorChanges('handleCityStyle', event.target.value);
+												}}
+											>
+												<option value='circle'>Circle</option>
+												<option value='pin'>Pin</option>
+											</select>
+										</label>
+									}
 								</AccordionItemPanel>
 							</AccordionItem>
 						</Accordion>
