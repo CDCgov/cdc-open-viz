@@ -1056,6 +1056,7 @@ useEffect(()=>{
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left' ]}/>
+                  <TextField type='textarea' value={config.legend.description} 	updateField={updateField} 	section='legend' 	fieldName='description' 	label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
 
