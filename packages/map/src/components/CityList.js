@@ -99,6 +99,8 @@ const CityList = (({
         onClick={() => geoClickHandler(cityDisplayName, geoData)}
         data-tip={toolTip}
         data-for="tooltip"
+        strokeWidth={2}
+        stroke={'black'}
         {...additionalProps}
         >
       </path>
