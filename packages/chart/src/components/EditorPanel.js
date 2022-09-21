@@ -28,7 +28,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData';
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
-  const [ value, setValue ] = useState(stateValue);
+  const [ value, setValue ] = useState(stateValue); 
 
   const [ debouncedValue ] = useDebounce(value, 500);
 
@@ -1307,6 +1307,27 @@ useEffect(()=>{
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+                  	<TextField
+											value={config.table.caption}
+											updateField={updateField}
+											section='table'
+                      type='textarea'
+											fieldName='caption'
+											label='Data Table Caption'
+											placeholder=' Data table'
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a description of  the data table to be read by screen readers.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      />
+                   <CheckBox value={config.table.limitHeight} section="table" fieldName="limitHeight" label="Limit Table Height" updateField={updateField}/>
+                   {config.table.limitHeight && (
+                   <TextField value={config.table.height} section="table" fieldName='height'  label='Data Table Height' type="number" min="0" max="500" 	placeholder='Height(px)' updateField={updateField}/>
+                   )}
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
