@@ -76,14 +76,13 @@ const Sidebar = (props) => {
     }
 
     return (
-      <li className={disabled ? 'disabled single-legend' : 'single-legend'}>
-        <button
-          key={idx}
-          title={`Legend item ${legendLabel} - Click to disable`}
-          onClick={() => { toggleLegendActive(idx, legendLabel); }}
+      <li 
+        className={disabled ? 'disabled single-legend' : 'single-legend'}
+        key={idx}
+        title={`Legend item ${legendLabel} - Click to disable`}
+        onClick={() => { toggleLegendActive(idx, legendLabel); } }
         >
         <LegendCircle fill={entry.color} /> <span className="label">{legendLabel}</span>
-      </button>
       </li>
     );
   });
