@@ -605,11 +605,44 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           {/* Data Table */}
           {config.table && config.table.show && config.data && <DataTable data={config.data} config={config}/>}
-          {config.table && config.table.show && config.datasets && Object.keys(config.datasets).map(datasetKey => (
-            <div className="multi-table-container" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-              <DataTable data={config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
-            </div>
-          ))}
+          {config.table && config.table.show && config.datasets && Object.keys(config.datasets).map(datasetKey => {
+            
+            //For each dataset, find any shared filters that apply to all visualizations using the dataset
+            //Apply these filters to the table
+            let filteredTableData;
+            if(config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0){
+              //Gets list of visuailzations using the dataset
+              let vizKeysUsingDataset = [];
+              Object.keys(config.visualizations).forEach(visualizationKey => {
+                if(config.visualizations[visualizationKey].dataKey === datasetKey){
+                  vizKeysUsingDataset.push(visualizationKey);
+                }
+              });
+
+              //Checks shared filters against list to see if all visualizations are represented
+              let applicableFilters = [];
+              config.dashboard.sharedFilters.forEach(sharedFilter => {
+                let allMatch = true;
+                vizKeysUsingDataset.forEach(visualizationKey => {
+                  if(sharedFilter.usedBy.indexOf(visualizationKey) === -1){
+                    allMatch = false;
+                  }
+                });
+                if(allMatch){
+                  applicableFilters.push(sharedFilter);
+                }
+              });
+
+              //Applys any applicable filters
+              if(applicableFilters.length > 0){
+                filteredTableData = filterData(applicableFilters, config.datasets[datasetKey].data)
+              }
+            }
+
+            return (<div className="multi-table-container" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
+              <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
+            </div>)
+          })}
 
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
