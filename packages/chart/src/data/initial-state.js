@@ -49,7 +49,8 @@ export default {
   legend: {
     behavior: 'isolate',
     position: 'right',
-    reverseLabelOrder:false
+    reverseLabelOrder:false,
+    description:''
   },
   exclusions: {
     active: false,
