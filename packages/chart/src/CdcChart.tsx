@@ -472,7 +472,8 @@ export default function CdcChart(
 
     return (
       <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
-        {legend.label && <h2>{legend.label}</h2>}
+        {legend.label && <h2>{parse(legend.label)}</h2>}
+        {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal
         scale={colorScale}
         itemDirection="row"
