@@ -506,15 +506,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       <>
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
-          <div className="cdc-data-bite-inner-container">
+          <div className={innerContainerClasses.join(' ')}>
             {title && <div className={`bite-header cove-component__header component__header ${config.theme}`}>{parse(title)}</div>}
-            <div className={`bite ${biteClasses.join(' ')} ${contentClasses.join(' ')}`}>
-              <div className={`bite-content-container ${innerContainerClasses.join(' ')}`}>
+            <div className={`bite ${biteClasses.join(' ')}`}>
+              <div className={`bite-content-container ${contentClasses.join(' ')}` }>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
                 <div className={`bite-content`}>
-                  {showBite && 'title' === biteStyle && <div className="bite-value cove-component__header" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
-                  {showBite && 'split' === biteStyle && <div className="bite-value cove-component__header" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'split' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
                       <div className="bite-content__text-wrap">
                       <p className="bite-text">
