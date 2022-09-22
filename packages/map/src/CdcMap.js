@@ -16,8 +16,17 @@ import Canvg from 'canvg';
 
 // Data
 import colorPalettes from '../../core/data/colorPalettes';
-import ExternalIcon from './images/external-link.svg'; // TODO: Move to Icon component
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit } from './data/supported-geos';
+import ExternalIcon from './images/external-link.svg';
+import {
+    supportedStates,
+    supportedTerritories,
+    supportedCountries,
+    supportedCounties,
+    supportedCities,
+    supportedStatesFipsCodes,
+    stateFipsToTwoDigit,
+    supportedRegions
+} from './data/supported-geos';
 import initialState from './data/initial-state';
 import { countryCoordinates } from './data/country-coordinates';
 
@@ -43,15 +52,19 @@ import Sidebar from './components/Sidebar';
 import Modal from './components/Modal';
 import EditorPanel from './components/EditorPanel'; // Future: Lazy
 import UsaMap from './components/UsaMap'; // Future: Lazy
+import UsaRegionMap from './components/UsaRegionMap'; // Future: Lazy
 import CountyMap from './components/CountyMap'; // Future: Lazy
 import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
 
+import { publish } from '@cdc/core/helpers/events';
+
 // Data props
 const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
+const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
 const countyKeys = Object.keys(supportedCounties)
 const cityKeys = Object.keys(supportedCities)
@@ -114,6 +127,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const [accessibleStatus, setAccessibleStatus] = useState('')
     const [filteredCountryCode, setFilteredCountryCode] = useState()
     const [position, setPosition] = useState(state.mapPosition);
+    const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
+    const [container, setContainer] = useState()
 
     
     let legendMemo = useRef(new Map())
@@ -168,8 +183,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         })
     };
 
-
-
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
@@ -211,6 +224,23 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 if(!uid) {
                     uid = cityKeys.find( (key) => key === geoName)
                 }
+            }
+
+            if("us-region" === obj.general.geoType && obj.columns.geo.name) {
+
+                // const geoName = row[obj.columns.geo.name] && typeof row[obj.columns.geo.name] === "string" ? row[obj.columns.geo.name].toUpperCase() : '';
+
+                let geoName = '';
+                if (row[obj.columns.geo.name] !== undefined && row[obj.columns.geo.name] !== null) {
+
+                    geoName = String(row[obj.columns.geo.name])
+                    geoName = geoName.toUpperCase()
+                }
+
+                // Regions
+                uid = regionKeys.find( (key) => supportedRegions[key].includes(geoName) )
+
+
             }
 
             // World Check
@@ -268,12 +298,22 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             6: [ 0, 2, 3, 4, 5, 7 ],
             7: [ 0, 2, 3, 4, 5, 6, 7 ],
             8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+            9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ],
+            10: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
         }
 
         const applyColorToLegend = (legendIdx) => {
             // Default to "bluegreen" color scheme if the passed color isn't valid
             let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
+
+            // Handle Region Maps need for a 10th color
+            if( general.geoType === 'us-region' && mapColorPalette.length < 10 ) {
+                if(!general.palette.isReversed) {
+                    mapColorPalette.push( chroma(mapColorPalette[8]).darken(0.75).hex() )
+                } else {
+                    mapColorPalette.unshift( chroma(mapColorPalette[0]).darken(0.75).hex() )
+                }
+            }
 
             let colorIdx = legendIdx - specialClasses
 
@@ -385,7 +425,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     uniqueValues.get(value).push(hashObj(row))
                 }
 
-                if(count === 9) break // Can only have 9 categorical items for now
+                if(count === 10) break // Can only have 10 categorical items for now
             }
 
             let sorted = [...uniqueValues.keys()]
@@ -774,6 +814,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (node !== null) {
             resizeObserver.observe(node);
         }
+        setContainer(node)
     },[]);
 
     const mapSvg = useRef(null);
@@ -1149,7 +1190,42 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         return newState;
     }
 
-    const loadConfig = async (configObj) => {
+    const handleMapAriaLabels = (state = '', testing = false) => {
+        if(testing) console.log(`handleMapAriaLabels Testing On: ${state}`);
+        try {
+            if(!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state');
+            let ariaLabel = '';
+            switch(state.general.geoType) {
+                case 'world':
+                    ariaLabel += 'World map'
+                    break;
+                case 'us':
+                    ariaLabel += 'United States map'
+                    break;
+                case 'us-county':
+                    ariaLabel += `United States county map`
+                    break;
+                case 'single-state':
+                    ariaLabel += `${state.general.statePicked.stateName} county map`
+                    break;
+                case 'us-region':
+                    ariaLabel += `United States HHS Region map`
+                    break;
+                default:
+                    ariaLabel = 'Data visualization container'
+                    break;
+            }
+
+            if(state.general.title) {
+                ariaLabel += ` with the title: ${state.general.title}`
+            }
+            return ariaLabel;
+        } catch(e) {
+            console.error(e.message)
+        }
+    }
+
+    const loadConfig = async (configObj) => { 
         // Set loading flag
         if(!loading) setLoading(true)
 
@@ -1233,6 +1309,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        if (state && !coveLoadedHasRan && container) {
+            publish('cove_loaded', { config: state })
+            setCoveLoadedHasRan(true)
+        }
+    }, [state, container]);
 
     // useEffect(() => {
     //     if(state.focusedCountry && state.data) {
@@ -1400,7 +1483,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         position,
         setPosition,
         setSharedFilterValue,
-        hasZoom : state.general.allowMapZoom
+        hasZoom : state.general.allowMapZoom,
+        handleMapAriaLabels
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
@@ -1493,9 +1577,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
-					<section className='geography-container' aria-hidden='true' ref={mapSvg}>
+					<section className='geography-container' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
-                            <section className='geography-container' aria-hidden='true' ref={mapSvg}>
+                            <section className='geography-container' ref={mapSvg}>
                                 {modal && (
                                     <Modal
                                         type={general.type}
@@ -1510,7 +1594,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                     <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
                                 {'us' === general.geoType && (
-                                    <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                  <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
+                                )}
+                                {'us-region' === general.geoType && (
+                                  <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
                                 {'world' === general.geoType && (
                                     <WorldMap supportedCountries={supportedCountries} {...mapProps} />

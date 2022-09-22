@@ -197,6 +197,16 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
         <li>
+          <Tooltip position="right">
+            <Tooltip.Target>
+              <IconButton label="United States (HHS Regions)" type="map" subType="us-region" icon={<UsaRegionIcon/>}/>
+            </Tooltip.Target>
+            <Tooltip.Content>
+              Present a U.S. choropleth map at state or county level.
+            </Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label="World" type="map" subType="world" icon={<GlobeIcon/>}/>

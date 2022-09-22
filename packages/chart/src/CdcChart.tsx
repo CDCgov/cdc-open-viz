@@ -7,6 +7,8 @@ import 'whatwg-fetch'
 
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import { scaleOrdinal } from '@visx/scale';
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
+
 import { timeParse, timeFormat } from 'd3-time-format';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
@@ -26,6 +28,10 @@ import EditorPanel from './components/EditorPanel';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
+
+import SparkLine from './components/SparkLine';
 
 import './scss/main.scss';
 
@@ -47,6 +53,10 @@ export default function CdcChart(
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
+  const [parentElement, setParentElement] = useState(false)
+  const [externalFilters, setExternalFilters] = useState(null);
+  const [container, setContainer] = useState()
+  const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
@@ -58,6 +68,27 @@ export default function CdcChart(
       const date = new Date();
       return new Date(date.getTime() - (date.getTime() % round)).toISOString();
   }
+
+  const handleChartAriaLabels = (state, testing = false) => {
+      if(testing) console.log(`handleChartAriaLabels Testing On:`, state);
+      try {
+          if(!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state');
+          let ariaLabel = '';
+
+          if(state.visualizationType) {
+            ariaLabel += `${state.visualizationType} chart`
+          }
+
+          if(state.title && state.visualizationType) {
+              ariaLabel += ` with the title: ${state.title}`
+          }
+
+          return ariaLabel;
+      } catch(e) {
+          console.error(e.message)
+      }
+  }
+
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
@@ -109,6 +140,7 @@ export default function CdcChart(
   }
 
   const updateConfig = (newConfig, dataOverride = undefined) => {
+
     let data = dataOverride || stateData
 
     // Deeper copy
@@ -161,6 +193,7 @@ export default function CdcChart(
     setExcludedData(newExcludedData)
 
     // After data is grabbed, loop through and generate filter column values if there are any
+    let currentData;
     if (newConfig.filters) {
 
       newConfig.filters.forEach((filter, index) => {
@@ -175,7 +208,8 @@ export default function CdcChart(
 
       });
 
-      setFilteredData(filterData(newConfig.filters, newExcludedData));
+      currentData = filterData(newConfig.filters, newExcludedData);
+      setFilteredData(currentData);
     }
 
     //Enforce default values that need to be calculated at runtime
@@ -297,13 +331,80 @@ export default function CdcChart(
     if (node !== null) {
         resizeObserver.observe(node);
     }
+
+    setContainer(node)
   },[]);
+
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
 
   // Load data when component first mounts
   useEffect(() => {
     loadConfig();
   }, []);
 
+  /**
+   * When cove has a config and container ref publish the cove_loaded event.
+   */
+  useEffect(() => {
+    if(container && !isEmpty(config) && !coveLoadedEventRan) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedEventRan(true)
+    }
+
+  }, [container, config]);
+  
+
+/**
+ * Handles filter change events outside of COVE
+ * Updates externalFilters state
+ * Another useEffect listens to externalFilterChanges and updates the config.
+ */
+  useEffect(() => {
+
+    const handleFilterData = (e:CustomEvent) => {
+        let tmp = [];
+        tmp.push(e.detail)
+        setExternalFilters(tmp)
+    }
+    
+    subscribe('cove_filterData', (e:CustomEvent) => handleFilterData(e))
+
+    return () => {
+      unsubscribe('cove_filterData', handleFilterData);
+    }
+
+  }, [config]);
+
+
+/**
+ * Handles changes to externalFilters
+ * For some reason e.detail is returning [order: "asc"] even though
+ * we're not passing that in. The code here checks for an active prop instead of an empty array.
+ */
+  useEffect(() => {
+
+    if(externalFilters && externalFilters[0]) {
+      const hasActiveProperty = externalFilters[0].hasOwnProperty('active')
+
+      if(!hasActiveProperty) {
+        let configCopy = {...config }
+        delete configCopy['filters']
+        setConfig(configCopy)
+        setFilteredData(filterData(externalFilters, excludedData));
+      }
+    }
+
+    if(externalFilters && externalFilters.length > 0 && externalFilters.length > 0 && externalFilters[0].hasOwnProperty('active')) {
+      let newConfigHere = {...config, filters: externalFilters }
+      setConfig(newConfigHere)
+      setFilteredData(filterData(externalFilters, excludedData));
+    }
+    
+  }, [externalFilters]);
+
+  
   // Load data when configObj data changes
   if(configObj){
     useEffect(() => {
@@ -521,7 +622,7 @@ export default function CdcChart(
                   </LegendItem>
                 )
               })}
-              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset}>Reset</button>}
+              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
             </div>
           )}
         </LegendOrdinal>
@@ -544,7 +645,7 @@ export default function CdcChart(
 
     let filterList = '';
     if (config.filters) {
-
+      
       filterList = config.filters.map((singleFilter, index) => {
         const values = [];
         const sortAsc = (a, b) => {
@@ -616,10 +717,31 @@ export default function CdcChart(
     return false;
   };
 
+  let innerContainerClasses = ['cove-component__inner']
+	config.title && innerContainerClasses.push('component--has-title')
+	config.subtext && innerContainerClasses.push('component--has-subtext')
+	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+	let contentClasses = ['cove-component__content'];
+	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
+	!config.visual?.border && contentClasses.push('no-borders');
+	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+	config.visual?.accent && contentClasses.push('component--has-accent');
+	config.visual?.background && contentClasses.push('component--has-background');
+	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+
+
   // Prevent render if loading
   let body = (<Loading />)
   let lineDatapointClass = ''
   let barBorderClass = ''
+
+  let sparkLineStyles = {
+    width: '100%',
+    height: '100px',
+  }
 
   if(false === loading) {
     if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
@@ -636,7 +758,7 @@ export default function CdcChart(
             {title && (
               <div
                 role="heading"
-                className={`chart-title ${config.theme}`}
+                className={`chart-title ${config.theme} cove-component__header`}
                 aria-level={2}
               >
                 {config && (
@@ -653,22 +775,42 @@ export default function CdcChart(
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            {config.filters && <Filters />}
+            {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
             {config?.introText && <section className="introText">{parse(config.introText)}</section>}
             <div
               className={`chart-container${
                 config.legend.hide ? " legend-hidden" : ""
-              }${lineDatapointClass}${barBorderClass}`}
+              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
-              {chartComponents[visualizationType]}
+              {/* All charts except sparkline */}
+              {config.visualizationType !== "Spark Line" && 
+                chartComponents[visualizationType]
+              }
+
+              {/* Sparkline */}
+              {config.visualizationType === "Spark Line" && (
+                <>
+                  { description && <div className="subtext">{parse(description)}</div>}
+                  <div style={sparkLineStyles}>
+                    <ParentSize>
+                      {(parent) => (
+                        <>
+                          <SparkLine width={parent.width} height={parent.height} />
+                        </>
+                      )}
+                    </ParentSize>
+                  </div>
+                </>
+              )
+              }
               {/* Legend */}
-              {!config.legend.hide && <Legend />}
+              {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
             {/* Description */}
-            {description && <div className="section-subtext">{parse(description)}</div>}
+            {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
             {/* Data Table */}
-            {config.xAxis.dataKey && config.table.show && <DataTable />}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line" && <DataTable />}
             {config?.footnotes && <section className="footnotes">{parse(config.footnotes)}</section>}
           </div>
         )}
@@ -676,7 +818,12 @@ export default function CdcChart(
     );
   }
 
+  const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
+  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
+
   const contextValues = {
+    getXAxisData,
+    getYAxisData,
     config,
     rawData: stateData ?? {},
     excludedData: excludedData,
@@ -697,11 +844,24 @@ export default function CdcChart(
     missingRequiredSections,
     setEditing,
     setFilteredData,
+    handleChartAriaLabels
   }
+
+  const classes = [
+    'cdc-open-viz-module',
+    'type-chart',
+    `${currentViewport}`,
+    `font-${config.fontSize}`,
+    `${config.theme}`
+  ]
+
+  config.visualizationType === "Spark Line" && classes.push(`type-sparkline`)
+  isEditor && classes.push('spacing-wrapper')
+  isEditor && classes.push('isEditor')
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`cdc-open-viz-module type-chart ${currentViewport} font-${config.fontSize}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
         {body}
       </div>
     </Context.Provider>
