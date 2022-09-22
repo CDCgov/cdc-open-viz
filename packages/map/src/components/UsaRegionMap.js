@@ -4,27 +4,11 @@ import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import { geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
-import topoJSON from '../data/us-topo.json';
-import hexTopoJSON from '../data/us-hex-topo.json';
-import { AlbersUsa, Mercator } from '@visx/geo';
+import topoJSON from '../data/us-regions-topo-2.json';
+import { Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
-import CityList from './CityList';
-import BubbleList from './BubbleList';
-import { supportedStates } from '../data/supported-geos';
 
-const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
-const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
-
-const Hexagon = ({label, text, stroke, strokeWidth, ...props}) => {
-  return (
-    <svg viewBox="0 0 45 51">
-      <g {...props}>
-        <polygon  stroke={stroke} strokeWidth={strokeWidth} points="22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702"/>
-        <text textAnchor="middle" dominantBaseline="middle" x="50%" y="54%" fill={text}>{label}</text>
-      </g>
-    </svg>
-  )
-}
+const { features: unitedStates } = feature(topoJSON, topoJSON.objects.regions)
 
 const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
   return (
@@ -37,30 +21,7 @@ const Rect = ({label, text, stroke, strokeWidth, ...props}) => {
   )
 }
 
-const offsets = {
-  'US-VT': [50, -8],
-  'US-NH': [34, 2],
-  'US-MA': [30, -1],
-  'US-RI': [28, 2],
-  'US-CT': [35, 10],
-  'US-NJ': [42, 1],
-  'US-DE': [33, 0],
-  'US-MD': [47, 10]
-};
-
-const nudges = {
-  'US-FL': [15, 3],
-  'US-AK': [0, -8],
-  'US-CA': [-10, 0],
-  'US-NY': [5, 0],
-  'US-MI': [13, 20],
-  'US-LA': [-10, -3],
-  'US-HI': [-10, 10],
-  'US-ID': [0, 10],
-  'US-WV': [-2, 2]
-}
-
-const UsaMap = (props) => {
+const UsaRegionMap = (props) => {
   const {
     state,
     applyTooltipsToGeo,
@@ -72,7 +33,6 @@ const UsaMap = (props) => {
     rebuildTooltips,
     titleCase,
     handleCircleClick,
-    setSharedFilterValue,
     handleMapAriaLabels
   } = props;
 
@@ -105,7 +65,7 @@ const UsaMap = (props) => {
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
-    const Shape = isHex ? Hexagon : Rect
+    const Shape = Rect
 
     const territoryData = data[territory];
 
@@ -142,7 +102,6 @@ const UsaMap = (props) => {
       styles = {
         color: textColor,
         fill: legendColors[0],
-        opacity: setSharedFilterValue && setSharedFilterValue !== territoryData[state.columns.geo.name] ? .5 : 1,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1],
@@ -181,22 +140,6 @@ const UsaMap = (props) => {
 
       let x = 0, y = 5
 
-      if(nudges[abbr] && false === isHex) {
-        x += nudges[abbr][0]
-        y += nudges[abbr][1]
-      }
-
-      if( undefined === offsets[abbr] || isHex ) {
-        return (
-          <g transform={`translate(${centroid})`}>
-            <text x={x} y={y} fontSize={14} strokeWidth="0" style={{fill: textColor}} textAnchor="middle">
-              {abbr.substring(3)}
-            </text>
-          </g>
-        )
-      }
-
-      let [dx, dy] = offsets[abbr]
 
       return (
         <g>
@@ -212,27 +155,7 @@ const UsaMap = (props) => {
   const constructGeoJsx = (geographies, projection) => {
     let showLabel = state.general.displayStateLabels
 
-    // Order alphabetically. Important for accessibility if ever read out loud.
-    geographies.map ( state => {
-      if(!state.feature.properties.iso) return;
-      state.feature.properties.name = titleCase(supportedStates[state.feature.properties.iso][0])
-    })
-
-    geographies.sort( (a,b) => {
-      const first = a.feature.properties.name.toUpperCase(); // ignore upper and lowercase
-      const second = b.feature.properties.name.toUpperCase(); // ignore upper and lowercase
-      if (first < second) {
-        return -1;
-      }
-      if (first > second) {
-        return 1;
-      }
-
-      // names must be equal
-      return 0;
-    })
-    const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
-      console.log('geos here', geo)
+    const geosJsx = geographies.map(( {feature: geo, path = '', index}) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
@@ -242,7 +165,6 @@ const UsaMap = (props) => {
 
       // Map the name from the geo data with the appropriate key for the processed data
       let geoKey = geo.properties.iso;
-      let geoName = geo.properties.name;
 
       // Manually add Washington D.C. in for Hex maps
 
@@ -251,7 +173,6 @@ const UsaMap = (props) => {
       const geoData = data[geoKey];
 
       let legendColors;
-
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
         legendColors = applyLegendToRow(geoData);
@@ -265,7 +186,6 @@ const UsaMap = (props) => {
 
         styles = {
           fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
-          opacity: setSharedFilterValue && setSharedFilterValue !== geoData[state.columns.geo.name] ? .5 : 1,
           cursor: 'default',
           '&:hover': {
             fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6',
@@ -279,101 +199,113 @@ const UsaMap = (props) => {
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
+
+        const TerratoryRect = (props) => {
+          const { posX = 0, tName } = props
+          let textColor = "#fff"
+
+          if (chroma.contrast(textColor, legendColors[0]) < 4.5) {
+            textColor = '#202020';
+          }
+          return (
+            <>
+              <rect x={posX} width="36" height="24" rx="6" stroke="#fff" strokeWidth="1" />
+              <text x={posX + 8} y="17" fill={textColor}>{tName}</text>
+            </>
+          )
+        }
+
+        const circleRadius = 15;
+
+        // SIDE CHART EXPERIMENT
+        // const height = state.data[index].Change;
+        // const barHeight = Math.abs(height * 20 );
+        // const barPositive = height > 0;
+        // const barY = barPositive ? -barHeight + 15 : 15;
+        // const baseY = 14;
+        // const barFill = barPositive ? "#fff" : "#fff";
+
         return (
-          <g data-name={geoName} key={key}>
-            <g
-              data-for="tooltip"
-              data-tip={tooltip}
-              className="geo-group"
-              css={styles}
-              onClick={() => geoClickHandler(geoDisplayName, geoData)}
-            >
-              <path
-                tabIndex={-1}
-                className='single-geo'
-                stroke={geoStrokeColor}
-                strokeWidth={1.3}   
-                d={path}
-              />
-              {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
+          <g
+            data-for="tooltip"
+            data-tip={tooltip}
+            key={key}
+            className="geo-group"
+            css={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+          >
+
+            <path
+              tabIndex={-1}
+              className='single-geo'
+              stroke={geoStrokeColor}
+              strokeWidth={1.3}   
+              d={path}
+            />
+            <g id={`region-${index+1}-label`}>
+              <circle fill="#fff" stroke="#999" cx={circleRadius} cy={circleRadius} r={circleRadius}/>
+              <text fill="#333" x="15px" y="20px" textAnchor="middle">{index+1}</text>
+              {/* SIDE CHART EXPERIMENT */}
+              {/*<g y={barY*20}>*/}
+              {/*  <rect x="-20" y={barY} width="10" height={barHeight} fill={barFill} stroke="#333"/>*/}
+              {/*  <rect x="-23" y={baseY} width="16" height="2" fill="#000" />*/}
+              {/*</g>*/}
+              {/* / SIDE CHART EXPERIMENT */}
             </g>
+            {geoKey === 'region 2' &&
+              <g id="region-2-territories">
+                <TerratoryRect tName="PR" />
+                <TerratoryRect posX={45} tName="VI" />
+              </g>
+            }
+
+            { geoKey === 'region 9' &&
+              <g id="region-9-territories">
+                <g className="region-9-row1">
+                  <TerratoryRect tName="AS" />
+                  <TerratoryRect posX={45} tName="GU" />
+                  <TerratoryRect posX={90} tName="MP" />
+                </g>
+                <g className="region-9-row2">
+                  <TerratoryRect tName="FM" />
+                  <TerratoryRect posX={45} tName="PW" />
+                  <TerratoryRect posX={90} tName="MH" />
+                </g>
+              </g>
+            }
           </g>
         )
       }
 
       // Default return state, just geo with no additional information
       return (
-        <g data-name={geoName} key={key}>
-          <g
-            className="geo-group"
-            css={styles}
-          >
-            <path
-              tabIndex={-1}
-              className='single-geo'
-              stroke={geoStrokeColor}
-              strokeWidth={1.3}
-              d={path}
-            />
-            {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
-          </g>
+        <g
+        key={key}
+          className="geo-group"
+          css={styles}
+        >
+          <path
+            tabIndex={-1}
+            className='single-geo'
+            stroke={geoStrokeColor}
+            strokeWidth={1.3}
+            d={path}
+          />
+          {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
         </g>
       )
     });
-
-    if(isHex) return geosJsx;
-
-    // Cities
-    geosJsx.push(<CityList
-      projection={projection}
-      key="cities"
-      data={data}
-      state={state}
-      geoClickHandler={geoClickHandler}
-      applyTooltipsToGeo={applyTooltipsToGeo}
-      displayGeoName={displayGeoName}
-      applyLegendToRow={applyLegendToRow}
-      titleCase={titleCase}
-    />)
-
-    // Bubbles
-    if (state.general.type === 'bubble') {
-      geosJsx.push(
-        <BubbleList
-          key="bubbles"
-          data={state.data}
-          runtimeData={data}
-          state={state}
-          projection={projection}
-          applyLegendToRow={applyLegendToRow}
-          applyTooltipsToGeo={applyTooltipsToGeo}
-          displayGeoName={displayGeoName}
-        />
-      )
-    }
-
     return geosJsx;
   };
   
   return (
-    <ErrorBoundary component="UsaMap">
-      <svg 
-        viewBox="0 0 880 500" 
-        role="img" 
-        aria-label={handleMapAriaLabels(state)}
-      >
-        {state.general.displayAsHex ?
-            (<Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
-              {({ features, projection }) => constructGeoJsx(features, projection)}
-            </Mercator>) :
-            (<AlbersUsa 
-              data={focusedStates} 
-              translate={translate} 
-              fitExtent={extent}
-              >
-              {({ features, projection }) => constructGeoJsx(features, projection)}
-            </AlbersUsa>)
-        }
+    <ErrorBoundary component="UsaRegionMap">
+      <svg viewBox="0 0 880 500" role="img" aria-label={handleMapAriaLabels(state)}>
+
+        <Mercator data={focusedStates} scale={620} translate={[1500, 735]}>
+          {({ features, projection }) => constructGeoJsx(features, projection)}
+        </Mercator>
+
       </svg>
       {territories.length > 0 && (
         <section className="territories">
@@ -385,4 +317,4 @@ const UsaMap = (props) => {
   );
 };
 
-export default memo(UsaMap)
+export default memo(UsaRegionMap)

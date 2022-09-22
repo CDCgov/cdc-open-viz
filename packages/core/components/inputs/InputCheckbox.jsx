@@ -24,6 +24,10 @@ const InputCheckbox = memo((
   const [ value, setValue ] = useState(stateValue)
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+  if(fieldName === 'border') {
+    console.table({fieldName, value, stateValue})
+    
+  }
 
   useEffect(() => {
     if (stateValue !== undefined && stateValue !== value) {

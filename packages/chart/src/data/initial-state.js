@@ -60,5 +60,10 @@ export default {
   isPaletteReversed: false,
   labels: false,
   dataFormat: {commas:false,prefix:'',suffix:""},
-  confidenceKeys: {}
+  confidenceKeys: {},
+  visual: {
+    border: true,
+    accent: true,
+    background: true
+  }
 }

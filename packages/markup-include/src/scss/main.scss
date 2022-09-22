@@ -1,7 +1,16 @@
 @import '~@cdc/core/styles/v2/main';
 
 .markup-include {
+
+  .cove-component__header { 
+    font-size: unset;
+  }
+  
   .cove-component__content {
-    background-color: #fff;
+    background-color: #f2f2f2;
+    font-size: 14px;
+  }
+  .cove-component__content.component--hideBackgroundColor {
+    background: transparent;
   }
 }

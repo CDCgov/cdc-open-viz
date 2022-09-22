@@ -99,7 +99,8 @@ const SingleStateMap = (props) => {
     supportedTerritories,
     rebuildTooltips,
     runtimeLegend,
-    generateColorsArray
+    generateColorsArray,
+    handleMapAriaLabels
   } = props;
 
 
@@ -290,11 +291,16 @@ const SingleStateMap = (props) => {
     return geosJsx;
   };
 
-
   return (
     <ErrorBoundary component="SingleStateMap">
 		{stateToShow &&
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="xMinYMin" className="svg-container">
+			<svg 
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`} 
+        preserveAspectRatio="xMinYMin" 
+        className="svg-container" 
+        role="img"
+        aria-label={handleMapAriaLabels(state)}
+      >
 				<rect className="background center-container ocean" width={WIDTH} height={HEIGHT} fillOpacity={1} fill="white"></rect>
 				<CustomProjection 
 					data={ [{states: stateToShow, counties: countiesToShow }] } 

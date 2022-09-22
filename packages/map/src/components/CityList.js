@@ -91,6 +91,21 @@ const CityList = (({
       />
     );
 
+    const pin = (
+      <path 
+        class="marker" 
+        d="M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z" 
+        title="Click for more information"
+        onClick={() => geoClickHandler(cityDisplayName, geoData)}
+        data-tip={toolTip}
+        data-for="tooltip"
+        strokeWidth={2}
+        stroke={'black'}
+        {...additionalProps}
+        >
+      </path>
+    );
+
     let transform = `translate(${projection(supportedCities[city])})`
 
     return (
@@ -100,7 +115,8 @@ const CityList = (({
         css={styles}
         className="geo-point"
       >
-        {circle}
+        {state.visual.cityStyle === 'circle' && circle }
+        {state.visual.cityStyle === 'pin' && pin }
       </g>
     );
   });
