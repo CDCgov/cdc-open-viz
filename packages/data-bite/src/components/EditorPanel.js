@@ -637,7 +637,7 @@ const EditorPanel = memo(() => {
                     label="Hide Background Color"
                     updateField={updateField}
                   />
-                  <label className="header">
+                  <label>
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
