@@ -15,6 +15,9 @@ import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import { Fragment } from 'react';
 
+import { publish } from '@cdc/core/helpers/events'
+
+
 type DefaultsType = typeof defaults
 interface Props{
   configUrl?: string,
@@ -48,6 +51,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const transform = new DataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
@@ -360,17 +367,44 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
   }
 
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+  let contentClasses = ['cove-component__content'];
+  !config.visual?.border && contentClasses.push('no-borders');
+  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+  config.visual?.accent && contentClasses.push('component--has-accent');
+  config.visual?.background && contentClasses.push('component--has-background');
+  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+  // ! these two will be retired.
+  config.shadow && innerContainerClasses.push('shadow')
+  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
       if (node !== null) {
           resizeObserver.observe(node);
       }
+      setContainer(node)
   },[]);
 
   // Initial load
   useEffect(() => {
     loadConfig()
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
+
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   if(configObj && config && configObj.data !== config.data){
     loadConfig();
@@ -472,15 +506,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       <>
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
-          <div className={innerContainerClasses.join(' ')}>
-            {title && <div className="cove-component__header">{parse(title)}</div>}
-            <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className={ contentClasses.join(' ')} >
+          <div className="cdc-data-bite-inner-container">
+            {title && <div className={`bite-header cove-component__header component__header ${config.theme}`}>{parse(title)}</div>}
+            <div className={`bite ${biteClasses.join(' ')} ${contentClasses.join(' ')}`}>
+              <div className={`bite-content-container ${innerContainerClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
-                <div className="bite-content">
-                  {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
-                  {showBite && 'split' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                <div className={`bite-content`}>
+                  {showBite && 'title' === biteStyle && <div className="bite-value cove-component__header" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
+                  {showBite && 'split' === biteStyle && <div className="bite-value cove-component__header" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
                       <div className="bite-content__text-wrap">
                       <p className="bite-text">
