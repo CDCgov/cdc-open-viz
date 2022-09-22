@@ -1,12 +1,11 @@
 import React, { useEffect, useCallback, useState, FC } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import DataTransform from '@cdc/core/components/DataTransform'
+import DataTransform from '@cdc/core/helpers/DataTransform'
 import Loading from '@cdc/core/components/Loading'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import ConfigContext from './ConfigContext'
-import Papa from 'papaparse';
 import parse from 'html-react-parser';
 import './scss/main.scss'
 
