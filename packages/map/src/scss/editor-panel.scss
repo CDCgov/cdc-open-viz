@@ -30,7 +30,8 @@
         fill: currentColor
       }
     }
-    li {
+    button {
+      background: transparent;
       padding: .3em .75em;
       display: flex;
       border: $lightGray 1px solid;
@@ -239,7 +240,6 @@
         display: block;
         text-align: left;
         cursor: pointer;
-        color: rgba(0,0,0,.5);
         text-decoration: underline;
         span {
           text-decoration: none;

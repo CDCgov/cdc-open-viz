@@ -54,7 +54,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     if(null !== tempConfig) {
       const parsedData = JSON.stringify(tempConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
-      const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+      const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
       window.dispatchEvent(event)
     }
   }, [tempConfig])

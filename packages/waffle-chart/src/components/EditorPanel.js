@@ -18,6 +18,13 @@ import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
+const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+  <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={value} onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes} />
+    <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
+  </label>
+))
+
 const EditorPanel = memo((props) => {
   const {
     config,
@@ -58,16 +65,20 @@ const EditorPanel = memo((props) => {
         sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
       }
     }
-
     let updatedConfig = { ...config, [section]: sectionValue }
 
     updateConfig(updatedConfig)
   }
 
   useEffect(() => {
+
+    console.log('updating parent')
+    console.log(setParentConfig)
     // Pass up to Editor if needed
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
+
+      console.log('newConfig', newConfig)
 
       setParentConfig(newConfig)
     }
@@ -564,6 +575,15 @@ const EditorPanel = memo((props) => {
               ></li>
             ))}
           </ul>
+
+          {/* <div className="cove-accordion__panel-section">
+            <CheckBox value={config.visual.border} section="visual" fieldName="border" label="Display Borders" updateField={updateField} />
+            <CheckBox value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
+            <CheckBox value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+            <CheckBox value={config.visual.background} section="visual" fieldName="background" label="Use theme background color" updateField={updateField} />
+            <CheckBox value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+          </div> */}
+
         </label>
         
         <div className="cove-accordion__panel-section">
