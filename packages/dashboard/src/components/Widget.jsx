@@ -4,7 +4,7 @@ import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
-import { DataTransform } from '@cdc/core/helpers/dataTransform'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
