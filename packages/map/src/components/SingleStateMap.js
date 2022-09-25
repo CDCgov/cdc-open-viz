@@ -7,7 +7,7 @@ import { feature, mesh } from "topojson-client";
 import { CustomProjection } from '@visx/geo';
 import colorPalettes from '../../../core/data/colorPalettes';
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
-import testJSON from '../data/dfc-map.json';
+import testJSON from '../data/county-map.json';
 
 const abbrs = {
   Alabama: 'AL',
