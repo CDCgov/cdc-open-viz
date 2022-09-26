@@ -428,7 +428,11 @@ export default function CdcDashboard(
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
-          {config.dashboard.filters && <Filters/>}
+          {config.dashboard.filters &&
+            <div className="cove-dashboard-filters">
+              <Filters />
+            </div>
+          }
 
           {/* Visualizations */}
           {config.rows && config.rows.map((row, index) => {
