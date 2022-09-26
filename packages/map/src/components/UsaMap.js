@@ -10,7 +10,7 @@ import { AlbersUsa, Mercator } from '@visx/geo';
 import chroma from 'chroma-js';
 import CityList from './CityList';
 import BubbleList from './BubbleList';
-import { supportedStates } from '../data/supported-geos';
+import { supportedCities, supportedStates } from '../data/supported-geos';
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -75,6 +75,28 @@ const UsaMap = (props) => {
     setSharedFilterValue,
     handleMapAriaLabels
   } = props;
+
+  let isFilterValueSupported = false;
+
+  if(setSharedFilterValue){
+    Object.keys(supportedStates).forEach(supportedState => {
+      if(supportedStates[supportedState].indexOf(setSharedFilterValue.toUpperCase()) !== -1){
+        isFilterValueSupported = true;
+      }
+    });
+    Object.keys(supportedTerritories).forEach(supportedTerritory => {
+      if(supportedTerritories[supportedTerritory].indexOf(setSharedFilterValue.toUpperCase()) !== -1){
+        isFilterValueSupported = true;
+      }
+    });
+    Object.keys(supportedCities).forEach(supportedCity => {
+      if(supportedCity === setSharedFilterValue.toUpperCase()){
+        isFilterValueSupported = true;
+      }
+    });
+  }
+
+  console.log(isFilterValueSupported);
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
@@ -142,7 +164,8 @@ const UsaMap = (props) => {
       styles = {
         color: textColor,
         fill: legendColors[0],
-        opacity: setSharedFilterValue && setSharedFilterValue !== territoryData[state.columns.geo.name] ? .5 : 1,
+        opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== territoryData[state.columns.geo.name] ? .5 : 1,
+        stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === territoryData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
         cursor: needsPointer ? 'pointer' : 'default',
         '&:hover': {
           fill: legendColors[1],
@@ -159,7 +182,6 @@ const UsaMap = (props) => {
         text={styles.color}
         data-tip={toolTip}
         data-for="tooltip"
-        stroke={geoStrokeColor}
         strokeWidth={1.5}
         onClick={() => geoClickHandler(territory, territoryData)}
       />)
@@ -264,7 +286,8 @@ const UsaMap = (props) => {
 
         styles = {
           fill: state.general.type !== 'bubble' ? legendColors[0] : '#E6E6E6',
-          opacity: setSharedFilterValue && setSharedFilterValue !== geoData[state.columns.geo.name] ? .5 : 1,
+          opacity: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue !== geoData[state.columns.geo.name] ? .5 : 1,
+          stroke: setSharedFilterValue && isFilterValueSupported && setSharedFilterValue === geoData[state.columns.geo.name] ? 'rgba(0, 0, 0, 1)' : geoStrokeColor,
           cursor: 'default',
           '&:hover': {
             fill: state.general.type !== 'bubble' ? legendColors[1] : '#e6e6e6',
@@ -290,7 +313,6 @@ const UsaMap = (props) => {
               <path
                 tabIndex={-1}
                 className='single-geo'
-                stroke={geoStrokeColor}
                 strokeWidth={1.3}   
                 d={path}
               />
@@ -333,6 +355,8 @@ const UsaMap = (props) => {
       displayGeoName={displayGeoName}
       applyLegendToRow={applyLegendToRow}
       titleCase={titleCase}
+      setSharedFilterValue={setSharedFilterValue}
+      isFilterValueSupported={isFilterValueSupported}
     />)
 
     // Bubbles
