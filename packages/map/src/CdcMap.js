@@ -568,7 +568,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
                 let scale = d3.scaleQuantile()
                     .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
-                    //.domain(domainNums)
                     .range(colorRange) // set range to our colors array
 
                 let breaks = scale.quantiles();
@@ -576,27 +575,28 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 console.log('breaks', breaks)
                 console.log('d', domainNums)
-
+                
                 
                 // always start with domain beginning breakpoint
-                breaks.unshift(d3.extent(domainNums)?.[0])
+                if(d3.extent(domainNums)?.[0] !== 0) {
+                    breaks.unshift(d3.extent(domainNums)?.[0])
+                }
                 
+                // if separating zero insert zero in first position.
                 if (state.legend.separateZero && !hasZeroInData) {
                     breaks.splice(1, 0, 1);
                 } 
                 
                 breaks.map( (item, index) => {
 
+                    console.log('first result', result)
+
                     let min = breaks[index];
                     let max = breaks[index + 1] - 1;
 
                     const setMin = () => {
                         // in starting position and zero in the data
-                        if(index === 0 && state.legend.separateZero) {
-                            min = 0;
-                        }
-
-                        if(index === 0 && !state.legend.separateZero) {
+                        if(!state.legend.separateZero) {
                             min = domainNums[0]
                         }
 
@@ -612,17 +612,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         }
                     }
 
-                    setMin()
-                    setMax()
-                    console.log('res', result)
-
-                    if(index === 0 && result[index]?.max === 0 && state.legend.separateZero) return true;
-                    result.push({
-                        min,
-                        max,
-                        color: scale(item)
-                    })
-                    
+                        setMin()
+                        setMax()
+                        console.log('res', result)
+                        
+                        if(min !== 0 && max !== 0){
+                            result.push({
+                                min,
+                                max,
+                                color: scale(item)
+                            })
+                        }
                     
                     dataSet.forEach( (row, dataIndex) => {
                         let number = row[state.columns.primary.name]
