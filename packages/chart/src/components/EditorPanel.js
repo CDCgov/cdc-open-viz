@@ -221,6 +221,8 @@ const EditorPanel = () => {
   })
 
   const sortableItemStyles = {
+    animate: false,
+    animateReplay: true,
     display: 'block',
     boxSizing: 'border-box',
     border: '1px solid #D1D1D1',
@@ -1199,6 +1201,10 @@ useEffect(()=>{
                   {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') &&
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
+
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+
+                  {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
                   {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
                     <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={[ 'hidden', 'hover', 'always show' ]}/>
