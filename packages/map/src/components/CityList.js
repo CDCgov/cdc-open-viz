@@ -12,7 +12,9 @@ const CityList = (({
   displayGeoName,
   applyLegendToRow,
   projection,
-  titleCase
+  titleCase,
+  setSharedFilterValue,
+  isFilterValueSupported
 }) => {
   const [citiesData, setCitiesData] = useState({});
 
@@ -51,8 +53,8 @@ const CityList = (({
 
     const styles = {
       fill: legendColors[0],
-      outline: 0,
-      stroke: 'rgba(0, 0, 0, 0.4)',
+      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? .5 : 1,
+      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0
