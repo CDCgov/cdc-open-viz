@@ -560,7 +560,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // get nums
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
-                console.log('hasZeroInData', hasZeroInData)
                 if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
 
                 domainNums = d3.extent(domainNums)
@@ -572,10 +571,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 let breaks = scale.quantiles();
                 breaks = breaks.map( item => Math.round(item))
-
-                console.log('breaks', breaks)
-                console.log('d', domainNums)
-                
                 
                 // always start with domain beginning breakpoint
                 if(d3.extent(domainNums)?.[0] !== 0) {
@@ -589,7 +584,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 
                 breaks.map( (item, index) => {
 
-                    console.log('first result', result)
 
                     let min = breaks[index];
                     let max = breaks[index + 1] - 1;
@@ -614,7 +608,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                         setMin()
                         setMax()
-                        console.log('res', result)
                         
                         if(min !== 0 && max !== 0){
                             result.push({
