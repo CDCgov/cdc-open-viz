@@ -547,10 +547,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                     const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                     const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
-
+                    const tableLink = <a  href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>;
+                   
                     return (
                       <React.Fragment key={`vis__${index}__${colIndex}`}>
-                        <div className={`dashboard-col dashboard-col-${col.width}`}>
+                        <div  className={`dashboard-col dashboard-col-${col.width}`}>
                           {visualizationConfig.type === 'chart' && (
                             <CdcChart
                               key={col.widget}
@@ -561,6 +562,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                             }}
                             setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                             isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                             />
                             )}
                           {visualizationConfig.type === 'map' && (
@@ -596,7 +598,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                               }}
                               isDashboard={true}/>
                           )}
-                          {config.table && config.table.show && config.datasets && <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>}
                         </div>
                       </React.Fragment>
                     )
