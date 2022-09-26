@@ -515,8 +515,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   } else {
     body = (
       <>
+   
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
+          {/* Description */}
+          {description && <div className="subtext">{parse(description)}</div>}
           {/* Title */}
           {title &&
             <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
@@ -551,45 +554,45 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                           {visualizationConfig.type === 'chart' && (
                             <CdcChart
                               key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                              isDashboard={true}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                            isDashboard={true}
                             />
-                          )}
+                            )}
                           {visualizationConfig.type === 'map' && (
                             <CdcMap
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                              setSharedFilterValue={setSharedFilterValue}
-                              isDashboard={true}
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                            setSharedFilterValue={setSharedFilterValue}
+                            isDashboard={true}
                             />
-                          )}
+                            )}
                           {visualizationConfig.type === 'data-bite' && (
                             <CdcDataBite
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              isDashboard={true}/>
-                          )}
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            isDashboard={true}/>
+                            )}
                           {visualizationConfig.type === 'waffle-chart' && (
                             <CdcWaffleChart
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
                               }}
                               isDashboard={true}/>
                           )}
@@ -643,9 +646,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
             </div>)
           })}
-
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
         </div>
       </>
     )
