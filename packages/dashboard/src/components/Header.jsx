@@ -186,7 +186,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
               <span className="edit-label column-heading">Used By:</span>
               <ul>
                 {filter.usedBy && filter.usedBy.map(vizKey => (
-                  <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={() => removeFilterUsedBy(filter, index, vizKey)}>X</button></li>
+                  <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={(e) => {e.preventDefault();removeFilterUsedBy(filter, index, vizKey)}}>X</button></li>
                 ))}
               </ul>
               <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
