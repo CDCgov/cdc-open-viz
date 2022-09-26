@@ -11,6 +11,7 @@ import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
 import PairedBarChart from './PairedBarChart';
+import SparkLine from './SparkLine';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -18,7 +19,7 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -125,20 +126,20 @@ export default function LinearChart() {
     if(config.visualizationType === 'Paired Bar') {
       
 
-    let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
-    let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
+      let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
+      let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
 
-    // group one
-    var g1xScale = scaleLinear<number>({
-      domain: [0, Math.max(groupOneMax,groupTwoMax) ],
-      range: [xMax/2, 0]
-    })
-  
-    // group 2
-    var g2xScale = scaleLinear<number>({
-      domain: g1xScale.domain(),
-      range: [xMax / 2, xMax]
-    })
+      // group one
+      var g1xScale = scaleLinear<number>({
+        domain: [0, Math.max(groupOneMax,groupTwoMax) ],
+        range: [xMax/2, 0]
+      })
+    
+      // group 2
+      var g2xScale = scaleLinear<number>({
+        domain: g1xScale.domain(),
+        range: [xMax / 2, xMax]
+      })
 
     }
   }
@@ -152,7 +153,7 @@ export default function LinearChart() {
 
   return (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear">
+      <svg width={width} height={height} className="linear" role="img" aria-label={handleChartAriaLabels(config)} tabIndex={0}>
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -189,6 +190,7 @@ export default function LinearChart() {
           }) : '' }
 
           {/* Y axis */}
+          {config.visualizationType !== "Spark Line" &&
             <AxisLeft
             scale={yScale}
             left={config.runtime.yAxis.size}
@@ -217,16 +219,15 @@ export default function LinearChart() {
                             stroke="#333"
                             display={config.runtime.horizontal ? 'none' : 'block'}
                           />
-                        )}
-                        
-                        { config.runtime.yAxis.gridLines ? (
-                          <Line
-                            from={{x: tick.from.x + xMax, y: tick.from.y}}
-                            to={tick.from}
-                            stroke="rgba(0,0,0,0.3)"
-                          />
-                          ) : ''
-                        }
+                          )}
+                          { config.runtime.yAxis.gridLines ? (
+                            <Line
+                              from={{x: tick.from.x + xMax, y: tick.from.y}}
+                              to={tick.from}
+                              stroke="rgba(0,0,0,0.3)"
+                            />
+                            ) : ''
+                          }
 
                         {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
@@ -257,6 +258,15 @@ export default function LinearChart() {
                             >{tick.formattedValue}</Text>
                         }
 
+                        { (config.orientation === "horizontal" && config.visualizationType === 'Paired Bar') && !config.yAxis.hideLabel &&
+                            // 17 is a magic number from the offset in barchart.
+                            <Text
+                              transform={`translate(${-15}, ${ tick.from.y }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
+                              verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
+                              textAnchor={"end"}
+                            >{formatNumber(tick.formattedValue)}</Text>
+                        }
+
 
                         { config.orientation !== "horizontal" && config.visualizationType !== 'Paired Bar' && !config.yAxis.hideLabel &&
                             <Text
@@ -269,39 +279,40 @@ export default function LinearChart() {
                             </Text>
                         }
 
-                      </Group>
-                    );
-                  })}
-                  { (!config.yAxis.hideAxis) && (
-                  <Line
-                    from={props.axisFromPoint}
-                    to={props.axisToPoint}
-                    stroke="#333"
-                  />
-                  )}
-                  { yScale.domain()[0] < 0 && (
+                        </Group>
+                      );
+                    })}
+                    {!config.yAxis.hideAxis &&  (
                     <Line
-                      from={{x: props.axisFromPoint.x, y: yScale(0)}}
-                      to={{x: xMax, y: yScale(0)}}
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
                       stroke="#333"
                     />
-                  )}
-                  <Text
-                    className="y-label"
-                    textAnchor="middle"
-                    verticalAnchor="start"
-                    transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
-                    fontWeight="bold"
-                  >
-                    {props.label}
-                  </Text>
-                </Group>
-              );
-            }}
-          </AxisLeft>
+                    )}
+                    { yScale.domain()[0] < 0 && (
+                      <Line
+                        from={{x: props.axisFromPoint.x, y: yScale(0)}}
+                        to={{x: xMax, y: yScale(0)}}
+                        stroke="#333"
+                      />
+                    )}
+                    <Text
+                      className="y-label"
+                      textAnchor="middle"
+                      verticalAnchor="start"
+                      transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
+                      fontWeight="bold"
+                    >
+                      {props.label}
+                    </Text>
+                  </Group>
+                );
+              }}
+            </AxisLeft>
+          }
 
           {/* X axis */}
-          {config.visualizationType !== 'Paired Bar' && (
+          {config.visualizationType !== 'Paired Bar' && config.visualizationType !== "Spark Line" && (
           <AxisBottom
             top={yMax}
             left={config.runtime.yAxis.size}
@@ -403,7 +414,7 @@ export default function LinearChart() {
                             textAnchor={'end'}
                             width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
                           >
-                            {tick.formattedValue}
+                            {formatNumber(tick.formattedValue)}
                           </Text>
                       }
                       </Group>
