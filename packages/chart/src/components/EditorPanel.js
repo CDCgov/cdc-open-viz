@@ -199,8 +199,10 @@ const EditorPanel = () => {
 
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
- },[dispatch,config.palette]);
+  }, [dispatch, config.palette]);
 
+  console.log('config', config)
+  
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
@@ -798,12 +800,12 @@ useEffect(()=>{
                       </>
                     )}
 
-                    <Select
+                    {config.series.length === 1 && <Select
                       fieldName="visualizationType"
                       label="Rank by Value"
                       initial="Select"
                       onChange={(e) => sortSeries(e.target.value)}
-                      options={['asc', 'desc']} />
+                      options={['asc', 'desc']} />}
                     
                   </AccordionItemPanel>
                 </AccordionItem>

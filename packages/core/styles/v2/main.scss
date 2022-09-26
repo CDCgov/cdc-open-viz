@@ -1,8 +1,8 @@
 @import 'utils';
-@import 'base';
 @import 'themes';
 
 .cove {
+  @import 'base';
   color: $baseColor;
   font-size: 16px;
   line-height: 1.4;
@@ -10,6 +10,51 @@
   :focus,
   [tabindex]:focus-visible {
     outline: 2px solid rgba(255,102,1,.9);
+  }
+
+  margin: 0;
+  font: 1em/1.6 system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: #111;
+
+  strong {
+    font-weight: 600;
+  }
+
+  .subtext {
+    margin-top: 1em;
+  }
+
+  .warning {
+    padding: .75em 1em;
+    margin: 1em 0;
+    background-color: #FFD2D2;
+    color: #D8000C;
+    font-size: .8em;
+    border: #D8000C 1px solid;
+    border-radius: .4em;
+
+    strong {
+      font-weight: 600;
+      display: block;
+    }
+  }
+
+  .sr-only,
+  .sr-only-focusable:not(:focus) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    display: flex;
   }
 
   @import 'layout';

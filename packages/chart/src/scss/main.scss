@@ -219,7 +219,10 @@
   }
 
   .filters-section {
-    display: inline-block;
+    @include breakpoint(md) {
+      display: flex;
+      gap: 30px;
+    }
 
     label:not(:empty) {
       margin-right: .4em;
@@ -229,8 +232,8 @@
       font-size: 1em;
     }
 
-    .single-filter + .single-filter {
-      margin-left: 1em;
+    .single-filter {
+      margin-bottom: .5em;
     }
   }
 

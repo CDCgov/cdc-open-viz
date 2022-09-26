@@ -220,6 +220,13 @@
     }
   }
 
+  @include breakpoint(md) {
+    .cove-dashboard-filters {
+      display: flex;
+      gap: 30px;
+    }
+  }
+
   .dashboard-filters-section {
     margin: 0 0 1em;
   }
