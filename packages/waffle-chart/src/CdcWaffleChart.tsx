@@ -460,7 +460,7 @@ const CdcWaffleChart = (
     );
 
     content = (
-      <div className={`cove ${config.theme}`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme}`}>
         {isEditor &&
           <EditorPanel>
             {body}
