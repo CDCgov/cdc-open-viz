@@ -232,7 +232,6 @@ const UsaMap = (props) => {
       return 0;
     })
     const geosJsx = geographies.map(( {feature: geo, path = ''}) => {
-      console.log('geos here', geo)
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
       let styles = {
