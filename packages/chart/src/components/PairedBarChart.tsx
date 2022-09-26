@@ -88,14 +88,23 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
 	return (width > 0) && (
 		<>
+			<style>
+				{`
+				#cdc-visualization__paired-bar-chart,
+				 #cdc-visualization__paired-bar-chart > .visx-group {
+					transform-origin: center
+				}
+				`}
+			</style>
 			<svg
-				role="img"
 				id="cdc-visualization__paired-bar-chart"
 				width={width}
 				height={height}
+				viewBox={`0 0 ${width} ${height}`}
+				role="img"
 				tabIndex={0}
-				>
-				<Group top={0} left={config.xAxis.size}>
+			>
+				<Group top={0} left={config.xAxis.size} >
 					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map( (d,index) => {
 
 						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1;
@@ -125,9 +134,11 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 						y = Number(config.barPadding) > 20 ? y += Number(config.barPadding/3.5) - config.barHeight/2 : y += 0
 
 						return (
-						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
+						<>
+						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
 							<Bar
-								className="bar"
+								id={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
+								className='bar group-1'
 								key={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
 								x={halfWidth - barWidth}
 								y={ y }
@@ -152,6 +163,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								</Text>
 							}
 						</Group>
+						</>
 					)}
 					)}
 					{data.filter(item => config.series[1].dataKey === groupTwo.dataKey).map(d => {
@@ -180,9 +192,18 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 						}
 
 						return(
-							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}>
+							<>
+							<style>
+								{`
+								.bar-${groupTwo.dataKey}-${d[config.xAxis.dataKey]} {
+						  			transform-origin: ${halfWidth}px ${y}px
+								}
+							`}
+							</style>
+							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`} className='horizontal'>
 								<Bar
-									className="bar"
+									id={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
+									className="bar group-2"
 									key={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
 									x={halfWidth}
 									y={ y }
@@ -207,6 +228,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 									</Text>
 								}
 							</Group>
+							</>
 						)
 					}
 					)}

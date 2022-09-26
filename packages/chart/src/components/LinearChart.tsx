@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect,useState } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 
 import { Group } from '@visx/group';
@@ -11,6 +11,7 @@ import BarChart from './BarChart';
 import LineChart from './LineChart';
 import Context from '../context';
 import PairedBarChart from './PairedBarChart';
+import useIntersectionObserver from "./useIntersectionObserver";
 import SparkLine from './SparkLine';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
@@ -19,9 +20,28 @@ import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport,formatNumber, handleChartAriaLabels } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
+  const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
+
+  const triggerRef = useRef();
+  const dataRef = useIntersectionObserver(triggerRef, {
+    freezeOnceVisible: false
+  });
+
+  // If the chart is in view and set to animate and it has not already played
+  if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
+    setTimeout(() => {
+      setAnimatedChart(true);
+    }, 500);
+
+    setTimeout(() => {
+      setAnimatedChartPlayed(!animatedChartPlayed);
+    }, 600);
+  }
+
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
   }
@@ -41,7 +61,7 @@ export default function LinearChart() {
    // desctructure users enetered value from initial state config.
   const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
   // validation for for min/max that user entered;
-  const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0; 
+  const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0;
   const isMinValid = ((numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >=0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0));
 
   if (data) {
@@ -49,7 +69,7 @@ export default function LinearChart() {
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE;
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
-      min = 0; 
+      min = 0;
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
@@ -134,7 +154,7 @@ export default function LinearChart() {
         domain: [0, Math.max(groupOneMax,groupTwoMax) ],
         range: [xMax/2, 0]
       })
-    
+
       // group 2
       var g2xScale = scaleLinear<number>({
         domain: g1xScale.domain(),
@@ -152,7 +172,16 @@ export default function LinearChart() {
 
   return isNaN(width) ? <></> : (
     <ErrorBoundary component="LinearChart">
-      <svg width={width} height={height} className="linear" role="img" aria-label={handleChartAriaLabels(config)} tabIndex={0}>
+      <svg
+        width={width}
+        height={height}
+        // If the chart is set to not replay the filter and has already animated, don't add the animated class
+        // className={`linear ${(config.animate) || (config.animateReplay  && animatedChartPlayed) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
+        className={`linear ${(config.animate) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
+        role="img"
+        aria-label={handleChartAriaLabels(config)}
+        tabIndex={0}
+      >
           {/* Higlighted regions */}
           { config.regions ? config.regions.map((region) => {
             if(!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
@@ -203,7 +232,7 @@ export default function LinearChart() {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
               const belowBarPaddingFromTop = 9;
-              return ( 
+              return (
                 <Group className="left-axis">
                   {props.ticks.map((tick, i) => {
                     return (
@@ -218,15 +247,16 @@ export default function LinearChart() {
                             stroke="#333"
                             display={config.runtime.horizontal ? 'none' : 'block'}
                           />
-                          )}
-                          { config.runtime.yAxis.gridLines ? (
-                            <Line
-                              from={{x: tick.from.x + xMax, y: tick.from.y}}
-                              to={tick.from}
-                              stroke="rgba(0,0,0,0.3)"
-                            />
-                            ) : ''
-                          }
+                        )}
+
+                        { config.runtime.yAxis.gridLines ? (
+                          <Line
+                            from={{x: tick.from.x + xMax, y: tick.from.y}}
+                            to={tick.from}
+                            stroke="rgba(0,0,0,0.3)"
+                          />
+                          ) : ''
+                        }
 
                         {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
@@ -502,15 +532,22 @@ export default function LinearChart() {
           
           {/* Bar chart */}
           { (config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
-            <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              <>
+                <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
+              </>
+
           )}
 
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
-            <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              <>
+                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+              </>
+
           )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
+      <div ref={triggerRef} />
     </ErrorBoundary>
   )
 }
