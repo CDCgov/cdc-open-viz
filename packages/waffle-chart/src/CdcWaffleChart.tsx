@@ -13,6 +13,8 @@ import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 
+import { publish } from '@cdc/core/helpers/events';
+
 import './scss/main.scss'
 
 const themeColor = {
@@ -285,18 +287,35 @@ const WaffleChart = ({ config, isEditor }) => {
   config.title && innerContainerClasses.push('component--has-title')
   config.subtext && innerContainerClasses.push('component--has-subtext')
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
   !config.visual.border && contentClasses.push('no-borders');
   config.visual.accent && contentClasses.push('component--has-accent')
   config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
   config.visual.background && contentClasses.push('component--has-background');
   config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
 
+  config.shadow && innerContainerClasses.push('shadow')
+  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+
+  const handleWaffleChartAriaLabel = (state, testing = false) => {
+        if(testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state);
+        try {
+            let ariaLabel = 'Waffle chart';
+            if(state.title) {
+                ariaLabel += ` with the title: ${state.title}`
+            }
+            return ariaLabel;
+        } catch(e) {
+            console.error(e.message)
+        }
+  }
+
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
       {title &&
-        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+        <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden="true">
         {parse(title)}
       </header>
       }
@@ -305,7 +324,7 @@ const WaffleChart = ({ config, isEditor }) => {
           <div
             className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-              <svg width={setRatio()} height={setRatio()}>
+              <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
                 <Group>
                   {buildWaffle()}
                 </Group>
@@ -349,6 +368,8 @@ const CdcWaffleChart = (
   const [ loading, setLoading ] = useState(true)
 
   const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const [ container, setContainer ] = useState()
 
   // Default Functions
   const updateConfig = (newConfig) => {
@@ -395,12 +416,20 @@ const CdcWaffleChart = (
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   //Load initial config
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
   }, [])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+        publish('cove_loaded', { config: config })
+        setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   //Reload config if config object provided/updated
   useEffect(() => {
@@ -425,13 +454,13 @@ const CdcWaffleChart = (
     let bodyClasses = ['cove-component', 'waffle-chart']
 
     let body = (
-      <div className="cove-component waffle-chart" ref={outerContainerRef}>
-        <WaffleChart config={config} isEditor={isEditor} />
+      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
+        <WaffleChart config={config} isEditor={isEditor}/>
       </div>
     );
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={`cove ${config.theme}`}>
         {isEditor &&
           <EditorPanel>
             {body}

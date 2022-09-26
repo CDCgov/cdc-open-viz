@@ -2,6 +2,7 @@
 @import "~@cdc/core/styles/heading-colors";
 @import 'mixins';
 @import 'variables';
+@import '~@cdc/core/styles/v2/themes/color-definitions';
 
 .form-container {
   overflow: scroll;
@@ -15,6 +16,8 @@
 .cdc-open-viz-module.type-chart {
   @import 'DataTable';
   @import 'editor-panel';
+
+  border-radius: 3px;
 
   .visually-hidden {
     position: fixed;
@@ -69,6 +72,9 @@
     font-size: 1.1em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
+
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 
     em {
       font-style: italic;
@@ -213,7 +219,10 @@
   }
 
   .filters-section {
-    display: inline-block;
+    @include breakpoint(md) {
+      display: flex;
+      gap: 30px;
+    }
 
     label:not(:empty) {
       margin-right: .4em;
@@ -223,8 +232,8 @@
       font-size: 1em;
     }
 
-    .single-filter + .single-filter {
-      margin-left: 1em;
+    .single-filter {
+      margin-bottom: .5em;
     }
   }
 
@@ -255,7 +264,7 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section, .chart-container {
+    .filters-section, .chart-container:not(.sparkline) {
       margin-left: 1em;
       margin-right: 1em;
     }
@@ -329,9 +338,6 @@
       }
     }
   }
-  [tabindex]:focus-visible {
-    outline: 2px solid rgb(0, 95, 204) !important;
-  }
 }
 
 #paired-bar-legend {
@@ -348,5 +354,77 @@
     height: 1em;
     vertical-align: middle;
     margin: 0.25em;
+  }
+}
+
+
+.isEditor.type-sparkline .cdc-chart-inner-container {
+    margin: 3em auto 0;
+    max-width: 60%;
+}
+
+.cdc-open-viz-module.type-chart.lg.type-sparkline .chart-container > svg {
+  width: 100%;
+}
+
+.chart-container.sparkline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+.cdc-open-viz-module.type-chart.type-sparkline {
+
+  .cove-component__content {
+    background: #F2F2F2;
+  }
+
+  .cove-component__content.component--hideBackgroundColor {
+    background: transparent;
+  }
+
+  .chart-title:not(:empty) {
+    margin-bottom: 0 !important;
+  }
+
+  .cove-component__content .chart-container {
+    padding: 1em;
+  }
+
+  .cove-component__content:not(.no-borders) {
+    border: 1px solid $lightGray
+  }
+
+  .cove-component__header ~ .cove-component__content:not(.no-borders) {
+    border-top: none !important;
+  }
+
+  .subtext {
+    margin-top: 0px;
+  }
+
+  .isEditor {
+    position: relative;
+  }
+
+  .subtext {
+    margin-bottom: 15px;
+  }
+
+}
+
+.cdc-open-viz-module .cove-component__content.sparkline {
+  padding: 1em;
+}
+
+.cove-component__content.sparkline {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+
+  .visx-axis-tick:first-of-type {
+    transform: translate(20px, 0)
+  }
+
+  .visx-axis-tick:last-of-type {
+    transform: translate(-20px, 0)
   }
 }

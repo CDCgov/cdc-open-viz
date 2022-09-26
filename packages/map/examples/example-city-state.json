@@ -506,5 +506,8 @@
   },
   "color": "yelloworangered",
   "usingWidgetLoader": true,
-  "type": "map"
+  "type": "map",
+  "visual": {
+    "cityStyle": "pin"
+  }
 }
