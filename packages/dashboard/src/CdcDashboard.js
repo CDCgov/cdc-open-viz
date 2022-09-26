@@ -33,6 +33,8 @@ import Papa from 'papaparse'
 
 import './scss/main.scss'
 
+import { publish } from '@cdc/core/helpers/events'
+
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
     newViz: true,
@@ -107,6 +109,10 @@ export default function CdcDashboard(
   const [ preview, setPreview ] = useState(false)
 
   const [ currentViewport, setCurrentViewport ] = useState('lg')
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   const { title, description } = config ? (config.dashboard || config) : {}
 
@@ -224,6 +230,10 @@ export default function CdcDashboard(
     return values
   }
 
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   const updateConfig = (newConfig, dataOverride = null) => {
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
@@ -269,6 +279,13 @@ export default function CdcDashboard(
       setParentConfig(config)
     }
   }, [ config ])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -336,6 +353,7 @@ export default function CdcDashboard(
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   // Prevent render if loading
@@ -410,7 +428,11 @@ export default function CdcDashboard(
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
-          {config.dashboard.filters && <Filters/>}
+          {config.dashboard.filters &&
+            <div className="cove-dashboard-filters">
+              <Filters />
+            </div>
+          }
 
           {/* Visualizations */}
           {config.rows && config.rows.map((row, index) => {

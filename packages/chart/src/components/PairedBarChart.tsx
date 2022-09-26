@@ -101,7 +101,8 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 				width={width}
 				height={height}
 				viewBox={`0 0 ${width} ${height}`}
-
+				role="img"
+				tabIndex={0}
 			>
 				<Group top={0} left={config.xAxis.size} >
 					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map( (d,index) => {
@@ -134,7 +135,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
 						return (
 						<>
-
 						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
 							<Bar
 								id={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
@@ -160,7 +160,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 									y={ y + config.barHeight/2}
 									fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
 									{formatNumber(d[groupOne.dataKey])}
-
 								</Text>
 							}
 						</Group>
@@ -191,7 +190,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 								config.barPadding = barPadding / 2;
 							}
 						}
-
 
 						return(
 							<>

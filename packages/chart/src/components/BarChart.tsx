@@ -91,6 +91,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   },[config.barStyle])
 
+  // config.runtime.seriesKeys.sort().reverse();
+
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>

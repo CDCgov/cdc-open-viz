@@ -302,6 +302,14 @@ const EditorPanel = (props) => {
 					},
 				});
 				break;
+			case 'handleCityStyle':
+				setState({
+					...state,
+					visual: {
+						cityStyle: value,
+					},
+				});
+				break;
 			case 'geoBorderColor':
 				setState({
 					...state,
@@ -1186,8 +1194,6 @@ const EditorPanel = (props) => {
 		...draggableStyle,
 	});
 
-	console.log('general', general)
-
 	const CategoryList = () => {
 		return editorCatOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
@@ -1251,45 +1257,50 @@ const EditorPanel = (props) => {
 											<span>Geography</span>
 										</span>
 										<ul className='geo-buttons'>
-											<li
+											<button
 												className={
 													state.general.geoType === 'us' ||
 													state.general.geoType === 'us-county'
 														? 'active'
 														: ''
 												}
-												onClick={() => handleEditorChanges('geoType', 'us')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'us')
+												}}
 											>
 												<UsaGraphic />
 												<span>United States</span>
-											</li>
-											<li
+											</button>
+											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'world')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'world')
+													}
+												}
 											>
 												<WorldGraphic />
 												<span>World</span>
-											</li>
-											<li
+											</button>
+											<button
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'single-state')}
+												onClick={(e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'single-state')
+												}}
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
-											</li>
+											</button>
 										</ul>
 									</label>
 									{/* Select > State or County Map */}
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-												Map Type
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-												</Tooltip.Content>
-												</Tooltip>
+												Geography Subtype
+												
 											</span>
 											<select
 												value={state.general.geoType}
@@ -1323,7 +1334,15 @@ const EditorPanel = (props) => {
 									)}
 									{/* Type */}
 									<label>
-										<span className='edit-label column-heading'>Map Type</span>
+										<span className='edit-label column-heading'>
+											Map Type
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+												</Tooltip.Content>
+												</Tooltip>
+										</span>
 										<select
 											value={state.general.type}
 											onChange={(event) => {
@@ -1998,13 +2017,13 @@ const EditorPanel = (props) => {
 														)}
 													</Droppable>
 												</DragDropContext>
-												{editorCatOrder.length >= 9 && (
+												{editorCatOrder.length >= 10 && (
 													<section className='error-box my-2'>
 														<div>
 															<strong className='pt-1'>Warning</strong>
 															<p>
-																The maximum number of categorical legend items is 9. If
-																your data has more than 9 categories your map will not
+																The maximum number of categorical legend items is 10. If
+																your data has more than 10 categories your map will not
 																display properly.
 															</p>
 														</div>
@@ -2087,7 +2106,7 @@ const EditorPanel = (props) => {
 												</span>
 											</label>
 										)}
-										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
+										{(filtersJSX.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us')  && (
 											<label className='checkbox'>
 												<input
 													type='checkbox'
@@ -2492,7 +2511,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<TextField
+									{(state.general.type === 'bubble') && <><TextField
 										type='number'
 										value={state.visual.minBubbleSize}
 										section='visual'
@@ -2507,7 +2526,7 @@ const EditorPanel = (props) => {
 										fieldName='maxBubbleSize'
 										label='Maximum Bubble Size'
 										updateField={updateField}
-									/>
+									/></>}
 									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
 										<label className='checkbox'>
 											<input
@@ -2542,6 +2561,20 @@ const EditorPanel = (props) => {
 												}}
 											/>
 											<span className='edit-label'>Bubble Map has extra border</span>
+										</label>
+									}
+									{state.general.geoType === 'us' &&
+										<label>
+											<span className='edit-label'>City Style</span>
+											<select
+												value={state.visual.cityStyle || false}
+												onChange={(event) => {
+													handleEditorChanges('handleCityStyle', event.target.value);
+												}}
+											>
+												<option value='circle'>Circle</option>
+												<option value='pin'>Pin</option>
+											</select>
 										</label>
 									}
 								</AccordionItemPanel>

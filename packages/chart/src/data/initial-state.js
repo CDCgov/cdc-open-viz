@@ -42,13 +42,16 @@ export default {
   },
   table: {
     label: 'Data Table',
-    expanded: true
+    expanded: true,
+    limitHeight:false,
+    height:""
   },
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
     position: 'right',
-    reverseLabelOrder:false
+    reverseLabelOrder:false,
+    description:''
   },
   exclusions: {
     active: false,
@@ -58,5 +61,10 @@ export default {
   isPaletteReversed: false,
   labels: false,
   dataFormat: {commas:false,prefix:'',suffix:""},
-  confidenceKeys: {}
+  confidenceKeys: {},
+  visual: {
+    border: true,
+    accent: true,
+    background: true
+  }
 }

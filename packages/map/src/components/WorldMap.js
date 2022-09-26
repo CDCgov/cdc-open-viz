@@ -31,7 +31,8 @@ const WorldMap = (props) => {
     setFilteredCountryCode,
     position,
     setPosition,
-    hasZoom
+    hasZoom,
+    handleMapAriaLabels
   } = props;
 
 // TODO Refactor - state should be set together here to avoid rerenders
@@ -198,7 +199,11 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
   return (
     <ErrorBoundary component="WorldMap">
       {hasZoom ? (
-        <svg viewBox="0 0 880 500">
+        <svg 
+          viewBox="0 0 880 500"
+          role="img"
+          aria-label={handleMapAriaLabels(state)}
+        >
           <rect height={500} width={880} onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} fill="white"/>
           <ZoomableGroup
             zoom={position.zoom}

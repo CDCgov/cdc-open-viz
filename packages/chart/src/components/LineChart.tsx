@@ -66,6 +66,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
               strokeWidth={2}
               strokeOpacity={1}
               shapeRendering="geometricPrecision"
+              defined={(item,i) => {
+                return item[config.runtime.seriesLabels[seriesKey]] !== "";
+              }}
             />
           </Group>
         ))
