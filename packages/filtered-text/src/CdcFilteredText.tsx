@@ -106,7 +106,7 @@ const CdcFilteredText:FC<Props> = (props) => {
   }, [])
   let content = (<Loading/>)
 
-let filterClasses = ["cove","cove-component","cove-component__content","filtered-text"]
+let filterClasses = ["cove","cove-component","cove-component__content",'no-borders',"filtered-text"]
   config?.visual?.border && filterClasses.push('component--has-borderColorTheme');
   config?.visual?.accent && filterClasses.push('component--has-accent');
   config?.visual?.background && filterClasses.push('component--has-background');
@@ -121,17 +121,7 @@ let filterClasses = ["cove","cove-component","cove-component__content","filtered
         {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
         <div className={filterClasses.join(' ')} >
           <div className="cove-component__content-wrap">
-            {filterByTextColumn().slice(0,1).map((el,i)=>{
-              if(el.text || el.Text){
-                return (
-                  <p  key={i} > {parse(el.Text || el.text)} </p>
-                )
-              }else{
-                return (
-                  <p  key={i} > {parse(el[config.textColumn] ||"")} </p>
-                )
-              }
-          })}  
+            {filterByTextColumn().slice(0,1).map((el,i)=> <p key={i} > {parse(el[config.textColumn] ||"")} </p>)}  
           </div>
         </div>
         </>

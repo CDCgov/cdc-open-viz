@@ -68,7 +68,6 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = (props) => {
-
 	let mapData = states.concat(counties);
 
 	const {
@@ -80,6 +79,7 @@ const CountyMap = (props) => {
 		displayGeoName,
 		rebuildTooltips,
 		containerEl,
+		handleMapAriaLabels
 	} = props;
 
 	useEffect(() => {
@@ -518,7 +518,15 @@ const CountyMap = (props) => {
 	if(!data) <Loading />
 	return (
 		<ErrorBoundary component='CountyMap'>
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
+			<svg 
+				viewBox={`0 0 ${WIDTH} ${HEIGHT}`} 
+				preserveAspectRatio='xMinYMin' 
+				className='svg-container' 
+				data-scale={scale ? scale : ''} 
+				data-translate={translate ? translate : ''}
+				role="img"
+				aria-label={handleMapAriaLabels(state)}
+			>
 				<rect
 					className='background center-container ocean'
 					width={WIDTH}
