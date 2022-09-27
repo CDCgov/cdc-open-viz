@@ -564,7 +564,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
-                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
+                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1  : state.legend.numberOfItems - 1 )
+                
                 let scale = d3.scaleQuantile()
                     .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
                     .range(colorRange) // set range to our colors array
@@ -577,50 +578,60 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     breaks.unshift(d3.extent(domainNums)?.[0])
                 }
                 
-                // if separating zero insert zero in first position.
-                if (state.legend.separateZero && !hasZeroInData) {
-                    breaks.splice(1, 0, 1);
-                } 
                 
                 breaks.map( (item, index) => {
 
+                    const setMin = (index) => {
 
-                    let min = breaks[index];
-                    let max = breaks[index + 1] - 1;
-
-                    const setMin = () => {
+                        // if the break index is the last item 
+                        // console.log('index', index)
+                        // console.log('l', runtimeLegend.length - state.legend.specialClasses.length)
+                        // console.log('ll', runtimeLegend.length)
+                        let min = (index === 0 && !state.legend.separateZero) ? 0 : breaks[index];
                         // in starting position and zero in the data
-                        if(!state.legend.separateZero) {
+                        if(!state.legend.separateZero && (index === state.legend.specialClasses?.length )) {
                             min = domainNums[0]
                         }
+                        return min;
 
                     } 
 
-                    const setMax = () => {
-                        if(index === 0 && state.legend.separateZero) {
+                    const setMax = (index) => {
+                        let max = breaks[index + 1] - 1;
+
+                        if( (index === state.legend.specialClasses.length) && !state.legend.separateZero) {
                             max = 0;
                         }
 
                         if(index + 1 === breaks.length) {
                             max = domainNums[1]
                         }
+
+                        return max;
                     }
 
-                        setMin()
-                        setMax()
-                        
-                        if(min !== 0 && max !== 0){
-                            result.push({
-                                min,
-                                max,
-                                color: scale(item)
-                            })
-                        }
+                    let min = setMin(index)
+                    let max = setMax(index)
+
+                    console.log('break', item)
+
+                    result.push({
+                        min,
+                        max,
+                        color: scale(item)
+                    })
+
                     
                     dataSet.forEach( (row, dataIndex) => {
                         let number = row[state.columns.primary.name]
+
+                        let updated = 0
                         
-                        let updated = state.legend.separateZero ? index : index;
+                        // check if we're seperating zero out
+                        updated = state.legend.separateZero ? index + 1 : index;
+
+                        // check for special classes
+                        updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index;
 
                         if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
 
