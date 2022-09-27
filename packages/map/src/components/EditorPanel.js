@@ -2526,7 +2526,7 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/></>}
-									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
+									{ (state.general.geoType === 'world' || state.general.geoType === 'us' && state.general.type === 'bubble') &&
 										<label className='checkbox'>
 											<input
 												type='checkbox'
