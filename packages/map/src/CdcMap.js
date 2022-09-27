@@ -113,7 +113,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname,link}) => {
 
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
@@ -1642,6 +1642,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
                 )}
+                {link && link}
                 {general.introText && <section className="introText">{parse(general.introText)}</section>}
 				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
@@ -1666,7 +1667,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         tabbingId={tabId}
 					/>
                 )}
-                
                 {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
                 {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
             </section>}

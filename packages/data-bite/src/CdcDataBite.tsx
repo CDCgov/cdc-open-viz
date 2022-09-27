@@ -24,10 +24,11 @@ interface Props{
   isDashboard?: boolean
   isEditor?: boolean
   setConfig?:any
+  link?:any
 }
 
 const CdcDataBite:FC<Props> = (props) => {
-const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig,link } = props
 
   const [config, setConfig] = useState<DefaultsType>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
@@ -492,6 +493,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
               </div>
             </div>
           </div>
+          {link && link}
         </div>
       </>
     )

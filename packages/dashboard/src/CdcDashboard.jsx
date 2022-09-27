@@ -531,6 +531,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row, index) => {
 
             return (
+
               <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
                 {row.map((col, colIndex) => {
                   if (col.width) {
@@ -576,6 +577,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                             setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                             setSharedFilterValue={setSharedFilterValue}
                             isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                             />
                             )}
                           {visualizationConfig.type === 'data-bite' && (
@@ -586,7 +588,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                             setConfig={(newConfig) => {
                               updateChildConfig(col.widget, newConfig)
                             }}
-                            isDashboard={true}/>
+                            isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
+                            />
                             )}
                           {visualizationConfig.type === 'waffle-chart' && (
                             <CdcWaffleChart
@@ -596,7 +600,9 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                             setConfig={(newConfig) => {
                               updateChildConfig(col.widget, newConfig)
                               }}
-                              isDashboard={true}/>
+                              isDashboard={true}
+                              link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
+                              />
                           )}
                         </div>
                       </React.Fragment>
