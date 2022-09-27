@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,FC } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
@@ -30,8 +30,11 @@ const themeColor = {
   'theme-green': '#4b830d',
   'theme-amber': '#fbab18',
 }
+interface Props{
+  config?:any, isEditor?:any ,link?:any
+}
 
-const WaffleChart = ({ config, isEditor }) => {
+const WaffleChart:FC<Props>  = ({ config, isEditor ,link}) => {
   let {
     title,
     theme,
@@ -338,6 +341,7 @@ const WaffleChart = ({ config, isEditor }) => {
               </div>
               }
               <div className="cove-waffle-chart__data--text">{parse(content)}</div>
+              
               {subtext &&
                 <div className="cove-waffle-chart__subtext">
                   {parse(subtext)}
@@ -348,6 +352,7 @@ const WaffleChart = ({ config, isEditor }) => {
           </div>
         </div>
       </div>
+      {link && link}
     </>
   </div>
   )
