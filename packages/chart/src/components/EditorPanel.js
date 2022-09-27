@@ -196,11 +196,19 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
+<<<<<<< HEAD
 
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
   
+=======
+  
+  useEffect(()=>{
+    dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
+  }, [dispatch, config.palette]);
+
+>>>>>>> 5dd7d984 (repositioned text elements)
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
