@@ -1540,12 +1540,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						html={true}
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
-				)}
+                )}
                 <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
 					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-						{parse(title)}
-					</div>
-				</header>
+                        {parse(title)}
+                        <p>{general.superTitle}</p>
+                    </div>
+                    
+                </header>
+                
+                <div>
+                    {general.introText && <section className="introText">{parse(general.introText)}</section>}
+                </div>
+                
 				<section 
                     role="button"
                     tabIndex="0"
@@ -1577,6 +1584,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
+                    
 					<section className='geography-container' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
@@ -1613,7 +1621,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                         )}
                         </section>
-
+                   
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
 							viewport={currentViewport}
@@ -1643,7 +1651,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
                 )}
                 {link && link}
-                {general.introText && <section className="introText">{parse(general.introText)}</section>}
+
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                
 				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
@@ -1667,7 +1677,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         tabbingId={tabId}
 					/>
                 )}
-                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                
                 {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
             </section>}
             
