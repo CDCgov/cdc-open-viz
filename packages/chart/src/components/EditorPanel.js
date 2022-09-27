@@ -195,7 +195,9 @@ const EditorPanel = () => {
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
-	},[paletteName])
+  }, [paletteName])
+  
+  console.log("config", config.visualizationType);
 
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
@@ -1369,7 +1371,7 @@ useEffect(()=>{
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
-                  {/* <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/> */}
+                 {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
