@@ -613,8 +613,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     let min = setMin(index)
                     let max = setMax(index)
 
-                    console.log('break', item)
-
                     result.push({
                         min,
                         max,
