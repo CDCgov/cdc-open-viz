@@ -36,8 +36,8 @@ import SparkLine from './components/SparkLine';
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname,link} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname?,link?:any }
 ) {
 
   const transform = new DataTransform();
@@ -754,7 +754,7 @@ export default function CdcChart(
         {!missingRequiredSections() && !config.newViz && (
           <div className="cdc-chart-inner-container">
             {/* Title */}
-
+        
             {title && (
               <div
                 role="heading"
@@ -805,11 +805,15 @@ export default function CdcChart(
               )
               }
               {/* Legend */}
+            
               {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
+                 {/* Link */}
+            {link && link}
             {/* Description */}
             {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
             {/* Data Table */}
+
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line" && <DataTable />}
             {config?.footnotes && <section className="footnotes">{parse(config.footnotes)}</section>}
           </div>

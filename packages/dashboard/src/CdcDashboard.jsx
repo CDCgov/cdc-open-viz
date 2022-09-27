@@ -515,8 +515,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   } else {
     body = (
       <>
+   
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
+          {/* Description */}
+          {description && <div className="subtext">{parse(description)}</div>}
           {/* Title */}
           {title &&
             <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
@@ -528,6 +531,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row, index) => {
 
             return (
+
               <div className={`dashboard-row ${row.equalHeight ? 'equal-height' : ''}`} key={`row__${index}`}>
                 {row.map((col, colIndex) => {
                   if (col.width) {
@@ -544,56 +548,62 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                     const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                     const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
-
+                    const tableLink = <a  href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>;
+                   
                     return (
                       <React.Fragment key={`vis__${index}__${colIndex}`}>
-                        <div className={`dashboard-col dashboard-col-${col.width}`}>
+                        <div  className={`dashboard-col dashboard-col-${col.width}`}>
                           {visualizationConfig.type === 'chart' && (
                             <CdcChart
                               key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                              isDashboard={true}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                            isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                             />
-                          )}
+                            )}
                           {visualizationConfig.type === 'map' && (
                             <CdcMap
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-                              setSharedFilterValue={setSharedFilterValue}
-                              isDashboard={true}
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
+                            setSharedFilterValue={setSharedFilterValue}
+                            isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                             />
-                          )}
+                            )}
                           {visualizationConfig.type === 'data-bite' && (
                             <CdcDataBite
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
-                              }}
-                              isDashboard={true}/>
-                          )}
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
+                            }}
+                            isDashboard={true}
+                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
+                            />
+                            )}
                           {visualizationConfig.type === 'waffle-chart' && (
                             <CdcWaffleChart
-                              key={col.widget}
-                              config={visualizationConfig}
-                              isEditor={false}
-                              setConfig={(newConfig) => {
-                                updateChildConfig(col.widget, newConfig)
+                            key={col.widget}
+                            config={visualizationConfig}
+                            isEditor={false}
+                            setConfig={(newConfig) => {
+                              updateChildConfig(col.widget, newConfig)
                               }}
-                              isDashboard={true}/>
+                              isDashboard={true}
+                              link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
+                              />
                           )}
-                          {config.table && config.table.show && config.datasets && <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>}
                         </div>
                       </React.Fragment>
                     )
@@ -643,9 +653,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
             </div>)
           })}
-
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
         </div>
       </>
     )
