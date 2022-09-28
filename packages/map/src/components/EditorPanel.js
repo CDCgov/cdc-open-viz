@@ -32,6 +32,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor';
 
 const ReactTags = require('react-tag-autocomplete'); // Future: Lazy
+// The PR for this was dropped for some reason although the work is complete. Please advise. 
 
 const TextField = ({
 	label,
