@@ -488,17 +488,12 @@
     }
   }
 }
-.cdc-chart-inner-container {
-  margin-top: 2000px !important;
-}
-.cdc-visualization__paired-bar-chart {
 
+.cdc-visualization__paired-bar-chart {
   text-align: center;
   transform: scale(1);
   > .visx-group[style] {
     transform: scale(1);
-
-
   }
 }
 
@@ -518,7 +513,6 @@
     margin: 0.25em;
   }
 }
-
 
 .isEditor.type-sparkline .cdc-chart-inner-container {
     margin: 3em auto 0;
