@@ -33,7 +33,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const tipRounding =  config.tipRounding ;
   const radius = config.roundingStyle ==='standard' ? '8px' : config.roundingStyle ==='shallow' ? '5px': config.roundingStyle ==='finger' ? '15px':'0px';
   const stackCount = config.runtime.seriesKeys.length;
-  console.log('animatedChart', animatedChart)
+  const barBorderWidth = 1;
+  
   const applyRadius = (index:number)=>{
     if(index === undefined || index === null || !isRounded) return;
     let style = {};
@@ -151,7 +152,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 y={bar.y}
                 width={barThicknessAdjusted}
                 height={bar.height}
-                style={{background:bar.color,border:`${config.barBorderThickness ||1}px solid #333`,...style}}
+                style={{background:bar.color,border:`${config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,...style}}
                 opacity={transparentBar ? 0.5 : 1}
                 display={displayBar ? 'block' : 'none'}
                 data-tip={tooltip}
@@ -231,7 +232,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
                           height={config.barHeight}
-                          style={{background:bar.color,border:`${config.barBorderThickness ||1}px solid #333`,...style}}
+                          style={{background:bar.color,border:`${config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,...style}}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tip={tooltip}
@@ -408,7 +409,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         style={{
                           background:config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor :
                             config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor ,
-                          border:`${config.isLollipopChart ? 0 : config.barBorderThickness || 1}px solid #333`,
+                          border:`${config.isLollipopChart ? 0 :config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,
                           ...style
                         }}
                         opacity={transparentBar ? 0.5 : 1}
