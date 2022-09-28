@@ -58,17 +58,17 @@ const nudges = {
 };
 
 function CountyMapChecks(prevState, nextState) {
+	const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn;
 	const equalColumnName = prevState.state.general.type && nextState.state.general.type;
 	const equalNavColumn = prevState.state.columns.navigate && nextState.state.columns.navigate;
 	const equalLegend = prevState.runtimeLegend === nextState.runtimeLegend;
 	const equalBorderColors = prevState.state.general.geoBorderColor === nextState.state.general.geoBorderColor; // update when geoborder color changes
 	const equalMapColors = prevState.state.color === nextState.state.color; // update when map colors change
 	const equalData = prevState.data === nextState.data; // update when data changes
-	return equalMapColors && equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn ? true : false;
+	return equalMapColors && equalData && equalBorderColors && equalLegend && equalColumnName && equalNavColumn && equalNumberOptIn ? true : false;
 }
 
 const CountyMap = (props) => {
-
 	let mapData = states.concat(counties);
 
 	const {
@@ -80,6 +80,7 @@ const CountyMap = (props) => {
 		displayGeoName,
 		rebuildTooltips,
 		containerEl,
+		handleMapAriaLabels
 	} = props;
 
 	useEffect(() => {
@@ -518,7 +519,15 @@ const CountyMap = (props) => {
 	if(!data) <Loading />
 	return (
 		<ErrorBoundary component='CountyMap'>
-			<svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio='xMinYMin' className='svg-container' data-scale={scale ? scale : ''} data-translate={translate ? translate : ''}>
+			<svg 
+				viewBox={`0 0 ${WIDTH} ${HEIGHT}`} 
+				preserveAspectRatio='xMinYMin' 
+				className='svg-container' 
+				data-scale={scale ? scale : ''} 
+				data-translate={translate ? translate : ''}
+				role="img"
+				aria-label={handleMapAriaLabels(state)}
+			>
 				<rect
 					className='background center-container ocean'
 					width={WIDTH}

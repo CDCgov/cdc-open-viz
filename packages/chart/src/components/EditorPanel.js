@@ -16,8 +16,10 @@ import Context from '../context'
 import WarningImage from '../images/warning.svg'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor';
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { useColorPalette } from '../hooks/useColorPalette'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Waiting from '@cdc/core/components/Waiting';
+import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'; //TODO: Update with Icon component
+import {useColorPalette} from '../hooks/useColorPalette';
 
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
@@ -26,7 +28,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData';
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
-  const [ value, setValue ] = useState(stateValue);
+  const [ value, setValue ] = useState(stateValue); 
 
   const [ debouncedValue ] = useDebounce(value, 500);
 
@@ -193,12 +195,12 @@ const EditorPanel = () => {
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
-	},[paletteName])
+  }, [paletteName])
 
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
- },[dispatch,config.palette]);
-
+  }, [dispatch, config.palette]);
+  
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
@@ -219,6 +221,8 @@ const EditorPanel = () => {
   })
 
   const sortableItemStyles = {
+    animate: false,
+    animateReplay: true,
     display: 'block',
     boxSizing: 'border-box',
     border: '1px solid #D1D1D1',
@@ -244,7 +248,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    console.log('fieldName', fieldName)
     // Top level
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
@@ -525,7 +528,7 @@ const EditorPanel = () => {
                   {exclusion}
                 </div>
               </div>
-              <span className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</span>
+              <button className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</button>
             </li>
           )
         })}
@@ -720,17 +723,17 @@ useEffect(()=>{
                     {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
-                        <label>
-                          <span className="edit-label">
+                        <fieldset>
+                          <legend className="edit-label float-left">
                             Displaying
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                        </label>
+                          </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </fieldset>
                         <ul className="series-list">
                           {config.series.map((series, i) => {
 
@@ -758,8 +761,8 @@ useEffect(()=>{
                                   </div>
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
-                                    {config.series.length > 1 &&
-                                      <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                    {config.series && config.series.length > 1 &&
+                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
                                 </li>
@@ -773,8 +776,8 @@ useEffect(()=>{
                                     {series.dataKey}
                                   </div>
                                 </div>
-                                {config.series.length > 1 &&
-                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                {config.series && config.series.length > 1 &&
+                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                 }
                               </li>
                             )
@@ -796,12 +799,12 @@ useEffect(()=>{
                       </>
                     )}
 
-                    <Select
+                    {config.series && config.series.length === 1 && <Select
                       fieldName="visualizationType"
                       label="Rank by Value"
                       initial="Select"
                       onChange={(e) => sortSeries(e.target.value)}
-                      options={['asc', 'desc']} />
+                      options={['asc', 'desc']} />}
                     
                   </AccordionItemPanel>
                 </AccordionItem>
@@ -943,7 +946,9 @@ useEffect(()=>{
                             <>
                               {config.exclusions.keys.length > 0 &&
                                 <>
-                                  <label><span className="edit-label">Excluded Keys</span></label>
+                                  <fieldset>
+                                    <legend className="edit-label">Excluded Keys</legend>
+                                  </fieldset>
                                   <ExclusionsList/>
                                 </>
                               }
@@ -1006,7 +1011,9 @@ useEffect(()=>{
                         <>
                           {config.exclusions.keys.length > 0 &&
                             <>
-                              <label><span className="edit-label">Excluded Keys</span></label>
+                              <fieldset>
+                                <legend className="edit-label">Excluded Keys</legend>
+                              </fieldset>
                               <ExclusionsList/>
                             </>
                           }
@@ -1056,6 +1063,7 @@ useEffect(()=>{
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left' ]}/>
+                  <TextField type='textarea' value={config.legend.description} 	updateField={updateField} 	section='legend' 	fieldName='description' 	label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1156,12 +1164,12 @@ useEffect(()=>{
 
                   {config.isLollipopChart &&
                     <>
-                      <label className="header">
-                        <span className="edit-label">Lollipop Shape</span>
+                      <fieldset className="header">
+                        <legend className="edit-label">Lollipop Shape</legend>
                         <div onChange={(e) => {
                           setLollipopShape(e.target.value)
                         }}>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1170,7 +1178,7 @@ useEffect(()=>{
                             />
                             Circle
                           </label>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1181,7 +1189,7 @@ useEffect(()=>{
                           </label>
                         </div>
 
-                      </label>
+                      </fieldset>
                       <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={[ 'regular', 'two-tone' ]}/>
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
                     </>
@@ -1193,6 +1201,10 @@ useEffect(()=>{
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+
+                  {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
+
                   {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
                     <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={[ 'hidden', 'hover', 'always show' ]}/>
                   }
@@ -1201,10 +1213,15 @@ useEffect(()=>{
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, theme: palette })
-                        }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                        </li>
+                        <button 
+                          title={palette}
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, theme: palette })
+                          }} 
+                          className={config.theme === palette ? 'selected ' + palette : palette}>
+                        </button>
                       ))}
                     </ul>
                   </label>
@@ -1230,13 +1247,19 @@ useEffect(()=>{
                       }
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
@@ -1258,13 +1281,19 @@ useEffect(()=>{
 
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
@@ -1287,6 +1316,14 @@ useEffect(()=>{
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
                   }
+
+                  {/* <div className="cove-accordion__panel-section">
+                    <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                    <CheckBox value={config.visual?.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                    <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                    <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                    <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                  </div> */}
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1305,15 +1342,38 @@ useEffect(()=>{
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+                  	<TextField
+											value={config.table.caption}
+											updateField={updateField}
+											section='table'
+                      type='textarea'
+											fieldName='caption'
+											label='Data Table Caption'
+											placeholder=' Data table'
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a description of  the data table to be read by screen readers.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      />
+                   <CheckBox value={config.table.limitHeight} section="table" fieldName="limitHeight" label="Limit Table Height" updateField={updateField}/>
+                   {config.table.limitHeight && (
+                   <TextField value={config.table.height} section="table" fieldName='height'  label='Data Table Height' type="number" min="0" max="500" 	placeholder='Height(px)' updateField={updateField}/>
+                   )}
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
-                  {/* <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/> */}
+                 {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
           </form>
-          <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          {config.type !== 'Spark Line' &&
+            <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          }
         </section>
       </section>
     </ErrorBoundary>
