@@ -265,7 +265,6 @@
       display: block;
       text-align: left;
       cursor: pointer;
-      color: rgba(0, 0, 0, .5);
       text-decoration: underline;
 
       span {
@@ -310,6 +309,8 @@
     z-index: 3;
   }
 
+
+  legend,
   label {
     text-transform: uppercase;
     display: block;
@@ -341,6 +342,29 @@
     }
   }
 
+  legend {
+    font-weight: normal;
+    margin-bottom: 0.3em;
+  }
+
+  legend + span {
+    float: left;
+  }
+
+  .radio-label {
+    font-weight: normal;
+  }
+
+  .accordion__panel fieldset:not(:first-child) {
+    margin-top: 1em;
+  }
+
+  .accordion__panel fieldset {
+    label:not(:first-child) {
+      margin-top: 0rem;
+    }
+  }
+
   input[type="text"], input[role="combobox"], input[type="number"], textarea {
     min-width: 100%;
     max-width: 100%; // Doing this prevents width of textarea from being changed
@@ -350,7 +374,7 @@
     min-height: 140px;
   }
 
-  .header .color-palette li {
+  .header .color-palette button {
     width: 21px;
     height: 21px;
     border-radius: 40px;
@@ -365,7 +389,7 @@
     list-style: none;
     flex-wrap: wrap;
 
-    li {
+    button {
       width: 45px;
       height: 23px;
       margin-right: 4px;
@@ -375,6 +399,7 @@
       overflow: hidden;
       cursor: pointer;
       position: relative;
+      padding: 0;
 
       .click-target {
         position: absolute;
@@ -390,12 +415,17 @@
 
       span {
         width: 33.3%;
+        height: 100%;
       }
     }
   }
 
   fieldset {
     display: block;
+
+    .float-left {
+      float: left;
+    }
   }
 
   .primary-fieldset {
@@ -641,7 +671,7 @@
     cursor: auto;
   }
 
-  [type="radio"] {
+  input[type="radio"] {
     border: 1px solid #8c8f94;
     border-radius: 50%;
     margin-right: 5px;

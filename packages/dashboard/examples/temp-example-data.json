@@ -1,0 +1,130 @@
+[
+  {
+    "date": "2011-10-01",
+    "New York": "89.4",
+    "San Francisco": "26.7",
+    "Austin": "34.2",
+    "wind": "Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-02",
+    "New York": "54.0",
+    "San Francisco": "59.9",
+    "Austin": "68.7",
+    "wind": "Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-03",
+    "New York": "51.3",
+    "San Francisco": "53.1",
+    "Austin": "64.4",
+    "wind": "Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-04",
+    "New York": "34.7",
+    "San Francisco": "56.8",
+    "Austin": "98.0",
+    "wind": "Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-01",
+    "New York": "32.4",
+    "San Francisco": "43.7",
+    "Austin": "54.2",
+    "wind": "Don't Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-02",
+    "New York": "65.0",
+    "San Francisco": "76.9",
+    "Austin": "87.7",
+    "wind": "Don't Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-03",
+    "New York": "53.3",
+    "San Francisco": "59.1",
+    "Austin": "69.4",
+    "wind": "Don't Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-04",
+    "New York": "55.7",
+    "San Francisco": "58.8",
+    "Austin": "68.0",
+    "wind": "Don't Include Wind",
+    "humidity": "Include Humidiy"
+  },
+  {
+    "date": "2011-10-01",
+    "New York": "63.4",
+    "San Francisco": "62.7",
+    "Austin": "72.2",
+    "wind": "Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-02",
+    "New York": "58.0",
+    "San Francisco": "59.9",
+    "Austin": "67.7",
+    "wind": "Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-03",
+    "New York": "53.3",
+    "San Francisco": "59.1",
+    "Austin": "69.4",
+    "wind": "Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-04",
+    "New York": "55.7",
+    "San Francisco": "58.8",
+    "Austin": "68.0",
+    "wind": "Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-01",
+    "New York": "63.4",
+    "San Francisco": "62.7",
+    "Austin": "87.2",
+    "wind": "Don't Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-02",
+    "New York": "98.0",
+    "San Francisco": "59.9",
+    "Austin": "67.7",
+    "wind": "Don't Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-03",
+    "New York": "53.3",
+    "San Francisco": "59.1",
+    "Austin": "69.4",
+    "wind": "Don't Include Wind",
+    "humidity": "Don't Include Humidiy"
+  },
+  {
+    "date": "2011-10-04",
+    "New York": "55.7",
+    "San Francisco": "54.8",
+    "Austin": "68.0",
+    "wind": "Don't Include Wind",
+    "humidity": "Don't Include Humidiy"
+  }
+]

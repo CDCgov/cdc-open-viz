@@ -1,6 +1,16 @@
 @import "../utils/variables";
 @import "../themes/index";
 
+.sbdocs .cove-button {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+
+  &.fluid {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
 .cove-button {
   display: inline-block;
   position: relative;
@@ -24,7 +34,7 @@
 
   &:disabled {
     background-color: #adadad !important;
-    cursor: not-allowed !important;
+    cursor: not-allowed;
   }
 
   &:not(:disabled) {
@@ -38,17 +48,23 @@
     background-color: lighten($primary, 5%);
   }
 
-  &:active,
-  &:focus {
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      outline: 2px solid rgba(161, 161, 161, 0.6);
-      border-radius: .3125em;
-      margin: -2px;
-      pointer-events: none;
+  &:not(.loading) {
+    &:focus,
+    &:active {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        outline: 2px solid rgba(161, 161, 161, 0.6);
+        border-radius: .3125em;
+        margin: -2px;
+        pointer-events: none;
+      }
     }
+  }
+
+  &.loading:disabled {
+    cursor: default;
   }
 
   &.fluid {
@@ -121,58 +137,3 @@
   transition: all 500ms $transition-expo-out;
   opacity: 0;
 }
-
-/* Old Styles ------------------------------------------
-.btn {
-  display: block;
-  padding: .4em .8em;
-  font-size: 1em;
-  color: #fff;
-  background: #005eaa;
-  border: 0;
-  border-radius: .3em;
-  transition: .1s background-color;
-  cursor: pointer;
-
-  &.full-width {
-    width: 100%;
-  }
-
-  &:hover {
-    transition: .1s background-color;
-  }
-
-  &.secondary {
-    font-size: .8em;
-    padding: .3em 1em;
-    background: rgba(0, 0, 0, 0.3);
-    display: inline-block;
-    margin-bottom: 1em;
-
-    &:hover {
-      background: rgba(0, 0, 0, .5);
-    }
-  }
-
-  &.danger {
-    background-color: $red;
-    color: #fff;
-
-    &:hover {
-      background-color: darken($red, 5%);
-    }
-  }
-
-  &:hover {
-    transition: .1s all;
-    background: lighten(#005eaa, 5%);
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-    position: relative;
-    top: 2px;
-    margin-left: 5px;
-  }
-}*/

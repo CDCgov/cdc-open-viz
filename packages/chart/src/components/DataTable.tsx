@@ -141,7 +141,10 @@ export default function DataTable() {
           >
             {config.table.label}
           </div>
-          <div className="table-container">
+          <div 
+           className="table-container"
+           style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
+           >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
               hidden={!tableExpanded} 

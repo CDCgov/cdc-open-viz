@@ -1,12 +1,13 @@
 import React, { useState, useEffect, memo } from 'react'
+import PropTypes from 'prop-types'
 
-import Check from '../../assets/check.svg'
-import '../../styles/v2/components/input.scss'
+import Check from '../../assets/icon-check.svg'
+import '../../styles/v2/components/input/index.scss'
 
 const InputCheckbox = memo((
   {
     label,
-    size = 'medium',
+    size = 'small',
     activeColor = null,
     activeCheckColor = null,
     section = null,
@@ -23,6 +24,10 @@ const InputCheckbox = memo((
   const [ value, setValue ] = useState(stateValue)
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+  if(fieldName === 'border') {
+    console.table({fieldName, value, stateValue})
+    
+  }
 
   useEffect(() => {
     if (stateValue !== undefined && stateValue !== value) {
@@ -51,5 +56,12 @@ const InputCheckbox = memo((
     </div>
   )
 })
+
+InputCheckbox.propTypes = {
+  label: PropTypes.string,
+  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  activeColor: PropTypes.string,
+  activeCheckColor: PropTypes.string
+}
 
 export default InputCheckbox
