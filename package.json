@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@cdc/core": "^1.1.2",
+    "@visx/legend": "^2.10.0",
     "@visx/responsive": "^2.10.0"
   }
 }
