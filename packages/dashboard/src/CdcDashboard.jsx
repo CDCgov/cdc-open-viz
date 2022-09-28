@@ -604,6 +604,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                               link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                               />
                           )}
+                          {visualizationConfig.type === 'markup-include' && (
+                            <CdcMarkupInclude
+                              key={col.widget}
+                              config={visualizationConfig}
+                              isEditor={false}
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }}
+                              isDashboard={true}
+                            />
+                          )}
                         </div>
                       </React.Fragment>
                     )
