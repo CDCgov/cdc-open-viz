@@ -196,14 +196,10 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
-  
-  console.log("config", config.visualizationType);
 
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
-
-  console.log('config', config)
   
   const filterOptions = [
     {
@@ -252,7 +248,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    console.log('fieldName', fieldName)
     // Top level
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
@@ -766,7 +761,7 @@ useEffect(()=>{
                                   </div>
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
-                                    {config.series.length > 1 &&
+                                    {config.series && config.series.length > 1 &&
                                       <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
@@ -781,7 +776,7 @@ useEffect(()=>{
                                     {series.dataKey}
                                   </div>
                                 </div>
-                                {config.series.length > 1 &&
+                                {config.series && config.series.length > 1 &&
                                   <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                 }
                               </li>
@@ -804,7 +799,7 @@ useEffect(()=>{
                       </>
                     )}
 
-                    {config.series.length === 1 && <Select
+                    {config.series && config.series.length === 1 && <Select
                       fieldName="visualizationType"
                       label="Rank by Value"
                       initial="Select"
