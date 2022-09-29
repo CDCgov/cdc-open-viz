@@ -44,7 +44,8 @@ export default {
     label: 'Data Table',
     expanded: true,
     limitHeight:false,
-    height:""
+    height:"",
+    caption:""
   },
   orientation: 'vertical',
   legend: {
