@@ -113,7 +113,7 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname,link}) => {
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = "localhost:8080",link}) => {
 
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
@@ -1244,10 +1244,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
+                newState.dataUrl = 'https://' + hostname + newState.dataUrl
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
+            // handle urls with spaces in the name.
+            if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString )
+
+            let newData = await fetchRemoteData(newState.dataUrl )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
