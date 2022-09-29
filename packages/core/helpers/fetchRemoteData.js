@@ -2,13 +2,18 @@ import Papa from 'papaparse';
 
 export default async function (url) {
     try {
+
+        // Using URL Object to get pathname without URL paramaters on regex.
+        url = new URL(url)
+
+        const path = url.pathname
         const regex = /(?:\.([^.]+))?$/
+        const ext = (regex.exec(path)[1])
 
         let data = []
 
-        const ext = (regex.exec(url)[1])
         if ('csv' === ext) {
-            data = await fetch(url)
+            data = await fetch(url.href)
                 .then(response => response.text())
                 .then(responseText => {
                     const parsedCsv = Papa.parse(responseText, {
@@ -21,7 +26,7 @@ export default async function (url) {
         }
 
         if ('json' === ext) {
-            data = await fetch(url)
+            data = await fetch(url.href)
                 .then(response => response.json())
         }
 
