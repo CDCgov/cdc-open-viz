@@ -151,6 +151,7 @@ export default function DataTable() {
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
+              <caption className='cdcdataviz-sr-only'>{config.table.caption ?  config.table.caption : "" }</caption>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup,index) => (
