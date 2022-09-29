@@ -96,8 +96,6 @@ const UsaMap = (props) => {
     });
   }
 
-  console.log(isFilterValueSupported);
-
   // "Choose State" options
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(unitedStates)
