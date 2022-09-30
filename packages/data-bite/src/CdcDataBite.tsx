@@ -94,6 +94,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     if (response.dataUrl) {
       response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       let newData = await fetchRemoteData(response.dataUrl)
+
       
       if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
@@ -182,6 +183,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return
       }
 
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( num => num !== 0 )
+      }
+
       let mean:number = 0
       if(arr.length > 1){
        /// first convert each element to number then add using reduce method to escape string concatination.
@@ -261,8 +266,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData:any[] = []
-
+    let numericalData:any[] = config.data.map( item => Number( item[config.dataColumn] ))
 
    // Get the column's data
      if(filteredData.length){
@@ -271,7 +275,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         if(typeof value === 'number') numericalData.push(value)
       });
      }
-
 
 
     switch (dataFunction) {
