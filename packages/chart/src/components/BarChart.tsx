@@ -206,7 +206,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     }
 
                     return (
-                      <Group key={index}>
+                      <Group key={index}
+                             className="stack"
+                             top={-( isLabelOnYAxis ? 10 * index : 0 )}
+                      >
                           <foreignObject
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           x={bar.x}
@@ -268,7 +271,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             <BarGroup
               data={data}
               keys={(config.runtime.barSeriesKeys || config.runtime.seriesKeys)}
-              height={yMax}
+              height={yMax + 500}
               x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.runtime.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
@@ -303,7 +306,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 <Group 
                   className={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
                   key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} 
-                  top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index : 0} 
+                  top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index  - ( isLabelOnYAxis ? 10 * barGroup.index : 0 ) : 0}
                   left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar,index) => {
 
@@ -356,7 +359,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     const style = applyRadius(index)
-
+                    // console.log('config.runtime.horizontal',
+                    //   barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0)
+                    // )
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
@@ -518,7 +523,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   <Text
                                     display={displayBar ? 'block' : 'none'}
                                     x={ bar.y - 5 } // padding
-                                    y={ 
+                                    y={
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
                                         (config.barHeight * (barGroup.bars.length - bar.index - 1) )  + (config.barHeight / 2 )
                                       }
@@ -533,7 +538,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                   <Text
                                     display={displayBar ? 'block' : 'none'}
                                     x={ `${bar.y + (config.isLollipopChart ? 15 : 5)}` } // padding
-                                    y={ 
+                                    y={
                                         config.isLollipopChart ? (config.barHeight * (barGroup.bars.length - bar.index - 1) ) + offset :
                                         (config.barHeight * (barGroup.bars.length - bar.index - 1) )  + (config.barHeight / 2 )
                                       }
