@@ -262,6 +262,7 @@ const EditorPanel = memo((props) => {
               updateField={updateField}
               initial="Select"
               options={getColumns()}
+              className="cove-input"
             />
           </div>
 
@@ -273,12 +274,13 @@ const EditorPanel = memo((props) => {
               updateField={updateField}
               initial="Select"
               options={DATA_FUNCTIONS}
+              className="cove-input"
             />
           </div>
 
           <div className="cove-input-group">
             <label>
-              <span className="edit-label">Data Conditional</span>
+              <span className="edit-label cove-input__label">Data Conditional</span>
             </label>
             <div className="cove-accordion__panel-row cove-accordion__small-inputs">
               <div className="cove-accordion__panel-col">
@@ -288,6 +290,7 @@ const EditorPanel = memo((props) => {
                   updateField={updateField}
                   initial="Select"
                   options={getColumns()}
+                  className="cove-input"
                 />
               </div>
               <div className="cove-accordion__panel-col">
@@ -297,6 +300,7 @@ const EditorPanel = memo((props) => {
                   updateField={updateField}
                   initial="Select"
                   options={DATA_OPERATORS}
+                  className="cove-input"
                 />
               </div>
               <div className="cove-accordion__panel-col">
@@ -489,6 +493,7 @@ const EditorPanel = memo((props) => {
           label="Shape"
           updateField={updateField}
           options={["circle", "square", "person"]}
+          className="cove-input"
         />
 
         <div
@@ -521,13 +526,14 @@ const EditorPanel = memo((props) => {
             fieldName="orientation"
             label="Layout"
             updateField={updateField}
+            className="cove-input"
             options={["horizontal", "vertical"]}
           />
         </div>
 
         <div className="cove-input-group">
           <label>
-            <span className="edit-label column-heading">
+            <span className="edit-label column-heading cove-input__label">
               Data Point Font Size
             </span>
           </label>
@@ -557,10 +563,11 @@ const EditorPanel = memo((props) => {
           label="Overall Font Size"
           updateField={updateField}
           options={["small", "medium", "large"]}
+          className="cove-input"
         />
 
         <label>
-          <span className="edit-label">Theme</span>
+          <span className="edit-label cove-input__label">Theme</span>
           <ul className="color-palette">
             {headerColors.map((palette) => (
               <li
