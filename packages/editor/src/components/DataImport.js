@@ -369,7 +369,7 @@ export default function DataImport() {
   const resetButton = () => {
     return ( //todo convert to modal
       <button className="btn danger"
-              onClick={() => resetEditor({type: config.type}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
+              onClick={() => resetEditor({type: config.type, visualizationType: config.visualizationType}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
         <CloseIcon/>
       </button>
     )
