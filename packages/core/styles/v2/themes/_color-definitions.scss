@@ -44,7 +44,6 @@ $theme: (
         border-top: 1px solid string.unquote(nth($theme-colors, 1));
       }
       
-      // should probably be in color definitions but logically makes sense here.
       .cove-component__inner:not(.component--has-title) .cove-component__content {
         border-top: 1px solid #ccc;
       }
