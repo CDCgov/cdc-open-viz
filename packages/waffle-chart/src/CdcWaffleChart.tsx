@@ -445,7 +445,7 @@ const CdcWaffleChart = (
 
   if (loading === false) {
     let classNames = [
-      'cdc-open-viz-module',
+      'cove',
       'type-waffle-chart',
       currentViewport,
       config.theme,
@@ -465,7 +465,7 @@ const CdcWaffleChart = (
     );
 
     content = (
-      <div className={`cove ${config.theme}`}>
+      <div className={classNames.join(' ')}>
         {isEditor &&
           <EditorPanel>
             {body}

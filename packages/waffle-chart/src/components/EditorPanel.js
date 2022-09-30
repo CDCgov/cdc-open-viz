@@ -586,7 +586,7 @@ const EditorPanel = memo((props) => {
 
         </label>
         
-        <div className="cove-accordion__panel-section">
+        <div className="cove-accordion__panel-section reverse-labels">
           <InputCheckbox inline size='small' value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
           <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
           <InputCheckbox size='small' value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
