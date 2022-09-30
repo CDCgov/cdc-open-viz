@@ -19,6 +19,11 @@
 //}
 
 .cove {
+
+  &-editor__panel {
+    ul.color-palette { margin: 0; }
+  }
+
   .cove-waffle-chart {
     display: flex;
     flex-wrap: wrap;
