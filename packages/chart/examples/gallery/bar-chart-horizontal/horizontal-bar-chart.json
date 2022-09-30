@@ -152,14 +152,14 @@
 		},
 		"barPadding": 40,
 		"barHeight": 25,
-		"labelPlacement": "Below Bar",
+		"labelPlacement": "On Date/Category Axis",
 		"label": "Accidents"
 	},
 	"barThickness": "0.7",
 	"height": 560,
 	"xAxis": {
 		"type": "categorical",
-		"size": "0",
+		"size": "180",
 		"tickRotation": 0,
 		"dataKey": "Group",
 		"label": ""
