@@ -1633,6 +1633,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 							resetLegendToggles={resetLegendToggles}
 							changeFilterActive={changeFilterActive}
 							setAccessibleStatus={setAccessibleStatus}
+                            displayDataAsText={displayDataAsText}
 						/>
 					)}
 				</section>
