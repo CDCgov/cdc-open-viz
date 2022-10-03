@@ -961,18 +961,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if (Number(value)) {
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
-
-                    const decimalPoint = columnObj.roundToPlace
-
+                    const decimalPoint = Number(columnObj.roundToPlace)
+                    
                     formattedValue = Number(value).toFixed(decimalPoint)
-
+                    
                 }
 
                 if(columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-
-                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal'})
-
+                    const decimalPoint = Number(columnObj.roundToPlace)
+                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: decimalPoint, maximumFractionDigits: decimalPoint })
                 }
+
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
