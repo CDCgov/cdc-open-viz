@@ -1354,6 +1354,41 @@ const EditorPanel = (props) => {
 											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
+									<label>
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
 									{/* SubType */}
 									{'us' === state.general.geoType && 'data' === state.general.type && (
 										<label className='checkbox mt-4'>
@@ -1479,41 +1514,6 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
-									<label>
-                     <span className="edit-label">Data Classification Type</span>
-                     <div>
-                       <label>
-                         <input
-                           type="radio"
-                           name="equalnumber"
-                           value="equalnumber"
-                           checked={state.legend.type === "equalnumber"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Numeric/Quantitative
-                       </label>
-                       <label>
-                         <input
-                           type="radio"
-                           name="category"
-                           value="category"
-                           checked={state.legend.type === "category"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Categorical
-                       </label>
-                     </div>
-                   </label>
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
