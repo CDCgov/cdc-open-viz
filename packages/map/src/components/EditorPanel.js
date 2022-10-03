@@ -1381,20 +1381,6 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>Display state labels</span>
 											</label>
 										)}
-									{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
-										<label>
-											<span className='edit-label'>Legend Type</span>
-											<select
-												value={legend.type}
-												onChange={(event) => {
-													handleEditorChanges('legendType', event.target.value);
-												}}
-											>
-												<option value='equalnumber'>Equal Number (Quantiles)</option>
-												<option value='equalinterval'>Equal Interval</option>
-											</select>
-											</label>
-											)}
 								</AccordionItemPanel>
 							</AccordionItem>
 							<AccordionItem>
@@ -1923,6 +1909,20 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
+										{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
+										<label>
+											<span className='edit-label'>Legend Type</span>
+											<select
+												value={legend.type}
+												onChange={(event) => {
+													handleEditorChanges('legendType', event.target.value);
+												}}
+											>
+												<option value='equalnumber'>Equal Number (Quantiles)</option>
+												<option value='equalinterval'>Equal Interval</option>
+											</select>
+											</label>
+											)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
@@ -1945,6 +1945,7 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
+										
 										{state.legend.type === 'equalnumber' &&
 											<label className="checkbox mt-4">
 												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
