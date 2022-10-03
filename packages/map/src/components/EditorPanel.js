@@ -1923,6 +1923,44 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
+									{'navigation' !== state.general.type && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.general.showSidebar || false}
+												onChange={(event) => {
+													handleEditorChanges('showSidebar', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Show Legend</span>
+										</label>
+									)}
+									{'navigation' !== state.general.type && (
+										<label>
+											<span className='edit-label'>Legend Position</span>
+											<select
+												value={legend.position || false}
+												onChange={(event) => {
+													handleEditorChanges('sidebarPosition', event.target.value);
+												}}
+											>
+												<option value='side'>Side</option>
+												<option value='bottom'>Bottom</option>
+											</select>
+										</label>
+									)}
+									{'side' === legend.position && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleColumn}
+												onChange={(event) => {
+													handleEditorChanges('singleColumnLegend', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Single Column Legend</span>
+										</label>
+									)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
@@ -2378,45 +2416,6 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
 									</label>
-
-									{'navigation' !== state.general.type && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.showSidebar || false}
-												onChange={(event) => {
-													handleEditorChanges('showSidebar', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Show Legend</span>
-										</label>
-									)}
-									{'navigation' !== state.general.type && (
-										<label>
-											<span className='edit-label'>Legend Position</span>
-											<select
-												value={legend.position || false}
-												onChange={(event) => {
-													handleEditorChanges('sidebarPosition', event.target.value);
-												}}
-											>
-												<option value='side'>Side</option>
-												<option value='bottom'>Bottom</option>
-											</select>
-										</label>
-									)}
-									{'side' === legend.position && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={legend.singleColumn}
-												onChange={(event) => {
-													handleEditorChanges('singleColumnLegend', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Single Column Legend</span>
-										</label>
-									)}
 									{'navigation' === state.general.type && (
 										<label className='checkbox'>
 											<input
