@@ -1628,6 +1628,7 @@ const EditorPanel = (props) => {
                               fieldName='roundToPlace'
                               label='Round'
                               updateField={updateField}
+							  min={0}
                             />
                           </li>
                           <li>
