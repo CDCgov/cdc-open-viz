@@ -100,7 +100,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
     if(null !== tempConfig) {
-      const parsedData = JSON.stringify(tempConfig)
+      const parsedData = stripConfig(tempConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
       const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
       window.dispatchEvent(event)
@@ -108,7 +108,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   }, [tempConfig])
 
   useEffect(() => {
-    const parsedData = JSON.stringify(config)
+    const parsedData = stripConfig(config)
     // Emit the data in a regular JS event so it can be consumed by anything.
     const event = new CustomEvent('updateVizConfig', { detail: parsedData})
     window.dispatchEvent(event)
@@ -119,6 +119,18 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
       setGlobalActive(-1)
     }
   }, [globalActive])
+
+  const stripConfig = (config) => {
+    let newConfig = {...config};
+    if(newConfig.type === 'dashboard' && newConfig.visualizations){
+      Object.keys(newConfig.visualizations).forEach(visualizationKey => {
+        delete newConfig.visualizations[visualizationKey].data;
+        delete newConfig.visualizations[visualizationKey].formattedData;
+        delete newConfig.visualizations[visualizationKey].originalFormattedData;
+      });
+    }
+    return JSON.stringify(newConfig);
+  };
 
   const maxFileSize = 10; // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
