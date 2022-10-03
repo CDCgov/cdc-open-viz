@@ -518,12 +518,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
    
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
-          {/* Description */}
-          {description && <div className="subtext">{parse(description)}</div>}
           {/* Title */}
           {title &&
             <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
-
+          {/* Description */}
+          {description && <div className="subtext">{parse(description)}</div>}
           {/* Filters */}
           {config.dashboard.sharedFilters && <Filters/>}
 
