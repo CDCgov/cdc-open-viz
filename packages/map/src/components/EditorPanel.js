@@ -1368,7 +1368,7 @@ const EditorPanel = (props) => {
 										</label>
 									)}
 									{'us' === state.general.geoType &&
-										'data' === state.general.type &&
+										'bubble' !== state.general.type &&
 										false === state.general.displayAsHex && (
 											<label className='checkbox'>
 												<input
