@@ -1354,6 +1354,41 @@ const EditorPanel = (props) => {
 											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
+									<label>
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
 									{/* SubType */}
 									{'us' === state.general.geoType && 'data' === state.general.type && (
 										<label className='checkbox mt-4'>
@@ -1381,20 +1416,6 @@ const EditorPanel = (props) => {
 												<span className='edit-label'>Display state labels</span>
 											</label>
 										)}
-									{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
-										<label>
-											<span className='edit-label'>Legend Type</span>
-											<select
-												value={legend.type}
-												onChange={(event) => {
-													handleEditorChanges('legendType', event.target.value);
-												}}
-											>
-												<option value='equalnumber'>Equal Number (Quantiles)</option>
-												<option value='equalinterval'>Equal Interval</option>
-											</select>
-											</label>
-											)}
 								</AccordionItemPanel>
 							</AccordionItem>
 							<AccordionItem>
@@ -1493,41 +1514,6 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
-									<label>
-                     <span className="edit-label">Data Classification Type</span>
-                     <div>
-                       <label>
-                         <input
-                           type="radio"
-                           name="equalnumber"
-                           value="equalnumber"
-                           checked={state.legend.type === "equalnumber"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Numeric/Quantitative
-                       </label>
-                       <label>
-                         <input
-                           type="radio"
-                           name="category"
-                           value="category"
-                           checked={state.legend.type === "category"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Categorical
-                       </label>
-                     </div>
-                   </label>
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1924,6 +1910,20 @@ const EditorPanel = (props) => {
 										<AccordionItemButton>Legend</AccordionItemButton>
 									</AccordionItemHeading>
 									<AccordionItemPanel>
+										{(state.legend.type === "equalnumber" || state.legend.type === 'equalinterval') && (
+										<label>
+											<span className='edit-label'>Legend Type</span>
+											<select
+												value={legend.type}
+												onChange={(event) => {
+													handleEditorChanges('legendType', event.target.value);
+												}}
+											>
+												<option value='equalnumber'>Equal Number (Quantiles)</option>
+												<option value='equalinterval'>Equal Interval</option>
+											</select>
+											</label>
+											)}
 									{'navigation' !== state.general.type && (
 										<label className='checkbox'>
 											<input
@@ -1984,6 +1984,7 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
+										
 										{state.legend.type === 'equalnumber' &&
 											<label className="checkbox mt-4">
 												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
