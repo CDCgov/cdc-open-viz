@@ -564,7 +564,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
 
-                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) + 1 : state.legend.numberOfItems + 1)
+                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) - 1 : state.legend.numberOfItems )
                 
                 console.log('colorRange', colorRange)
 
