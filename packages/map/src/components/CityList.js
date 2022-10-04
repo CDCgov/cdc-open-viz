@@ -95,7 +95,7 @@ const CityList = (({
 
     const pin = (
       <path 
-        class="marker" 
+        className="marker" 
         d="M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z" 
         title="Click for more information"
         onClick={() => geoClickHandler(cityDisplayName, geoData)}

@@ -168,14 +168,16 @@
     position: relative;
     overflow: hidden;
     border-top: none;
-    background: $lightestGray;
-    border: solid 1px $lightGray;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
 
     &-header {
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
+    }
+
+    .bite-content-container.component--hideBackgroundColor  {
+      background: transparent;
     }
 
     &.no-borders {
@@ -419,5 +421,16 @@
     }
 
     .cove-component__header + .bite { border-top: 0; }
+  }
+}
+
+
+.cove-component__content {
+  background: $lightestGray;
+
+  &:not(.no-borders) {
+    border-color: $lightGray;
+    border-width: 1px;
+    border-style: solid;
   }
 }

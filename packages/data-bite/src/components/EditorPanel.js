@@ -597,30 +597,24 @@ const EditorPanel = memo(() => {
                     options={["small", "medium", "large"]}
                   />
                   <CheckBox
-                    value={config.shadow}
-                    fieldName="shadow"
-                    label="Display Shadow"
-                    updateField={updateField}
-                  />
-                  <CheckBox
                     value={config.visual?.border}
                     section="visual"
                     fieldName="border"
                     label="Display Border"
                     updateField={updateField}
                   />
+                  <CheckBox 
+                    value={config.visual?.borderColorTheme} 
+                    section="visual"
+                    fieldName="borderColorTheme"
+                    label="Use Border Color Theme"
+                    updateField={updateField} 
+                  />
                   <CheckBox
                     value={config.visual?.accent}
                     section="visual"
                     fieldName="accent"
                     label="Use Accent Style"
-                    updateField={updateField}
-                  />
-                  <CheckBox
-                    value={config.visual?.roundedBorders}
-                    section="visual"
-                    fieldName="roundedBorders"
-                    label="Use Rounded Borders"
                     updateField={updateField}
                   />
                   <CheckBox

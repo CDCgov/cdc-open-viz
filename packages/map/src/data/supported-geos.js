@@ -497,6 +497,7 @@ export const supportedTerritories = {
 };
 
 export const supportedCities = {
+  'GAINESVILLE': [-82.3248, 29.6516],
   'DISTRICT OF COLUMBIA': [-77.036873, 38.907192],
   'US-DC': [-77.036873, 38.907192],
   'WASHINGTON D.C.': [-77.036873, 38.907192],
