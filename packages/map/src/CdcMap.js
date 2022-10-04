@@ -564,7 +564,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
 
-                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) - 1 : state.legend.numberOfItems )
+                let colorRange = colors.slice(0, state.legend.numberOfItems )
                 
                 console.log('colorRange', colorRange)
 
@@ -576,15 +576,16 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 breaks = breaks.map( item => Math.round(item))
                 
-                // always start with domain beginning breakpoint
-                if(d3.extent(domainNums)?.[0] !== 0 && Math.min.apply(null, domainNums) !== 0) {
-                    console.log(`Adding: ${d3.extent(domainNums)?.[0]}`)
-                    breaks.unshift(d3.extent(domainNums)?.[0])
-                }
+                // always start with zero for new quantile
+                // we can't start at the first break, because there will be items missing.
+                // if(d3.extent(domainNums)?.[0] !== 0 && Math.min.apply(null, domainNums) !== 0) {
+                //     console.log(`Adding: ${d3.extent(domainNums)?.[0]}`)
+                //     breaks.unshift(d3.extent(domainNums)?.[0])
+                // }
 
 
                 // if seperating zero force it into breaks
-                if( (state.legend.separateZero && breaks[0] !== 0) && !hasZeroInData) {
+                if(breaks[0] !== 0) {
                     console.log('breaks at zero', breaks[0])
                     console.log(`Adding: 0`, hasZeroInData)
                     breaks.unshift(0)
