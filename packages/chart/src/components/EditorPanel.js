@@ -196,11 +196,11 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
-
+  
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
-  
+
   const filterOptions = [
     {
       label: 'Ascending Alphanumeric',
@@ -631,7 +631,7 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
-                  {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
+                  {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
                   {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
