@@ -1,5 +1,4 @@
 {
-	"type": "map",
 	"general": {
 		"title": "Default County Map",
 		"subtext": "",
@@ -11,8 +10,26 @@
 		"showTitle": true,
 		"geoBorderColor": "darkGray",
 		"showDownloadButton": true,
-		"expandDataTable": false
+		"expandDataTable": false,
+		"showDownloadMediaButton": false,
+		"displayAsHex": false,
+		"displayStateLabels": false,
+		"language": "en",
+		"hasRegions": false,
+		"fullBorder": false,
+		"palette": {
+			"isReversed": false
+		},
+		"allowMapZoom": true,
+		"hideGeoColumnInTooltip": false,
+		"hidePrimaryColumnInTooltip": false,
+		"statePicked": {
+			"fipsCode": "01",
+			"stateName": "Alabama"
+		},
+		"equalNumberOptIn": true
 	},
+	"type": "map",
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
@@ -41,61 +58,96 @@
 		"title": "Legend Title",
 		"description": "Legend Text",
 		"type": "equalnumber",
-		"specialClasses": ["N/A"]
+		"specialClasses": [
+			{
+				"key": "Insured Rate",
+				"value": "18",
+				"label": "18"
+			}
+		],
+		"descriptions": {},
+		"unified": false,
+		"singleColumn": false,
+		"dynamicDescription": false
 	},
 	"filters": [],
+	"dataTable": {
+		"title": "Data Table",
+		"forceDisplay": true
+	},
+	"tooltips": {
+		"appearanceType": "hover",
+		"linkLabel": "Learn More",
+		"capitalizeLabels": true
+	},
+	"runtime": {
+		"editorErrorMessage": []
+	},
+	"visual": {
+		"minBubbleSize": 1,
+		"maxBubbleSize": 20,
+		"extraBubbleBorder": false,
+		"cityStyle": "circle"
+	},
+	"mapPosition": {
+		"coordinates": [
+			0,
+			30
+		],
+		"zoom": 1
+	},
 	"data": [
 		{
-			"Insured Rate": "8",
+			"Insured Rate": 8,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "06071",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "25",
+			"Insured Rate": 25,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "55005",
 			"Year (Good filter option)": "2010",
 			"link": "https://cdc.gov"
 		},
 		{
-			"Insured Rate": "25",
+			"Insured Rate": 25,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "12103",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "25",
+			"Insured Rate": 25,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "32005",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "18",
+			"Insured Rate": 18,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "06075",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "3",
+			"Insured Rate": 3,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "06027",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "25",
+			"Insured Rate": 25,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "06029",
 			"Year (Good filter option)": "2010",
 			"link": ""
 		},
 		{
-			"Insured Rate": "60",
+			"Insured Rate": 60,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "06065",
 			"Year (Good filter option)": "2010",

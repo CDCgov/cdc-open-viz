@@ -560,23 +560,33 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // get nums
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
-                if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
+                if(state.legend.separateZero && hasZeroInData) { domainNums.add(0) }
 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
-                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1  : state.legend.numberOfItems - 1 )
+
+                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) - 1 : state.legend.numberOfItems )
                 
+                console.log('colorRange', colorRange)
+
                 let scale = d3.scaleQuantile()
                     .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
                     .range(colorRange) // set range to our colors array
 
                 let breaks = scale.quantiles();
+
                 breaks = breaks.map( item => Math.round(item))
                 
                 // always start with domain beginning breakpoint
                 if(d3.extent(domainNums)?.[0] !== 0) {
                     breaks.unshift(d3.extent(domainNums)?.[0])
                 }
+
+                // if seperating zero force it into breaks
+                if(state.legend.separateZero && breaks[0] !== 0) breaks.unshift(0)
+
+                console.log('breaks', breaks)
+                console.log('domainNums', domainNums)
                 
                 
                 breaks.map( (item, index) => {
@@ -584,24 +594,44 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     const setMin = (index) => {
 
                         // if the break index is the last item 
-                        // console.log('index', index)
-                        // console.log('l', runtimeLegend.length - state.legend.specialClasses.length)
-                        // console.log('ll', runtimeLegend.length)
-                        let min = (index === 0 && !state.legend.separateZero) ? 0 : breaks[index];
-                        // in starting position and zero in the data
-                        if(!state.legend.separateZero && (index === state.legend.specialClasses?.length )) {
-                            min = domainNums[0]
+                        console.log('break index in loop:', index)
+
+                        //debugger;
+                        let min = breaks[index];
+
+                        // if first break is a seperated zero, min is zero
+                        if( index === 0 && state.legend.separateZero) {
+                            min = 0;
                         }
+
+                        // if we're on the second break, and seperating out zero, increment min to 1.
+                        if( index === 1 && state.legend.separateZero) {
+                            min = 1
+                        }
+
+                        // // in starting position and zero in the data
+                        // if((index === state.legend.specialClasses?.length ) && (state.legend.specialClasses.length !== 0)) {
+                        //     min = breaks[index]
+                        // }
                         return min;
 
                     } 
 
-                    const setMax = (index) => {
+                    const setMax = (index, min) => {
+
                         let max = breaks[index + 1] - 1;
 
-                        if( (index === state.legend.specialClasses.length) && !state.legend.separateZero) {
+                        // check if min and max range are the same
+                        // if (min === max + 1) {
+                        //     max = breaks[index + 1]
+                        // }
+
+                        if(index === 0 && state.legend.separateZero) {
                             max = 0;
                         }
+                        // if ((index === state.legend.specialClasses.length && state.legend.specialClasses.length !== 0) && !state.legend.separateZero && hasZeroInData) {
+                        //     max = 0;
+                        // }
 
                         if(index + 1 === breaks.length) {
                             max = domainNums[1]
@@ -611,13 +641,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     }
 
                     let min = setMin(index)
-                    let max = setMax(index)
+                    let max = setMax(index, min)
 
                     result.push({
                         min,
                         max,
                         color: scale(item)
                     })
+
+                    console.log('result', result)
 
                     
                     dataSet.forEach( (row, dataIndex) => {
@@ -626,7 +658,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         let updated = 0
                         
                         // check if we're seperating zero out
-                        updated = state.legend.separateZero ? index + 1 : index;
+                        updated = state.legend.separateZero && hasZeroInData ? index + 1 : index;
 
                         // check for special classes
                         updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index;
@@ -1244,8 +1276,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl
+                newState.dataUrl = 'http://' + hostname + newState.dataUrl
             }
+
+            console.log('d', newState.dataUrl)
 
             // handle urls with spaces in the name.
             if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString )
