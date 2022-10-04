@@ -477,7 +477,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         let legendNumber = Math.min(number, Object.keys(uniqueValues).length);
 
         // Separate zero
-        if(true === obj.legend.separateZero) {
+        if(true === obj.legend.separateZero && !state.general.equalNumberOptIn) {
             let addLegendItem = false;
 
             for(let i = 0; i < dataSet.length; i++) {
@@ -560,12 +560,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // get nums
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
-                if(state.legend.separateZero && hasZeroInData) { domainNums.add(0) }
 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
 
-                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) - 1 : state.legend.numberOfItems )
+                let colorRange = colors.slice(0, state.legend.separateZero ? Number(state.legend.numberOfItems) + 1 : state.legend.numberOfItems + 1)
                 
                 console.log('colorRange', colorRange)
 
@@ -578,12 +577,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 breaks = breaks.map( item => Math.round(item))
                 
                 // always start with domain beginning breakpoint
-                if(d3.extent(domainNums)?.[0] !== 0) {
+                if(d3.extent(domainNums)?.[0] !== 0 && Math.min.apply(null, domainNums) !== 0) {
+                    console.log(`Adding: ${d3.extent(domainNums)?.[0]}`)
                     breaks.unshift(d3.extent(domainNums)?.[0])
                 }
 
+
                 // if seperating zero force it into breaks
-                if(state.legend.separateZero && breaks[0] !== 0) breaks.unshift(0)
+                if( (state.legend.separateZero && breaks[0] !== 0) && !hasZeroInData) {
+                    console.log('breaks at zero', breaks[0])
+                    console.log(`Adding: 0`, hasZeroInData)
+                    breaks.unshift(0)
+                }
+                console.log('breaks', breaks)
 
                 breaks.map( (item, index) => {
 
@@ -654,7 +660,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         let updated = 0
                         
                         // check if we're seperating zero out
-                        updated = state.legend.separateZero && hasZeroInData ? index + 1 : index;
+                        updated = state.legend.separateZero && hasZeroInData ? index : index;
 
                         // check for special classes
                         updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index;
