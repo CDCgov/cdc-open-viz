@@ -62,24 +62,35 @@ export default function ChooseTab() {
 
 
     let setTypes = () => {
-        // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
-        let newConfig = {
+      if(type === config.type){
+        if(subType !== config.visualizationType){
+          setConfig({...config, newViz: true, visualizationType: subType})
+        }
+
+        setGlobalActive(1)
+      } else {
+        let confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?');
+
+        if(confirmation){
+          let newConfig = {
             newViz: true,
             datasets: {},
             type
-        }
+          }
 
-        if(type === 'map') {
+          if(type === 'map') {
             newConfig.general = {
-                ...newConfig.general,
-                geoType: subType
+              ...newConfig.general,
+              geoType: subType
             }
-        } else {
+          } else {
             newConfig.visualizationType = subType
-        }
+          }
 
-        setConfig(newConfig)
-        setGlobalActive(1)
+          setConfig(newConfig);
+          setGlobalActive(1)
+        }
+      }
     }
 
     return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span

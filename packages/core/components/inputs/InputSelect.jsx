@@ -36,7 +36,7 @@ const InputSelect = memo((
 
   return (
     <label>
-      {label && <span className="edit-label">{label}</span>}
+      {label && <span className="edit-label cove-input__label">{label}</span>}
       <select className={required && !value ? 'warning' : ''} name={fieldName} value={value} onChange={(event) => {
         updateField(section, subsection, fieldName, event.target.value)
       }} {...attributes}>
