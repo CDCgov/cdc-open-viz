@@ -996,18 +996,17 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if (Number(value)) {
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
-
-                    const decimalPoint = columnObj.roundToPlace
-
+                    const decimalPoint = Number(columnObj.roundToPlace)
+                    
                     formattedValue = Number(value).toFixed(decimalPoint)
-
+                    
                 }
 
                 if(columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-
-                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal'})
-
+                    const decimalPoint = Number(columnObj.roundToPlace)
+                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: decimalPoint, maximumFractionDigits: decimalPoint })
                 }
+
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
@@ -1582,12 +1581,19 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						html={true}
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
-				)}
+                )}
                 <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
 					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-						{parse(title)}
-					</div>
-				</header>
+                        {parse(title)}
+                        <p>{general.superTitle}</p>
+                    </div>
+                    
+                </header>
+                
+                <div>
+                    {general.introText && <section className="introText">{parse(general.introText)}</section>}
+                </div>
+                
 				<section 
                     role="button"
                     tabIndex="0"
@@ -1619,6 +1625,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
+                    
 					<section className='geography-container' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
@@ -1655,7 +1662,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                         )}
                         </section>
-
+                   
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
 							viewport={currentViewport}
@@ -1671,6 +1678,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 							resetLegendToggles={resetLegendToggles}
 							changeFilterActive={changeFilterActive}
 							setAccessibleStatus={setAccessibleStatus}
+                            displayDataAsText={displayDataAsText}
 						/>
 					)}
 				</section>
@@ -1685,7 +1693,9 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					/>
                 )}
                 {link && link}
-                {general.introText && <section className="introText">{parse(general.introText)}</section>}
+
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                
 				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
@@ -1709,7 +1719,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         tabbingId={tabId}
 					/>
                 )}
-                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                
                 {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
             </section>}
             
