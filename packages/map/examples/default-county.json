@@ -105,7 +105,7 @@
 			"link": ""
 		},
 		{
-			"Insured Rate": 25,
+			"Insured Rate": 0,
 			"Coverage Status": "Insured",
 			"FIPS Codes": "55005",
 			"Year (Good filter option)": "2010",
