@@ -570,7 +570,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 console.log('colorRange', colorRange)
 
                 let scale = d3.scaleQuantile()
-                    .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
+                    .domain([... new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
                     .range(colorRange) // set range to our colors array
 
                 let breaks = scale.quantiles();
@@ -585,10 +585,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // if seperating zero force it into breaks
                 if(state.legend.separateZero && breaks[0] !== 0) breaks.unshift(0)
 
-                console.log('breaks', breaks)
-                console.log('domainNums', domainNums)
-                
-                
                 breaks.map( (item, index) => {
 
                     const setMin = (index) => {
