@@ -1282,7 +1282,10 @@ useEffect(()=>{
                     </>
                   )}
                   {(config.orientation === 'horizontal' && config.yAxis.labelPlacement !== 'On Bar') &&
-                    <TextField type="number" value={config.barHeight || '25'} fieldName="barHeight" label="Bar Thickness" updateField={updateField} min="15"/>
+                    <>
+                      <TextField type="number" value={config.barHeight || '25'} fieldName="barHeight" label="Bar Thickness" updateField={updateField} min="15"/>
+                      <TextField type="number" value={config.barSpacing || '10'} fieldName="barSpacing" label="Bar Spacing" updateField={updateField} min="0"/>
+                    </>
                   }
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>

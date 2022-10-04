@@ -204,11 +204,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF';
                     }
-
                     return (
                       <Group key={index}
-                             className="stack"
-                             top={-( isLabelOnYAxis ? 10 * index : 0 )}
+                             className={`stack calc-${Number(config.barSpacing) * index}`}
+                             top={-( isLabelOnYAxis ? ( -25 + Number( config.barSpacing ) ) * index : 0 )}
                       >
                           <foreignObject
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
@@ -304,9 +303,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                 return barGroups.map((barGroup, index) => (
                 <Group 
-                  className={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
-                  key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`} 
-                  top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index  - ( isLabelOnYAxis ? 10 * barGroup.index : 0 ) : 0}
+                  className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} calc-${Number(-25 + config.barSpacing)}`}
+                  key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
+                  top={config.runtime.horizontal ? yMax / barGroups.length * barGroup.index  + ( isLabelOnYAxis ? ( -25 + Number(config.barSpacing) ) * Number( barGroup.index ) : 0 ) : 0}
                   left={config.runtime.horizontal ? 0 : xMax / barGroups.length * barGroup.index}>
                   {barGroup.bars.map((bar,index) => {
 
@@ -359,9 +358,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     const style = applyRadius(index)
-                    // console.log('config.runtime.horizontal',
-                    //   barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0)
-                    // )
+
                     return (
                     <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                       <Text
