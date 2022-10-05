@@ -1582,13 +1582,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
                 )}
-                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-                        {parse(title)}
-                        <p>{general.superTitle}</p>
-                    </div>
-                    
-                </header>
+                {state.general.title &&
+                    <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false })}>
+                        <div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
+                            <sup>{general.superTitle}</sup>
+                            <div>{parse(title)}</div>
+                        </div>
+                    </header>
+                }
                 
                 <div>
                     {general.introText && <section className="introText">{parse(general.introText)}</section>}
