@@ -588,7 +588,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                               updateChildConfig(col.widget, newConfig)
                             }}
                             isDashboard={true}
-                            link = { config.table && config.table.show && config.datasets ? tableLink : undefined }
                             />
                             )}
                           {visualizationConfig.type === 'waffle-chart' && (
