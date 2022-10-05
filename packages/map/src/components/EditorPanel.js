@@ -351,7 +351,7 @@ const EditorPanel = (props) => {
 				break;
 			case 'legendType':
 
-				let testForType = typeof state.data[0][state.columns.primary.name];
+				let testForType = Number(typeof state.data[0][state.columns.primary.name]);
 				let hasValue = state.data[0][state.columns.primary.name];
 				let messages = [];
 
@@ -359,7 +359,7 @@ const EditorPanel = (props) => {
 					messages.push(`There appears to be values missing for data in the primary column ${state.columns.primary.name}`);
 				}
 
-				if (testForType === 'string' && value !== 'category') {
+				if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
 					messages.push( 'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.' );
 				} else {
 					messages = []
