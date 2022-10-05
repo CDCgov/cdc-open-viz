@@ -107,7 +107,6 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-	console.log('filteredQualitative', filteredQualitative)
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
 	const headerColors = [
