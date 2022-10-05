@@ -107,7 +107,7 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-
+	console.log('filteredQualitative', filteredQualitative)
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
 	const headerColors = [
@@ -2520,6 +2520,10 @@ const EditorPanel = (props) => {
 													backgroundColor: colorPalettes[palette][6],
 												};
 
+												// hide palettes with too few colors for region maps
+												if ( colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region' ) {
+													return('');
+												}
 												return (
 													<li
 														title={palette}
