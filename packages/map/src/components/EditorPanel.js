@@ -18,6 +18,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg';
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/icon-map-world.svg';
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg';
 import worldDefaultConfig from '../../examples/default-world.json';
@@ -105,7 +106,6 @@ const EditorPanel = (props) => {
 	const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0]);
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
-
 
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
@@ -510,6 +510,20 @@ const EditorPanel = (props) => {
 							general: {
 								...state.general,
 								geoType: 'us',
+							},
+							dataTable: {
+								...state.dataTable,
+								forceDisplay: true,
+							},
+						});
+						ReactTooltip.rebuild();
+						break;
+					case 'us-region':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								geoType: 'us-region',
 							},
 							dataTable: {
 								...state.dataTable,
@@ -1274,6 +1288,16 @@ const EditorPanel = (props) => {
 												<UsaGraphic />
 												<span>United States</span>
 											</button>
+                      <button
+                        className={state.general.geoType === 'us-region' ? 'active' : ''}
+                        onClick={ (e) => {
+                          e.preventDefault();
+                          handleEditorChanges('geoType', 'us-region')
+                        }}
+                      >
+                        <UsaRegionGraphic />
+                        <span>U.S. Region</span>
+                      </button>
 											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
 												onClick={ (e) => {
@@ -2497,6 +2521,10 @@ const EditorPanel = (props) => {
 													backgroundColor: colorPalettes[palette][6],
 												};
 
+												// hide palettes with too few colors for region maps
+												if ( colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region' ) {
+													return('');
+												}
 												return (
 													<li
 														title={palette}
