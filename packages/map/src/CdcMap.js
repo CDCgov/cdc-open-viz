@@ -565,8 +565,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let colors = colorPalettes[state.color]
 
                 let colorRange = colors.slice(0, state.legend.numberOfItems )
-                
-                console.log('colorRange', colorRange)
 
                 let scale = d3.scaleQuantile()
                     .domain([... new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
@@ -586,18 +584,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                 // if seperating zero force it into breaks
                 if(breaks[0] !== 0) {
-                    console.log('breaks at zero', breaks[0])
-                    console.log(`Adding: 0`, hasZeroInData)
                     breaks.unshift(0)
                 }
-                console.log('breaks', breaks)
 
                 breaks.map( (item, index) => {
 
                     const setMin = (index) => {
-
-                        // if the break index is the last item 
-                        console.log('break index in loop:', index)
 
                         //debugger;
                         let min = breaks[index];
@@ -651,8 +643,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         max,
                         color: scale(item)
                     })
-
-                    console.log('result', result)
 
                     
                     dataSet.forEach( (row, dataIndex) => {
@@ -1279,8 +1269,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             if(newState.dataUrl[0] === '/') {
                 newState.dataUrl = 'http://' + hostname + newState.dataUrl
             }
-
-            console.log('d', newState.dataUrl)
 
             // handle urls with spaces in the name.
             if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString )
