@@ -994,16 +994,15 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (columnObj) {
             // If value is a number, apply specific formattings
             if (Number(value)) {
+                const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
-                    const decimalPoint = Number(columnObj.roundToPlace)
-                    
                     formattedValue = Number(value).toFixed(decimalPoint)
                     
                 }
 
                 if(columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-                    const decimalPoint = Number(columnObj.roundToPlace)
                     formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: decimalPoint, maximumFractionDigits: decimalPoint })
                 }
 
