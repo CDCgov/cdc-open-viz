@@ -117,7 +117,7 @@ export default function PieChart() {
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
 
             let textColor = "#FFF";
-            if (chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
+            if (colorScale(arc.data[config.runtime.xAxis.dataKey]) && chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
               textColor = "000";
             }
 
