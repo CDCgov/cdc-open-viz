@@ -58,6 +58,7 @@ import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
+import UsaGeoCodeMap from './components/UsaGeoCodeMap'; // Future: Lazy
 
 import { publish } from '@cdc/core/helpers/events';
 
@@ -223,6 +224,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // Cities
                 if(!uid) {
                     uid = cityKeys.find( (key) => key === geoName)
+                }
+
+                if('us-geocode' === state.general.type) {
+                    console.log('obj', row)
+                    uid = row[state.columns.geo.name]
                 }
             }
 
@@ -1280,9 +1286,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 newData = transform.developerStandardize(newData, newState.dataDescription);
             }
 
+            console.log('new data', newData)
+
             if(newData) {
                 newState.data = newData
             }
+
+
+            console.log('newState', newState)
         }
 
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
@@ -1308,7 +1319,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if(newState.dataTable.forceDisplay === undefined){
             newState.dataTable.forceDisplay = !isDashboard;
         }
-
+        
         validateFipsCodeLength(newState);
         setState(newState)
         setLoading(false)
@@ -1344,18 +1355,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setCoveLoadedHasRan(true)
         }
     }, [state, container]);
-
-    // useEffect(() => {
-    //     if(state.focusedCountry && state.data) {
-    //         let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === state.focusedCountry[state.columns.geo.name])
-    //         let temp = {
-    //             ...state,
-    //             data: newRuntimeData
-    //         }
-    //         setRuntimeData(temp)
-    //     }
-
-    // }, [state.focusedCountry]);
 
     useEffect(() => {
         if (state.data) {
@@ -1630,7 +1629,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 {'single-state' === general.geoType && (
                                     <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
-                                {'us' === general.geoType && (
+                                { ('us' === general.geoType && 'us-geocode' !== state.general.type ) && (
                                   <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
                                 )}
                                 {'us-region' === general.geoType && (
@@ -1639,8 +1638,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 {'world' === general.geoType && (
                                     <WorldMap supportedCountries={supportedCountries} {...mapProps} />
                                 )}
-                                {'us-county' === general.geoType && (
+                                { ('us-county' === general.geoType && state.general.type !== 'us-geocode') && (
                                     <CountyMap
+                                        supportedCountries={supportedCountries}
+                                        {...mapProps}
+                                    />
+                                )}
+                                {(state.general.type === 'us-geocode') && (
+                                    <UsaGeoCodeMap
                                         supportedCountries={supportedCountries}
                                         {...mapProps}
                                     />
