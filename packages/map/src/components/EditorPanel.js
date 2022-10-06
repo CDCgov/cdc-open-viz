@@ -440,6 +440,15 @@ const EditorPanel = (props) => {
 				break;
 			case 'editorMapType':
 				switch (value) {
+					case 'us-geocode':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								type: value,
+							},
+						});
+						break;
 					case 'data':
 						setState({
 							...state,
@@ -1352,6 +1361,7 @@ const EditorPanel = (props) => {
 											}}
 										>
 											<option value='data'>Data</option>
+											<option value='us-geocode'>United States Geocode</option>
 											<option value='navigation'>Navigation</option>
 											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
@@ -1531,14 +1541,14 @@ const EditorPanel = (props) => {
 								<AccordionItemPanel>
 									<label className='edit-block geo'>
 										<span className='edit-label column-heading'>
-                      Geography
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
+										Geography
+										<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+											<p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
+											</Tooltip.Content>
+										</Tooltip>
+										</span>
 										<select
 											value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
 											onChange={(event) => {
@@ -1696,6 +1706,23 @@ const EditorPanel = (props) => {
                         	</label>
 						</fieldset>
 					)}
+
+					{'us-geocode' === state.general.type &&
+					<>
+						<label>Latitude Column</label>
+						<select value={state.columns.latitude.name ? state.columns.latitude.name : ''} onChange={(e) => {
+							editColumn('latitude', 'name', e.target.value);
+							}}>
+						{columnsOptions}
+						</select>
+						<label>Longitude Column</label>
+						<select value={state.columns.longitude.name ? state.columns.longitude.name : ''} onChange={(e) => {
+							editColumn('longitude', 'name', e.target.value);
+						}}>
+							{columnsOptions}
+						</select>
+					</>
+					}
 
 					{'navigation' !== state.general.type && (
                       <fieldset className="primary-fieldset edit-block">
