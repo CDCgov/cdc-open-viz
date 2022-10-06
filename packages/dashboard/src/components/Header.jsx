@@ -178,7 +178,7 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
               <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
                 <option value="">- Select Option -</option>
                 {Object.keys(config.visualizations).map((vizKey) => (
-                  <option value={vizKey} key={`set-by-select-item-${vizKey}`}>{vizKey}</option>
+                  <option value={vizKey} key={`set-by-select-item-${vizKey}`}>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : (config.visualizations[vizKey].title || vizKey)}</option>
                 ))}
               </select>
             </label>
@@ -186,13 +186,13 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
               <span className="edit-label column-heading">Used By:</span>
               <ul>
                 {filter.usedBy && filter.usedBy.map(vizKey => (
-                  <li key={`used-by-list-item-${vizKey}`}><span>{vizKey}</span> <button onClick={(e) => {e.preventDefault();removeFilterUsedBy(filter, index, vizKey)}}>X</button></li>
+                  <li key={`used-by-list-item-${vizKey}`}><span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : (config.visualizations[vizKey].title || vizKey)}</span> <button onClick={(e) => {e.preventDefault();removeFilterUsedBy(filter, index, vizKey)}}>X</button></li>
                 ))}
               </ul>
               <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
                 <option value="">- Select Option -</option>
                 {Object.keys(config.visualizations).filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter).map((vizKey) => (
-                  <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{vizKey}</option>
+                  <option value={vizKey} key={`used-by-select-item-${vizKey}`}>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : (config.visualizations[vizKey].title || vizKey)}</option>
                 ))}
               </select>
             </label>
