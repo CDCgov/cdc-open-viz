@@ -4,6 +4,7 @@ import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos';
 import { scaleLinear } from 'd3-scale';
 
+
 const CityList = (({
   data,
   state,
@@ -14,19 +15,32 @@ const CityList = (({
   projection,
   titleCase,
   setSharedFilterValue,
-  isFilterValueSupported
+  isFilterValueSupported,
+  isGeoCodeMap
 }) => {
+
   const [citiesData, setCitiesData] = useState({});
 
   useEffect(() => {
-    const citiesList = Object.keys(data).filter((item) => Object.keys(supportedCities).includes(item));
+    console.log('is geo code?', isGeoCodeMap)
+    console.log('data', state.data)
+    if(!isGeoCodeMap) {
+      const citiesList = Object.keys(data).filter((item) => Object.keys(supportedCities).includes(item));
+  
+      const citiesDictionary = {};
+  
+      citiesList.map((city) => citiesDictionary[city] = data[city]);
+  
+      setCitiesData(citiesDictionary);
+    } else {
+      const citiesDictionary = {};
+      state.data.map(city => citiesDictionary[city[state.columns.geo.name]] = city)
+      console.log('citiesDictionary', citiesDictionary)
+      setCitiesData(citiesDictionary);
+    }
+  }, [data, state.data]);
 
-    const citiesDictionary = {};
-
-    citiesList.map((city) => citiesDictionary[city] = data[city]);
-
-    setCitiesData(citiesDictionary);
-  }, [data]);
+  console.log('citiesData', citiesData)
 
   if (state.general.type === 'bubble') {
     const maxDataValue = Math.max(...state.data.map(d => d[state.columns.primary.name]))
@@ -39,13 +53,17 @@ const CityList = (({
       .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
   }
-
-  const cityList = Object.keys(citiesData).filter((c) => undefined !== data[c]);
-
+  console.log('this', Object.keys(citiesData).filter((c) => undefined !== c))
+  let cityList = isGeoCodeMap ? Object.keys(citiesData).filter((c) => undefined !== c) : Object.keys(citiesData).filter((c) => undefined !== data[c]);
+  if(!cityList) return true;
   const cities = cityList.map((city, i) => {
-    const cityDisplayName = titleCase( displayGeoName(city) );
+    console.log('city', city)
 
-    const legendColors = applyLegendToRow(data[city]);
+    const geoData = isGeoCodeMap ? state.data.filter(item => city === item[state.columns.geo.name])[0] : data[city];
+
+    const cityDisplayName = isGeoCodeMap ? city : titleCase( displayGeoName(city) );
+
+    const legendColors = isGeoCodeMap ? applyLegendToRow(geoData) : applyLegendToRow(data[city]);
 
     if (legendColors === false) {
       return true;
@@ -65,7 +83,7 @@ const CityList = (({
       }
     };
 
-    const geoData = data[city];
+
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, data[city]);
 
@@ -74,7 +92,7 @@ const CityList = (({
       styles.cursor = 'pointer'
     }
 
-    const radius = state.general.geoType === 'us' ? 8 : 4;
+    const radius = state.general.geoType === 'us' && !isGeoCodeMap ? 8 : isGeoCodeMap ? 2 : 4;
 
     const additionalProps = {
       fillOpacity: state.general.type === 'bubble' ? .4 : 1
@@ -108,7 +126,17 @@ const CityList = (({
       </path>
     );
 
-    let transform = `translate(${projection(supportedCities[city])})`
+    let transform = '';
+    if (!isGeoCodeMap)  {
+      transform = `translate(${projection(supportedCities[city])})`
+    }
+    if (isGeoCodeMap) {
+      console.log('city here', city)
+      let coords = [Number(geoData[state.columns.longitude.name]), Number(geoData[state.columns.latitude.name])]
+      console.log('coords', coords)
+      transform = `translate(${projection(coords)})`
+
+    }
 
     return (
       <g
