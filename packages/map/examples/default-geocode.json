@@ -778,7 +778,7 @@
 	"newViz": true,
 	"type": "map",
 	"general": {
-		"geoType": "us",
+		"geoType": "us-county",
 		"geoBorderColor": "darkGray",
 		"headerColor": "theme-blue",
 		"showTitle": true,

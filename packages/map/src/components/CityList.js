@@ -81,7 +81,7 @@ const CityList = (({
     const toolTip = applyTooltipsToGeo(cityDisplayName, data[city]);
 
     // If we need to add a cursor pointer
-    if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
+    if ((state.columns.navigate && (geoData?.[state.columns.navigate.name] && geoData[state.columns.navigate.name]) ) || state.tooltips.appearanceType === 'click') {
       styles.cursor = 'pointer'
     }
 
@@ -126,7 +126,7 @@ const CityList = (({
     }
 
     if (isGeoCodeMap) {
-      let coords = [Number(geoData[state.columns.longitude.name]), Number(geoData[state.columns.latitude.name])]
+      let coords = [Number(geoData?.[state.columns.longitude.name]), Number(geoData?.[state.columns.latitude.name])]
       transform = `translate(${projection(coords)})`
     }
 
