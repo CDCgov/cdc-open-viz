@@ -84,17 +84,23 @@ const generateColorsArray = (color = '#000000', special = false) => {
 }
 
 const hashObj = (row) => {
-    let str = JSON.stringify(row)
+    try {
+        if(!row) throw new Error('No row supplied to hashObj')
+        let str = JSON.stringify(row)
 
-	let hash = 0;
-	if (str.length === 0) return hash;
-	for (let i = 0; i < str.length; i++) {
-		let char = str.charCodeAt(i);
-		hash = ((hash<<5)-hash) + char;
-		hash = hash & hash;
-	}
+        let hash = 0;
+        if (str.length === 0) return hash;
+        for (let i = 0; i < str.length; i++) {
+            let char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
 
-    return hash;
+        return hash;
+    } catch( e ) {
+        console.error(e)
+    }
+
 }
 
 // returns string[]
@@ -196,6 +202,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
 
+        console.info('running addUIDs')
+
         obj.data.forEach(row => {
             let uid = null
 
@@ -226,9 +234,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     uid = cityKeys.find( (key) => key === geoName)
                 }
 
-                if('us-geocode' === state.general.type) {
-                    uid = row[state.columns.geo.name]
-                }
             }
 
             if("us-region" === obj.general.geoType && obj.columns.geo.name) {
@@ -256,9 +261,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // County Check
-            if("us-county" === obj.general.geoType || "single-state" === obj.general.geoType) {
+            if("us-county" === obj.general.geoType || "single-state" === obj.general.geoType && "us-geocode" !== obj.general.type) {
                 const fips = row[obj.columns.geo.name]
                 uid = countyKeys.find( (key) => key === fips )
+            }
+
+            if ('us-geocode' === state.general.type) {
+                uid = row[state.columns.geo.name]
             }
 
             // TODO: Points
@@ -269,7 +278,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 });
             }
         })
-
         obj.data.fromColumn = fromColumn
     })
 
@@ -295,6 +303,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         console.log('obj', obj)
         console.log('rtDAta', runtimeData)
         let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
+
         console.log('d', dataSet)
 
         const colorDistributions = {
@@ -781,66 +790,72 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Calculates what's going to be displayed on the map and data table at render.
     const generateRuntimeData = useCallback((obj, filters, hash, test) => {
-        const result = {}
+        try {
+            console.info('running generate runtime data')
+            const result = {}
 
-        if(hash) {
-            // Adding property this way prevents it from being enumerated
-            Object.defineProperty(result, 'fromHash', {
-                value : hash
-            });
+            if (hash) {
+                // Adding property this way prevents it from being enumerated
+                Object.defineProperty(result, 'fromHash', {
+                    value: hash
+                });
+            }
+
+
+            obj.data.forEach(row => {
+
+                if (test) {
+                    console.log('object', obj)
+                    console.log('row', row)
+                }
+                if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
+
+                // When on a single state map filter runtime data by state
+                if (
+                    !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
+                    obj.general.geoType === 'single-state'
+                ) {
+                    return false;
+                }
+
+
+                if (row[obj.columns.primary.name]) {
+                    row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
+                }
+
+                // If this is a navigation only map, skip if it doesn't have a URL
+                if ("navigation" === obj.general.type) {
+                    let navigateUrl = row[obj.columns.navigate.name] || "";
+
+                    if (undefined !== navigateUrl && typeof navigateUrl === "string") {
+                        // Strip hidden characters before we check length
+                        navigateUrl = navigateUrl.replace(/(\r\n|\n|\r)/gm, '');
+                    }
+                    if (0 === navigateUrl.length) {
+                        return false
+                    }
+                }
+
+                // Filters
+                if (filters?.length) {
+                    for (let i = 0; i < filters.length; i++) {
+                        const { columnName, active } = filters[i]
+
+                        if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
+                    }
+                }
+
+                // Don't add additional rows with same UID
+                if (undefined === result[row.uid]) {
+                    result[row.uid] = row
+                }
+            })
+
+            return result
+        } catch(e) {
+            console.error(e)
         }
 
-
-        obj.data.forEach(row => {
-
-            if(test) {
-                console.log('object', obj)
-                console.log('row', row) 
-            }
-            if(undefined === row.uid) return false // No UID for this row, we can't use for mapping
-
-            // When on a single state map filter runtime data by state
-            if (
-                !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
-                obj.general.geoType === 'single-state'
-            ) {
-                return false;
-            }
-
-
-            if(row[obj.columns.primary.name]) {
-                row[obj.columns.primary.name] = numberFromString(row[obj.columns.primary.name], state)
-            }
-
-            // If this is a navigation only map, skip if it doesn't have a URL
-            if("navigation" === obj.general.type ) {
-                let navigateUrl = row[obj.columns.navigate.name] || "";
-
-                if ( undefined !== navigateUrl && typeof navigateUrl === "string" ) {
-                    // Strip hidden characters before we check length
-                    navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
-                }
-                if ( 0 === navigateUrl.length ) {
-                    return false
-                }
-            }
-
-            // Filters
-            if(filters?.length) {
-                for(let i = 0; i < filters.length; i++) {
-                    const {columnName, active} = filters[i]
-
-                    if (String(row[columnName]) !== String(active)) return false // Bail out, not part of filter
-                }
-            }
-
-            // Don't add additional rows with same UID
-            if(undefined === result[row.uid]) {
-                result[row.uid] = row
-            }
-        })
-
-        return result
     })
 
     const outerContainerRef = useCallback(node => {
@@ -1014,25 +1029,33 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const applyLegendToRow = (rowObj) => {
-        // Navigation map
-        if("navigation" === state.general.type) {
-          let mapColorPalette = colorPalettes[ state.color ] || colorPalettes[ 'bluegreenreverse' ]
 
-          return generateColorsArray( mapColorPalette[ 3 ] )
+        try {
+
+            if(!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
+            // Navigation map
+            if ("navigation" === state.general.type) {
+                let mapColorPalette = colorPalettes[state.color] || colorPalettes['bluegreenreverse']
+
+                return generateColorsArray(mapColorPalette[3])
+            }
+
+            let hash = hashObj(rowObj)
+
+            if (legendMemo.current.has(hash)) {
+                let idx = legendMemo.current.get(hash)
+
+                if (runtimeLegend[idx]?.disabled) return false
+
+                return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
+            }
+
+            // Fail state
+            return generateColorsArray()
+        } catch (e) {
+            console.error(e)
         }
 
-        let hash = hashObj(rowObj)
-
-        if( legendMemo.current.has(hash) ) {
-            let idx = legendMemo.current.get(hash)
-
-            if(runtimeLegend[idx]?.disabled) return false
-
-            return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
-        }
-
-        // Fail state
-        return generateColorsArray()
     }
 
     const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
@@ -1044,7 +1067,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') ? 'County: ':
             '';
 
-        if (state.general.geoType === 'us-county') {
+        if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
             let stateFipsCode = row[state.columns.geo.name].substring(0,2)
             const stateName = supportedStatesFipsCodes[stateFipsCode];
             
@@ -1637,14 +1660,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 {'world' === general.geoType && (
                                     <WorldMap supportedCountries={supportedCountries} {...mapProps} />
                                 )}
-                                { ('us-county' === general.geoType && state.general.type !== 'us-geocode') && (
+                                { ('us-county' === general.geoType) && (
                                     <CountyMap
-                                        supportedCountries={supportedCountries}
-                                        {...mapProps}
-                                    />
-                                )}
-                                {(state.general.type === 'us-geocode') && (
-                                    <UsaGeoCodeMap
                                         supportedCountries={supportedCountries}
                                         {...mapProps}
                                     />

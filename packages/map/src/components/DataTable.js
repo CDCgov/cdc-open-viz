@@ -344,11 +344,15 @@ const DataTable = (props) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} role="row">
-                  {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
-                      {cell.render('Cell')}
-                    </td>
-                  ))}
+                  {row.cells.map((cell) => {
+                    console.log('cell', cell)
+                    return (
+                      <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
+                        {cell.render('Cell')}
+                      </td>
+                    )
+                  }
+                  )}
                 </tr>
               );
             })}
