@@ -308,8 +308,6 @@ const EditorPanel = memo(() => {
     return null
   }
 
-  console.log(config,'CONFIG')
-
   return (
     <ErrorBoundary component="EditorPanel">
       {!config.newViz &&

@@ -266,15 +266,16 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData:any[] = config.data.map( item => Number( item[config.dataColumn] ))
-
-   // Get the column's data
-     if(filteredData.length){
-      filteredData.forEach(row => {
-        let value = numberFromString(row[dataColumn])
-        if(typeof value === 'number') numericalData.push(value)
-      });
-     }
+    let numericalData:any[] = []; 
+    // Get the column's data
+    if(filteredData.length){
+    filteredData.forEach(row => {
+      let value = numberFromString(row[dataColumn])
+      if(typeof value === 'number') numericalData.push(value)
+    });
+    } else {
+    numericalData = config.data.map( item => Number( item[config.dataColumn] ));
+    }
 
 
     switch (dataFunction) {
