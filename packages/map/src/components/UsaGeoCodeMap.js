@@ -199,7 +199,7 @@ const UsaGeoCodeMap = (props) => {
 
 		if (state.general.type !== 'us-geocode') {
 			e.preventDefault();
-			const svg = document.querySelector('.svg-container')
+			const svg = document.querySelector('.svg-container') 
 
 			svg.setAttribute('data-scaleZoom', 0)
 
@@ -224,7 +224,7 @@ const UsaGeoCodeMap = (props) => {
 			const allStates = document.querySelectorAll('.state');
 			document.querySelector('#focusedBorder path').style.stroke = 'none';
 			allStates.forEach(item => item.classList.remove('state--inactive'))
-			document.querySelectorAll('.state path').forEach(item => item.style.fill = 'rgb(244, 247, 250)')
+			//document.querySelectorAll('.state path').forEach(item => item.style.fill = 'rgb(244, 247, 250)')
 			document.querySelectorAll('.state').forEach(item => item.style.display = 'block')
 			stateLinesPath.current.setAttribute('stroke', geoStrokeColor);
 			stateLinesPath.current.setAttribute('stroke-width', startingLineWidth);

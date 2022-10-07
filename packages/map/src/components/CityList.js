@@ -22,8 +22,6 @@ const CityList = (({
   const [citiesData, setCitiesData] = useState({});
 
   useEffect(() => {
-    console.log('is geo code?', isGeoCodeMap)
-    console.log('data', state.data)
     if(!isGeoCodeMap) {
       const citiesList = Object.keys(data).filter((item) => Object.keys(supportedCities).includes(item));
   
@@ -35,12 +33,9 @@ const CityList = (({
     } else {
       const citiesDictionary = {};
       state.data.map(city => citiesDictionary[city[state.columns.geo.name]] = city)
-      console.log('citiesDictionary', citiesDictionary)
       setCitiesData(citiesDictionary);
     }
   }, [data, state.data]);
-
-  console.log('citiesData', citiesData)
 
   if (state.general.type === 'bubble') {
     const maxDataValue = Math.max(...state.data.map(d => d[state.columns.primary.name]))
@@ -53,11 +48,9 @@ const CityList = (({
       .range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
   }
-  console.log('this', Object.keys(citiesData).filter((c) => undefined !== c))
   let cityList = isGeoCodeMap ? Object.keys(citiesData).filter((c) => undefined !== c) : Object.keys(citiesData).filter((c) => undefined !== data[c]);
   if(!cityList) return true;
   const cities = cityList.map((city, i) => {
-    console.log('city', city)
 
     const geoData = isGeoCodeMap ? state.data.filter(item => city === item[state.columns.geo.name])[0] : data[city];
 
@@ -127,15 +120,14 @@ const CityList = (({
     );
 
     let transform = '';
+
     if (!isGeoCodeMap)  {
       transform = `translate(${projection(supportedCities[city])})`
     }
-    if (isGeoCodeMap) {
-      console.log('city here', city)
-      let coords = [Number(geoData[state.columns.longitude.name]), Number(geoData[state.columns.latitude.name])]
-      console.log('coords', coords)
-      transform = `translate(${projection(coords)})`
 
+    if (isGeoCodeMap) {
+      let coords = [Number(geoData[state.columns.longitude.name]), Number(geoData[state.columns.latitude.name])]
+      transform = `translate(${projection(coords)})`
     }
 
     return (
