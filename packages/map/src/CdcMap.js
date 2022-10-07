@@ -227,7 +227,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 }
 
                 if('us-geocode' === state.general.type) {
-                    console.log('obj', row)
                     uid = row[state.columns.geo.name]
                 }
             }
@@ -293,7 +292,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
+        console.log('obj', obj)
+        console.log('rtDAta', runtimeData)
         let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
+        console.log('d', dataSet)
 
         const colorDistributions = {
             1: [ 1 ],
@@ -514,12 +516,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Sort data for use in equalnumber or equalinterval
-        dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
-            let aNum = a[primaryCol]
-            let bNum = b[primaryCol]
-
-            return aNum - bNum
-        })
+        if(!state.general.type === 'us-geocode') {
+            dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
+                let aNum = a[primaryCol]
+                let bNum = b[primaryCol]
+    
+                return aNum - bNum
+            })
+        }
 
         // Equal Number
         if (type === 'equalnumber') {
@@ -563,9 +567,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     numberOfRows -= chunkAmt
                 }
             } else {
+
                 // get nums
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
+
+                console.log('dataSet', dataSet)
+                console.log('domainNums', dataSet.map(item => item[state.columns.primary.name]) )
 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
@@ -579,14 +587,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let breaks = scale.quantiles();
 
                 breaks = breaks.map( item => Math.round(item))
-                
-                // always start with zero for new quantile
-                // we can't start at the first break, because there will be items missing.
-                // if(d3.extent(domainNums)?.[0] !== 0 && Math.min.apply(null, domainNums) !== 0) {
-                //     console.log(`Adding: ${d3.extent(domainNums)?.[0]}`)
-                //     breaks.unshift(d3.extent(domainNums)?.[0])
-                // }
-
 
                 // if seperating zero force it into breaks
                 if(breaks[0] !== 0) {
@@ -1286,14 +1286,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 newData = transform.developerStandardize(newData, newState.dataDescription);
             }
 
-            console.log('new data', newData)
 
             if(newData) {
                 newState.data = newData
             }
-
-
-            console.log('newState', newState)
         }
 
         // This code goes through and adds the defaults for every property declaring in the initial state at the top.
@@ -1422,9 +1418,12 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             setRuntimeData(newRuntimeData)
         }
 
+        console.log('hashLegend', hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData))
+
         // Legend
         if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
+            console.log('legend', legend)
             setRuntimeLegend(legend)
         }
 
