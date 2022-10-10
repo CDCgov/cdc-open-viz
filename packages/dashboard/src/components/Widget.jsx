@@ -124,6 +124,10 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   const dataDesignerModal = (configureData, dataKeyOverride) => {
     const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
 
+    console.log(overlay);
+    overlay?.actions.toggleOverlay();
+    if (Object.keys(config.visualizations).pop().includes('markup-include')) return;
+
     return (
       <Modal>
         <Modal.Content>
@@ -152,8 +156,9 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   useEffect(() => {
-    if(data.openModal){
-      overlay?.actions.openOverlay(dataDesignerModal(dataRef.current))
+    if (data.openModal) {
+      if (Object.keys(config.visualizations).pop().includes("markup-include")) return;
+        overlay?.actions.openOverlay(dataDesignerModal(dataRef.current));
 
       visualizations[data.uid].openModal = false
 
