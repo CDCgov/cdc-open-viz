@@ -48,10 +48,10 @@
 			"name": "Condition"
 		},
 		"latitude": {
-			"name": "Latitude"
+			"name": ""
 		},
 		"longitude": {
-			"name": "Longitude"
+			"name": ""
 		}
 	},
 	"legend": {
