@@ -1,783 +1,9 @@
 {
-	"data": [
-		{
-			"Label": "Alamo",
-			"Latitude": "37.36",
-			"Longitude": "-115.16",
-			"Value": "1"
-		},
-		{
-			"Label": "Austin",
-			"Latitude": "39.5",
-			"Longitude": "-117.07",
-			"Value": "2"
-		},
-		{
-			"Label": "Baker",
-			"Latitude": "39.01",
-			"Longitude": "-114.12",
-			"Value": "3"
-		},
-		{
-			"Label": "Battle Mountain",
-			"Latitude": "40.64",
-			"Longitude": "-116.95",
-			"Value": "4"
-		},
-		{
-			"Label": "Beatty",
-			"Latitude": "36.94",
-			"Longitude": "-116.7",
-			"Value": "5"
-		},
-		{
-			"Label": "Beaverdam",
-			"Latitude": "37.69",
-			"Longitude": "-114.44",
-			"Value": "6"
-		},
-		{
-			"Label": "Bennett Springs",
-			"Latitude": "37.72",
-			"Longitude": "-114.48",
-			"Value": "7"
-		},
-		{
-			"Label": "Blue Diamond",
-			"Latitude": "36.04",
-			"Longitude": "-115.41",
-			"Value": "8"
-		},
-		{
-			"Label": "Boulder City city",
-			"Latitude": "35.84",
-			"Longitude": "-114.93",
-			"Value": "9"
-		},
-		{
-			"Label": "Bunkerville",
-			"Latitude": "36.72",
-			"Longitude": "-114.12",
-			"Value": "10"
-		},
-		{
-			"Label": "Cal-Nev-Ari",
-			"Latitude": "35.3",
-			"Longitude": "-114.88",
-			"Value": "11"
-		},
-		{
-			"Label": "Caliente city",
-			"Latitude": "37.61",
-			"Longitude": "-114.52",
-			"Value": "12"
-		},
-		{
-			"Label": "Carlin city",
-			"Latitude": "40.72",
-			"Longitude": "-116.11",
-			"Value": "13"
-		},
-		{
-			"Label": "Carson City",
-			"Latitude": "39.15",
-			"Longitude": "-119.75",
-			"Value": "14"
-		},
-		{
-			"Label": "Carter Springs",
-			"Latitude": "38.86",
-			"Longitude": "-119.64",
-			"Value": "15"
-		},
-		{
-			"Label": "Cold Springs",
-			"Latitude": "39.69",
-			"Longitude": "-119.98",
-			"Value": "16"
-		},
-		{
-			"Label": "Crescent Valley",
-			"Latitude": "40.42",
-			"Longitude": "-116.58",
-			"Value": "17"
-		},
-		{
-			"Label": "Crystal Bay",
-			"Latitude": "39.23",
-			"Longitude": "-120",
-			"Value": "18"
-		},
-		{
-			"Label": "Dayton",
-			"Latitude": "39.26",
-			"Longitude": "-119.57",
-			"Value": "19"
-		},
-		{
-			"Label": "Denio",
-			"Latitude": "41.97",
-			"Longitude": "-118.61",
-			"Value": "20"
-		},
-		{
-			"Label": "Double Spring",
-			"Latitude": "38.78",
-			"Longitude": "-119.62",
-			"Value": "21"
-		},
-		{
-			"Label": "Dry Valley",
-			"Latitude": "37.88",
-			"Longitude": "-114.31",
-			"Value": "22"
-		},
-		{
-			"Label": "Dyer",
-			"Latitude": "37.65",
-			"Longitude": "-118.03",
-			"Value": "23"
-		},
-		{
-			"Label": "East Valley",
-			"Latitude": "38.95",
-			"Longitude": "-119.7",
-			"Value": "24"
-		},
-		{
-			"Label": "Elko city",
-			"Latitude": "40.84",
-			"Longitude": "-115.77",
-			"Value": "25"
-		},
-		{
-			"Label": "Ely city",
-			"Latitude": "39.26",
-			"Longitude": "-114.87",
-			"Value": "26"
-		},
-		{
-			"Label": "Empire",
-			"Latitude": "40.58",
-			"Longitude": "-119.34",
-			"Value": "27"
-		},
-		{
-			"Label": "Enterprise",
-			"Latitude": "36.02",
-			"Longitude": "-115.22",
-			"Value": "28"
-		},
-		{
-			"Label": "Eureka",
-			"Latitude": "39.51",
-			"Longitude": "-115.97",
-			"Value": "29"
-		},
-		{
-			"Label": "Fallon city",
-			"Latitude": "39.47",
-			"Longitude": "-118.78",
-			"Value": "30"
-		},
-		{
-			"Label": "Fallon Station",
-			"Latitude": "39.42",
-			"Longitude": "-118.72",
-			"Value": "31"
-		},
-		{
-			"Label": "Fernley city",
-			"Latitude": "39.56",
-			"Longitude": "-119.19",
-			"Value": "32"
-		},
-		{
-			"Label": "Fish Springs",
-			"Latitude": "38.95",
-			"Longitude": "-119.65",
-			"Value": "33"
-		},
-		{
-			"Label": "Fort McDermitt",
-			"Latitude": "41.97",
-			"Longitude": "-117.64",
-			"Value": "34"
-		},
-		{
-			"Label": "Gabbs",
-			"Latitude": "38.87",
-			"Longitude": "-117.92",
-			"Value": "35"
-		},
-		{
-			"Label": "Gardnerville",
-			"Latitude": "38.94",
-			"Longitude": "-119.74",
-			"Value": "36"
-		},
-		{
-			"Label": "Gardnerville Ranchos",
-			"Latitude": "38.89",
-			"Longitude": "-119.74",
-			"Value": "37"
-		},
-		{
-			"Label": "Genoa",
-			"Latitude": "39.03",
-			"Longitude": "-119.83",
-			"Value": "38"
-		},
-		{
-			"Label": "Gerlach",
-			"Latitude": "40.65",
-			"Longitude": "-119.36",
-			"Value": "39"
-		},
-		{
-			"Label": "Glenbrook",
-			"Latitude": "39.1",
-			"Longitude": "-119.93",
-			"Value": "40"
-		},
-		{
-			"Label": "Golconda",
-			"Latitude": "40.96",
-			"Longitude": "-117.51",
-			"Value": "41"
-		},
-		{
-			"Label": "Golden Valley",
-			"Latitude": "39.62",
-			"Longitude": "-119.82",
-			"Value": "42"
-		},
-		{
-			"Label": "Goldfield",
-			"Latitude": "37.71",
-			"Longitude": "-117.24",
-			"Value": "43"
-		},
-		{
-			"Label": "Goodsprings",
-			"Latitude": "35.83",
-			"Longitude": "-115.43",
-			"Value": "44"
-		},
-		{
-			"Label": "Grass Valley",
-			"Latitude": "40.8",
-			"Longitude": "-117.76",
-			"Value": "45"
-		},
-		{
-			"Label": "Hawthorne",
-			"Latitude": "38.52",
-			"Longitude": "-118.63",
-			"Value": "46"
-		},
-		{
-			"Label": "Henderson city",
-			"Latitude": "36.01",
-			"Longitude": "-115.04",
-			"Value": "47"
-		},
-		{
-			"Label": "Hiko",
-			"Latitude": "37.61",
-			"Longitude": "-115.2",
-			"Value": "48"
-		},
-		{
-			"Label": "Humboldt River Ranch",
-			"Latitude": "40.46",
-			"Longitude": "-118.27",
-			"Value": "49"
-		},
-		{
-			"Label": "Imlay",
-			"Latitude": "40.66",
-			"Longitude": "-118.14",
-			"Value": "50"
-		},
-		{
-			"Label": "Incline Village",
-			"Latitude": "39.26",
-			"Longitude": "-119.95",
-			"Value": "51"
-		},
-		{
-			"Label": "Indian Hills",
-			"Latitude": "39.09",
-			"Longitude": "-119.8",
-			"Value": "52"
-		},
-		{
-			"Label": "Indian Springs",
-			"Latitude": "36.57",
-			"Longitude": "-115.72",
-			"Value": "53"
-		},
-		{
-			"Label": "Jackpot",
-			"Latitude": "41.98",
-			"Longitude": "-114.66",
-			"Value": "54"
-		},
-		{
-			"Label": "Johnson Lane",
-			"Latitude": "39.05",
-			"Longitude": "-119.72",
-			"Value": "55"
-		},
-		{
-			"Label": "Kingsbury",
-			"Latitude": "38.99",
-			"Longitude": "-119.88",
-			"Value": "56"
-		},
-		{
-			"Label": "Kingston",
-			"Latitude": "39.21",
-			"Longitude": "-117.07",
-			"Value": "57"
-		},
-		{
-			"Label": "Lakeridge",
-			"Latitude": "39.04",
-			"Longitude": "-119.94",
-			"Value": "58"
-		},
-		{
-			"Label": "Lamoille",
-			"Latitude": "40.72",
-			"Longitude": "-115.48",
-			"Value": "59"
-		},
-		{
-			"Label": "Las Vegas city",
-			"Latitude": "36.23",
-			"Longitude": "-115.26",
-			"Value": "60"
-		},
-		{
-			"Label": "Laughlin",
-			"Latitude": "35.13",
-			"Longitude": "-114.69",
-			"Value": "61"
-		},
-		{
-			"Label": "Lemmon Valley",
-			"Latitude": "39.69",
-			"Longitude": "-119.84",
-			"Value": "62"
-		},
-		{
-			"Label": "Logan Creek",
-			"Latitude": "39.06",
-			"Longitude": "-119.93",
-			"Value": "63"
-		},
-		{
-			"Label": "Lovelock city",
-			"Latitude": "40.18",
-			"Longitude": "-118.48",
-			"Value": "64"
-		},
-		{
-			"Label": "Lund",
-			"Latitude": "38.87",
-			"Longitude": "-115.01",
-			"Value": "65"
-		},
-		{
-			"Label": "McDermitt",
-			"Latitude": "41.99",
-			"Longitude": "-117.7",
-			"Value": "66"
-		},
-		{
-			"Label": "McGill",
-			"Latitude": "39.4",
-			"Longitude": "-114.78",
-			"Value": "67"
-		},
-		{
-			"Label": "Mesquite city",
-			"Latitude": "36.8",
-			"Longitude": "-114.13",
-			"Value": "68"
-		},
-		{
-			"Label": "Mina",
-			"Latitude": "38.39",
-			"Longitude": "-118.11",
-			"Value": "69"
-		},
-		{
-			"Label": "Minden",
-			"Latitude": "38.96",
-			"Longitude": "-119.77",
-			"Value": "70"
-		},
-		{
-			"Label": "Moapa Town",
-			"Latitude": "36.77",
-			"Longitude": "-114.65",
-			"Value": "71"
-		},
-		{
-			"Label": "Moapa Valley",
-			"Latitude": "36.61",
-			"Longitude": "-114.46",
-			"Value": "72"
-		},
-		{
-			"Label": "Mogul",
-			"Latitude": "39.52",
-			"Longitude": "-119.92",
-			"Value": "73"
-		},
-		{
-			"Label": "Montello",
-			"Latitude": "41.27",
-			"Longitude": "-114.2",
-			"Value": "74"
-		},
-		{
-			"Label": "Mount Charleston",
-			"Latitude": "36.26",
-			"Longitude": "-115.61",
-			"Value": "75"
-		},
-		{
-			"Label": "Mount Wilson",
-			"Latitude": "38.23",
-			"Longitude": "-114.45",
-			"Value": "76"
-		},
-		{
-			"Label": "Nellis AFB",
-			"Latitude": "36.25",
-			"Longitude": "-115.06",
-			"Value": "77"
-		},
-		{
-			"Label": "Nelson",
-			"Latitude": "35.72",
-			"Longitude": "-114.83",
-			"Value": "78"
-		},
-		{
-			"Label": "Nixon",
-			"Latitude": "39.83",
-			"Longitude": "-119.36",
-			"Value": "79"
-		},
-		{
-			"Label": "North Las Vegas city",
-			"Latitude": "36.29",
-			"Longitude": "-115.09",
-			"Value": "80"
-		},
-		{
-			"Label": "Oasis",
-			"Latitude": "41.03",
-			"Longitude": "-114.48",
-			"Value": "81"
-		},
-		{
-			"Label": "Orovada",
-			"Latitude": "41.56",
-			"Longitude": "-117.78",
-			"Value": "82"
-		},
-		{
-			"Label": "Osino",
-			"Latitude": "40.94",
-			"Longitude": "-115.66",
-			"Value": "83"
-		},
-		{
-			"Label": "Owyhee",
-			"Latitude": "41.92",
-			"Longitude": "-116.18",
-			"Value": "84"
-		},
-		{
-			"Label": "Pahrump",
-			"Latitude": "36.24",
-			"Longitude": "-116.02",
-			"Value": "85"
-		},
-		{
-			"Label": "Panaca",
-			"Latitude": "37.79",
-			"Longitude": "-114.4",
-			"Value": "86"
-		},
-		{
-			"Label": "Paradise",
-			"Latitude": "36.08",
-			"Longitude": "-115.14",
-			"Value": "87"
-		},
-		{
-			"Label": "Paradise Valley",
-			"Latitude": "41.49",
-			"Longitude": "-117.53",
-			"Value": "88"
-		},
-		{
-			"Label": "Pioche",
-			"Latitude": "37.95",
-			"Longitude": "-114.44",
-			"Value": "89"
-		},
-		{
-			"Label": "Preston",
-			"Latitude": "38.92",
-			"Longitude": "-115.06",
-			"Value": "90"
-		},
-		{
-			"Label": "Rachel",
-			"Latitude": "37.65",
-			"Longitude": "-115.73",
-			"Value": "91"
-		},
-		{
-			"Label": "Reno city",
-			"Latitude": "39.55",
-			"Longitude": "-119.85",
-			"Value": "92"
-		},
-		{
-			"Label": "Round Hill Village",
-			"Latitude": "38.99",
-			"Longitude": "-119.92",
-			"Value": "93"
-		},
-		{
-			"Label": "Ruhenstroth",
-			"Latitude": "38.89",
-			"Longitude": "-119.68",
-			"Value": "94"
-		},
-		{
-			"Label": "Ruth",
-			"Latitude": "39.28",
-			"Longitude": "-114.99",
-			"Value": "95"
-		},
-		{
-			"Label": "Sandy Valley",
-			"Latitude": "35.84",
-			"Longitude": "-115.63",
-			"Value": "96"
-		},
-		{
-			"Label": "Schurz",
-			"Latitude": "38.94",
-			"Longitude": "-118.79",
-			"Value": "97"
-		},
-		{
-			"Label": "Searchlight",
-			"Latitude": "35.48",
-			"Longitude": "-114.92",
-			"Value": "98"
-		},
-		{
-			"Label": "Silver Peak",
-			"Latitude": "37.76",
-			"Longitude": "-117.64",
-			"Value": "99"
-		},
-		{
-			"Label": "Silver Springs",
-			"Latitude": "39.38",
-			"Longitude": "-119.21",
-			"Value": "100"
-		},
-		{
-			"Label": "Skyland",
-			"Latitude": "39.03",
-			"Longitude": "-119.92",
-			"Value": "101"
-		},
-		{
-			"Label": "Smith Valley",
-			"Latitude": "38.78",
-			"Longitude": "-119.34",
-			"Value": "102"
-		},
-		{
-			"Label": "Spanish Springs",
-			"Latitude": "39.66",
-			"Longitude": "-119.67",
-			"Value": "103"
-		},
-		{
-			"Label": "Sparks city",
-			"Latitude": "39.57",
-			"Longitude": "-119.71",
-			"Value": "104"
-		},
-		{
-			"Label": "Spring Creek",
-			"Latitude": "40.74",
-			"Longitude": "-115.6",
-			"Value": "105"
-		},
-		{
-			"Label": "Spring Valley",
-			"Latitude": "36.1",
-			"Longitude": "-115.26",
-			"Value": "106"
-		},
-		{
-			"Label": "Stagecoach",
-			"Latitude": "39.37",
-			"Longitude": "-119.38",
-			"Value": "107"
-		},
-		{
-			"Label": "Stateline",
-			"Latitude": "38.97",
-			"Longitude": "-119.94",
-			"Value": "108"
-		},
-		{
-			"Label": "Summerlin South",
-			"Latitude": "36.12",
-			"Longitude": "-115.33",
-			"Value": "109"
-		},
-		{
-			"Label": "Sun Valley",
-			"Latitude": "39.61",
-			"Longitude": "-119.78",
-			"Value": "110"
-		},
-		{
-			"Label": "Sunrise Manor",
-			"Latitude": "36.18",
-			"Longitude": "-115.05",
-			"Value": "111"
-		},
-		{
-			"Label": "Sutcliffe",
-			"Latitude": "39.95",
-			"Longitude": "-119.63",
-			"Value": "112"
-		},
-		{
-			"Label": "Tonopah",
-			"Latitude": "38.1",
-			"Longitude": "-117.25",
-			"Value": "113"
-		},
-		{
-			"Label": "Topaz Lake",
-			"Latitude": "38.7",
-			"Longitude": "-119.54",
-			"Value": "114"
-		},
-		{
-			"Label": "Topaz Ranch Estates",
-			"Latitude": "38.74",
-			"Longitude": "-119.5",
-			"Value": "115"
-		},
-		{
-			"Label": "Ursine",
-			"Latitude": "37.98",
-			"Longitude": "-114.23",
-			"Value": "116"
-		},
-		{
-			"Label": "Valmy",
-			"Latitude": "40.77",
-			"Longitude": "-117.13",
-			"Value": "117"
-		},
-		{
-			"Label": "Verdi",
-			"Latitude": "39.51",
-			"Longitude": "-119.98",
-			"Value": "118"
-		},
-		{
-			"Label": "Virginia City",
-			"Latitude": "39.31",
-			"Longitude": "-119.65",
-			"Value": "119"
-		},
-		{
-			"Label": "Wadsworth",
-			"Latitude": "39.63",
-			"Longitude": "-119.29",
-			"Value": "120"
-		},
-		{
-			"Label": "Walker Lake",
-			"Latitude": "38.65",
-			"Longitude": "-118.76",
-			"Value": "121"
-		},
-		{
-			"Label": "Washoe Valley",
-			"Latitude": "39.29",
-			"Longitude": "-119.78",
-			"Value": "122"
-		},
-		{
-			"Label": "Wells city",
-			"Latitude": "41.11",
-			"Longitude": "-114.95",
-			"Value": "123"
-		},
-		{
-			"Label": "West Wendover city",
-			"Latitude": "40.74",
-			"Longitude": "-114.08",
-			"Value": "124"
-		},
-		{
-			"Label": "Whitney",
-			"Latitude": "36.1",
-			"Longitude": "-115.04",
-			"Value": "125"
-		},
-		{
-			"Label": "Winchester",
-			"Latitude": "36.14",
-			"Longitude": "-115.13",
-			"Value": "126"
-		},
-		{
-			"Label": "Winnemucca city",
-			"Latitude": "40.96",
-			"Longitude": "-117.73",
-			"Value": "127"
-		},
-		{
-			"Label": "Yerington city",
-			"Latitude": "38.99",
-			"Longitude": "-119.16",
-			"Value": "128"
-		},
-		{
-			"Label": "Zephyr Cove",
-			"Latitude": "39.01",
-			"Longitude": "-119.93",
-			"Value": "129"
-		}
-	],
-	"newViz": true,
-	"type": "map",
 	"general": {
+		"statePicked": {
+			"fipsCode": "32",
+			"stateName": "Nevada"
+		},
 		"geoType": "us-county",
 		"geoBorderColor": "darkGray",
 		"headerColor": "theme-blue",
@@ -790,29 +16,22 @@
 		"territoriesLabel": "Territories",
 		"language": "en",
 		"hasRegions": false,
-		"expandDataTable": true,
+		"expandDataTable": false,
 		"fullBorder": false,
 		"type": "us-geocode",
-		"title": "Default US Map"
+		"title": "Default US Map",
+		"palette": {
+			"isReversed": false
+		},
+		"allowMapZoom": true,
+		"hideGeoColumnInTooltip": false,
+		"hidePrimaryColumnInTooltip": false
 	},
-	"geoType": "us",
-	"geoBorderColor": "darkGray",
-	"headerColor": "theme-blue",
-	"showTitle": true,
-	"showSidebar": true,
-	"showDownloadButton": true,
-	"showDownloadMediaButton": false,
-	"displayAsHex": false,
-	"displayStateLabels": false,
-	"territoriesLabel": "Territories",
-	"language": "en",
-	"hasRegions": false,
-	"expandDataTable": true,
-	"fullBorder": false,
+	"type": "map",
 	"color": "pinkpurple",
 	"columns": {
 		"geo": {
-			"name": "Label",
+			"name": "City",
 			"label": "Location",
 			"tooltip": false,
 			"dataTable": true
@@ -828,7 +47,9 @@
 		"navigate": {
 			"name": "Condition"
 		},
-		"latitude": {"name": "Latitude"},
+		"latitude": {
+			"name": "Latitude"
+		},
 		"longitude": {
 			"name": "Longitude"
 		}
@@ -839,7 +60,7 @@
 		"unified": false,
 		"singleColumn": false,
 		"dynamicDescription": false,
-		"type": "category",
+		"type": "equalnumber",
 		"numberOfItems": 3,
 		"position": "side",
 		"title": "Legend"
@@ -853,5 +74,673 @@
 		"appearanceType": "hover",
 		"linkLabel": "Learn More",
 		"capitalizeLabels": true
-	}
+	},
+	"runtime": {
+		"editorErrorMessage": []
+	},
+	"visual": {
+		"minBubbleSize": 1,
+		"maxBubbleSize": 20,
+		"extraBubbleBorder": false,
+		"cityStyle": "circle"
+	},
+	"mapPosition": {
+		"coordinates": [
+			0,
+			30
+		],
+		"zoom": 1
+	},
+	"data": [
+		{
+			"City": "Albuquerque",
+			"Longitude": "-106.650421",
+			"Latitude": "35.084385",
+			"Value": "1"
+		},
+		{
+			"City": "Anaheim",
+			"Longitude": "-117.914299",
+			"Latitude": "33.836594",
+			"Value": "2"
+		},
+		{
+			"City": "Anchorage",
+			"Longitude": "-149.900284",
+			"Latitude": "61.218056",
+			"Value": "3"
+		},
+		{
+			"City": "Arlington",
+			"Longitude": "-97.108063",
+			"Latitude": "32.735687",
+			"Value": "4"
+		},
+		{
+			"City": "Atlanta",
+			"Longitude": "-84.387985",
+			"Latitude": "33.748997",
+			"Value": "5"
+		},
+		{
+			"City": "Aurora",
+			"Longitude": "-93.717979",
+			"Latitude": "36.97089",
+			"Value": "6"
+		},
+		{
+			"City": "Austin",
+			"Longitude": "-97.743057",
+			"Latitude": "30.267153",
+			"Value": "7"
+		},
+		{
+			"City": "Bakersfield",
+			"Longitude": "-119.018715",
+			"Latitude": "35.373291",
+			"Value": "8"
+		},
+		{
+			"City": "Baltimore",
+			"Longitude": "-76.61219",
+			"Latitude": "39.290386",
+			"Value": "9"
+		},
+		{
+			"City": "Baton Rouge",
+			"Longitude": "-91.187149",
+			"Latitude": "30.451468",
+			"Value": "10"
+		},
+		{
+			"City": "Boise",
+			"Longitude": "-116.202316",
+			"Latitude": "43.615021",
+			"Value": "11"
+		},
+		{
+			"City": "Boston",
+			"Longitude": "-71.058884",
+			"Latitude": "42.360081",
+			"Value": "12"
+		},
+		{
+			"City": "Buffalo",
+			"Longitude": "-78.878372",
+			"Latitude": "42.886448",
+			"Value": "13"
+		},
+		{
+			"City": "Chandler",
+			"Longitude": "-111.841248",
+			"Latitude": "33.30616",
+			"Value": "14"
+		},
+		{
+			"City": "Charlotte",
+			"Longitude": "-80.843124",
+			"Latitude": "35.227085",
+			"Value": "15"
+		},
+		{
+			"City": "Chesapeake",
+			"Longitude": "-76.287491",
+			"Latitude": "36.768208",
+			"Value": "16"
+		},
+		{
+			"City": "Chicago",
+			"Longitude": "-87.629799",
+			"Latitude": "41.878113",
+			"Value": "17"
+		},
+		{
+			"City": "Chula Vista",
+			"Longitude": "-117.084198",
+			"Latitude": "32.640053",
+			"Value": "18"
+		},
+		{
+			"City": "Cincinnati",
+			"Longitude": "-84.512016",
+			"Latitude": "39.103119",
+			"Value": "19"
+		},
+		{
+			"City": "Cleveland",
+			"Longitude": "-81.694359",
+			"Latitude": "41.499321",
+			"Value": "20"
+		},
+		{
+			"City": "Colorado Springs",
+			"Longitude": "-104.821365",
+			"Latitude": "38.833881",
+			"Value": "21"
+		},
+		{
+			"City": "Columbus",
+			"Longitude": "-82.998795",
+			"Latitude": "39.961178",
+			"Value": "22"
+		},
+		{
+			"City": "Corpus Christi",
+			"Longitude": "-97.396378",
+			"Latitude": "27.800583",
+			"Value": "23"
+		},
+		{
+			"City": "Dallas",
+			"Longitude": "-96.796989",
+			"Latitude": "32.776665",
+			"Value": "24"
+		},
+		{
+			"City": "Denver",
+			"Longitude": "-104.99025",
+			"Latitude": "39.739235",
+			"Value": "25"
+		},
+		{
+			"City": "Detroit",
+			"Longitude": "-83.045753",
+			"Latitude": "42.331429",
+			"Value": "26"
+		},
+		{
+			"City": "District of Columbia",
+			"Longitude": "-77.036873",
+			"Latitude": "38.907192",
+			"Value": "27"
+		},
+		{
+			"City": "Durham",
+			"Longitude": "-78.898621",
+			"Latitude": "35.994034",
+			"Value": "28"
+		},
+		{
+			"City": "El Paso",
+			"Longitude": "-106.485023",
+			"Latitude": "31.761877",
+			"Value": "29"
+		},
+		{
+			"City": "Fort Wayne",
+			"Longitude": "-85.139351",
+			"Latitude": "41.079273",
+			"Value": "30"
+		},
+		{
+			"City": "Ft Wayne",
+			"Longitude": "-85.139351",
+			"Latitude": "41.079273",
+			"Value": "31"
+		},
+		{
+			"City": "Fort Worth",
+			"Longitude": "-97.330765",
+			"Latitude": "32.755489",
+			"Value": "32"
+		},
+		{
+			"City": "Fremont",
+			"Longitude": "-121.988571",
+			"Latitude": "37.548271",
+			"Value": "33"
+		},
+		{
+			"City": "Fresno",
+			"Longitude": "-119.787125",
+			"Latitude": "36.737797",
+			"Value": "34"
+		},
+		{
+			"City": "Garland",
+			"Longitude": "-96.638885",
+			"Latitude": "32.912624",
+			"Value": "35"
+		},
+		{
+			"City": "Gilbert",
+			"Longitude": "-111.789024",
+			"Latitude": "33.352825",
+			"Value": "36"
+		},
+		{
+			"City": "Glendale",
+			"Longitude": "-118.255074",
+			"Latitude": "34.142509",
+			"Value": "37"
+		},
+		{
+			"City": "Greensboro",
+			"Longitude": "-79.791977",
+			"Latitude": "36.072636",
+			"Value": "38"
+		},
+		{
+			"City": "Henderson",
+			"Longitude": "-114.98172",
+			"Latitude": "36.039524",
+			"Value": "39"
+		},
+		{
+			"City": "Hialeah",
+			"Longitude": "-80.278107",
+			"Latitude": "25.857595",
+			"Value": "40"
+		},
+		{
+			"City": "Honolulu",
+			"Longitude": "-157.858337",
+			"Latitude": "21.306944",
+			"Value": "41"
+		},
+		{
+			"City": "Houston",
+			"Longitude": "-95.358421",
+			"Latitude": "29.749907",
+			"Value": "42"
+		},
+		{
+			"City": "Indianapolis",
+			"Longitude": "-86.158066",
+			"Latitude": "39.768402",
+			"Value": "43"
+		},
+		{
+			"City": "Irvine",
+			"Longitude": "-117.826508",
+			"Latitude": "33.684566",
+			"Value": "44"
+		},
+		{
+			"City": "Irving",
+			"Longitude": "-96.948891",
+			"Latitude": "32.814018",
+			"Value": "45"
+		},
+		{
+			"City": "Jacksonville",
+			"Longitude": "-81.655647",
+			"Latitude": "30.332184",
+			"Value": "46"
+		},
+		{
+			"City": "Jersey City",
+			"Longitude": "-74.077644",
+			"Latitude": "40.728157",
+			"Value": "47"
+		},
+		{
+			"City": "Kansas City",
+			"Longitude": "-94.578568",
+			"Latitude": "39.099728",
+			"Value": "48"
+		},
+		{
+			"City": "Laredo",
+			"Longitude": "-99.507553",
+			"Latitude": "27.503561",
+			"Value": "49"
+		},
+		{
+			"City": "Las Vegas",
+			"Longitude": "-115.139832",
+			"Latitude": "36.169941",
+			"Value": "50"
+		},
+		{
+			"City": "Lexington",
+			"Longitude": "-84.503716",
+			"Latitude": "38.040585",
+			"Value": "51"
+		},
+		{
+			"City": "Lincoln",
+			"Longitude": "-95.262955",
+			"Latitude": "37.346134",
+			"Value": "52"
+		},
+		{
+			"City": "Long Beach",
+			"Longitude": "-118.193741",
+			"Latitude": "33.77005",
+			"Value": "53"
+		},
+		{
+			"City": "Los Angeles",
+			"Longitude": "-118.243683",
+			"Latitude": "34.052235",
+			"Value": "54"
+		},
+		{
+			"City": "Los Angeles County",
+			"Longitude": "-118.229362",
+			"Latitude": "34.058762",
+			"Value": "55"
+		},
+		{
+			"City": "Louisville",
+			"Longitude": "-85.758453",
+			"Latitude": "38.252666",
+			"Value": "56"
+		},
+		{
+			"City": "Lubbock",
+			"Longitude": "-101.855164",
+			"Latitude": "33.577862",
+			"Value": "57"
+		},
+		{
+			"City": "Madison",
+			"Longitude": "-89.40123",
+			"Latitude": "43.073051",
+			"Value": "58"
+		},
+		{
+			"City": "Marion County, Indiana",
+			"Longitude": "-86.136543",
+			"Latitude": "39.781029",
+			"Value": "59"
+		},
+		{
+			"City": "Memphis",
+			"Longitude": "-90.048981",
+			"Latitude": "35.149532",
+			"Value": "60"
+		},
+		{
+			"City": "Mesa",
+			"Longitude": "-111.831474",
+			"Latitude": "33.415184",
+			"Value": "61"
+		},
+		{
+			"City": "Miami",
+			"Longitude": "-80.191788",
+			"Latitude": "25.761681",
+			"Value": "62"
+		},
+		{
+			"City": "Milwaukee",
+			"Longitude": "-87.906471",
+			"Latitude": "43.038902",
+			"Value": "63"
+		},
+		{
+			"City": "Minneapolis",
+			"Longitude": "-93.265015",
+			"Latitude": "44.977753",
+			"Value": "64"
+		},
+		{
+			"City": "Montgomery County, Maryland",
+			"Longitude": "-77.199406",
+			"Latitude": "39.153515",
+			"Value": "65"
+		},
+		{
+			"City": "Nashville",
+			"Longitude": "-86.781601",
+			"Latitude": "36.162663",
+			"Value": "66"
+		},
+		{
+			"City": "New Orleans",
+			"Longitude": "-90.071533",
+			"Latitude": "29.951065",
+			"Value": "67"
+		},
+		{
+			"City": "New York City",
+			"Longitude": "-74.005974",
+			"Latitude": "40.712776",
+			"Value": "68"
+		},
+		{
+			"City": "Newark",
+			"Longitude": "-95.582733",
+			"Latitude": "37.443188",
+			"Value": "69"
+		},
+		{
+			"City": "Norfolk",
+			"Longitude": "-76.285873",
+			"Latitude": "36.850769",
+			"Value": "70"
+		},
+		{
+			"City": "North Las Vegas",
+			"Longitude": "-115.114571",
+			"Latitude": "36.19585",
+			"Value": "71"
+		},
+		{
+			"City": "Oakland",
+			"Longitude": "-122.271111",
+			"Latitude": "37.804363",
+			"Value": "72"
+		},
+		{
+			"City": "Oklahoma City",
+			"Longitude": "-97.516426",
+			"Latitude": "35.46756",
+			"Value": "73"
+		},
+		{
+			"City": "Omaha",
+			"Longitude": "-95.934502",
+			"Latitude": "41.256538",
+			"Value": "74"
+		},
+		{
+			"City": "Orlando",
+			"Longitude": "-81.379234",
+			"Latitude": "28.538336",
+			"Value": "75"
+		},
+		{
+			"City": "Philadelphia",
+			"Longitude": "-75.165222",
+			"Latitude": "39.952583",
+			"Value": "76"
+		},
+		{
+			"City": "Phoenix",
+			"Longitude": "-112.074036",
+			"Latitude": "33.448376",
+			"Value": "77"
+		},
+		{
+			"City": "Pittsburgh",
+			"Longitude": "-79.995888",
+			"Latitude": "40.440624",
+			"Value": "78"
+		},
+		{
+			"City": "Plano",
+			"Longitude": "-96.698883",
+			"Latitude": "33.019844",
+			"Value": "79"
+		},
+		{
+			"City": "Portland",
+			"Longitude": "-122.658722",
+			"Latitude": "45.51223",
+			"Value": "80"
+		},
+		{
+			"City": "Raleigh",
+			"Longitude": "-78.638176",
+			"Latitude": "35.779591",
+			"Value": "81"
+		},
+		{
+			"City": "Reno",
+			"Longitude": "-119.813805",
+			"Latitude": "39.529633",
+			"Value": "82"
+		},
+		{
+			"City": "Richmond",
+			"Longitude": "-77.43605",
+			"Latitude": "37.540726",
+			"Value": "83"
+		},
+		{
+			"City": "Riverside",
+			"Longitude": "-117.375496",
+			"Latitude": "33.980602",
+			"Value": "84"
+		},
+		{
+			"City": "Sacramento",
+			"Longitude": "-121.4944",
+			"Latitude": "38.581573",
+			"Value": "85"
+		},
+		{
+			"City": "Saint Paul",
+			"Longitude": "-93.089958",
+			"Latitude": "44.953705",
+			"Value": "86"
+		},
+		{
+			"City": "San Antonio",
+			"Longitude": "-98.493629",
+			"Latitude": "29.424122",
+			"Value": "87"
+		},
+		{
+			"City": "San Diego",
+			"Longitude": "-117.161087",
+			"Latitude": "32.715736",
+			"Value": "88"
+		},
+		{
+			"City": "San Francisco",
+			"Longitude": "-122.419418",
+			"Latitude": "37.774929",
+			"Value": "89"
+		},
+		{
+			"City": "San Jose",
+			"Longitude": "-121.88633",
+			"Latitude": "37.338207",
+			"Value": "90"
+		},
+		{
+			"City": "Santa Ana",
+			"Longitude": "-117.867653",
+			"Latitude": "33.745472",
+			"Value": "91"
+		},
+		{
+			"City": "Scottsdale",
+			"Longitude": "-111.926048",
+			"Latitude": "33.494171",
+			"Value": "92"
+		},
+		{
+			"City": "Seattle",
+			"Longitude": "-122.332069",
+			"Latitude": "47.606209",
+			"Value": "93"
+		},
+		{
+			"City": "Spokane",
+			"Longitude": "-117.426048",
+			"Latitude": "47.658779",
+			"Value": "94"
+		},
+		{
+			"City": "St. Louis",
+			"Longitude": "-90.199402",
+			"Latitude": "38.627003",
+			"Value": "95"
+		},
+		{
+			"City": "St. Petersburg",
+			"Longitude": "-82.640289",
+			"Latitude": "27.767601",
+			"Value": "96"
+		},
+		{
+			"City": "Stockton",
+			"Longitude": "-121.290779",
+			"Latitude": "37.957703",
+			"Value": "97"
+		},
+		{
+			"City": "Tampa",
+			"Longitude": "-82.457176",
+			"Latitude": "27.950575",
+			"Value": "98"
+		},
+		{
+			"City": "Toledo",
+			"Longitude": "-83.537865",
+			"Latitude": "41.652805",
+			"Value": "99"
+		},
+		{
+			"City": "Tucson",
+			"Longitude": "-110.974709",
+			"Latitude": "32.222607",
+			"Value": "100"
+		},
+		{
+			"City": "Tuscon",
+			"Longitude": "-110.974709",
+			"Latitude": "32.222607",
+			"Value": "101"
+		},
+		{
+			"City": "Tulsa",
+			"Longitude": "-95.992775",
+			"Latitude": "36.15398",
+			"Value": "102"
+		},
+		{
+			"City": "Virginia Beach",
+			"Longitude": "-75.977982",
+			"Latitude": "36.852924",
+			"Value": "103"
+		},
+		{
+			"City": "Wichita",
+			"Longitude": "-97.330055",
+			"Latitude": "37.687176",
+			"Value": "104"
+		},
+		{
+			"City": "Winston Salem",
+			"Longitude": "-80.244217",
+			"Latitude": "36.099861",
+			"Value": "105"
+		},
+		{
+			"City": "Winston–Salem",
+			"Longitude": "-80.244217",
+			"Latitude": "36.099861",
+			"Value": "106"
+		}
+	],
+	"geoType": "us",
+	"geoBorderColor": "darkGray",
+	"headerColor": "theme-blue",
+	"showTitle": true,
+	"showSidebar": true,
+	"showDownloadButton": true,
+	"showDownloadMediaButton": false,
+	"displayAsHex": false,
+	"displayStateLabels": false,
+	"territoriesLabel": "Territories",
+	"language": "en",
+	"hasRegions": false,
+	"expandDataTable": true,
+	"fullBorder": false
 }
