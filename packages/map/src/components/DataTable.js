@@ -206,7 +206,7 @@ const DataTable = (props) => {
 
             const legendColor = applyLegendToRow(rowObj);
 
-            if(state.general.geoType !== 'us-county') {
+            if(state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
               var labelValue = displayGeoName(row.original);
             } else {
               var labelValue = formatLegendLocation(row.original)
