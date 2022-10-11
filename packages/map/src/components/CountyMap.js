@@ -45,18 +45,8 @@ const STATE_INACTIVE_FILL = '#F4F7FA';
 const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2]);
 const path = geoPath().projection(projection);
 const stateLines = path(mesh(testJSON, testJSON.objects.states));
+const countyLines = path(mesh(testJSON, testJSON.objects.counties));
 
-const nudges = {
-	'US-FL': [15, 3],
-	'US-AK': [0, -8],
-	'US-CA': [-10, 0],
-	'US-NY': [5, 0],
-	'US-MI': [13, 20],
-	'US-LA': [-10, -3],
-	'US-HI': [-10, 10],
-	'US-ID': [0, 10],
-	'US-WV': [-2, 2],
-};
 
 function CountyMapChecks(prevState, nextState) {
 	const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn;
@@ -443,6 +433,12 @@ const CountyMap = (props) => {
 		return output;
 	});
 
+	const GeoCodeCountyLines = memo(() => {
+		return (
+			<path d={countyLines} className="county-borders" style={{ stroke: geoStrokeColor}} />
+		)
+	})
+
 	const StateOutput = memo(({ geographies, states }) => {
 		let output = [];
 		output.push(
@@ -537,6 +533,10 @@ const CountyMap = (props) => {
 		{
 			'us-geocode' !== state.general.type &&
 			geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		}
+		{
+			'us-geocode' === state.general.type &&
+			geosJsx.push(<GeoCodeCountyLines />);
 		}
 		geosJsx.push(<StateOutput geographies={geographies} states={states} key="state-key" />);
 		geosJsx.push(

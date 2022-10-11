@@ -42,7 +42,9 @@ export default {
     },
     navigate: {
       name: ''
-    }
+    },
+    latitude: { name: "" },
+    longitude: { name: "" }
   },
   legend: {
     descriptions: {},
