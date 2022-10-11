@@ -694,6 +694,7 @@ const EditorPanel = (props) => {
 	};
 
 	const columnsRequiredChecker = useCallback(() => {
+		console.info('Running columns required check.')
 		let columnList = [];
 
 		// Geo is always required
@@ -712,6 +713,14 @@ const EditorPanel = (props) => {
 			('' === state.columns.navigate.name || undefined === state.columns.navigate)
 		) {
 			columnList.push('Navigation');
+		}
+
+		if ('us-geocode' === state.general.type && '' === state.columns.latitude.name) {
+			columnList.push('Latitude')
+		}
+		
+		if ('us-geocode' === state.general.type && '' === state.columns.longitude.name) {
+			columnList.push('Longitude')
 		}
 
 		if (columnList.length === 0) columnList = null;
