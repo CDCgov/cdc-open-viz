@@ -58,7 +58,6 @@ import DataTable from './components/DataTable'; // Future: Lazy
 import NavigationMenu from './components/NavigationMenu'; // Future: Lazy
 import WorldMap from './components/WorldMap'; // Future: Lazy
 import SingleStateMap from './components/SingleStateMap'; // Future: Lazy
-import UsaGeoCodeMap from './components/UsaGeoCodeMap'; // Future: Lazy
 
 import { publish } from '@cdc/core/helpers/events';
 
@@ -202,8 +201,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
 
-        console.info('running addUIDs')
-
         obj.data.forEach(row => {
             let uid = null
 
@@ -261,7 +258,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // County Check
-            if("us-county" === obj.general.geoType || "single-state" === obj.general.geoType && "us-geocode" !== obj.general.type) {
+            if( ("us-county" === obj.general.geoType || "single-state" === obj.general.geoType) && "us-geocode" !== obj.general.type) {
                 const fips = row[obj.columns.geo.name]
                 uid = countyKeys.find( (key) => key === fips )
             }
@@ -270,7 +267,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 uid = row[state.columns.geo.name]
             }
 
-            // TODO: Points
             if(uid) {
                 Object.defineProperty(row, 'uid', {
                     value: uid,
@@ -278,6 +274,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 });
             }
         })
+
         obj.data.fromColumn = fromColumn
     })
 
@@ -300,11 +297,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // Unified will based the legend off ALL of the data maps received. Otherwise, it will use
-        console.log('obj', obj)
-        console.log('rtDAta', runtimeData)
         let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData);
-
-        console.log('d', dataSet)
 
         const colorDistributions = {
             1: [ 1 ],
@@ -791,7 +784,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // Calculates what's going to be displayed on the map and data table at render.
     const generateRuntimeData = useCallback((obj, filters, hash, test) => {
         try {
-            console.info('running generate runtime data')
             const result = {}
 
             if (hash) {
@@ -813,7 +805,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // When on a single state map filter runtime data by state
                 if (
                     !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
-                    obj.general.geoType === 'single-state'
+                    obj.general.geoType === 'single-state' &&
+                    obj.general.type !== 'us-geocode'
                 ) {
                     return false;
                 }
@@ -1438,15 +1431,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
             const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+
             setRuntimeData(newRuntimeData)
         }
-
-        console.log('hashLegend', hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData))
 
         // Legend
         if (hashLegend !== runtimeLegend.fromHash && (undefined === runtimeData.init || newRuntimeData)) {
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
-            console.log('legend', legend)
             setRuntimeLegend(legend)
         }
 
