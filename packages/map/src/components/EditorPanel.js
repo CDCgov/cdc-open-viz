@@ -997,7 +997,7 @@ const EditorPanel = (props) => {
 	}
 
 	const additionalColumns = Object.keys(state.columns).filter((value) => {
-		const defaultCols = ['geo', 'navigate', 'primary'];
+		const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude'];
 
 		if (true === defaultCols.includes(value)) {
 			return false;

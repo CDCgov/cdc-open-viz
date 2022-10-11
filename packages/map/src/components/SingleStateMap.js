@@ -67,8 +67,6 @@ const abbrs = {
   'American Samoa': 'AS'
 }
 
-
-
 // SVG ITEMS
 const WIDTH = 880;
 const HEIGHT = 500;
