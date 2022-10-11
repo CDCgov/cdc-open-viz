@@ -297,7 +297,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     }
 
     if (legacyUpdateNeeded) {
-      setConfig(newConfig)
+      updateConfig(newConfig)
       if (newConfig.datasets) {
         let newData = {}
         Object.keys(newConfig.datasets).forEach(dataKey => newData[dataKey] = newConfig.datasets[dataKey].data)
