@@ -14,3 +14,12 @@
     background: transparent;
   }
 }
+
+.cove-accordion__panel-section {
+  overflow: auto;
+
+  label {
+    display: block;
+    float: left;
+  }
+}
