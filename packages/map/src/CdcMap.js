@@ -1478,7 +1478,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         'map-container',
         state.legend.position,
         state.general.type,
-        state.general.geoType
+        state.general.geoType,
+        'outline-none'
     ]
 
     if(modal) {
@@ -1614,7 +1615,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         Skip Over Map Container
                     </a>
                     
-					<section className='geography-container' ref={mapSvg} tabIndex="0">
+					<section className='geography-container outline-none' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
                                 {modal && (
