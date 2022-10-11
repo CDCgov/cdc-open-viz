@@ -241,7 +241,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1);
 
         if (applicableFilters.length > 0) {
-          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
         }
       })
     }
