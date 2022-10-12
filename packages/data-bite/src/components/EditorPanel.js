@@ -594,6 +594,7 @@ const EditorPanel = memo(() => {
                     updateField={updateField}
                     options={["small", "medium", "large"]}
                   />
+                  <div className="checkbox-group">
                   <CheckBox
                     value={config.visual?.border}
                     section="visual"
@@ -629,6 +630,7 @@ const EditorPanel = memo(() => {
                     label="Hide Background Color"
                     updateField={updateField}
                   />
+                  </div>
                   <label>
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
