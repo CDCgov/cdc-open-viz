@@ -107,7 +107,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const processData = async (config) => {
     let dataset = config.formattedData || config.data
 
-    if (!dataset && config.dataUrl) {
+    if (config.dataUrl) {
       dataset = await fetchRemoteData(config.dataUrl)
 
       if (dataset && config.dataDescription) {
@@ -125,6 +125,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json()
+    let newConfig = { ...defaults, ...response }
     let datasets = {}
 
     if (response.datasets) {
@@ -132,12 +133,40 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         datasets[key] = await processData(response.datasets[key])
       }))
     } else {
-      datasets['backwards-compatibility'] = await processData(response)
+      let dataKey = newConfig.dataFileName || 'backwards-compatibility'
+      datasets[dataKey] = await processData(response)
+
+      newConfig.datasets = {
+        dataKey: {
+          data: datasets[dataKey],
+          dataDescription: newConfig.dataDescription
+        }
+      };
+  
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = dataKey
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
+      })
+  
+      delete newConfig.data
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
+      delete newConfig.dataFileSourceType
+      delete newConfig.dataDescription
+      delete newConfig.formattedData
+  
+      if (newConfig.dashboard && newConfig.dashboard.filters) {
+        newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
+        newConfig.dashboard.filters.forEach(filter => {
+          newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
+        })
+  
+        delete newConfig.dashboard.filters
+      }
     }
 
     setData(datasets)
-
-    let newConfig = { ...defaults, ...response }
 
     updateConfig(newConfig, datasets)
     setLoading(false)
@@ -252,59 +281,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     newConfig.runtime = {}
     setConfig(newConfig)
   }
-
-  // Backwards compatiblity support for .filters after moving to .sharedFilters
-  useEffect(() => {
-    let legacyUpdateNeeded = false
-    let newConfig
-
-    if (config.data || config.dataUrl) {
-      legacyUpdateNeeded = true
-      newConfig = { ...config }
-
-      newConfig.datasets = {}
-      newConfig.datasets[config.dataFileName || 'dataset-1'] = {
-        data: config.data,
-        dataUrl: config.dataUrl,
-        dataFileName: config.dataFileName || 'dataset-1',
-        dataFileSourceType: config.dataFileSourceType
-      }
-
-      Object.keys(newConfig.visualizations).forEach(vizKey => {
-        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1'
-        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
-        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
-      })
-
-      delete newConfig.data
-      delete newConfig.dataUrl
-      delete newConfig.dataFileName
-      delete newConfig.dataFileSourceType
-      delete newConfig.dataDescription
-      delete newConfig.formattedData
-    }
-
-    if (config.dashboard && config.dashboard.filters) {
-      legacyUpdateNeeded = true
-      newConfig = { ...(newConfig || config) }
-
-      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
-      newConfig.dashboard.filters.forEach(filter => {
-        newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
-      })
-
-      delete newConfig.dashboard.filters
-    }
-
-    if (legacyUpdateNeeded) {
-      updateConfig(newConfig)
-      if (newConfig.datasets) {
-        let newData = {}
-        Object.keys(newConfig.datasets).forEach(dataKey => newData[dataKey] = newConfig.datasets[dataKey].data)
-        setData(newData)
-      }
-    }
-  })
 
   // Load data when component first mounts
   useEffect(() => {
