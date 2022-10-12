@@ -129,10 +129,10 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 								let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
 
 								const tooltip = `<div>
-				${yAxisTooltip}<br />
-				${xAxisTooltip}<br />
-				${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
-				</div>`
+									${yAxisTooltip}<br />
+									${xAxisTooltip}<br />
+									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+									</div>`
 
 								let circleRadii = 4.5
 
@@ -147,7 +147,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 											{formatNumber(d[seriesKey])}
 										</Text>
 
-										{dataIndex + 1 !== data.length &&
+										{ (dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show') || (config.lineDatapointStyle === 'hover') ) &&
 											<circle
 												key={`${seriesKey}-${dataIndex}`}
 												r={circleRadii}
@@ -174,13 +174,16 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 								marker-end="url(#arrow)"
 
 							/>
-								<MarkerArrow 
-									id="arrow" 
-									refX={2} 
-									size={6} 
-									marker-end="url(#arrow)"
-									fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-									/>
+							<MarkerArrow 
+								id="arrow" 
+								refX={2} 
+								size={6} 
+								marker-end="url(#arrow)"
+								strokeOpacity={1}
+								fillOpacity={1}
+								stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+								fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+								/>
 
 						</Group>
 						<AxisBottom
