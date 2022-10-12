@@ -136,12 +136,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       let dataKey = newConfig.dataFileName || 'backwards-compatibility'
       datasets[dataKey] = await processData(response)
 
-      newConfig.datasets = {
-        dataKey: {
-          data: datasets[dataKey],
-          dataDescription: newConfig.dataDescription
-        }
-      };
+      let datasetsFull = {};
+      datasetsFull[dataKey] = {
+        data: datasets[dataKey],
+        dataDescription: newConfig.dataDescription
+      }
+      newConfig.datasets = datasetsFull;
   
       Object.keys(newConfig.visualizations).forEach(vizKey => {
         newConfig.visualizations[vizKey].dataKey = dataKey
