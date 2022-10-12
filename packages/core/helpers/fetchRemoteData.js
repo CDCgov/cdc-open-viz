@@ -13,7 +13,6 @@ export default async function (url) {
         let data = []
 
         if ('csv' === ext) {
-            console.log('here', url.href)
             data = await fetch(url.href)
                 .then(response => response.text())
                 .then(responseText => {
