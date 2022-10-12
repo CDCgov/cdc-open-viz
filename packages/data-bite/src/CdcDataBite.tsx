@@ -92,9 +92,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
+
       response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
       let newData = await fetchRemoteData(response.dataUrl)
-
       
       if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
@@ -162,6 +162,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return;
       }
       // second validation
+      console.log('arr', arr)
       if(arr.length === 0 || !Array.isArray(arr)){
         console.error('Arguments are not valid getColumnSum function ')
         return;
@@ -269,12 +270,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     let numericalData:any[] = []; 
     // Get the column's data
     if(filteredData.length){
-    filteredData.forEach(row => {
-      let value = numberFromString(row[dataColumn])
-      if(typeof value === 'number') numericalData.push(value)
-    });
-    } else {
-    numericalData = config.data.map( item => Number( item[config.dataColumn] ));
+      filteredData.forEach(row => {
+        let value = numberFromString(row[dataColumn])
+        if(typeof value === 'number') numericalData.push(value)
+      });
     }
 
 

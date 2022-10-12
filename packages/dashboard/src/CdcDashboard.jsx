@@ -109,7 +109,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
     if (!dataset && config.dataUrl) {
       dataset = await fetchRemoteData(config.dataUrl)
-
       if (dataset && config.dataDescription) {
         try {
           dataset = transform.autoStandardize(data)
