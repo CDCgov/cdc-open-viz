@@ -49,13 +49,13 @@ const Sidebar = (props) => {
 
     // If interval, add some formatting
     if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-      formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
+      formattedText = `${entryMin} - < ${entryMax}`;
     }
 
     const { disabled } = entry;
 
     if (legend.type === 'category') {
-      formattedText = prefix + entry.value + suffix;
+      formattedText = displayDataAsText(entry.value, 'primary');
     }
 
     if (entry.max === 0 && entry.min === 0) {
