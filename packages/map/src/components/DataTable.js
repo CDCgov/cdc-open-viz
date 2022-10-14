@@ -206,7 +206,7 @@ const DataTable = (props) => {
 
             const legendColor = applyLegendToRow(rowObj);
 
-            if(state.general.geoType !== 'us-county') {
+            if(state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
               var labelValue = displayGeoName(row.original);
             } else {
               var labelValue = formatLegendLocation(row.original)
@@ -344,11 +344,14 @@ const DataTable = (props) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} role="row">
-                  {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
-                      {cell.render('Cell')}
-                    </td>
-                  ))}
+                  {row.cells.map((cell) => {
+                    return (
+                      <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
+                        {cell.render('Cell')}
+                      </td>
+                    )
+                  }
+                  )}
                 </tr>
               );
             })}
