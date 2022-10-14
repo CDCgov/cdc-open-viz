@@ -12,7 +12,9 @@ const CityList = (({
   displayGeoName,
   applyLegendToRow,
   projection,
-  titleCase
+  titleCase,
+  setSharedFilterValue,
+  isFilterValueSupported
 }) => {
   const [citiesData, setCitiesData] = useState({});
 
@@ -51,8 +53,8 @@ const CityList = (({
 
     const styles = {
       fill: legendColors[0],
-      outline: 0,
-      stroke: 'rgba(0, 0, 0, 0.4)',
+      opacity: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] !== setSharedFilterValue ? .5 : 1,
+      stroke: setSharedFilterValue && isFilterValueSupported && data[city][state.columns.geo.name] === setSharedFilterValue ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
         fill: legendColors[1],
         outline: 0
@@ -93,7 +95,7 @@ const CityList = (({
 
     const pin = (
       <path 
-        class="marker" 
+        className="marker" 
         d="M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z" 
         title="Click for more information"
         onClick={() => geoClickHandler(cityDisplayName, geoData)}

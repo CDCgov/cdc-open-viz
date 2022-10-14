@@ -14,8 +14,9 @@ import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Loading from '@cdc/core/components/Loading';
-import DataTransform from '@cdc/core/components/DataTransform';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
@@ -35,8 +36,8 @@ import SparkLine from './components/SparkLine';
 import './scss/main.scss';
 
 export default function CdcChart(
-  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname} :
-  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname? }
+  { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname,link} :
+  { configUrl?: string, config?: any, isEditor?: boolean, isDashboard?: boolean, setConfig?, setEditing?, hostname?,link?:any }
 ) {
 
   const transform = new DataTransform();
@@ -253,20 +254,7 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
-    // Check for duplicate x axis values in data
-    if(!currentData) currentData = newExcludedData;
-
-    let uniqueXValues = {};
-
-    if(newConfig.visualizationType !== 'Paired Bar') {
-      for(let i = 0; i < currentData.length; i++) {
-        if(uniqueXValues[currentData[i][newConfig.xAxis.dataKey]]){
-          newConfig.runtime.editorErrorMessage = 'Duplicate keys in data. Try adding a filter.';
-        } else {
-          uniqueXValues[currentData[i][newConfig.xAxis.dataKey]] = true;
-        }
-      }
-    }
+    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -280,6 +268,7 @@ export default function CdcChart(
           add = false;
         }
       });
+
       if(add) filteredData.push(row);
     });
     return filteredData;
@@ -505,11 +494,10 @@ export default function CdcChart(
 
   // Format numeric data based on settings in config
   const formatNumber = (num) => {
-    if(num === undefined || num ===null) return "";
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
     // if num is NaN return num
-    if(isNaN(num)) return num ;
+    if(isNaN(num)|| !num) return num ;
 
     let original = num;
     let prefix = config.dataFormat.prefix;
@@ -521,8 +509,8 @@ export default function CdcChart(
     };
 
     num = numberFromString(num);
-
-    if(isNaN(num)) {
+    
+    if (isNaN(num)) {
       config.runtime.editorErrorMessage = `Unable to parse number from data ${original}. Try reviewing your data and selections in the Data Series section.`;
       return original
     }
@@ -531,8 +519,7 @@ export default function CdcChart(
     if (config.dataCutoff){
       let cutoff = numberFromString(config.dataCutoff)
 
-      if(num < cutoff) {
-        prefix = '< ' + (prefix || '');
+      if(num < cutoff) { 
         num = cutoff;
       }
     }
@@ -581,7 +568,8 @@ export default function CdcChart(
 
     return (
       <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
-        {legend.label && <h2>{legend.label}</h2>}
+        {legend.label && <h2>{parse(legend.label)}</h2>}
+        {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal
         scale={colorScale}
         itemDirection="row"
@@ -758,18 +746,38 @@ export default function CdcChart(
     body = (
       <>
         {isEditor && <EditorPanel />}
-        {!missingRequiredSections() && !config.newViz && <div className={`cdc-chart-inner-container`}>
-          <>
+        {!missingRequiredSections() && !config.newViz && (
+          <div className="cdc-chart-inner-container">
             {/* Title */}
-            {title && <div role="heading" className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>{parse(title)}</div>}
-            <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
+        
+            {title && (
+              <div
+                role="heading"
+                className={`chart-title ${config.theme} cove-component__header`}
+                aria-level={2}
+              >
+                {config && (
+                  <sup className="superTitle">{parse(config.superTitle || '')}</sup>
+                )}
+                <div>{parse(title)}</div>
+              </div>
+            )}
+            <a
+              id="skip-chart-container"
+              className="cdcdataviz-sr-only-focusable"
+              href={handleChartTabbing}
+            >
               Skip Over Chart Container
             </a>
             {/* Filters */}
-            { (config.filters && !externalFilters ) && <Filters />}
+            {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
-              
+            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
+            <div
+              className={`chart-container${
+                config.legend.hide ? " legend-hidden" : ""
+              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+            >
               {/* All charts except sparkline */}
               {config.visualizationType !== "Spark Line" && 
                 chartComponents[visualizationType]
@@ -791,20 +799,22 @@ export default function CdcChart(
                 </>
               )
               }
-
               {/* Legend */}
-              {(!config.legend.hide && config.visualizationType !== "Spark Line") && <Legend />}
-
+            
+              {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
-          </>
-          {/* Description */}
-          { (description && config.visualizationType !== "Spark Line") && <div className="subtext">{parse(description)}</div>}
-          {/* Data Table */}
-          { (config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line") && <DataTable />}
-        </div>
-        }
+                 {/* Link */}
+            {link && link}
+            {/* Description */}
+            {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
+            {/* Data Table */}
+
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== "Spark Line" && <DataTable />}
+            {config?.footnotes && <section className="footnotes">{parse(config.footnotes)}</section>}
+          </div>
+        )}
       </>
-    )
+    );
   }
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];

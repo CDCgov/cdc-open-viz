@@ -10,21 +10,21 @@ import ReactTooltip from 'react-tooltip';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDebounce } from 'use-debounce';
 
+import colorPalettes from '@cdc/core/data/colorPalettes';
+import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
-import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../../../core/data/colorPalettes';
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg';
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg';
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
-import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -107,7 +107,6 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-
 	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
 
 	const headerColors = [
@@ -183,6 +182,7 @@ const EditorPanel = (props) => {
 	};
 
 	const handleEditorChanges = async (property, value) => {
+		
 		switch (property) {
 
 			// change these to be more generic.
@@ -232,8 +232,14 @@ const EditorPanel = (props) => {
 					...state,
 					general: {
 						...state.general,
-						[property]: value
+						allowMapZoom: value
 					}
+				})
+				break;
+			case 'hideGeoColumnInTooltip':
+				setState({
+					...state,
+					[property]: value
 				})
 				break;
 			case 'hidePrimaryColumnInTooltip':
@@ -345,7 +351,7 @@ const EditorPanel = (props) => {
 				break;
 			case 'legendType':
 
-				let testForType = typeof state.data[0][state.columns.primary.name];
+				let testForType = Number(typeof state.data[0][state.columns.primary.name]);
 				let hasValue = state.data[0][state.columns.primary.name];
 				let messages = [];
 
@@ -353,8 +359,10 @@ const EditorPanel = (props) => {
 					messages.push(`There appears to be values missing for data in the primary column ${state.columns.primary.name}`);
 				}
 
-				if (testForType === 'string' && value !== 'category') {
-					messages.push( 'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.' );
+				if (testForType === 'string' && isNaN(testForType) && value !== 'category')  {
+					messages.push(
+            "Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical."
+          );
 				} else {
 					messages = []
 				}
@@ -502,6 +510,20 @@ const EditorPanel = (props) => {
 							general: {
 								...state.general,
 								geoType: 'us',
+							},
+							dataTable: {
+								...state.dataTable,
+								forceDisplay: true,
+							},
+						});
+						ReactTooltip.rebuild();
+						break;
+					case 'us-region':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								geoType: 'us-region',
 							},
 							dataTable: {
 								...state.dataTable,
@@ -1266,6 +1288,16 @@ const EditorPanel = (props) => {
 												<UsaGraphic />
 												<span>United States</span>
 											</button>
+                      <button
+                        className={state.general.geoType === 'us-region' ? 'active' : ''}
+                        onClick={ (e) => {
+                          e.preventDefault();
+                          handleEditorChanges('geoType', 'us-region')
+                        }}
+                      >
+                        <UsaRegionGraphic />
+                        <span>U.S. Region</span>
+                      </button>
 											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
 												onClick={ (e) => {
@@ -1293,13 +1325,8 @@ const EditorPanel = (props) => {
 									{(state.general.geoType === 'us' || state.general.geoType === 'us-county') && (
 										<label>
 											<span className='edit-label column-heading'>
-												Map Type
-												<Tooltip style={{textTransform: 'none'}}>
-												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-												<Tooltip.Content>
-													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
-												</Tooltip.Content>
-												</Tooltip>
+												Geography Subtype
+												
 											</span>
 											<select
 												value={state.general.geoType}
@@ -1333,7 +1360,15 @@ const EditorPanel = (props) => {
 									)}
 									{/* Type */}
 									<label>
-										<span className='edit-label column-heading'>Map Type</span>
+										<span className='edit-label column-heading'>
+											Map Type
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+													<p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
+												</Tooltip.Content>
+												</Tooltip>
+										</span>
 										<select
 											value={state.general.type}
 											onChange={(event) => {
@@ -1345,84 +1380,6 @@ const EditorPanel = (props) => {
 											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
-									{/* SubType */}
-									{'us' === state.general.geoType && 'data' === state.general.type && (
-										<label className='checkbox mt-4'>
-											<input
-												type='checkbox'
-												checked={state.general.displayAsHex}
-												onChange={(event) => {
-													handleEditorChanges('displayAsHex', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Display As Hex Map</span>
-										</label>
-									)}
-									{'us' === state.general.geoType &&
-										'data' === state.general.type &&
-										false === state.general.displayAsHex && (
-											<label className='checkbox'>
-												<input
-													type='checkbox'
-													checked={state.general.displayStateLabels}
-													onChange={(event) => {
-														handleEditorChanges('displayStateLabels', event.target.checked);
-													}}
-												/>
-												<span className='edit-label'>Display state labels</span>
-											</label>
-										)}
-								</AccordionItemPanel>
-							</AccordionItem>
-							<AccordionItem>
-								{' '}
-								{/* General */}
-								<AccordionItemHeading>
-									<AccordionItemButton>General</AccordionItemButton>
-								</AccordionItemHeading>
-								<AccordionItemPanel>
-									<TextField
-										value={state.general.title}
-										updateField={updateField}
-										section='general'
-										fieldName='title'
-										label='Title'
-										placeholder='Map Title'
-										tooltip={
-										<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-											<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
-											</Tooltip.Content>
-										</Tooltip>
-										}
-									/>
-									<TextField
-										type='textarea'
-										value={general.subtext}
-										updateField={updateField}
-										section='general'
-										fieldName='subtext'
-										label='Subtext'
-										tooltip={
-											<Tooltip style={{textTransform: 'none'}}>
-											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-											<Tooltip.Content>
-												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
-											</Tooltip.Content>
-											</Tooltip>
-										}
-									/>
-									{'us' === state.general.geoType && (
-										<TextField
-											value={general.territoriesLabel}
-											updateField={updateField}
-											section='general'
-											fieldName='territoriesLabel'
-											label='Territories Label'
-											placeholder='Territories'
-										/>
-									)}
 									<label>
                      <span className="edit-label">Data Classification Type</span>
                      <div>
@@ -1458,6 +1415,131 @@ const EditorPanel = (props) => {
                        </label>
                      </div>
                    </label>
+									{/* SubType */}
+									{'us' === state.general.geoType && 'data' === state.general.type && (
+										<label className='checkbox mt-4'>
+											<input
+												type='checkbox'
+												checked={state.general.displayAsHex}
+												onChange={(event) => {
+													handleEditorChanges('displayAsHex', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Display As Hex Map</span>
+										</label>
+									)}
+									{'us' === state.general.geoType &&
+										'bubble' !== state.general.type &&
+										false === state.general.displayAsHex && (
+											<label className='checkbox'>
+												<input
+													type='checkbox'
+													checked={state.general.displayStateLabels}
+													onChange={(event) => {
+														handleEditorChanges('displayStateLabels', event.target.checked);
+													}}
+												/>
+												<span className='edit-label'>Display state labels</span>
+											</label>
+										)}
+								</AccordionItemPanel>
+							</AccordionItem>
+							<AccordionItem>
+								{' '}
+								{/* General */}
+								<AccordionItemHeading>
+									<AccordionItemButton>General</AccordionItemButton>
+								</AccordionItemHeading>
+								<AccordionItemPanel>
+									<TextField
+										value={general.title}
+										updateField={updateField}
+										section='general'
+										fieldName='title'
+										label='Title'
+										placeholder='Map Title'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										value={general.superTitle || ''}
+										updateField={updateField}
+										section='general'
+										fieldName='superTitle'
+										label='Super Title'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Super Title</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.introText}
+										updateField={updateField}
+										section='general'
+										fieldName='introText'
+										label='Intro Text'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Intro Text</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.subtext}
+										updateField={updateField}
+										section='general'
+										fieldName='subtext'
+										label='Subtext'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									<TextField
+										type='textarea'
+										value={general.footnotes}
+										updateField={updateField}
+										section='general'
+										fieldName='footnotes'
+										label='Footnotes'
+										tooltip={
+											<Tooltip style={{textTransform: 'none'}}>
+												<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+												<Tooltip.Content>
+												<p>Footnotes</p>
+												</Tooltip.Content>
+											</Tooltip>
+										}
+									/>
+									{'us' === state.general.geoType && (
+										<TextField
+											value={general.territoriesLabel}
+											updateField={updateField}
+											section='general'
+											fieldName='territoriesLabel'
+											label='Territories Label'
+											placeholder='Territories'
+										/>
+									)}
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1558,6 +1640,7 @@ const EditorPanel = (props) => {
                               fieldName='roundToPlace'
                               label='Round'
                               updateField={updateField}
+							  min={0}
                             />
                           </li>
                           <li>
@@ -1862,12 +1945,49 @@ const EditorPanel = (props) => {
 													handleEditorChanges('legendType', event.target.value);
 												}}
 											>
-												<option value='equalnumber'>Equal Number</option>
+												<option value='equalnumber'>Equal Number (Quantiles)</option>
 												<option value='equalinterval'>Equal Interval</option>
-												<option value='category'>Categorical</option>
 											</select>
 											</label>
 											)}
+									{'navigation' !== state.general.type && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.general.showSidebar || false}
+												onChange={(event) => {
+													handleEditorChanges('showSidebar', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Show Legend</span>
+										</label>
+									)}
+									{'navigation' !== state.general.type && (
+										<label>
+											<span className='edit-label'>Legend Position</span>
+											<select
+												value={legend.position || false}
+												onChange={(event) => {
+													handleEditorChanges('sidebarPosition', event.target.value);
+												}}
+											>
+												<option value='side'>Side</option>
+												<option value='bottom'>Bottom</option>
+											</select>
+										</label>
+									)}
+									{'side' === legend.position && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleColumn}
+												onChange={(event) => {
+													handleEditorChanges('singleColumnLegend', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Single Column Legend</span>
+										</label>
+									)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
@@ -1890,6 +2010,7 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
+										
 										{state.legend.type === 'equalnumber' &&
 											<label className="checkbox mt-4">
 												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
@@ -2050,7 +2171,7 @@ const EditorPanel = (props) => {
 												</span>
 											</label>
 										)}
-										{filtersJSX.length > 0 || state.general.type === 'bubble' && (
+										{(filtersJSX.length > 0 || state.general.type === 'bubble' || state.general.geoType === 'us')  && (
 											<label className='checkbox'>
 												<input
 													type='checkbox'
@@ -2323,45 +2444,6 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
 									</label>
-
-									{'navigation' !== state.general.type && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.showSidebar || false}
-												onChange={(event) => {
-													handleEditorChanges('showSidebar', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Show Legend</span>
-										</label>
-									)}
-									{'navigation' !== state.general.type && (
-										<label>
-											<span className='edit-label'>Legend Position</span>
-											<select
-												value={legend.position || false}
-												onChange={(event) => {
-													handleEditorChanges('sidebarPosition', event.target.value);
-												}}
-											>
-												<option value='side'>Side</option>
-												<option value='bottom'>Bottom</option>
-											</select>
-										</label>
-									)}
-									{'side' === legend.position && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={legend.singleColumn}
-												onChange={(event) => {
-													handleEditorChanges('singleColumnLegend', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Single Column Legend</span>
-										</label>
-									)}
 									{'navigation' === state.general.type && (
 										<label className='checkbox'>
 											<input
@@ -2439,6 +2521,10 @@ const EditorPanel = (props) => {
 													backgroundColor: colorPalettes[palette][6],
 												};
 
+												// hide palettes with too few colors for region maps
+												if ( colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region' ) {
+													return('');
+												}
 												return (
 													<li
 														title={palette}
@@ -2455,7 +2541,7 @@ const EditorPanel = (props) => {
 												);
 											})}
 									</ul>
-									<TextField
+									{(state.general.type === 'bubble') && <><TextField
 										type='number'
 										value={state.visual.minBubbleSize}
 										section='visual'
@@ -2470,8 +2556,8 @@ const EditorPanel = (props) => {
 										fieldName='maxBubbleSize'
 										label='Maximum Bubble Size'
 										updateField={updateField}
-									/>
-									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
+									/></>}
+									{ (state.general.geoType === 'world' || state.general.geoType === 'us' && state.general.type === 'bubble') &&
 										<label className='checkbox'>
 											<input
 												type='checkbox'

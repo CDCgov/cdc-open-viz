@@ -9,7 +9,6 @@ import ResizeObserver from 'resize-observer-polyfill';
 // Third party
 import ReactTooltip from 'react-tooltip';
 import chroma from 'chroma-js';
-import Papa from 'papaparse';
 import parse from 'html-react-parser';
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas';
@@ -36,15 +35,16 @@ import './scss/main.scss';
 import './scss/btn.scss'
 
 // Images
+// TODO: Move to Icon component
 import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading';
-import DataTransform from '@cdc/core/components/DataTransform';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
+import numberFromString from '@cdc/core/helpers/numberFromString';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
 
 // Child Components
@@ -113,8 +113,8 @@ const getUniqueValues = (data, columnName) => {
     return Object.keys(result)
 }
 
-const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, hostname}) => {
-     
+const CdcMap = ({className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = "localhost:8080",link}) => {
+
     const [showLoadingMessage, setShowLoadingMessage] = useState(false)
     const transform = new DataTransform()
     const [state, setState] = useState( {...initialState} )
@@ -186,7 +186,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
             let newViewport = getViewport(entry.contentRect.width)
-            
+
             setCurrentViewport(newViewport)
         }
     });
@@ -307,7 +307,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
             // Handle Region Maps need for a 10th color
-            if( general.geoType === 'us-region' && mapColorPalette.length < 10 ) {
+            if( general.geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8 ) {
                 if(!general.palette.isReversed) {
                     mapColorPalette.push( chroma(mapColorPalette[8]).darken(0.75).hex() )
                 } else {
@@ -360,8 +360,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                             }
 
                             let specialColor = '';
-                            
-                            // color the state if val is in row 
+
+                            // color the state if val is in row
                             specialColor = result.findIndex(p => p.value === val)
 
                             newLegendMemo.set( hashObj(row), specialColor)
@@ -391,10 +391,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
                             specialClasses += 1;
                         }
-                    
+
                         let specialColor = '';
-                        
-                        // color the state if val is in row 
+
+                        // color the state if val is in row
                         if ( Object.values(row).includes(val) ) {
                             specialColor = result.findIndex(p => p.value === val)
                         }
@@ -477,7 +477,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         let legendNumber = Math.min(number, Object.keys(uniqueValues).length);
 
         // Separate zero
-        if(true === obj.legend.separateZero) {
+        if(true === obj.legend.separateZero && !state.general.equalNumberOptIn) {
             let addLegendItem = false;
 
             for(let i = 0; i < dataSet.length; i++) {
@@ -560,74 +560,101 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 // get nums
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
-                console.log('hasZeroInData', hasZeroInData)
-                if(hasZeroInData && state.legend.separateZero) { domainNums.add(0) }
 
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
-                let colorRange = colors.slice(0, state.legend.separateZero ? state.legend.numberOfItems - 1 : state.legend.numberOfItems)
+
+                let colorRange = colors.slice(0, state.legend.numberOfItems )
+
                 let scale = d3.scaleQuantile()
-                    .domain(dataSet.map(item => Math.round(item[state.columns.primary.name]))) // min/max values
-                    //.domain(domainNums)
+                    .domain([... new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
                     .range(colorRange) // set range to our colors array
 
                 let breaks = scale.quantiles();
+
                 breaks = breaks.map( item => Math.round(item))
+                
+                // always start with zero for new quantile
+                // we can't start at the first break, because there will be items missing.
+                // if(d3.extent(domainNums)?.[0] !== 0 && Math.min.apply(null, domainNums) !== 0) {
+                //     console.log(`Adding: ${d3.extent(domainNums)?.[0]}`)
+                //     breaks.unshift(d3.extent(domainNums)?.[0])
+                // }
 
-                console.log('breaks', breaks)
-                console.log('d', domainNums)
 
-                
-                // always start with domain beginning breakpoint
-                breaks.unshift(d3.extent(domainNums)?.[0])
-                
-                if (state.legend.separateZero && !hasZeroInData) {
-                    breaks.splice(1, 0, 1);
-                } 
-                
+                // if seperating zero force it into breaks
+                if(breaks[0] !== 0) {
+                    breaks.unshift(0)
+                }
+
                 breaks.map( (item, index) => {
 
-                    let min = breaks[index];
-                    let max = breaks[index + 1] - 1;
+                    const setMin = (index) => {
 
-                    const setMin = () => {
-                        // in starting position and zero in the data
-                        if(index === 0 && state.legend.separateZero) {
+                        //debugger;
+                        let min = breaks[index];
+
+                        // if first break is a seperated zero, min is zero
+                        if( index === 0 && state.legend.separateZero) {
                             min = 0;
                         }
 
-                        if(index === 0 && !state.legend.separateZero) {
-                            min = domainNums[0]
+                        // if we're on the second break, and seperating out zero, increment min to 1.
+                        if( index === 1 && state.legend.separateZero) {
+                            min = 1
                         }
+
+                        // // in starting position and zero in the data
+                        // if((index === state.legend.specialClasses?.length ) && (state.legend.specialClasses.length !== 0)) {
+                        //     min = breaks[index]
+                        // }
+                        return min;
 
                     } 
 
-                    const setMax = () => {
+                    const setMax = (index, min) => {
+
+                        let max = breaks[index + 1] - 1;
+
+                        // check if min and max range are the same
+                        // if (min === max + 1) {
+                        //     max = breaks[index + 1]
+                        // }
+
                         if(index === 0 && state.legend.separateZero) {
                             max = 0;
                         }
+                        // if ((index === state.legend.specialClasses.length && state.legend.specialClasses.length !== 0) && !state.legend.separateZero && hasZeroInData) {
+                        //     max = 0;
+                        // }
 
                         if(index + 1 === breaks.length) {
                             max = domainNums[1]
                         }
+
+                        return max;
                     }
 
-                    setMin()
-                    setMax()
-                    console.log('res', result)
+                    let min = setMin(index)
+                    let max = setMax(index, min)
 
-                    if(index === 0 && result[index]?.max === 0 && state.legend.separateZero) return true;
                     result.push({
                         min,
                         max,
                         color: scale(item)
                     })
-                    
+
                     
                     dataSet.forEach( (row, dataIndex) => {
                         let number = row[state.columns.primary.name]
+
+                        let updated = 0
                         
-                        let updated = state.legend.separateZero ? index : index;
+                        // check if we're seperating zero out
+                        updated = state.legend.separateZero && hasZeroInData ? index : index;
+
+                        // check for special classes
+                        updated = state.legend.specialClasses ? updated + state.legend.specialClasses.length : index;
 
                         if (result[updated]?.min === (null || undefined) || result[updated]?.max === (null || undefined)) return;
 
@@ -756,7 +783,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 value : hash
             });
         }
-        
+
 
         obj.data.forEach(row => {
 
@@ -782,7 +809,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // If this is a navigation only map, skip if it doesn't have a URL
             if("navigation" === obj.general.type ) {
                 let navigateUrl = row[obj.columns.navigate.name] || "";
-                
+
                 if ( undefined !== navigateUrl && typeof navigateUrl === "string" ) {
                     // Strip hidden characters before we check length
                     navigateUrl = navigateUrl.replace( /(\r\n|\n|\r)/gm, '' );
@@ -930,7 +957,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             filters[idx].active = activeValue
             const newData = generateRuntimeData(state, filters)
-            
+
             // throw an error if newData is empty
             if (isEmpty(newData)) throw new Error('Cove Filter Error: No runtime data to set for this filter')
 
@@ -942,12 +969,14 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
     }
-
     const displayDataAsText = (value, columnName) => {
-        if(value === null) {
+        if(value === null || value === "" || value === undefined ) {
             return ""
         }
-
+        if(typeof value === 'string' && value.length > 0 && state.legend.type==='equalnumber'){
+            return value
+        }
+ 
         let formattedValue = value
 
         let columnObj = state.columns[columnName]
@@ -955,20 +984,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         if (columnObj) {
             // If value is a number, apply specific formattings
             if (Number(value)) {
+                const decimalPoint = columnObj.roundToPlace ? Number(columnObj.roundToPlace) : 0
+
                 // Rounding
                 if(columnObj.hasOwnProperty('roundToPlace') && columnObj.roundToPlace !== "None") {
-
-                    const decimalPoint = columnObj.roundToPlace
-
                     formattedValue = Number(value).toFixed(decimalPoint)
-
+                    
                 }
 
                 if(columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
-
-                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal'})
-
+                    formattedValue = Number(value).toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: decimalPoint, maximumFractionDigits: decimalPoint })
                 }
+
             }
 
             // Check if it's a special value. If it is not, apply the designated prefix and suffix
@@ -1082,45 +1109,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         setRuntimeLegend(newLegend)
     }
 
-    // Supports JSON or CSV
-    const fetchRemoteData = async (url) => {
-        try {
-            const urlObj = new URL(url);
-            const regex = /(?:\.([^.]+))?$/
-
-            let data = []
-
-            const ext = (regex.exec(urlObj.pathname)[1])
-            if ('csv' === ext) {
-                data = await fetch(url)
-                    .then(response => response.text())
-                    .then(responseText => {
-                        const parsedCsv = Papa.parse(responseText, {
-                            header: true,
-                            dynamicTyping: true,
-                            skipEmptyLines: true
-                        })
-                        return parsedCsv.data
-                    })
-            }
-
-            if ('json' === ext) {
-                data = await fetch(url)
-                    .then(response => response.json())
-            }
-
-            return data;
-        } catch {
-            // If we can't parse it, still attempt to fetch it
-            try {
-                let response = await (await fetch(configUrl)).json()
-                return response
-            } catch {
-                console.error(`Cannot parse URL: ${url}`);
-            }
-        }
-    }
-
     const formatLegendLocation = (key) => {
         let value = key;
         var formattedName = '';
@@ -1159,7 +1147,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         const dict = {
-            "District of Columbia" : "Washington D.C.",
+            "Washington D.C." : "District of Columbia",
+            "WASHINGTON DC":"District of Columbia",
+            "DC":"District of Columbia",
+            "WASHINGTON DC.":"District of Columbia",
             "Congo": "Republic of the Congo"
         }
 
@@ -1188,6 +1179,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     }
 
     const geoClickHandler = (key, value) => {
+        if(setSharedFilter){
+            setSharedFilter(state.uid, value);
+        }
+
         // If modals are set or we are on a mobile viewport, display modal
         if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
             setModal({
@@ -1272,10 +1267,13 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {
             if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'https://' + hostname + newState.dataUrl + '?v=' + cacheBustingString
+                newState.dataUrl = 'http://' + hostname + newState.dataUrl
             }
 
-            let newData = await fetchRemoteData(newState.dataUrl + '?v=' + cacheBustingString )
+            // handle urls with spaces in the name.
+            if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString )
+
+            let newData = await fetchRemoteData(newState.dataUrl )
 
             if(newData && newState.dataDescription) {
                 newData = transform.autoStandardize(newData);
@@ -1421,8 +1419,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         // Data
         let newRuntimeData;
         if(hashData !== runtimeData.fromHash && state.data?.fromColumn) {
-            const data = generateRuntimeData(state, filters || runtimeFilters, hashData)
-            setRuntimeData(data)
+            const newRuntimeData = generateRuntimeData(state, filters || runtimeFilters, hashData)
+            setRuntimeData(newRuntimeData)
         }
 
         // Legend
@@ -1430,7 +1428,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
             setRuntimeLegend(legend)
         }
-        
+
     }, [state])
 
     useEffect(() => {
@@ -1445,7 +1443,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             geoType: state.general.geoType,
             data: state.data
         })
-        
+
         // Legend - Update when runtimeData does
         if(hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
             const legend = generateRuntimeLegend(state, runtimeData)
@@ -1462,8 +1460,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
     // Destructuring for more readable JSX
     const { general, tooltips, dataTable } = state
-    const { title = '', subtext = ''} = general
-
+    const { title = '', subtext = '' } = general
+    
     // Outer container classes
     let outerContainerClasses = [
         'cdc-open-viz-module',
@@ -1480,7 +1478,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         'map-container',
         state.legend.position,
         state.general.type,
-        state.general.geoType
+        state.general.geoType,
+        'outline-none'
     ]
 
     if(modal) {
@@ -1512,14 +1511,40 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         filteredCountryCode,
         position,
         setPosition,
+        setSharedFilterValue,
         hasZoom : state.general.allowMapZoom,
         handleMapAriaLabels
     }
 
     if (!mapProps.data || !state.data) return <Loading />;
 
-    const handleMapTabbing = general.showSidebar ? `#legend` : state.general.title ? `#dataTableSection__${state.general.title.replace(/\s/g, '')}` : `#dataTableSection`
-    
+    const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading;
+
+    const handleMapTabbing = () => {
+        let tabbingID;
+
+        // 1) skip to legend
+        if (general.showSidebar) {
+            tabbingID = '#legend'
+        }
+        
+        // 2) skip to data table if it exists and not a navigation map
+        if (hasDataTable && !general.showSidebar) {
+            tabbingID = `#dataTableSection__${Date.now()}`;
+        }
+        
+        // 3) if its a navigation map skip to the dropdown.
+        if (state.general.type === 'navigation') {
+            tabbingID = `#dropdown-${Date.now()}`;
+        }
+
+        // 4) handle other options
+        return tabbingID || '#!';
+
+    }
+
+    const tabId = handleMapTabbing()
+
     return (
 		<div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
 			{isEditor && (
@@ -1544,12 +1569,20 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						html={true}
 						className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
 					/>
-				)}
-                <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false } )}>
-					<div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-						{parse(title)}
-					</div>
-				</header>
+                )}
+                {state.general.title &&
+                    <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { "aria-hidden": true } : { "aria-hidden": false })}>
+                        <div role='heading' className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
+                            <sup>{general.superTitle}</sup>
+                            <div>{parse(title)}</div>
+                        </div>
+                    </header>
+                }
+                
+                <div>
+                    {general.introText && <section className="introText">{parse(general.introText)}</section>}
+                </div>
+                
 				<section 
                     role="button"
                     tabIndex="0"
@@ -1578,10 +1611,11 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						</div>
 					)}
 
-                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={handleMapTabbing}>
+                    <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
-					<section className='geography-container' ref={mapSvg} tabIndex="0">
+                    
+					<section className='geography-container outline-none' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
                                 {modal && (
@@ -1614,10 +1648,10 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                                 )}
                                 {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                             </section>
-                        
+
                         )}
                         </section>
-
+                   
 					{general.showSidebar && 'navigation' !== general.type && (
 						<Sidebar
 							viewport={currentViewport}
@@ -1633,18 +1667,24 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 							resetLegendToggles={resetLegendToggles}
 							changeFilterActive={changeFilterActive}
 							setAccessibleStatus={setAccessibleStatus}
+                            displayDataAsText={displayDataAsText}
 						/>
 					)}
 				</section>
 				{'navigation' === general.type && (
-					<NavigationMenu
+                    <NavigationMenu
+                        mapTabbingID={tabId}
 						displayGeoName={displayGeoName}
 						data={runtimeData}
 						options={general}
 						columns={state.columns}
 						navigationHandler={(val) => navigationHandler(val)}
 					/>
-				)}
+                )}
+                {link && link}
+
+                {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+                
 				{state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
 					<DataTable
 						state={state}
@@ -1660,15 +1700,18 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 						displayGeoName={displayGeoName}
 						applyLegendToRow={applyLegendToRow}
 						tableTitle={dataTable.title}
-						indexTitle={dataTable.indexTitle}
+						indexTitle={dataTable.indexLabel}
 						mapTitle={general.title}
 						viewport={currentViewport}
                         formatLegendLocation={formatLegendLocation}
                         setFilteredCountryCode={setFilteredCountryCode}
+                        tabbingId={tabId}
 					/>
-				)}
-				{subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-			</section>}
+                )}
+                
+                {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
+            </section>}
+            
 			<div aria-live='assertive' className='cdcdataviz-sr-only'>
 				{accessibleStatus}
 			</div>

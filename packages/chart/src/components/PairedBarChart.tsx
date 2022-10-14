@@ -15,7 +15,7 @@ interface PairedBarChartProps {
 
 const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 
-	const { config, colorScale, transformedData } = useContext<any>(Context);
+	const { config, colorScale, transformedData, formatNumber, seriesHighlight } = useContext<any>(Context);
 
 	if(!config || config?.series?.length < 2) return;
 
@@ -49,7 +49,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 	const yScale = scaleBand({
 		range: [0, adjustedHeight],
 		domain: data.map(d => d[config.dataDescription.xKey]),
-		padding: 0.2
 	});
 
 	// Set label color
@@ -63,78 +62,173 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 		groupTwo.labelColor = '#FFFFFF';
 	}
 
+	const dataTipOne = (d) => {
+		return (
+			`<p>
+				${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
+				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
+				${config.dataDescription.valueKey}: ${formatNumber(d[groupOne.dataKey])} 
+			</p>`
+		)
+	}
+
+	const dataTipTwo = (d) => {
+		return (
+			`<p>
+				${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
+				${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
+				${config.dataDescription.valueKey}: ${formatNumber(d[groupTwo.dataKey])}
+			</p>`
+		)
+	}
+
+	const isLabelBelowBar = config.yAxis.labelPlacement === "Below Bar";
+	const isLabelOnYAxis = config.yAxis.labelPlacement === "On Date/Category Axis";
+	const isLabelMissing = !config.yAxis.labelPlacement;
+
 	return (width > 0) && (
 		<>
+			<style>
+				{`
+				#cdc-visualization__paired-bar-chart,
+				 #cdc-visualization__paired-bar-chart > .visx-group {
+					transform-origin: center
+				}
+				`}
+			</style>
 			<svg
-				role="img"
 				id="cdc-visualization__paired-bar-chart"
 				width={width}
 				height={height}
+				viewBox={`0 0 ${width} ${height}`}
+				role="img"
 				tabIndex={0}
-				>
-				<Group top={0} left={config.xAxis.size}>
-					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map(d => {
+			>
+				<Group top={0} left={config.xAxis.size} >
+					{data.filter(item => config.series[0].dataKey === groupOne.dataKey).map( (d,index) => {
+
+						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[0].dataKey) === -1;
+						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[0].dataKey) !== -1;
 						let barWidth = (xScale(d[config.series[0].dataKey]))
+                    	let barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25;
+                    	let barPadding = barHeight;
+                    	config.barHeight = Number(config.barHeight) ? Number(config.barHeight) : 25;
+						config.barPadding = config.barHeight;
+                    
+						if (config.orientation=== "horizontal") {
+	
+							if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+								if(barHeight < 40) {
+								config.barPadding = 40;
+								} else {
+								config.barPadding = barPadding;
+								}
+							} else {
+								config.barPadding = barPadding / 2;
+							}
+						}
+
+                    	config.height = (Number(barHeight) ) * data.length + (config.barPadding * data.length);
+
+						let y =  yScale([d[config.dataDescription.xKey]]) + config.barHeight/1.5;
+						y = Number(config.barPadding) > 20 ? y += Number(config.barPadding/3.5) - config.barHeight/2 : y += 0
+
 						return (
-						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`}>
+						<>
+						<Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
 							<Bar
-								className="bar"
+								id={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
+								className='bar group-1'
 								key={`bar-${groupOne.dataKey}-${d[config.dataDescription.xKey]}`}
 								x={halfWidth - barWidth}
-								y={yScale([d[config.dataDescription.xKey]])}
+								y={ y }
 								width={xScale(d[config.series[0].dataKey])}
-								height={yScale.bandwidth()}
+								height={barHeight}
 								fill={groupOne.color}
-								data-tip={
-									`<p>
-										${config.dataDescription.seriesKey}: ${groupOne.dataKey}<br/>
-										${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-										${config.dataDescription.valueKey}: ${d[groupOne.dataKey]}
-									</p>`
-								}
+								data-tip={ dataTipOne(d) }
 								data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+								stroke="#333"
+								strokeWidth={config.barBorderThickness || 1}
+								opacity={transparentBar ? 0.5 : 1}
+								display={displayBar ? 'block' : 'none'}
 							/>
-							<Text
-								textAnchor={barWidth < 100 ? 'end' : 'start' }
-								x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
-								y={yScale([d[config.dataDescription.xKey]]) + yScale.bandwidth() / 1.5}
-								fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
-								{d[config.dataDescription.xKey]}
-							</Text>
+							{config.yAxis.displayNumbersOnBar && displayBar &&
+								<Text
+									textAnchor={barWidth < 100 ? 'end' : 'start' }
+									verticalAnchor="middle"
+									x={halfWidth - (barWidth < 100 ? barWidth + 10 : barWidth - 5)}
+									y={ y + config.barHeight/2}
+									fill={barWidth > 100 ? groupOne.labelColor : '#000' }>
+									{formatNumber(d[groupOne.dataKey])}
+								</Text>
+							}
 						</Group>
+						</>
 					)}
 					)}
 					{data.filter(item => config.series[1].dataKey === groupTwo.dataKey).map(d => {
 						let barWidth = (xScale(d[config.series[1].dataKey]))
+						let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(config.series[1].dataKey) === -1;
+						let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(config.series[1].dataKey) !== -1;
+						
+                    	let barHeight = config.barHeight ? config.barHeight : 25;
+                    	let barPadding = barHeight;
+                    	config.barHeight = Number(config.barHeight)
+
+						let y =  yScale([d[config.dataDescription.xKey]]) + config.barHeight/1.5;
+						y = Number(config.barPadding) > 20 ? y += Number(config.barPadding/3.5) - config.barHeight/2 : y += 0
+                    
+						if (config.orientation=== "horizontal") {
+	
+							if(isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
+								if(barHeight < 40) {
+								config.barPadding = 40;
+								} else {
+								config.barPadding = barPadding;
+								}
+							} else {
+								config.barPadding = barPadding / 2;
+							}
+						}
 
 						return(
-							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}>
+							<>
+							<style>
+								{`
+								.bar-${groupTwo.dataKey}-${d[config.xAxis.dataKey]} {
+						  			transform-origin: ${halfWidth}px ${y}px
+								}
+							`}
+							</style>
+							<Group key={`group-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`} className='horizontal'>
 								<Bar
-									className="bar"
+									id={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
+									className="bar group-2"
 									key={`bar-${groupTwo.dataKey}-${d[config.dataDescription.xKey]}`}
 									x={halfWidth}
-									y={yScale([d[config.dataDescription.xKey]])}
+									y={ y }
 									width={xScale(d[config.series[1].dataKey])}
-									height={yScale.bandwidth()}
+									height={barHeight}
 									fill={groupTwo.color}
-									data-tip={
-										`<p>
-											${config.dataDescription.seriesKey}: ${groupTwo.dataKey}<br/>
-											${config.xAxis.dataKey}: ${d[config.xAxis.dataKey]}<br/>
-											${config.dataDescription.valueKey}: ${d[groupTwo.dataKey]}
-										</p>`
-									}
+									data-tip={ dataTipTwo(d) }
 									data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-
+									strokeWidth={config.barBorderThickness || 1}
+									stroke="#333"
+									opacity={transparentBar ? 0.5 : 1}
+									display={displayBar ? 'block' : 'none'}
 								/>
-								<Text
-									textAnchor={barWidth < 100 ? 'start' : 'end' }
-									x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
-									y={yScale([d[config.dataDescription.xKey]]) + (yScale.bandwidth() / 1.5)}
-									fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
-									{d[config.dataDescription.xKey]}
-								</Text>
+								{config.yAxis.displayNumbersOnBar && displayBar &&
+									<Text
+										textAnchor={barWidth < 100 ? 'start' : 'end' }
+										verticalAnchor="middle"
+										x={halfWidth + (barWidth < 100 ? barWidth + 10 : barWidth - 10 )}
+										y={ y + config.barHeight/2}
+										fill={barWidth > 100 ? groupTwo.labelColor : '#000' }>
+										{formatNumber(d[groupTwo.dataKey])}
+									</Text>
+								}
 							</Group>
+							</>
 						)
 					}
 					)}

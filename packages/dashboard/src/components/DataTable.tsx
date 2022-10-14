@@ -15,11 +15,9 @@ import { Base64 } from 'js-base64';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
-import Context from '../context';
+export default function DataTable(props) {
 
-export default function DataTable() {
-
-  const { data, config } = useContext<any>(Context);
+  const { data, datasetKey, config } = props;
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
@@ -46,7 +44,7 @@ export default function DataTable() {
         aria-label="Download this data in a CSV file format."
         className={`btn btn-download no-border`}
       >
-        Download Data (CSV)
+        Download {datasetKey ? `"${datasetKey}"` : 'Data'} (CSV)
       </a>
     )
   });
@@ -60,9 +58,7 @@ export default function DataTable() {
       return [{
           Header : 'No Data Found'
       }];
-    }
-
-    else {
+    } else {
       Object.keys(data[0]).map((key) => {
           const newCol = {
             Header: key,
@@ -125,12 +121,13 @@ export default function DataTable() {
     <ErrorBoundary component="DataTable">
       <section className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
+            role="button"
             className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
             onClick={() => { setTableExpanded(!tableExpanded); }}
             tabIndex={0}
             onKeyDown={(e) => { if (e.keyCode === 13) { setTableExpanded(!tableExpanded); } }}
           >
-            {config.table.label}
+            {config.table.label}{datasetKey ? `: ${datasetKey}` : ''}
           </div>
           <div className="table-container">
             <table  className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  hidden={!tableExpanded} {...getTableProps()}>

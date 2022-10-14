@@ -24,6 +24,7 @@
     "@cdc/data-bite": "^1.1.2",
     "@cdc/waffle-chart": "^1.0.0",
     "@cdc/markup-include": "^1.0.0",
+    "@cdc/filtered-text": "^0.0.1",
     "@cdc/map": "^2.6.2",
     "html-react-parser": "1.4.9",
     "js-base64": "^2.5.2",

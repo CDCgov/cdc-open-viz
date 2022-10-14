@@ -6,6 +6,7 @@ import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie';
 import chroma from "chroma-js";
 import { Group } from '@visx/group';
 import { Text } from '@visx/text';
+import useIntersectionObserver from "./useIntersectionObserver";
 
 import Context from '../context';
 
@@ -23,8 +24,18 @@ export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
+  const [animatedPie, setAnimatePie] = useState<boolean>((!config.animate));
 
-  
+  const triggerRef = useRef();
+  const dataRef = useIntersectionObserver(triggerRef, {
+    freezeOnceVisible: false
+  });
+
+  if( dataRef?.isIntersecting && config.animate && ! animatedPie ) {
+    setTimeout(() => {
+      setAnimatePie(true);
+    }, 500);
+  }
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
@@ -101,12 +112,12 @@ export default function PieChart() {
             props: PieStyles;
             key: string;
             }) => {
-           
+
             const [centroidX, centroidY] = path.centroid(arc);
             const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1;
 
             let textColor = "#FFF";
-            if (chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
+            if (colorScale(arc.data[config.runtime.xAxis.dataKey]) && chroma.contrast(textColor, colorScale(arc.data[config.runtime.xAxis.dataKey])) < 3.5) {
               textColor = "000";
             }
 
@@ -172,7 +183,13 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component="PieChart">
-      <svg width={width} height={height} role="img" aria-label={handleChartAriaLabels(config)}>
+      <svg
+        width={width}
+        height={height}
+        className={`animated-pie group ${animatedPie ? 'animated' : ''}`}
+        role="img"
+        aria-label={handleChartAriaLabels(config)}
+      >
         <Group top={centerY} left={centerX}>
           <Pie
             data={filteredData || data}
@@ -190,6 +207,7 @@ export default function PieChart() {
           </Pie>
         </Group>
       </svg>
+      <div ref={triggerRef} />
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
     </ErrorBoundary>
   )
