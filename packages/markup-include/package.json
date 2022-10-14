@@ -1,6 +1,6 @@
 {
   "name": "@cdc/markup-include",
-  "version": "1.0.0",
+  "version": "9.22.9",
   "description": "React component for displaying HTML content from an outside link",
   "main": "dist/cdcmarkupinclude",
   "scripts": {
@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "dependencies": {
-    "@cdc/core": "^1.1.2",
+    "@cdc/core": "^9.22.9",
     "axios": "^0.26.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
