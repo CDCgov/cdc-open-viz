@@ -34,5 +34,6 @@
   },
   "resolutions": {
     "@types/react": "17.x"
-  }
+  },
+  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
 }
