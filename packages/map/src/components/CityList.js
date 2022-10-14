@@ -56,7 +56,7 @@ const CityList = (({
 
     const cityDisplayName = isGeoCodeMap ? city : titleCase( displayGeoName(city) );
 
-    const legendColors = isGeoCodeMap ? applyLegendToRow(geoData) : applyLegendToRow(data[city]);
+    const legendColors = (isGeoCodeMap && geoData) ? applyLegendToRow(geoData) : data[city] ? applyLegendToRow(data[city]) : false;
 
     if (legendColors === false) {
       return true;
