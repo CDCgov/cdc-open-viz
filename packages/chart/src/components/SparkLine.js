@@ -144,7 +144,7 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 											{formatNumber(d[seriesKey])}
 										</Text>
 
-										{ (dataIndex + 1 !== data.length && (config.lineDatapointStyle === 'always show') || (config.lineDatapointStyle === 'hover') ) &&
+										{ dataIndex + 1 !== data.length && ( (config.lineDatapointStyle === 'always show') || (config.lineDatapointStyle === 'hover') ) &&
 											<circle
 												key={`${seriesKey}-${dataIndex}`}
 												r={circleRadii}
