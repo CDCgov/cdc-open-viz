@@ -1,0 +1,241 @@
+{
+	"type": "chart",
+	"title": "Example Horizontal Bar Chart",
+	"theme": "theme-teal",
+	"fontSize": "small",
+	"lineDatapointStyle": "hover",
+	"barHasBorder": "false",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": 50,
+		"gridLines": false,
+		"type": "chart",
+		"title": "Example Horizontal Bar Chart",
+		"theme": "theme-teal",
+		"fontSize": "small",
+		"lineDatapointStyle": "hover",
+		"barHasBorder": "false",
+		"padding": {
+			"left": 5,
+			"right": 5
+		},
+		"yAxis": {
+			"size": 50,
+			"gridLines": false,
+			"label": "X-Axis Example Label",
+			"numTicks": "10"
+		},
+		"barThickness": "0.7",
+		"height": 560,
+		"xAxis": {
+			"type": "categorical",
+			"size": "0",
+			"tickRotation": 0,
+			"dataKey": "Group",
+			"label": ""
+		},
+		"table": {
+			"label": "Data Table",
+			"expanded": true,
+			"download": false,
+			"show": true
+		},
+		"legend": {
+			"behavior": "isolate",
+			"position": "right",
+			"label": "Type of Data"
+		},
+		"exclusions": {
+			"active": false,
+			"keys": []
+		},
+		"palette": "qualitative-soft",
+		"labels": false,
+		"dataFormat": {},
+		"confidenceKeys": {},
+		"data": [
+			{
+				"Group": "Combined Total of Group A",
+				"Vehicle": "100",
+				"Home": "120",
+				"Work": "140",
+				"Office": "120"
+			},
+			{
+				"Group": "Combined Total of Group B",
+				"Vehicle": "150",
+				"Home": "140",
+				"Work": "100",
+				"Office": "90"
+			},
+			{
+				"Group": "Combined Total of Group C",
+				"Vehicle": "90",
+				"Home": "90",
+				"Work": "80",
+				"Office": "80"
+			},
+			{
+				"Group": "Combined Total of Group D",
+				"Vehicle": "70",
+				"Home": "60",
+				"Work": "50",
+				"Office": "70"
+			}
+		],
+		"visualizationType": "Bar",
+		"visualizationSubType": "horizontal",
+		"series": [
+			{
+				"dataKey": "Vehicle",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "Home",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "Work",
+				"type": "Bar"
+			},
+			{
+				"dataKey": "Office",
+				"type": "Bar"
+			}
+		],
+		"description": "This example shows a horizontal bar chart created in the visualization editor in WCMS",
+		"runtime": {
+			"seriesLabels": {
+				"Vehicle": "Vehicle",
+				"Home": "Home",
+				"Work": "Work",
+				"Office": "Office"
+			},
+			"seriesLabelsAll": [
+				"Vehicle",
+				"Home",
+				"Work",
+				"Office"
+			],
+			"originalXAxis": {
+				"type": "categorical",
+				"size": "0",
+				"tickRotation": 0,
+				"dataKey": "Group",
+				"label": ""
+			},
+			"seriesKeys": [
+				"Vehicle",
+				"Home",
+				"Work",
+				"Office"
+			],
+			"xAxis": {
+				"size": 50,
+				"gridLines": false,
+				"label": "X-Axis Example Label",
+				"numTicks": "10"
+			},
+			"yAxis": {
+				"type": "categorical",
+				"size": "0",
+				"tickRotation": 0,
+				"dataKey": "Group",
+				"label": ""
+			},
+			"horizontal": true,
+			"uniqueId": 1644353484184,
+			"editorErrorMessage": ""
+		},
+		"barPadding": 40,
+		"barHeight": 25,
+		"labelPlacement": "Below Bar",
+		"label": "Accidents"
+	},
+	"barThickness": "0.7",
+	"height": 560,
+	"xAxis": {
+		"type": "categorical",
+		"size": "0",
+		"tickRotation": 0,
+		"dataKey": "Group",
+		"label": ""
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": true,
+		"download": false,
+		"show": true
+	},
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"label": "Location"
+	},
+	"exclusions": {
+		"active": false,
+		"keys": []
+	},
+	"palette": "qualitative-soft",
+	"labels": false,
+	"dataFormat": {},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Group": "Group A Survey Results",
+			"Vehicle": "100",
+			"Home": "120",
+			"Work": "140",
+			"Office": "120"
+		},
+		{
+			"Group": "Group B Survey Results",
+			"Vehicle": "150",
+			"Home": "140",
+			"Work": "100",
+			"Office": "90"
+		},
+		{
+			"Group": "Group C Survey Results",
+			"Vehicle": "90",
+			"Home": "90",
+			"Work": "80",
+			"Office": "80"
+		},
+		{
+			"Group": "Group D Survey Results",
+			"Vehicle": "70",
+			"Home": "60",
+			"Work": "50",
+			"Office": "70"
+		}
+	],
+	"visualizationType": "Bar",
+	"visualizationSubType": "horizontal",
+	"series": [
+		{
+			"dataKey": "Vehicle",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Home",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Work",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Office",
+			"type": "Bar"
+		}
+	],
+	"description": "This example shows a horizontal bar chart created in the visualization editor in WCMS",
+	"barPadding": 40,
+	"barHeight": 25,
+	"dataFileName": "3-CSV_Source_Example_for_Horizontal_Bar_viz - Fixed.csv",
+	"dataFileSourceType": "file"
+}

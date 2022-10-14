@@ -5,7 +5,7 @@ import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
 } from 'react-table';
 import Papa from 'papaparse';
-import ExternalIcon from '../images/external-link.svg';
+import ExternalIcon from '../images/external-link.svg'; // TODO: Move to Icon component
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import LegendCircle from '@cdc/core/components/LegendCircle';
@@ -288,7 +288,7 @@ const DataTable = (props) => {
   if(!state.data) return <Loading />
   return (
     <ErrorBoundary component="DataTable">
-      <section id={state.general.title ? `dataTableSection__${state.general.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
+      <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
         </a>
@@ -298,17 +298,17 @@ const DataTable = (props) => {
         tabIndex="0"
         onKeyDown={(e) => { if (e.keyCode === 13) { setExpanded(!expanded); } }}
       >
- 
+
         {tableTitle}
       </div>
-      <div 
+      <div
         className="table-container"
-        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } } 
+        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } }
       >
         <table
-          height={expanded ? null : 0} {...getTableProps()} 
-          aria-live="assertive" 
-          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
+          height={expanded ? null : 0} {...getTableProps()}
+          aria-live="assertive"
+          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}
           hidden={!expanded}
           aria-rowcount={state?.data.length ? state.data.length : '-1' }
         >
@@ -317,7 +317,7 @@ const DataTable = (props) => {
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th 
+                  <th
                     tabIndex="0"
                     title={column.Header}
                     role="columnheader"

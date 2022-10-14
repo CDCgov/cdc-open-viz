@@ -6,7 +6,7 @@
     .left-col {
         background: #fff;
         padding: $gbl-padding;
-        width: 33.333%;
+        width: 50%;
         border-right: $lightGray 1px solid;
         position: fixed;
         bottom: 0;
@@ -15,12 +15,15 @@
         margin-top: 3rem;
         z-index: 1;
         overflow-y: auto;
+        .dataset-name-input {
+            width: 100%;
+        }
         .heading-3 {
             font-weight: 600;
             margin-bottom: .5em;
-        }
-        .data-question {
-            margin-bottom: .5em;
+            margin-top: 1em;
+            border-top: 1px solid gray;
+            padding-top: .5em;
         }
         .tabs {
             margin-bottom: 2em;
@@ -52,6 +55,28 @@
             .tab-content {
                 padding-top: $gbl-padding;
                 border-top: 1px solid $baseColor;
+            }
+        }
+        table {
+            width: 100%;
+            border: 1px solid gray;
+            thead {
+                background-color: rgb(220, 220, 200);
+                border-bottom: 1px solid gray;
+            }
+            td {
+                text-align: center;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 40px;
+        
+                button {
+                    font-size: 11pt;
+                }
+            }
+            td:last-child {
+                max-width: 10px;
             }
         }
         .cdcdataviz-file-selector {
@@ -92,59 +117,11 @@
             color: $mediumGray;
         }
         .btn {
-            display: inline;
+            display: inline-block;
+            margin: 1em 0;
         }
         .btn.active {
             background: darken($primary, 15%);
-        }
-        .question {
-            margin-bottom: 1em;
-        }
-        .table-button-container {
-            display: flex;
-            justify-content: space-between;
-
-        }
-        .table-button {
-            width: 49%;
-            border: 1px solid $lightGray;
-            border-radius: .3em;
-            background-color: $lightest-gray;
-            padding: .75em;
-            cursor: pointer;
-            strong {
-                font-weight: bold;
-            }
-            &.active {
-                border: 2px solid #005eaa;
-            }
-
-            p {
-                font-size: .8em;
-                margin-bottom: 1em;
-            }
-
-            table + table {
-                margin-top: 1em;
-            }
-
-            table {
-                font-size: .8em;
-                background-color: #fff;
-                border: 1px solid $lightGray;
-                border-collapse: collapse;
-                margin: auto;
-                th {
-                    background-color: $primary;
-                    color: white;
-                    text-align: left;
-                }
-                th, td {
-                    border-top: 1px solid $lightGray;
-                    border-bottom: 1px solid $lightGray;
-                    padding: 0 5px;
-                }
-            }
         }
         .input-group {
             display: flex;
@@ -206,7 +183,7 @@
         position: relative;
         background-color: $lightest-gray;
         padding: $gbl-padding;
-        width: 66.667%;
+        width: 50% !important;
         @import "data-table";
     }
 }

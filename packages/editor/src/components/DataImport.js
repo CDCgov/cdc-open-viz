@@ -1,11 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import { useDebounce } from 'use-debounce'
 import { get } from 'axios'
 
-import { DataTransform } from '@cdc/core/components/DataTransform'
-import Modal from '@cdc/core/components/ui/Modal'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 import GlobalState from '../context'
@@ -22,10 +20,11 @@ import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 
+import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
 import '../scss/data-import.scss'
-import Button from '@cdc/core/components/elements/Button'
-import Icon from '@cdc/core/components/ui/Icon'
+
+import '@cdc/core/styles/v2/components/data-designer.scss'
 
 export default function DataImport() {
   const {
@@ -47,24 +46,35 @@ export default function DataImport() {
 
   const [ externalURL, setExternalURL ] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : (config.dataUrl || ''))
 
-  const [ debouncedExternalURL ] = useDebounce(externalURL, 200)
-
   const [ keepURL, setKeepURL ] = useState(!!config.dataUrl)
+
+  const [ addingDataset, setAddingDataset ] = useState(config.type === 'dashboard' || !config.data);
+
+  const [ editingDataset, setEditingDataset ] = useState();
 
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
   }
 
-  useEffect(() => {
-    if (false !== keepURL) {
-      setConfig({ ...config, dataUrl: debouncedExternalURL || externalURL })
+  const displayFileName = (name) => {
+    const nameParts = name.split('/');
+    return nameParts[nameParts.length - 1];
+  }
+
+  const displaySize = (size) => {
+    if(size === undefined) return '';
+
+    if(size > Math.pow(1024, 3)){
+      return Math.round(size / Math.pow(1024, 3) * 100) / 100 + ' GB';
+    } else if(size > Math.pow(1024, 2)){
+      return Math.round(size / Math.pow(1024, 2) * 100) / 100 + ' MB';
+    } else if(size > 1024){
+      return Math.round(size / 1024 * 100) / 100 + ' KB';
     } else {
-      let newConfig = {...config};
-      delete newConfig.dataUrl;
-      setConfig(newConfig);
+      return size + ' B'
     }
-  }, [ debouncedExternalURL, keepURL ])
+  }
 
   /**
    * Check to see all series for the viz exists in the new dataset
@@ -126,12 +136,12 @@ export default function DataImport() {
     return responseBlob
   }
 
-  const onDrop = ([ uploadedFile ]) => loadData(uploadedFile)
+  const onDrop = ([ uploadedFile ]) => loadData(uploadedFile, editingDataset, editingDataset)
 
   /**
    * Handle loading data
    */
-  const loadData = async (fileBlob = null, fileName) => {
+  const loadData = async (fileBlob = null, fileName, editingDatasetKey) => {
     let fileData = fileBlob
     let fileSource = fileData?.path ?? fileName ?? null
     let fileSourceType = 'file'
@@ -156,8 +166,10 @@ export default function DataImport() {
       }
     }
 
+    let fileSize = fileData.size;
+
     // Check if file is too big
-    if (fileData.size > (maxFileSize * 1048576)) {
+    if (fileSize > (maxFileSize * 1048576)) {
       setErrors([ errorMessages.fileTooLarge ])
       return
     }
@@ -207,13 +219,35 @@ export default function DataImport() {
 
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
-            setConfig({
-              ...config,
-              ...tempConfig,
-              data: text, // new data
-              dataFileName: fileSource, // new file source
-              dataFileSourceType: fileSourceType,// new file source type
-            })
+            if(config.type === 'dashboard'){
+              let newDatasets = {...config.datasets};
+
+              Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
+
+              newDatasets[editingDatasetKey || fileSource] = {
+                data: text, // new data
+                dataFileSize: fileSize,
+                dataFileName: fileSource, // new file source
+                dataFileSourceType: fileSourceType,// new file source type
+                dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
+                preview: true
+              }
+
+              setConfig({
+                ...config,
+                ...tempConfig,
+                dataset: newDatasets
+              })
+            } else {
+              setConfig({
+                ...config,
+                ...tempConfig,
+                data: text, // new data
+                dataFileName: fileSource, // new file source
+                dataFileSourceType: fileSourceType, // new file source type
+                formattedData: transform.developerStandardize(text, config.dataDescription)
+              })
+            }
           } else {
             resetEditor({
               data: text,
@@ -222,8 +256,38 @@ export default function DataImport() {
             }, 'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?')
           }
         } else {
-          setConfig({ ...config, data: text, dataFileName: fileSource, dataFileSourceType: fileSourceType })
+          if(config.type === 'dashboard') {
+            let newDatasets = {...config.datasets};
+
+            Object.keys(newDatasets).forEach(datasetKey => newDatasets[datasetKey].preview = false);
+
+            newDatasets[editingDatasetKey || fileSource] = {
+              data: text, // new data
+              dataFileSize: fileSize,
+              dataFileName: fileSource, // new file source
+              dataFileSourceType: fileSourceType,// new file source type
+              dataFileFormat: fileExtension.replace('.', '').toUpperCase(),
+              preview: true
+            }
+
+            setConfig({ ...config, datasets: newDatasets })
+          } else {
+            setConfig({
+              ...config,
+              ...tempConfig,
+              data: text, // new data
+              dataFileName: fileSource, // new file source
+              dataFileSourceType: fileSourceType, // new file source type
+              formattedData: transform.developerStandardize(text, config.dataDescription)// new file source type
+            })
+          }
         }
+
+        if(editingDataset){
+          setEditingDataset(undefined);
+        }
+        setAddingDataset(false);
+        setExternalURL('');
       } catch (err) {
         setErrors(err)
       }
@@ -249,16 +313,27 @@ export default function DataImport() {
     setConfig(newConfig)
   }, [])
 
-  const updateDescriptionProp = (key, value) => {
-    let dataDescription = { ...config.dataDescription, [key]: value }
-    let formattedData = transform.developerStandardize(config.data, dataDescription)
+  const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
+    if(config.type === 'dashboard') {
+      let dataDescription = { ...config.datasets[datasetKey].dataDescription, [key]: value }
+      let formattedData = transform.developerStandardize(config.datasets[datasetKey].data, dataDescription)
 
-    setConfig({ ...config, formattedData, dataDescription })
+      let newDatasets = {...config.datasets}
+      newDatasets[datasetKey] = {...newDatasets[datasetKey], dataDescription, formattedData};
+
+      setConfig({ ...config, datasets: newDatasets })
+    } else {
+      let dataDescription = { ...config.dataDescription, [key]: value }
+      let formattedData = transform.developerStandardize(config.data, dataDescription)
+
+      setConfig({ ...config, formattedData, dataDescription })
+    }
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps: getRootProps2, getInputProps: getInputProps2, isDragActive: isDragActive2 } = useDropzone({ onDrop })
 
-  const loadFileFromUrl = (url) => {
+  const loadFileFromUrl = (url, editingDatasetKey) => {
     // const extUrl = (url) ? url : config.dataFileName // set url to what is saved in config unless the user has entered something
 
     return (
@@ -268,7 +343,7 @@ export default function DataImport() {
                  placeholder="e.g., https://data.cdc.gov/resources/file.json" aria-label="Load data from external URL"
                  aria-describedby="load-data" value={externalURL} onChange={(e) => setExternalURL(e.target.value)}/>
           <button className="input-group-text btn btn-primary px-4" type="submit" id="load-data"
-                  onClick={() => loadData(null, externalURL)}>Load
+                  onClick={() => loadData(null, externalURL, editingDatasetKey)}>Load
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
@@ -279,59 +354,178 @@ export default function DataImport() {
     )
   }
 
-  const warningModal = () => {
-    return (
-      <Modal fontTheme={'light'} headerBgColor={'#d73636'} showClose={false}>
-        <Modal.Header>
-          <center>Warning</center>
-        </Modal.Header>
-        <Modal.Content>
-          <center>
-            <p style={{ fontSize: '1rem' }}>Reseting will remove your data and settings.</p>
-          </center>
-        </Modal.Content>
-        <Modal.Footer>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{
-              marginBottom: '1rem',
-              fontSize: '1rem'
-            }}>
-              Are you sure you want to continue?
-            </p>
-            <Button className="warn" style={{ marginRight: '1rem' }}
-                    onClick={() => overlay.actions.toggleOverlay(false)}
-            >No, Cancel</Button>
-            <Button className="success" onClick={() => {
-              resetEditor({})
-              overlay.actions.toggleOverlay(false)
-            }}>Yes, Continue</Button>
-          </div>
-        </Modal.Footer>
-      </Modal>
-    )
-  }
-
   const resetEditor = (config = {}, message = 'Are you sure you want to do this?') => {
     config.newViz = true
-    setTempConfig(null)
-    setConfig(config)
+
+    const confirmDataReset = window.confirm(message)
+
+    if (confirmDataReset === true) {
+      setTempConfig(null)
+      setConfig(config)
+      setAddingDataset(true)
+    }
   }
 
   const resetButton = () => {
-    return (
-      <Button className="warn" style={{ height: '2.5rem', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
-              onClick={() => overlay.actions.openOverlay(warningModal(), true)}>
-        Clear <Icon display="close" style={{marginLeft: '0.5rem'}}/>
-      </Button>
+    return ( //todo convert to modal
+      <button className="btn danger"
+              onClick={() => resetEditor({type: config.type, visualizationType: config.visualizationType}, 'Reseting will remove your data and settings. Do you want to continue?')}>Clear
+        <CloseIcon/>
+      </button>
     )
+  }
+
+  const setGlobalDatasetProp = (datasetKey, prop, value) => {
+    let newDatasets = {...config.datasets};
+
+    if(value === true){
+      Object.keys(newDatasets).forEach(datasetKeyIter => {
+        if(datasetKeyIter !== datasetKey){
+          newDatasets[datasetKeyIter][prop] = false;
+        } else {
+          newDatasets[datasetKeyIter][prop] = true;
+        }
+      })
+    } else {
+      newDatasets[datasetKey][prop] = value;
+    }
+
+    setConfig({...config, datasets: newDatasets});
+  };
+
+  const removeDataset = (datasetKey) => {
+    let newDatasets = {...config.datasets};
+    let newVisualizations = {...config.visualizations};
+
+    Object.keys(newVisualizations).forEach(vizKey => {
+      if(newVisualizations[vizKey].dataKey === datasetKey) {
+        delete newVisualizations[vizKey].dataKey;
+      }
+    });
+
+    delete newDatasets[datasetKey];
+
+    setConfig({...config, datasets: newDatasets, visualizations: newVisualizations});
+  }
+
+  const renameDataset = (oldName, newName) => {
+    if(oldName === newName) return;
+
+    let newDatasets = {...config.datasets};
+    let newVisualizations = {...config.visualizations};
+
+    let suffix = 2;
+    let originalName = newName;
+    while(newDatasets[newName]){
+      newName = originalName + '-' + suffix;
+      suffix++;
+    }
+
+    newDatasets[newName] = newDatasets[oldName];
+    delete newDatasets[oldName];
+
+    Object.keys(newVisualizations).forEach(vizKey => {
+      if(newVisualizations[vizKey].dataKey === oldName) {
+        newVisualizations[vizKey].dataKey = newName;
+      }
+    });
+
+    setConfig({...config, datasets: newDatasets, visualizations: newVisualizations});
+  }
+
+  let previewData, configureData, readyToConfigure = false;
+  if(config.type === 'dashboard'){
+    readyToConfigure = Object.keys(config.datasets).length > 0;
+    Object.keys(config.datasets).forEach(datasetKey => {
+      if(config.datasets[datasetKey].preview){
+        previewData = config.datasets[datasetKey].data;
+      }
+    });
+  } else {
+    previewData = config.data;
+    configureData = config;
+    readyToConfigure = !!config.formattedData;
   }
 
   return (
     <>
       <div className="left-col">
-        {(!config.data || !config.dataFileSourceType) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
+        {config.type === 'dashboard' && Object.keys(config.datasets).length > 0 && (
+          <>
+            <div className="heading-3">Data Sources</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Size</th><th>Type</th><th colSpan="4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(config.datasets).map(datasetKey => config.datasets[datasetKey].dataFileName && (
+                  <tr key={`tr-${datasetKey}`}>
+                    <td><input className="dataset-name-input" type="text" defaultValue={datasetKey} onBlur={(e) => renameDataset(datasetKey, e.target.value)}/></td>
+                    <td>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
+                    <td>{config.datasets[datasetKey].dataFileFormat}</td>
+                    <td><button className="btn btn-primary" onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}>Preview Data</button></td>
+                    <td><button className="btn btn-primary" onClick={() => {
+                      if(editingDataset === datasetKey){
+                        setEditingDataset(undefined);
+                      } else {
+                        setEditingDataset(datasetKey);
+                      }
+                    }}>Edit Data</button></td>
+                    <td><button className="btn btn-primary" onClick={() => removeDataset(datasetKey)}>X</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {configureData && configureData.data && (
+          <>
+            {config.type !== 'dashboard' && (
+              <>
+                <div className="heading-3">Data Source</div>
+                <div className="file-loaded-area">
+                  {config.dataFileSourceType === 'file' && (
+                    <div className="data-source-options">
+                      <div
+                        className={isDragActive2 ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps2()}>
+                        <input {...getInputProps2()} />
+                        {
+                          isDragActive2 ?
+                            <p>Drop file here</p> :
+                            <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
+                        }
+                      </div>
+                      <div>
+                        {resetButton()}
+                      </div>
+                    </div>
+                  )}
+
+                  {config.dataFileSourceType === 'url' && (
+                    <div className="url-source-options">
+                      <div>
+                        {loadFileFromUrl(externalURL)}
+                      </div>
+                      <div>
+                        {resetButton()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+          </>
+        )}
+
+        {(editingDataset || addingDataset) && (   // dataFileSourceType needs to be checked here since earlier versions did not track this state
           <div className="load-data-area">
-            <Tabs>
+            <div className="heading-3">{editingDataset ? `Editing ${editingDataset}` : 'Add Dataset'}</div>
+            <Tabs startingTab={editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? 1 : 0}>
               <TabPane title="Upload File" icon={<FileUploadIcon className="inline-icon"/>}>
                 {sharepath &&
                   <p className="alert--info">
@@ -349,7 +543,7 @@ export default function DataImport() {
                 </div>
               </TabPane>
               <TabPane title="Load from URL" icon={<LinkIcon className="inline-icon"/>}>
-                {loadFileFromUrl(externalURL)}
+                {loadFileFromUrl(editingDataset && config.datasets[editingDataset].dataFileSourceType === 'url' ? config.datasets[editingDataset].dataFileName : externalURL, editingDataset)}
               </TabPane>
             </Tabs>
             {errors && (errors.map ? errors.map((message, index) => (
@@ -364,282 +558,35 @@ export default function DataImport() {
             <span className="heading-3">Load Sample Data:</span>
             <ul className="sample-data-list">
               <li
-                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv')}>United
+                onClick={() => loadData(new Blob([ validMapData ], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>United
                 States Sample Data #1
               </li>
               <li
-                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv')}>Chart
+                onClick={() => loadData(new Blob([ validChartData ], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}>Chart
                 Sample Data
               </li>
               <li
-                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv')}>United
+                onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}>United
                 States Counties Sample Data
               </li>
             </ul>
-            <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
-               rel="noopener noreferrer" className="guidance-link">
-              <div>
-                <h3>Get Help</h3>
-                <p>Documentation and examples on formatting data and configuring visualizations.</p>
-              </div>
-            </a>
           </div>
         )}
 
-        {config.dataFileSourceType && (
+        {config.type === 'dashboard' && !addingDataset && <p><button className="btn btn-primary" onClick={() => setAddingDataset(true)}>+ Add More Files</button></p>}
+
+        {readyToConfigure && <p><button className="btn btn-primary" onClick={() => setGlobalActive(2)}>Configure your visualization</button></p>}
+
+        <a href="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html" target="_blank"
+            rel="noopener noreferrer" className="guidance-link">
           <div>
-            <div className="heading-3">Data Source</div>
-            <div className="file-loaded-area">
-              {config.dataFileSourceType === 'file' && (
-                <div className="data-source-options">
-                  <div
-                    className={isDragActive ? 'drag-active cdcdataviz-file-selector loaded-file' : 'cdcdataviz-file-selector loaded-file'} {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    {
-                      isDragActive ?
-                        <p>Drop file here</p> :
-                        <p><FileUploadIcon/> <span>{config.dataFileName ?? 'Replace data file'}</span></p>
-                    }
-                  </div>
-                  <div>
-                    {resetButton()}
-                  </div>
-                </div>
-              )}
-
-              {config.dataFileSourceType === 'url' && (
-                <div className="url-source-options">
-                  <div>
-                    {loadFileFromUrl(externalURL)}
-                  </div>
-                  <div>
-                    {resetButton()}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="question">
-              <div className="heading-3">Describe Data</div>
-              <div className="heading-4 data-question">Data Orientation</div>
-              <div className="table-button-container">
-                <div
-                  className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === false ? ' active' : '')}
-                  onClick={() => {
-                    updateDescriptionProp('horizontal', false)
-                  }}>
-                  <strong>Vertical</strong>
-                  <p>Values for map geography or chart date/category axis are contained in a single <em>column</em>.</p>
-                  <table>
-                    <tbody>
-                    <tr>
-                      <th>Date</th>
-                      <th>Value</th>
-                      <th>...</th>
-                    </tr>
-                    <tr>
-                      <td>01/01/2020</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    <tr>
-                      <td>02/01/2020</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    </tbody>
-                  </table>
-                  <table>
-                    <tbody>
-                    <tr>
-                      <th>State</th>
-                      <th>Value</th>
-                      <th>...</th>
-                    </tr>
-                    <tr>
-                      <td>Georgia</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    <tr>
-                      <td>Florida</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div
-                  className={'table-button' + (config.dataDescription && config.dataDescription.horizontal === true ? ' active' : '')}
-                  onClick={() => {
-                    updateDescriptionProp('horizontal', true)
-                  }}>
-                  <strong>Horizontal</strong>
-                  <p>Values for map geography or chart date/category axis are contained in a single <em>row</em></p>
-                  <table>
-                      <tbody>
-                        <tr>
-                            <th>Date</th>
-                            <td>01/01/2020</td>
-                            <td>02/01/2020</td>
-                            <td>...</td>
-                        </tr>
-                        <tr>
-                            <th>Value</th>
-                            <td>100</td>
-                            <td>150</td>
-                            <td>...</td>
-                        </tr>
-                      </tbody>
-                  </table>
-                  <table>
-                    <tbody>
-                    <tr>
-                      <th>State</th>
-                      <td>Georgia</td>
-                      <td>Florida</td>
-                      <td>...</td>
-                    </tr>
-                    <tr>
-                      <th>Value</th>
-                      <td>100</td>
-                      <td>150</td>
-                      <td>...</td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            {config.dataDescription && (
-              <>
-                <div className="question">
-                  <div className="heading-4 data-question">Are there multiple series represented in your data?</div>
-                  <div>
-                    <button className={config.dataDescription.series === true ? 'btn btn-primary active' : 'btn btn-primary'} style={{ marginRight: '.5em' }} onClick={() => { updateDescriptionProp('series', true) }}>Yes</button>
-                    <button className={config.dataDescription.series === false ? 'btn btn-primary active' : 'btn btn-primary'} onClick={() => {updateDescriptionProp('series', false)}}>No</button>
-                  </div>
-                </div>
-                {config.dataDescription.horizontal === true && config.dataDescription.series === true && (
-                  <div className="question">
-                    <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
-                    <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}} value={config.dataDescription.seriesKey}>
-                      <option value="">Choose an option</option>
-                      {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
-                    </select>
-                  </div>
-                )}
-                {config.dataDescription.horizontal === false && config.dataDescription.series === true && (
-                  <>
-                    <div className="question">
-                      <div className="heading-4 data-question">Are the series values in your data represented in a single row, or across multiple rows?</div>
-                      <div className="table-button-container">
-                        <div className={'table-button' + (config.dataDescription.singleRow === true ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', true)}}>
-                          <p>Each row contains the data for an individual series in itself.</p>
-                          <table>
-                            <tbody>
-                            <tr>
-                              <th>Date</th>
-                              <th>Virus 1</th>
-                              <th>Virus 2</th>
-                              <th>...</th>
-                            </tr>
-                            <tr>
-                              <td>01/01/2020</td>
-                              <td>100</td>
-                              <td>150</td>
-                              <td>...</td>
-                            </tr>
-                            <tr>
-                              <td>02/01/2020</td>
-                              <td>15</td>
-                              <td>20</td>
-                              <td>...</td>
-                            </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <div className={'table-button' + (config.dataDescription.singleRow === false ? ' active' : '')} onClick={() => {updateDescriptionProp('singleRow', false)}}>
-                          <p>Each series data is broken out into multiple rows.</p>
-                          <table>
-                            <tbody>
-                            <tr>
-                              <th>Virus</th>
-                              <th>Date</th>
-                              <th>Value</th>
-                            </tr>
-                            <tr>
-                              <td>Virus 1</td>
-                              <td>01/01/2020</td>
-                              <td>100</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 1</td>
-                              <td>02/01/2020</td>
-                              <td>150</td>
-                            </tr>
-                            <tr>
-                              <td>...</td>
-                              <td>...</td>
-                              <td>...</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 2</td>
-                              <td>01/01/2020</td>
-                              <td>15</td>
-                            </tr>
-                            <tr>
-                              <td>Virus 2</td>
-                              <td>02/01/2020</td>
-                              <td>20</td>
-                            </tr>
-                            <tr>
-                              <td>...</td>
-                              <td>...</td>
-                              <td>...</td>
-                            </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                    {config.dataDescription.singleRow === false && (
-                      <>
-                        <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents which series the row is describing?</div>
-                          <select onChange={(e) => {updateDescriptionProp('seriesKey', e.target.value)}}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
-                          </select>
-                        </div>
-                        <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents the values for the category/date axis or map geography?</div>
-                          <select onChange={(e) => {updateDescriptionProp('xKey', e.target.value)}}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
-                          </select>
-                        </div>
-                        <div className="question">
-                          <div className="heading-4 data-question">Which property in the dataset represents the numeric value?</div>
-                          <select onChange={(e) => {updateDescriptionProp('valueKey', e.target.value)}}>
-                            <option value="">Choose an option</option>
-                            {Object.keys(config.data[0]).map((value, index) => <option value={value} key={index}>{value}</option>)}
-                          </select>
-                        </div>
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-            {config.formattedData && (
-              <button className="btn btn-primary" style={{ float: 'right', marginBottom: '2em' }}
-                      onClick={() => setGlobalActive(1)}>Select your visualization type &raquo;</button>
-            )}
+            <h3>Get Help</h3>
+            <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
-        )}
+        </a>
       </div>
       <div className="right-col">
-        <PreviewDataTable data={config.data}/>
+        <PreviewDataTable data={previewData}/>
       </div>
     </>
   )

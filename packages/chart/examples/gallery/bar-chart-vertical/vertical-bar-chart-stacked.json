@@ -1,0 +1,81 @@
+{
+	"type": "chart",
+	"title": "Example Stacked Bar Chart",
+	"theme": "theme-orange",
+	"fontSize": "medium",
+	"height": "375",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": "64",
+		"gridLines": false,
+		"label": "Y-Axis Label Example"
+	},
+	"barThickness": 0.35,
+	"xAxis": {
+		"size": "67",
+		"tickRotation": "25",
+		"dataKey": "Year",
+		"label": "X-Axis Label Example"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": true,
+		"download": true
+	},
+	"legend": {
+		"behavior": "isolate",
+		"position": "right",
+		"label": "Data Type"
+	},
+	"palette": "qualitative-bold",
+	"labels": false,
+	"dataFormat": {
+		"suffix": "%"
+	},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Year": "2015",
+			"Data 1": "25",
+			"Data 2": "20",
+			"Data 3": "55"
+		},
+		{
+			"Year": "2016",
+			"Data 1": "35",
+			"Data 2": "30",
+			"Data 3": "35"
+		},
+		{
+			"Year": "2017",
+			"Data 1": "22",
+			"Data 2": "38",
+			"Data 3": "40"
+		},
+		{
+			"Year": "2018",
+			"Data 1": "40",
+			"Data 2": "40",
+			"Data 3": "20"
+		}
+	],
+	"visualizationType": "Bar",
+	"visualizationSubType": "stacked",
+	"series": [
+		{
+			"dataKey": "Data 1",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 2",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 3",
+			"type": "Bar"
+		}
+	]
+}

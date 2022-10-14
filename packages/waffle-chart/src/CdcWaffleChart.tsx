@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,FC } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
@@ -30,8 +30,11 @@ const themeColor = {
   'theme-green': '#4b830d',
   'theme-amber': '#fbab18',
 }
+interface Props{
+  config?:any, isEditor?:any ,link?:any
+}
 
-const WaffleChart = ({ config, isEditor }) => {
+const WaffleChart:FC<Props>  = ({ config, isEditor ,link}) => {
   let {
     title,
     theme,
@@ -281,6 +284,7 @@ const WaffleChart = ({ config, isEditor }) => {
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
+  let contentClasses = ['cove-component__content']
 
   let innerContainerClasses = ['cove-component__inner']
   config.title && innerContainerClasses.push('component--has-title')
@@ -288,14 +292,12 @@ const WaffleChart = ({ config, isEditor }) => {
   config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
   config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
 
-  let contentClasses = ['cove-component__content'];
-  !config.visual?.border && contentClasses.push('no-borders');
-  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-  config.visual?.accent && contentClasses.push('component--has-accent');
-  config.visual?.background && contentClasses.push('component--has-background');
-  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+  !config.visual.border && contentClasses.push('no-borders');
+  config.visual.accent && contentClasses.push('component--has-accent')
+  config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
+  config.visual.background && contentClasses.push('component--has-background');
+  config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
 
-  // ! these two will be retired.
   config.shadow && innerContainerClasses.push('shadow')
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
@@ -315,42 +317,44 @@ const WaffleChart = ({ config, isEditor }) => {
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
-        {title &&
-        <div className={`cove-component__header chart-title ${config.theme}`} >
-            {parse(title)}
-        </div>
-        }
-        <div className={contentClasses.join(' ')}>
-          <div className="cove-component__content-wrap">
-            <div
-              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-              <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-                <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
-                  <Group>
-                    {buildWaffle()}
-                  </Group>
-                </svg>
-              </div>
-              {(dataPercentage || content) &&
-              <div className="cove-waffle-chart__data">
-                {dataPercentage &&
-                <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
-                  {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
-                </div>
-                }
-                <div className="cove-waffle-chart__data--text" >{parse(content)}</div>
+      {title &&
+        <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden="true">
+        {parse(title)}
+      </header>
+      }
+      <div className={contentClasses.join(' ')}>
+        <div className="cove-component__content-wrap">
+          <div
+            className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+            <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
+              <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
+                <Group>
+                  {buildWaffle()}
+                </Group>
+              </svg>
+            </div>
+            {(dataPercentage || content) &&
+            <div className="cove-waffle-chart__data">
+              {dataPercentage &&
+              <div className="cove-waffle-chart__data--primary" style={dataFontSize}>
+                {prefix ? prefix : null}{dataPercentage}{suffix ? suffix : null}
               </div>
               }
-            </div>
-            {subtext &&
-            <div className="cove-waffle-chart__subtext">
-              {parse(subtext)}
+              <div className="cove-waffle-chart__data--text">{parse(content)}</div>
+              
+              {subtext &&
+                <div className="cove-waffle-chart__subtext">
+                  {parse(subtext)}
+                </div>
+              }
             </div>
             }
           </div>
         </div>
-      </>
-    </div>
+      </div>
+      {link && link}
+    </>
+  </div>
   )
 }
 
@@ -435,13 +439,13 @@ const CdcWaffleChart = (
   //Reload config if config object provided/updated
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
-  }, [ configObj?.data ])
+  }, [])
 
   let content = (<Loading/>)
 
   if (loading === false) {
     let classNames = [
-      'cdc-open-viz-module',
+      'cove',
       'type-waffle-chart',
       currentViewport,
       config.theme,
@@ -454,17 +458,19 @@ const CdcWaffleChart = (
 
     let bodyClasses = ['cove-component', 'waffle-chart']
 
-    
-
     let body = (
       <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
         <WaffleChart config={config} isEditor={isEditor}/>
       </div>
-    )
+    );
 
     content = (
-      <div className={`cove ${config.theme}`}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
+      <div className={classNames.join(' ')}>
+        {isEditor &&
+          <EditorPanel>
+            {body}
+          </EditorPanel>
+        }
         {!isEditor && body}
       </div>
     )

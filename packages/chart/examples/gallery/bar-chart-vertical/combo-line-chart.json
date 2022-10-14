@@ -1,0 +1,137 @@
+{
+	"type": "chart",
+	"title": "Combo Bar-Line Chart",
+	"theme": "theme-purple",
+	"fontSize": "medium",
+	"height": "332",
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": "68",
+		"gridLines": true,
+		"label": "Y-Axis Label Example"
+	},
+	"barThickness": 0.35,
+	"xAxis": {
+		"size": "78",
+		"tickRotation": "25",
+		"dataKey": "Date",
+		"label": "X-Axis Example Label",
+		"type": "date",
+		"dateParseFormat": "%d/%m/%Y",
+		"dateDisplayFormat": "%d/%m/%Y"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": true,
+		"download": true
+	},
+	"legend": {
+		"behavior": "highlight",
+		"position": "right",
+		"label": "Data Type"
+	},
+	"palette": "qualitative-soft",
+	"labels": false,
+	"dataFormat": {},
+	"confidenceKeys": {},
+	"data": [
+		{
+			"Date": "1/15/2016",
+			"Data 1": "90",
+			"Data 2": "110",
+			"Data 3": "100",
+			"Data 4": "90",
+			"Monthly-Goal": "100"
+		},
+		{
+			"Date": "2/15/2016",
+			"Data 1": "100",
+			"Data 2": "110",
+			"Data 3": "100",
+			"Data 4": "100",
+			"Monthly-Goal": "100"
+		},
+		{
+			"Date": "3/15/2016",
+			"Data 1": "80",
+			"Data 2": "90",
+			"Data 3": "100",
+			"Data 4": "120",
+			"Monthly-Goal": "110"
+		},
+		{
+			"Date": "4/15/2016",
+			"Data 1": "80",
+			"Data 2": "90",
+			"Data 3": "110",
+			"Data 4": "120",
+			"Monthly-Goal": "110"
+		},
+		{
+			"Date": "5/15/2016",
+			"Data 1": "70",
+			"Data 2": "90",
+			"Data 3": "110",
+			"Data 4": "130",
+			"Monthly-Goal": "120"
+		},
+		{
+			"Date": "6/15/2016",
+			"Data 1": "100",
+			"Data 2": "120",
+			"Data 3": "120",
+			"Data 4": "130",
+			"Monthly-Goal": "120"
+		},
+		{
+			"Date": "7/15/2016",
+			"Data 1": "110",
+			"Data 2": "140",
+			"Data 3": "120",
+			"Data 4": "130",
+			"Monthly-Goal": "130"
+		},
+		{
+			"Date": "8/15/2016",
+			"Data 1": "110",
+			"Data 2": "130",
+			"Data 3": "120",
+			"Data 4": "140",
+			"Monthly-Goal": "130"
+		},
+		{
+			"Date": "9/15/2016",
+			"Data 1": "120",
+			"Data 2": "130",
+			"Data 3": "120",
+			"Data 4": "150",
+			"Monthly-Goal": "140"
+		}
+	],
+	"visualizationType": "Combo",
+	"series": [
+		{
+			"dataKey": "Data 1",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 2",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 3",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Data 4",
+			"type": "Bar"
+		},
+		{
+			"dataKey": "Monthly-Goal",
+			"type": "Line"
+		}
+	]
+}
