@@ -1227,7 +1227,7 @@ const EditorPanel = (props) => {
 	});
 
 	const CategoryList = () => {
-		return state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.map((value, index) => (
+		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
 				{(provided, snapshot) => (
 					<li style={{ position: 'relative' }}>
@@ -1243,7 +1243,7 @@ const EditorPanel = (props) => {
 					</li>
 				)}
 			</Draggable>
-		));
+		)) : <></>;
 	};
 
 	const Error = () => {
