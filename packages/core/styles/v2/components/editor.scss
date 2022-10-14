@@ -2,6 +2,8 @@
 @import "../themes/index";
 
 .cove-editor {
+
+  @import "./../base/reset";
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas: "panel content";
@@ -414,7 +416,6 @@
     display: block;
     text-align: left;
     cursor: pointer;
-    color: rgba(0, 0, 0, .5);
     text-decoration: underline;
 
     span {

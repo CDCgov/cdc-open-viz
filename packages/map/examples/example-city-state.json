@@ -149,6 +149,12 @@
       "URL": "https://www.cdc.gov/"
     },
     {
+      "STATE": "GAINESVILLE",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
       "STATE": "ID",
       "Rate": "*",
       "Location": "Work",
@@ -506,5 +512,8 @@
   },
   "color": "yelloworangered",
   "usingWidgetLoader": true,
-  "type": "map"
+  "type": "map",
+  "visual": {
+    "cityStyle": "pin"
+  }
 }

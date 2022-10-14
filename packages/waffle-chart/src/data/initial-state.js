@@ -25,7 +25,7 @@ export default {
   "theme": "theme-blue",
   "type": "waffle-chart",
   "visual": {
-    "border": false,
+    "border": true,
     "accent": false,
     "background": false,
     "hideBackgroundColor": false,

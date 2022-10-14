@@ -155,6 +155,9 @@ header + .map-container.full-border {
 			height: 1.75em;
 			width: 1.75em;
 		}
+		&:focus {
+			background: #005eaa;
+		}
 	}
 	> button:first-child {
 		margin-right: 0.25em;
@@ -170,6 +173,7 @@ header + .map-container.full-border {
 			width: 2.5em;
 		}
 	}
+	
 }
 
 @include breakpointClass(md) {
