@@ -99,6 +99,7 @@ module.exports = (env = {}, { mode }) => {
               'dist/cdcdatabite.js',
               'dist/cdcwafflechart.js',
               'dist/cdcmarkupinclude.js',
+              'dist/cdcfilteredtext.js'
             ]
 
             let except = [

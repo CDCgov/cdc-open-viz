@@ -141,13 +141,17 @@ export default function DataTable() {
           >
             {config.table.label}
           </div>
-          <div className="table-container">
+          <div 
+           className="table-container"
+           style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
+           >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
               hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
+              <caption className='cdcdataviz-sr-only'>{config.table.caption ?  config.table.caption : "" }</caption>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup,index) => (
@@ -182,15 +186,18 @@ export default function DataTable() {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
-                      {row.cells.map((cell, index) => (
-                        <td 
-                          tabIndex="0" 
-                          {...cell.getCellProps()} 
-                          key={`tbody__tr__td-${index}`} 
-                          role="gridcell">
-                          {cell.render('Cell')}
-                        </td>
-                      ))}
+                      {row.cells.map((cell, index) => {
+                        return (
+                          <td 
+                            tabIndex="0" 
+                            {...cell.getCellProps()} 
+                            key={`tbody__tr__td-${index}`} 
+                            role="gridcell">
+                            { cell.render('Cell') }
+                          </td>
+                        )
+                      }
+                      )}
                     </tr>
                   );
                 })}

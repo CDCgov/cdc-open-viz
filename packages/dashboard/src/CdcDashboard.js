@@ -19,6 +19,7 @@ import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
+import FilteredText from '@cdc/filtered-text';
 
 import EditorPanel from './components/EditorPanel'
 import Grid from './components/Grid'
@@ -58,6 +59,9 @@ const addVisualization = (type, subType) => {
     case 'markup-include':
       newVisualizationConfig.visualizationType = type
       break
+    case 'filtered-text':
+         newVisualizationConfig.visualizationType = type
+      break
   }
 
   return newVisualizationConfig
@@ -83,6 +87,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
       <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <Widget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
@@ -395,6 +400,9 @@ export default function CdcDashboard(
           case 'markup-include':
             body = <><Header back={back} subEditor="Markup Include"/><CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/></>
             break
+            case 'filtered-text':
+              body = <><Header back={back} subEditor="Filtered Text"/><FilteredText key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/></>
+              break
         }
       }
     })
@@ -420,7 +428,11 @@ export default function CdcDashboard(
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
-          {config.dashboard.filters && <Filters/>}
+          {config.dashboard.filters &&
+            <div className="cove-dashboard-filters">
+              <Filters />
+            </div>
+          }
 
           {/* Visualizations */}
           {config.rows && config.rows.map((row, index) => {
@@ -451,6 +463,9 @@ export default function CdcDashboard(
                         updateChildConfig(col.widget, newConfig)
                       }} isDashboard={true}/>}
                       {visualizationConfig.type === 'markup-include' && <CdcMarkupInclude key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {
+                        updateChildConfig(col.widget, newConfig)
+                      }} isDashboard={true}/>}
+                      {visualizationConfig.type === 'filtered-text' && <FilteredText key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {
                         updateChildConfig(col.widget, newConfig)
                       }} isDashboard={true}/>}
                     </div>

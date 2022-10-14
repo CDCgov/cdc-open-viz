@@ -20,7 +20,7 @@ import Context from '../context';
 
 export default function SparkLine({width: parentWidth, height: parentHeight}) {
 
-	const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale } = useContext(Context);
+	const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(Context);
 	let width = parentWidth
 	const { minValue, maxValue } = useReduceData(config, data)
 	// if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -107,9 +107,12 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 	return (
 		<ErrorBoundary component="SparkLine">
 			<svg
+				role="img"
+				aria-label={handleChartAriaLabels(config)}
 				width={width} 
 				height={height} 
 				className={'sparkline'}
+				tabIndex={0}
 				>
 					{(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => (
 						<>

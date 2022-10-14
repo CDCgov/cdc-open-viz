@@ -1,0 +1,68 @@
+{
+	"type": "chart",
+	"title": "Bar Chart with Confidence Intervals",
+	"theme": "theme-green",
+	"fontSize": "medium",
+	"height": 300,
+	"padding": {
+		"left": 5,
+		"right": 5
+	},
+	"yAxis": {
+		"size": "75",
+		"gridLines": true,
+		"label": "Y-Axis Example Label"
+	},
+	"barThickness": 0.35,
+	"xAxis": {
+		"size": "50",
+		"tickRotation": 0,
+		"dataKey": "Date",
+		"label": "X-Axis Sample Label"
+	},
+	"table": {
+		"label": "Data Table",
+		"expanded": true
+	},
+	"legend": {
+		"behavior": "isolate",
+		"position": "right"
+	},
+	"palette": "qualitative-bold",
+	"labels": false,
+	"dataFormat": {},
+	"confidenceKeys": {
+		"upper": "high",
+		"lower": "low"
+	},
+	"data": [
+		{
+			"Data": "data1",
+			"Date": "1/12/2016",
+			"Value": "212",
+			"high": "220",
+			"low": "200"
+		},
+		{
+			"Data": "data2",
+			"Date": "1/13/2016",
+			"Value": "213",
+			"high": "230",
+			"low": "205"
+		},
+		{
+			"Data": "data3",
+			"Date": "1/14/2016",
+			"Value": "214",
+			"high": "240",
+			"low": "210"
+		}
+	],
+	"visualizationType": "Bar",
+	"series": [
+		{
+			"dataKey": "Value",
+			"type": "Bar"
+		}
+	]
+}

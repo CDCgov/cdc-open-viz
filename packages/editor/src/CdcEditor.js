@@ -33,6 +33,54 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     startingTab = 2
   }
 
+  // Legacy support - dashboards using a single dataset
+  if(config.type === 'dashboard'){
+    let legacyUpdateNeeded = false;
+    let newConfig;
+
+    if(config.data || config.dataUrl){
+      legacyUpdateNeeded = true;
+      newConfig = {...config};
+
+      newConfig.datasets = {};
+      newConfig.datasets[config.dataFileName || 'dataset-1'] = {
+        data: config.data,
+        dataUrl: config.dataUrl,
+        dataFileName: config.dataFileName || 'dataset-1',
+        dataFileSourceType: config.dataFileSourceType
+      };
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1';
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription;
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData;
+      });
+
+      delete newConfig.data;
+      delete newConfig.dataUrl,
+      delete newConfig.dataFileName;
+      delete newConfig.dataFileSourceType;
+      delete newConfig.dataDescription;
+      delete newConfig.formattedData;
+    }
+
+    if(config.dashboard && config.dashboard.filters){
+      legacyUpdateNeeded = true;
+      newConfig = {...config};
+
+      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || [];
+      newConfig.dashboard.filters.forEach(filter => {
+        newConfig.dashboard.sharedFilters.push({...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations)});
+      });
+
+      delete newConfig.dashboard.filters;
+    }
+    
+    if(legacyUpdateNeeded){
+      setConfig(newConfig);
+    }
+  }
+
   const [globalActive, setGlobalActive] = useState(startingTab);
 
   const resizeObserver = new ResizeObserver(([ container ]) => {
@@ -101,18 +149,31 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     sharepath
   }
 
+  let configureDisabled = true;
+
+  if(config.type !== 'dashboard'){
+    if(config.formattedData){
+      configureDisabled = false;
+    }
+  } else {
+    if(config.datasets && Object.keys(config.datasets).length > 0){
+      configureDisabled = false;
+    }
+  }
+
   return (
     <GlobalContextProvider>
       <GlobalState.Provider value={state}>
-        <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef} >
+        <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
           <Tabs className="top-level" startingTab={globalActive}>
-            <TabPane title="1. Import Data" className="data-designer">
-              <DataImport />
-            </TabPane>
-            <TabPane title="2. Choose Visualization Type" className="choose-type" disableRule={!config.data && !config.formattedData}>
+            <TabPane title="1. Choose Visualization Type" className="choose-type">
               <ChooseTab />
             </TabPane>
-            <TabPane title="3. Configure" className="configure" disableRule={null === config.data || !config.type}>
+            <TabPane title="2. Import Data" className="data-designer" disableRule={!config.type}>
+              <DataImport />
+            </TabPane>
+            
+            <TabPane title="3. Configure" className="configure" disableRule={configureDisabled}>
               <ConfigureTab containerEl={containerEl }/>
             </TabPane>
           </Tabs>

@@ -4,19 +4,18 @@ import '../scss/choose-vis-tab.scss'
 import GlobalState from '../context'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-import DashboardIcon from '../assets/icons/dashboard.svg'
-import BarIcon from '@cdc/core/assets/chart-bar-solid.svg'
-import LineIcon from '@cdc/core/assets/chart-line-solid.svg'
-import PieIcon from '@cdc/core/assets/chart-pie-solid.svg'
-import GlobeIcon from '@cdc/core/assets/world-graphic.svg'
-import UsaIcon from '@cdc/core/assets/usa-graphic.svg'
+import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
+import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
+import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
+import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
+import GlobeIcon from '@cdc/core/assets/icon-map-world.svg'
+import UsaIcon from '@cdc/core/assets/icon-map-usa.svg'
 import UsaRegionIcon from '@cdc/core/assets/usa-region-graphic.svg'
-import DataBiteIcon from '@cdc/core/assets/data-bite-graphic.svg'
+import DataBiteIcon from '@cdc/core/assets/icon-databite.svg'
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
-import MarkupIncludeIcon from '@cdc/core/assets/icon-code.svg'
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg'
-import PairedBarIcon from '@cdc/core/assets/paired-bar.svg'
-import HorizontalStackIcon from '@cdc/core/assets/horizontal-stacked-bar.svg'
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
+import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
+import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(GlobalState)
@@ -46,7 +45,7 @@ export default function ChooseTab() {
       isHorizontalStackedChart = (orientation === config.orientation && stacked === true)
     }
 
-    if (type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true
+    if(type === 'dashboard' || type === 'data-bite' || type === 'waffle-chart' || type === 'markup-include') isSubType = true;
 
     // TODO: sorry, we should refactor this at some point.
     // trying to get this out for 4.22.5 - this is so stacked horizontal and bar charts aren't highlighted at the same time.
@@ -63,34 +62,35 @@ export default function ChooseTab() {
 
 
     let setTypes = () => {
-      // Only take the data/data source properties from existing config. Covers case of selecting a new visualization.
-      let newConfig = {
-        data: [ ...config.data ],
-        dataFileName: config.dataFileName,
-        dataFileSourceType: config.dataFileSourceType,
-        dataDescription: config.dataDescription,
-        dataUrl: config.dataUrl,
-        newViz: true,
-        type,
-        orientation: orientation ? orientation : null,
-        visualizationSubType: label === 'Horizontal Bar (Stacked)' ? 'stacked' : null
-      }
-
-      if (config.formattedData) {
-        newConfig.formattedData = config.formattedData
-      }
-
-      if (type === 'map') {
-        newConfig.general = {
-          ...newConfig.general,
-          geoType: subType
+      if(type === config.type){
+        if(subType !== config.visualizationType){
+          setConfig({...config, newViz: true, visualizationType: subType})
         }
-      } else {
-        newConfig.visualizationType = subType
-      }
 
-      setConfig(newConfig)
-      setGlobalActive(2)
+        setGlobalActive(1)
+      } else {
+        let confirmation = !config.type || window.confirm('Changing visualization type will clear configuration settings. Do you want to continue?');
+
+        if(confirmation){
+          let newConfig = {
+            newViz: true,
+            datasets: {},
+            type
+          }
+
+          if(type === 'map') {
+            newConfig.general = {
+              ...newConfig.general,
+              geoType: subType
+            }
+          } else {
+            newConfig.visualizationType = subType
+          }
+
+          setConfig(newConfig);
+          setGlobalActive(1)
+        }
+      }
     }
 
     return (<button className={classNames} onClick={() => setTypes()} aria-label={label}>{icon}<span
