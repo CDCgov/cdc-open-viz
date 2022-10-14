@@ -1,10 +1,6 @@
 {
   "name": "@cdc/chart",
-<<<<<<< HEAD
-  "version": "9.22.9",
-=======
   "version": "1.3.4",
->>>>>>> main
   "description": "React component for visualizing tabular data in various types of charts",
   "main": "dist/cdcchart",
   "scripts": {
@@ -23,11 +19,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-<<<<<<< HEAD
-    "@cdc/core": "^9.22.9",
-=======
     "@cdc/core": "^1.1.4",
->>>>>>> main
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
@@ -58,9 +50,5 @@
   "resolutions": {
     "@types/react": "17.x"
   },
-<<<<<<< HEAD
-  "gitHead": "170845062bcbb93f31270104688f69c4148935d8"
-=======
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
->>>>>>> main
 }
