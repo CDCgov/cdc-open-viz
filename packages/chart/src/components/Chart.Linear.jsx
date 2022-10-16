@@ -65,7 +65,7 @@ const ChartLinear = ({ dimensions, colorScale, seriesHighlight, formatNumber }) 
 
     //If data value max wasn't provided, calculate it
     if (max === Number.MIN_VALUE) {
-      max = maxValue
+      max = maxValue + 1
     }
 
     //Adds Y Axis data padding if applicable
@@ -433,7 +433,7 @@ const ChartLinear = ({ dimensions, colorScale, seriesHighlight, formatNumber }) 
           </>
         }
         {config.visualizationType === 'Paired Bar' && (
-          <ChartLinearBarPaired colorScale={colorScale} width={xMax} height={yMax}/>
+          <ChartLinearBarPaired dimensions={dimensions} colorScale={colorScale} width={xMax} height={yMax}/>
         )}
 
         {/* Bar chart */}

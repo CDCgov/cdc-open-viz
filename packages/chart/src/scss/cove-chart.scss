@@ -9,6 +9,7 @@
   flex-wrap: wrap;
   align-items: flex-start;
   margin-bottom: 1rem;
+  width: 100%;
 
   &.no-border {
     .visx-group:not(.visx-axis) {
@@ -17,6 +18,10 @@
       }
     }
   }
+}
+
+.cove-chart__visualization {
+  flex: 1 1 auto;
 }
 
 .cove-chart--chart {
@@ -64,7 +69,7 @@
   order: 1;
 
   @include breakpoint(md) {
-    width: 25%;
+    width: 23%;
     margin-left: 1rem;
     order: 2;
 

@@ -13,8 +13,7 @@ import Label from '../elements/Label'
 // Styles
 import '../../styles/components/input/index.scss'
 
-const InputSlider = (
-  {
+const InputSlider = ({
     label,
     labelPosition = 'left',
     tooltip,
@@ -26,8 +25,7 @@ const InputSlider = (
     value: inlineValue,
     min = null, max = null,
     className, ...attributes
-  }
-) => {
+  }) => {
 
   const { config, configActions } = useConfigContext()
 

@@ -39,22 +39,22 @@ const ComponentWrapper = ({ domContainer }) => {
       file: '/examples/planet-pie-example-config.json',
       name: 'Planet Pie'
     },
-    {
-      file: '/examples/date-exclusions-config.json',
-      name: 'Date Exclusions'
-    },
-    {
-      file: '/examples/case-rate-example-config.json',
-      name: 'Case Rates'
-    },
-    {
-      file: '/examples/paired-bar-example.json',
-      name: 'Paired Bar'
-    },
-    {
-      file: '/examples/horizontal-chart.json',
-      name: 'Horizontal Chart'
-    }
+    // {
+    //   file: '/examples/date-exclusions-config.json',
+    //   name: 'Date Exclusions'
+    // },
+    // {
+    //   file: '/examples/case-rate-example-config.json',
+    //   name: 'Case Rates'
+    // },
+    // {
+    //   file: '/examples/paired-bar-example.json',
+    //   name: 'Paired Bar'
+    // },
+    // {
+    //   file: '/examples/horizontal-chart.json',
+    //   name: 'Horizontal Chart'
+    // }
   ]
 
   // Currently loaded demo config

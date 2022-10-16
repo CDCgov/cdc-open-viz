@@ -3,6 +3,7 @@
     "dataUrl":  "/examples/planet-example-data.json",
     "visualizationType": "Bar",
     "visualizationSubType": "stacked",
+    "barHeight": 25,
     "series": [{"dataKey": "Radius"}, {"dataKey": "Diameter"}],
     "fontSize": "medium",
     "dataCutoff": "0.5",

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
 import Pie from '@visx/shape/lib/shapes/Pie'
 import { Group } from '@visx/group'
@@ -105,7 +105,7 @@ const ChartPie = ({ dimensions, seriesHighlight, colorScale, formatNumber }) => 
 
   let { width } = dimensions
 
-  if (config && config.legend && !config.legend.hide && view === 'lg') {
+  if (config && config.legend && !config.legend.hide) {
     width = width * 0.73
   }
 

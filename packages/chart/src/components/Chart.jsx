@@ -42,6 +42,11 @@ const Chart = () => {
   const [ colorScale, setColorScale ] = useState(null)
   const [ seriesHighlight, setSeriesHighlight ] = useState([])
 
+  //Checks if lollipop chart and adjusts base bar height
+  useEffect(() => {
+    if (!config.isLollipopChart || config.isLollipopChart === false) configActions.updateField([ 'barHeight' ], 25)
+  }, [])
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (data && config.xAxis && config.runtime?.seriesKeys) {
@@ -95,7 +100,7 @@ const Chart = () => {
       // Adjust width based on legend display
       // TODO: Add variations for responsive screen sizes
       if (config && config.legend && !config.legend.hide) {
-        width = width * 0.73
+        // width = width * 0.73
       }
 
       setDimensions({ width, height })
@@ -140,7 +145,7 @@ const Chart = () => {
 
   // Sorts data series for horizontal bar charts
   const sortData = (a, b) => {
-    let sortKey = config.visualizationType === 'Bar' && config.visualizationSubType === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey
+    let sortKey = config.visualizationType === 'Bar' && config.orientation === 'horizontal' ? config.xAxis.dataKey : config.yAxis.sortKey
     let aData = parseFloat(a[sortKey])
     let bData = parseFloat(b[sortKey])
 

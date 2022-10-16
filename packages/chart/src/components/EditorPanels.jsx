@@ -99,13 +99,14 @@ const EditorPanels = () => {
 
   // Requred sections target evaluation is truthy
   const requiredSections = [
-    config.visualizationType === 'Paired Bar' ? config.series.length < 2 : (config.series && config.series.length > 0), // If paired bar chart and length is less than 2, or if config has series + minimum one item
+    config.visualizationType === 'Paired Bar' ? config.series ? config.series.length <= 2 : (config.series && config.series.length > 0) : true, // If paired bar chart and length is less than 2, or if config has series + minimum one item
     config.visualizationType === 'Pie' ? !!config.yAxis.dataKey : true, // If Pie chart, and yAxis data key exists, else just resolve true
     !!config.xAxis.dataKey // If datakey exists and is not empty, null, or undefined
   ]
 
   useEffect(() => {
     if (requiredSections) configActions.setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+    console.log(requiredSections)
   }, [ config ])
 
   useEffect(() => {

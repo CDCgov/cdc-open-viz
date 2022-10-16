@@ -50,10 +50,6 @@ const ChartLinearBar = ({
     }
   }, [ config.yAxis ])
 
-  useEffect(() => {
-    if (config.isLollipopChart === false) configActions.updateField([ 'barHeight' ], 25)
-  }, [ config.isLollipopChart ])
-
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
