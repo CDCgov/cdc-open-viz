@@ -400,7 +400,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </Text>
                       <foreignObject
                         id={`barGroup${barGroup.index}`}
-                        className="tets"
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0) : barY }
@@ -426,7 +425,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           key={`circle--${bar.index}`}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          style={{ 'opacity': `${config.animate ? 0 : 1}`, filter: 'unset' }}
+                          style={{ filter: 'unset' }}
                         />
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
