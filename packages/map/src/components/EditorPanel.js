@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import {
 	Accordion,
 	AccordionItem,
@@ -12,7 +12,7 @@ import { useDebounce } from 'use-debounce';
 
 import colorPalettes from '@cdc/core/data/colorPalettes';
 import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import { useColorPalette } from '../hooks/useColorPalette';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
@@ -2294,14 +2294,14 @@ const EditorPanel = (props) => {
 											fieldName='indexLabel'
 											label='Index Column Header'
 											placeholder='Location'
-                      tooltip={
-                        <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
+                                            tooltip={
+                                                <Tooltip style={{textTransform: 'none'}}>
+                                                <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                                                <Tooltip.Content>
+                                                    <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                                                </Tooltip.Content>
+                                                </Tooltip>
+                                            }
 										/>
 										<TextField
 											value={dataTable.caption}
