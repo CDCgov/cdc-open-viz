@@ -23,7 +23,8 @@ const iconHash = {
   'world': <Icon display="mapWorld" base/>,
   'single-state': <Icon display="mapAl" base/>,
   'gear': <Icon display="gear" base/>,
-  'tools': <Icon display="tools" base/>
+  'tools': <Icon display="tools" base/>,
+  'filtered-text': <Icon display='filtered-text' base/>
 }
 
 const labelHash = {
@@ -36,7 +37,8 @@ const labelHash = {
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
   'world': 'World',
-  'single-state': 'U.S. State'
+  'single-state': 'U.S. State',
+  'filtered-text':'filtered-text'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
