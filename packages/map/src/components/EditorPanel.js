@@ -107,8 +107,6 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
-
 	const headerColors = [
 		'theme-blue',
 		'theme-purple',
@@ -124,13 +122,11 @@ const EditorPanel = (props) => {
 	];
 
 	const categoryMove = (idx1, idx2) => {
-		let categoryValuesOrder = [...editorCatOrder];
+		let categoryValuesOrder = [...state.legend.categoryValuesOrder];
 
 		let [movedItem] = categoryValuesOrder.splice(idx1, 1);
 
 		categoryValuesOrder.splice(idx2, 0, movedItem);
-
-		setEditorCatOrder(categoryValuesOrder);
 
 		setState({
 			...state,
@@ -956,10 +952,30 @@ const EditorPanel = (props) => {
 	}, [state]);
 
 	useEffect(() => {
+		//If a categorical map is used and the order is either not defined or incorrect, fix it
 		if ('category' === state.legend.type) {
-			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+			let valid = true;
+			if(state.legend.categoryValuesOrder){
+				runtimeLegend.forEach(item => {
+					if(!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
+						valid = false;
+					}
+				});
+			} else {
+				valid = false;
+			}
 
-			setEditorCatOrder(arr);
+			if(!valid){
+				let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						categoryValuesOrder: arr,
+					},
+				});
+			}
 		}
 	}, [runtimeLegend]);
 
@@ -1229,7 +1245,7 @@ const EditorPanel = (props) => {
 	});
 
 	const CategoryList = () => {
-		return editorCatOrder.map((value, index) => (
+		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
 				{(provided, snapshot) => (
 					<li style={{ position: 'relative' }}>
@@ -1245,7 +1261,7 @@ const EditorPanel = (props) => {
 					</li>
 				)}
 			</Draggable>
-		));
+		)) : <></>;
 	};
 
 	const Error = () => {
@@ -2118,7 +2134,7 @@ const EditorPanel = (props) => {
 														)}
 													</Droppable>
 												</DragDropContext>
-												{editorCatOrder.length >= 10 && (
+												{state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.length >= 10 && (
 													<section className='error-box my-2'>
 														<div>
 															<strong className='pt-1'>Warning</strong>
