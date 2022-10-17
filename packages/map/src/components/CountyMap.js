@@ -10,6 +10,7 @@ import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
 import testJSON from '../data/dfc-map.json';
 import { abbrs } from '../data/abbreviations';
+import CityList from './CityList';
 
 const offsets = {
 	Vermont: [50, -8],
@@ -44,18 +45,8 @@ const STATE_INACTIVE_FILL = '#F4F7FA';
 const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2]);
 const path = geoPath().projection(projection);
 const stateLines = path(mesh(testJSON, testJSON.objects.states));
+const countyLines = path(mesh(testJSON, testJSON.objects.counties));
 
-const nudges = {
-	'US-FL': [15, 3],
-	'US-AK': [0, -8],
-	'US-CA': [-10, 0],
-	'US-NY': [5, 0],
-	'US-MI': [13, 20],
-	'US-LA': [-10, -3],
-	'US-HI': [-10, 10],
-	'US-ID': [0, 10],
-	'US-WV': [-2, 2],
-};
 
 function CountyMapChecks(prevState, nextState) {
 	const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn;
@@ -80,7 +71,10 @@ const CountyMap = (props) => {
 		displayGeoName,
 		rebuildTooltips,
 		containerEl,
-		handleMapAriaLabels
+		handleMapAriaLabels,
+		titleCase,
+		setSharedFilterValue,
+		isFilterValueSupported
 	} = props;
 
 	useEffect(() => {
@@ -215,27 +209,42 @@ const CountyMap = (props) => {
 	};
 
 	const onReset = (e) => {
-		e.preventDefault();
-		const svg = document.querySelector('.svg-container')
 
-		svg.setAttribute('data-scaleZoom', 0)
+		if (state.general.type !== 'us-geocode') {
+			e.preventDefault();
+			const svg = document.querySelector('.svg-container') 
+
+			svg.setAttribute('data-scaleZoom', 0)
 
 
-		const allStates = document.querySelectorAll('.state path');
-		const allCounties = document.querySelectorAll('.county path');
+			const allStates = document.querySelectorAll('.state path');
+			const allCounties = document.querySelectorAll('.county path');
 
-		stateLinesPath.current.setAttribute('stroke', geoStrokeColor);
-		stateLinesPath.current.setAttribute('stroke-width', startingLineWidth);
+			stateLinesPath.current.setAttribute('stroke', geoStrokeColor);
+			stateLinesPath.current.setAttribute('stroke-width', startingLineWidth);
 
-		let otherStates = document.querySelectorAll(`.state--inactive`);
-		otherStates.forEach((el) => (el.style.display = 'none'));
-		allCounties.forEach((el) => (el.style.strokeWidth = 0.85));
-		allStates.forEach((state) => state.setAttribute('stroke-width', .75 / .85 ));
+			let otherStates = document.querySelectorAll(`.state--inactive`);
+			otherStates.forEach((el) => (el.style.display = 'none'));
+			allCounties.forEach((el) => (el.style.strokeWidth = 0.85));
+			allStates.forEach((state) => state.setAttribute('stroke-width', .75 / .85));
 
-		mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`);
+			mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`);
 
-		// reset button
-		resetButton.current.style.display = 'none';
+			// reset button
+			resetButton.current.style.display = 'none';
+		} else {
+			const svg = document.querySelector('.svg-container')
+			const allStates = document.querySelectorAll('.state');
+			document.querySelector('#focusedBorder path').style.stroke = 'none';
+			allStates.forEach(item => item.classList.remove('state--inactive'))
+			//document.querySelectorAll('.state path').forEach(item => item.style.fill = 'rgb(244, 247, 250)')
+			document.querySelectorAll('.state').forEach(item => item.style.display = 'block')
+			stateLinesPath.current.setAttribute('stroke', geoStrokeColor);
+			stateLinesPath.current.setAttribute('stroke-width', startingLineWidth);
+			svg.setAttribute('data-scaleZoom', 0)
+			mapGroup.current.setAttribute('transform', `translate(${[0, 0]}) scale(${0.85})`);
+			resetButton.current.style.display = 'none';
+		}
 	};
 
 	function setStateLeave() {
@@ -261,11 +270,11 @@ const CountyMap = (props) => {
 		focusedBorderPath.current.setAttribute('d', focusedStateLine);
 		focusedBorderPath.current.setAttribute('stroke', '#000');
 
-		if(scale) {
-			allStates.forEach( state => state.setAttribute('stroke-width', 0.75 / scale))
-			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale );
+		if (scale) {
+			allStates.forEach(state => state.setAttribute('stroke-width', 0.75 / scale))
+			focusedBorderPath.current.setAttribute('stroke-width', 0.75 / scale);
 		}
-		
+
 	}
 
 	const StateLines = memo(({ stateLines, lineWidth, geoStrokeColor }) => {
@@ -424,6 +433,12 @@ const CountyMap = (props) => {
 		return output;
 	});
 
+	const GeoCodeCountyLines = memo(() => {
+		return (
+			<path d={countyLines} className="county-borders" style={{ stroke: geoStrokeColor}} />
+		)
+	})
+
 	const StateOutput = memo(({ geographies, states }) => {
 		let output = [];
 		output.push(
@@ -446,13 +461,25 @@ const CountyMap = (props) => {
 
 				const geoDisplayName = displayGeoName(geoKey);
 
-				let stateStyles = {
-					cursor: 'default',
-					stroke: STATE_BORDER,
-					strokeWidth: 0.75 / scale,
-					display: !focusedState ? 'none' : focusedState && focusedState !== geo.id ? 'block' : 'none',
-					fill: focusedState && focusedState !== geo.id ? STATE_INACTIVE_FILL : 'none',
-				};
+				let stateStyles = {}
+
+				if (state.general.type !== 'us-geocode') {
+					stateStyles = {
+						cursor: 'default',
+						stroke: STATE_BORDER,
+						strokeWidth: 0.75 / scale,
+						display: !focusedState ? 'none' : focusedState && focusedState !== geo.id ? 'block' : 'none',
+						fill: focusedState && focusedState !== geo.id ? STATE_INACTIVE_FILL : 'none',
+					};
+				} else {
+					stateStyles = {
+						cursor: 'default',
+						stroke: STATE_BORDER,
+						strokeWidth: 0.75 / scale,
+						display: 'block',
+						fill: '#f4f7fa',
+					};
+				}
 
 				let stateSelectedStyles = {
 					fillOpacity: 1,
@@ -503,7 +530,14 @@ const CountyMap = (props) => {
 		const states = geographies.slice(0, 56);
 		const counties = geographies.slice(56);
 		let geosJsx = [];
-		geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		{
+			'us-geocode' !== state.general.type &&
+			geosJsx.push(<CountyOutput geographies={geographies} counties={counties} key="county-key" />);
+		}
+		{
+			'us-geocode' === state.general.type &&
+			geosJsx.push(<GeoCodeCountyLines />);
+		}
 		geosJsx.push(<StateOutput geographies={geographies} states={states} key="state-key" />);
 		geosJsx.push(
 			<StateLines
@@ -514,16 +548,30 @@ const CountyMap = (props) => {
 			/>
 		);
 		geosJsx.push(<FocusedStateBorder key="focused-border-key" />);
+		geosJsx.push(<CityList
+			projection={projection}
+			key="cities"
+			data={data}
+			state={state}
+			geoClickHandler={geoClickHandler}
+			applyTooltipsToGeo={applyTooltipsToGeo}
+			displayGeoName={displayGeoName}
+			applyLegendToRow={applyLegendToRow}
+			titleCase={titleCase}
+			setSharedFilterValue={setSharedFilterValue}
+			isFilterValueSupported={isFilterValueSupported}
+			isGeoCodeMap={true}
+		/>)
 		return geosJsx;
 	};
 	if(!data) <Loading />
 	return (
 		<ErrorBoundary component='CountyMap'>
-			<svg 
-				viewBox={`0 0 ${WIDTH} ${HEIGHT}`} 
-				preserveAspectRatio='xMinYMin' 
-				className='svg-container' 
-				data-scale={scale ? scale : ''} 
+			<svg
+				viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+				preserveAspectRatio='xMinYMin'
+				className='svg-container'
+				data-scale={scale ? scale : ''}
 				data-translate={translate ? translate : ''}
 				role="img"
 				aria-label={handleMapAriaLabels(state)}
@@ -550,12 +598,14 @@ const CountyMap = (props) => {
 								transform={`translate(${translate}) scale(${scale})`}
 								key='countyMapGroup'
 							>
-								{constructGeoJsx(features, geoAlbersUsaTerritories)}
+								{constructGeoJsx(features, projection)}
 							</g>
 						);
 					}}
 				</CustomProjection>
 			</svg>
+
+			{/* TODO: Refactor to COVE button */}
 			<button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }} tabIndex="0">
 				Reset Zoom
 			</button>

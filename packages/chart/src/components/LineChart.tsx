@@ -34,7 +34,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
 
               let circleRadii = 4.5
 
-              return (
+              return d[seriesKey] && (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                 <Text
                     display={config.labels ? 'block' : 'none'}

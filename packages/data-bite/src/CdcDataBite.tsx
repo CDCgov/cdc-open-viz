@@ -113,7 +113,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     setLoading(false);
   }
 
-  const calculateDataBite = ():string|number => {
+  const calculateDataBite = (includePrefixSuffix:boolean = true):string|number => {
 
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
@@ -326,11 +326,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
           // Optional
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
-     return dataFormat.prefix + dataBite + dataFormat.suffix
+     return includePrefixSuffix ? (dataFormat.prefix + dataBite + dataFormat.suffix) : dataBite
     } else { 
       //Rounding and formatting for ranges happens earlier.
 
-      return dataFormat.prefix + dataBite + dataFormat.suffix
+      return includePrefixSuffix ? (dataFormat.prefix + dataBite + dataFormat.suffix) : dataBite
     }
   }
 
@@ -392,7 +392,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite())
+      let targetVal = Number(calculateDataBite(false))
       let argumentActive = false
 
       imageData.options.forEach((option, index) => {

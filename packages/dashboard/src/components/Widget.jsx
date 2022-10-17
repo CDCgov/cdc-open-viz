@@ -23,7 +23,8 @@ const iconHash = {
   'world': <Icon display="mapWorld" base/>,
   'single-state': <Icon display="mapAl" base/>,
   'gear': <Icon display="gear" base/>,
-  'tools': <Icon display="tools" base/>
+  'tools': <Icon display="tools" base/>,
+  'filtered-text': <Icon display='filtered-text' base/>
 }
 
 const labelHash = {
@@ -36,7 +37,8 @@ const labelHash = {
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
   'world': 'World',
-  'single-state': 'U.S. State'
+  'single-state': 'U.S. State',
+  'filtered-text':'filtered-text'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
@@ -124,6 +126,9 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   const dataDesignerModal = (configureData, dataKeyOverride) => {
     const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
 
+    overlay?.actions.toggleOverlay();
+    if (Object.keys(config.visualizations).pop().includes('markup-include')) return;
+
     return (
       <Modal>
         <Modal.Content>
@@ -152,8 +157,9 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   }
 
   useEffect(() => {
-    if(data.openModal){
-      overlay?.actions.openOverlay(dataDesignerModal(dataRef.current))
+    if (data.openModal) {
+      if (Object.keys(config.visualizations).pop().includes("markup-include")) return;
+        overlay?.actions.openOverlay(dataDesignerModal(dataRef.current));
 
       visualizations[data.uid].openModal = false
 
