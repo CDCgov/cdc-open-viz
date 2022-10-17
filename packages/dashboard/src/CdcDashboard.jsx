@@ -24,6 +24,7 @@ import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
+import CdcFilteredText from '@cdc/filtered-text';
 
 import Grid from './components/Grid'
 import Header from './components/Header'
@@ -59,6 +60,9 @@ const addVisualization = (type, subType) => {
     case 'markup-include':
       newVisualizationConfig.visualizationType = type
       break
+    case 'filtered-text':
+      newVisualizationConfig.visualizationType = type
+      break
     default:
       newVisualizationConfig.visualizationType = type
       break
@@ -87,6 +91,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
       <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <Widget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
@@ -107,7 +112,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const processData = async (config) => {
     let dataset = config.formattedData || config.data
 
-    if (!dataset && config.dataUrl) {
+    if (config.dataUrl) {
       dataset = await fetchRemoteData(config.dataUrl)
       if (dataset && config.dataDescription) {
         try {
@@ -124,6 +129,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json()
+    let newConfig = { ...defaults, ...response }
     let datasets = {}
 
     if (response.datasets) {
@@ -131,12 +137,40 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         datasets[key] = await processData(response.datasets[key])
       }))
     } else {
-      datasets['backwards-compatibility'] = await processData(response)
+      let dataKey = newConfig.dataFileName || 'backwards-compatibility'
+      datasets[dataKey] = await processData(response)
+
+      let datasetsFull = {};
+      datasetsFull[dataKey] = {
+        data: datasets[dataKey],
+        dataDescription: newConfig.dataDescription
+      }
+      newConfig.datasets = datasetsFull;
+  
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = dataKey
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
+      })
+  
+      delete newConfig.data
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
+      delete newConfig.dataFileSourceType
+      delete newConfig.dataDescription
+      delete newConfig.formattedData
+  
+      if (newConfig.dashboard && newConfig.dashboard.filters) {
+        newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
+        newConfig.dashboard.filters.forEach(filter => {
+          newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
+        })
+  
+        delete newConfig.dashboard.filters
+      }
     }
 
     setData(datasets)
-
-    let newConfig = { ...defaults, ...response }
 
     updateConfig(newConfig, datasets)
     setLoading(false)
@@ -251,59 +285,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     newConfig.runtime = {}
     setConfig(newConfig)
   }
-
-  // Backwards compatiblity support for .filters after moving to .sharedFilters
-  useEffect(() => {
-    let legacyUpdateNeeded = false
-    let newConfig
-
-    if (config.data || config.dataUrl) {
-      legacyUpdateNeeded = true
-      newConfig = { ...config }
-
-      newConfig.datasets = {}
-      newConfig.datasets[config.dataFileName || 'dataset-1'] = {
-        data: config.data,
-        dataUrl: config.dataUrl,
-        dataFileName: config.dataFileName || 'dataset-1',
-        dataFileSourceType: config.dataFileSourceType
-      }
-
-      Object.keys(newConfig.visualizations).forEach(vizKey => {
-        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1'
-        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
-        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
-      })
-
-      delete newConfig.data
-      delete newConfig.dataUrl
-      delete newConfig.dataFileName
-      delete newConfig.dataFileSourceType
-      delete newConfig.dataDescription
-      delete newConfig.formattedData
-    }
-
-    if (config.dashboard && config.dashboard.filters) {
-      legacyUpdateNeeded = true
-      newConfig = { ...(newConfig || config) }
-
-      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
-      newConfig.dashboard.filters.forEach(filter => {
-        newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
-      })
-
-      delete newConfig.dashboard.filters
-    }
-
-    if (legacyUpdateNeeded) {
-      updateConfig(newConfig)
-      if (newConfig.datasets) {
-        let newData = {}
-        Object.keys(newConfig.datasets).forEach(dataKey => newData[dataKey] = newConfig.datasets[dataKey].data)
-        setData(newData)
-      }
-    }
-  })
 
   // Load data when component first mounts
   useEffect(() => {
@@ -493,6 +474,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               />
             </>
             break
+            case 'filtered-text':
+              body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
+                <CdcFilteredText
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  setConfig={updateConfig}
+                  isDashboard={true}
+                />
+              </>
+              break
           default:
             body = <></>
             break
@@ -523,7 +515,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && <Filters/>}
+          {config.dashboard.sharedFilters && <div className="cove-dashboard-filters"> <Filters/></div>}
 
           {/* Visualizations */}
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row, index) => {
@@ -603,6 +595,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                           )}
                           {visualizationConfig.type === 'markup-include' && (
                             <CdcMarkupInclude
+                              key={col.widget}
+                              config={visualizationConfig}
+                              isEditor={false}
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }}
+                              isDashboard={true}
+                            />
+                          )}
+                            {visualizationConfig.type === 'filtered-text' && (
+                            <CdcFilteredText
                               key={col.widget}
                               config={visualizationConfig}
                               isEditor={false}
