@@ -14,6 +14,7 @@ import Modal from '@cdc/core/components/ui/Modal'
 const iconHash = {
   'data-bite': <Icon display="databite" base/>,
   'Bar': <Icon display="chartBar" base/>,
+  'Spark Line': <Icon display="chartLine" />,
   'waffle-chart': <Icon display="grid" base/>,
   'markup-include': <Icon display="code" base/>,
   'Line': <Icon display="chartLine" base/>,
@@ -33,6 +34,7 @@ const labelHash = {
   'markup-include': 'Markup Include',
   'Bar': 'Bar',
   'Line': 'Line',
+  'Spark Line': 'Spark Line',
   'Pie': 'Pie',
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',

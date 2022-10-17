@@ -105,8 +105,9 @@ const CdcFilteredText:FC<Props> = (props) => {
   }, [])
   let content = (<Loading/>)
 
-let filterClasses = ["cove","cove-component","cove-component__content",'no-borders',"filtered-text"]
-  config?.visual?.border && filterClasses.push('component--has-borderColorTheme');
+let filterClasses = ["cove","cove-component","cove-component__content","filtered-text"]
+  !config.visual?.border && filterClasses.push('no-borders');
+  config?.visual?.borderColorTheme && filterClasses.push('component--has-borderColorTheme');
   config?.visual?.accent && filterClasses.push('component--has-accent');
   config?.visual?.background && filterClasses.push('component--has-background');
   config?.visual?.hideBackgroundColor && filterClasses.push('component--hideBackgroundColor');
