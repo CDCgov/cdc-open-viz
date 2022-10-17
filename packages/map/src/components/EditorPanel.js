@@ -937,7 +937,7 @@ const EditorPanel = (props) => {
 		//If a categorical map is used and the order is either not defined or incorrect, fix it
 		if ('category' === state.legend.type) {
 			let valid = true;
-			if(state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.length === runtimeLegend.length){
+			if(state.legend.categoryValuesOrder){
 				runtimeLegend.forEach(item => {
 					if(!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
 						valid = false;
