@@ -500,7 +500,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && <Filters/>}
+          {config.dashboard.sharedFilters && <div className="cove-dashboard-filters"> <Filters/></div>}
 
           {/* Visualizations */}
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row, index) => {
