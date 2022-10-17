@@ -24,6 +24,7 @@ import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
+import CdcFilteredText from '@cdc/filtered-text';
 
 import Grid from './components/Grid'
 import Header from './components/Header'
@@ -59,6 +60,9 @@ const addVisualization = (type, subType) => {
     case 'markup-include':
       newVisualizationConfig.visualizationType = type
       break
+    case 'filtered-text':
+      newVisualizationConfig.visualizationType = type
+      break
     default:
       newVisualizationConfig.visualizationType = type
       break
@@ -87,6 +91,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
       <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <Widget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
@@ -470,6 +475,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               />
             </>
             break
+            case 'filtered-text':
+              body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
+                <CdcFilteredText
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  setConfig={updateConfig}
+                  isDashboard={true}
+                />
+              </>
+              break
           default:
             body = <></>
             break
@@ -580,6 +596,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                           )}
                           {visualizationConfig.type === 'markup-include' && (
                             <CdcMarkupInclude
+                              key={col.widget}
+                              config={visualizationConfig}
+                              isEditor={false}
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }}
+                              isDashboard={true}
+                            />
+                          )}
+                            {visualizationConfig.type === 'filtered-text' && (
+                            <CdcFilteredText
                               key={col.widget}
                               config={visualizationConfig}
                               isEditor={false}
