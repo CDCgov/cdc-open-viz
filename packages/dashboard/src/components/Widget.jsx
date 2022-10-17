@@ -124,7 +124,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   const dataDesignerModal = (configureData, dataKeyOverride) => {
     const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
 
-    console.log(overlay);
     overlay?.actions.toggleOverlay();
     if (Object.keys(config.visualizations).pop().includes('markup-include')) return;
 
