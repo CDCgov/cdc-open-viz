@@ -1,6 +1,8 @@
 {
     "title": "Paired Bar Chart Example",
     "dataUrl":  "/examples/paired-bar-data.json",
+    "animate": true,
+    "animateReplay": true,
     "visualizationType": "Paired Bar",
     "series": [
         {"dataKey": "Male","type": "Paired Bar"},

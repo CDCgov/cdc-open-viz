@@ -12,12 +12,14 @@ import PieIcon from '@cdc/core/assets/chart-pie-solid.svg';
 import UsaIcon from '@cdc/core/assets/usa-graphic.svg';
 import WorldIcon from '@cdc/core/assets/world-graphic.svg';
 import AlabamaIcon from '@cdc/core/assets/alabama-graphic.svg';
+import FilteredText from '@cdc/core/assets/filtered-text.svg';
 
 import Context from '../context';
 
 const iconHash = {
   'data-bite' : <BiteIcon />,
   'Bar': <BarIcon />,
+  'Spark Line': <LineIcon />,
   'waffle-chart' : <GridIcon />,
   'markup-include' : <CodeIcon />,
   'Line' : <LineIcon />,
@@ -25,7 +27,8 @@ const iconHash = {
   'us' : <UsaIcon />,
   'us-county': <UsaIcon />,
   'world' : <WorldIcon />,
-  'single-state': <AlabamaIcon />
+  'single-state': <AlabamaIcon />,
+  'filtered-text' :  <FilteredText />,
 }
 
 const labelHash = {
@@ -35,14 +38,19 @@ const labelHash = {
   'Bar' : 'Bar',
   'Line' : 'Line',
   'Pie' : 'Pie',
+  'Spark Line' : 'Spark Line',
   'us': 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
   'world' : 'World',
-  'single-state': 'U.S. State'
+  'single-state': 'U.S. State',
+  'filtered-text':'Filtered Text'
+
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { rows, visualizations, config, updateConfig } = useContext(Context)
+
+  console.log('type', type)
 
   const handleWidgetMove = (item, monitor) => {
       let result = monitor.getDropResult()

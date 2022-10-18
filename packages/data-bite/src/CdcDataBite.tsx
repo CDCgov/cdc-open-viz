@@ -1,19 +1,21 @@
-import React, { useEffect,  useState, useCallback,FC } from 'react';
+import React, { useEffect,  useState, useCallback,FC, memo } from 'react';
 import EditorPanel from './components/EditorPanel';
 import defaults from './data/initial-state';
 import Loading from '@cdc/core/components/Loading';
 import getViewport from '@cdc/core/helpers/getViewport';
 import ResizeObserver from 'resize-observer-polyfill';
-import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
 import Context from './context';
-// @ts-ignore
-import DataTransform from '@cdc/core/components/DataTransform';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import CircleCallout from './components/CircleCallout';
 import './scss/main.scss';
 import numberFromString from '@cdc/core/helpers/numberFromString';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 import { Fragment } from 'react';
+
+import { publish } from '@cdc/core/helpers/events'
+
 
 type DefaultsType = typeof defaults
 interface Props{
@@ -22,10 +24,11 @@ interface Props{
   isDashboard?: boolean
   isEditor?: boolean
   setConfig?:any
+  link?:any
 }
 
 const CdcDataBite:FC<Props> = (props) => {
-const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig,link } = props
 
   const [config, setConfig] = useState<DefaultsType>({...defaults});
   const [loading, setLoading] = useState<Boolean>(true);
@@ -40,14 +43,18 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    general: { isCompactStyle }
   } = config;
-
 
 
   const transform = new DataTransform()
 
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   //Observes changes to outermost container and changes viewport size in state
   const resizeObserver = new ResizeObserver(entries => {
@@ -56,44 +63,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         setCurrentViewport(newViewport)
     }
   });
-
-  const fetchRemoteData = async (url) => {
-    try {
-        const urlObj = new URL(url);
-        const regex = /(?:\.([^.]+))?$/
-
-        let data = []
-
-        const ext = (regex.exec(urlObj.pathname)[1])
-        if ('csv' === ext) {
-            data = await fetch(url)
-                .then(response => response.text())
-                .then(responseText => {
-                    const parsedCsv = Papa.parse(responseText, {
-                        header: true,
-                        dynamicTyping: true,
-                        skipEmptyLines: true
-                    })
-                    return parsedCsv.data
-                })
-        }
-
-        if ('json' === ext) {
-            data = await fetch(url)
-                .then(response => response.json())
-        }
-
-        return data;
-    } catch {
-        // If we can't parse it, still attempt to fetch it
-        try {
-            let response = await (await fetch(configUrl)).json()
-            return response
-        } catch {
-            console.error(`Cannot parse URL: ${url}`);
-        }
-    }
-  }
 
   const updateConfig = (newConfig) => {
     // Deeper copy
@@ -115,13 +84,19 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
+    const round = 1000 * 60 * 15;
+    const date = new Date();
+    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
-      let newData = await fetchRemoteData(response.dataUrl)
 
-      if(newData && response.dataDescription) {
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
+      let newData = await fetchRemoteData(response.dataUrl)
+      
+      if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
           newData = transform.developerStandardize(newData, response.dataDescription);
       }
@@ -138,11 +113,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     setLoading(false);
   }
 
-  const calculateDataBite = ():string|number => {
-  
+  const calculateDataBite = (includePrefixSuffix:boolean = true):string|number => {
+
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return '';  
+      return '';
     }
 
 
@@ -151,8 +126,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       if(value === undefined || value===null){
        console.error('Enter correct value to "applyPrecision()" function ')
       return ;
-    }  
-  // second validation 
+    }
+  // second validation
   if(Number.isNaN(value)){
     console.error(' Argunment isNaN, "applyPrecision()" function ')
     return;
@@ -170,6 +145,16 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return String(result)
     }
 
+    // filter null and 0 out from count data
+    const getColumnCount = (arr:(string|number)[]) => {
+      if(config.dataFormat.ignoreZeros) {
+        numericalData = numericalData.filter( item => item && item)
+        return numericalData.length
+      } else {
+        return numericalData.length
+      }
+    }
+
     const getColumnSum = (arr:(string|number)[]) => {
       // first validation
       if(arr===undefined || arr===null){
@@ -177,6 +162,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return;
       }
       // second validation
+      console.log('arr', arr)
       if(arr.length === 0 || !Array.isArray(arr)){
         console.error('Arguments are not valid getColumnSum function ')
         return;
@@ -195,9 +181,13 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       // first validation
       if(arr===undefined || arr===null ||!Array.isArray(arr)){
         console.error('Enter valid parameter getColumnMean function')
-        return 
+        return
       }
-     
+
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( num => num !== 0 )
+      }
+
       let mean:number = 0
       if(arr.length > 1){
        /// first convert each element to number then add using reduce method to escape string concatination.
@@ -261,13 +251,9 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
       return formattedValue
     }
-  
-  
-
-  
 
     let dataBite:string|number = '';
-    
+
     //Optionally filter the data based on the user's filter
     let filteredData = config.data;
 
@@ -281,22 +267,21 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
       }
     });
 
-    let numericalData:any[] = []
+    let numericalData:any[] = []; 
+    // Get the column's data
+    if(filteredData.length){
+    filteredData.forEach(row => {
+      let value = numberFromString(row[dataColumn])
+      if(typeof value === 'number') numericalData.push(value)
+    });
+    } else {
+    numericalData = config.data.map( item => Number( item[config.dataColumn] ));
+    }
 
-
-   // Get the column's data
-     if(filteredData.length){   
-      filteredData.forEach(row => {
-        let value = numberFromString(row[dataColumn])
-        if(typeof value === 'number') numericalData.push(value)
-      });
-     }
-    
-  
 
     switch (dataFunction) {
       case DATA_FUNCTION_COUNT:
-        dataBite = numericalData.length;
+        dataBite = getColumnCount(numericalData);
         break;
       case DATA_FUNCTION_SUM:
         dataBite = getColumnSum(numericalData);
@@ -325,7 +310,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
           rangeMin = applyLocaleString(rangeMin)
           rangeMax = applyLocaleString(rangeMax)
           }
-      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax+config.dataFormat.suffix;  
+      dataBite =  config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax+config.dataFormat.suffix;
         break;
       default:
         console.warn('Data bite function not recognized: ' + dataFunction);
@@ -334,34 +319,61 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     // If not the range, then round and format here
     if (dataFunction !== DATA_FUNCTION_RANGE) {
       dataBite = applyPrecision(dataBite);
-  
+
       if (config.dataFormat.commas) {
        dataBite = applyLocaleString(dataBite)
       }
-          // Optional 
+          // Optional
       // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
-     return dataBite
+     return includePrefixSuffix ? (dataFormat.prefix + dataBite + dataFormat.suffix) : dataBite
     } else { 
       //Rounding and formatting for ranges happens earlier.
 
-      return dataBite
+      return includePrefixSuffix ? (dataFormat.prefix + dataBite + dataFormat.suffix) : dataBite
     }
   }
+
+  let innerContainerClasses = ['cove-component__inner']
+  config.title && innerContainerClasses.push('component--has-title')
+  config.subtext && innerContainerClasses.push('component--has-subtext')
+  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+  let contentClasses = ['cove-component__content'];
+  !config.visual?.border && contentClasses.push('no-borders');
+  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+  config.visual?.accent && contentClasses.push('component--has-accent');
+  config.visual?.background && contentClasses.push('component--has-background');
+  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+  // ! these two will be retired.
+  config.shadow && innerContainerClasses.push('shadow')
+  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
       if (node !== null) {
           resizeObserver.observe(node);
       }
+      setContainer(node)
   },[]);
 
   // Initial load
   useEffect(() => {
     loadConfig()
+    publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
-  if(configObj && config && configObj.data !== config.data){
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
+
+  if(configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)){
     loadConfig();
   }
 
@@ -380,7 +392,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     let imageAlt = imageData.alt
 
     if ('dynamic' === imageData.display && imageData.options && imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite())
+      let targetVal = Number(calculateDataBite(false))
       let argumentActive = false
 
       imageData.options.forEach((option, index) => {
@@ -436,18 +448,24 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         isBottom = true
         break;
     }
-    config?.visual?.border && biteClasses.push('bite--has-border');
-    config?.visual?.accent && biteClasses.push('bite--has-accent');
-    config?.visual?.background && biteClasses.push('bite--has-background');
-    config?.visual?.hideBackgroundColor && biteClasses.push('bite--hideBackgroundColor');
-    
-    let innerContainerClasses = ['cdc-data-bite-inner-container']
-    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
-    config.title && innerContainerClasses.push('bite--has-title')
-    config.subtext && innerContainerClasses.push('bite--has-subtext')
-    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-    config.shadow && innerContainerClasses.push('shadow')
 
+    
+    let innerContainerClasses = ['cove-component__inner']
+    config.title && innerContainerClasses.push('component--has-title')
+    config.subtext && innerContainerClasses.push('component--has-subtext')
+    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
+    config.general.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+
+    let contentClasses = ['cove-component__content'];
+    !config.visual.border && contentClasses.push('no-borders');
+    config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
+    config.visual.accent && contentClasses.push('component--has-accent');
+    config.visual.background && contentClasses.push('component--has-background');
+    config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+
+    // ! these two will be retired.
+    config.shadow && innerContainerClasses.push('shadow')
+    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 
@@ -456,12 +474,12 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         {isEditor && <EditorPanel />}
         <div className={isEditor ? 'spacing-wrapper' : ''}>
           <div className={innerContainerClasses.join(' ')}>
-            {title && <div className="bite-header">{parse(title)}</div>}
+            {title && <div className={`bite-header cove-component__header component__header ${config.theme}`}>{parse(title)}</div>}
             <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className="bite-content-container" >
+              <div className={`bite-content-container ${contentClasses.join(' ')}` }>
                 {showBite && 'graphic' === biteStyle && isTop && <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={biteFontSize} dataFormat={dataFormat} /> }
                 {isTop && <DataImage />}
-                <div className="bite-content">
+                <div className={`bite-content`}>
                   {showBite && 'title' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                   {showBite && 'split' === biteStyle && <div className="bite-value" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</div>}
                     <Fragment>
@@ -471,7 +489,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
                         {parse(biteBody)}
                       </p>
                       {showBite && 'end' === biteStyle && <span className="bite-value data-bite-body" style={{fontSize: biteFontSize + 'px'}}>{calculateDataBite()}</span>}
-                      {subtext && <p className="bite-subtext">{parse(subtext)}</p>}
+                      {subtext && !isCompactStyle && <p className="bite-subtext">{parse(subtext)}</p>}
                       </div>
                     </Fragment>
                 </div>
@@ -480,12 +498,14 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
               </div>
             </div>
           </div>
+          {link && link}
         </div>
       </>
     )
   }
 
   let classNames = [
+    'cove',
     'cdc-open-viz-module',
     'type-data-bite',
     currentViewport,

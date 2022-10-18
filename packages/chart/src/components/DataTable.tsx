@@ -24,7 +24,7 @@ export default function DataTable() {
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
-
+  const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded);
   const [accessibilityLabel, setAccessibilityLabel] = useState('');
 
@@ -73,7 +73,7 @@ export default function DataTable() {
 
     data.forEach((d) => {
         const newCol = {
-          Header: config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
+          Header: config.runtime[section].type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
           Cell: ({ row }) => {
             return (
               <>
@@ -133,20 +133,25 @@ export default function DataTable() {
     <ErrorBoundary component="DataTable">
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`}  className={`data-table-container`} aria-label={accessibilityLabel}>
           <div
+            role="button"
             className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
-            onClick={() => { setTableExpanded(!tableExpanded); }}
             tabIndex={0}
+            onClick={() => { setTableExpanded(!tableExpanded); }}
             onKeyDown={(e) => { if (e.keyCode === 13) { setTableExpanded(!tableExpanded); } }}
           >
             {config.table.label}
           </div>
-          <div className="table-container">
+          <div 
+           className="table-container"
+           style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
+           >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
               hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
+              <caption className='cdcdataviz-sr-only'>{config.table.caption ?  config.table.caption : "" }</caption>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup,index) => (
@@ -168,7 +173,7 @@ export default function DataTable() {
                           : column.render('Header')
                         }
                         <button>
-                          <span className="cdcdataviz-sr-only">{`Sort by ${(column.render('Header')).toLowerCase() } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
+                          <span className="cdcdataviz-sr-only">{`Sort by ${typeof column.render('Header') === 'string' ? column.render('Header').toLowerCase() : column.render('Header') } in ${ column.isSorted ? column.isSortedDesc ? 'descending' : 'ascending' : 'no'} `} order</span>
                         </button>
                         <div {...column.getResizerProps()} className="resizer" />
                       </th>

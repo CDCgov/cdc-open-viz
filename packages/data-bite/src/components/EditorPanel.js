@@ -10,7 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
-import WarningImage from '../images/warning.svg'
+import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -67,10 +67,10 @@ const TextField = memo(({label, section = null, subsection = null, fieldName, up
   )
 })
 
-const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, updateField, ...attributes}) => (
+const CheckBox = memo(({label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes}) => (
   <label className="checkbox">
     <input type="checkbox" name={fieldName} checked={ value } onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes}/>
-    <span className="edit-label">{label}</span>
+    <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
   </label>
 ))
 
@@ -465,13 +465,8 @@ const EditorPanel = memo(() => {
                       />
                     </li>
                   </ul>
-                  <CheckBox
-                    value={config.dataFormat.commas}
-                    section="dataFormat"
-                    fieldName="commas"
-                    label="Add commas"
-                    updateField={updateField}
-                  />
+                  <CheckBox value={config.dataFormat.commas} section="dataFormat" fieldName="commas" label="Add commas" updateField={updateField} />
+                  <CheckBox value={config.dataFormat.ignoreZeros} section="dataFormat" fieldName="ignoreZeros" label="Ignore Zeros" updateField={updateField} />
                   <hr className="accordion__divider" />
 
                   <label style={{ marginBottom: "1rem" }}>
@@ -599,12 +594,7 @@ const EditorPanel = memo(() => {
                     updateField={updateField}
                     options={["small", "medium", "large"]}
                   />
-                  <CheckBox
-                    value={config.shadow}
-                    fieldName="shadow"
-                    label="Display Shadow"
-                    updateField={updateField}
-                  />
+                  <div className="checkbox-group">
                   <CheckBox
                     value={config.visual?.border}
                     section="visual"
@@ -612,18 +602,18 @@ const EditorPanel = memo(() => {
                     label="Display Border"
                     updateField={updateField}
                   />
+                  <CheckBox 
+                    value={config.visual?.borderColorTheme} 
+                    section="visual"
+                    fieldName="borderColorTheme"
+                    label="Use Border Color Theme"
+                    updateField={updateField} 
+                  />
                   <CheckBox
                     value={config.visual?.accent}
                     section="visual"
                     fieldName="accent"
                     label="Use Accent Style"
-                    updateField={updateField}
-                  />
-                  <CheckBox
-                    value={config.visual?.roundedBorders}
-                    section="visual"
-                    fieldName="roundedBorders"
-                    label="Use Rounded Borders"
                     updateField={updateField}
                   />
                   <CheckBox
@@ -640,7 +630,8 @@ const EditorPanel = memo(() => {
                     label="Hide Background Color"
                     updateField={updateField}
                   />
-                  <label className="header">
+                  </div>
+                  <label>
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
@@ -662,7 +653,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {["title", "body"].includes(config.biteStyle) && (
+              {['title', 'body', 'graphic'].includes(config.biteStyle) && (
                 <AccordionItem>
                   {" "}
                   {/*Image & Dynamic Images*/}

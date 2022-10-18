@@ -2,6 +2,8 @@
     "title": "Data Cutoff Example (< 0.1)",
     "theme": "theme-blue",
     "dataUrl":  "/examples/cutoff-example-data.json",
+    "animate": true,
+    "animateReplay": true,
     "visualizationType": "Line",
     "series": [{"dataKey": "Value"}],
     "barThickness": 0.3,
