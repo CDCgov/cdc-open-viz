@@ -433,11 +433,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
 
-            // Coerce strings to numbers inside configuredOrder property
-            for(let i = 0; i < configuredOrder.length; i++) {
-                configuredOrder[i] = numberFromString(configuredOrder[i])
-            }
-
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
                     return configuredOrder.indexOf(a) - configuredOrder.indexOf(b);
