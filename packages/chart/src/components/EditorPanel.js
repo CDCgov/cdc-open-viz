@@ -196,6 +196,13 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
+
+  useEffect(() => {
+    if(config.legend.dynamicLegend) {
+      console.info('Using dynamic legend')
+      setFilteredData([])
+    }
+  }, [config.legend.dynamicLegend]);
   
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
@@ -235,8 +242,6 @@ const EditorPanel = () => {
     cursor: 'move',
     zIndex: '999',
   }
-
-  let hasLineChart = false
 
   const enforceRestrictions = (updatedConfig) => {
     if (updatedConfig.orientation === 'horizontal') {
