@@ -52,7 +52,8 @@ export default {
     behavior: 'isolate',
     position: 'right',
     reverseLabelOrder:false,
-    description:''
+    description:'',
+    dynamicLegend: false
   },
   exclusions: {
     active: false,
