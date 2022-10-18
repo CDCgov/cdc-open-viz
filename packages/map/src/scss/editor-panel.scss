@@ -1,4 +1,21 @@
+.post-type-cdc_visualization {
+  .cove {
+    // Temp Radio button fix
+    // Resets User Agent Style, forms.css is overwriting our styles here.
+    input[type="radio"] {
+        background-color: initial !important;
+        cursor: default !important;
+        appearance: auto !important;
+        box-sizing: border-box !important;
+        margin: 3px 3px 0px 5px !important;
+        padding: initial !important;
+        border: initial !important;
+    }
+    // End Temp Radio button fix
+  }
+}
 .cdc-open-viz-module {
+
   .geo-buttons {
     list-style: none;
     display: flex;
@@ -13,7 +30,8 @@
         fill: currentColor
       }
     }
-    li {
+    button {
+      background: transparent;
       padding: .3em .75em;
       display: flex;
       border: $lightGray 1px solid;
@@ -222,7 +240,6 @@
         display: block;
         text-align: left;
         cursor: pointer;
-        color: rgba(0,0,0,.5);
         text-decoration: underline;
         span {
           text-decoration: none;

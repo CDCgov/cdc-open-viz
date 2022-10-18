@@ -16,17 +16,9 @@ const Sidebar = (props) => {
     setRuntimeLegend,
     prefix,
     suffix,
-    viewport
+    viewport,
+    displayDataAsText
   } = props;
-
-  const addCommas = (value) => {
-    // If value is a number, apply specific formattings
-    if (value && columns.primary.hasOwnProperty('useCommas') && columns.primary.useCommas === true) {
-      return value.toLocaleString('en-US', { style: 'decimal' });
-    }
-
-    return value;
-  };
 
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
@@ -48,21 +40,22 @@ const Sidebar = (props) => {
   };
 
   const legendList = runtimeLegend.map((entry, idx) => {
-    const entryMax = addCommas(entry.max);
 
-    const entryMin = addCommas(entry.min);
+    const entryMax = displayDataAsText(entry.max, 'primary');
 
-    let formattedText = `${prefix + entryMin + suffix}${entryMax !== entryMin ? ` - ${prefix + entryMax + suffix}` : ''}`;
+    const entryMin = displayDataAsText(entry.min, 'primary');
+
+    let formattedText = `${entryMin}${entryMax !== entryMin ? ` - ${entryMax}` : ''}`;
 
     // If interval, add some formatting
     if (legend.type === 'equalinterval' && idx !== runtimeLegend.length - 1) {
-      formattedText = `${prefix + entryMin + suffix} - < ${prefix + entryMax + suffix}`;
+      formattedText = `${entryMin} - < ${entryMax}`;
     }
 
     const { disabled } = entry;
 
     if (legend.type === 'category') {
-      formattedText = prefix + entry.value + suffix;
+      formattedText = displayDataAsText(entry.value, 'primary');
     }
 
     if (entry.max === 0 && entry.min === 0) {
@@ -76,12 +69,13 @@ const Sidebar = (props) => {
     }
 
     return (
-      <li
+      <li 
+        className={disabled ? 'disabled single-legend' : 'single-legend'}
         key={idx}
         title={`Legend item ${legendLabel} - Click to disable`}
-        onClick={() => { toggleLegendActive(idx, legendLabel); }}
-        className={disabled ? 'disabled single-legend' : 'single-legend'}
-      ><LegendCircle fill={entry.color} /> <span className="label">{legendLabel}</span>
+        onClick={() => { toggleLegendActive(idx, legendLabel); } }
+        >
+        <LegendCircle fill={entry.color} /> <span className="label">{legendLabel}</span>
       </li>
     );
   });

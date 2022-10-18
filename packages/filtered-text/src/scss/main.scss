@@ -1,0 +1,11 @@
+@import '~@cdc/core/styles/v2/main';
+
+.cove-accordion__panel-section {
+	overflow: auto;
+
+	.cove-input__checkbox--small {
+		float: left;
+		display: block;
+		margin-right: 5px;
+	}
+}

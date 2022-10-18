@@ -53,6 +53,18 @@ export const supportedStates = {
   'US-WY': ['WYOMING', 'WY']
 };
 
+export const supportedRegions = {
+  'region 1': ['REGION 1', 'R1'],
+  'region 2': ['REGION 2', 'R2'],
+  'region 3': ['REGION 3', 'R3'],
+  'region 4': ['REGION 4', 'R4'],
+  'region 5': ['REGION 5', 'R5'],
+  'region 6': ['REGION 6', 'R6'],
+  'region 7': ['REGION 7', 'R7'],
+  'region 8': ['REGION 8', 'R8'],
+  'region 9': ['REGION 9', 'R9'],
+  'region 10': ['REGION 10', 'R10']
+}
 
 export const stateToIso = {
   // States
@@ -271,7 +283,7 @@ export const supportedCountries = {
   CCK: ['Cocos (Keeling) Islands', 'Cocos (Keeling) Islands (Australia)'],
   COL: ['Colombia'],
   COM: ['Comoros'],
-  COG: ['Congo', 'Congo, Republic of the'],
+  COG: ['Congo', 'Congo, Republic of the', 'Republic of the Congo'],
   COD: ['Democratic Republic of the Congo', 'Congo, Democratic Republic of the', 'Congo, the Democratic Republic of the', 'Dem. Rep. Congo'],
   COK: ['Cook Islands', 'Cook Is.', 'Cook Islands (New Zealand)'],
   CRI: ['Costa Rica'],
@@ -485,7 +497,12 @@ export const supportedTerritories = {
 };
 
 export const supportedCities = {
+  'GAINESVILLE': [-82.3248, 29.6516],
   'DISTRICT OF COLUMBIA': [-77.036873, 38.907192],
+  'US-DC': [-77.036873, 38.907192],
+  'WASHINGTON D.C.': [-77.036873, 38.907192],
+  'WASHINGTON DC.': [-77.036873, 38.907192],
+  'WASHINGTON DC': [-77.036873, 38.907192],
   'LOS ANGELES COUNTY': [-118.229362, 34.058762],
   MESA: [-111.831474, 33.415184],
   PHOENIX: [-112.074036, 33.448376],

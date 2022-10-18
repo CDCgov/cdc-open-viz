@@ -1,6 +1,8 @@
 {
     "title": "Planet Radius (Combo Example)",
     "dataUrl":  "/examples/planet-example-data.json",
+    "animate": true,
+    "animateReplay": true,
     "visualizationType": "Combo",
     "series": [{"dataKey":"Radius", "type":"Line"}, {"dataKey":"Diameter", "type":"Bar"}],
     "dataFormat": {

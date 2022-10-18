@@ -302,7 +302,7 @@ const EditorPanel = memo(() => {
                     value={"Super Title"}
                     updateField={updateField}
                     section="general"
-                    fieldName="super_title"
+                    fieldName="superTitle"
                     label="Super Title"
                     placeholder="Super Title"
                     tooltip={
@@ -325,7 +325,7 @@ const EditorPanel = memo(() => {
                     value={"Intro Text"}
                     updateField={updateField}
                     section="general"
-                    fieldName="intro_text"
+                    fieldName="introText"
                     label="Intro Text"
                     tooltip={
                       <Tooltip style={{ textTransform: "none" }}>

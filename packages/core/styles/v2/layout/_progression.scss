@@ -1,4 +1,5 @@
-.waiting {
+//TODO: Replace any '.waiting' classes with below
+.waiting-splash {
   @include emptyState;
   padding-top: 0;
 
@@ -25,7 +26,8 @@
   }
 }
 
-.loading {
+//TODO: Replace any '.loading' classes with below
+.loading-splash {
   position: absolute;
   top: 0;
   right: 0;

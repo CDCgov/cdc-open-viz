@@ -10,7 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate } = useContext<any>(Context);
 
   return (
     <ErrorBoundary component="LineChart">
@@ -22,8 +22,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
             display={config.legend.behavior === "highlight" || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
           >
             { data.map((d, dataIndex) => {
+              const xAxisValue = config.runtime.xAxis.type==='date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey];
               let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
-              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` :xAxisValue;
 
               const tooltip = `<div>
               ${yAxisTooltip}<br />
@@ -33,7 +34,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
 
               let circleRadii = 4.5
 
-              return (
+              return d[seriesKey] && (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                 <Text
                     display={config.labels ? 'block' : 'none'}
@@ -65,6 +66,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData }
               strokeWidth={2}
               strokeOpacity={1}
               shapeRendering="geometricPrecision"
+              defined={(item,i) => {
+                return item[config.runtime.seriesLabels[seriesKey]] !== "";
+              }}
             />
           </Group>
         ))

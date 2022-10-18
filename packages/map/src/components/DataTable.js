@@ -5,7 +5,7 @@ import {
   useTable, useSortBy, useResizeColumns, useBlockLayout
 } from 'react-table';
 import Papa from 'papaparse';
-import ExternalIcon from '../images/external-link.svg';
+import ExternalIcon from '../images/external-link.svg'; // TODO: Move to Icon component
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import LegendCircle from '@cdc/core/components/LegendCircle';
@@ -32,7 +32,8 @@ const DataTable = (props) => {
     navigationHandler,
     viewport,
     formatLegendLocation,
-    tabbingId
+    tabbingId,
+    setFilteredCountryCode
   } = props;
 
   const [expanded, setExpanded] = useState(expandDataTable);
@@ -41,7 +42,7 @@ const DataTable = (props) => {
 
   const [ready, setReady] = useState(false)
 
-  const fileName = `${mapTitle}.csv`;
+  const fileName = `${mapTitle || 'data-table'}.csv`;
 
 
   // Catch all sorting method used on load by default but also on user click
@@ -205,7 +206,7 @@ const DataTable = (props) => {
 
             const legendColor = applyLegendToRow(rowObj);
 
-            if(state.general.geoType !== 'us-county') {
+            if(state.general.geoType !== 'us-county' || state.general.type === 'us-geocode') {
               var labelValue = displayGeoName(row.original);
             } else {
               var labelValue = formatLegendLocation(row.original)
@@ -297,17 +298,17 @@ const DataTable = (props) => {
         tabIndex="0"
         onKeyDown={(e) => { if (e.keyCode === 13) { setExpanded(!expanded); } }}
       >
- 
+
         {tableTitle}
       </div>
-      <div 
+      <div
         className="table-container"
-        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } } 
+        style={ { maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' } }
       >
         <table
-          height={expanded ? null : 0} {...getTableProps()} 
-          aria-live="assertive" 
-          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
+          height={expanded ? null : 0} {...getTableProps()}
+          aria-live="assertive"
+          className={expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}
           hidden={!expanded}
           aria-rowcount={state?.data.length ? state.data.length : '-1' }
         >
@@ -316,7 +317,7 @@ const DataTable = (props) => {
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th 
+                  <th
                     tabIndex="0"
                     title={column.Header}
                     role="columnheader"
@@ -343,11 +344,14 @@ const DataTable = (props) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} role="row">
-                  {row.cells.map((cell) => (
-                    <td tabIndex="0" {...cell.getCellProps()} role="gridcell">
-                      {cell.render('Cell')}
-                    </td>
-                  ))}
+                  {row.cells.map((cell) => {
+                    return (
+                      <td tabIndex="0" {...cell.getCellProps()} role="gridcell" onClick={ (e) => (state.general.type === 'bubble' && state.general.allowMapZoom && state.general.geoType === 'world') ? setFilteredCountryCode(cell.row.original) : true }>
+                        {cell.render('Cell')}
+                      </td>
+                    )
+                  }
+                  )}
                 </tr>
               );
             })}

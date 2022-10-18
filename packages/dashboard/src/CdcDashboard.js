@@ -19,6 +19,7 @@ import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
+import FilteredText from '@cdc/filtered-text';
 
 import EditorPanel from './components/EditorPanel'
 import Grid from './components/Grid'
@@ -31,6 +32,8 @@ import DataTable from './components/DataTable'
 import Papa from 'papaparse'
 
 import './scss/main.scss'
+
+import { publish } from '@cdc/core/helpers/events'
 
 const addVisualization = (type, subType) => {
   let newVisualizationConfig = {
@@ -55,6 +58,9 @@ const addVisualization = (type, subType) => {
       break
     case 'markup-include':
       newVisualizationConfig.visualizationType = type
+      break
+    case 'filtered-text':
+         newVisualizationConfig.visualizationType = type
       break
   }
 
@@ -81,6 +87,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
       <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <Widget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
@@ -102,6 +109,10 @@ export default function CdcDashboard(
   const [ preview, setPreview ] = useState(false)
 
   const [ currentViewport, setCurrentViewport ] = useState('lg')
+
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+
+  const [ container, setContainer ] = useState()
 
   const { title, description } = config ? (config.dashboard || config) : {}
 
@@ -144,6 +155,12 @@ export default function CdcDashboard(
     }
   }
 
+   const cacheBustingString = () => {
+     const round = 1000 * 60 * 15;
+     const date = new Date();
+     return new Date(date.getTime() - (date.getTime() % round)).toISOString();
+   };
+
   const loadConfig = async (configObj) => {
     // Set loading flag
     if (!loading) setLoading(true)
@@ -152,11 +169,12 @@ export default function CdcDashboard(
 
     // If a dataUrl property exists, always pull from that.
     if (newState.dataUrl) {
+      
       if (newState.dataUrl[0] === '/') {
         newState.dataUrl = 'https://' + hostname + newState.dataUrl
       }
 
-      let newData = await fetchRemoteData(newState.dataUrl)
+      let newData = await fetchRemoteData(newState.dataUrl + `?v=${cacheBustingString()}`)
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
@@ -212,6 +230,10 @@ export default function CdcDashboard(
     return values
   }
 
+  function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   const updateConfig = (newConfig, dataOverride = null) => {
     // After data is grabbed, loop through and generate filter column values if there are any
     if (newConfig.dashboard.filters) {
@@ -257,6 +279,13 @@ export default function CdcDashboard(
       setParentConfig(config)
     }
   }, [ config ])
+
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+      publish('cove_loaded', { config: config })
+      setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -324,6 +353,7 @@ export default function CdcDashboard(
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   // Prevent render if loading
@@ -370,6 +400,9 @@ export default function CdcDashboard(
           case 'markup-include':
             body = <><Header back={back} subEditor="Markup Include"/><CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/></>
             break
+            case 'filtered-text':
+              body = <><Header back={back} subEditor="Filtered Text"/><FilteredText key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/></>
+              break
         }
       }
     })
@@ -395,7 +428,11 @@ export default function CdcDashboard(
           {title && <div role="heading" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>{title}</div>}
 
           {/* Filters */}
-          {config.dashboard.filters && <Filters/>}
+          {config.dashboard.filters &&
+            <div className="cove-dashboard-filters">
+              <Filters />
+            </div>
+          }
 
           {/* Visualizations */}
           {config.rows && config.rows.map((row, index) => {
@@ -426,6 +463,9 @@ export default function CdcDashboard(
                         updateChildConfig(col.widget, newConfig)
                       }} isDashboard={true}/>}
                       {visualizationConfig.type === 'markup-include' && <CdcMarkupInclude key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {
+                        updateChildConfig(col.widget, newConfig)
+                      }} isDashboard={true}/>}
+                      {visualizationConfig.type === 'filtered-text' && <FilteredText key={col.widget} config={visualizationConfig} isEditor={false} setConfig={(newConfig) => {
                         updateChildConfig(col.widget, newConfig)
                       }} isDashboard={true}/>}
                     </div>

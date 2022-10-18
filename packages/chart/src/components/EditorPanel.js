@@ -14,9 +14,12 @@ import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
 import Context from '../context'
 import WarningImage from '../images/warning.svg'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor';
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { useColorPalette } from '../hooks/useColorPalette'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
+import Waiting from '@cdc/core/components/Waiting';
+import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'; //TODO: Update with Icon component
+import {useColorPalette} from '../hooks/useColorPalette';
 
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
@@ -25,7 +28,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData';
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
-  const [ value, setValue ] = useState(stateValue);
+  const [ value, setValue ] = useState(stateValue); 
 
   const [ debouncedValue ] = useDebounce(value, 500);
 
@@ -38,7 +41,6 @@ const TextField = memo(({label, tooltip, section = null, subsection = null, fiel
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
   const onChange = (e) => {
-
     if ('number' !== type || min === null) {
       setValue(e.target.value)
     } else {
@@ -189,20 +191,15 @@ const EditorPanel = () => {
     setFilteredData
   } = useContext(Context)
 
-  const {minValue,maxValue} = useReduceData(config,data)
+  const {minValue,maxValue,existPositiveValue} = useReduceData(config,unfilteredData);
   const {paletteName,isPaletteReversed,filteredPallets,filteredQualitative,dispatch} = useColorPalette(colorPalettes,config);
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
-	},[paletteName])
-
+  }, [paletteName])
+  
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
- },[dispatch,config.palette]);
-
-  useEffect(() => {
-    dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [ dispatch, config.palette ])
-
+  }, [dispatch, config.palette]);
 
   const filterOptions = [
     {
@@ -224,6 +221,8 @@ const EditorPanel = () => {
   })
 
   const sortableItemStyles = {
+    animate: false,
+    animateReplay: true,
     display: 'block',
     boxSizing: 'border-box',
     border: '1px solid #D1D1D1',
@@ -314,19 +313,25 @@ const EditorPanel = () => {
   const addNewFilter = () => {
     let filters = config.filters ? [ ...config.filters ] : []
 
-    filters.push({ values: [] })
+    filters.push({ values: [] });
 
-    updateConfig({ ...config, filters })
+    updateConfig({ ...config, filters });
   }
 
   const addNewSeries = (seriesKey) => {
     let newSeries = config.series ? [ ...config.series ] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' })
-    updateConfig({ ...config, series: newSeries })
+    newSeries.push({ dataKey: seriesKey, type: 'Bar' });
+    updateConfig({ ...config, series: newSeries });
+  }
+
+  const sortSeries = (e) => {
+    const series = config.series[0].dataKey
+    const sorted = data.sort((a, b) => a[series] - b[series]);
+    const newData = e === "asc" ? sorted : sorted.reverse();
+    updateConfig({ ...config }, newData);
   }
 
   const removeSeries = (seriesKey) => {
-
 
     let series = [ ...config.series ]
     let seriesIndex = -1
@@ -427,7 +432,6 @@ const EditorPanel = () => {
     return unique ? [ ...new Set(values) ] : values
   }
 
- 
   const showBarStyleOptions = ()=>{
     if (config.visualizationType === 'Bar' && config.visualizationSubType !== 'stacked' && (config.orientation==='horizontal' || config.orientation==='vertical') ) {
       return ['flat','rounded','lollipop']
@@ -524,7 +528,7 @@ const EditorPanel = () => {
                   {exclusion}
                 </div>
               </div>
-              <span className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</span>
+              <button className="series-list__remove" onClick={() => removeExclusion(exclusion)}>&#215;</button>
             </li>
           )
         })}
@@ -542,8 +546,8 @@ const EditorPanel = () => {
       </section>
     )
   }
-  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
 
+  const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [ movedItem ] = filterOrder.splice(idx1, 1)
     filterOrder.splice(idx2, 0, movedItem)
@@ -564,94 +568,51 @@ const EditorPanel = () => {
     config.runtime.editorErrorMessage = 'Add a data series'
   }
 
-  const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
-  const [warningMsg,updateWarningMsg] = useState({maxMsg:'',minMsg:''})
-  
-  const onMaxChangeHandler = (e) => {
-     const enteredValue = e.target.value;
+  const section = config.orientation==='horizontal'  ? 'xAxis' : 'yAxis';
+  const [warningMsg,setWarningMsg] = useState({maxMsg:'',minMsg:''});
 
-     var existPositiveValue;
-     let value;
+  const validateMaxValue = () => {
+    const enteredValue = config[section].max;
+    let message = '';
 
-     // loop through series keys
-    if (config.runtime.seriesKeys) {
-      for(let i = 0; i < config.runtime.seriesKeys.length; i++) {
-        existPositiveValue = data.some(d => d[config.runtime.seriesKeys[i]] >= 0);
-      }
-    }
+   switch(true){
+     case (enteredValue  && parseFloat(enteredValue) < parseFloat(maxValue) && existPositiveValue):
+       message = 'Max value must be more than '+ maxValue;
+       break;
+     case (enteredValue  && parseFloat(enteredValue) < 0 && !existPositiveValue):
+       message = 'Value must be more than or equal to 0';
+       break;
+     default : message = '' ;
+   }
+    setWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:message}});
+  };
 
-     // input >= max
-    if (Number(enteredValue) >= maxValue) {
-        value = enteredValue
-        updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-    }
-    
-    // input < max && a positive number exists
-    if (Number(enteredValue)< maxValue && existPositiveValue) {
-        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Max value must be more than '+ maxValue}})
-    }
-    
-    // input < max && all numbers negatice
-    if (Number(enteredValue) < maxValue && !existPositiveValue) {
-        updateWarningMsg(function(presMsg){return{...presMsg,maxMsg:'Value must be more than or equal to 0'}})
-    }
-    updateField(section, null, 'max', value)
-    
-    if (!enteredValue.length) {
-      updateWarningMsg(function(prevMsg){return{...prevMsg,maxMsg:''}})
-    }
-  }
-  
-  const onMinChangeHandler = (e) => {
-    const enteredValue = e.target.value;
-    let value;
-    if (config.visualizationType === 'Line') {
-      if (Number(enteredValue) > minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than ' + minValue}})
-      } else {
-        value = enteredValue
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' } })
-      }
-      } else {
-        if (Number(enteredValue) > minValue) {
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than '+ minValue }})
-        } else if (Number(enteredValue) > 0  ) {
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: 'Value must be less than or equal to 0' }})
-        } else {
-          value = enteredValue
-          updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: '' }})
-        }
-       
-      }
-      updateField(section, null, 'min', value)
 
-      if (!enteredValue.length) {
-        updateWarningMsg(function (presMsg) { return {...presMsg, minMsg: ''}})
-      }
-    }
-  
+  const validateMinValue = ()=>{
+   const enteredValue = config[section].min;
+   let minVal = Number(minValue); 
+   let message = '';
 
-  useEffect(() => {
-    if (config[section].max && config[section].max < maxValue) {
-      updateField(section,null,'max',maxValue)
-      updateWarningMsg(function (presMsg) {return {...presMsg, maxMsg: `Entered value ${config[section].max} is not valid `}})
-    } 
-  }, [data,maxValue])
-  
-  useEffect(() => {
-    if (config.visualizationType === 'Line') {
-      if (config[section].min && config[section].min > minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-        updateField(section,null,'min',minValue)
-      }
-    } else {
-      if (config[section].min && config[section].min < minValue) {
-        updateWarningMsg(function (presMsg) { return { ...presMsg, minMsg: `Entered value ${config[section].min} is not valid`}})
-        updateField(section,null,'min',minValue)
-      }
-    }
-  }, [data,minValue])
-  
+  switch(true){
+    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+      message = 'Value must be less than ' + minValue;
+      break; 
+    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+      message = 'Value must be less than or equal to 0';
+      break; 
+    case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
+      message = 'Value must be less than ' + minValue; 
+      break;
+    default : message = ''
+  };
+    setWarningMsg(function (prevMsg) { return {...prevMsg, minMsg: message}});
+ };
+
+useEffect(()=>{
+  validateMinValue();
+  validateMaxValue();
+},[minValue,maxValue,config]);
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm/>}
@@ -669,7 +630,7 @@ const EditorPanel = () => {
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar' ]}/>
+                  <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line' ]}/>
                   {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
@@ -678,17 +639,18 @@ const EditorPanel = () => {
                   {(config.visualizationType === 'Bar' && config.orientation === 'horizontal') &&
                     <Select value={config.yAxis.labelPlacement || 'Below Bar'} section="yAxis" fieldName="labelPlacement" label="Label Placement" updateField={updateField} options={[ 'Below Bar', 'On Date/Category Axis' ]}/>
                   }
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis') &&
+                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar' ) ? (
                     <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField}/>
-                  }
+                  ): config.visualizationType !== 'Pie' &&  (
+                    <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField}/>
+                  )}
                   {config.visualizationType === 'Pie' && <Select fieldName="pieType" label="Pie Chart Type" updateField={updateField} options={[ 'Regular', 'Donut' ]}/>}
                   <TextField value={config.title} fieldName="title" label="Title" updateField={updateField} />
                   
                   <TextField
-										value={config.super_title || ''}
+										value={config.superTitle}
 										updateField={updateField}
-										section='general'
-										fieldName='super_title'
+										fieldName='superTitle'
 										label='Super Title'
 										placeholder='Super Title'
 										tooltip={
@@ -703,10 +665,9 @@ const EditorPanel = () => {
                   
                   <TextField
 										type='textarea'
-										value={config.intro_text}
+										value={config.introText}
 										updateField={updateField}
-										section='general'
-										fieldName='intro_text'
+										fieldName='introText'
 										label='Intro Text'
 										tooltip={
                       <Tooltip style={{textTransform: 'none'}}>
@@ -731,7 +692,6 @@ const EditorPanel = () => {
 										type='textarea'
 										value={config.footnotes}
 										updateField={updateField}
-										section='general'
 										fieldName='footnotes'
 										label='Footnotes'
 										tooltip={
@@ -763,17 +723,17 @@ const EditorPanel = () => {
                     {((!config.series || config.series.length === 0 || config.series.length < 2) && (config.visualizationType === 'Paired Bar')) && <p className="warning">Select two data series for paired bar chart (e.g., Male and Female).</p>}
                     {config.series && config.series.length !== 0 && (
                       <>
-                        <label>
-                          <span className="edit-label">
+                        <fieldset>
+                          <legend className="edit-label float-left">
                             Displaying
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                        </label>
+                          </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </fieldset>
                         <ul className="series-list">
                           {config.series.map((series, i) => {
 
@@ -801,8 +761,8 @@ const EditorPanel = () => {
                                   </div>
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
-                                    {config.series.length > 1 &&
-                                      <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                    {config.series && config.series.length > 1 &&
+                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
                                 </li>
@@ -816,8 +776,8 @@ const EditorPanel = () => {
                                     {series.dataKey}
                                   </div>
                                 </div>
-                                {config.series.length > 1 &&
-                                  <span className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</span>
+                                {config.series && config.series.length > 1 &&
+                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
                                 }
                               </li>
                             )
@@ -838,6 +798,14 @@ const EditorPanel = () => {
                         <Select value={config.confidenceKeys.lower || ''} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()}/>
                       </>
                     )}
+
+                    {config.series && config.series.length === 1 && <Select
+                      fieldName="visualizationType"
+                      label="Rank by Value"
+                      initial="Select"
+                      onChange={(e) => sortSeries(e.target.value)}
+                      options={['asc', 'desc']} />}
+                    
                   </AccordionItemPanel>
                 </AccordionItem>
               }
@@ -900,7 +868,7 @@ const EditorPanel = () => {
                       <CheckBox value={config.xAxis.hideAxis} section="xAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideLabel} section="xAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.xAxis.hideTicks} section="xAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.xAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.xAxis.max}  section='xAxis' fieldName='max' label='update max value' type='number' placeholder='Auto'  updateField={updateField} />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
                     </>
                     : (config.visualizationType !=='Pie') &&
@@ -908,9 +876,9 @@ const EditorPanel = () => {
                       <CheckBox value={config.yAxis.hideAxis} section="yAxis" fieldName="hideAxis" label="Hide Axis" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideLabel} section="yAxis" fieldName="hideLabel" label="Hide Label" updateField={updateField} />
                       <CheckBox value={config.yAxis.hideTicks} section="yAxis" fieldName="hideTicks" label="Hide Ticks" updateField={updateField} />
-                      <TextField value={config.yAxis.max} type='number' label='update max value' placeholder='Auto' onChange={(e) => onMaxChangeHandler(e)} />
+                      <TextField value={config.yAxis.max} section='yAxis' fieldName='max' type='number' label='update max value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.maxMsg}</span>
-                      <TextField value={config.yAxis.min} type='number' label='update min value' placeholder='Auto' onChange={(e)=>onMinChangeHandler(e)}  />
+                      <TextField value={config.yAxis.min} section='yAxis' fieldName='min' type='number' label='update min value' placeholder='Auto' updateField={updateField}  />
                       <span style={{color:'red',display:'block'}} >{warningMsg.minMsg}</span>
                     </>
                   }
@@ -978,7 +946,9 @@ const EditorPanel = () => {
                             <>
                               {config.exclusions.keys.length > 0 &&
                                 <>
-                                  <label><span className="edit-label">Excluded Keys</span></label>
+                                  <fieldset>
+                                    <legend className="edit-label">Excluded Keys</legend>
+                                  </fieldset>
                                   <ExclusionsList/>
                                 </>
                               }
@@ -1041,7 +1011,9 @@ const EditorPanel = () => {
                         <>
                           {config.exclusions.keys.length > 0 &&
                             <>
-                              <label><span className="edit-label">Excluded Keys</span></label>
+                              <fieldset>
+                                <legend className="edit-label">Excluded Keys</legend>
+                              </fieldset>
                               <ExclusionsList/>
                             </>
                           }
@@ -1091,6 +1063,7 @@ const EditorPanel = () => {
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left' ]}/>
+                  <TextField type='textarea' value={config.legend.description} 	updateField={updateField} 	section='legend' 	fieldName='description' 	label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1191,12 +1164,12 @@ const EditorPanel = () => {
 
                   {config.isLollipopChart &&
                     <>
-                      <label className="header">
-                        <span className="edit-label">Lollipop Shape</span>
+                      <fieldset className="header">
+                        <legend className="edit-label">Lollipop Shape</legend>
                         <div onChange={(e) => {
                           setLollipopShape(e.target.value)
                         }}>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1205,7 +1178,7 @@ const EditorPanel = () => {
                             />
                             Circle
                           </label>
-                          <label>
+                          <label className="radio-label">
                             <input
                               type="radio"
                               name="lollipopShape"
@@ -1216,7 +1189,7 @@ const EditorPanel = () => {
                           </label>
                         </div>
 
-                      </label>
+                      </fieldset>
                       <Select value={config.lollipopColorStyle ? config.lollipopColorStyle : 'two-tone'} fieldName="lollipopColorStyle" label="Lollipop Color Style" updateField={updateField} options={[ 'regular', 'two-tone' ]}/>
                       <Select value={config.lollipopSize ? config.lollipopSize : 'small'} fieldName="lollipopSize" label="Lollipop Size" updateField={updateField} options={[ 'small', 'medium', 'large' ]}/>
                     </>
@@ -1228,7 +1201,11 @@ const EditorPanel = () => {
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
-                  {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line') &&
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+
+                  {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
+
+                  {((config.series?.some(series => series.type === 'Line') && config.visualizationType === 'Combo') || config.visualizationType === 'Line' || config.visualizationType === "Spark Line") &&
                     <Select value={config.lineDatapointStyle} fieldName="lineDatapointStyle" label="Line Datapoint Style" updateField={updateField} options={[ 'hidden', 'hover', 'always show' ]}/>
                   }
 
@@ -1236,10 +1213,15 @@ const EditorPanel = () => {
                     <span className="edit-label">Header Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, theme: palette })
-                        }} className={config.theme === palette ? 'selected ' + palette : palette}>
-                        </li>
+                        <button 
+                          title={palette}
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, theme: palette })
+                          }} 
+                          className={config.theme === palette ? 'selected ' + palette : palette}>
+                        </button>
                       ))}
                     </ul>
                   </label>
@@ -1265,13 +1247,19 @@ const EditorPanel = () => {
                       }
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
@@ -1293,22 +1281,25 @@ const EditorPanel = () => {
 
 
                       return (
-                        <li title={palette} key={palette} onClick={() => {
-                          updateConfig({ ...config, palette })
-                        }} className={config.palette === palette ? 'selected' : ''}>
+                        <button 
+                          title={palette} 
+                          key={palette} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateConfig({ ...config, palette })
+                          }}
+                          className={config.palette === palette ? 'selected' : ''}
+                        >
                           <span style={colorOne}></span>
                           <span style={colorTwo}></span>
                           <span style={colorThree}></span>
-                        </li>
+                        </button>
                       )
                     })}
                   </ul>
 
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      {config.orientation !== 'horizontal' &&
-                        <CheckBox value={config.labels} fieldName="labels" label="Display label on data" updateField={updateField}/>
-                      }
                       <TextField value={config.dataCutoff} type="number" fieldName="dataCutoff" className="number-narrow" label="Data Cutoff" updateField={updateField} tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
@@ -1326,8 +1317,14 @@ const EditorPanel = () => {
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
                   }
 
-                  {config.orientation === 'horizontal' && (config.yAxis.labelPlacement === 'Below Bar' || config.yAxis.labelPlacement === 'On Date/Category Axis' || config.visualizationType === 'Paired Bar') &&
-                    <CheckBox value={config.yAxis.displayNumbersOnBar} section="yAxis" fieldName="displayNumbersOnBar" label={config.isLollipopChart ? 'Display Numbers after Bar' : 'Display Numbers on Bar'} updateField={updateField} />
+                  {config.visualizationType === "Spark Line" &&
+                    <div className="cove-accordion__panel-section checkbox-group">
+                      <CheckBox value={config.visual?.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
+                      <CheckBox value={config.visual?.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use Border Color Theme" updateField={updateField} />
+                      <CheckBox value={config.visual?.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
+                      <CheckBox value={config.visual?.background} section="visual" fieldName="background" label="Use Theme Background Color" updateField={updateField} />
+                      <CheckBox value={config.visual?.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
+                    </div>
                   }
                 </AccordionItemPanel>
               </AccordionItem>
@@ -1347,14 +1344,38 @@ const EditorPanel = () => {
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+                  	<TextField
+											value={config.table.caption}
+											updateField={updateField}
+											section='table'
+                      type='textarea'
+											fieldName='caption'
+											label='Data Table Caption'
+											placeholder=' Data table'
+                      tooltip={
+                        <Tooltip style={{textTransform: 'none'}}>
+                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a description of  the data table to be read by screen readers.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                      />
+                   <CheckBox value={config.table.limitHeight} section="table" fieldName="limitHeight" label="Limit Table Height" updateField={updateField}/>
+                   {config.table.limitHeight && (
+                   <TextField value={config.table.height} section="table" fieldName='height'  label='Data Table Height' type="number" min="0" max="500" 	placeholder='Height(px)' updateField={updateField}/>
+                   )}
                   <CheckBox value={config.table.expanded} section="table" fieldName="expanded" label="Expanded by Default" updateField={updateField}/>
                   <CheckBox value={config.table.download} section="table" fieldName="download" label="Display Download Button" updateField={updateField}/>
                   <TextField value={config.table.label} section="table" fieldName="label" label="Label" updateField={updateField}/>
-                  <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>
+                 {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section="table" fieldName="indexLabel" label="Index Column Header" updateField={updateField}/>}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
           </form>
+          {config.type !== 'Spark Line' &&
+            <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />
+          }
         </section>
       </section>
     </ErrorBoundary>

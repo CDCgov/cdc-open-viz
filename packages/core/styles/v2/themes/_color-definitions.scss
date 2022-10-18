@@ -4,7 +4,7 @@ $theme: (
         'amber':  ('#fbab18', '#ffd54f', '#ffecb3', '#fff7e1'),
         'blue':   ('#005eaa', '#88c3ea', '#c0e9ff', '#edf9ff'),
         'brown':  ('#705043', '#ad907b', '#d7ccc8', '#f2ebe8'),
-        'cyan':   ('#006778', '#65b0bd', '#cce5e9', '#ebf5f6'),
+        'cyan':   ('#007B91', '#65b0bd', '#cce5e9', '#ebf5f6'),
         'green':  ('#4b830d', '#84bc49', '#dcedc8', '#f1f8e9'),
         'indigo': ('#26418f', '#92a6dd', '#dee8ff', '#f2f6ff'),
         'orange': ('#bb4d00', '#ffad42', '#ffe97d', '#fff4cf'),
@@ -14,12 +14,82 @@ $theme: (
         'teal':   ('#00695c', '#4ebaaa', '#ceece7', '#ebf7f5' )
 );
 
+// .type-sparkline class used for creating sparklines
+// once v2 is released plz update html structure
+// to use .cove
+.markup-include,
+.type-waffle-chart,
+.type-data-bite,
+.cdc-open-viz-module.type-chart.type-sparkline,
 .cove {
   @each $theme-name, $theme-colors in $theme {
     // Header
     .theme-#{$theme-name} {
       background-color: string.unquote(nth($theme-colors, 1));
       border-color: string.unquote(nth($theme-colors, 2));
+      border-bottom-style: solid;
+      border-bottom-width: 4px;
+    }
+
+     &.theme-#{$theme-name} {
+
+      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
+        border-left: 1px solid string.unquote(nth($theme-colors, 1));
+        border-right: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      // when component doesn't have a title add border top
+      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
+        border-top: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+      
+      .cove-component__inner:not(.component--has-title) .cove-component__content {
+        border-top: 1px solid #ccc;
+      }
+
+      .cove-component__header {
+        border-color: string.unquote(nth($theme-colors, 2));
+      }
+
+      .cove-component__content.component--has-accent {
+        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3));
+      }
+    }
+
+    &.theme-#{$theme-name} {
+
+      .cove-component__content:not(.no-borders).component--has-borderColorTheme {
+        border-left: 1px solid string.unquote(nth($theme-colors, 1));
+        border-right: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+
+      // when component doesn't have a title add border top
+      .cove-component__inner:not(.component--has-title) .cove-component__content.component--has-borderColorTheme:not(.no-borders) {
+        border-top: 1px solid string.unquote(nth($theme-colors, 1));
+      }
+      
+      // should probably be in color definitions but logically makes sense here.
+      .cove-component__inner:not(.component--has-title) .cove-component__content {
+        border-top: 1px solid #ccc;
+      }
+
+      .cove-component__header {
+        border-color: string.unquote(nth($theme-colors, 2));
+      }
+
+      .cove-component__content.component--has-accent {
+        border-left: .5rem solid string.unquote(nth($theme-colors, 1)) !important;
+      }
+
+      .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
+        background: string.unquote(nth($theme-colors, 3));
+      }
     }
   }
 }
