@@ -32,7 +32,8 @@
 	"legend": {
 		"behavior": "isolate",
 		"position": "right",
-		"label": "Type of Data"
+		"label": "Type of Data",
+		"dynamicLegend": true
 	},
 	"palette": "qualitative-bold",
 	"labels": false,
