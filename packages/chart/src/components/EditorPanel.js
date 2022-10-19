@@ -197,12 +197,7 @@ const EditorPanel = () => {
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
 
-  useEffect(() => {
-    if(config.legend.dynamicLegend) {
-      console.info('Using dynamic legend')
-      setFilteredData([])
-    }
-  }, [config.legend.dynamicLegend]);
+
   
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
