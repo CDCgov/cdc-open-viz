@@ -32,6 +32,7 @@ import getViewport from '@cdc/core/helpers/getViewport';
 import { DataTransform } from '@cdc/core/helpers/DataTransform';
 
 import './scss/main.scss';
+import useChartClasses from './hooks/useChartClasses';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname,link} :
@@ -55,12 +56,23 @@ export default function CdcChart(
   const [externalFilters, setExternalFilters] = useState(null);
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [dynamicLegendItems, setDynamicLegendItems] = useState([])
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  // TODO: refactor opp for project standardization .ie useDataVizClasses vs useChartClasses
+  const { 
+    barBorderClass,
+    lineDatapointClass, 
+    contentClasses,
+    innerContainerClasses, 
+    sparkLineStyles 
+  } = useChartClasses(config)
+
+  // TODO: move to core
   const cacheBustingString = () => {
       const round = 1000 * 60 * 15;
       const date = new Date();
@@ -441,7 +453,7 @@ export default function CdcChart(
     const newSeriesHighlight = [];
 
     // If we're highlighting all the series, reset them
-    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
+    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend) {
       highlightReset()
       return
     }
@@ -471,8 +483,13 @@ export default function CdcChart(
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    setSeriesHighlight([]);
+    if(config.legend.dynamicLegend && dynamicLegendItems) {
+      setSeriesHighlight(dynamicLegendItems.map( item => item.text ))
+    } else {
+      setSeriesHighlight([]);
+    }
   }
+
   const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const parseDate = (dateString: string) => {
@@ -636,36 +653,13 @@ export default function CdcChart(
     return false;
   };
 
-  let innerContainerClasses = ['cove-component__inner']
-	config.title && innerContainerClasses.push('component--has-title')
-	config.subtext && innerContainerClasses.push('component--has-subtext')
-	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-	let contentClasses = ['cove-component__content'];
-	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-	!config.visual?.border && contentClasses.push('no-borders');
-	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-	config.visual?.accent && contentClasses.push('component--has-accent');
-	config.visual?.background && contentClasses.push('component--has-background');
-	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-
 
   // Prevent render if loading
   let body = (<Loading />)
-  let lineDatapointClass = ''
-  let barBorderClass = ''
 
-  let sparkLineStyles = {
-    width: '100%',
-    height: '100px',
-  }
 
-  if(false === loading) {
-    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
-    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
-    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+  if(!loading) {
+
 
     body = (
       <>
@@ -725,7 +719,7 @@ export default function CdcChart(
               }
               {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
-                 {/* Link */}
+            {/* Link */}
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
@@ -768,7 +762,10 @@ export default function CdcChart(
     handleChartAriaLabels,
     highlight,
     highlightReset,
-    legend
+    legend,
+    setSeriesHighlight,
+    dynamicLegendItems,
+    setDynamicLegendItems
   }
 
   const classes = [

@@ -1,32 +1,41 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import Context from '../context';
 import parse from 'html-react-parser';
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
 import LegendCircle from '@cdc/core/components/LegendCircle';
 
+import useLegendClasses from './../hooks/useLegendClasses';
 
-// JSX for Legend
+
 const Legend = () => {
 
-	let containerClasses = ['legend-container']
-	let innerClasses = ['legend-container__inner'];
-	const [dynamicLegendItems, setDynamicLegendItems] = useState([])
-	const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setFilteredData, transformedData: filteredData } = useContext(Context);
+	const { 
+		config,
+		legend,
+		colorScale,
+		seriesHighlight,
+		highlight,
+		highlightReset,
+		setSeriesHighlight,
+		dynamicLegendItems,
+		setDynamicLegendItems,
+		seriesLabelsAll
+	} = useContext(Context);
 
-	console.log('runtime series labels', config.runtime.seriesLabels)
-	console.log('runtime', config.runtime)
+	const {innerClasses, containerClasses} = useLegendClasses(config)
 
+	useEffect(() => {
+		setSeriesHighlight(dynamicLegendItems.map( item => item.text))
+	}, [dynamicLegendItems]);
 
-	if (config.legend.position === "left") {
-		containerClasses.push('left')
+	const removeDynamicLegendItem = (label ) => {
+		let newLegendItems = dynamicLegendItems.filter((item) => item.text !== label.text);
+		let newLegendItemsText = newLegendItems.map(item => item.text )
+		setDynamicLegendItems( newLegendItems )
+		setSeriesHighlight( newLegendItemsText)
 	}
 
-	if (config.legend.reverseLabelOrder) {
-		innerClasses.push('d-flex')
-		innerClasses.push('flex-column-reverse')
-	}
-
-	if(!legend) return true;
+	if (!legend) return;
 
 	if (!legend.dynamicLegend) return (
 		<aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
@@ -59,6 +68,7 @@ const Legend = () => {
 								className += ' inactive'
 							}
 
+
 							return (
 								<LegendItem
 									className={className}
@@ -80,7 +90,7 @@ const Legend = () => {
 								</LegendItem>
 							)
 						})}
-						{seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
+						{seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={ (labels) => highlightReset(labels) } tabIndex={0}>Reset</button>}
 					</div>
 				)}
 			</LegendOrdinal>
@@ -91,6 +101,7 @@ const Legend = () => {
 		<aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
 			{legend.label && <h2>{parse(legend.label)}</h2>}
 			{legend.description && <p>{parse(legend.description)}</p>}
+
 			<LegendOrdinal
 				scale={colorScale}
 				itemDirection="row"
@@ -98,24 +109,33 @@ const Legend = () => {
 				shapeMargin="0 10px 0"
 			>
 
-				{labels => (
+				{labels => {
+					console.log('this', config.legend.dynamicLegendItemLimit)
+				if ( Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length ) {
+					return (
 					<select
 						className={'dynamic-legend-dropdown'}
 						onChange={(e) => {
-							setFilteredData([...dynamicLegendItems, JSON.parse(e.target.value)]);
+							let value = JSON.parse(e.target.value).text;
+							if(value === config.legend.dynamicLegendDefaultText) {
+								// highlightReset()
+							} else {
+								setDynamicLegendItems([...dynamicLegendItems, JSON.parse(e.target.value)])
+							}
 						}}
 					>
 						<option
 							className={'all'}
 							tabIndex={0}
-							value={'All Data'}
+							value={JSON.stringify({ text: config.legend.dynamicLegendDefaultText })}
 
 						>
-							Show All
+							{config.legend.dynamicLegendDefaultText}
 						</option>
 						{labels.map((label, i) => {
 							let className = 'legend-item'
 							let itemName = label.datum
+							let inDynamicList = false;
 
 							// Filter excluded data keys from legend
 							if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
@@ -131,7 +151,13 @@ const Legend = () => {
 								className += ' inactive'
 							}
 
-							console.log('label', label)
+							dynamicLegendItems.map(listItem => {
+								if(listItem.text === label.text) {
+									inDynamicList = true;
+								}
+							})
+
+							if(inDynamicList) return true;
 
 							return (
 								<option
@@ -144,17 +170,19 @@ const Legend = () => {
 								</option>
 							)
 						})}
-						{seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
 					</select>
-
-
-				)}
-
+					)
+				} else {
+					return config.legend.dynamicLegendItemLimitMessage
+				}
+			}}
 			</LegendOrdinal>
-			{/* {console.log('d l it', dynamicLegendItems)} */}
-			{console.log('filteredData', filteredData)}
+
+			{seriesHighlight.length < dynamicLegendItems.length && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset Highlight</button>}
+
 			<div className="dynamic-legend-list">
-				{filteredData.map((label, i) => {
+				{dynamicLegendItems.map((label, i) => {
+
 					let className = 'legend-item'
 					let itemName = label.text
 
@@ -173,24 +201,28 @@ const Legend = () => {
 					}
 
 					return (
-						<LegendItem
-							className={className}
-							tabIndex={0}
-							key={`legend-quantile-${i}`}
-							onKeyPress={(e) => {
-								if (e.key === 'Enter') {
-									highlight(label);
-								}
-							}}
-							onClick={() => {
-								highlight(label);
-							}}
-						>
-							<LegendCircle fill={label.value} />
-							<LegendLabel align="left" margin="0 0 0 4px">
-								{label.text}
-							</LegendLabel>
-						</LegendItem>
+						<>
+							<LegendItem
+								className={className}
+								tabIndex={0}
+								key={`dynamic-legend-item-${i}`}
+								alignItems="center"
+								
+							>
+								<button
+									className="btn-wrapper"
+									onClick={() => {
+										highlight(label);
+									}}
+								>
+									<LegendCircle fill={label.value} config={config} />
+									<LegendLabel align="space-between" margin="4px 0 0 4px">
+										{label.text}
+									</LegendLabel>
+								</button>
+								<button onClick={() => removeDynamicLegendItem(label)}>x</button>
+							</LegendItem>
+						</>
 					)
 				})}
 			</div>
