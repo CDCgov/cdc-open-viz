@@ -53,7 +53,11 @@ export default {
     position: 'right',
     reverseLabelOrder:false,
     description:'',
-    dynamicLegend: false
+    dynamicLegend: false,
+    dynamicLegendDefaultText: "Show All",
+    dynamicLegendItemLimit: 5,
+    dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
+    dynamicLegendChartMessage: 'Select Options from the Legend',
   },
   exclusions: {
     active: false,
