@@ -110,8 +110,10 @@ const Legend = () => {
 			>
 
 				{labels => {
-					console.log('this', config.legend.dynamicLegendItemLimit)
-				if ( Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length ) {
+				if ( 
+					(Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length) // legend items are less than limit
+					&& (dynamicLegendItems.length !== config.runtime.seriesLabelsAll.length) ) // legend items are equal to series length
+					{
 					return (
 					<select
 						className={'dynamic-legend-dropdown'}
@@ -178,12 +180,11 @@ const Legend = () => {
 			}}
 			</LegendOrdinal>
 
-			{seriesHighlight.length < dynamicLegendItems.length && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset Highlight</button>}
 
 			<div className="dynamic-legend-list">
 				{dynamicLegendItems.map((label, i) => {
 
-					let className = 'legend-item'
+					let className = ['legend-item']
 					let itemName = label.text
 
 					// Filter excluded data keys from legend
@@ -196,14 +197,18 @@ const Legend = () => {
 						itemName = config.runtime.seriesKeys[index]
 					}
 
-					if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-						className += ' inactive'
+					if (seriesHighlight.length > 0 && !seriesHighlight.includes(itemName)) {
+						className.push('inactive')
+					}
+
+					if(seriesHighlight.length === 0 && config.legend.dynamicLegend) {
+						className.push('inactive')
 					}
 
 					return (
 						<>
 							<LegendItem
-								className={className}
+								className={className.join(' ')}
 								tabIndex={0}
 								key={`dynamic-legend-item-${i}`}
 								alignItems="center"
@@ -226,6 +231,7 @@ const Legend = () => {
 					)
 				})}
 			</div>
+			{seriesHighlight.length < dynamicLegendItems.length && <button className={`legend-reset legend-reset--dynamic ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
 		</aside>
 	)
 }
