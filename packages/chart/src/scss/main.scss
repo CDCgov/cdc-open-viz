@@ -130,6 +130,13 @@
       top: 1em;
       border-radius: 3px;
 
+
+      &--dynamic {
+        position: relative;
+        float: right;
+        right: unset;
+      }
+
       &:hover {
         background: rgba(0, 0, 0, .15);
         transition: .3s all;
