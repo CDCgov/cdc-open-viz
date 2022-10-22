@@ -31,6 +31,8 @@ import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 import SparkLine from './components/SparkLine';
 
 import './scss/main.scss';
@@ -60,6 +62,8 @@ export default function CdcChart(
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
+
+  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -711,22 +715,6 @@ export default function CdcChart(
 
     return false;
   };
-
-  let innerContainerClasses = ['cove-component__inner']
-	config.title && innerContainerClasses.push('component--has-title')
-	config.subtext && innerContainerClasses.push('component--has-subtext')
-	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-	let contentClasses = ['cove-component__content'];
-	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-	!config.visual?.border && contentClasses.push('no-borders');
-	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-	config.visual?.accent && contentClasses.push('component--has-accent');
-	config.visual?.background && contentClasses.push('component--has-background');
-	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-
 
   // Prevent render if loading
   let body = (<Loading />)

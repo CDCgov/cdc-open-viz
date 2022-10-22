@@ -15,7 +15,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 import { Fragment } from 'react';
 
 import { publish } from '@cdc/core/helpers/events'
-import useDataVizClasses from './hooks/useDataVizClasses';
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
 
 
 type DefaultsType = typeof defaults

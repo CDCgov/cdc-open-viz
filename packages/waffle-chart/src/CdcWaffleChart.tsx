@@ -15,7 +15,7 @@ import defaults from './data/initial-state'
 
 import { publish } from '@cdc/core/helpers/events';
 
-import useDataVizClasses from './hooks/useDataVizClasses';
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
 
 import './scss/main.scss'
 
