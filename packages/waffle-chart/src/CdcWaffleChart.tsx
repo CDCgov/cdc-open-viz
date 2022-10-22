@@ -15,6 +15,8 @@ import defaults from './data/initial-state'
 
 import { publish } from '@cdc/core/helpers/events';
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 import './scss/main.scss'
 
 const themeColor = {
@@ -284,22 +286,7 @@ const WaffleChart:FC<Props>  = ({ config, isEditor ,link}) => {
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  let contentClasses = ['cove-component__content']
-
-  let innerContainerClasses = ['cove-component__inner']
-  config.title && innerContainerClasses.push('component--has-title')
-  config.subtext && innerContainerClasses.push('component--has-subtext')
-  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-  !config.visual.border && contentClasses.push('no-borders');
-  config.visual.accent && contentClasses.push('component--has-accent')
-  config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
-  config.visual.background && contentClasses.push('component--has-background');
-  config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-  config.shadow && innerContainerClasses.push('shadow')
-  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
+  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
   const handleWaffleChartAriaLabel = (state, testing = false) => {
         if(testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state);
