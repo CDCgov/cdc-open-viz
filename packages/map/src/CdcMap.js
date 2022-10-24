@@ -1201,7 +1201,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
+        if (window.matchMedia("(any-hover: none)").matches || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
                 keyedData: value
@@ -1568,7 +1568,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 				/>
 			)}
 			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
+                {!window.matchMedia("(any-hover: none)").matches && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
 						place='right'
