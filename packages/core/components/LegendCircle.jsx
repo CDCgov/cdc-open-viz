@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default function LegendCircle({fill}) {
+
   const styles = {
     marginRight: '5px',
     borderRadius: '300px',
