@@ -9,11 +9,6 @@
   .loading > div.la-ball-beat {
     margin-top: 20%;
   }
-  @include breakpointClass(xs) {
-    div#tooltip {
-      display: none !important;
-    }
-  }
   @include breakpointClass(md) {
     .map-container.modal-background::before {
       border-bottom: $lightGray 1px solid;
