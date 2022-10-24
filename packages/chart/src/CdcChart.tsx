@@ -17,13 +17,7 @@ import parse from 'html-react-parser';
 import Context from './context';
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
-import DataTable from './components/DataTable';
-import Context from './context';
-import defaults from './data/initial-state';
 
-import EditorPanel from './components/EditorPanel';
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
@@ -39,8 +33,6 @@ import Loading from '@cdc/core/components/Loading';
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
-import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
-import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 import getViewport from '@cdc/core/helpers/getViewport';
 import { DataTransform } from '@cdc/core/helpers/DataTransform';
 
@@ -74,18 +66,15 @@ export default function CdcChart(
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
-  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
-
-  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  // TODO: refactor opp for project standardization .ie useDataVizClasses vs useChartClasses
-  const { 
+  const {     
     barBorderClass,
     lineDatapointClass, 
     contentClasses,
     innerContainerClasses, 
-    sparkLineStyles 
-  } = useChartClasses(config)
+    sparkLineStyles
+  } = useDataVizClasses(config)
+
+  const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
   // TODO: move to core
   const cacheBustingString = () => {
