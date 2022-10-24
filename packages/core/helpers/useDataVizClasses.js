@@ -1,4 +1,13 @@
 export default function useDataVizClasses(config) {
+
+	let lineDatapointClass = ''
+	let barBorderClass = ''
+
+	if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
+	if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
+	if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+
+
 	let innerContainerClasses = ['cove-component__inner']
 	let contentClasses = ['cove-component__content'];
 
@@ -18,8 +27,11 @@ export default function useDataVizClasses(config) {
 	config.shadow && innerContainerClasses.push('shadow')
 	config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
-	// if filtered text
-	// ["cove", "cove-component", "cove-component__content", "filtered-text"]
+	let sparkLineStyles = {
+		width: '100%',
+		height: '100px',
+	}
 
-	return { innerContainerClasses, contentClasses};
+
+	return { innerContainerClasses, contentClasses, barBorderClass, lineDatapointClass, sparkLineStyles};
 }
