@@ -30,7 +30,7 @@ export default function ChooseTab() {
   /**
    * IconButton component
    */
-  const IconButton = ({ icon, label, type, subType, barType, orientation, stacked = false }) => {
+  const IconButton = ({ icon, label, type, subType, barType, orientation, stacked = false, generalType = "data" }) => {
     let isSubType = false
     let isHorizontalStackedChart = false
     let classNames;
@@ -81,7 +81,8 @@ export default function ChooseTab() {
           if(type === 'map') {
             newConfig.general = {
               ...newConfig.general,
-              geoType: subType
+              geoType: subType,
+              type: generalType
             }
           } else {
             newConfig.visualizationType = subType
@@ -234,6 +235,16 @@ export default function ChooseTab() {
             </Tooltip.Target>
             <Tooltip.Content>
               Present a choropleth map of an individual U.S. state.
+            </Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label="U.S. Geocode" type="map" subType="us-county" generalType="us-geocode" icon={<UsaIcon />}/>
+            </Tooltip.Target>
+            <Tooltip.Content>
+              United States GeoCode
             </Tooltip.Content>
           </Tooltip>
         </li>
