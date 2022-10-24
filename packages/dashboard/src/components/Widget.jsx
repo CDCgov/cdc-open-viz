@@ -86,6 +86,14 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     delete visualizations[data.uid]
 
+    if(config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0){
+      config.dashboard.sharedFilters.forEach(sharedFilter => {
+        if(sharedFilter.usedBy.indexOf(data.uid) !== -1){
+          sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1);
+        }
+      });
+    }
+
     updateConfig({ ...config, rows, visualizations })
   }
 

@@ -15,6 +15,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 import { Fragment } from 'react';
 
 import { publish } from '@cdc/core/helpers/events'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
 
 
 type DefaultsType = typeof defaults
@@ -46,6 +47,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     subtext,
     general: { isCompactStyle }
   } = config;
+
+  const { innerContainerClasses, contentClasses } = useDataVizClasses(config);
 
 
   const transform = new DataTransform()
@@ -334,22 +337,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
   }
 
-  let innerContainerClasses = ['cove-component__inner']
-  config.title && innerContainerClasses.push('component--has-title')
-  config.subtext && innerContainerClasses.push('component--has-subtext')
-  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
 
-  let contentClasses = ['cove-component__content'];
-  !config.visual?.border && contentClasses.push('no-borders');
-  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-  config.visual?.accent && contentClasses.push('component--has-accent');
-  config.visual?.background && contentClasses.push('component--has-background');
-  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-  // ! these two will be retired.
-  config.shadow && innerContainerClasses.push('shadow')
-  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
@@ -448,24 +436,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         isBottom = true
         break;
     }
-
-    
-    let innerContainerClasses = ['cove-component__inner']
-    config.title && innerContainerClasses.push('component--has-title')
-    config.subtext && innerContainerClasses.push('component--has-subtext')
-    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-    config.general.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-    let contentClasses = ['cove-component__content'];
-    !config.visual.border && contentClasses.push('no-borders');
-    config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-    config.visual.accent && contentClasses.push('component--has-accent');
-    config.visual.background && contentClasses.push('component--has-background');
-    config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-    // ! these two will be retired.
-    config.shadow && innerContainerClasses.push('shadow')
-    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 

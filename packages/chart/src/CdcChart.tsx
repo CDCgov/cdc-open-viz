@@ -17,6 +17,19 @@ import parse from 'html-react-parser';
 import Context from './context';
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
+import DataTable from './components/DataTable';
+import Context from './context';
+import defaults from './data/initial-state';
+
+import EditorPanel from './components/EditorPanel';
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import LegendCircle from '@cdc/core/components/LegendCircle';
+import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
+
+import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
+
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 import SparkLine from './components/SparkLine';
 import Legend from './components/Legend';
 import DataTable from './components/DataTable';
@@ -60,6 +73,8 @@ export default function CdcChart(
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
+
+  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -655,7 +670,6 @@ export default function CdcChart(
 
     return false;
   };
-
 
   // Prevent render if loading
   let body = (<Loading />)
