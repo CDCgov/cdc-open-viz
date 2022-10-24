@@ -492,16 +492,12 @@ export default function CdcChart(
     } else {
       newSeriesHighlight.push(newHighlight);
     }
-
-    console.log('new', newSeriesHighlight)
-
     setSeriesHighlight(newSeriesHighlight);
   };
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
     if(config.legend.dynamicLegend && dynamicLegendItems) {
-      console.log('dyn', dynamicLegendItems)
       setSeriesHighlight(dynamicLegendItems.map( item => item.text ))
     } else {
       setSeriesHighlight([]);
