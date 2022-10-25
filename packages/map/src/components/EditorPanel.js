@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import {
 	Accordion,
 	AccordionItem,
@@ -12,12 +12,13 @@ import { useDebounce } from 'use-debounce';
 
 import colorPalettes from '@cdc/core/data/colorPalettes';
 import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
+import { useColorPalette } from '../hooks/useColorPalette';
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg';
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg';
 import WorldGraphic from '@cdc/core/assets/icon-map-world.svg';
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg';
 import worldDefaultConfig from '../../examples/default-world.json';
@@ -106,9 +107,6 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-
-	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
-
 	const headerColors = [
 		'theme-blue',
 		'theme-purple',
@@ -124,13 +122,11 @@ const EditorPanel = (props) => {
 	];
 
 	const categoryMove = (idx1, idx2) => {
-		let categoryValuesOrder = [...editorCatOrder];
+		let categoryValuesOrder = [...state.legend.categoryValuesOrder];
 
 		let [movedItem] = categoryValuesOrder.splice(idx1, 1);
 
 		categoryValuesOrder.splice(idx2, 0, movedItem);
-
-		setEditorCatOrder(categoryValuesOrder);
 
 		setState({
 			...state,
@@ -519,6 +515,20 @@ const EditorPanel = (props) => {
 							general: {
 								...state.general,
 								geoType: 'us',
+							},
+							dataTable: {
+								...state.dataTable,
+								forceDisplay: true,
+							},
+						});
+						ReactTooltip.rebuild();
+						break;
+					case 'us-region':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								geoType: 'us-region',
 							},
 							dataTable: {
 								...state.dataTable,
@@ -942,10 +952,30 @@ const EditorPanel = (props) => {
 	}, [state]);
 
 	useEffect(() => {
+		//If a categorical map is used and the order is either not defined or incorrect, fix it
 		if ('category' === state.legend.type) {
-			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+			let valid = true;
+			if(state.legend.categoryValuesOrder){
+				runtimeLegend.forEach(item => {
+					if(!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
+						valid = false;
+					}
+				});
+			} else {
+				valid = false;
+			}
 
-			setEditorCatOrder(arr);
+			if(!valid){
+				let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						categoryValuesOrder: arr,
+					},
+				});
+			}
 		}
 	}, [runtimeLegend]);
 
@@ -1215,7 +1245,7 @@ const EditorPanel = (props) => {
 	});
 
 	const CategoryList = () => {
-		return editorCatOrder.map((value, index) => (
+		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
 				{(provided, snapshot) => (
 					<li style={{ position: 'relative' }}>
@@ -1231,7 +1261,7 @@ const EditorPanel = (props) => {
 					</li>
 				)}
 			</Draggable>
-		));
+		)) : <></>;
 	};
 
 	const Error = () => {
@@ -1292,6 +1322,16 @@ const EditorPanel = (props) => {
 												<UsaGraphic />
 												<span>United States</span>
 											</button>
+                      <button
+                        className={state.general.geoType === 'us-region' ? 'active' : ''}
+                        onClick={ (e) => {
+                          e.preventDefault();
+                          handleEditorChanges('geoType', 'us-region')
+                        }}
+                      >
+                        <UsaRegionGraphic />
+                        <span>U.S. Region</span>
+                      </button>
 											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
 												onClick={ (e) => {
@@ -2094,7 +2134,7 @@ const EditorPanel = (props) => {
 														)}
 													</Droppable>
 												</DragDropContext>
-												{editorCatOrder.length >= 10 && (
+												{state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.length >= 10 && (
 													<section className='error-box my-2'>
 														<div>
 															<strong className='pt-1'>Warning</strong>
@@ -2254,14 +2294,14 @@ const EditorPanel = (props) => {
 											fieldName='indexLabel'
 											label='Index Column Header'
 											placeholder='Location'
-                      tooltip={
-                        <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
+                                            tooltip={
+                                                <Tooltip style={{textTransform: 'none'}}>
+                                                <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                                                <Tooltip.Content>
+                                                    <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                                                </Tooltip.Content>
+                                                </Tooltip>
+                                            }
 										/>
 										<TextField
 											value={dataTable.caption}
@@ -2533,6 +2573,10 @@ const EditorPanel = (props) => {
 													backgroundColor: colorPalettes[palette][6],
 												};
 
+												// hide palettes with too few colors for region maps
+												if ( colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region' ) {
+													return('');
+												}
 												return (
 													<li
 														title={palette}

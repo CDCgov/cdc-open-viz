@@ -1,7 +1,7 @@
 #!/bin/bash
 # Prepend commit messages with branch name
 # To Use:
-# Link using absolute paths to your dir: ln -s -f [absolute path]/git/hooks/prepare-commit-msg [absolute_path]/prepare-commit-msg
+# Link using absolute paths to your dir: ln -s -f [absolute_path_to_this_file] [absolute_path_to_project_root]/.git/hooks
 # Update permissions on hook if needed: chmod +x ./git/hooks/prepare-commit-msg
 BRANCHES_TO_SKIP=(main integration test)
 BRANCH_NAME=$(git symbolic-ref --short HEAD)

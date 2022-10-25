@@ -144,10 +144,10 @@ const RowMenu = ({ rowIdx, row }) => {
         </ul>
       </div>
       <div className="spacer"></div>
-      <button className={'row-menu__btn'} title="Row Settings"
-              onClick={() => overlay?.actions.openOverlay(rowSettings)}>
-        <Icon display="edit" color="#fff" size={25}/>
-      </button>
+      {/*<button className={'row-menu__btn'} title="Row Settings"*/}
+      {/*        onClick={() => overlay?.actions.openOverlay(rowSettings)}>*/}
+      {/*  <Icon display="edit" color="#fff" size={25}/>*/}
+      {/*</button>*/}
       <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title="Move Row Up"
               onClick={() => moveRow('up')}>
         <Icon display="caretUp" color="#fff" size={25}/>

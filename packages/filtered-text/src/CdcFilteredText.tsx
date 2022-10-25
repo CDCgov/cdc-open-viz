@@ -9,6 +9,8 @@ import ConfigContext from './ConfigContext'
 import parse from 'html-react-parser';
 import './scss/main.scss'
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 interface Props {
 	configUrl: string,
 	config?: object,
@@ -30,6 +32,8 @@ const CdcFilteredText:FC<Props> = (props) => {
   const [stateData, setStateData] = useState<Array<any>>(config.data || []);
   const [excludedData, setExcludedData] = useState<Array<Object>>();
   let {title,filters} = config;
+
+  const { contentClasses, innerContainerClasses} = useDataVizClasses(config)
 
   // Default Functions
 
@@ -72,31 +76,28 @@ const CdcFilteredText:FC<Props> = (props) => {
     setConfig(newConfig);
   }
 
-    //Optionally filter the data based on the user's filter
+  const filterByTextColumn = ()=>{
+  let filteredData =[];
 
-
-    const filterByTextColumn = ()=>{
-    let filteredData =[];
-
-      if(filters.length){
-        filters.map((filter) => {
-           if ( filter.columnName && filter.columnValue ) {
-           return filteredData = stateData.filter(function (e) {
-               return e[filter.columnName] === filter.columnValue;
-             });
-           } else {
-             return null;
-           }
-         })
-       }else{
-         // filter by textColumn if selected
-          return filteredData = stateData.filter((e,index)=> {
-          return e[config.textColumn] && index===0;
+    if(filters.length){
+      filters.map((filter) => {
+          if ( filter.columnName && filter.columnValue ) {
+          return filteredData = stateData.filter(function (e) {
+              return e[filter.columnName] === filter.columnValue;
+            });
+          } else {
+            return null;
+          }
         })
-       }
-     
-       return filteredData;
-    };
+      }else{
+        // filter by textColumn if selected
+        return filteredData = stateData.filter((e,index)=> {
+        return e[config.textColumn] && index===0;
+      })
+      }
+    
+      return filteredData;
+  };
    
 
   //Load initial config
@@ -105,20 +106,11 @@ const CdcFilteredText:FC<Props> = (props) => {
   }, [])
   let content = (<Loading/>)
 
-let filterClasses = ["cove","cove-component","cove-component__content",'no-borders',"filtered-text"]
-  config?.visual?.border && filterClasses.push('component--has-borderColorTheme');
-  config?.visual?.accent && filterClasses.push('component--has-accent');
-  config?.visual?.background && filterClasses.push('component--has-background');
-  config?.visual?.hideBackgroundColor && filterClasses.push('component--hideBackgroundColor');
-  
-  let innerContainerClasses = [' cove-component__content']
-  config.title && innerContainerClasses.push('component--has-title')
-
   if (loading === false) {
     let body = (
          <>
         {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
-        <div className={filterClasses.join(' ')} >
+        <div className={contentClasses.join(' ')} >
           <div className="cove-component__content-wrap">
             {filterByTextColumn().slice(0,1).map((el,i)=> <p key={i} > {parse(el[config.textColumn] ||"")} </p>)}  
           </div>

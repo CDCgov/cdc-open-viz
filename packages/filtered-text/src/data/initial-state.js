@@ -10,6 +10,7 @@ export default {
 		background:false,
 		roundedBorders:false,
 		accent:false,
-		border:false
+		border:false,
+		borderColorTheme: false
 	}
 }

@@ -16,8 +16,6 @@ export default function useIntersectionObserver(
         const node = elementRef?.current;
         const hasIOSupport = !!window.IntersectionObserver;
 
-        // console.log('node: ', node)
-
         if (!hasIOSupport || frozen || !node) return;
 
         const observerParams = { threshold, root, rootMargin };

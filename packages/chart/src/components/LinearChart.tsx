@@ -175,9 +175,7 @@ export default function LinearChart() {
       <svg
         width={width}
         height={height}
-        // If the chart is set to not replay the filter and has already animated, don't add the animated class
-        // className={`linear ${(config.animate) || (config.animateReplay  && animatedChartPlayed) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
-        className={`linear ${(config.animate) ? 'animated' : ''} ${animatedChart ? 'animate' : ''}`}
+        className={`linear ${(config.animate) ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''}`}
         role="img"
         aria-label={handleChartAriaLabels(config)}
         tabIndex={0}
@@ -541,7 +539,7 @@ export default function LinearChart() {
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
               <>
-                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} />
               </>
 
           )}
