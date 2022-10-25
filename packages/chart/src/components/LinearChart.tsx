@@ -58,6 +58,9 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
+  // Shawn: This reversees the chart.-
+  config.runtime.seriesKeys.sort().reverse();
+
    // desctructure users enetered value from initial state config.
   const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
   // validation for for min/max that user entered;

@@ -20,8 +20,8 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import Context from '../context';
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
-
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter } = useContext<any>(Context);
+  
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
   const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
@@ -182,7 +182,7 @@ export default function DataTable() {
                 ))}
               </thead>
               <tbody {...getTableBodyProps()}>
-                {rows.map((row, index) => {
+                {rows.sort().reverse().map((row, index) => {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
