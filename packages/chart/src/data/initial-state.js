@@ -51,6 +51,7 @@ export default {
   legend: {
     behavior: 'isolate',
     position: 'right',
+    colorCode:'',
     reverseLabelOrder:false,
     description:'',
     dynamicLegend: false,
