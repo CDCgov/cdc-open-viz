@@ -1064,7 +1064,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         
         toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-        if( ('data' === state.general.type || state.general.type === 'bubble') && undefined !== row) {
+        if( ('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode') && undefined !== row) {
             toolTipText += `<dl>`
 
             Object.keys(state.columns).forEach((columnKey) => {
