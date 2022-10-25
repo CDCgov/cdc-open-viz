@@ -317,7 +317,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
             // Handle Region Maps need for a 10th color
-            if( general.geoType === 'us-region' && mapColorPalette.length < 10 ) {
+            if( general.geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8 ) {
                 if(!general.palette.isReversed) {
                     mapColorPalette.push( chroma(mapColorPalette[8]).darken(0.75).hex() )
                 } else {
@@ -442,11 +442,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 
             // Apply custom sorting or regular sorting
             let configuredOrder = obj.legend.categoryValuesOrder ?? []
-
-            // Coerce strings to numbers inside configuredOrder property
-            for(let i = 0; i < configuredOrder.length; i++) {
-                configuredOrder[i] = numberFromString(configuredOrder[i])
-            }
 
             if(configuredOrder.length) {
                 sorted.sort( (a, b) => {
@@ -1206,7 +1201,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
 
         // If modals are set or we are on a mobile viewport, display modal
-        if ('xs' === currentViewport || 'xxs' === currentViewport || 'click' === state.tooltips.appearanceType) {
+        if (window.matchMedia("(any-hover: none)").matches || 'click' === state.tooltips.appearanceType) {
             setModal({
                 geoName: key,
                 keyedData: value
@@ -1490,7 +1485,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         'map-container',
         state.legend.position,
         state.general.type,
-        state.general.geoType
+        state.general.geoType,
+        'outline-none'
     ]
 
     if(modal) {
@@ -1571,9 +1567,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
 					columnsInData={Object.keys(state.data[0])}
 				/>
 			)}
-			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && 
-            <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-                {['lg', 'md'].includes(currentViewport) && 'hover' === tooltips.appearanceType && (
+			{!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+                {!window.matchMedia("(any-hover: none)").matches && 'hover' === tooltips.appearanceType && (
 					<ReactTooltip
 						id='tooltip'
 						place='right'
@@ -1627,7 +1622,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                         Skip Over Map Container
                     </a>
                     
-					<section className='geography-container' ref={mapSvg} tabIndex="0">
+					<section className='geography-container outline-none' ref={mapSvg} tabIndex="0">
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
                                 {modal && (
