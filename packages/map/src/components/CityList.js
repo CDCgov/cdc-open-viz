@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos';
 import { scaleLinear } from 'd3-scale';
-
+import ReactTooltip from 'react-tooltip';
 
 const CityList = (({
   data,
@@ -20,6 +20,10 @@ const CityList = (({
 }) => {
 
   const [citiesData, setCitiesData] = useState({});
+
+  useEffect(() => {
+    ReactTooltip.rebuild()
+  });
 
   useEffect(() => {
     if(!isGeoCodeMap) {
@@ -50,6 +54,8 @@ const CityList = (({
   }
   let cityList = isGeoCodeMap ? Object.keys(citiesData).filter((c) => undefined !== c) : Object.keys(citiesData).filter((c) => undefined !== data[c]);
   if(!cityList) return true;
+
+  // Cities output
   const cities = cityList.map((city, i) => {
 
     const geoData = isGeoCodeMap ? state.data.filter(item => city === item[state.columns.geo.name])[0] : data[city];
