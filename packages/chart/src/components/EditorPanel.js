@@ -424,6 +424,19 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
+
+    const getDataValueOptions = (data)=>{
+      if(!data) return [];
+      const set = new Set();
+      for (let i=0; i<data.length; i++){
+        for (const [key, value] of Object.entries(data[i])) {
+          set.add(key)
+        }
+        
+      }
+      return Array.from(set)
+    };
+    
   const getDataValues = (dataKey, unique = false) => {
     let values = []
     excludedData.map(e => {
@@ -1071,6 +1084,10 @@ useEffect(()=>{
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+
+                  {(config.visualizationType==='Bar' && config.visualizationSubType ==="regular" && config.runtime.seriesKeys.length===1 )&& (
+                   <Select value={config.legend.colorCode} section="legend" fieldName="colorCode" label="Color code by category" initial="Select" updateField={updateField} options={getDataValueOptions(data)}/>
+                  )}
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left' ]}/>
