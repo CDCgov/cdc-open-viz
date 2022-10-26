@@ -5,35 +5,39 @@ import 'core-js/stable';
 import ResizeObserver from 'resize-observer-polyfill';
 import 'whatwg-fetch';
 
-import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
+// External Libraries
 import { scaleOrdinal } from '@visx/scale';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
-
 import { timeParse, timeFormat } from 'd3-time-format';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
-import Loading from '@cdc/core/components/Loading';
-import { DataTransform } from '@cdc/core/helpers/DataTransform';
-import getViewport from '@cdc/core/helpers/getViewport';
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
+// Primary Components
+import Context from './context';
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
-import DataTable from './components/DataTable';
-import Context from './context';
-import defaults from './data/initial-state';
 
-import EditorPanel from './components/EditorPanel';
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 import SparkLine from './components/SparkLine';
+import Legend from './components/Legend';
+import DataTable from './components/DataTable';
+import defaults from './data/initial-state';
+import EditorPanel from './components/EditorPanel';
+import Loading from '@cdc/core/components/Loading';
+
+// helpers
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import getViewport from '@cdc/core/helpers/getViewport';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
 
 import './scss/main.scss';
+import useChartClasses from './hooks/useChartClasses';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname,link} :
@@ -57,12 +61,22 @@ export default function CdcChart(
   const [externalFilters, setExternalFilters] = useState(null);
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [dynamicLegendItems, setDynamicLegendItems] = useState([])
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
+  const {     
+    barBorderClass,
+    lineDatapointClass, 
+    contentClasses,
+    innerContainerClasses, 
+    sparkLineStyles
+  } = useDataVizClasses(config)
+
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  // TODO: move to core
   const cacheBustingString = () => {
       const round = 1000 * 60 * 15;
       const date = new Date();
@@ -468,14 +482,18 @@ export default function CdcChart(
     } else {
       newSeriesHighlight.push(newHighlight);
     }
-
     setSeriesHighlight(newSeriesHighlight);
   };
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    setSeriesHighlight([]);
+    if(config.legend.dynamicLegend && dynamicLegendItems) {
+      setSeriesHighlight(dynamicLegendItems.map( item => item.text ))
+    } else {
+      setSeriesHighlight([]);
+    }
   }
+
   const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const parseDate = (dateString: string) => {
@@ -552,6 +570,7 @@ export default function CdcChart(
     'Pie' : <PieChart />,
   }
 
+<<<<<<< HEAD
   // JSX for Legend
   const Legend = () => {
 
@@ -626,6 +645,8 @@ export default function CdcChart(
     )
   }
 
+=======
+>>>>>>> test
   const Filters = () => {
     const changeFilterActive = (index, value) => {
       let newFilters = config.filters;
@@ -713,36 +734,12 @@ export default function CdcChart(
     return false;
   };
 
-  let innerContainerClasses = ['cove-component__inner']
-	config.title && innerContainerClasses.push('component--has-title')
-	config.subtext && innerContainerClasses.push('component--has-subtext')
-	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-	let contentClasses = ['cove-component__content'];
-	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-	!config.visual?.border && contentClasses.push('no-borders');
-	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-	config.visual?.accent && contentClasses.push('component--has-accent');
-	config.visual?.background && contentClasses.push('component--has-background');
-	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-
-
   // Prevent render if loading
   let body = (<Loading />)
-  let lineDatapointClass = ''
-  let barBorderClass = ''
 
-  let sparkLineStyles = {
-    width: '100%',
-    height: '100px',
-  }
 
-  if(false === loading) {
-    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
-    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
-    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+  if(!loading) {
+
 
     body = (
       <>
@@ -800,11 +797,9 @@ export default function CdcChart(
                 </>
               )
               }
-              {/* Legend */}
-            
               {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
-                 {/* Link */}
+            {/* Link */}
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
@@ -844,7 +839,13 @@ export default function CdcChart(
     missingRequiredSections,
     setEditing,
     setFilteredData,
-    handleChartAriaLabels
+    handleChartAriaLabels,
+    highlight,
+    highlightReset,
+    legend,
+    setSeriesHighlight,
+    dynamicLegendItems,
+    setDynamicLegendItems
   }
 
   const classes = [
