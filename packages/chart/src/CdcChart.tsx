@@ -567,11 +567,6 @@ export default function CdcChart(
       innerClasses.push('flex-column-reverse')
     }
 
-    console.log('config', config)
-    console.log('data', config.data.sort());
-    console.log('legend', config.legend);
-
-
     return (
       <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
         {legend.label && <h2>{parse(legend.label)}</h2>}
