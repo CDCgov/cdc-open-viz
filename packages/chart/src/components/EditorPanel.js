@@ -594,10 +594,10 @@ const EditorPanel = () => {
    let message = '';
 
   switch(true){
-    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+    case ((config.visualizationType === 'Line' || config.visualizationType === 'Spark Line')  && (enteredValue && parseFloat(enteredValue) > minVal)):
       message = 'Value must be less than ' + minValue;
       break; 
-    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+    case ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo' ) && enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
       message = 'Value must be less than or equal to 0';
       break; 
     case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
