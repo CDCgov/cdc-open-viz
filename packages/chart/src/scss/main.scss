@@ -130,6 +130,13 @@
       top: 1em;
       border-radius: 3px;
 
+
+      &--dynamic {
+        position: relative;
+        float: right;
+        right: unset;
+      }
+
       &:hover {
         background: rgba(0, 0, 0, .15);
         transition: .3s all;
@@ -161,6 +168,29 @@
         opacity: .5;
         transition: .2s all;
       }
+    }
+  }
+
+  .dynamic-legend-list {
+
+    // overide traditional legend item that uses !important
+    .legend-item {
+      align-items: flex-end !important;
+      justify-content: space-between;
+
+      .btn-wrapper {
+        background: transparent;
+      }
+    }
+
+    .visx-legend-label {
+      width: auto !important;
+      display: inline-block !important;
+    }
+
+    button {
+      width: auto;
+      display: inline-block;
     }
   }
 

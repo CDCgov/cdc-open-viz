@@ -338,10 +338,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     if(config.isLollipopChart) {
                       offset = ( (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2) - lollipopBarWidth / 2
                     }
-
+                    
+                    const palette  = colorPalettes[config.palette];
                     let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length;
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
-
+                    if( config.legend.colorCode && config.series.length===1)  barColor = palette[barGroup.index];
+                     
                     let yAxisValue = formatNumber(bar.value);
                     let xAxisValue = config.runtime[section].type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
