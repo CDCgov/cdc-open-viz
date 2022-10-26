@@ -71,6 +71,10 @@ export default function LinearChart() {
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
     }
+    if(config.visualizationType === 'Line' ){
+      const isMinValid = Number(enteredMinValue) < Number(minValue)
+      min = (enteredMinValue && isMinValid) ? Number(enteredMinValue) : minValue;
+    }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
       // if all values in data are negative set max = 0
