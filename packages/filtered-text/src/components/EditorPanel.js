@@ -268,7 +268,6 @@ const EditorPanel = memo((props) => {
 			</Button>
 		  </Accordion.Section>
 		  <Accordion.Section title="Visual">
-	
 			<InputSelect
 			  value={config.fontSize}
 			  fieldName="fontSize"
@@ -276,7 +275,7 @@ const EditorPanel = memo((props) => {
 			  updateField={updateField}
 			  options={["small", "medium", "large"]}
 			/>
-	
+				<br/>
 			<label>
 			  <span className="edit-label">Theme</span>
 			  <ul className="color-palette">
