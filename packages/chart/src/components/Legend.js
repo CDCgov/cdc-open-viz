@@ -6,7 +6,6 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 
 import useLegendClasses from './../hooks/useLegendClasses';
 
-
 const Legend = () => {
 
 	const { 
@@ -24,8 +23,6 @@ const Legend = () => {
 		colorPalettes
 	} = useContext(Context);
 
-	
-
 	const {innerClasses, containerClasses} = useLegendClasses(config)
 
 	useEffect(() => {
@@ -39,12 +36,16 @@ const Legend = () => {
 		setSeriesHighlight( newLegendItemsText)
 	}
 
-	const createLegendLabels = (data,defaultLabels) =>{
+	const createLegendLabels = (data, defaultLabels) => {
+		if (defaultLabels) {
+			defaultLabels.sort((a, b) => (a.datum > b.datum ? 1 : -1));
+		}
+
 		const colorCode = config.legend?.colorCode;
 		if( config.visualizationType !=='Bar' ||  config.visualizationSubType !=="regular" || !colorCode || config.series?.length > 1) return defaultLabels;
 		let palette = colorPalettes[config.palette];
-	   
-		while(data.length > palette.length) {
+		
+		while (data.length > palette.length) {
 		  palette = palette.concat(palette);
 		}
 	
@@ -56,11 +57,12 @@ const Legend = () => {
 			text:d[colorCode],
 			value:palette[i]
 		  };
-		 
+		
 		  return newLabel
 		  
 		})
-		return valueLabels
+		
+		return valueLabels;
 	  }
 
 	if (!legend) return;
