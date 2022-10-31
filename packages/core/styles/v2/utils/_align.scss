@@ -1,0 +1,17 @@
+// Content Align Classes
+@mixin align($propNames, $className, $valueName) {
+  @each $propName in $propNames {
+    #{'.align-' + $propName + '-' + $className} {
+      #{'align-' + $propName}: #{$valueName} !important;
+    }
+  }
+}
+
+@include align(('content', 'items', 'self'), 'start', 'flex-start');
+@include align(('content', 'items', 'self'), 'end', 'flex-end');
+@include align(('content', 'items', 'self'), 'center', 'center');
+@include align(('content', 'items', 'self'), 'stretch', 'stretch');
+
+@include align(('items', 'self'), 'baseline', 'baseline');
+@include align('content', 'around', 'space-around');
+@include align('content', 'between', 'space-between');

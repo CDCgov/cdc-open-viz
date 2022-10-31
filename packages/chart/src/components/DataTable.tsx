@@ -20,8 +20,8 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import Context from '../context';
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
-
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter } = useContext<any>(Context);
+  
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
   const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
@@ -141,13 +141,17 @@ export default function DataTable() {
           >
             {config.table.label}
           </div>
-          <div className="table-container">
+          <div 
+           className="table-container"
+           style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
+           >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
               hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
+              <caption className='cdcdataviz-sr-only'>{config.table.caption ?  config.table.caption : "" }</caption>
               <caption className="visually-hidden">{config.table.label}</caption>
               <thead>
                 {headerGroups.map((headerGroup,index) => (
@@ -178,7 +182,7 @@ export default function DataTable() {
                 ))}
               </thead>
               <tbody {...getTableBodyProps()}>
-                {rows.map((row, index) => {
+                {rows.sort().reverse().map((row, index) => {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>

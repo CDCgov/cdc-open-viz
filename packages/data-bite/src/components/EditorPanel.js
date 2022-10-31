@@ -10,7 +10,7 @@ import {
 
 import { useDebounce } from 'use-debounce'
 import Context from '../context'
-import WarningImage from '../images/warning.svg'
+import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -308,8 +308,6 @@ const EditorPanel = memo(() => {
     return null
   }
 
-  console.log(config,'CONFIG')
-
   return (
     <ErrorBoundary component="EditorPanel">
       {!config.newViz &&
@@ -596,12 +594,7 @@ const EditorPanel = memo(() => {
                     updateField={updateField}
                     options={["small", "medium", "large"]}
                   />
-                  <CheckBox
-                    value={config.shadow}
-                    fieldName="shadow"
-                    label="Display Shadow"
-                    updateField={updateField}
-                  />
+                  <div className="checkbox-group">
                   <CheckBox
                     value={config.visual?.border}
                     section="visual"
@@ -609,18 +602,18 @@ const EditorPanel = memo(() => {
                     label="Display Border"
                     updateField={updateField}
                   />
+                  <CheckBox 
+                    value={config.visual?.borderColorTheme} 
+                    section="visual"
+                    fieldName="borderColorTheme"
+                    label="Use Border Color Theme"
+                    updateField={updateField} 
+                  />
                   <CheckBox
                     value={config.visual?.accent}
                     section="visual"
                     fieldName="accent"
                     label="Use Accent Style"
-                    updateField={updateField}
-                  />
-                  <CheckBox
-                    value={config.visual?.roundedBorders}
-                    section="visual"
-                    fieldName="roundedBorders"
-                    label="Use Rounded Borders"
                     updateField={updateField}
                   />
                   <CheckBox
@@ -637,7 +630,8 @@ const EditorPanel = memo(() => {
                     label="Hide Background Color"
                     updateField={updateField}
                   />
-                  <label className="header">
+                  </div>
+                  <label>
                     <span className="edit-label">Theme</span>
                     <ul className="color-palette">
                       {headerColors.map((palette) => (
@@ -659,7 +653,7 @@ const EditorPanel = memo(() => {
                 </AccordionItemPanel>
               </AccordionItem>
 
-              {["title", "body"].includes(config.biteStyle) && (
+              {['title', 'body', 'graphic'].includes(config.biteStyle) && (
                 <AccordionItem>
                   {" "}
                   {/*Image & Dynamic Images*/}

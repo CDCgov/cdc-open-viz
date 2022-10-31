@@ -18,6 +18,13 @@ import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 
 const headerColors = [ 'theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber' ]
 
+const CheckBox = memo(({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
+  <label className="checkbox">
+    <input type="checkbox" name={fieldName} checked={value} onChange={() => { updateField(section, subsection, fieldName, !value) }} {...attributes} />
+    <span className="edit-label column-heading">{label}</span><span className="cove-icon">{tooltip}</span>
+  </label>
+))
+
 const EditorPanel = memo((props) => {
   const {
     config,
@@ -58,17 +65,16 @@ const EditorPanel = memo((props) => {
         sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
       }
     }
-
     let updatedConfig = { ...config, [section]: sectionValue }
 
     updateConfig(updatedConfig)
   }
 
   useEffect(() => {
+
     // Pass up to Editor if needed
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
-
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,6 +257,7 @@ const EditorPanel = memo((props) => {
               updateField={updateField}
               initial="Select"
               options={getColumns()}
+              className="cove-input"
             />
           </div>
 
@@ -262,12 +269,13 @@ const EditorPanel = memo((props) => {
               updateField={updateField}
               initial="Select"
               options={DATA_FUNCTIONS}
+              className="cove-input"
             />
           </div>
 
           <div className="cove-input-group">
             <label>
-              <span className="edit-label">Data Conditional</span>
+              <span className="edit-label cove-input__label">Data Conditional</span>
             </label>
             <div className="cove-accordion__panel-row cove-accordion__small-inputs">
               <div className="cove-accordion__panel-col">
@@ -277,6 +285,7 @@ const EditorPanel = memo((props) => {
                   updateField={updateField}
                   initial="Select"
                   options={getColumns()}
+                  className="cove-input"
                 />
               </div>
               <div className="cove-accordion__panel-col">
@@ -286,6 +295,7 @@ const EditorPanel = memo((props) => {
                   updateField={updateField}
                   initial="Select"
                   options={DATA_OPERATORS}
+                  className="cove-input"
                 />
               </div>
               <div className="cove-accordion__panel-col">
@@ -478,6 +488,7 @@ const EditorPanel = memo((props) => {
           label="Shape"
           updateField={updateField}
           options={["circle", "square", "person"]}
+          className="cove-input"
         />
 
         <div
@@ -510,13 +521,14 @@ const EditorPanel = memo((props) => {
             fieldName="orientation"
             label="Layout"
             updateField={updateField}
+            className="cove-input"
             options={["horizontal", "vertical"]}
           />
         </div>
 
         <div className="cove-input-group">
           <label>
-            <span className="edit-label column-heading">
+            <span className="edit-label column-heading cove-input__label">
               Data Point Font Size
             </span>
           </label>
@@ -546,10 +558,11 @@ const EditorPanel = memo((props) => {
           label="Overall Font Size"
           updateField={updateField}
           options={["small", "medium", "large"]}
+          className="cove-input"
         />
 
         <label>
-          <span className="edit-label">Theme</span>
+          <span className="edit-label cove-input__label">Theme</span>
           <ul className="color-palette">
             {headerColors.map((palette) => (
               <li
@@ -566,7 +579,7 @@ const EditorPanel = memo((props) => {
           </ul>
         </label>
         
-        <div className="cove-accordion__panel-section">
+        <div className="cove-accordion__panel-section reverse-labels">
           <InputCheckbox inline size='small' value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
           <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
           <InputCheckbox size='small' value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />

@@ -2,6 +2,7 @@ export default {
   type: 'chart',
   title: '',
   theme: 'theme-blue',
+  animate: false,
   fontSize: 'medium',
   lineDatapointStyle: 'hover',
   barHasBorder: 'false',
@@ -21,7 +22,7 @@ export default {
     displayNumbersOnBar:false,
     hideLabel: false,
     hideTicks: false,
-    size: 50,
+    size: 120,
     gridLines: false,
     min:'',
     max:'',
@@ -42,13 +43,23 @@ export default {
   },
   table: {
     label: 'Data Table',
-    expanded: true
+    expanded: true,
+    limitHeight:false,
+    height:"",
+    caption:""
   },
   orientation: 'vertical',
   legend: {
     behavior: 'isolate',
     position: 'right',
-    reverseLabelOrder:false
+    colorCode:'',
+    reverseLabelOrder:false,
+    description:'',
+    dynamicLegend: false,
+    dynamicLegendDefaultText: "Show All",
+    dynamicLegendItemLimit: 5,
+    dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
+    dynamicLegendChartMessage: 'Select Options from the Legend',
   },
   exclusions: {
     active: false,
@@ -58,5 +69,10 @@ export default {
   isPaletteReversed: false,
   labels: false,
   dataFormat: {commas:false,prefix:'',suffix:""},
-  confidenceKeys: {}
+  confidenceKeys: {},
+  visual: {
+    border: true,
+    accent: true,
+    background: true
+  }
 }
