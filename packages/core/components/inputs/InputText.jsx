@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
-import '../../styles/v2/components/input.scss'
+import '../../styles/v2/components/input/index.scss'
 
 const InputText = memo((
   {
@@ -13,8 +13,9 @@ const InputText = memo((
     value: stateValue,
     type = 'input',
     tooltip,
+    placeholder,
     i = null, min = null, max = null,
-    ...attributes
+    className, ...attributes
   }
 ) => {
 
@@ -41,27 +42,25 @@ const InputText = memo((
     }
   }
 
-  let formElement = <input type="text" name={name} onChange={onChange} {...attributes} value={value}/>
-
-  if ('textarea' === type) {
-    formElement = (
-      <textarea name={name} onChange={onChange} {...attributes} value={value}/>
-    )
+  let inputAttrs = {
+    className: `cove-input${className ? ' ' + className : ''}`,
+    type,
+    name,
+    placeholder,
+    onChange,
+    value,
+    ...attributes
   }
 
-  if ('number' === type) {
-    formElement = <input type="number" name={name} onChange={onChange} {...attributes} value={value}/>
-  }
+  let formElement = 'textarea' === type
+    ? (<textarea {...inputAttrs}/>)
+    : (<input {...inputAttrs}/>)
 
   return (
-    <div className="cove-input-group">
-      {label &&
-        <>
-          <label>{label}{tooltip}</label>
-        </>
-      }
+    <>
+      {label && <label className="cove-input__label">{label}</label>}{tooltip}
       {formElement}
-    </div>
+    </>
   )
 })
 

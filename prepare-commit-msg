@@ -1,0 +1,14 @@
+#!/bin/bash
+# Prepend commit messages with branch name
+# To Use:
+# Link using absolute paths to your dir: ln -s -f [absolute_path_to_this_file] [absolute_path_to_project_root]/.git/hooks
+# Update permissions on hook if needed: chmod +x ./git/hooks/prepare-commit-msg
+BRANCHES_TO_SKIP=(main integration test)
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+BRANCH_NAME="${BRANCH_NAME##*/}"
+BRANCH_EXCLUDED=$(printf "%s\n" "${BRANCHES_TO_SKIP[@]}" | grep -c "^$BRANCH_NAME$")
+BRANCH_IN_COMMIT=$(grep -c "\[$BRANCH_NAME\]" $1)
+
+if [ -n "$BRANCH_NAME" ] && ! [[ $BRANCH_EXCLUDED -eq 1 ]] && ! [[ $BRANCH_IN_COMMIT -ge 1 ]]; then
+  sed -i.bak -e "1s/^/[$BRANCH_NAME] /" $1
+fi

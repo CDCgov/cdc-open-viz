@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,FC } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
@@ -12,6 +12,10 @@ import Loading from '@cdc/core/components/Loading'
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
+
+import { publish } from '@cdc/core/helpers/events';
+
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
 
 import './scss/main.scss'
 
@@ -28,8 +32,11 @@ const themeColor = {
   'theme-green': '#4b830d',
   'theme-amber': '#fbab18',
 }
+interface Props{
+  config?:any, isEditor?:any ,link?:any
+}
 
-const WaffleChart = ({ config, isEditor }) => {
+const WaffleChart:FC<Props>  = ({ config, isEditor ,link}) => {
   let {
     title,
     theme,
@@ -279,24 +286,26 @@ const WaffleChart = ({ config, isEditor }) => {
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  let contentClasses = ['cove-component__content']
+  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
-  let innerContainerClasses = ['cove-component__inner']
-  config.title && innerContainerClasses.push('component--has-title')
-  config.subtext && innerContainerClasses.push('component--has-subtext')
-  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  
-  !config.visual.border && contentClasses.push('no-borders');
-  config.visual.accent && contentClasses.push('component--has-accent')
-  config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
-  config.visual.background && contentClasses.push('component--has-background');
-  config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
+  const handleWaffleChartAriaLabel = (state, testing = false) => {
+        if(testing) console.log(`handleWaffleChartAriaLabels Testing On:`, state);
+        try {
+            let ariaLabel = 'Waffle chart';
+            if(state.title) {
+                ariaLabel += ` with the title: ${state.title}`
+            }
+            return ariaLabel;
+        } catch(e) {
+            console.error(e.message)
+        }
+  }
 
   return (
     <div className={innerContainerClasses.join(' ')}>
       <>
       {title &&
-        <header className={`cove-component__header ${config.theme}`} aria-hidden="true">
+        <header className={`cove-component__header chart-title ${config.theme}`} aria-hidden="true">
         {parse(title)}
       </header>
       }
@@ -305,7 +314,7 @@ const WaffleChart = ({ config, isEditor }) => {
           <div
             className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className="cove-waffle-chart__chart" style={{ width: setRatio() }}>
-              <svg width={setRatio()} height={setRatio()}>
+              <svg width={setRatio()} height={setRatio()} role="img" aria-label={handleWaffleChartAriaLabel(config)} tabIndex={0}>
                 <Group>
                   {buildWaffle()}
                 </Group>
@@ -319,6 +328,7 @@ const WaffleChart = ({ config, isEditor }) => {
               </div>
               }
               <div className="cove-waffle-chart__data--text">{parse(content)}</div>
+              
               {subtext &&
                 <div className="cove-waffle-chart__subtext">
                   {parse(subtext)}
@@ -329,6 +339,7 @@ const WaffleChart = ({ config, isEditor }) => {
           </div>
         </div>
       </div>
+      {link && link}
     </>
   </div>
   )
@@ -349,6 +360,8 @@ const CdcWaffleChart = (
   const [ loading, setLoading ] = useState(true)
 
   const [ currentViewport, setCurrentViewport ] = useState<String>('lg')
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const [ container, setContainer ] = useState()
 
   // Default Functions
   const updateConfig = (newConfig) => {
@@ -395,6 +408,7 @@ const CdcWaffleChart = (
     if (node !== null) {
       resizeObserver.observe(node)
     }
+    setContainer(node)
   }, [])
 
   //Load initial config
@@ -402,16 +416,30 @@ const CdcWaffleChart = (
     loadConfig().catch((err) => console.log(err))
   }, [])
 
+  useEffect(() => {
+    if (config && !coveLoadedHasRan && container) {
+        publish('cove_loaded', { config: config })
+        setCoveLoadedHasRan(true)
+    }
+  }, [config, container]);
+
   //Reload config if config object provided/updated
   useEffect(() => {
     loadConfig().catch((err) => console.log(err))
   }, [])
 
+  //Reload config if parent passes different config
+  useEffect(() => {
+    if(!configObj.dataUrl){
+      updateConfig({ ...defaults, ...configObj});
+    }
+  }, [configObj.data])
+
   let content = (<Loading/>)
 
   if (loading === false) {
     let classNames = [
-      'cdc-open-viz-module',
+      'cove',
       'type-waffle-chart',
       currentViewport,
       config.theme,
@@ -425,13 +453,13 @@ const CdcWaffleChart = (
     let bodyClasses = ['cove-component', 'waffle-chart']
 
     let body = (
-      <div className="cove-component waffle-chart" ref={outerContainerRef}>
-        <WaffleChart config={config} isEditor={isEditor} />
+      <div className={`${bodyClasses.join(' ')}`} ref={outerContainerRef}>
+        <WaffleChart config={config} isEditor={isEditor}/>
       </div>
     );
 
     content = (
-      <div className={`cove`} style={isDashboard ? { marginTop: '3rem' } : null}>
+      <div className={classNames.join(' ')}>
         {isEditor &&
           <EditorPanel>
             {body}

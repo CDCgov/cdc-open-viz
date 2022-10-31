@@ -42,7 +42,9 @@ export default {
     },
     navigate: {
       name: ''
-    }
+    },
+    latitude: { name: "" },
+    longitude: { name: "" }
   },
   legend: {
     descriptions: {},
@@ -70,7 +72,8 @@ export default {
   visual: {
     minBubbleSize: 1,
     maxBubbleSize: 20,
-    extraBubbleBorder: false
+    extraBubbleBorder: false,
+    cityStyle: 'circle'
   },
   mapPosition: 
     { coordinates: [0, 30], zoom: 1 }

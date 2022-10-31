@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import {
 	Accordion,
 	AccordionItem,
@@ -10,21 +10,21 @@ import ReactTooltip from 'react-tooltip';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useDebounce } from 'use-debounce';
 
+import colorPalettes from '@cdc/core/data/colorPalettes';
+import { supportedStatesFipsCodes } from '../data/supported-geos';
+import { useColorPalette } from '../hooks/useColorPalette';
+
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Waiting from '@cdc/core/components/Waiting';
 
-import UsaGraphic from '@cdc/core/assets/usa-graphic.svg';
-import WorldGraphic from '@cdc/core/assets/world-graphic.svg';
-import AlabamaGraphic from '@cdc/core/assets/alabama-graphic.svg';
-import colorPalettes from '../../../core/data/colorPalettes';
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg';
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg';
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg';
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg';
 import worldDefaultConfig from '../../examples/default-world.json';
 import usaDefaultConfig from '../../examples/default-usa.json';
 import countyDefaultConfig from '../../examples/default-county.json';
-import QuestionIcon from '@cdc/core/assets/question-circle.svg';
 
-import { supportedStatesFipsCodes } from '../data/supported-geos';
-import { GET_PALETTE,useColorPalette } from '../hooks/useColorPalette';
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox';
 import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -107,9 +107,6 @@ const EditorPanel = (props) => {
 
 	const {filteredPallets,filteredQualitative,isPaletteReversed,paletteName} = useColorPalette(colorPalettes,state);
 
-
-	const [editorCatOrder, setEditorCatOrder] = useState(state.legend.categoryValuesOrder || []);
-
 	const headerColors = [
 		'theme-blue',
 		'theme-purple',
@@ -125,13 +122,11 @@ const EditorPanel = (props) => {
 	];
 
 	const categoryMove = (idx1, idx2) => {
-		let categoryValuesOrder = [...editorCatOrder];
+		let categoryValuesOrder = [...state.legend.categoryValuesOrder];
 
 		let [movedItem] = categoryValuesOrder.splice(idx1, 1);
 
 		categoryValuesOrder.splice(idx2, 0, movedItem);
-
-		setEditorCatOrder(categoryValuesOrder);
 
 		setState({
 			...state,
@@ -183,6 +178,7 @@ const EditorPanel = (props) => {
 	};
 
 	const handleEditorChanges = async (property, value) => {
+		
 		switch (property) {
 
 			// change these to be more generic.
@@ -302,6 +298,14 @@ const EditorPanel = (props) => {
 					},
 				});
 				break;
+			case 'handleCityStyle':
+				setState({
+					...state,
+					visual: {
+						cityStyle: value,
+					},
+				});
+				break;
 			case 'geoBorderColor':
 				setState({
 					...state,
@@ -343,7 +347,7 @@ const EditorPanel = (props) => {
 				break;
 			case 'legendType':
 
-				let testForType = typeof state.data[0][state.columns.primary.name];
+				let testForType = Number(typeof state.data[0][state.columns.primary.name]);
 				let hasValue = state.data[0][state.columns.primary.name];
 				let messages = [];
 
@@ -351,8 +355,10 @@ const EditorPanel = (props) => {
 					messages.push(`There appears to be values missing for data in the primary column ${state.columns.primary.name}`);
 				}
 
-				if (testForType === 'string' && value !== 'category') {
-					messages.push( 'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to categorical.' );
+				if (testForType === 'string' && isNaN(testForType) && value !== 'category')  {
+					messages.push(
+            "Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical."
+          );
 				} else {
 					messages = []
 				}
@@ -430,6 +436,15 @@ const EditorPanel = (props) => {
 				break;
 			case 'editorMapType':
 				switch (value) {
+					case 'us-geocode':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								type: value,
+							},
+						});
+						break;
 					case 'data':
 						setState({
 							...state,
@@ -500,6 +515,20 @@ const EditorPanel = (props) => {
 							general: {
 								...state.general,
 								geoType: 'us',
+							},
+							dataTable: {
+								...state.dataTable,
+								forceDisplay: true,
+							},
+						});
+						ReactTooltip.rebuild();
+						break;
+					case 'us-region':
+						setState({
+							...state,
+							general: {
+								...state.general,
+								geoType: 'us-region',
 							},
 							dataTable: {
 								...state.dataTable,
@@ -675,6 +704,7 @@ const EditorPanel = (props) => {
 	};
 
 	const columnsRequiredChecker = useCallback(() => {
+		console.info('Running columns required check.')
 		let columnList = [];
 
 		// Geo is always required
@@ -693,6 +723,14 @@ const EditorPanel = (props) => {
 			('' === state.columns.navigate.name || undefined === state.columns.navigate)
 		) {
 			columnList.push('Navigation');
+		}
+
+		if ('us-geocode' === state.general.type && '' === state.columns.latitude.name) {
+			columnList.push('Latitude')
+		}
+		
+		if ('us-geocode' === state.general.type && '' === state.columns.longitude.name) {
+			columnList.push('Longitude')
 		}
 
 		if (columnList.length === 0) columnList = null;
@@ -914,10 +952,30 @@ const EditorPanel = (props) => {
 	}, [state]);
 
 	useEffect(() => {
+		//If a categorical map is used and the order is either not defined or incorrect, fix it
 		if ('category' === state.legend.type) {
-			let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+			let valid = true;
+			if(state.legend.categoryValuesOrder){
+				runtimeLegend.forEach(item => {
+					if(!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
+						valid = false;
+					}
+				});
+			} else {
+				valid = false;
+			}
 
-			setEditorCatOrder(arr);
+			if(!valid){
+				let arr = runtimeLegend.filter((item) => !item.special).map(({ value }) => value);
+
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						categoryValuesOrder: arr,
+					},
+				});
+			}
 		}
 	}, [runtimeLegend]);
 
@@ -978,7 +1036,7 @@ const EditorPanel = (props) => {
 	}
 
 	const additionalColumns = Object.keys(state.columns).filter((value) => {
-		const defaultCols = ['geo', 'navigate', 'primary'];
+		const defaultCols = ['geo', 'navigate', 'primary', 'latitude', 'longitude'];
 
 		if (true === defaultCols.includes(value)) {
 			return false;
@@ -1187,7 +1245,7 @@ const EditorPanel = (props) => {
 	});
 
 	const CategoryList = () => {
-		return editorCatOrder.map((value, index) => (
+		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
 			<Draggable key={value} draggableId={`item-${value}`} index={index}>
 				{(provided, snapshot) => (
 					<li style={{ position: 'relative' }}>
@@ -1203,7 +1261,7 @@ const EditorPanel = (props) => {
 					</li>
 				)}
 			</Draggable>
-		));
+		)) : <></>;
 	};
 
 	const Error = () => {
@@ -1249,32 +1307,52 @@ const EditorPanel = (props) => {
 											<span>Geography</span>
 										</span>
 										<ul className='geo-buttons'>
-											<li
+											<button
 												className={
 													state.general.geoType === 'us' ||
 													state.general.geoType === 'us-county'
 														? 'active'
 														: ''
 												}
-												onClick={() => handleEditorChanges('geoType', 'us')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'us')
+												}}
 											>
 												<UsaGraphic />
 												<span>United States</span>
-											</li>
-											<li
+											</button>
+                      <button
+                        className={state.general.geoType === 'us-region' ? 'active' : ''}
+                        onClick={ (e) => {
+                          e.preventDefault();
+                          handleEditorChanges('geoType', 'us-region')
+                        }}
+                      >
+                        <UsaRegionGraphic />
+                        <span>U.S. Region</span>
+                      </button>
+											<button
 												className={state.general.geoType === 'world' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'world')}
+												onClick={ (e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'world')
+													}
+												}
 											>
 												<WorldGraphic />
 												<span>World</span>
-											</li>
-											<li
+											</button>
+											<button
 												className={state.general.geoType === 'single-state' ? 'active' : ''}
-												onClick={() => handleEditorChanges('geoType', 'single-state')}
+												onClick={(e) => {
+													e.preventDefault();
+													handleEditorChanges('geoType', 'single-state')
+												}}
 											>
 												<AlabamaGraphic />
 												<span>U.S. State</span>
-											</li>
+											</button>
 										</ul>
 									</label>
 									{/* Select > State or County Map */}
@@ -1332,10 +1410,46 @@ const EditorPanel = (props) => {
 											}}
 										>
 											<option value='data'>Data</option>
+											<option value='us-geocode'>United States Geocode</option>
 											<option value='navigation'>Navigation</option>
 											{ (state.general.geoType === 'world' || state.general.geoType === 'us') && <option value="bubble">Bubble</option>}
 										</select>
 									</label>
+									<label>
+                     <span className="edit-label">Data Classification Type</span>
+                     <div>
+                       <label>
+                         <input
+                           type="radio"
+                           name="equalnumber"
+                           value="equalnumber"
+                           checked={state.legend.type === "equalnumber"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Numeric/Quantitative
+                       </label>
+                       <label>
+                         <input
+                           type="radio"
+                           name="category"
+                           value="category"
+                           checked={state.legend.type === "category"}
+                           onChange={(e) =>
+                             handleEditorChanges(
+                               "classificationType",
+                               e.target.value
+                             )
+                           }
+                         />
+                         Categorical
+                       </label>
+                     </div>
+                   </label>
 									{/* SubType */}
 									{'us' === state.general.geoType && 'data' === state.general.type && (
 										<label className='checkbox mt-4'>
@@ -1350,7 +1464,7 @@ const EditorPanel = (props) => {
 										</label>
 									)}
 									{'us' === state.general.geoType &&
-										'data' === state.general.type &&
+										'bubble' !== state.general.type &&
 										false === state.general.displayAsHex && (
 											<label className='checkbox'>
 												<input
@@ -1461,41 +1575,6 @@ const EditorPanel = (props) => {
 											placeholder='Territories'
 										/>
 									)}
-									<label>
-                     <span className="edit-label">Data Classification Type</span>
-                     <div>
-                       <label>
-                         <input
-                           type="radio"
-                           name="equalnumber"
-                           value="equalnumber"
-                           checked={state.legend.type === "equalnumber"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Numeric/Quantitative
-                       </label>
-                       <label>
-                         <input
-                           type="radio"
-                           name="category"
-                           value="category"
-                           checked={state.legend.type === "category"}
-                           onChange={(e) =>
-                             handleEditorChanges(
-                               "classificationType",
-                               e.target.value
-                             )
-                           }
-                         />
-                         Categorical
-                       </label>
-                     </div>
-                   </label>
 									{/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
@@ -1511,14 +1590,14 @@ const EditorPanel = (props) => {
 								<AccordionItemPanel>
 									<label className='edit-block geo'>
 										<span className='edit-label column-heading'>
-                      Geography
-                      <Tooltip style={{textTransform: 'none'}}>
-                        <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
+										Geography
+										<Tooltip style={{textTransform: 'none'}}>
+											<Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+											<Tooltip.Content>
+											<p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
+											</Tooltip.Content>
+										</Tooltip>
+										</span>
 										<select
 											value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
 											onChange={(event) => {
@@ -1596,6 +1675,7 @@ const EditorPanel = (props) => {
                               fieldName='roundToPlace'
                               label='Round'
                               updateField={updateField}
+							  min={0}
                             />
                           </li>
                           <li>
@@ -1675,6 +1755,23 @@ const EditorPanel = (props) => {
                         	</label>
 						</fieldset>
 					)}
+
+					{'us-geocode' === state.general.type &&
+					<>
+						<label>Latitude Column</label>
+						<select value={state.columns.latitude.name ? state.columns.latitude.name : ''} onChange={(e) => {
+							editColumn('latitude', 'name', e.target.value);
+							}}>
+						{columnsOptions}
+						</select>
+						<label>Longitude Column</label>
+						<select value={state.columns.longitude.name ? state.columns.longitude.name : ''} onChange={(e) => {
+							editColumn('longitude', 'name', e.target.value);
+						}}>
+							{columnsOptions}
+						</select>
+					</>
+					}
 
 					{'navigation' !== state.general.type && (
                       <fieldset className="primary-fieldset edit-block">
@@ -1900,12 +1997,49 @@ const EditorPanel = (props) => {
 													handleEditorChanges('legendType', event.target.value);
 												}}
 											>
-												<option value='equalnumber'>Equal Number</option>
+												<option value='equalnumber'>Equal Number (Quantiles)</option>
 												<option value='equalinterval'>Equal Interval</option>
-												<option value='category'>Categorical</option>
 											</select>
 											</label>
 											)}
+									{'navigation' !== state.general.type && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={state.general.showSidebar || false}
+												onChange={(event) => {
+													handleEditorChanges('showSidebar', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Show Legend</span>
+										</label>
+									)}
+									{'navigation' !== state.general.type && (
+										<label>
+											<span className='edit-label'>Legend Position</span>
+											<select
+												value={legend.position || false}
+												onChange={(event) => {
+													handleEditorChanges('sidebarPosition', event.target.value);
+												}}
+											>
+												<option value='side'>Side</option>
+												<option value='bottom'>Bottom</option>
+											</select>
+										</label>
+									)}
+									{'side' === legend.position && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleColumn}
+												onChange={(event) => {
+													handleEditorChanges('singleColumnLegend', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Single Column Legend</span>
+										</label>
+									)}
 										{'category' !== legend.type && (
 											<label className='checkbox'>
 												<input
@@ -1928,6 +2062,7 @@ const EditorPanel = (props) => {
 											</label>
 										)}
 										{/* Temp Checkbox */}
+										
 										{state.legend.type === 'equalnumber' &&
 											<label className="checkbox mt-4">
 												<input type="checkbox" checked={ state.general.equalNumberOptIn } onChange={(event) => { handleEditorChanges("showEqualNumber", event.target.checked) }} />
@@ -1999,13 +2134,13 @@ const EditorPanel = (props) => {
 														)}
 													</Droppable>
 												</DragDropContext>
-												{editorCatOrder.length >= 9 && (
+												{state.legend.categoryValuesOrder && state.legend.categoryValuesOrder.length >= 10 && (
 													<section className='error-box my-2'>
 														<div>
 															<strong className='pt-1'>Warning</strong>
 															<p>
-																The maximum number of categorical legend items is 9. If
-																your data has more than 9 categories your map will not
+																The maximum number of categorical legend items is 10. If
+																your data has more than 10 categories your map will not
 																display properly.
 															</p>
 														</div>
@@ -2159,14 +2294,14 @@ const EditorPanel = (props) => {
 											fieldName='indexLabel'
 											label='Index Column Header'
 											placeholder='Location'
-                      tooltip={
-                        <Tooltip style={{textTransform: 'none'}}>
-                          <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
+                                            tooltip={
+                                                <Tooltip style={{textTransform: 'none'}}>
+                                                <Tooltip.Target><Icon display="question" style={{marginLeft: '0.5rem'}}/></Tooltip.Target>
+                                                <Tooltip.Content>
+                                                    <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
+                                                </Tooltip.Content>
+                                                </Tooltip>
+                                            }
 										/>
 										<TextField
 											value={dataTable.caption}
@@ -2361,45 +2496,6 @@ const EditorPanel = (props) => {
 										/>
 										<span className='edit-label'>Hide Primary Column Name in Tooltip</span>
 									</label>
-
-									{'navigation' !== state.general.type && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={state.general.showSidebar || false}
-												onChange={(event) => {
-													handleEditorChanges('showSidebar', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Show Legend</span>
-										</label>
-									)}
-									{'navigation' !== state.general.type && (
-										<label>
-											<span className='edit-label'>Legend Position</span>
-											<select
-												value={legend.position || false}
-												onChange={(event) => {
-													handleEditorChanges('sidebarPosition', event.target.value);
-												}}
-											>
-												<option value='side'>Side</option>
-												<option value='bottom'>Bottom</option>
-											</select>
-										</label>
-									)}
-									{'side' === legend.position && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={legend.singleColumn}
-												onChange={(event) => {
-													handleEditorChanges('singleColumnLegend', event.target.checked);
-												}}
-											/>
-											<span className='edit-label'>Single Column Legend</span>
-										</label>
-									)}
 									{'navigation' === state.general.type && (
 										<label className='checkbox'>
 											<input
@@ -2477,6 +2573,10 @@ const EditorPanel = (props) => {
 													backgroundColor: colorPalettes[palette][6],
 												};
 
+												// hide palettes with too few colors for region maps
+												if ( colorPalettes[palette].length <= 8 && state.general.geoType === 'us-region' ) {
+													return('');
+												}
 												return (
 													<li
 														title={palette}
@@ -2509,7 +2609,7 @@ const EditorPanel = (props) => {
 										label='Maximum Bubble Size'
 										updateField={updateField}
 									/></>}
-									{ (state.general.geoType === 'world' || state.general.geoType === 'us') &&
+									{ (state.general.geoType === 'world' || state.general.geoType === 'us' && state.general.type === 'bubble') &&
 										<label className='checkbox'>
 											<input
 												type='checkbox'
@@ -2543,6 +2643,20 @@ const EditorPanel = (props) => {
 												}}
 											/>
 											<span className='edit-label'>Bubble Map has extra border</span>
+										</label>
+									}
+									{state.general.geoType === 'us' &&
+										<label>
+											<span className='edit-label'>City Style</span>
+											<select
+												value={state.visual.cityStyle || false}
+												onChange={(event) => {
+													handleEditorChanges('handleCityStyle', event.target.value);
+												}}
+											>
+												<option value='circle'>Circle</option>
+												<option value='pin'>Pin</option>
+											</select>
 										</label>
 									}
 								</AccordionItemPanel>

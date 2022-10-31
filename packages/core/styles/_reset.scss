@@ -6,6 +6,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   color: #111;
+
+  // match cdc site outline
+  :focus,
+  [tabindex]:focus-visible {
+    outline: 2px solid rgba(255,102,1,.9) !important;
+  }
+
+  .outline-none {
+    outline: none !important;
+  }
 }
 .cdc-open-viz-module {
   div, span, applet, object, iframe,

@@ -1,11 +1,13 @@
 @import "../utils/variables";
 @import "../themes/index";
 
-.cove-modal {
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 3px 3px 10px rgb(0 0 0 / 20%);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
+.cove-overlay {
+  .cove-modal {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 3px 3px 10px rgb(0 0 0 / 20%);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
+  }
 }
 
 .cove-modal__header {
@@ -27,7 +29,12 @@
 }
 
 .cove-modal__content {
-  padding: 1rem;
+  padding: 1rem !important;
+
+  label {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
 }
 
 .cove-modal__footer {

@@ -2,370 +2,58 @@
 	"type":"dashboard",
 	"data": [
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "43",
-			"state": "Alabama"
+			"name": "Jupiter",
+			"Radius": "10.97",
+			"Diameter": "22",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "75",
-			"state": "Alabama"
+			"name": "Saturn",
+			"Radius": "9.14",
+			"Diameter": "18",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "0",
-			"state": "Alaska"
+			"name": "Uranus",
+			"Radius": "3.98",
+			"Diameter": "8",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
+			"name": "Neptune",
+			"Radius": "3.86",
+			"Diameter": "7",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
+			"name": "Earth",
+			"Radius": "1",
+			"Diameter": "2",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "37.2",
-			"state": "California"
+			"name": "Venus",
+			"Radius": "0.950",
+			"Diameter": "2",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
+			"name": "Mars",
+			"Radius": "0.532",
+			"Diameter": "1",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
+			"name": "Mercury",
+			"Radius": "0.383",
+			"Diameter": "0.7",
+			"distance": "0"
 		},
 		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 1",
-			"Insured Rate": "83",
-			"state": "Florida"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "100",
-			"state": "Alabama"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "0",
-			"state": "Alaska"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "37.2",
-			"state": "California"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 1",
-			"Insured Rate": "83",
-			"state": "Florida"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "0",
-			"state": "Alabama"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "0",
-			"state": "Alaska"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "37.2",
-			"state": "California"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 1",
-			"Insured Rate": "83",
-			"state": "Florida"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "43",
-			"state": "Alabama"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "0",
-			"state": "Alaska"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "37.2",
-			"state": "California"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option1",
-			"filter2": "sub option 2",
-			"Insured Rate": "83",
-			"state": "Florida"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "43",
-			"state": "Alabama"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "0",
-			"state": "Alaska"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "37.2",
-			"state": "California"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option2",
-			"filter2": "sub option 2",
-			"Insured Rate": "83",
-			"state": "Florida"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "43",
-			"state": "Alabama"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "0",
-			"state": "Alaska"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "72.7",
-			"state": "Arizona"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "78.7",
-			"state": "Arkansas"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "37.2",
-			"state": "California"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "50.6",
-			"state": "Colorado"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "83.2",
-			"state": "Connecticut"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "90",
-			"state": "Delaware"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "77",
-			"state": "District of Columbia"
-		},
-		{
-			"filter1": "option3",
-			"filter2": "sub option 2",
-			"Insured Rate": "83",
-			"state": "Florida"
+			"name": "Pluto",
+			"Radius": "0.181",
+			"Diameter": "0.3",
+			"distance": "0"
 		}
 	],
 	"dashboard": {
