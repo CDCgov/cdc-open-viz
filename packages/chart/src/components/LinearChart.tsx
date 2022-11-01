@@ -5,7 +5,7 @@ import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
 import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
-import { AxisLeft, AxisBottom } from '@visx/axis';
+import { AxisLeft, AxisBottom, AxisRight } from '@visx/axis';
 
 import BarChart from './BarChart';
 import LineChart from './LineChart';
@@ -18,6 +18,9 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
+import useRightAxis from '../hooks/useRightAxis';
+
+// TODO: Move scaling functions into hooks to manage complexity
 
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
@@ -50,6 +53,8 @@ export default function LinearChart() {
 
   const xMax = width - config.runtime.yAxis.size;
   const yMax = height - config.runtime.xAxis.size;
+
+  const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data});
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
@@ -340,6 +345,84 @@ export default function LinearChart() {
                 );
               }}
             </AxisLeft>
+          }
+
+          {/* Right Axis */}
+          {hasRightAxis &&
+            <AxisRight
+            scale={yScaleRight}
+            left={width}
+            label={config.yAxis.rightLabel}
+            tickFormat={tick => formatNumber(tick, 'right')}
+            numTicks={config.runtime.yAxis.rightNumTicks || undefined}
+          >
+
+            {props => {
+              const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+              const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
+              return (
+                <Group className="right-axis">
+                  {props.ticks.map((tick, i) => {
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className="vx-axis-tick"
+                      >
+                        {!config.runtime.yAxis.rightHideTicks && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            stroke="#333"
+                            display={config.runtime.horizontal ? 'none' : 'block'}
+                          />
+                        )}
+
+                        { config.runtime.yAxis.rightGridLines ? (
+                          <Line
+                            from={{x: tick.from.x + xMax, y: tick.from.y}}
+                            to={tick.from}
+                            stroke="rgba(0,0,0,0.3)"
+                          />
+                          ) : ''
+                        }
+
+                        { !config.yAxis.rightHideLabel &&
+                            <Text
+                              x={tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                              textAnchor={'start'}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                        }
+
+                        </Group>
+                      );
+                    })}
+                    {!config.yAxis.rightHideAxis &&  (
+                    <Line
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
+                      stroke="#333"
+                    />
+                    )}
+                    <Text
+                      className="y-label"
+                      textAnchor="middle"
+                      verticalAnchor="start"
+                      transform={`translate(${0 + config.yAxis.rightSize ? config.yAxis.rightSize : 0}, ${axisCenter}) rotate(90)`}
+                      fontWeight="bold"
+                    >
+                      {props.label}
+                    </Text>
+                  </Group>
+                );
+              }}
+
+            </AxisRight>
+          
+          
           }
 
           {/* X axis */}
