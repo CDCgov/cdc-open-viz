@@ -26,6 +26,10 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData';
+import useRightAxis from '../hooks/useRightAxis'
+
+// TODO: Remove unused imports
+// TDOO: Move inline styles to a scss file
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue); 
@@ -196,12 +200,13 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
-
-
   
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
+
+
+  const {hasRightAxis} = useRightAxis({config})
 
   const filterOptions = [
     {
@@ -318,11 +323,16 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters });
   }
 
-  const addNewSeries = (seriesKey) => {
+  const addNewSeries = (seriesKey, right = false) => {
     let newSeries = config.series ? [ ...config.series ] : []
     newSeries.push({ dataKey: seriesKey, type: 'Bar' });
-    updateConfig({ ...config, series: newSeries });
+    if(!right) {
+      updateConfig({ ...config, series: newSeries }); // left axis series keys
+    } else {
+      updateConfig({ ...config, rightSeries: newSeries }); // right axis series keys
+    }
   }
+  
 
   const sortSeries = (e) => {
     const series = config.series[0].dataKey
@@ -404,8 +414,8 @@ const EditorPanel = () => {
     })
 
     if (filter) {
-      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
-      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== ''
+      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== '' // TODO: remove?
+      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== '' // TODO: remove?
 
       Object.keys(columns).forEach(key => {
         if (
@@ -827,7 +837,7 @@ useEffect(()=>{
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== 'Pie'
-                      ? config.visualizationType === 'Bar' ? 'Value Axis' : 'Value Axis'
+                      ? config.visualizationType === 'Bar' ? 'Left Value Axis' : 'Left Value Axis'
                       : 'Data Format'
                     }
                     {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon"/>}
@@ -897,6 +907,51 @@ useEffect(()=>{
                   }
                 </AccordionItemPanel>
               </AccordionItem>
+
+              {/* Right Value Axis Settings */}
+              {hasRightAxis &&
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>
+                      Right Value Axis
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                      <Select value={config.yAxis.rightSeries} section="yAxis" fieldName="rightSeries" label="Right Value Axis Series" updateField={updateField} options={getColumns(false)}/>
+                      <TextField value={config.yAxis.rightLabel} section="yAxis" fieldName="rightLabel" label="Label" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightNumTicks} placeholder="Auto" type="number" section="yAxis" fieldName="rightNumTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightSize} type="number" section="yAxis" fieldName="rightSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
+                      
+                      <span className="divider-heading">Number Formatting</span>
+                      <CheckBox value={config.dataFormat.rightCommas} section="dataFormat" fieldName="rightCommas" label="Add commas" updateField={updateField}/>
+                      <TextField value={config.dataFormat.rightRoundTo} type="number" section="dataFormat" fieldName="rightRoundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} min={0}/>
+                      <div className="two-col-inputs">
+                        <TextField value={config.dataFormat.rightPrefix} section="dataFormat" fieldName="rightPrefix" label="Prefix" updateField={updateField} tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
+                              {config.visualizationType !== 'Pie' && <p>Enter a data prefix (such as "$"), if applicable.</p>}
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }/>
+                        <TextField value={config.dataFormat.rightSuffix} section="dataFormat" fieldName="rightSuffix" label="Suffix" updateField={updateField} tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                              {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }/>
+                      </div>
+                      
+                      <CheckBox value={config.yAxis.rightHideAxis} section="yAxis" fieldName="rightHideAxis" label="Hide Axis" updateField={updateField} />
+                      <CheckBox value={config.yAxis.rightHideLabel} section="yAxis" fieldName="rightHideLabel" label="Hide Label" updateField={updateField} />
+                      <CheckBox value={config.yAxis.rightHideTicks} section="yAxis" fieldName="rightHideTicks" label="Hide Ticks" updateField={updateField} />
+                  </AccordionItemPanel>
+                </AccordionItem>
+              }
 
               <AccordionItem>
                 <AccordionItemHeading>
