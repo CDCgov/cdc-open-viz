@@ -30,9 +30,8 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
-
   // If the chart is in view and set to animate and it has not already played
-  if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
+  if( dataRef?.isIntersecting === false && config.animate && ! animatedChartPlayed ) {
     setTimeout(() => {
       setAnimatedChart(true);
     }, 500);
@@ -549,7 +548,7 @@ export default function LinearChart() {
           )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
-      <div ref={triggerRef} />
+      <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
 }
