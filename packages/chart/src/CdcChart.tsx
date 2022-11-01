@@ -252,7 +252,7 @@ export default function CdcChart(
         if(series.type === 'Bar'){
           newConfig.runtime.barSeriesKeys.push(series.dataKey);
         }
-        if(series.type === 'Line'){
+        if(series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg'){
           newConfig.runtime.lineSeriesKeys.push(series.dataKey);
         }
       });
