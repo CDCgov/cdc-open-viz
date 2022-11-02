@@ -143,11 +143,11 @@ export default function DataTable() {
           </div>
           <div 
            className="table-container"
+           hidden={!tableExpanded} 
            style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
            >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
-              hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
