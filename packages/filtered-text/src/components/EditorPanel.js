@@ -176,7 +176,7 @@ const EditorPanel = memo((props) => {
 			  value={config.title}
 			  fieldName="title"
 			  label="Title"
-			  placeholder="Waffle Chart Title"
+			  placeholder="Filterable Text Title"
 			  updateField={updateField}
 			/>
 		  </Accordion.Section>
