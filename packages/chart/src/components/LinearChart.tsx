@@ -23,7 +23,7 @@ export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
-  const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+  const [animatedChart, setAnimatedChart] = useState<boolean>(false);
   const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
 
   const triggerRef = useRef();
@@ -31,15 +31,13 @@ export default function LinearChart() {
     freezeOnceVisible: false
   });
   // If the chart is in view and set to animate and it has not already played
-  if( dataRef?.isIntersecting === false && config.animate && ! animatedChartPlayed ) {
-    setTimeout(() => {
-      setAnimatedChart(true);
-    }, 500);
-
-    setTimeout(() => {
-      setAnimatedChartPlayed(!animatedChartPlayed);
-    }, 600);
-  }
+  useEffect( () => {
+    if( dataRef?.isIntersecting === true && config.animate ) {
+      setTimeout(() => {
+        setAnimatedChart(prevState => true);
+      }, 500);
+    }
+  }, [dataRef?.isIntersecting, config.animate]);
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
