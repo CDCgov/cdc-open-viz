@@ -57,8 +57,6 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
-  config.runtime.seriesKeys.sort().reverse();
-
   const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
   const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0;
   const isMinValid = ((numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >=0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0));
