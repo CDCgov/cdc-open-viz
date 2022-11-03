@@ -22,7 +22,7 @@ export default {
     displayNumbersOnBar:false,
     hideLabel: false,
     hideTicks: false,
-    size: 120,
+    size: 50,
     gridLines: false,
     min:'',
     max:'',
