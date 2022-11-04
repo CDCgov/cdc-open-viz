@@ -185,9 +185,10 @@ const Widget = ({ data = {}, addVisualization, type }) => {
               {data.dataKey && data.dataDescription && data.formattedData &&
                 <button title="Configure Visualization" className="btn btn-configure" onClick={editWidget}>{iconHash['tools']}</button>
               }
-              <button title="Configure Data" className="btn btn-configure" onClick={() => {
+              {type !== 'markup-include' && <button title="Configure Data" className="btn btn-configure" onClick={() => {
                 overlay?.actions.openOverlay(dataDesignerModal(data))
-              }}>{iconHash['gear']}</button>
+              }}>{iconHash['gear']}
+              </button>}
               <div className="widget-menu-item" onClick={deleteWidget}>
                 <Icon display="close" base/>
               </div>
