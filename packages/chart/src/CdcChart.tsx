@@ -37,7 +37,6 @@ import getViewport from '@cdc/core/helpers/getViewport';
 import { DataTransform } from '@cdc/core/helpers/DataTransform';
 
 import './scss/main.scss';
-import useChartClasses from './hooks/useChartClasses';
 
 export default function CdcChart(
   { configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname,link} :
@@ -57,7 +56,6 @@ export default function CdcChart(
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
-  const [parentElement, setParentElement] = useState(false)
   const [externalFilters, setExternalFilters] = useState(null);
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
@@ -221,7 +219,6 @@ export default function CdcChart(
           newConfig.filters[index].active = filterValues[0];
 
       });
-
       currentData = filterData(newConfig.filters, newExcludedData);
       setFilteredData(currentData);
     }
@@ -431,6 +428,7 @@ export default function CdcChart(
     if(stateData && config.xAxis && config.runtime.seriesKeys) {
       let palette = config.customColors || colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
+      let newColorScale;
 
       while(numberOfKeys > palette.length) {
         palette = palette.concat(palette);
@@ -438,7 +436,7 @@ export default function CdcChart(
 
       palette = palette.slice(0, numberOfKeys);
 
-      const newColorScale = () => scaleOrdinal({
+      newColorScale = () => scaleOrdinal({
         domain: config.runtime.seriesLabelsAll,
         range: palette,
       });
@@ -457,7 +455,7 @@ export default function CdcChart(
     const newSeriesHighlight = [];
 
     // If we're highlighting all the series, reset them
-    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
+    if( (seriesHighlight.length + 1 === config.runtime.seriesKeys.length) && !config.legend.dynamicLegend) {
       highlightReset()
       return
     }
@@ -742,6 +740,7 @@ export default function CdcChart(
     getXAxisData,
     getYAxisData,
     config,
+    setConfig,
     rawData: stateData ?? {},
     excludedData: excludedData,
     transformedData: filteredData || excludedData,
