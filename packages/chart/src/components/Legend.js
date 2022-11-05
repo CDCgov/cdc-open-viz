@@ -29,18 +29,17 @@ const Legend = () => {
 	const {innerClasses, containerClasses} = useLegendClasses(config)
 
 	useEffect(() => {
-		setSeriesHighlight( dynamicLegendItems.map( item => item.text) )
-
-		// loop through transformed data
-		// delete key on transformed data if selected is not in dynamic legend
 		if(dynamicLegendItems.length === 0) return;
-		let propertyNames = dynamicLegendItems.map( item => item.text)
-		let colsToKeep = [...propertyNames]
+		
+		let itemsToHighlight = dynamicLegendItems.map( item => item.text);
+		
+		setSeriesHighlight( itemsToHighlight )
+		
+		let colsToKeep = [...itemsToHighlight]
 		let tmpLabels = [];
 
-		let filtered = rawData.map( dataItem => {
+		rawData.map( dataItem => {
 			let tmp = {}
-			let tmpLabels = [];
 			colsToKeep.map( col => {
 				tmp[col] = isNaN(dataItem[col]) ? dataItem[col] : dataItem[col]
 			})
@@ -51,29 +50,55 @@ const Legend = () => {
 			tmpLabels[col] = col
 		})
 
-		setConfig({
-			...config,
-			runtime: {
-				...config.runtime,
-				seriesKeys: colsToKeep,
-				seriesLabels: tmpLabels
-			}
-		})
+		if(dynamicLegendItems.length > 0) {
+			setConfig({
+				...config,
+				runtime: {
+					...config.runtime,
+					seriesKeys: colsToKeep,
+					seriesLabels: tmpLabels
+				}
+			})
+		}
+		
 
 
+	}, [dynamicLegendItems]);
+
+
+	useEffect(() => {
+		if(dynamicLegendItems.length === 0 ) {
+
+			// loop through all labels and add keys
+			let resetSeriesNames = [...config.runtime.seriesLabelsAll]
+			let tmpLabels = [];
+			config.runtime.seriesLabelsAll.map( item => {
+				resetSeriesNames.map( col => {
+					tmpLabels[col] = col
+				})
+			})
+
+			setConfig({
+				...config,
+				runtime: {
+					...config.runtime,
+					seriesKeys: config.runtime.seriesLabelsAll,
+					seriesLabels: tmpLabels
+				}
+			})
+
+		}
 	}, [dynamicLegendItems]);
 
 	const removeDynamicLegendItem = (label) => {
 		let newLegendItems = dynamicLegendItems.filter((item) => item.text !== label.text);
 		let newLegendItemsText = newLegendItems.map(item => item.text )
 		setDynamicLegendItems( newLegendItems )
-		//setSeriesHighlight( newLegendItemsText)
+		setSeriesHighlight( newLegendItemsText)
 	}
 	const handleDynamicLegendChange = (e) => {
 		setDynamicLegendItems([...dynamicLegendItems, JSON.parse(e.target.value)])
 	}
-
-	console.log('data', data)
 
 	const createLegendLabels = (data,defaultLabels) => {
 		const colorCode = config.legend?.colorCode;
@@ -118,7 +143,8 @@ const Legend = () => {
 
 				{labels => (
 					<div className={innerClasses.join(' ')}>
-						{dynamicLegendItems.map((label, i) => {
+						{createLegendLabels(data,labels).map((label, i) => {
+
 							let className = 'legend-item'
 							let itemName = label.datum
 
@@ -250,14 +276,14 @@ const Legend = () => {
 
 					let className = ['legend-item']
 					let itemName = label.text
-
+					let palette = colorPalettes[config.palette];
 
 					// Filter excluded data keys from legend
 					if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
 						return
 					}
 
-					if (config.runtime.seriesLabels) {
+					if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
 						let index = config.runtime.seriesLabelsAll.indexOf(itemName)
 						itemName = config.runtime.seriesKeys[index]
 					}
@@ -285,7 +311,7 @@ const Legend = () => {
 										highlight(label);
 									}}
 								>
-									<LegendCircle fill={label.value} config={config} />
+									<LegendCircle fill={palette[i]} config={config} />
 									<LegendLabel align="space-between" margin="4px 0 0 4px">
 										{label.text}
 									</LegendLabel>

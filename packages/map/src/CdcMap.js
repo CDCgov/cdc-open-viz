@@ -569,9 +569,6 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                 let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
                 let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
 
-                console.log('dataSet', dataSet)
-                console.log('domainNums', dataSet.map(item => item[state.columns.primary.name]) )
-
                 domainNums = d3.extent(domainNums)
                 let colors = colorPalettes[state.color]
 

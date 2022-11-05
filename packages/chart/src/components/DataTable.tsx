@@ -60,7 +60,6 @@ export default function DataTable() {
     const newTableColumns = config.visualizationType === 'Pie' ? [] : [{
       Header: '',
       Cell: ({ row }) => {
-        console.log('row', row)
         const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original;
         return (
           <Fragment>
