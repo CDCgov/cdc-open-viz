@@ -182,7 +182,7 @@ export default function DataTable() {
                 ))}
               </thead>
               <tbody {...getTableBodyProps()}>
-                {rows.sort().reverse().map((row, index) => {
+                {rows.map((row, index) => {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
