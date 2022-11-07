@@ -16,6 +16,7 @@ import { Fragment } from 'react';
 
 import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 
 type DefaultsType = typeof defaults
@@ -87,9 +88,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
-    const round = 1000 * 60 * 15;
-    const date = new Date();
-    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+    
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
