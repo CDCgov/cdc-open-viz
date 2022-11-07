@@ -29,7 +29,28 @@ const getMaxValueFromData = () => {
     config.series.dataKey
   ) {
     max = Math.max(...data.map((d) => Number(d[config.series.dataKey])));
-  } else {
+
+  }else if(config.visualizationType === "Combo"  && config.visualizationSubType === "stacked" && !isBar){
+    let total  = []
+
+    if(config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys ){
+    // get barSeries max Values added to each other
+    data.map(function (d,index) {
+      const totalYValues =config.runtime.barSeriesKeys.reduce((yTotal, k) => {
+          yTotal += Number(d[k]);
+          return yTotal;
+        }, 0);
+        total.push(totalYValues) 
+    
+   });
+   // get lineSeries largest values
+   const lineMax =  Math.max(...data.map((d) =>Math.max(...config.runtime.lineSeriesKeys.map((key) => Number(d[key])))));
+
+    const barMax = Math.max(...total) 
+
+    max = (Number(barMax) > Number(lineMax)) ? barMax : lineMax;
+  }
+  }else {
     max = Math.max(
       ...data.map((d) =>
         Math.max(...config.runtime.seriesKeys.map((key) => Number(d[key])))

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 // IE11
-import 'core-js/stable'
-import ResizeObserver from 'resize-observer-polyfill'
-import 'whatwg-fetch'
+import 'core-js/stable';
+import ResizeObserver from 'resize-observer-polyfill';
+import 'whatwg-fetch';
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale';
@@ -151,6 +151,7 @@ export default function CdcChart(
     updateConfig(newConfig, data);
   }
 
+
   const updateConfig = (newConfig, dataOverride = undefined) => {
 
     let data = dataOverride || stateData
@@ -229,6 +230,7 @@ export default function CdcChart(
     newConfig.runtime.seriesLabelsAll = [];
     newConfig.runtime.originalXAxis = newConfig.xAxis;
 
+
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys;
@@ -265,7 +267,6 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
-    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
