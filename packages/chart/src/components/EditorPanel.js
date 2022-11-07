@@ -607,10 +607,10 @@ const EditorPanel = () => {
    let message = '';
 
   switch(true){
-    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+    case ((config.visualizationType === 'Line' || config.visualizationType === 'Spark Line')  && (enteredValue && parseFloat(enteredValue) > minVal)):
       message = 'Value must be less than ' + minValue;
       break; 
-    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+    case ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo' ) && enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
       message = 'Value must be less than or equal to 0';
       break; 
     case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
@@ -644,7 +644,7 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line' ]}/>
-                  {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
+                  {(config.visualizationType === 'Bar'|| config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
                   {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
@@ -848,7 +848,14 @@ useEffect(()=>{
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField}/>
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField} tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target><Icon display="question"/></Tooltip.Target>
+                        <Tooltip.Content>
+                         <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>  
+                        </Tooltip.Content>
+                      </Tooltip>
+                      }/>
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField}/>}
                     </>
                   )}

@@ -151,11 +151,11 @@ export default function DataTable() {
           </div>
           <div 
            className="table-container"
+           hidden={!tableExpanded} 
            style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
            >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
-              hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
@@ -190,7 +190,7 @@ export default function DataTable() {
                 ))}
               </thead>
               <tbody {...getTableBodyProps()}>
-                {rows.map((row, index) => {
+                {rows.sort().reverse().map((row, index) => {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>

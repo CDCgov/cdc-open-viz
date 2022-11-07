@@ -32,6 +32,7 @@ const CdcFilteredText:FC<Props> = (props) => {
   const [stateData, setStateData] = useState<Array<any>>(config.data || []);
   const [excludedData, setExcludedData] = useState<Array<Object>>();
   let {title,filters} = config;
+  const fontSize = config.fontSize ==='small' ? '16px' : config.fontSize ==='medium' ? '22px' :'27px';
 
   const { contentClasses, innerContainerClasses} = useDataVizClasses(config)
 
@@ -109,10 +110,10 @@ const CdcFilteredText:FC<Props> = (props) => {
   if (loading === false) {
     let body = (
          <>
-        {title && <header className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
+        {title && <header style={{fontSize}} className={`cove-component__header ${config.theme} `}>{parse(title)}</header>}
         <div className={contentClasses.join(' ')} >
           <div className="cove-component__content-wrap">
-            {filterByTextColumn().slice(0,1).map((el,i)=> <p key={i} > {parse(el[config.textColumn] ||"")} </p>)}  
+            {filterByTextColumn().slice(0,1).map((el,i)=> <p style={{fontSize}} key={i} > {parse(el[config.textColumn] ||"")} </p>)}  
           </div>
         </div>
         </>
