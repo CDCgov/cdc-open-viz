@@ -182,7 +182,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         <div className="widget__content">
           {data.rowIdx !== undefined && (
             <div className="widget-menu">
-              {data.dataKey && data.dataDescription && data.formattedData &&
+              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') &&
                 <button title="Configure Visualization" className="btn btn-configure" onClick={editWidget}>{iconHash['tools']}</button>
               }
               {type !== 'markup-include' && <button title="Configure Data" className="btn btn-configure" onClick={() => {
