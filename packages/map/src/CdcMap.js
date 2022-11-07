@@ -45,6 +45,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform';
 import getViewport from '@cdc/core/helpers/getViewport';
 import numberFromString from '@cdc/core/helpers/numberFromString';
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 
 // Child Components
@@ -1277,9 +1278,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             ...configObj
         }
 
-        const round = 1000 * 60 * 15;
-        const date = new Date();
-        let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+        
 
         // If a dataUrl property exists, always pull from that.
         if (newState.dataUrl) {

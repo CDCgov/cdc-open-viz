@@ -35,6 +35,7 @@ import Loading from '@cdc/core/components/Loading';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport';
 import { DataTransform } from '@cdc/core/helpers/DataTransform';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 import './scss/main.scss';
 import useChartClasses from './hooks/useChartClasses';
@@ -76,12 +77,8 @@ export default function CdcChart(
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
-  // TODO: move to core
-  const cacheBustingString = () => {
-      const round = 1000 * 60 * 15;
-      const date = new Date();
-      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
-  }
+  
+  
 
   const handleChartAriaLabels = (state, testing = false) => {
       if(testing) console.log(`handleChartAriaLabels Testing On:`, state);
