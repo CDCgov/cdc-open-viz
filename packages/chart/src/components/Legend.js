@@ -102,29 +102,33 @@ const Legend = () => {
 
 	const createLegendLabels = (data,defaultLabels) => {
 		const colorCode = config.legend?.colorCode;
-
-		if( config.visualizationType !=='Bar' ||  config.visualizationSubType !=="regular" || !colorCode || config.series?.length > 1) return defaultLabels;
+		if( config.visualizationType !=='Bar' ||  config.visualizationSubType !=="regular" || !colorCode || config.series?.length > 1){
+			return defaultLabels;
+		};
 		let palette = colorPalettes[config.palette];
 	   
 		while(data.length > palette.length) {
 		  palette = palette.concat(palette);
 		}
-	
 		palette = palette.slice(0, data.length);
-		let valueLabels = data.map((d,i)=>{
-		  const newLabel ={
-			datum : d[colorCode],
-			index:i,
-			text:d[colorCode],
-			value:palette[i]
-		  };
-		 
-		  return newLabel
-		  
-		})
+		//store uniq values to Set by colorCode
+		const set = new Set();
 
-		return valueLabels
-	}
+		data.forEach(d=>set.add(d[colorCode]));
+
+		// create labels with uniq values
+		const uniqeLabels = Array.from(set).map((val,i)=>{
+			const newLabel = {
+				datum :val,
+				index:i,
+				text:val,
+				value:palette[i]
+			};
+		return newLabel;
+		});
+
+		return uniqeLabels;
+	  };
 
 
 	  
