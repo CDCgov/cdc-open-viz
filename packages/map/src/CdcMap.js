@@ -1007,6 +1007,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
+
+    if(!row) return;
     let toolTipText = ''
 
     // Adds geo label, ie State: Georgia
