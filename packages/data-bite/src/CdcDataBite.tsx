@@ -95,7 +95,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
 
     if (response.dataUrl) {
 
-      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString()}`;
       let newData = await fetchRemoteData(response.dataUrl)
       
       if (newData && response.dataDescription) {
