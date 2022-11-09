@@ -1536,7 +1536,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {state.general.title &&
           <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
             <div role="heading" className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-              <sup>{general.superTitle}</sup>
+              {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
               <div>{parse(title)}</div>
             </div>
           </header>
