@@ -11,6 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
@@ -113,7 +114,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(config.dataUrl)
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+
       if (dataset && config.dataDescription) {
         try {
           dataset = transform.autoStandardize(data)
