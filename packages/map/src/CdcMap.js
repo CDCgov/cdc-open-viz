@@ -1287,8 +1287,8 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
             }
 
             // handle urls with spaces in the name.
-            if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString )
-
+            if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
+            console.log('newstata', newState)
             let newData = await fetchRemoteData(newState.dataUrl )
 
             if(newData && newState.dataDescription) {
