@@ -10,7 +10,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate } = useContext<any>(Context);
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate } = useContext<any>(Context);
 
   return (
     <ErrorBoundary component="LineChart">
@@ -34,7 +34,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
               let circleRadii = 4.5
 
-              return d[seriesKey] && (
+              return d[seriesKey] !== undefined && (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                 
                 <Text
@@ -64,7 +64,12 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 data={data}
                 x={(d) => xScale(getXAxisData(d))}
                 y={(d) => yScale(getYAxisData(d, seriesKey))}
-                stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                stroke={colorScale && !config.legend.dynamicLegend ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : 
+                // is dynamic legend
+                config.legend.dynamicLegend ? colorPalettes[config.palette][index] :
+                // fallback
+                '#000'
+                }
                 strokeWidth={2}
                 strokeOpacity={1}
                 shapeRendering="geometricPrecision"
