@@ -67,6 +67,13 @@
     vertical-align: baseline;
   }
 
+  .cove .map-title sup,
+  .map-title sup {
+    top: unset;
+    margin: .5em 0;
+    display: block;
+  }
+
   sup {
     /* Move the superscripted text up */
     top: -0.5em;
