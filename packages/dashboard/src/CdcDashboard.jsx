@@ -37,12 +37,13 @@ import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 
 const addVisualization = (type, subType) => {
+  let modalWillOpen = type === "markup-include" ? false : true;
   let newVisualizationConfig = {
     newViz: true,
-    openModal: true,
+    openModal: modalWillOpen,
     uid: type + Date.now(),
-    type
-  }
+    type,
+  };
 
   switch (type) {
     case 'chart':
