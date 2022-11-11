@@ -435,7 +435,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           key={`circle--${bar.index}`}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          style={{ filter: 'unset' }}
+                          style={{ filter: 'unset', opacity: 1 }}
                         />
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
