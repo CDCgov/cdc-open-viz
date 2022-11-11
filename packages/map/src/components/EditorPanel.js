@@ -593,6 +593,15 @@ const EditorPanel = (props) => {
 					},
 				});
 				break;
+				case 'singleRowLegend':
+					setState({
+						...state,
+						legend: {
+							...state.legend,
+							singleRow: !state.legend.singleRow,
+						},
+					});
+					break;
 			case 'dynamicDescription':
 				setState({
 					...state,
@@ -1243,6 +1252,7 @@ const EditorPanel = (props) => {
 	const getItemStyle = (isDragging, draggableStyle) => ({
 		...draggableStyle,
 	});
+	console.log('legend.singleRow', legend.singleRow)
 
 	const CategoryList = () => {
 		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
@@ -2028,6 +2038,20 @@ const EditorPanel = (props) => {
 											</select>
 										</label>
 									)}
+									{legend.position ==='bottom' && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleRow || false}
+												onChange={(event) => {
+													handleEditorChanges('singleRowLegend', event.target.checked);
+												}}
+											>
+											
+											</input>
+												<span className='edit-label'>Single Row Legend</span>
+										</label>
+										)}
 									{'side' === legend.position && (
 										<label className='checkbox'>
 											<input
