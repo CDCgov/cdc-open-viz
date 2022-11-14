@@ -1252,7 +1252,6 @@ const EditorPanel = (props) => {
 	const getItemStyle = (isDragging, draggableStyle) => ({
 		...draggableStyle,
 	});
-	console.log('legend.singleRow', legend.singleRow)
 
 	const CategoryList = () => {
 		return state.legend.categoryValuesOrder ? state.legend.categoryValuesOrder.map((value, index) => (
