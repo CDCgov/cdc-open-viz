@@ -142,7 +142,7 @@ const Sidebar = (props) => {
           }
           return true;
         })}
-        <ul className={legend.singleColumn ? 'single-column' : ''} aria-label="Legend items">
+        <ul className={(legend.position==='side' && legend.singleColumn) ? 'single-column' : (legend.position==='bottom' && legend.singleRow) ? 'single-row' : ''} aria-label="Legend items">
           {legendList}
         </ul>
       </section>
