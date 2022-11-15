@@ -24,18 +24,20 @@ export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext<any>(Context);
 
   const [filteredData, setFilteredData] = useState<any>(undefined);
-  const [animatedPie, setAnimatePie] = useState<boolean>((!config.animate));
+  const [animatedPie, setAnimatePie] = useState<boolean>(false);
 
   const triggerRef = useRef();
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
 
-  if( dataRef?.isIntersecting && config.animate && ! animatedPie ) {
-    setTimeout(() => {
-      setAnimatePie(true);
-    }, 500);
-  }
+  useEffect( () => {
+    if (dataRef?.isIntersecting && config.animate && !animatedPie) {
+      setTimeout(() => {
+        setAnimatePie(true);
+      }, 500);
+    }
+  }, [dataRef?.isIntersecting, config.animate])
 
   type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
     animate?: boolean;
@@ -186,7 +188,7 @@ export default function PieChart() {
       <svg
         width={width}
         height={height}
-        className={`animated-pie group ${animatedPie ? 'animated' : ''}`}
+        className={`group ${animatedPie ? 'animated' : ''}`}
         role="img"
         aria-label={handleChartAriaLabels(config)}
       >
