@@ -50,8 +50,7 @@ console.log('seriesStyle', seriesStyle)
             </div>`
 
               let circleRadii = 4.5
-
-              return d[seriesKey] !== undefined && (
+              return (d[seriesKey] !== undefined && d[seriesKey] !== "") && (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                 
                 <Text
@@ -62,6 +61,7 @@ console.log('seriesStyle', seriesStyle)
                     textAnchor="middle">
                       {formatNumber(d[seriesKey])}
                   </Text>
+                  
                   <circle
                     key={`${seriesKey}-${dataIndex}`}
                     r={circleRadii}
