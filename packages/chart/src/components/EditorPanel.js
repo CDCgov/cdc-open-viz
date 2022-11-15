@@ -763,7 +763,10 @@ useEffect(()=>{
                                 }} style={{ width: '100px', marginRight: '10px' }}>
                                   <option value="" default>Select</option>
                                   <option value="Bar">Bar</option>
-                                  <option value="Line">Line</option>
+                                  <option value="Line">Solid Line</option>
+                                  <option value="dashed-sm">Small Dashed</option>
+                                  <option value="dashed-md">Medium Dashed</option>
+                                  <option value="dashed-lg">Large Dashed</option>
                                 </select>
                               )
 
