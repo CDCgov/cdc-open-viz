@@ -1533,7 +1533,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
           />
         )}
-        {state.general.title &&
+        {(state.general.title || general.superTitle) &&
           <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
             <div role="heading" className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
               {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
