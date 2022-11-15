@@ -40,11 +40,12 @@ import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
-import Loading from '@cdc/core/components/Loading'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import getViewport from '@cdc/core/helpers/getViewport'
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import Loading from '@cdc/core/components/Loading';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
+import getViewport from '@cdc/core/helpers/getViewport';
+import numberFromString from '@cdc/core/helpers/numberFromString';
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 // Child Components
 import Sidebar from './components/Sidebar'
@@ -1238,20 +1239,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
-    const round = 1000 * 60 * 15
-    const date = new Date()
-    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString()
 
-    // If a dataUrl property exists, always pull from that.
-    if (newState.dataUrl) {
-      if (newState.dataUrl[0] === '/') {
-        newState.dataUrl = 'http://' + hostname + newState.dataUrl
-      }
+        // If a dataUrl property exists, always pull from that.
+        if (newState.dataUrl) {
+            if(newState.dataUrl[0] === '/') {
+                newState.dataUrl = 'http://' + hostname + newState.dataUrl
+            }
 
-      // handle urls with spaces in the name.
-      if (newState.dataUrl) newState.dataUrl = encodeURI(newState.dataUrl + '?v=' + cacheBustingString)
-
-      let newData = await fetchRemoteData(newState.dataUrl)
+            // handle urls with spaces in the name.
+            if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
+            let newData = await fetchRemoteData(newState.dataUrl )
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
