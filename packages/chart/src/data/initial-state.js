@@ -26,6 +26,7 @@ export default {
     gridLines: false,
     min:'',
     max:'',
+    rightHideAxis: true,
   },
   barThickness: 0.35,
   barHeight: 25,
