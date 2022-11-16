@@ -138,15 +138,13 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-  }
-
-  th {
-    flex-grow: 1;
+    &:first-child {
+      flex-grow: 1;
+    }
   }
 
   td {
     position: relative;
-    flex-grow: 1;
   }
 
   td a {
