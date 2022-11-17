@@ -560,8 +560,8 @@ const CountyMap = (props) => {
 			titleCase={titleCase}
 			setSharedFilterValue={setSharedFilterValue}
 			isFilterValueSupported={isFilterValueSupported}
-			isGeoCodeMap={true}
-		/>)
+			isGeoCodeMap={state.type === 'us-geocode'}
+			/>)
 		return geosJsx;
 	};
 	if(!data) <Loading />
