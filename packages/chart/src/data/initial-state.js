@@ -27,6 +27,11 @@ export default {
     min:'',
     max:'',
     rightHideAxis: true,
+    rightAxisSize: 0,
+    rightLabelOffsetSize: 0
+  },
+  topAxis: {
+    hasLine: false
   },
   barThickness: 0.35,
   barHeight: 25,

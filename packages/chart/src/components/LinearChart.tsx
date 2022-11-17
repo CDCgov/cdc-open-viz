@@ -5,7 +5,7 @@ import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
 import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
-import { AxisLeft, AxisBottom, AxisRight } from '@visx/axis';
+import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis';
 
 import BarChart from './BarChart';
 import LineChart from './LineChart';
@@ -50,8 +50,7 @@ export default function LinearChart() {
   }
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
-
-  const xMax = width - config.runtime.yAxis.size;
+  const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize;
   const yMax = height - config.runtime.xAxis.size;
 
   const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data});
@@ -351,10 +350,11 @@ export default function LinearChart() {
           {hasRightAxis &&
             <AxisRight
             scale={yScaleRight}
-            left={width}
+            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize}
             label={config.yAxis.rightLabel}
             tickFormat={tick => formatNumber(tick, 'right')}
             numTicks={config.runtime.yAxis.rightNumTicks || undefined}
+            labelOffset={45}
           >
 
             {props => {
@@ -411,7 +411,7 @@ export default function LinearChart() {
                       className="y-label"
                       textAnchor="middle"
                       verticalAnchor="start"
-                      transform={`translate(${0 + config.yAxis.rightSize ? config.yAxis.rightSize : 0}, ${axisCenter}) rotate(90)`}
+                      transform={`translate(${config.yAxis.rightLabelOffsetSize}, ${axisCenter}) rotate(90)`}
                       fontWeight="bold"
                     >
                       {props.label}
@@ -423,6 +423,19 @@ export default function LinearChart() {
             </AxisRight>
           
           
+          }
+
+          {config.topAxis.hasLine &&
+            <AxisTop 
+              stroke="#333"
+              left={config.runtime.yAxis.size}
+              scale={xScale}
+              hideTicks
+              hideZero
+              tickLabelProps={() => ({
+                fill: 'transparent'
+              })}
+            />
           }
 
           {/* X axis */}
