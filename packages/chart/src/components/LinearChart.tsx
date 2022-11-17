@@ -19,6 +19,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 import useRightAxis from '../hooks/useRightAxis';
+import useTopAxis from '../hooks/useTopAxis';
 
 // TODO: Move scaling functions into hooks to manage complexity
 
@@ -54,6 +55,7 @@ export default function LinearChart() {
   const yMax = height - config.runtime.xAxis.size;
 
   const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data});
+  const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
@@ -425,7 +427,7 @@ export default function LinearChart() {
           
           }
 
-          {config.topAxis.hasLine &&
+          {hasTopAxis && config.topAxis.hasLine &&
             <AxisTop 
               stroke="#333"
               left={config.runtime.yAxis.size}

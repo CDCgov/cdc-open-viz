@@ -206,7 +206,7 @@ const EditorPanel = () => {
   }, [dispatch, config.palette]);
 
 
-  const {hasRightAxis} = useRightAxis({config})
+  const {hasRightAxis, addRightAxisSeries} = useRightAxis({config}, updateConfig)
 
   const filterOptions = [
     {
@@ -323,14 +323,10 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters });
   }
 
-  const addNewSeries = (seriesKey, right = false) => {
-    let newSeries = config.series ? [ ...config.series ] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' });
-    if(!right) {
+  const addNewSeries = (seriesKey) => {
+      let newSeries = config.series ? [ ...config.series ] : []
+      newSeries.push({ dataKey: seriesKey, type: 'Bar' });
       updateConfig({ ...config, series: newSeries }); // left axis series keys
-    } else {
-      updateConfig({ ...config, rightSeries: newSeries }); // right axis series keys
-    }
   }
   
 
@@ -831,6 +827,107 @@ useEffect(()=>{
                     
                   </AccordionItemPanel>
                 </AccordionItem>
+              }
+
+              {hasRightAxis &&
+                <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Data Series Right Axis</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                {config.series && config.series.length !== 0 && (
+                      <>
+                        <fieldset>
+                          <legend className="edit-label float-left">
+                            Displaying (Right Data Series)
+                          </legend>
+                        </fieldset>
+
+                        <ul className="series-list">
+                          {config.rightSeries && config.rightSeries.map((series, i) => {
+
+                            if (config.visualizationType === 'Combo') {
+                              let changeType = (i, value) => {
+                                let series = [ ...config.rightSeries ]
+                                series[i].type = value
+                                updateConfig({ 
+                                  ...config, 
+                                  rightSeries: series 
+                                })
+                              }
+
+                              let typeDropdown = (
+                                <select value={series.type} onChange={(event) => {
+                                  changeType(i, event.target.value)
+                                }} style={{ width: '100px', marginRight: '10px' }}>
+                                  <option value="" default>Select</option>
+                                  <option value="Bar">Bar</option>
+                                  <option value="Line">Line</option>
+                                </select>
+                              )
+
+                              return (
+                                <li key={series.dataKey}>
+                                  <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                    <div className="series-list__name-text">{series.dataKey}</div>
+                                  </div>
+                                  <span>
+                                    <span className="series-list__dropdown">{typeDropdown}</span>
+                                    {config.rightSeries && config.rightSeries.length > 1 &&
+                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
+                                    }
+                                  </span>
+                                </li>
+                              )
+                            }
+
+                            return (
+                              <li key={series.dataKey}>
+                                <div className="series-list__name" data-title={series.dataKey}>
+                                  <div className="series-list__name--text">
+                                    {series.dataKey}
+                                  </div>
+                                </div>
+                                {config.series && config.series.length > 1 &&
+                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
+                                }
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </>)}
+
+                    <Select 
+                      fieldName="visualizationType" 
+                      label="Add Data Series" 
+                      initial="Select" onChange={(e) => {
+                        if (e.target.value !== '' && e.target.value !== 'Select') {
+                          addRightAxisSeries(e.target.value)
+                        }
+                        e.target.value = ''
+                      }} 
+                      options={getColumns(false)}
+                    />
+
+                    {config.rightSeries && config.rightSeries.length <= 1 && config.visualizationType === 'Bar' && (
+                      <>
+                        <span className="divider-heading">Confidence Keys</span>
+                        <Select value={config.confidenceKeys.upper || ''} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()}/>
+                        <Select value={config.confidenceKeys.lower || ''} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()}/>
+                      </>
+                    )}
+
+                    {config.rightSeries && config.rightSeries.length === 1 && 
+                      <Select
+                        fieldName="visualizationType"
+                        label="Rank by Value"
+                        initial="Select"
+                        onChange={(e) => sortSeries(e.target.value)}
+                        options={['asc', 'desc']} 
+                      />
+                    }
+                </AccordionItemPanel>
+              </AccordionItem>
               }
 
               <AccordionItem>

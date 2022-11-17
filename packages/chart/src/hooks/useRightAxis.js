@@ -1,6 +1,6 @@
 import { scaleLinear } from '@visx/scale';
 
-export default function useRightAxis({config, yMax = 0, data = []}) {
+export default function useRightAxis({config, yMax = 0, data = []}, updateConfig) {
 
 	const hasRightAxis = (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Line') && config.orientation === 'vertical'
 	const rightColumnName = config.yAxis.rightSeries;
@@ -14,6 +14,15 @@ export default function useRightAxis({config, yMax = 0, data = []}) {
 		range: [yMax, 0],
 	});
 
+	const addRightAxisSeries = (seriesKey) => {
+		let newSeries = config.rightSeries ? [ ...config.rightSeries ] : []
+		newSeries.push({ dataKey: seriesKey, type: 'Bar' });
+		updateConfig({ ...config, rightSeries: newSeries }); // right axis series keys
+	}
 
-	return {yScaleRight, hasRightAxis};
+	const removeRightAxisSeries = () => {
+
+	}
+
+	return {yScaleRight, hasRightAxis, addRightAxisSeries};
 }
