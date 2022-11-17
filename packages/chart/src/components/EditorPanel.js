@@ -920,7 +920,8 @@ useEffect(()=>{
                       <Select value={config.yAxis.rightSeries} section="yAxis" fieldName="rightSeries" label="Right Value Axis Series" updateField={updateField} options={getColumns(false)}/>
                       <TextField value={config.yAxis.rightLabel} section="yAxis" fieldName="rightLabel" label="Label" updateField={updateField}/>
                       <TextField value={config.yAxis.rightNumTicks} placeholder="Auto" type="number" section="yAxis" fieldName="rightNumTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                      <TextField value={config.yAxis.rightSize} type="number" section="yAxis" fieldName="rightSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightSize} type="number" section="yAxis" fieldName="rightAxisSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightLabelOffsetSize} type="number" section="yAxis" fieldName="rightLabelOffsetSize" label="Label Offset" className="number-narrow" updateField={updateField}/>
                       
                       <span className="divider-heading">Number Formatting</span>
                       <CheckBox value={config.dataFormat.rightCommas} section="dataFormat" fieldName="rightCommas" label="Add commas" updateField={updateField}/>
@@ -1244,6 +1245,12 @@ useEffect(()=>{
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+
+                  { (config.visualizationType === 'Bar' || 
+                    config.visualizationType === 'Line' ||
+                    config.visualizationType === 'Combo') &&
+                      <CheckBox value={config.topAxis.hasLine} section="topAxis" fieldName="hasLine" label="Add Top Axis Line" updateField={updateField} />
+                  }
 
                   {config.isLollipopChart &&
                     <>
