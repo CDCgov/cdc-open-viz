@@ -355,6 +355,7 @@ const UsaMap = (props) => {
       titleCase={titleCase}
       setSharedFilterValue={setSharedFilterValue}
       isFilterValueSupported={isFilterValueSupported}
+      isGeoCodeMap={state.type === 'us-geocode'}
     />)
 
     // Bubbles
