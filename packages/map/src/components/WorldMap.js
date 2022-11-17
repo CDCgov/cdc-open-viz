@@ -174,7 +174,7 @@ const ZoomControls = ({position, setPosition, state, setState, setRuntimeData, g
       applyTooltipsToGeo={applyTooltipsToGeo}
       displayGeoName={displayGeoName}
       applyLegendToRow={applyLegendToRow}
-			isGeoCodeMap={state.type === 'us-geocode'}
+			isGeoCodeMap={state.general.type === 'us-geocode'}
     />)
 
     // Bubbles
