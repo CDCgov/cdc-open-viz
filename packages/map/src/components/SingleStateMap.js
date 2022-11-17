@@ -210,7 +210,7 @@ const SingleStateMap = (props) => {
       titleCase={titleCase}
       setSharedFilterValue={setSharedFilterValue}
       isFilterValueSupported={isFilterValueSupported}
-      isGeoCodeMap={true}
+			isGeoCodeMap={state.general.type === 'us-geocode'}
     />)
 
     return geosJsx;
