@@ -9,8 +9,12 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 
 import Context from '../context';
 
+import useRightAxis from '../hooks/useRightAxis'
+
+
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate } = useContext<any>(Context);
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate, updateConfig } = useContext<any>(Context);
+  const {yScaleRight} = useRightAxis({config}, updateConfig)
 
   return (
     <ErrorBoundary component="LineChart">
@@ -64,6 +68,75 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 data={data}
                 x={(d) => xScale(getXAxisData(d))}
                 y={(d) => yScale(getYAxisData(d, seriesKey))}
+                stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                strokeWidth={2}
+                strokeOpacity={1}
+                shapeRendering="geometricPrecision"
+                defined={(item,i) => {
+                  return item[config.runtime.seriesLabels[seriesKey]] !== "";
+                }}
+              />
+          </Group>
+        ))
+        }
+
+        {/* Right Axis Scaling Lines */}
+        { config.rightSeries && config.rightSeries.map((seriesKey, index) => (
+          <Group
+            key={`series-${seriesKey}`}
+            opacity={config.legend.behavior === "highlight" && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
+            display={config.legend.behavior === "highlight" || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
+          >
+            { data.map((d, dataIndex) => {
+              const xAxisValue = config.runtime.xAxis.type==='date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey];
+              let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+              let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` :xAxisValue;
+
+              const tooltip = `<div>
+              ${yAxisTooltip}<br />
+              ${xAxisTooltip}<br />
+              ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+            </div>`
+
+              let circleRadii = 4.5
+
+              console.log('d', d)
+              console.log('s', seriesKey)
+              console.log(yScaleRight(getYAxisData(d, seriesKey.dataKey)))
+
+              return d[seriesKey] && (
+                <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                
+                <Text
+                    display={config.labels ? 'block' : 'none'}
+                    x={xScale(getXAxisData(d))}
+                    y={yScale(getYAxisData(d, seriesKey))}
+                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    textAnchor="middle">
+                      {formatNumber(d[seriesKey])}
+                  </Text>
+
+                  <circle
+                    key={`right-${seriesKey}-${dataIndex}`}
+                    r={circleRadii}
+                    cx={xScale(getXAxisData(d))}
+                    cy={yScaleRight(getYAxisData(d, seriesKey))}
+                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
+                    style={{fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}}
+                    data-tip={tooltip}
+                    data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                  />
+                </Group>
+            )
+            })}
+
+
+              <LinePath
+                className={`right-${seriesKey}`}
+                curve={allCurves.curveLinear}
+                data={data}
+                x={(d) => xScale(getXAxisData(d))}
+                y={(d) => yScaleRight(getYAxisData(d, seriesKey.dataKey))}
                 stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                 strokeWidth={2}
                 strokeOpacity={1}

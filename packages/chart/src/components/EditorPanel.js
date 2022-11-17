@@ -206,7 +206,7 @@ const EditorPanel = () => {
   }, [dispatch, config.palette]);
 
 
-  const {hasRightAxis, addRightAxisSeries} = useRightAxis({config}, updateConfig)
+  const {hasRightAxis, addRightAxisSeries, removeRightAxisSeries} = useRightAxis({config}, updateConfig)
 
   const filterOptions = [
     {
@@ -874,7 +874,7 @@ useEffect(()=>{
                                   <span>
                                     <span className="series-list__dropdown">{typeDropdown}</span>
                                     {config.rightSeries && config.rightSeries.length > 1 &&
-                                      <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
+                                      <button className="series-list__remove" onClick={() => removeRightAxisSeries(series.dataKey)}>&#215;</button>
                                     }
                                   </span>
                                 </li>
