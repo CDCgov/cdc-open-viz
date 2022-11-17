@@ -20,6 +20,7 @@ const Sidebar = (props) => {
     displayDataAsText
   } = props;
 
+  const className = (legend.position==='side' && legend.singleColumn) ? 'single-column' : (legend.position==='bottom' && legend.singleRow) ? 'single-row' : '';
   // Toggles if a legend is active and being applied to the map and data table.
   const toggleLegendActive = (i, legendLabel) => {
     const newValue = !runtimeLegend[i].disabled;
@@ -114,7 +115,7 @@ const Sidebar = (props) => {
 
   return (
     <ErrorBoundary component="Sidebar">
-      <aside id="legend" className={`${legend.position} ${legend.singleColumn ? 'single-column cdcdataviz-sr-focusable' : 'cdcdataviz-sr-focusable'} ${viewport}`} role="region" aria-label="Legend" tabIndex="0">
+      <aside id="legend" className={`${legend.position} ${className} cdcdataviz-sr-focusable ${viewport}`} role="region" aria-label="Legend" tabIndex="0">
       <section className="legend-section" aria-label="Map Legend">
         {runtimeLegend.disabledAmt > 0 &&
           (
@@ -142,7 +143,7 @@ const Sidebar = (props) => {
           }
           return true;
         })}
-        <ul className={legend.singleColumn ? 'single-column' : ''} aria-label="Legend items">
+        <ul className={className} aria-label="Legend items">
           {legendList}
         </ul>
       </section>
