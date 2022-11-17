@@ -23,28 +23,28 @@ import useTopAxis from '../hooks/useTopAxis';
 
 // TODO: Move scaling functions into hooks to manage complexity
 
+// TODO: remove unused imports/variables
+// TODO: consider moving logic into hooks
+// TODO: formatting
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
-  const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+  const [animatedChart, setAnimatedChart] = useState<boolean>(false);
   const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
 
   const triggerRef = useRef();
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
-
   // If the chart is in view and set to animate and it has not already played
-  if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
-    setTimeout(() => {
-      setAnimatedChart(true);
-    }, 500);
-
-    setTimeout(() => {
-      setAnimatedChartPlayed(!animatedChartPlayed);
-    }, 600);
-  }
+  useEffect( () => {
+    if( dataRef?.isIntersecting === true && config.animate ) {
+      setTimeout(() => {
+        setAnimatedChart(prevState => true);
+      }, 500);
+    }
+  }, [dataRef?.isIntersecting, config.animate]);
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
@@ -63,8 +63,6 @@ export default function LinearChart() {
   let xScale;
   let yScale;
   let seriesScale;
-
-  config.runtime.seriesKeys.sort().reverse();
 
   const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
   const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0;
@@ -641,13 +639,13 @@ export default function LinearChart() {
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
               <>
-                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} />
+                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
               </>
 
           )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
-      <div ref={triggerRef} />
+      <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
 }

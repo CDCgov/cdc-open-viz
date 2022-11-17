@@ -769,7 +769,10 @@ useEffect(()=>{
                                 }} style={{ width: '100px', marginRight: '10px' }}>
                                   <option value="" default>Select</option>
                                   <option value="Bar">Bar</option>
-                                  <option value="Line">Line</option>
+                                  <option value="Line">Solid Line</option>
+                                  <option value="dashed-sm">Small Dashed</option>
+                                  <option value="dashed-md">Medium Dashed</option>
+                                  <option value="dashed-lg">Large Dashed</option>
                                 </select>
                               )
 
@@ -955,7 +958,14 @@ useEffect(()=>{
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField}/>
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField} tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target><Icon display="question"/></Tooltip.Target>
+                        <Tooltip.Content>
+                         <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>  
+                        </Tooltip.Content>
+                      </Tooltip>
+                      }/>
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField}/>}
                     </>
                   )}
@@ -1218,7 +1228,7 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                 <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField}/>
-                  <fieldset className="checkbox-group">
+                  {/* <fieldset className="checkbox-group">
                     <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
                     {config.legend.dynamicLegend && (
                       <>
@@ -1228,7 +1238,7 @@ useEffect(()=>{
                         <TextField value={config.legend.dynamicLegendChartMessage} section="legend" fieldName="dynamicLegendChartMessage" label="Dynamic Legend Chart Message" updateField={updateField} />
                       </>
                     )}
-                  </fieldset>
+                  </fieldset> */}
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
@@ -1388,7 +1398,7 @@ useEffect(()=>{
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
-                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 

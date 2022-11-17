@@ -57,7 +57,7 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
       });
 
       delete newConfig.data;
-      delete newConfig.dataUrl,
+      delete newConfig.dataUrl;
       delete newConfig.dataFileName;
       delete newConfig.dataFileSourceType;
       delete newConfig.dataDescription;

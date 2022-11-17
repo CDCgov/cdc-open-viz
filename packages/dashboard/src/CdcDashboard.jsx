@@ -11,6 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
@@ -36,12 +37,13 @@ import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 
 const addVisualization = (type, subType) => {
+  let modalWillOpen = type === "markup-include" ? false : true;
   let newVisualizationConfig = {
     newViz: true,
-    openModal: true,
+    openModal: modalWillOpen,
     uid: type + Date.now(),
-    type
-  }
+    type,
+  };
 
   switch (type) {
     case 'chart':
@@ -113,7 +115,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(config.dataUrl)
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+
       if (dataset && config.dataDescription) {
         try {
           dataset = transform.autoStandardize(data)
