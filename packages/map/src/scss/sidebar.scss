@@ -124,18 +124,6 @@ aside {
     }
   }
 
-  @include breakpointClass(sm) {
-    .legend-section ul.single-row{
-      align-items: flex-start;
-      justify-content: flex-start;
-     
-      li {
-        width: auto;
-        display: inline-block;
-      }
-    }
-  }
-
   .filters-section {
     padding: 0 1em 1em;
     .heading-3 {
