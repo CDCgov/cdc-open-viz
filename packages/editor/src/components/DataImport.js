@@ -235,20 +235,28 @@ export default function DataImport() {
                 preview: true
               }
 
+              if(keepURL){
+                newDatasets[editingDatasetKey || fileSource].dataUrl = fileSource;
+              }
+
               setConfig({
                 ...config,
                 ...tempConfig,
                 dataset: newDatasets
               })
             } else {
-              setConfig({
+              let newConfig = {
                 ...config,
                 ...tempConfig,
                 data: text, // new data
                 dataFileName: fileSource, // new file source
                 dataFileSourceType: fileSourceType, // new file source type
                 formattedData: transform.developerStandardize(text, config.dataDescription)
-              })
+              }
+              if(keepURL){
+                newConfig.dataUrl = fileSource;
+              }
+              setConfig(newConfig)
             }
           } else {
             resetEditor({
@@ -272,16 +280,24 @@ export default function DataImport() {
               preview: true
             }
 
+            if(keepURL){
+              newDatasets[editingDatasetKey || fileSource].dataUrl = fileSource;
+            }
+
             setConfig({ ...config, datasets: newDatasets })
           } else {
-            setConfig({
+            let newConfig = {
               ...config,
               ...tempConfig,
               data: text, // new data
               dataFileName: fileSource, // new file source
               dataFileSourceType: fileSourceType, // new file source type
               formattedData: transform.developerStandardize(text, config.dataDescription)// new file source type
-            })
+            }
+            if(keepURL){
+              newConfig.dataUrl = fileSource;
+            }
+            setConfig(newConfig)
           }
         }
 
@@ -290,6 +306,7 @@ export default function DataImport() {
         }
         setAddingDataset(false);
         setExternalURL('');
+        setKeepURL(false);
       } catch (err) {
         setErrors(err)
       }
@@ -332,6 +349,27 @@ export default function DataImport() {
     }
   }
 
+  const changeKeepURL = (value, editingDatasetKey) => {
+    if(editingDatasetKey){
+      let newDatasets = {...config.datasets};
+      if(value === false){
+        delete newDatasets[editingDatasetKey].dataUrl;
+      } else {
+        newDatasets[editingDatasetKey].dataUrl = newDatasets[editingDatasetKey].dataFileName;
+      }
+      setConfig({...config, datasets: newDatasets});
+    } else if(config.type !== 'dashboard') {
+      let newConfig = {...config};
+      if(value === false){
+        delete newConfig.dataUrl;
+      } else {
+        newConfig.dataUrl = newConfig.dataFileName;
+      }
+      setConfig(newConfig);
+    }
+    setKeepURL(value);
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   const { getRootProps: getRootProps2, getInputProps: getInputProps2, isDragActive: isDragActive2 } = useDropzone({ onDrop })
 
@@ -349,7 +387,7 @@ export default function DataImport() {
           </button>
         </form>
         <label htmlFor="keep-url" className="mt-1 d-flex keep-url">
-          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => setKeepURL(!keepURL)}/> Always
+          <input type="checkbox" id="keep-url" checked={keepURL} onChange={() => changeKeepURL(!keepURL, editingDatasetKey)}/> Always
           load from URL (normally will only pull once)
         </label>
       </>
@@ -471,8 +509,12 @@ export default function DataImport() {
                     <td><button className="btn btn-primary" onClick={() => {
                       if(editingDataset === datasetKey){
                         setEditingDataset(undefined);
+                        setExternalURL('');
+                        setKeepURL(false);
                       } else {
                         setEditingDataset(datasetKey);
+                        setExternalURL(config.datasets[datasetKey].dataUrl || config.datasets[datasetKey].dataFileName);
+                        setKeepURL(!!config.datasets[datasetKey].dataUrl);
                       }
                     }}>Edit Data</button></td>
                     <td><button className="btn btn-primary" onClick={() => removeDataset(datasetKey)}>X</button></td>
