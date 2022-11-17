@@ -590,6 +590,17 @@ const EditorPanel = (props) => {
 					legend: {
 						...state.legend,
 						singleColumn: !state.legend.singleColumn,
+						singleRow:false
+					},
+				});
+				break;
+				case 'singleRowLegend':
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						singleRow: !state.legend.singleRow,
+						singleColumn:false
 					},
 				});
 				break;
@@ -737,6 +748,7 @@ const EditorPanel = (props) => {
 
 		setRequiredColumns(columnList);
 	}, [state.columns, state.general.type]);
+	console.log(state.legend)
 
 	const editColumn = async (columnName, editTarget, value) => {
 		let newSpecialClasses;
@@ -2038,6 +2050,18 @@ const EditorPanel = (props) => {
 												}}
 											/>
 											<span className='edit-label'>Single Column Legend</span>
+										</label>
+									)}
+										{'bottom' === legend.position && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleRow}
+												onChange={(event) => {
+													handleEditorChanges('singleRowLegend', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Single Row Legend</span>
 										</label>
 									)}
 										{'category' !== legend.type && (
