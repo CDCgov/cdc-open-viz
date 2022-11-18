@@ -176,7 +176,7 @@ const EditorPanel = memo((props) => {
 			  value={config.title}
 			  fieldName="title"
 			  label="Title"
-			  placeholder="Waffle Chart Title"
+			  placeholder="Filterable Text Title"
 			  updateField={updateField}
 			/>
 		  </Accordion.Section>
@@ -268,7 +268,6 @@ const EditorPanel = memo((props) => {
 			</Button>
 		  </Accordion.Section>
 		  <Accordion.Section title="Visual">
-	
 			<InputSelect
 			  value={config.fontSize}
 			  fieldName="fontSize"
@@ -276,7 +275,7 @@ const EditorPanel = memo((props) => {
 			  updateField={updateField}
 			  options={["small", "medium", "large"]}
 			/>
-	
+				<br/>
 			<label>
 			  <span className="edit-label">Theme</span>
 			  <ul className="color-palette">
@@ -295,7 +294,7 @@ const EditorPanel = memo((props) => {
 			  </ul>
 			</label>
 			
-			<div className="cove-accordion__panel-section">
+			<div className="cove-accordion__panel-section checkbox-group">
 			  <InputCheckbox inline size='small' value={config.visual.border} section="visual" fieldName="border" label="Display Border" updateField={updateField} />
 			  <InputCheckbox inline size='small' value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
 			  <InputCheckbox size='small' value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />

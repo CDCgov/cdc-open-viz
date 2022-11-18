@@ -11,6 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
@@ -24,6 +25,7 @@ import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
+import CdcFilteredText from '@cdc/filtered-text';
 
 import Grid from './components/Grid'
 import Header from './components/Header'
@@ -35,12 +37,13 @@ import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 
 const addVisualization = (type, subType) => {
+  let modalWillOpen = type === "markup-include" ? false : true;
   let newVisualizationConfig = {
     newViz: true,
-    openModal: true,
+    openModal: modalWillOpen,
     uid: type + Date.now(),
-    type
-  }
+    type,
+  };
 
   switch (type) {
     case 'chart':
@@ -57,6 +60,9 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = type
       break
     case 'markup-include':
+      newVisualizationConfig.visualizationType = type
+      break
+    case 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     default:
@@ -87,6 +93,7 @@ const VisualizationsPanel = () => (
       <Widget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
       <Widget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
       <Widget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <Widget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
@@ -108,7 +115,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     let dataset = config.formattedData || config.data
 
     if (config.dataUrl) {
-      dataset = await fetchRemoteData(config.dataUrl)
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
 
       if (dataset && config.dataDescription) {
         try {
@@ -470,6 +477,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               />
             </>
             break
+            case 'filtered-text':
+              body = <><Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
+                <CdcFilteredText
+                  key={visualizationKey}
+                  config={visualizationConfig}
+                  isEditor={true}
+                  setConfig={updateConfig}
+                  isDashboard={true}
+                />
+              </>
+              break
           default:
             body = <></>
             break
@@ -500,7 +518,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           {/* Description */}
           {description && <div className="subtext">{parse(description)}</div>}
           {/* Filters */}
-          {config.dashboard.sharedFilters && <Filters/>}
+          {config.dashboard.sharedFilters && <div className="cove-dashboard-filters"> <Filters/></div>}
 
           {/* Visualizations */}
           {config.rows && config.rows.filter(row => row.filter(col => col.widget).length !== 0).map((row, index) => {
@@ -580,6 +598,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                           )}
                           {visualizationConfig.type === 'markup-include' && (
                             <CdcMarkupInclude
+                              key={col.widget}
+                              config={visualizationConfig}
+                              isEditor={false}
+                              setConfig={(newConfig) => {
+                                updateChildConfig(col.widget, newConfig)
+                              }}
+                              isDashboard={true}
+                            />
+                          )}
+                            {visualizationConfig.type === 'filtered-text' && (
+                            <CdcFilteredText
                               key={col.widget}
                               config={visualizationConfig}
                               isEditor={false}

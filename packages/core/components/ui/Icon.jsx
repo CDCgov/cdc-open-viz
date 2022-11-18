@@ -27,6 +27,7 @@ import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 import iconGear from '../../assets/icon-gear.svg'
 import iconTools from '../../assets/icon-tools.svg'
+import iconText from '../../assets/filtered-text.svg'
 
 import '../../styles/v2/components/icon.scss'
 
@@ -56,7 +57,8 @@ const iconHash = {
   'warningCircle': iconWarningCircle,
   'warningTriangle': iconWarningTriangle,
   'gear': iconGear,
-  'tools': iconTools
+  'tools': iconTools,
+  'filtered-text':iconText
 }
 
 const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {

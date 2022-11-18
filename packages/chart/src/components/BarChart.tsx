@@ -338,10 +338,20 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     if(config.isLollipopChart) {
                       offset = ( (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2) - lollipopBarWidth / 2
                     }
+                    
+                    const set = new Set()
+                    data.forEach(d=>set.add(d[config.legend.colorCode]));
+                    const uniqValues = Array.from(set);
+
+                    let palette  = colorPalettes[config.palette].slice(0,uniqValues.length);
 
                     let barWidth = config.isLollipopChart ? lollipopBarWidth : barGroupWidth / barGroup.bars.length;
                     let barColor = config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key] ? colorScale(config.runtime.seriesLabels[bar.key]) : colorScale(bar.key);
-
+                    while( palette.length < barGroups.length ){
+                      palette =palette.concat(palette)
+                    }
+                    if( config.legend.colorCode && config.series.length===1)  barColor = palette[barGroup.index];
+                     
                     let yAxisValue = formatNumber(bar.value);
                     let xAxisValue = config.runtime[section].type==='date' ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey])) : data[barGroup.index][config.runtime.originalXAxis.dataKey]
 
@@ -400,7 +410,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       </Text>
                       <foreignObject
                         id={`barGroup${barGroup.index}`}
-                        className="tets"
                         key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                         x={ config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset }
                         y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0) : barY }
@@ -426,7 +435,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           key={`circle--${bar.index}`}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          style={{ 'opacity': `${config.animate ? 0 : 1}`, filter: 'unset' }}
+                          style={{ filter: 'unset', opacity: 1 }}
                         />
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&

@@ -231,6 +231,10 @@ const Header = ({setPreview, tabSelected, setTabSelected, back, subEditor = null
               <label>Show Table</label><input type="checkbox" defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)}  />
               <label>Expanded by Default</label><input type="checkbox" defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
               <label>Display Download Button</label><input type="checkbox" defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
+              <label>Limit Table Height</label><input type="checkbox" defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
+              {config.table.limitHeight && (
+                <input class="table-height-input" type="text" placeholder="Height (px)" defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />
+              )}
             </>
           )}
         </div>
