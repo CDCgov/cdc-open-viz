@@ -205,8 +205,23 @@ const EditorPanel = () => {
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
 
+  useEffect(() => {
+      let newSeries = config.series.map( series => {
+      return {
+        ...series,
+        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar'
+      }
+    })
 
-  const {hasRightAxis, addRightAxisSeries, removeRightAxisSeries} = useRightAxis({config}, updateConfig)
+    updateConfig({
+      ...config,
+      series: newSeries
+    })
+
+  }, [config.visualizationType]);
+
+
+  const { hasRightAxis } = useRightAxis({config}, updateConfig)
 
   const filterOptions = [
     {
@@ -832,40 +847,42 @@ useEffect(()=>{
                 </AccordionItem>
               }
 
-              {hasRightAxis &&
+              {hasRightAxis && config.series &&
                 <AccordionItem>
                 <AccordionItemHeading>
-                  <AccordionItemButton>Data Series Right Axis</AccordionItemButton>
+                  <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                {config.series && config.series.length !== 0 && (
+                    {config.series && config.series.length !== 0 && (
                       <>
                         <fieldset>
                           <legend className="edit-label float-left">
-                            Displaying (Right Data Series)
+                            Displaying
                           </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Assign an axis for the series</p>
+                            </Tooltip.Content>
+                          </Tooltip>
                         </fieldset>
-
                         <ul className="series-list">
-                          {config.rightSeries && config.rightSeries.map((series, i) => {
+                          {config.series.map((series, i) => {
 
-                            if (config.visualizationType === 'Combo') {
-                              let changeType = (i, value) => {
-                                let series = [ ...config.rightSeries ]
-                                series[i].type = value
-                                updateConfig({ 
-                                  ...config, 
-                                  rightSeries: series 
-                                })
+                              if(series.type !== 'Line') return false; // can't set individual bars atm.
+
+                              let changeAxis= (i, value) => {
+                                let series = [ ...config.series ]
+                                series[i].axis = value
+                                updateConfig({ ...config, series })
                               }
 
-                              let typeDropdown = (
-                                <select value={series.type} onChange={(event) => {
-                                  changeType(i, event.target.value)
+                              let axisDropdown = (
+                                <select value={series.axis} onChange={(event) => {
+                                  changeAxis(i, event.target.value)
                                 }} style={{ width: '100px', marginRight: '10px' }}>
-                                  <option value="" default>Select</option>
-                                  <option value="Bar">Bar</option>
-                                  <option value="Line">Line</option>
+                                  <option value="Left" default>left</option>
+                                  <option value="Right">right</option>
                                 </select>
                               )
 
@@ -875,14 +892,10 @@ useEffect(()=>{
                                     <div className="series-list__name-text">{series.dataKey}</div>
                                   </div>
                                   <span>
-                                    <span className="series-list__dropdown">{typeDropdown}</span>
-                                    {config.rightSeries && config.rightSeries.length > 1 &&
-                                      <button className="series-list__remove" onClick={() => removeRightAxisSeries(series.dataKey)}>&#215;</button>
-                                    }
+                                    <span className="series-list__dropdown">{axisDropdown}</span>
                                   </span>
                                 </li>
                               )
-                            }
 
                             return (
                               <li key={series.dataKey}>
@@ -899,37 +912,7 @@ useEffect(()=>{
                           })}
                         </ul>
                       </>)}
-
-                    <Select 
-                      fieldName="visualizationType" 
-                      label="Add Data Series" 
-                      initial="Select" onChange={(e) => {
-                        if (e.target.value !== '' && e.target.value !== 'Select') {
-                          addRightAxisSeries(e.target.value)
-                        }
-                        e.target.value = ''
-                      }} 
-                      options={getColumns(false)}
-                    />
-
-                    {config.rightSeries && config.rightSeries.length <= 1 && config.visualizationType === 'Bar' && (
-                      <>
-                        <span className="divider-heading">Confidence Keys</span>
-                        <Select value={config.confidenceKeys.upper || ''} section="confidenceKeys" fieldName="upper" label="Upper" updateField={updateField} initial="Select" options={getColumns()}/>
-                        <Select value={config.confidenceKeys.lower || ''} section="confidenceKeys" fieldName="lower" label="Lower" updateField={updateField} initial="Select" options={getColumns()}/>
-                      </>
-                    )}
-
-                    {config.rightSeries && config.rightSeries.length === 1 && 
-                      <Select
-                        fieldName="visualizationType"
-                        label="Rank by Value"
-                        initial="Select"
-                        onChange={(e) => sortSeries(e.target.value)}
-                        options={['asc', 'desc']} 
-                      />
-                    }
-                </AccordionItemPanel>
+                  </AccordionItemPanel>
               </AccordionItem>
               }
 
@@ -1024,10 +1007,9 @@ useEffect(()=>{
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                      <Select value={config.yAxis.rightSeries} section="yAxis" fieldName="rightSeries" label="Right Value Axis Series" updateField={updateField} options={getColumns(false)}/>
                       <TextField value={config.yAxis.rightLabel} section="yAxis" fieldName="rightLabel" label="Label" updateField={updateField}/>
                       <TextField value={config.yAxis.rightNumTicks} placeholder="Auto" type="number" section="yAxis" fieldName="rightNumTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                      <TextField value={config.yAxis.rightSize} type="number" section="yAxis" fieldName="rightAxisSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightAxisSize} type="number" section="yAxis" fieldName="rightAxisSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
                       <TextField value={config.yAxis.rightLabelOffsetSize} type="number" section="yAxis" fieldName="rightLabelOffsetSize" label="Label Offset" className="number-narrow" updateField={updateField}/>
                       
                       <span className="divider-heading">Number Formatting</span>
@@ -1353,11 +1335,6 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
 
-                  { (config.visualizationType === 'Bar' || 
-                    config.visualizationType === 'Line' ||
-                    config.visualizationType === 'Combo') &&
-                      <CheckBox value={config.topAxis.hasLine} section="topAxis" fieldName="hasLine" label="Add Top Axis Line" updateField={updateField} />
-                  }
 
                   {config.isLollipopChart &&
                     <>
@@ -1512,6 +1489,12 @@ useEffect(()=>{
                   }
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
+                  }
+
+                  { (config.visualizationType === 'Bar' || 
+                    config.visualizationType === 'Line' ||
+                    config.visualizationType === 'Combo') &&
+                      <CheckBox value={config.topAxis.hasLine} section="topAxis" fieldName="hasLine" label="Add Top Axis Line" updateField={updateField} />
                   }
 
                   {config.visualizationType === "Spark Line" &&

@@ -250,7 +250,7 @@ export default function LinearChart() {
                           <Line
                             from={tick.from}
                             to={tick.to}
-                            stroke="#333"
+                            stroke={config.yAxis.tickColor}
                             display={config.runtime.horizontal ? 'none' : 'block'}
                           />
                         )}
@@ -309,6 +309,7 @@ export default function LinearChart() {
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                              fill={config.yAxis.tickLabelColor}
                             >
                               {tick.formattedValue}
                             </Text>
@@ -337,6 +338,7 @@ export default function LinearChart() {
                       verticalAnchor="start"
                       transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
                       fontWeight="bold"
+                      fill={config.yAxis.labelColor}
                     >
                       {props.label}
                     </Text>
@@ -372,8 +374,8 @@ export default function LinearChart() {
                           <Line
                             from={tick.from}
                             to={tick.to}
-                            stroke="#333"
                             display={config.runtime.horizontal ? 'none' : 'block'}
+                            stroke={config.yAxis.rightAxisTickColor}
                           />
                         )}
 
@@ -392,6 +394,7 @@ export default function LinearChart() {
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={'start'}
+                              fill={config.yAxis.rightAxisTickLabelColor}
                             >
                               {tick.formattedValue}
                             </Text>
@@ -411,8 +414,9 @@ export default function LinearChart() {
                       className="y-label"
                       textAnchor="middle"
                       verticalAnchor="start"
-                      transform={`translate(${config.yAxis.rightLabelOffsetSize}, ${axisCenter}) rotate(90)`}
+                      transform={`translate(${config.yAxis.rightLabelOffsetSize ? config.yAxis.rightLabelOffsetSize : 0}, ${axisCenter}) rotate(90)`}
                       fontWeight="bold"
+                      fill={config.yAxis.rightAxisLabelColor}
                     >
                       {props.label}
                     </Text>
@@ -465,7 +469,7 @@ export default function LinearChart() {
                         <Line
                           from={tick.from}
                           to={tick.to}
-                          stroke="#333"
+                          stroke={ config.xAxis.tickColor }
                         />
                         )}
                         {!config.xAxis.hideLabel && (
@@ -474,6 +478,7 @@ export default function LinearChart() {
                           verticalAnchor="start"
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                          fill={ config.xAxis.tickLabelColor }
                         >
                           {tick.formattedValue}
                         </Text>
@@ -495,6 +500,7 @@ export default function LinearChart() {
                     textAnchor="middle"
                     verticalAnchor="end"
                     fontWeight="bold"
+                    fill={config.xAxis.labelColor}
                   >
                     {props.label}
                   </Text>
