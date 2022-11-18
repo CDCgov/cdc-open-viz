@@ -1,7 +1,7 @@
 import { scaleLinear } from '@visx/scale';
 
 export default function useRightAxis({config, yMax = 0, data = []}, updateConfig) {
-	const hasRightAxis = (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Line') && config.orientation === 'vertical'
+	const hasRightAxis = (config.visualizationType === 'Combo') && config.orientation === 'vertical'
 	const rightSeriesKeys = config.series.filter( series => series.axis === 'Right').map( key => key.dataKey )
 	
 	const allRightAxisData = (rightSeriesKeys) => {
