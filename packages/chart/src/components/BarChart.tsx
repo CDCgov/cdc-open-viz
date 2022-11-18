@@ -7,14 +7,11 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import Context from '../context';
 import ReactTooltip from 'react-tooltip';
 import { BarStackHorizontal } from '@visx/shape';
-import useRightAxis from '../hooks/useRightAxis'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context);
   const { orientation, visualizationSubType } = config;
   const isHorizontal = orientation === 'horizontal';
-  const {yScaleRight} = useRightAxis({config, yMax, data}, updateConfig)
-
 
   const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5;
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
@@ -332,8 +329,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
                     let offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (1 - (config.barThickness || 0.8)) / 2;
 
-                    const seriesData = config.series.filter ( item => item.dataKey === bar.key)
-                    const seriesAxis = seriesData[0].axis ? seriesData[0].axis : 'left';
+
 
                     // ! Unsure if this should go back.
                     if(config.isLollipopChart) {
