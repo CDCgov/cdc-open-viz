@@ -15,6 +15,8 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 import { Fragment } from 'react';
 
 import { publish } from '@cdc/core/helpers/events'
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 
 type DefaultsType = typeof defaults
@@ -46,6 +48,8 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     subtext,
     general: { isCompactStyle }
   } = config;
+
+  const { innerContainerClasses, contentClasses } = useDataVizClasses(config);
 
 
   const transform = new DataTransform()
@@ -84,17 +88,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
   const loadConfig = async () => {
     let response = configObj || await (await fetch(configUrl)).json();
 
-    const round = 1000 * 60 * 15;
-    const date = new Date();
-    let cacheBustingString = new Date(date.getTime() - (date.getTime() % round)).toISOString();
+    
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
-      response.dataUrl = `${response.dataUrl}?${cacheBustingString}`;
-      let newData = await fetchRemoteData(response.dataUrl)
 
+      response.dataUrl = `${response.dataUrl}?${cacheBustingString()}`;
+      let newData = await fetchRemoteData(response.dataUrl)
       
       if (newData && response.dataDescription) {
           newData = transform.autoStandardize(newData);
@@ -162,6 +164,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         return;
       }
       // second validation
+      console.log('arr', arr)
       if(arr.length === 0 || !Array.isArray(arr)){
         console.error('Arguments are not valid getColumnSum function ')
         return;
@@ -333,22 +336,7 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
   }
 
-  let innerContainerClasses = ['cove-component__inner']
-  config.title && innerContainerClasses.push('component--has-title')
-  config.subtext && innerContainerClasses.push('component--has-subtext')
-  config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-  config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
 
-  let contentClasses = ['cove-component__content'];
-  !config.visual?.border && contentClasses.push('no-borders');
-  config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-  config.visual?.accent && contentClasses.push('component--has-accent');
-  config.visual?.background && contentClasses.push('component--has-background');
-  config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-  // ! these two will be retired.
-  config.shadow && innerContainerClasses.push('shadow')
-  config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   // Load data when component first mounts
   const outerContainerRef = useCallback(node => {
@@ -447,24 +435,6 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         isBottom = true
         break;
     }
-
-    
-    let innerContainerClasses = ['cove-component__inner']
-    config.title && innerContainerClasses.push('component--has-title')
-    config.subtext && innerContainerClasses.push('component--has-subtext')
-    config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-    config.general.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-    let contentClasses = ['cove-component__content'];
-    !config.visual.border && contentClasses.push('no-borders');
-    config.visual.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-    config.visual.accent && contentClasses.push('component--has-accent');
-    config.visual.background && contentClasses.push('component--has-background');
-    config.visual.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-    // ! these two will be retired.
-    config.shadow && innerContainerClasses.push('shadow')
-    config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction;
 

@@ -15,10 +15,12 @@ import LinkIcon from '../assets/icons/link.svg'
 
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-import validMapData from '../../example/valid-data-map.csv'
 
+
+import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
+import sampleGeoPoints from '../../example/supported-cities.csv'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -610,6 +612,10 @@ export default function DataImport() {
               <li
                 onClick={() => loadData(new Blob([ validCountyMapData ], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}>United
                 States Counties Sample Data
+              </li>
+              <li
+                onClick={() => loadData(new Blob([ sampleGeoPoints ], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}>
+                Sample Geo Points
               </li>
             </ul>
           </div>

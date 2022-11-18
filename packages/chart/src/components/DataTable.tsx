@@ -20,7 +20,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle';
 import Context from '../context';
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter } = useContext<any>(Context);
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber:numberFormatter, colorPalettes } = useContext<any>(Context);
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
@@ -63,7 +63,15 @@ export default function DataTable() {
         const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original;
         return (
           <Fragment>
-            {config.visualizationType !== 'Pie' && <LegendCircle fill={colorScale(seriesLabel)} />}
+            {config.visualizationType !== 'Pie' && 
+              <LegendCircle 
+                fill={ 
+                  // non dynamic leged
+                  !config.legend.dynamicLegend ? colorScale(seriesLabel) 
+                  // dynamic legend
+                  : config.legend.dynamicLegend ? colorPalettes[config.palette][row.index] 
+                  // fallback
+                  : '#000'} />}
             <span>{seriesLabel}</span>
           </Fragment>
         )
@@ -143,11 +151,11 @@ export default function DataTable() {
           </div>
           <div 
            className="table-container"
+           hidden={!tableExpanded} 
            style={ { maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' } } 
            >
             <table  
               className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}  
-              hidden={!tableExpanded} 
               {...getTableProps()}
               aria-rowcount={ config?.series?.length ? config?.series?.length : '-1' }
               >
