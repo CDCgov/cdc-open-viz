@@ -14,7 +14,7 @@ import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber,formatDate,parseDate, updateConfig } = useContext<any>(Context);
-  const {yScaleRight} = useRightAxis({config, yMax, data}, updateConfig)
+  const { yScaleRight } = useRightAxis({config, yMax, data, updateConfig})
 
   const handleLineType = (lineType) => {
     switch(lineType) {

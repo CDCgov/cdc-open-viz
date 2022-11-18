@@ -210,13 +210,16 @@ const EditorPanel = () => {
   // dataKey is unchanged here.
   // ie. { dataKey: 'series_name', type: 'Bar', axis: 'Left'}
   useEffect(() => {
-      let newSeries = config.series.map( series => {
-      return {
-        ...series,
-        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
-        axis: 'Left'
+      let newSeries = [];
+      if(config.series) {
+        newSeries = config.series.map( series => {
+          return {
+            ...series,
+            type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+            axis: 'Left'
+          }
+        })
       }
-    })
 
     updateConfig({
       ...config,
@@ -226,7 +229,7 @@ const EditorPanel = () => {
   }, [config.visualizationType]);
 
 
-  const { hasRightAxis } = useRightAxis({config}, updateConfig)
+  const { hasRightAxis } = useRightAxis({config: config, yMax: config.yAxis.size, data: config.data, updateConfig})
 
   const filterOptions = [
     {
@@ -652,6 +655,8 @@ useEffect(()=>{
   validateMaxValue();
 },[minValue,maxValue,config]);
 
+console.log('config', config)
+
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm/>}
@@ -774,12 +779,15 @@ useEffect(()=>{
                           </Tooltip>
                         </fieldset>
                         <ul className="series-list">
-                          {config.series.map((series, i) => {
+                          {config.series && config.series.map((series, i) => {
 
                             if (config.visualizationType === 'Combo') {
                               let changeType = (i, value) => {
                                 let series = [ ...config.series ]
                                 series[i].type = value
+                                
+                                series[i].axis = 'Left'
+
                                 updateConfig({ ...config, series })
                               }
 
@@ -858,7 +866,10 @@ useEffect(()=>{
                   <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    {config.series && config.series.length !== 0 && (
+                    {config.series && config.series.filter( series => series.type === 'Line').length === 0 &&
+                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
+                    }
+                    {config.series && config.series.filter( series => series.type === 'Line').length !== 0 && (
                       <>
                         <fieldset>
                           <legend className="edit-label float-left">
@@ -872,7 +883,7 @@ useEffect(()=>{
                           </Tooltip>
                         </fieldset>
                         <ul className="series-list">
-                          {config.series.map((series, i) => {
+                          {config.series && config.series.map((series, i) => {
 
                               if(series.type === 'Bar') return false; // can't set individual bars atm.
 
@@ -901,19 +912,6 @@ useEffect(()=>{
                                   </span>
                                 </li>
                               )
-
-                            return (
-                              <li key={series.dataKey}>
-                                <div className="series-list__name" data-title={series.dataKey}>
-                                  <div className="series-list__name--text">
-                                    {series.dataKey}
-                                  </div>
-                                </div>
-                                {config.series && config.series.length > 1 &&
-                                  <button className="series-list__remove" onClick={() => removeSeries(series.dataKey)}>&#215;</button>
-                                }
-                              </li>
-                            )
                           })}
                         </ul>
                       </>)}

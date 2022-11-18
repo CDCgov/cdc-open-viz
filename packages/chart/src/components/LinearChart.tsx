@@ -27,7 +27,7 @@ import useTopAxis from '../hooks/useTopAxis';
 // TODO: consider moving logic into hooks
 // TODO: formatting
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>(false);
@@ -54,7 +54,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize;
   const yMax = height - config.runtime.xAxis.size;
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data});
+  const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data, updateConfig});
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
@@ -352,7 +352,7 @@ export default function LinearChart() {
           {hasRightAxis &&
             <AxisRight
             scale={yScaleRight}
-            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize}
+            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize - config.yAxis.size}
             label={config.yAxis.rightLabel}
             tickFormat={tick => formatNumber(tick, 'right')}
             numTicks={config.runtime.yAxis.rightNumTicks || undefined}
