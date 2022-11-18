@@ -205,11 +205,16 @@ const EditorPanel = () => {
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
 
+  // when the visualization type changes we 
+  // have to update the individual series type & axis details
+  // dataKey is unchanged here.
+  // ie. { dataKey: 'series_name', type: 'Bar', axis: 'Left'}
   useEffect(() => {
       let newSeries = config.series.map( series => {
       return {
         ...series,
-        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar'
+        type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+        axis: 'Left'
       }
     })
 
@@ -847,7 +852,7 @@ useEffect(()=>{
                 </AccordionItem>
               }
 
-              {hasRightAxis && config.series &&
+              {hasRightAxis && config.series && config.visualizationType === 'Combo' &&
                 <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
@@ -869,7 +874,7 @@ useEffect(()=>{
                         <ul className="series-list">
                           {config.series.map((series, i) => {
 
-                              if(series.type !== 'Line') return false; // can't set individual bars atm.
+                              if(series.type === 'Bar') return false; // can't set individual bars atm.
 
                               let changeAxis= (i, value) => {
                                 let series = [ ...config.series ]
