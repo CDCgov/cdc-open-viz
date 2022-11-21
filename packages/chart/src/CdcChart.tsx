@@ -1,37 +1,41 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 // IE11
-import 'core-js/stable'
-import ResizeObserver from 'resize-observer-polyfill'
-import 'whatwg-fetch'
+import 'core-js/stable';
+import ResizeObserver from 'resize-observer-polyfill';
+import 'whatwg-fetch';
 
-import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend';
+// External Libraries
 import { scaleOrdinal } from '@visx/scale';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
-
 import { timeParse, timeFormat } from 'd3-time-format';
 import Papa from 'papaparse';
 import parse from 'html-react-parser';
 
-import Loading from '@cdc/core/components/Loading';
-import { DataTransform } from '@cdc/core/helpers/DataTransform';
-import getViewport from '@cdc/core/helpers/getViewport';
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
 
+// Primary Components
+import Context from './context';
 import PieChart from './components/PieChart';
 import LinearChart from './components/LinearChart';
-import DataTable from './components/DataTable';
-import Context from './context';
-import defaults from './data/initial-state';
 
-import EditorPanel from './components/EditorPanel';
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import LegendCircle from '@cdc/core/components/LegendCircle';
 import {colorPalettesChart as colorPalettes} from '../../core/data/colorPalettes';
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events';
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses';
+
 import SparkLine from './components/SparkLine';
+import Legend from './components/Legend';
+import DataTable from './components/DataTable';
+import defaults from './data/initial-state';
+import EditorPanel from './components/EditorPanel';
+import Loading from '@cdc/core/components/Loading';
+
+// helpers
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import getViewport from '@cdc/core/helpers/getViewport';
+import { DataTransform } from '@cdc/core/helpers/DataTransform';
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
 
 import './scss/main.scss';
 
@@ -53,21 +57,26 @@ export default function CdcChart(
   const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([]);
   const [currentViewport, setCurrentViewport] = useState<String>('lg');
   const [dimensions, setDimensions] = useState<Array<Number>>([]);
-  const [parentElement, setParentElement] = useState(false)
   const [externalFilters, setExternalFilters] = useState(null);
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
+  const [dynamicLegendItems, setDynamicLegendItems] = useState([])
 
   const legendGlyphSize = 15;
   const legendGlyphSizeHalf = legendGlyphSize / 2;
 
+  const {     
+    barBorderClass,
+    lineDatapointClass, 
+    contentClasses,
+    innerContainerClasses, 
+    sparkLineStyles
+  } = useDataVizClasses(config)
+
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
-  const cacheBustingString = () => {
-      const round = 1000 * 60 * 15;
-      const date = new Date();
-      return new Date(date.getTime() - (date.getTime() % round)).toISOString();
-  }
+  
+  
 
   const handleChartAriaLabels = (state, testing = false) => {
       if(testing) console.log(`handleChartAriaLabels Testing On:`, state);
@@ -139,6 +148,7 @@ export default function CdcChart(
     updateConfig(newConfig, data);
   }
 
+
   const updateConfig = (newConfig, dataOverride = undefined) => {
 
     let data = dataOverride || stateData
@@ -207,7 +217,6 @@ export default function CdcChart(
           newConfig.filters[index].active = filterValues[0];
 
       });
-
       currentData = filterData(newConfig.filters, newExcludedData);
       setFilteredData(currentData);
     }
@@ -217,6 +226,7 @@ export default function CdcChart(
     newConfig.runtime.seriesLabels = {};
     newConfig.runtime.seriesLabelsAll = [];
     newConfig.runtime.originalXAxis = newConfig.xAxis;
+
 
     if (newConfig.visualizationType === 'Pie') {
       newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey]);
@@ -236,7 +246,7 @@ export default function CdcChart(
         if(series.type === 'Bar'){
           newConfig.runtime.barSeriesKeys.push(series.dataKey);
         }
-        if(series.type === 'Line'){
+        if(series.type === 'Line' || series.type === 'dashed-sm' || series.type === 'dashed-md' || series.type === 'dashed-lg'){
           newConfig.runtime.lineSeriesKeys.push(series.dataKey);
         }
       });
@@ -254,7 +264,6 @@ export default function CdcChart(
     newConfig.runtime.uniqueId = Date.now();
     newConfig.runtime.editorErrorMessage = newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey ? 'Data Key property in Y Axis section must be set for pie charts.' : '';
 
-    // if (newConfig.length) newConfig.reverse();
     setConfig(newConfig);
   };
 
@@ -417,6 +426,7 @@ export default function CdcChart(
     if(stateData && config.xAxis && config.runtime.seriesKeys) {
       let palette = config.customColors || colorPalettes[config.palette]
       let numberOfKeys = config.runtime.seriesKeys.length
+      let newColorScale;
 
       while(numberOfKeys > palette.length) {
         palette = palette.concat(palette);
@@ -424,7 +434,7 @@ export default function CdcChart(
 
       palette = palette.slice(0, numberOfKeys);
 
-      const newColorScale = () => scaleOrdinal({
+      newColorScale = () => scaleOrdinal({
         domain: config.runtime.seriesLabelsAll,
         range: palette,
       });
@@ -443,7 +453,7 @@ export default function CdcChart(
     const newSeriesHighlight = [];
 
     // If we're highlighting all the series, reset them
-    if(seriesHighlight.length + 1 === config.runtime.seriesKeys.length) {
+    if( (seriesHighlight.length + 1 === config.runtime.seriesKeys.length) && !config.legend.dynamicLegend) {
       highlightReset()
       return
     }
@@ -467,14 +477,18 @@ export default function CdcChart(
     } else {
       newSeriesHighlight.push(newHighlight);
     }
-
     setSeriesHighlight(newSeriesHighlight);
   };
 
   // Called on reset button click, unhighlights all data series
   const highlightReset = () => {
-    setSeriesHighlight([]);
+    if(config.legend.dynamicLegend && dynamicLegendItems) {
+      setSeriesHighlight(dynamicLegendItems.map( item => item.text ))
+    } else {
+      setSeriesHighlight([]);
+    }
   }
+
   const section = config.orientation ==='horizontal' ? 'yAxis' :'xAxis';
 
   const parseDate = (dateString: string) => {
@@ -549,80 +563,6 @@ export default function CdcChart(
     'Line' : <LinearChart />,
     'Combo': <LinearChart />,
     'Pie' : <PieChart />,
-  }
-
-  // JSX for Legend
-  const Legend = () => {
-
-    let containerClasses = ['legend-container']
-    let innerClasses = ['legend-container__inner'];
-
-    if(config.legend.position === "left") {
-      containerClasses.push('left')
-    }
-
-    if(config.legend.reverseLabelOrder) {
-      innerClasses.push('d-flex')
-      innerClasses.push('flex-column-reverse')
-    }
-
-    return (
-      <aside id="legend" className={containerClasses.join(' ')} role="region" aria-label="legend" tabIndex={0}>
-        {legend.label && <h2>{parse(legend.label)}</h2>}
-        {legend.description && <p>{parse(legend.description)}</p>}
-        <LegendOrdinal
-        scale={colorScale}
-        itemDirection="row"
-        labelMargin="0 20px 0 0"
-        shapeMargin="0 10px 0"
-        >
-          {labels => (
-            <div className={innerClasses.join(' ')}>
-              {labels.map((label, i) => {
-                let className = 'legend-item'
-                let itemName:any = label.datum
-
-                // Filter excluded data keys from legend
-                if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                  return
-                }
-
-                if(config.runtime.seriesLabels){
-                  let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                  itemName = config.runtime.seriesKeys[index]
-                }
-
-                if( seriesHighlight.length > 0 && false === seriesHighlight.includes( itemName ) ) {
-                  className += ' inactive'
-                }
-
-                return (
-                  <LegendItem
-                    className={className}
-                    tabIndex={0}
-                    key={`legend-quantile-${i}`}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        highlight(label);
-                      }
-                    }}
-                    onClick={() => {
-                      highlight(label);
-                    }}
-                  >
-                    <LegendCircle fill={label.value} />
-                    <LegendLabel align="left" margin="0 0 0 4px">
-                      {label.text}
-                    </LegendLabel>
-                  </LegendItem>
-                )
-              })}
-              {seriesHighlight.length > 0 && <button className={`legend-reset ${config.theme}`} onClick={highlightReset} tabIndex={0}>Reset</button>}
-            </div>
-          )}
-        </LegendOrdinal>
-      </aside>
-    )
   }
 
   const Filters = () => {
@@ -712,36 +652,12 @@ export default function CdcChart(
     return false;
   };
 
-  let innerContainerClasses = ['cove-component__inner']
-	config.title && innerContainerClasses.push('component--has-title')
-	config.subtext && innerContainerClasses.push('component--has-subtext')
-	config.biteStyle && innerContainerClasses.push(`bite__style--${config.biteStyle}`)
-	config.general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
-
-	let contentClasses = ['cove-component__content'];
-	config.visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-	!config.visual?.border && contentClasses.push('no-borders');
-	config.visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme');
-	config.visual?.accent && contentClasses.push('component--has-accent');
-	config.visual?.background && contentClasses.push('component--has-background');
-	config.visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor');
-
-
-
   // Prevent render if loading
   let body = (<Loading />)
-  let lineDatapointClass = ''
-  let barBorderClass = ''
 
-  let sparkLineStyles = {
-    width: '100%',
-    height: '100px',
-  }
 
-  if(false === loading) {
-    if (config.lineDatapointStyle === "hover") { lineDatapointClass = ' chart-line--hover' }
-    if (config.lineDatapointStyle === "always show") { lineDatapointClass = ' chart-line--always' }
-    if (config.barHasBorder === "false") { barBorderClass = ' chart-bar--no-border' }
+  if(!loading) {
+
 
     body = (
       <>
@@ -799,11 +715,9 @@ export default function CdcChart(
                 </>
               )
               }
-              {/* Legend */}
-            
               {!config.legend.hide && config.visualizationType !== "Spark Line" && <Legend />}
             </div>
-                 {/* Link */}
+            {/* Link */}
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== "Spark Line" && <div className="subtext">{parse(description)}</div>}
@@ -824,6 +738,7 @@ export default function CdcChart(
     getXAxisData,
     getYAxisData,
     config,
+    setConfig,
     rawData: stateData ?? {},
     excludedData: excludedData,
     transformedData: filteredData || excludedData,
@@ -843,7 +758,13 @@ export default function CdcChart(
     missingRequiredSections,
     setEditing,
     setFilteredData,
-    handleChartAriaLabels
+    handleChartAriaLabels,
+    highlight,
+    highlightReset,
+    legend,
+    setSeriesHighlight,
+    dynamicLegendItems,
+    setDynamicLegendItems
   }
 
   const classes = [

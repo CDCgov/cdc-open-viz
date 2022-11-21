@@ -86,6 +86,14 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     delete visualizations[data.uid]
 
+    if(config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0){
+      config.dashboard.sharedFilters.forEach(sharedFilter => {
+        if(sharedFilter.usedBy.indexOf(data.uid) !== -1){
+          sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1);
+        }
+      });
+    }
+
     updateConfig({ ...config, rows, visualizations })
   }
 
@@ -129,7 +137,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
 
     overlay?.actions.toggleOverlay();
-    if (Object.keys(config.visualizations).pop().includes('markup-include')) return;
 
     return (
       <Modal>
@@ -160,7 +167,6 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
   useEffect(() => {
     if (data.openModal) {
-      if (Object.keys(config.visualizations).pop().includes("markup-include")) return;
         overlay?.actions.openOverlay(dataDesignerModal(dataRef.current));
 
       visualizations[data.uid].openModal = false
@@ -176,12 +182,13 @@ const Widget = ({ data = {}, addVisualization, type }) => {
         <div className="widget__content">
           {data.rowIdx !== undefined && (
             <div className="widget-menu">
-              {data.dataKey && data.dataDescription && data.formattedData &&
+              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') &&
                 <button title="Configure Visualization" className="btn btn-configure" onClick={editWidget}>{iconHash['tools']}</button>
               }
-              <button title="Configure Data" className="btn btn-configure" onClick={() => {
+              {type !== 'markup-include' && <button title="Configure Data" className="btn btn-configure" onClick={() => {
                 overlay?.actions.openOverlay(dataDesignerModal(data))
-              }}>{iconHash['gear']}</button>
+              }}>{iconHash['gear']}
+              </button>}
               <div className="widget-menu-item" onClick={deleteWidget}>
                 <Icon display="close" base/>
               </div>
