@@ -328,7 +328,7 @@ const WaffleChart:FC<Props>  = ({ config, isEditor ,link}) => {
               </div>
               }
               <div className="cove-waffle-chart__data--text">{parse(content)}</div>
-              
+
               {subtext &&
                 <div className="cove-waffle-chart__subtext">
                   {parse(subtext)}
@@ -429,11 +429,14 @@ const CdcWaffleChart = (
   }, [])
 
   //Reload config if parent passes different config
-  useEffect(() => {
-    if(!configObj.dataUrl){
-      updateConfig({ ...defaults, ...configObj});
-    }
-  }, [configObj.data])
+  if(configObj) {
+    useEffect(() => {
+      console.log('changing')
+      if(!configObj.dataUrl){
+        updateConfig({ ...defaults, ...configObj});
+      }
+    }, [configObj.data])
+  }
 
   let content = (<Loading/>)
 
