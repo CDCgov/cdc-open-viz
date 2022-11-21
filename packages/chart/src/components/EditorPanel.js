@@ -655,8 +655,6 @@ useEffect(()=>{
   validateMaxValue();
 },[minValue,maxValue,config]);
 
-console.log('config', config)
-
   return (
     <ErrorBoundary component="EditorPanel">
       {config.newViz && <Confirm/>}
