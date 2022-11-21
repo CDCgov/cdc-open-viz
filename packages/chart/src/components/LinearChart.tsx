@@ -19,28 +19,28 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
 
+// TODO: remove unused imports/variables
+// TODO: consider moving logic into hooks
+// TODO: formatting
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
-  const [animatedChart, setAnimatedChart] = useState<boolean>((!config.animate));
+  const [animatedChart, setAnimatedChart] = useState<boolean>(false);
   const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
 
   const triggerRef = useRef();
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   });
-
   // If the chart is in view and set to animate and it has not already played
-  if( dataRef?.isIntersecting && config.animate && ! animatedChartPlayed ) {
-    setTimeout(() => {
-      setAnimatedChart(true);
-    }, 500);
-
-    setTimeout(() => {
-      setAnimatedChartPlayed(!animatedChartPlayed);
-    }, 600);
-  }
+  useEffect( () => {
+    if( dataRef?.isIntersecting === true && config.animate ) {
+      setTimeout(() => {
+        setAnimatedChart(prevState => true);
+      }, 500);
+    }
+  }, [dataRef?.isIntersecting, config.animate]);
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73;
@@ -58,9 +58,7 @@ export default function LinearChart() {
   let yScale;
   let seriesScale;
 
-   // desctructure users enetered value from initial state config.
   const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
-  // validation for for min/max that user entered;
   const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue)  >= numberFromString(maxValue) : numberFromString(enteredMaxValue)  >= 0;
   const isMinValid = ((numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >=0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0));
 
@@ -70,6 +68,10 @@ export default function LinearChart() {
 
     if((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
       min = 0;
+    }
+    if(config.visualizationType === 'Line' ){
+      const isMinValid = Number(enteredMinValue) < Number(minValue)
+      min = (enteredMinValue && isMinValid) ? Number(enteredMinValue) : minValue;
     }
     //If data value max wasn't provided, calculate it
     if(max === Number.MIN_VALUE){
@@ -539,13 +541,13 @@ export default function LinearChart() {
           {/* Line chart */}
           { (config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar') && (
               <>
-                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+                <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
               </>
 
           )}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type="light" arrowColor="rgba(0,0,0,0)" className="tooltip"/>
-      <div ref={triggerRef} />
+      <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
 }

@@ -8,7 +8,7 @@ import { feature, mesh } from 'topojson-client';
 import { CustomProjection } from '@visx/geo';
 import colorPalettes from '../../../core/data/colorPalettes'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections';
-import testJSON from '../data/dfc-map.json';
+import testJSON from '../data/county-map.json';
 import { abbrs } from '../data/abbreviations';
 import CityList from './CityList';
 
@@ -560,8 +560,8 @@ const CountyMap = (props) => {
 			titleCase={titleCase}
 			setSharedFilterValue={setSharedFilterValue}
 			isFilterValueSupported={isFilterValueSupported}
-			isGeoCodeMap={true}
-		/>)
+			isGeoCodeMap={state.general.type === 'us-geocode'}
+			/>)
 		return geosJsx;
 	};
 	if(!data) <Loading />

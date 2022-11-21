@@ -196,6 +196,8 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
+
+
   
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
@@ -235,8 +237,6 @@ const EditorPanel = () => {
     cursor: 'move',
     zIndex: '999',
   }
-
-  let hasLineChart = false
 
   const enforceRestrictions = (updatedConfig) => {
     if (updatedConfig.orientation === 'horizontal') {
@@ -424,6 +424,19 @@ const EditorPanel = () => {
     return Object.keys(columns)
   }
 
+
+    const getDataValueOptions = (data)=>{
+      if(!data) return [];
+      const set = new Set();
+      for (let i=0; i<data.length; i++){
+        for (const [key, value] of Object.entries(data[i])) {
+          set.add(key)
+        }
+        
+      }
+      return Array.from(set)
+    };
+    
   const getDataValues = (dataKey, unique = false) => {
     let values = []
     excludedData.map(e => {
@@ -594,10 +607,10 @@ const EditorPanel = () => {
    let message = '';
 
   switch(true){
-    case (config.visualizationType === 'Line'  && (enteredValue && parseFloat(enteredValue) > minVal)):
+    case ((config.visualizationType === 'Line' || config.visualizationType === 'Spark Line')  && (enteredValue && parseFloat(enteredValue) > minVal)):
       message = 'Value must be less than ' + minValue;
       break; 
-    case (enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
+    case ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo' ) && enteredValue && minVal > 0 &&  parseFloat(enteredValue) > 0):
       message = 'Value must be less than or equal to 0';
       break; 
     case ( enteredValue &&  minVal < 0 && parseFloat(enteredValue) > minVal) :
@@ -631,7 +644,7 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName="visualizationType" label="Chart Type" updateField={updateField} options={[ 'Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line' ]}/>
-                  {config.visualizationType === 'Bar' && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
+                  {(config.visualizationType === 'Bar'|| config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName="visualizationSubType" label="Chart Subtype" updateField={updateField} options={[ 'regular', 'stacked' ]}/>}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName="orientation" label="Orientation" updateField={updateField} options={[ 'vertical', 'horizontal' ]}/>}
                   {config.visualizationType === 'Bar' &&  <Select value={ config.isLollipopChart? 'lollipop': config.barStyle || 'flat'} fieldName="barStyle" label="bar style" updateField={updateField}  options={showBarStyleOptions()}/>}
                   {(config.visualizationType === 'Bar' && config.barStyle==='rounded' ) &&   <Select value={config.tipRounding||'top'} fieldName="tipRounding" label="tip rounding" updateField={updateField} options={['top','full']}/>}
@@ -750,7 +763,10 @@ useEffect(()=>{
                                 }} style={{ width: '100px', marginRight: '10px' }}>
                                   <option value="" default>Select</option>
                                   <option value="Bar">Bar</option>
-                                  <option value="Line">Line</option>
+                                  <option value="Line">Solid Line</option>
+                                  <option value="dashed-sm">Small Dashed</option>
+                                  <option value="dashed-md">Medium Dashed</option>
+                                  <option value="dashed-lg">Large Dashed</option>
                                 </select>
                               )
 
@@ -835,7 +851,14 @@ useEffect(()=>{
                     <>
                       <TextField value={config.yAxis.label} section="yAxis" fieldName="label" label="Label" updateField={updateField}/>
                       <TextField value={config.yAxis.numTicks} placeholder="Auto" type="number" section="yAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.size} type="number" section="yAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'} className="number-narrow" updateField={updateField} tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target><Icon display="question"/></Tooltip.Target>
+                        <Tooltip.Content>
+                         <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>  
+                        </Tooltip.Content>
+                      </Tooltip>
+                      }/>
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section="yAxis" fieldName="gridLines" label="Display Gridlines" updateField={updateField}/>}
                     </>
                   )}
@@ -1051,7 +1074,18 @@ useEffect(()=>{
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                    <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField}/>
+                <CheckBox value={config.legend.reverseLabelOrder} section="legend" fieldName="reverseLabelOrder" label="Reverse Labels" updateField={updateField}/>
+                  {/* <fieldset className="checkbox-group">
+                    <CheckBox value={config.legend.dynamicLegend} section="legend" fieldName="dynamicLegend" label="Dynamic Legend" updateField={updateField}/>
+                    {config.legend.dynamicLegend && (
+                      <>
+                        <TextField value={config.legend.dynamicLegendDefaultText} section="legend" fieldName="dynamicLegendDefaultText" label="Dynamic Legend Default Text" updateField={updateField} />
+                        <TextField value={config.legend.dynamicLegendItemLimit} type="number" min="0" section="legend" fieldName="dynamicLegendItemLimit" label={'Dynamic Legend Limit'} className="number-narrow" updateField={updateField}/>
+                        <TextField value={config.legend.dynamicLegendItemLimitMessage} section="legend" fieldName="dynamicLegendItemLimitMessage" label="Dynamic Legend Item Limit Message" updateField={updateField} />
+                        <TextField value={config.legend.dynamicLegendChartMessage} section="legend" fieldName="dynamicLegendChartMessage" label="Dynamic Legend Chart Message" updateField={updateField} />
+                      </>
+                    )}
+                  </fieldset> */}
                   <CheckBox value={config.legend.hide} section="legend" fieldName="hide" label="Hide Legend" updateField={updateField} tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
@@ -1060,6 +1094,10 @@ useEffect(()=>{
                       </Tooltip.Content>
                     </Tooltip>
                   }/>
+
+                  {(config.visualizationType==='Bar' && config.visualizationSubType ==="regular" && config.runtime.seriesKeys.length===1 )&& (
+                   <Select value={config.legend.colorCode} section="legend" fieldName="colorCode" label="Color code by category" initial="Select" updateField={updateField} options={getDataValueOptions(data)}/>
+                  )}
                   <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
                   <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
                   <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left' ]}/>
@@ -1201,7 +1239,7 @@ useEffect(()=>{
                     <Select value={config.barHasBorder} fieldName="barHasBorder" label="Bar Borders" updateField={updateField} options={[ 'true', 'false' ]}/>
                   }
 
-                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 

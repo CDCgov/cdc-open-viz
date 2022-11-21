@@ -55,6 +55,12 @@ header + .map-container.full-border {
 			flex-direction: row;
 		}
 	}
+
+	.map-container.us-geocode {
+		&.side {
+			flex-direction: row;
+		}
+	}
 }
 
 .geography-container {

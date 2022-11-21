@@ -35,16 +35,14 @@ export default function SparkLine({width: parentWidth, height: parentHeight}) {
 	let xScale;
 	let yScale;
 	let seriesScale;
-
+	const {max:enteredMaxValue,min:enteredMinValue} = config.runtime.yAxis;
+  		const isMaxValid =  Number(enteredMaxValue)  >= Number(maxValue); 
+  		const isMinValid =  Number(enteredMinValue)  <= Number(minValue); 
 
 	if (data) {
-		let min = config.runtime.yAxis.min !== undefined ? config.runtime.yAxis.min : minValue
-		let max = config.runtime.yAxis.max !== undefined ? config.runtime.yAxis.max : Number.MIN_VALUE;
-
-		if ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
-			min = 0;
-		}
-		//If data value max wasn't provided, calculate it
+		let min = (enteredMinValue && isMinValid) ? enteredMinValue : minValue;
+		let max = (enteredMaxValue && isMaxValid )? enteredMaxValue : Number.MIN_VALUE;
+		
 		if (max === Number.MIN_VALUE) {
 			max = maxValue
 		}

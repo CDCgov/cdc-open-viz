@@ -72,14 +72,9 @@ const EditorPanel = memo((props) => {
 
   useEffect(() => {
 
-    console.log('updating parent')
-    console.log(setParentConfig)
     // Pass up to Editor if needed
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
-
-      console.log('newConfig', newConfig)
-
       setParentConfig(newConfig)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -582,15 +577,6 @@ const EditorPanel = memo((props) => {
               ></li>
             ))}
           </ul>
-
-          {/* <div className="cove-accordion__panel-section">
-            <CheckBox value={config.visual.border} section="visual" fieldName="border" label="Display Borders" updateField={updateField} />
-            <CheckBox value={config.visual.borderColorTheme} section="visual" fieldName="borderColorTheme" label="Use theme border color" updateField={updateField} />
-            <CheckBox value={config.visual.accent} section="visual" fieldName="accent" label="Use Accent Style" updateField={updateField} />
-            <CheckBox value={config.visual.background} section="visual" fieldName="background" label="Use theme background color" updateField={updateField} />
-            <CheckBox value={config.visual.hideBackgroundColor} section="visual" fieldName="hideBackgroundColor" label="Hide Background Color" updateField={updateField} />
-          </div> */}
-
         </label>
         
         <div className="cove-accordion__panel-section reverse-labels">
