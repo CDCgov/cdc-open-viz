@@ -109,6 +109,7 @@ aside {
       }
     }
   }
+  
   &.bottom.single-row {
       width: 100%;
       .legend-section ul {
@@ -116,24 +117,18 @@ aside {
         align-items: baseline;
         justify-content:flex-start;
         flex-wrap: wrap;
-       
         li {
-
           justify-items: center;
           line-break:loose;
-         align-items: center;
+          align-items: center;
           width: auto;
-    
           padding-right: 1em;
           padding-bottom: 1em;
           display: inline-block;
-
           & > span {
             margin: 0 !important;
           }
-         
         }
-      
       }
   };
 

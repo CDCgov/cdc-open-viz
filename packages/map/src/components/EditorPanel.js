@@ -748,7 +748,6 @@ const EditorPanel = (props) => {
 
 		setRequiredColumns(columnList);
 	}, [state.columns, state.general.type]);
-	console.log(state.legend)
 
 	const editColumn = async (columnName, editTarget, value) => {
 		let newSpecialClasses;
