@@ -5,7 +5,7 @@ import { Group } from '@visx/group';
 import { Line } from '@visx/shape';
 import { Text } from '@visx/text';
 import { scaleLinear, scalePoint } from '@visx/scale';
-import { AxisLeft, AxisBottom } from '@visx/axis';
+import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis';
 
 import BarChart from './BarChart';
 import LineChart from './LineChart';
@@ -18,12 +18,16 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss';
 import useReduceData from '../hooks/useReduceData';
+import useRightAxis from '../hooks/useRightAxis';
+import useTopAxis from '../hooks/useTopAxis';
+
+// TODO: Move scaling functions into hooks to manage complexity
 
 // TODO: remove unused imports/variables
 // TODO: consider moving logic into hooks
 // TODO: formatting
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context);
   let [ width ] = dimensions;
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>(false);
@@ -47,9 +51,11 @@ export default function LinearChart() {
   }
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
-
-  const xMax = width - config.runtime.yAxis.size;
+  const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize;
   const yMax = height - config.runtime.xAxis.size;
+
+  const { yScaleRight, hasRightAxis } = useRightAxis({config, yMax, data, updateConfig});
+  const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = (d: any) => config.runtime.xAxis.type === 'date' ? (parseDate(d[config.runtime.originalXAxis.dataKey])).getTime() : d[config.runtime.originalXAxis.dataKey];
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey];
@@ -244,7 +250,7 @@ export default function LinearChart() {
                           <Line
                             from={tick.from}
                             to={tick.to}
-                            stroke="#333"
+                            stroke={config.yAxis.tickColor}
                             display={config.runtime.horizontal ? 'none' : 'block'}
                           />
                         )}
@@ -303,6 +309,7 @@ export default function LinearChart() {
                               y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                               verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
                               textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                              fill={config.yAxis.tickLabelColor}
                             >
                               {tick.formattedValue}
                             </Text>
@@ -331,6 +338,7 @@ export default function LinearChart() {
                       verticalAnchor="start"
                       transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`}
                       fontWeight="bold"
+                      fill={config.yAxis.labelColor}
                     >
                       {props.label}
                     </Text>
@@ -338,6 +346,100 @@ export default function LinearChart() {
                 );
               }}
             </AxisLeft>
+          }
+
+          {/* Right Axis */}
+          {hasRightAxis &&
+            <AxisRight
+            scale={yScaleRight}
+            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize - config.yAxis.size}
+            label={config.yAxis.rightLabel}
+            tickFormat={tick => formatNumber(tick, 'right')}
+            numTicks={config.runtime.yAxis.rightNumTicks || undefined}
+            labelOffset={45}
+          >
+
+            {props => {
+              const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2;
+              const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length * (1 - config.barThickness)) + 5;
+              return (
+                <Group className="right-axis">
+                  {props.ticks.map((tick, i) => {
+                    return (
+                      <Group
+                        key={`vx-tick-${tick.value}-${i}`}
+                        className="vx-axis-tick"
+                      >
+                        {!config.runtime.yAxis.rightHideTicks && (
+                          <Line
+                            from={tick.from}
+                            to={tick.to}
+                            display={config.runtime.horizontal ? 'none' : 'block'}
+                            stroke={config.yAxis.rightAxisTickColor}
+                          />
+                        )}
+
+                        { config.runtime.yAxis.rightGridLines ? (
+                          <Line
+                            from={{x: tick.from.x + xMax, y: tick.from.y}}
+                            to={tick.from}
+                            stroke="rgba(0,0,0,0.3)"
+                          />
+                          ) : ''
+                        }
+
+                        { !config.yAxis.rightHideLabel &&
+                            <Text
+                              x={tick.to.x}
+                              y={tick.to.y + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                              verticalAnchor={config.runtime.horizontal ? "start" : "middle"}
+                              textAnchor={'start'}
+                              fill={config.yAxis.rightAxisTickLabelColor}
+                            >
+                              {tick.formattedValue}
+                            </Text>
+                        }
+
+                        </Group>
+                      );
+                    })}
+                    {!config.yAxis.rightHideAxis &&  (
+                    <Line
+                      from={props.axisFromPoint}
+                      to={props.axisToPoint}
+                      stroke="#333"
+                    />
+                    )}
+                    <Text
+                      className="y-label"
+                      textAnchor="middle"
+                      verticalAnchor="start"
+                      transform={`translate(${config.yAxis.rightLabelOffsetSize ? config.yAxis.rightLabelOffsetSize : 0}, ${axisCenter}) rotate(90)`}
+                      fontWeight="bold"
+                      fill={config.yAxis.rightAxisLabelColor}
+                    >
+                      {props.label}
+                    </Text>
+                  </Group>
+                );
+              }}
+
+            </AxisRight>
+          
+          
+          }
+
+          {hasTopAxis && config.topAxis.hasLine &&
+            <AxisTop 
+              stroke="#333"
+              left={config.runtime.yAxis.size}
+              scale={xScale}
+              hideTicks
+              hideZero
+              tickLabelProps={() => ({
+                fill: 'transparent'
+              })}
+            />
           }
 
           {/* X axis */}
@@ -367,7 +469,7 @@ export default function LinearChart() {
                         <Line
                           from={tick.from}
                           to={tick.to}
-                          stroke="#333"
+                          stroke={ config.xAxis.tickColor }
                         />
                         )}
                         {!config.xAxis.hideLabel && (
@@ -376,6 +478,7 @@ export default function LinearChart() {
                           verticalAnchor="start"
                           textAnchor={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? 'end' : 'middle'}
                           width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}
+                          fill={ config.xAxis.tickLabelColor }
                         >
                           {tick.formattedValue}
                         </Text>
@@ -397,6 +500,7 @@ export default function LinearChart() {
                     textAnchor="middle"
                     verticalAnchor="end"
                     fontWeight="bold"
+                    fill={config.xAxis.labelColor}
                   >
                     {props.label}
                   </Text>
