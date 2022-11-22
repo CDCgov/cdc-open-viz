@@ -1,5 +1,5 @@
 @import '~@cdc/core/styles/base';
-@import "~@cdc/core/styles/heading-colors";
+@import '~@cdc/core/styles/heading-colors';
 @import 'mixins';
 @import 'variables';
 @import '~@cdc/core/styles/v2/themes/color-definitions';
@@ -8,7 +8,9 @@
   overflow-y: auto;
 }
 
-.d-flex { display: flex; }
+.d-flex {
+  display: flex;
+}
 .flex-column-reverse {
   flex-direction: column-reverse;
 }
@@ -24,7 +26,7 @@
     border: 1px solid #c4c4c4;
     border-radius: 8px;
     margin-top: 8px;
-    margin-bottom: 24px;  
+    margin-bottom: 24px;
   }
 
   .visually-hidden {
@@ -47,10 +49,10 @@
     background: #005eaa;
     color: #fff !important;
     border: 0;
-    padding: .4em .8em;
+    padding: 0.4em 0.8em;
     display: block;
     border-radius: 5px;
-    transition: .1s all;
+    transition: 0.1s all;
     cursor: pointer;
 
     &[disabled] {
@@ -74,7 +76,7 @@
 
   .chart-title {
     position: relative;
-    padding: .6em .8em;
+    padding: 0.6em 0.8em;
     margin: 0;
     color: #fff;
     font-size: 1.1em;
@@ -94,7 +96,7 @@
 
     &:not(:empty) {
       margin: 0 0 1rem 0 !important;
-      padding: .6em .8em;
+      padding: 0.6em 0.8em;
       border-bottom-width: 3px;
       border-bottom-style: solid;
     }
@@ -119,17 +121,16 @@
     position: relative;
 
     .legend-reset {
-      font-size: .7em;
+      font-size: 0.7em;
       color: rgba(0, 0, 0, 0.6);
       position: absolute;
       right: 1em;
       background: rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
-      transition: .3s all;
-      padding: .375rem;
+      transition: 0.3s all;
+      padding: 0.375rem;
       top: 1em;
       border-radius: 3px;
-
 
       &--dynamic {
         position: relative;
@@ -138,8 +139,8 @@
       }
 
       &:hover {
-        background: rgba(0, 0, 0, .15);
-        transition: .3s all;
+        background: rgba(0, 0, 0, 0.15);
+        transition: 0.3s all;
       }
     }
 
@@ -151,28 +152,27 @@
 
     .legend-item > .legend-item {
       display: inline-block;
-      margin-right: .5rem;
+      margin-right: 0.5rem;
       flex: 0 0 auto;
     }
 
     h2 {
       font-size: 1.3em;
-      margin-bottom: .3em;
+      margin-bottom: 0.3em;
     }
 
     .legend-item {
       cursor: pointer;
-      transition: .2s all;
+      transition: 0.2s all;
 
       &.inactive {
-        opacity: .5;
-        transition: .2s all;
+        opacity: 0.5;
+        transition: 0.2s all;
       }
     }
   }
 
   .dynamic-legend-list {
-
     // overide traditional legend item that uses !important
     .legend-item {
       align-items: flex-end !important;
@@ -197,7 +197,7 @@
   .tooltip {
     background-color: #fff;
     border: rgba(0, 0, 0, 0.3) 1px solid !important;
-    box-shadow: rgba(0, 0, 0, .1) 3px 3px 7px;
+    box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
     line-height: 1.4em;
     font-size: 1em !important;
     border-radius: 4px !important;
@@ -289,7 +289,7 @@
     }
 
     label:not(:empty) {
-      margin-right: .4em;
+      margin-right: 0.4em;
     }
 
     select {
@@ -297,13 +297,13 @@
     }
 
     .single-filter {
-      margin-bottom: .5em;
+      margin-bottom: 0.5em;
     }
   }
 
   @include breakpointClass(xs) {
     &.font-small {
-      font-size: .8em;
+      font-size: 0.8em;
 
       .chart-container > svg {
         font-size: 12px;
@@ -311,7 +311,7 @@
     }
 
     &.font-medium {
-      font-size: .9em;
+      font-size: 0.9em;
 
       .chart-container > svg {
         font-size: 14px;
@@ -328,7 +328,8 @@
   }
 
   @include breakpointClass(md) {
-    .filters-section, .chart-container:not(.sparkline) {
+    .filters-section,
+    .chart-container:not(.sparkline) {
       margin-left: 1em;
       margin-right: 1em;
     }
@@ -354,14 +355,14 @@
         order: 1;
 
         circle {
-          filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, .5));
+          filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
           transform-origin: 50% 50%;
         }
       }
     }
 
     &.font-small {
-      font-size: .9em;
+      font-size: 0.9em;
 
       .chart-container > svg {
         font-size: 14px;
@@ -407,120 +408,119 @@
     outline: 2px solid rgb(0, 95, 204) !important;
   }
 
-    // ANIMATIONS
-    // Pie Chart Animations
-    .animated-pie {
-      transition: all .4s ease-in-out;
-      opacity: 0;
+  // ANIMATIONS
+  // Pie Chart Animations
+  .animated-pie {
+    transition: all 0.4s ease-in-out;
+    opacity: 0;
+    transform-origin: center;
+    transform: scale(0, 0);
+
+    &.animated {
+      opacity: 1;
       transform-origin: center;
-      transform: scale(0, 0);
+      transform: scale(1, 1);
+    }
+
+    path,
+    text {
+      border: rgba(0, 0, 0, 0.3) 1px solid !important;
+      box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
+      opacity: 1;
+      line-height: 1.4em;
+      font-size: 1em;
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+
+    .animated-pie-text {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      transition-delay: 0.4s;
 
       &.animated {
         opacity: 1;
-        transform-origin: center;
-        transform: scale(1, 1);
       }
+    }
+  }
 
-      path,
-      text {
-        border: rgba(0,0,0,.3) 1px solid !important;
-        box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+  // Line/Combo Chart Animations
+  .linear,
+  .Line,
+  .Combo {
+    &.animated path {
+      opacity: 0;
+    }
+    &.animate {
+      path {
         opacity: 1;
-        line-height: 1.4em;
-        font-size: 1em;
-        border-radius: 4px;
-        padding: 8px 12px;
+        stroke-dasharray: 2000;
+        stroke-dashoffset: 2000;
+        animation: dash 2s ease-in-out forwards;
       }
-
-      .animated-pie-text {
-        opacity: 0;
-        transition: opacity .5s ease-in-out;
-        transition-delay: .4s;
-
-        &.animated {
-          opacity: 1;
+      @keyframes dash {
+        to {
+          stroke-dashoffset: 0;
         }
       }
     }
+  }
 
-    // Line/Combo Chart Animations
-    .linear,
-    .Line,
-    .Combo {
-      &.animated path {
+  // Bar/Combo Chart Animations
+  .linear,
+  .Bar,
+  .Combo {
+    .visx-group {
+      position: relative;
+    }
+
+    &.animated {
+      .vertical rect,
+      .vertical foreignObject {
         opacity: 0;
+        animation: growBar 0.5s linear forwards;
+        animation-play-state: paused;
       }
+
+      .horizontal rect,
+      .horizontal foreignObject {
+        animation: growBarH 0.5s linear forwards;
+        animation-play-state: paused;
+      }
+
       &.animate {
-        path {
-          opacity: 1;
-          stroke-dasharray: 2000;
-          stroke-dashoffset: 2000;
-          animation: dash 2s ease-in-out forwards;
+        rect,
+        foreignObject {
+          animation-play-state: running;
         }
-        @keyframes dash {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
+      }
+
+      .group-1,
+      .group-2 {
+        transform-origin: center;
       }
     }
-
-    // Bar/Combo Chart Animations
-    .linear,
-    .Bar,
-    .Combo {
-      .visx-group {
-        position: relative;
-      }
-
-      &.animated {
-        .vertical rect ,
-        .vertical foreignObject {
-          opacity: 0;
-          animation: growBar 0.5s linear forwards;
-          animation-play-state: paused;
-        }
-
-        .horizontal rect,
-        .horizontal foreignObject {
-          animation: growBarH 0.5s linear forwards;
-          animation-play-state: paused;
-        }
-
-        &.animate {
-          rect,
-          foreignObject {
-            animation-play-state: running;
-          }
-        }
-
-        .group-1,
-        .group-2 {
-          transform-origin: center;
-        }
-      }
-    }
-
+  }
 
   @keyframes growBar {
     from {
       opacity: 1;
-      transform: scale(1, 0) ;
+      transform: scale(1, 0);
     }
 
     to {
       opacity: 1;
-      transform: scale(1) ;
+      transform: scale(1);
     }
   }
 
   @keyframes growBarH {
     from {
-      transform: scale(0, 1) ;
+      transform: scale(0, 1);
     }
 
     to {
-      transform: scale(1) ;
+      transform: scale(1);
     }
   }
 }
@@ -534,7 +534,6 @@
 }
 
 #paired-bar-legend {
-
   text-align: center;
 
   div {
@@ -551,8 +550,8 @@
 }
 
 .isEditor.type-sparkline .cdc-chart-inner-container {
-    margin: 3em auto 0;
-    max-width: 60%;
+  margin: 3em auto 0;
+  max-width: 60%;
 }
 
 .cdc-open-viz-module.type-chart.lg.type-sparkline .chart-container > svg {
@@ -565,9 +564,8 @@
 }
 
 .cdc-open-viz-module.type-chart.type-sparkline {
-
   .cove-component__content {
-    background: #F2F2F2;
+    background: #f2f2f2;
   }
 
   .cove-component__content.component--hideBackgroundColor {
@@ -583,7 +581,7 @@
   }
 
   .cove-component__content:not(.no-borders) {
-    border: 1px solid $lightGray
+    border: 1px solid $lightGray;
   }
 
   .cove-component__header ~ .cove-component__content:not(.no-borders) {
@@ -601,7 +599,6 @@
   .subtext {
     margin-bottom: 15px;
   }
-
 }
 
 .cdc-open-viz-module .cove-component__content.sparkline {
@@ -613,10 +610,10 @@
   border-bottom-right-radius: 3px;
 
   .visx-axis-tick:first-of-type {
-    transform: translate(20px, 0)
+    transform: translate(20px, 0);
   }
 
   .visx-axis-tick:last-of-type {
-    transform: translate(-20px, 0)
+    transform: translate(-20px, 0);
   }
 }
