@@ -1,6 +1,6 @@
 @import '~@cdc/core/styles/base';
-@import "~@cdc/core/styles/heading-colors";
-@import "~@cdc/core/styles/v2/themes/color-definitions";
+@import '~@cdc/core/styles/heading-colors';
+@import '~@cdc/core/styles/v2/themes/color-definitions';
 @import 'variables';
 
 .cdc-open-viz-module.type-data-bite {
@@ -16,7 +16,7 @@
     border: 1px solid #c4c4c4;
     border-radius: 8px;
     margin-top: 8px;
-    margin-bottom: 24px;  
+    margin-bottom: 24px;
   }
 
   .loader {
@@ -34,10 +34,10 @@
     background: #005eaa;
     color: #fff;
     border: 0;
-    padding: .4em .8em;
+    padding: 0.4em 0.8em;
     display: block;
     border-radius: 5px;
-    transition: .1s all;
+    transition: 0.1s all;
     cursor: pointer;
 
     &[disabled] {
@@ -61,8 +61,8 @@
 
   .tooltip {
     background-color: #fff;
-    border: rgba(0,0,0,0.3) 1px solid !important;
-    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
+    border: rgba(0, 0, 0, 0.3) 1px solid !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
     line-height: 1.4em;
     font-size: 1em !important;
     border-radius: 4px !important;
@@ -71,7 +71,7 @@
   }
 
   &.font-small .bite-content-container {
-    font-size: .9em !important;
+    font-size: 0.9em !important;
   }
   &.font-large .bite-content-container {
     font-size: 1.1em !important;
