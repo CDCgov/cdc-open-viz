@@ -63,6 +63,7 @@
   },
   "lint-staged": {
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
       "eslint --config .eslintrc.js"
     ]
   },
