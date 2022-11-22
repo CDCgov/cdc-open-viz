@@ -993,12 +993,7 @@ useEffect(()=>{
                           }
                         </>
                       }
-
-                      {config.xAxis.type === 'date' &&
-                        <>
-                          <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                        </>
-                      }
+                      <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
 
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className="number-narrow" updateField={updateField}/>
 
