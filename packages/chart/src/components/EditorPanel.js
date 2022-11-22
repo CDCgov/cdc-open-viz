@@ -26,6 +26,10 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle';
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData';
+import useRightAxis from '../hooks/useRightAxis'
+
+// TODO: Remove unused imports
+// TDOO: Move inline styles to a scss file
 
 const TextField = memo(({label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = "input", i = null, min = null, ...attributes}) => {
   const [ value, setValue ] = useState(stateValue); 
@@ -196,12 +200,36 @@ const EditorPanel = () => {
 	useEffect(()=>{
 		if(paletteName) updateConfig({...config, palette:paletteName})
   }, [paletteName])
-
-
   
   useEffect(()=>{
     dispatch({type:"GET_PALETTE",payload:colorPalettes,paletteName:config.palette})
   }, [dispatch, config.palette]);
+
+  // when the visualization type changes we 
+  // have to update the individual series type & axis details
+  // dataKey is unchanged here.
+  // ie. { dataKey: 'series_name', type: 'Bar', axis: 'Left'}
+  useEffect(() => {
+      let newSeries = [];
+      if(config.series) {
+        newSeries = config.series.map( series => {
+          return {
+            ...series,
+            type: config.visualizationType === 'Combo' ? 'Bar' : config.visualizationType ? config.visualizationType : 'Bar',
+            axis: 'Left'
+          }
+        })
+      }
+
+    updateConfig({
+      ...config,
+      series: newSeries
+    })
+
+  }, [config.visualizationType]);
+
+
+  const { hasRightAxis } = useRightAxis({config: config, yMax: config.yAxis.size, data: config.data, updateConfig})
 
   const filterOptions = [
     {
@@ -319,10 +347,11 @@ const EditorPanel = () => {
   }
 
   const addNewSeries = (seriesKey) => {
-    let newSeries = config.series ? [ ...config.series ] : []
-    newSeries.push({ dataKey: seriesKey, type: 'Bar' });
-    updateConfig({ ...config, series: newSeries });
+      let newSeries = config.series ? [ ...config.series ] : []
+      newSeries.push({ dataKey: seriesKey, type: 'Bar' });
+      updateConfig({ ...config, series: newSeries }); // left axis series keys
   }
+  
 
   const sortSeries = (e) => {
     const series = config.series[0].dataKey
@@ -404,8 +433,8 @@ const EditorPanel = () => {
     })
 
     if (filter) {
-      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== ''
-      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== ''
+      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== '' // TODO: remove?
+      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== '' // TODO: remove?
 
       Object.keys(columns).forEach(key => {
         if (
@@ -748,12 +777,15 @@ useEffect(()=>{
                           </Tooltip>
                         </fieldset>
                         <ul className="series-list">
-                          {config.series.map((series, i) => {
+                          {config.series && config.series.map((series, i) => {
 
                             if (config.visualizationType === 'Combo') {
                               let changeType = (i, value) => {
                                 let series = [ ...config.series ]
                                 series[i].type = value
+                                
+                                series[i].axis = 'Left'
+
                                 updateConfig({ ...config, series })
                               }
 
@@ -763,7 +795,10 @@ useEffect(()=>{
                                 }} style={{ width: '100px', marginRight: '10px' }}>
                                   <option value="" default>Select</option>
                                   <option value="Bar">Bar</option>
-                                  <option value="Line">Line</option>
+                                  <option value="Line">Solid Line</option>
+                                  <option value="dashed-sm">Small Dashed</option>
+                                  <option value="dashed-md">Medium Dashed</option>
+                                  <option value="dashed-lg">Large Dashed</option>
                                 </select>
                               )
 
@@ -823,11 +858,70 @@ useEffect(()=>{
                 </AccordionItem>
               }
 
+              {hasRightAxis && config.series && config.visualizationType === 'Combo' &&
+                <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                    {config.series && config.series.filter( series => series.type === 'Line').length === 0 &&
+                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
+                    }
+                    {config.series && config.series.filter( series => series.type === 'Line').length !== 0 && (
+                      <>
+                        <fieldset>
+                          <legend className="edit-label float-left">
+                            Displaying
+                          </legend>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Assign an axis for the series</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </fieldset>
+                        <ul className="series-list">
+                          {config.series && config.series.map((series, i) => {
+
+                              if(series.type === 'Bar') return false; // can't set individual bars atm.
+
+                              let changeAxis= (i, value) => {
+                                let series = [ ...config.series ]
+                                series[i].axis = value
+                                updateConfig({ ...config, series })
+                              }
+
+                              let axisDropdown = (
+                                <select value={series.axis} onChange={(event) => {
+                                  changeAxis(i, event.target.value)
+                                }} style={{ width: '100px', marginRight: '10px' }}>
+                                  <option value="Left" default>left</option>
+                                  <option value="Right">right</option>
+                                </select>
+                              )
+
+                              return (
+                                <li key={series.dataKey}>
+                                  <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                    <div className="series-list__name-text">{series.dataKey}</div>
+                                  </div>
+                                  <span>
+                                    <span className="series-list__dropdown">{axisDropdown}</span>
+                                  </span>
+                                </li>
+                              )
+                          })}
+                        </ul>
+                      </>)}
+                  </AccordionItemPanel>
+              </AccordionItem>
+              }
+
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
                     {config.visualizationType !== 'Pie'
-                      ? config.visualizationType === 'Bar' ? 'Value Axis' : 'Value Axis'
+                      ? config.visualizationType === 'Bar' ? 'Left Value Axis' : 'Left Value Axis'
                       : 'Data Format'
                     }
                     {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width="25" className="warning-icon"/>}
@@ -904,6 +998,51 @@ useEffect(()=>{
                   }
                 </AccordionItemPanel>
               </AccordionItem>
+
+              {/* Right Value Axis Settings */}
+              {hasRightAxis &&
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>
+                      Right Value Axis
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                      <TextField value={config.yAxis.rightLabel} section="yAxis" fieldName="rightLabel" label="Label" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightNumTicks} placeholder="Auto" type="number" section="yAxis" fieldName="rightNumTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightAxisSize} type="number" section="yAxis" fieldName="rightAxisSize" label="Size (Width)" className="number-narrow" updateField={updateField}/>
+                      <TextField value={config.yAxis.rightLabelOffsetSize} type="number" section="yAxis" fieldName="rightLabelOffsetSize" label="Label Offset" className="number-narrow" updateField={updateField}/>
+                      
+                      <span className="divider-heading">Number Formatting</span>
+                      <CheckBox value={config.dataFormat.rightCommas} section="dataFormat" fieldName="rightCommas" label="Add commas" updateField={updateField}/>
+                      <TextField value={config.dataFormat.rightRoundTo} type="number" section="dataFormat" fieldName="rightRoundTo" label="Round to decimal point" className="number-narrow" updateField={updateField} min={0}/>
+                      <div className="two-col-inputs">
+                        <TextField value={config.dataFormat.rightPrefix} section="dataFormat" fieldName="rightPrefix" label="Prefix" updateField={updateField} tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
+                              {config.visualizationType !== 'Pie' && <p>Enter a data prefix (such as "$"), if applicable.</p>}
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }/>
+                        <TextField value={config.dataFormat.rightSuffix} section="dataFormat" fieldName="rightSuffix" label="Suffix" updateField={updateField} tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target><Icon display="question" style={{ marginLeft: '0.5rem' }}/></Tooltip.Target>
+                            <Tooltip.Content>
+                              {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
+                              {config.visualizationType !== 'Pie' && <p>Enter a data suffix (such as "%"), if applicable.</p>}
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }/>
+                      </div>
+                      
+                      <CheckBox value={config.yAxis.rightHideAxis} section="yAxis" fieldName="rightHideAxis" label="Hide Axis" updateField={updateField} />
+                      <CheckBox value={config.yAxis.rightHideLabel} section="yAxis" fieldName="rightHideLabel" label="Hide Label" updateField={updateField} />
+                      <CheckBox value={config.yAxis.rightHideTicks} section="yAxis" fieldName="rightHideTicks" label="Hide Ticks" updateField={updateField} />
+                  </AccordionItemPanel>
+                </AccordionItem>
+              }
 
               <AccordionItem>
                 <AccordionItemHeading>
@@ -990,12 +1129,7 @@ useEffect(()=>{
                           }
                         </>
                       }
-
-                      {config.xAxis.type === 'date' &&
-                        <>
-                          <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
-                        </>
-                      }
+                      <TextField value={config.xAxis.numTicks} placeholder="Auto" type="number" min="1" section="xAxis" fieldName="numTicks" label="Number of ticks" className="number-narrow" updateField={updateField}/>
 
                       <TextField value={config.xAxis.size} type="number" min="0" section="xAxis" fieldName="size" label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className="number-narrow" updateField={updateField}/>
 
@@ -1197,6 +1331,7 @@ useEffect(()=>{
                 </AccordionItemHeading>
                 <AccordionItemPanel>
 
+
                   {config.isLollipopChart &&
                     <>
                       <fieldset className="header">
@@ -1350,6 +1485,12 @@ useEffect(()=>{
                   }
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') &&
                     <TextField value={config.barThickness} type="number" fieldName="barThickness" label="Bar Thickness" updateField={updateField}/>
+                  }
+
+                  { (config.visualizationType === 'Bar' || 
+                    config.visualizationType === 'Line' ||
+                    config.visualizationType === 'Combo') &&
+                      <CheckBox value={config.topAxis.hasLine} section="topAxis" fieldName="hasLine" label="Add Top Axis Line" updateField={updateField} />
                   }
 
                   {config.visualizationType === "Spark Line" &&

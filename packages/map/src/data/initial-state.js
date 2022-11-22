@@ -51,7 +51,7 @@ export default {
     specialClasses: [],
     unified: false,
     singleColumn: false,
-    singleRow:true,
+    singleRow: false,
     dynamicDescription: false,
     type: "equalnumber",
     numberOfItems: 3,

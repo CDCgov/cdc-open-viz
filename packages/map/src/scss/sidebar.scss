@@ -109,6 +109,28 @@ aside {
       }
     }
   }
+  
+  &.bottom.single-row {
+      width: 100%;
+      .legend-section ul {
+        flex-direction: row;
+        align-items: baseline;
+        justify-content:flex-start;
+        flex-wrap: wrap;
+        li {
+          justify-items: center;
+          line-break:loose;
+          align-items: center;
+          width: auto;
+          padding-right: 1em;
+          padding-bottom: 1em;
+          display: inline-block;
+          & > span {
+            margin: 0 !important;
+          }
+        }
+      }
+  };
 
   @include breakpointClass(sm) {
     .legend-section ul {
@@ -120,18 +142,6 @@ aside {
         &:nth-last-of-type(-n+2) {
           padding-bottom: 0
         }
-      }
-    }
-  }
-
-  @include breakpointClass(sm) {
-    .legend-section ul.single-row{
-      align-items: flex-start;
-      justify-content: flex-start;
-     
-      li {
-        width: auto;
-        display: inline-block;
       }
     }
   }

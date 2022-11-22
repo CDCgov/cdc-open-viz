@@ -26,6 +26,18 @@ export default {
     gridLines: false,
     min:'',
     max:'',
+    labelColor: '#333',
+    tickLabelColor: '#333',
+    tickColor: '#333',
+    rightHideAxis: true,
+    rightAxisSize: 0,
+    rightLabelOffsetSize: 0,
+    rightAxisLabelColor: '#333',
+    rightAxisTickLabelColor: '#333',
+    rightAxisTickColor: '#333'
+  },
+  topAxis: {
+    hasLine: false
   },
   barThickness: 0.35,
   barHeight: 25,
@@ -39,6 +51,9 @@ export default {
     tickRotation: 0,
     min: '',
     max:'',
+    labelColor: '#333',
+    tickLabelColor: '#333',
+    tickColor: '#333'
   },
   table: {
     label: 'Data Table',
