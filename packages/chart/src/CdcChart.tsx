@@ -507,7 +507,7 @@ export default function CdcChart(
   };
 
   // Format numeric data based on settings in config
-  const formatNumber = (num) => {
+  const formatNumber = (num, axis) => {
     // check if value contains comma and remove it. later will add comma below.
     if(String(num).indexOf(',') !== -1)  num = num.replaceAll(',', '');
     // if num is NaN return num
@@ -515,12 +515,21 @@ export default function CdcChart(
 
     let original = num;
     let prefix = config.dataFormat.prefix;
+    let stringFormattingOptions;
 
-    let stringFormattingOptions = {
-      useGrouping: config.dataFormat.commas ? true : false,
-      minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
-      maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
-    };
+    if(axis !== 'right') {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.commas ? true : false,
+        minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
+        maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+      };
+    } else {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.rightCommas ? true : false,
+        minimumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0,
+        maximumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0
+      };
+    }
 
     num = numberFromString(num);
     
@@ -541,15 +550,24 @@ export default function CdcChart(
 
     let result = ""
 
-    if(prefix) {
+    if(prefix && axis !== 'right') {
       result += prefix
+    }
+
+    if(config.dataFormat.rightPrefix && axis === 'right') {
+      result += config.dataFormat.rightPrefix
     }
 
     result += num
 
-    if(config.dataFormat.suffix) {
+    if(config.dataFormat.suffix && axis !== 'right') {
       result += config.dataFormat.suffix
     }
+
+    if(config.dataFormat.rightSuffix && axis === 'right') {
+      result += config.dataFormat.rightSuffix
+    }
+
     return String(result)
   };
 
