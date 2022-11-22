@@ -590,18 +590,20 @@ const EditorPanel = (props) => {
 					legend: {
 						...state.legend,
 						singleColumn: !state.legend.singleColumn,
+						singleRow:false
 					},
 				});
 				break;
 				case 'singleRowLegend':
-					setState({
-						...state,
-						legend: {
-							...state.legend,
-							singleRow: !state.legend.singleRow,
-						},
-					});
-					break;
+				setState({
+					...state,
+					legend: {
+						...state.legend,
+						singleRow: !state.legend.singleRow,
+						singleColumn:false
+					},
+				});
+				break;
 			case 'dynamicDescription':
 				setState({
 					...state,
@@ -2037,20 +2039,6 @@ const EditorPanel = (props) => {
 											</select>
 										</label>
 									)}
-									{legend.position ==='bottom' && (
-										<label className='checkbox'>
-											<input
-												type='checkbox'
-												checked={legend.singleRow || false}
-												onChange={(event) => {
-													handleEditorChanges('singleRowLegend', event.target.checked);
-												}}
-											>
-											
-											</input>
-												<span className='edit-label'>Single Row Legend</span>
-										</label>
-										)}
 									{'side' === legend.position && (
 										<label className='checkbox'>
 											<input
@@ -2061,6 +2049,18 @@ const EditorPanel = (props) => {
 												}}
 											/>
 											<span className='edit-label'>Single Column Legend</span>
+										</label>
+									)}
+										{'bottom' === legend.position && (
+										<label className='checkbox'>
+											<input
+												type='checkbox'
+												checked={legend.singleRow}
+												onChange={(event) => {
+													handleEditorChanges('singleRowLegend', event.target.checked);
+												}}
+											/>
+											<span className='edit-label'>Single Row Legend</span>
 										</label>
 									)}
 										{'category' !== legend.type && (

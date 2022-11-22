@@ -6,7 +6,7 @@
     "series": [{"dataKey": "Radius"}],
     "fontSize": "medium",
     "dataCutoff": "0.5",
-    "orientation": "horizontal",
+    "orientation": "vertical",
     "dataFormat": {
         "roundTo": 1,
         "commas": false,
@@ -18,7 +18,9 @@
         "right": 5
     },
     "yAxis": {
-        "label": "Measurement (1000km)"
+        "label": "Measurement (1000km)",
+        "rightSeries": "Diameter",
+        "rightLabel": "testing"
     },
     "xAxis": {
         "label": "Planet",
