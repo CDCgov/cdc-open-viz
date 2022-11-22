@@ -225,7 +225,7 @@ export default function LinearChart() {
             label={config.runtime.yAxis.label}
             stroke="#333"
             tickFormat={(tick)=> config.runtime.yAxis.type ==='date' ? formatDate(parseDate(tick)) : config.orientation==='vertical' ? formatNumber(tick) : tick }
-            numTicks={config.runtime.yAxis.numTicks || undefined}
+            numTicks={config.runtime.yAxis.numTicks || data.length}
           >
             {props => {
               const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10;
