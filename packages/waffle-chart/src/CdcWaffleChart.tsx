@@ -429,11 +429,13 @@ const CdcWaffleChart = (
   }, [])
 
   //Reload config if parent passes different config
+  if(configObj?.data) {
   useEffect(() => {
     if(!configObj.dataUrl){
       updateConfig({ ...defaults, ...configObj});
     }
   }, [configObj.data])
+}
 
   let content = (<Loading/>)
 
