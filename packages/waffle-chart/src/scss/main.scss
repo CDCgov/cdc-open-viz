@@ -2,7 +2,6 @@
 @import 'waffle-chart';
 
 .cdc-open-viz-module.type-waffle-chart {
-
   .loader {
     width: 100%;
     text-align: center;
@@ -16,10 +15,10 @@
 
   @include breakpointClass(xs) {
     &.font-small {
-      font-size: .8em;
+      font-size: 0.8em;
     }
     &.font-medium {
-      font-size: .9em;
+      font-size: 0.9em;
     }
     &.font-large {
       font-size: 1em;
@@ -28,7 +27,7 @@
 
   @include breakpointClass(md) {
     &.font-small {
-      font-size: .9em;
+      font-size: 0.9em;
     }
     &.font-large {
       font-size: 1.1em;
