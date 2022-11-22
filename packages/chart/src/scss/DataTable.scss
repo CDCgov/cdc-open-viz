@@ -7,10 +7,11 @@
 .data-table-container {
   .region-table {
     display: table;
-    
-    thead, tbody {
+
+    thead,
+    tbody {
       display: table-row-group;
-  
+
       tr {
         display: table-row;
 
