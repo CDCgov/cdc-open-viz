@@ -188,7 +188,7 @@ export default function PieChart() {
       <svg
         width={width}
         height={height}
-        className={`animated-pie group ${animatedPie ? 'animated' : ''}`}
+        className={`group ${animatedPie ? 'animated' : ''}`}
         role="img"
         aria-label={handleChartAriaLabels(config)}
       >
