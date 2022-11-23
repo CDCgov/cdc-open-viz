@@ -1,12 +1,11 @@
-@import "../utils/variables";
-@import "../themes/index";
+@import '../utils/variables';
+@import '../themes/index';
 
 .cove-editor {
-
-  @import "./../base/reset";
+  @import './../base/reset';
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-areas: "panel content";
+  grid-template-areas: 'panel content';
   height: 100vh;
 
   .cove-editor__panel {
@@ -24,7 +23,7 @@
   .cove-editor__heading {
     font-size: 1.125em;
     user-select: none;
-    padding: .625rem 1.125rem;
+    padding: 0.625rem 1.125rem;
   }
 
   .cove-editor__panel-container {
@@ -54,7 +53,7 @@
     border: 0;
     cursor: pointer;
     transition: left 400ms ease 65ms, background-color 200ms ease;
-    box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
     user-select: none;
     z-index: 8;
 
@@ -63,7 +62,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       position: absolute;
-      content: "\00ab";
+      content: '\00ab';
     }
 
     &.collapsed {
@@ -71,12 +70,12 @@
       margin-left: 0;
 
       &:before {
-        content: "\00bb";
+        content: '\00bb';
       }
     }
 
     &:hover {
-      background-color: #ffffff
+      background-color: #ffffff;
     }
   }
 }
@@ -93,7 +92,7 @@
 
     > label {
       width: 48%;
-      margin-top: 0 !important
+      margin-top: 0 !important;
     }
   }
 
@@ -108,22 +107,22 @@
     border: $lightGray 1px solid;
 
     &:empty {
-      border: none !important
+      border: none !important;
     }
 
     li {
-      padding: .3em .5em;
+      padding: 0.3em 0.5em;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: .9em;
+      font-size: 0.9em;
 
       &:hover {
         background-color: $lightestGray;
       }
 
       span {
-        font-size: .8em;
+        font-size: 0.8em;
         color: #f00;
         cursor: pointer;
       }
@@ -141,7 +140,7 @@
 
   .guidance-link {
     margin: 2em 1em 0;
-    padding: .75em 1em;
+    padding: 0.75em 1em;
 
     svg {
       width: 60px;
@@ -158,7 +157,7 @@
     background: #565656;
     color: #fff;
     font-size: 1.1em;
-    padding: .6em 1em;
+    padding: 0.6em 1em;
     position: relative;
     border-bottom: #565656 3px solid;
     z-index: 3;
@@ -191,7 +190,8 @@
         width: 30%;
         display: inline-block;
 
-        input[type="text"], input[type="number"] {
+        input[type='text'],
+        input[type='number'] {
           width: 50px;
         }
       }
@@ -200,15 +200,15 @@
 
   .remove-column {
     margin: 0 auto;
-    color: #C32B2B;
-    font-size: .7em;
+    color: #c32b2b;
+    font-size: 0.7em;
     font-weight: bold;
     line-height: 1.6em;
     text-decoration: underline;
     text-transform: uppercase;
     border: 0;
     border-radius: 5px;
-    transition: .1s all;
+    transition: 0.1s all;
     float: right;
     outline: 0;
     cursor: pointer;
@@ -218,13 +218,14 @@
     padding-left: 1em;
     border: 0;
     border-left: rgba(0, 0, 0, 0.2) 4px solid;
-    transition: .2s all;
+    transition: 0.2s all;
 
     &:not(:first-child) {
       margin-top: 2em;
     }
 
-    input[type="text"], input[type="number"] {
+    input[type='text'],
+    input[type='number'] {
       font-size: 1em;
     }
 
@@ -238,13 +239,13 @@
 
     &:hover {
       border-left: rgba(0, 0, 0, 0.7) 4px solid;
-      transition: .2s all;
+      transition: 0.2s all;
     }
   }
 
   span.subtext {
     display: block;
-    color: rgba(0, 0, 0, .5);
+    color: rgba(0, 0, 0, 0.5);
     text-transform: none;
     font-weight: normal;
   }
@@ -257,25 +258,25 @@
     list-style: none;
 
     > li {
-      margin-right: .3em;
-      margin-bottom: .3em;
+      margin-right: 0.3em;
+      margin-bottom: 0.3em;
     }
 
     li > div {
       display: block;
       box-sizing: border-box;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
-      background: #F1F1F1;
-      padding: .4em .6em;
-      font-size: .8em;
-      margin-bottom: .3em;
+      background: #f1f1f1;
+      padding: 0.4em 0.6em;
+      font-size: 0.8em;
+      margin-bottom: 0.3em;
       cursor: move;
     }
   }
 
   .info {
-    font-size: .8em;
+    font-size: 0.8em;
     line-height: 1.4em;
     font-style: italic;
     padding-top: 10px;
@@ -290,11 +291,11 @@
     cursor: text;
 
     input.react-tags__search-input {
-      font-size: .8rem;
+      font-size: 0.8rem;
     }
 
     span {
-      display: inline
+      display: inline;
     }
 
     &.is-focused {
@@ -309,23 +310,23 @@
   .react-tags__selected-tag {
     display: inline-block;
     box-sizing: border-box;
-    border: 1px solid #D1D1D1;
+    border: 1px solid #d1d1d1;
     border-radius: 2px;
-    background: #F1F1F1;
-    padding: .4em .6em;
-    font-size: .8em;
-    margin-right: .3em;
-    margin-bottom: .3em;
+    background: #f1f1f1;
+    padding: 0.4em 0.6em;
+    font-size: 0.8em;
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
 
     &::after {
       content: '\2715';
-      color: #AAA;
+      color: #aaa;
       margin-left: 8px;
     }
 
     &:hover,
     &:focus {
-      border-color: #B1B1B1;
+      border-color: #b1b1b1;
     }
   }
 
@@ -337,7 +338,7 @@
       max-width: 100%;
       margin: 0;
       outline: none;
-      padding: .5em .3em;
+      padding: 0.5em 0.3em;
       font-size: inherit;
       line-height: inherit;
     }
@@ -364,7 +365,7 @@
       padding: 0;
       list-style: none;
       background: white;
-      border: 1px solid #D1D1D1;
+      border: 1px solid #d1d1d1;
       border-radius: 2px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
@@ -408,7 +409,7 @@
   text-align: left;
 
   p {
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   .advanced-toggle-link {
@@ -426,17 +427,17 @@
     }
 
     &:hover {
-      color: rgba(0, 0, 0, .7);
+      color: rgba(0, 0, 0, 0.7);
     }
   }
 
   textarea {
     height: 400px;
     width: 100%;
-    font-size: .9em;
-    padding: .5em;
+    font-size: 0.9em;
+    padding: 0.5em;
     font-family: monospace;
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 }
 
@@ -469,7 +470,7 @@ ul.color-palette {
     }
 
     &.selected {
-      border: rgba(0, 0, 0, .8) 2px solid;
+      border: rgba(0, 0, 0, 0.8) 2px solid;
     }
 
     span {
