@@ -4,7 +4,7 @@ export const GlobalContext = createContext({})
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export const GlobalContextProvider = ({ children }) => {
-  const [ globalContextData, setGlobalContextData ] = useState({})
+  const [globalContextData, setGlobalContextData] = useState({})
 
   const openOverlay = (obj, disableBgClose = false) => {
     let payload = { object: obj, show: true, disableBgClose: disableBgClose }
@@ -33,9 +33,5 @@ export const GlobalContextProvider = ({ children }) => {
     }
   }
 
-  return (
-    <GlobalContext.Provider value={globalSettings}>
-      {children}
-    </GlobalContext.Provider>
-  )
+  return <GlobalContext.Provider value={globalSettings}>{children}</GlobalContext.Provider>
 }
