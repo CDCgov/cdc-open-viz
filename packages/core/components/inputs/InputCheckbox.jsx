@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import Check from '../../assets/icon-check.svg'
 import '../../styles/v2/components/input/index.scss'
 
-const InputCheckbox = memo((
-  {
+const InputCheckbox = memo(
+  ({
     label,
     size = 'small',
     activeColor = null,
@@ -16,46 +16,43 @@ const InputCheckbox = memo((
     updateField,
     value: stateValue,
 
-    i = null, min = null, max = null,
+    i = null,
+    min = null,
+    max = null,
     ...attributes
-  }
-) => {
+  }) => {
+    const [value, setValue] = useState(stateValue)
 
-  const [ value, setValue ] = useState(stateValue)
-
-  let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
-  if(fieldName === 'border') {
-    console.table({fieldName, value, stateValue})
-    
-  }
-
-  useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value) {
-      setValue(stateValue)
+    let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
+    if (fieldName === 'border') {
+      console.table({ fieldName, value, stateValue })
     }
-  }, [ stateValue ])
 
-  useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value && updateField) {
-      updateField(section, subsection, fieldName, value, i)
-    }
-  }, [ value ])
+    useEffect(() => {
+      if (stateValue !== undefined && stateValue !== value) {
+        setValue(stateValue)
+      }
+    }, [stateValue])
 
-  return (
-    <div className="input-group">
-      {label && <label>{label}</label>}
-      <div
-        className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')}
-        onClick={() => setValue(!value)}>
-        <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
-             style={value && activeColor ? { backgroundColor: activeColor } : null}>
-          <Check className="cove-input__checkbox-check" style={{fill: activeCheckColor || '#025eaa'}}/>
+    useEffect(() => {
+      if (stateValue !== undefined && stateValue !== value && updateField) {
+        updateField(section, subsection, fieldName, value, i)
+      }
+    }, [value])
+
+    return (
+      <div className='input-group'>
+        {label && <label>{label}</label>}
+        <div className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')} onClick={() => setValue(!value)}>
+          <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`} style={value && activeColor ? { backgroundColor: activeColor } : null}>
+            <Check className='cove-input__checkbox-check' style={{ fill: activeCheckColor || '#025eaa' }} />
+          </div>
+          <input className='cove-input--hidden' type='checkbox' name={name} checked={value || false} readOnly />
         </div>
-        <input className="cove-input--hidden" type="checkbox" name={name} checked={value || false} readOnly/>
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
 
 InputCheckbox.propTypes = {
   label: PropTypes.string,
