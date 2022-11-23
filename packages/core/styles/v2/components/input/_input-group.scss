@@ -34,14 +34,14 @@
   }
 
   &.clear {
-    &[flow="left"] > {
+    &[flow='left'] > {
       :first-child {
         border: 0;
         left: 0;
       }
     }
 
-    &[flow="right"] > {
+    &[flow='right'] > {
       :last-child {
         border: 0;
         right: 0;

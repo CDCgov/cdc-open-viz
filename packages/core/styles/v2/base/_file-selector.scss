@@ -4,9 +4,9 @@
   font-size: 0.875rem;
   color: $mediumGray;
   border: $lightGray 2px dashed;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   cursor: pointer;
-  transition: .1s all;
+  transition: 0.1s all;
 
   &.drag-active {
     background-color: $lightestGray;

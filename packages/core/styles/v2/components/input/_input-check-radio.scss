@@ -8,8 +8,8 @@
   align-items: center;
 
   label,
-  input[type="checkbox"],
-  input[type="radio"] {
+  input[type='checkbox'],
+  input[type='radio'] {
     cursor: pointer;
     user-select: none;
   }
@@ -17,14 +17,14 @@
   label {
     padding-right: 6px;
 
-    + input[type="checkbox"],
-    + input[type="radio"] {
+    + input[type='checkbox'],
+    + input[type='radio'] {
       margin-left: 0;
     }
   }
 
-  input[type="checkbox"],
-  input[type="radio"] {
+  input[type='checkbox'],
+  input[type='radio'] {
     display: inline-block;
     margin-right: 0;
     margin-left: 0;
@@ -35,7 +35,7 @@
     }
   }
 
-  input[type="radio"] {
+  input[type='radio'] {
     margin-bottom: 5px;
   }
 }

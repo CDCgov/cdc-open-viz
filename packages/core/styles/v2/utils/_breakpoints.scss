@@ -1,18 +1,59 @@
 // Breakpoint Classes
 @mixin breakpoint($class) {
-  @if $class == xs {@media (max-width: 767.98px) { @content; }}
-  @else if $class == sm {@media (min-width: 768px) { @content; }}
-  @else if $class == md {@media (min-width: 960px) { @content; }}
-  @else if $class == lg {@media (min-width: 1170px) { @content; }}
-  @else if $class == xl {@media (min-width: 1280px) { @content; }}
-  @else {@warn "Breakpoint mixin supports: xs, sm, md, lg, xl";}
+  @if $class == xs {
+    @media (max-width: 767.98px) {
+      @content;
+    }
+  } @else if $class == sm {
+    @media (min-width: 768px) {
+      @content;
+    }
+  } @else if $class == md {
+    @media (min-width: 960px) {
+      @content;
+    }
+  } @else if $class == lg {
+    @media (min-width: 1170px) {
+      @content;
+    }
+  } @else if $class == xl {
+    @media (min-width: 1280px) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint mixin supports: xs, sm, md, lg, xl";
+  }
 }
 
 @mixin breakpointClass($class) {
-  @if $class == xs { &.xs, &.xxs {@content;} }
-  @else if $class == sm { &.sm, &.md, &.lg, &.xl {@content;} }
-  @else if $class == md { &.md, &.lg, &.xl {@content;} }
-  @else if $class == lg { &.lg, &.xl {@content;} }
-  @else if $class == xl { &.xl {@content;} }
-  @else {@warn "Breakpoint Class mixin supports: xs, sm, md, lg, xl";}
+  @if $class == xs {
+    &.xs,
+    &.xxs {
+      @content;
+    }
+  } @else if $class == sm {
+    &.sm,
+    &.md,
+    &.lg,
+    &.xl {
+      @content;
+    }
+  } @else if $class == md {
+    &.md,
+    &.lg,
+    &.xl {
+      @content;
+    }
+  } @else if $class == lg {
+    &.lg,
+    &.xl {
+      @content;
+    }
+  } @else if $class == xl {
+    &.xl {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint Class mixin supports: xs, sm, md, lg, xl";
+  }
 }
