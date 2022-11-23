@@ -1,498 +1,506 @@
 {
-	"type":"dashboard",
-	"datasets": { 
-		"data1": {
-			"data": [
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "43",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "75",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 1",
-					"Insured Rate": "83",
-					"state": "Florida"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "100",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 1",
-					"Insured Rate": "83",
-					"state": "Florida"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "0",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 1",
-					"Insured Rate": "83",
-					"state": "Florida"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "43",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option1",
-					"filter2": "sub option 2",
-					"Insured Rate": "83",
-					"state": "Florida"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "43",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option2",
-					"filter2": "sub option 2",
-					"Insured Rate": "83",
-					"state": "Florida"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "43",
-					"state": "Alabama"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "0",
-					"state": "Alaska"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "72.7",
-					"state": "Arizona"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "78.7",
-					"state": "Arkansas"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "37.2",
-					"state": "California"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "50.6",
-					"state": "Colorado"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "83.2",
-					"state": "Connecticut"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "90",
-					"state": "Delaware"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "77",
-					"state": "District of Columbia"
-				},
-				{
-					"filter1": "option3",
-					"filter2": "sub option 2",
-					"Insured Rate": "83",
-					"state": "Florida"
-				}
-			]
-		},
-		"data2": {
-			"dataUrl": "../examples/temp-example-data.json"
-		}
-	},
-	"dashboard": {
-	},
-	"rows": [
-		[{"width": 12, "widget": "chart1"}, {}, {}],
-		[{"width": 12, "widget": "map1"}, {}, {}]
-	],
-	"visualizations": {
-		"chart1": {
-			"uid": "chart1",
-			"type": "chart",
-			"dataKey": "data2",
-			"title": "Average Temperature By City (Line Example)",
-			"description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
-			"visualizationType": "Line",
-			"series": [{"dataKey": "New York", "label": "NY"}, {"dataKey": "San Francisco", "label": "SF"}, {"dataKey":"Austin", "label": "AU"}],
-			"filters":[{
-				"label": "Wind",
-				"columnName": "wind"
-			},{
-				"label": "Humidity",
-				"columnName": "humidity"
-			}],
-			"seriesLabel": "City",
-			"fontSize": "large",
-			"dataFormat": {
-				"commas": false,
-				"prefix": "",
-				"suffix": "°"
-			},
-			"padding": {
-				"left": 15,
-				"right": 15
-			},
-			"yAxis": {
-				"label": "Temperature",
-				"paddingPercent": 0.15
-			},
-			"xAxis": {
-				"label": "Date",
-				"dataKey": "date",
-				"type": "date",
-				"dateParseFormat": "%Y-%m-%d",
-				"dateDisplayFormat": "%b %d",
-				"numTicks": 8,
-				"tickRotation": 50
-			},
-			"legend": {
-				"label": "Legend",
-				"above": true,
-				"left": true
-			},
-			"table": {
-				"label": "Data Table",
-				"expanded": false,
-				"download": true
-			},
-			"regions": [
-				{
-					"label": "Region",
-					"color": "black",
-					"background": "green",
-					"from": "2011-10-02",
-					"to": "2011-10-03"
-				}
-			]
-		},
-		"map1": {
-			"uid": "map1",
-			"type": "map",
-			"defaultData": false,
-			"dataKey": "data1",
-			"general": {
-				"title": "Map Example",
-				"subtext": "",
-				"territoriesLabel": "Territories",
-				"type": "data",
-				"geoType": "us",
-				"headerColor": "theme-blue",
-				"showSidebar": true,
-				"showTitle": true,
-				"geoBorderColor": "darkGray",
-				"showDownloadButton": true,
-				"expandDataTable": true
-			},
-			"color": "pinkpurple",
-			"columns": {
-				"geo": {
-					"name": "state",
-					"label": "Location",
-					"tooltip": false,
-					"dataTable": true
-				},
-				"primary": {
-					"name": "Insured Rate",
-					"label": "Data Label",
-					"prefix": "",
-					"suffix": "%",
-					"dataTable": true,
-					"tooltip": true
-				},
-				"navigate": {
-					"name": "link",
-					"tooltip": false,
-					"dataTable": false
-				}
-			},
-			"legend": {
-				"numberOfItems": 3,
-				"position": "side",
-				"title": "Legend Title",
-				"description": "Legend Text",
-				"type": "equalnumber",
-				"specialClasses": ["N/A"]
-			},
-			"filters": [{
-				"label": "Filter 2",
-				"columnName": "filter2"
-			}]
-		}
-	}
+  "type": "dashboard",
+  "datasets": {
+    "data1": {
+      "data": [
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "75",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "100",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 1",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option1",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option2",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "43",
+          "state": "Alabama"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "0",
+          "state": "Alaska"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "72.7",
+          "state": "Arizona"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "78.7",
+          "state": "Arkansas"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "37.2",
+          "state": "California"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "50.6",
+          "state": "Colorado"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83.2",
+          "state": "Connecticut"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "90",
+          "state": "Delaware"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "77",
+          "state": "District of Columbia"
+        },
+        {
+          "filter1": "option3",
+          "filter2": "sub option 2",
+          "Insured Rate": "83",
+          "state": "Florida"
+        }
+      ]
+    },
+    "data2": {
+      "dataUrl": "../examples/temp-example-data.json"
+    }
+  },
+  "dashboard": {},
+  "rows": [
+    [{ "width": 12, "widget": "chart1" }, {}, {}],
+    [{ "width": 12, "widget": "map1" }, {}, {}]
+  ],
+  "visualizations": {
+    "chart1": {
+      "uid": "chart1",
+      "type": "chart",
+      "dataKey": "data2",
+      "title": "Average Temperature By City (Line Example)",
+      "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
+      "visualizationType": "Line",
+      "series": [
+        { "dataKey": "New York", "label": "NY" },
+        { "dataKey": "San Francisco", "label": "SF" },
+        { "dataKey": "Austin", "label": "AU" }
+      ],
+      "filters": [
+        {
+          "label": "Wind",
+          "columnName": "wind"
+        },
+        {
+          "label": "Humidity",
+          "columnName": "humidity"
+        }
+      ],
+      "seriesLabel": "City",
+      "fontSize": "large",
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "°"
+      },
+      "padding": {
+        "left": 15,
+        "right": 15
+      },
+      "yAxis": {
+        "label": "Temperature",
+        "paddingPercent": 0.15
+      },
+      "xAxis": {
+        "label": "Date",
+        "dataKey": "date",
+        "type": "date",
+        "dateParseFormat": "%Y-%m-%d",
+        "dateDisplayFormat": "%b %d",
+        "numTicks": 8,
+        "tickRotation": 50
+      },
+      "legend": {
+        "label": "Legend",
+        "above": true,
+        "left": true
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "download": true
+      },
+      "regions": [
+        {
+          "label": "Region",
+          "color": "black",
+          "background": "green",
+          "from": "2011-10-02",
+          "to": "2011-10-03"
+        }
+      ]
+    },
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "dataKey": "data1",
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "showDownloadButton": true,
+        "expandDataTable": true
+      },
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "Insured Rate",
+          "label": "Data Label",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        }
+      },
+      "legend": {
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend Title",
+        "description": "Legend Text",
+        "type": "equalnumber",
+        "specialClasses": ["N/A"]
+      },
+      "filters": [
+        {
+          "label": "Filter 2",
+          "columnName": "filter2"
+        }
+      ]
+    }
+  }
 }
