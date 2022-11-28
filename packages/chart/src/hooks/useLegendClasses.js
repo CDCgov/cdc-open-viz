@@ -6,6 +6,14 @@ export default function useLegendClasses(config) {
 	if (config.legend.position === "left") {
 		containerClasses.push('left')
 	}
+	if (config.legend.position === "bottom") {
+		containerClasses.push('bottom')
+		innerClasses.push('bottom')
+	}
+
+	if(config.legend.position==='bottom' && config.legend.singleRow){
+		innerClasses.push('single-row')
+	}
 
 	// Legend > Item Ordering
 	if (config.legend.reverseLabelOrder) {
