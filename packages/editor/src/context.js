@@ -1,7 +1,7 @@
-import { createContext } from 'react';
+import { createContext } from 'react'
 
-const GlobalState = createContext();
+const GlobalState = createContext()
 
-GlobalState.displayName = 'GlobalState';
+GlobalState.displayName = 'GlobalState'
 
-export default GlobalState;
+export default GlobalState

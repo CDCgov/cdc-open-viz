@@ -1,4 +1,6 @@
-.collapsed + .table-container { border-bottom: none; }
+.collapsed + .table-container {
+  border-bottom: none;
+}
 .table-container {
   overflow-x: auto;
   border-right: 1px solid $lightGray;
@@ -8,13 +10,13 @@
 
 div.data-table-heading {
   background: rgba(0, 0, 0, 0.05);
-  padding: .5em .7em;
+  padding: 0.5em 0.7em;
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
   background-image: url(~@cdc/core/assets/icon-minus.svg);
   background-size: 15px 15px; // Need to define both for IE11
-  background-position: right .7em center;
+  background-position: right 0.7em center;
   background-repeat: no-repeat;
   &:focus {
     z-index: 2;
@@ -23,7 +25,7 @@ div.data-table-heading {
   &.collapsed {
     background-image: url(~@cdc/core/assets/icon-plus.svg);
     background-size: 15px 15px; // Need to define both for IE11
-    background-position: right .7em center;
+    background-position: right 0.7em center;
     background-repeat: no-repeat;
     border-bottom: $lightGray 1px solid;
   }
@@ -39,7 +41,7 @@ table.data-table {
   overflow: auto;
   appearance: none;
   * {
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 
   thead {
@@ -67,14 +69,14 @@ table.data-table {
       top: 0;
       bottom: 0;
       right: 0;
-      touch-action:none;
+      touch-action: none;
     }
     tr {
       text-align: left;
     }
     th,
     td {
-      padding: .5em 1.3em .5em .7em;
+      padding: 0.5em 1.3em 0.5em 0.7em;
       line-height: normal;
       position: relative;
       text-align: left;
@@ -88,7 +90,7 @@ table.data-table {
     th.sort {
       background-color: darken($mediumGray, 10%);
       background-repeat: no-repeat;
-      background-position: right .5em center;
+      background-position: right 0.5em center;
       background-size: 10px 5px;
     }
 
@@ -104,7 +106,7 @@ table.data-table {
 
     th:last-child,
     td:last-child {
-      border-right: 0
+      border-right: 0;
     }
   }
 
@@ -112,21 +114,21 @@ table.data-table {
     tr {
       width: 100%;
       &:hover {
-        background: rgba(0, 0, 0, 0.05)
+        background: rgba(0, 0, 0, 0.05);
       }
     }
   }
 
   tr {
-    border-bottom: solid 1px #E5E5E5;
+    border-bottom: solid 1px #e5e5e5;
     min-width: 100%; // Needed to fill content up
     &:last-child {
-      border-bottom: 0
+      border-bottom: 0;
     }
   }
 
   td {
-    padding: .3em .7em;
+    padding: 0.3em 0.7em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
   }
 
@@ -138,17 +140,19 @@ table.data-table {
     &:last-child {
       border-right: 0 !important;
     }
-    &:first-child {
-      flex-grow: 1;
-    }
+  }
+
+  th {
+    flex-grow: 1;
   }
 
   td {
     position: relative;
+    flex-grow: 1;
   }
 
   td a {
-    padding: .3em .7em;
+    padding: 0.3em 0.7em;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -178,16 +182,17 @@ table.data-table {
     h3 {
       font-size: 1.3rem;
       font-weight: 600;
-      margin-bottom: .3rem;
+      margin-bottom: 0.3rem;
     }
   }
   tr:hover {
     background: #fff;
   }
-  th, td {
+  th,
+  td {
     width: 50%;
     &::before {
-      content: "\00a0";
+      content: '\00a0';
     }
   }
 }
@@ -201,18 +206,18 @@ table.data-table {
     margin: 0 1rem 0 0;
     display: flex;
     li + li {
-      margin-left: .3rem;
+      margin-left: 0.3rem;
     }
     button {
       background: $mediumGray;
-      padding: .6rem .8rem;
+      padding: 0.6rem 0.8rem;
       &:hover {
         background: lighten($mediumGray, 5%);
       }
     }
     button.btn-next {
       &::before {
-        content: " ";
+        content: ' ';
         background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
         background-size: 10px 5px;
         width: 10px;
@@ -223,7 +228,7 @@ table.data-table {
     }
     button.btn-prev {
       &::before {
-        content: " ";
+        content: ' ';
         background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
         background-size: 10px 5px;
         width: 10px;
@@ -234,7 +239,7 @@ table.data-table {
     }
     button[disabled] {
       background: $mediumGray;
-      opacity: .3;
+      opacity: 0.3;
       cursor: default;
       &:hover {
         background: $mediumGray;
@@ -247,9 +252,9 @@ table.data-table {
   color: #fff;
   float: right;
   text-decoration: none;
-  transition: .3s all;
+  transition: 0.3s all;
   margin: 1em 0;
   &:hover {
-    transition: .3s all;
+    transition: 0.3s all;
   }
 }

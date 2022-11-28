@@ -1,6 +1,6 @@
 {
   "title": "",
-  "dataUrl":  "/examples/date-exclusions-data.json",
+  "dataUrl": "/examples/date-exclusions-data.json",
   "type": "chart",
   "theme": "theme-blue",
   "fontSize": "medium",

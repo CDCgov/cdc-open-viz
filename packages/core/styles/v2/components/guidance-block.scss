@@ -1,10 +1,10 @@
-@import "../utils/variables";
-@import "../themes/color-definitions";
+@import '../utils/variables';
+@import '../themes/color-definitions';
 
 .cove-guidance-block {
   display: block;
   position: relative;
-  padding: .75rem 1rem;
+  padding: 0.75rem 1rem;
   margin-left: 5px;
   color: #444;
   text-decoration: none;
@@ -14,7 +14,7 @@
   transition: all 200ms $transition-expo-out;
 
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     top: -1px;
     left: -5px;
@@ -29,7 +29,7 @@
   &:active {
     background: $lightestGray;
     color: #444;
-    transition: .2s all;
+    transition: 0.2s all;
   }
 
   &:after {
@@ -70,5 +70,5 @@
 }
 
 .cove-guidance-block__content {
-  font-size: .875rem;
+  font-size: 0.875rem;
 }
