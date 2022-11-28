@@ -10,22 +10,34 @@ export default {
   lollipopShape: 'circle',
   lollipopColorStyle: 'two-tone',
   visualizationSubType: 'regular',
-  barStyle:'',
-  roundingStyle:'standard',
-  tipRounding:'top',
+  barStyle: '',
+  roundingStyle: 'standard',
+  tipRounding: 'top',
   padding: {
     left: 5,
     right: 5
   },
   yAxis: {
     hideAxis: false,
-    displayNumbersOnBar:false,
+    displayNumbersOnBar: false,
     hideLabel: false,
     hideTicks: false,
     size: 50,
     gridLines: false,
-    min:'',
-    max:'',
+    min: '',
+    max: '',
+    labelColor: '#333',
+    tickLabelColor: '#333',
+    tickColor: '#333',
+    rightHideAxis: true,
+    rightAxisSize: 0,
+    rightLabelOffsetSize: 0,
+    rightAxisLabelColor: '#333',
+    rightAxisTickLabelColor: '#333',
+    rightAxisTickColor: '#333'
+  },
+  topAxis: {
+    hasLine: false
   },
   barThickness: 0.35,
   barHeight: 25,
@@ -38,14 +50,17 @@ export default {
     size: 75,
     tickRotation: 0,
     min: '',
-    max:'',
+    max: '',
+    labelColor: '#333',
+    tickLabelColor: '#333',
+    tickColor: '#333'
   },
   table: {
     label: 'Data Table',
     expanded: true,
-    limitHeight:false,
-    height:"",
-    caption:""
+    limitHeight: false,
+    height: '',
+    caption: ''
   },
   orientation: 'vertical',
   legend: {
@@ -56,10 +71,10 @@ export default {
     reverseLabelOrder:false,
     description:'',
     dynamicLegend: false,
-    dynamicLegendDefaultText: "Show All",
+    dynamicLegendDefaultText: 'Show All',
     dynamicLegendItemLimit: 5,
     dynamicLegendItemLimitMessage: 'Dynamic Legend Item Limit Hit.',
-    dynamicLegendChartMessage: 'Select Options from the Legend',
+    dynamicLegendChartMessage: 'Select Options from the Legend'
   },
   exclusions: {
     active: false,
@@ -68,7 +83,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: {commas:false,prefix:'',suffix:""},
+  dataFormat: { commas: false, prefix: '', suffix: '' },
   confidenceKeys: {},
   visual: {
     border: true,

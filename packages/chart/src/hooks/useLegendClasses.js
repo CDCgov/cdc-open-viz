@@ -1,6 +1,6 @@
 export default function useLegendClasses(config) {
-	let containerClasses = ['legend-container']
-	let innerClasses = ['legend-container__inner'];
+  let containerClasses = ['legend-container']
+  let innerClasses = ['legend-container__inner']
 
 	// Legend Positioning
 	if (config.legend.position === "left") {
@@ -15,14 +15,14 @@ export default function useLegendClasses(config) {
 		innerClasses.push('single-row')
 	}
 
-	// Legend > Item Ordering
-	if (config.legend.reverseLabelOrder) {
-		innerClasses.push('d-flex')
-		innerClasses.push('flex-column-reverse')
-	}
+  // Legend > Item Ordering
+  if (config.legend.reverseLabelOrder) {
+    innerClasses.push('d-flex')
+    innerClasses.push('flex-column-reverse')
+  }
 
-	return {
-		containerClasses,
-		innerClasses
-	};
+  return {
+    containerClasses,
+    innerClasses
+  }
 }
