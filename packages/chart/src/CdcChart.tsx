@@ -690,8 +690,8 @@ export default function CdcChart(
             {/* Visualization */}
             {config?.introText && <section className="introText">{parse(config.introText)}</section>}
             <div
-              className={`chart-container${
-                config.legend.hide ? " legend-hidden" : ""
+              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
+              }${config.legend.hide ? " legend-hidden" : "" 
               }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}

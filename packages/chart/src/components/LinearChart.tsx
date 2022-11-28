@@ -25,6 +25,7 @@ import useReduceData from '../hooks/useReduceData';
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels } = useContext<any>(Context);
   let [ width ] = dimensions;
+  console.log('WIDTH',width)
   const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
   const [animatedChart, setAnimatedChart] = useState<boolean>(false);
   const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
@@ -42,9 +43,9 @@ export default function LinearChart() {
     }
   }, [dataRef?.isIntersecting, config.animate]);
 
-  if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
+  if(config && config.legend && !config.legend.hide && config.legend.position !=='bottom' && (currentViewport === 'lg' || currentViewport === 'md'))  {
     width = width * 0.73;
-  }
+  };
 
   const height = config.aspectRatio ? (width * config.aspectRatio) : config.height;
 
