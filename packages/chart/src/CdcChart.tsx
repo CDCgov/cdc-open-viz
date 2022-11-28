@@ -9,6 +9,7 @@ import 'whatwg-fetch'
 import { scaleOrdinal } from '@visx/scale'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
+import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 
@@ -480,6 +481,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let prefix = config.dataFormat.prefix
     let stringFormattingOptions
+    let formatSuffix = format('.2s')
 
     if (axis !== 'right') {
       stringFormattingOptions = {
@@ -513,6 +515,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     num = num.toLocaleString('en-US', stringFormattingOptions)
 
     let result = ''
+
+    if (config.dataFormat.useFormat) {
+      console.log('num', num)
+      num = formatSuffix(num)
+    }
 
     if (prefix && axis !== 'right') {
       result += prefix
