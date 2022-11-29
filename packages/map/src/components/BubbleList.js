@@ -16,7 +16,6 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
   if (!sortedRuntimeData) return
 
   const clickTolerance = 10
-
   // Set bubble sizes
   var size = scaleLinear().domain([hasBubblesWithZeroOnMap, maxDataValue]).range([state.visual.minBubbleSize, state.visual.maxBubbleSize])
 
@@ -34,7 +33,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         const legendColors = applyLegendToRow(country)
 
         let primaryKey = state.columns.primary.name
-        if ((Math.floor(Number(size(country[primaryKey]))) === 0 || country[primaryKey] === '') && !state.visual.showBubbleZeros) return
+        if ((Math.floor(Number(country[primaryKey])) === 0 || country[primaryKey] === '') && !state.visual.showBubbleZeros) return
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -117,7 +116,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
         if (item[primaryKey] === null) item[primaryKey] = ''
 
         // Return if hiding zeros on the map
-        if ((Math.floor(Number(size(item[primaryKey]))) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros) return
+        if ((Math.floor(Number(item[primaryKey])) === 0 || item[primaryKey] === '') && !state.visual.showBubbleZeros) return
 
         if (!stateData) return true
         let longitude = Number(stateData.Longitude)
