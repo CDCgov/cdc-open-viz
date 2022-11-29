@@ -6,3 +6,5 @@ packages/map/src/data/us-regions-topo.json
 packages/map/src/data/us-regions-topo-2.json
 packages/map/src/data/county-topo.json
 packages/map/src/data/county-map.json
+
+packages/chart/src/scss/alert.scss

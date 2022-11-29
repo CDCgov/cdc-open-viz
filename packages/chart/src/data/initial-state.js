@@ -63,13 +63,19 @@ export default {
     caption: ''
   },
   orientation: 'vertical',
+  alerts: [
+    {
+      type: 'info',
+      message: 'Filter Changed'
+    }
+  ],
   legend: {
     behavior: 'isolate',
     position: 'right',
-    singleRow:false,
-    colorCode:'',
-    reverseLabelOrder:false,
-    description:'',
+    singleRow: false,
+    colorCode: '',
+    reverseLabelOrder: false,
+    description: '',
     dynamicLegend: false,
     dynamicLegendDefaultText: 'Show All',
     dynamicLegendItemLimit: 5,

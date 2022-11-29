@@ -35,6 +35,8 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 
 import './scss/main.scss'
 
@@ -536,7 +538,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
+  const { legend, title, description, visualizationType, alerts, theme } = config
 
   // Select appropriate chart type
   const chartComponents = {
@@ -653,15 +655,25 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
               Skip Over Chart Container
             </a>
+
+            {alerts && (
+              <ul className='cove__alert-container'>
+                {alerts.map((alert, index) => (
+                  <li className={`cove__alert cove__alert--${alert.type} ${theme}`}>
+                    <Icon display='info' style={{ marginLeft: '0.5rem' }} base={false} alt='alert information' color='#000' size='15' />
+                    <p>{alert.message}</p>
+                    <Button style={{}} hoverStyle={false} role='button' fluid={false} onClick={e => e.preventDefault()} active={true} loading={false} loadingText={''} flexCenter={false}>
+                      Apply
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
-            <div
-              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : "" 
-              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
+            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            <div className={`chart-container ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 

@@ -113,6 +113,10 @@ $theme: (
       .cove-component__content.component--has-background:not(.component--hideBackgroundColor) {
         background: string.unquote(nth($theme-colors, 3));
       }
+
+      .cove__alert {
+        background: string.unquote(nth($theme-colors, 2));
+      }
     }
 
     &.theme-#{$theme-name} {
