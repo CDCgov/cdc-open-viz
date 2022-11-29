@@ -66,9 +66,10 @@ export default {
   legend: {
     behavior: 'isolate',
     position: 'right',
-    colorCode: '',
-    reverseLabelOrder: false,
-    description: '',
+    singleRow:false,
+    colorCode:'',
+    reverseLabelOrder:false,
+    description:'',
     dynamicLegend: false,
     dynamicLegendDefaultText: 'Show All',
     dynamicLegendItemLimit: 5,

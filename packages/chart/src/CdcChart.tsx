@@ -656,8 +656,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
-            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
+            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
+            <div
+              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
+              }${config.legend.hide ? " legend-hidden" : "" 
+              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+            >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 
