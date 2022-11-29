@@ -352,7 +352,7 @@ export default function LinearChart() {
           {hasRightAxis &&
             <AxisRight
             scale={yScaleRight}
-            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize - config.yAxis.size}
+            left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize}
             label={config.yAxis.rightLabel}
             tickFormat={tick => formatNumber(tick, 'right')}
             numTicks={config.runtime.yAxis.rightNumTicks || undefined}
