@@ -1,0 +1,30 @@
+@use 'sass:string';
+@import '~@cdc/core/styles/v2/themes/color-definitions';
+
+.cove__alert-container {
+  list-style: none;
+
+  .cove__alert {
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+
+    p { margin-left: 5px; }
+    button { margin-left: auto; }
+  }
+
+}
+
+
+// alert colors
+.cdc-open-viz-module .cove__alert,
+.cove .cove__alert {
+  @each $theme-name, $theme-colors in $theme {
+    &.theme-#{$theme-name} {
+      margin: .6rem 1rem;
+      padding: 10px;
+      background-color: string.unquote(nth($theme-colors, 3));
+      border-top: string.unquote(nth($theme-colors, 1))
+    }
+  }
+}
