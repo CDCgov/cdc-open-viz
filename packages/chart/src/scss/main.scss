@@ -115,10 +115,36 @@
     width: 100%;
     padding: 15px;
     vertical-align: top;
-    text-align: center;
+    text-align: left;
     border: 1px solid $lightGray;
     order: 1;
     position: relative;
+
+    &__inner{
+      &.bottom{
+        display: grid;
+        grid-template-columns: auto auto;
+      }
+
+      &.single-row{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+   
+         & >div{
+          padding:0 1.2em 1em 0;
+        }
+
+        & div>span {
+         margin-right: 0!important;
+        }
+
+        & >div.legend-item{
+          margin: 0 !important;
+        }
+       }
+    }
 
     .legend-reset {
       font-size: 0.7em;
@@ -158,7 +184,17 @@
 
     h2 {
       font-size: 1.3em;
-      margin-bottom: 0.3em;
+    }
+
+    h2,p{
+      margin-bottom: 0.8em;
+    }
+    & div.legend-item{
+      margin-bottom: 0.5em !important;
+
+      &:last-child{
+       margin: 0 !important;
+      }
     }
 
     .legend-item {
@@ -386,26 +422,7 @@
     }
   }
 
-  .legend-container__inner{
-    &.bottom{
-      display: grid;
-      grid-template-columns: auto auto;
-    }
-    &.single-row{
-     display: flex;
-     flex-direction: row;
-     
-     flex-wrap: wrap;
-     justify-content: flex-start;
-
-     & >div{
-       padding:0 1em 1em 0;
-     }
-     & div>span {
-      margin-right: 0!important;
-     }
-    }
-  }
+ 
   
   @include breakpointClass(lg) {
     &.font-small {
