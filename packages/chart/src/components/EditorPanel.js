@@ -992,6 +992,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
+                      <CheckBox  value={config.yAxis.isLegendValue} section='yAxis'  fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField}   /> 
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}

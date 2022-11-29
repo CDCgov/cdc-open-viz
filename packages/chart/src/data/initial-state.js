@@ -34,7 +34,8 @@ export default {
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
-    rightAxisTickColor: '#333'
+    rightAxisTickColor: '#333',
+    isLegendValue:false
   },
   topAxis: {
     hasLine: false
