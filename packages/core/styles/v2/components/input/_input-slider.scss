@@ -91,7 +91,7 @@
     }
 
     .cove-input__slider-track {
-      box-shadow: inset 1px 1px 3px rgb(0 0 0 / 40%)
+      box-shadow: inset 1px 1px 3px rgb(0 0 0 / 40%);
     }
 
     &.active {
@@ -100,7 +100,7 @@
       }
 
       .cove-input__slider-track {
-        box-shadow: inset 1px 1px 3px rgb(0 0 0 / 60%)
+        box-shadow: inset 1px 1px 3px rgb(0 0 0 / 60%);
       }
     }
   }
@@ -150,7 +150,6 @@
 
   &.slider--3d {
     .cove-input__slider-button {
-
       &:after {
         width: calc(100% - 8px);
         height: calc(100% - 8px);

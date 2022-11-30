@@ -1,156 +1,162 @@
 {
-	"type":"dashboard",
-	"data": [
-		{
-			"name": "Jupiter",
-			"Radius": "10.97",
-			"Diameter": "22",
-			"distance": "0"
-		},
-		{
-			"name": "Saturn",
-			"Radius": "9.14",
-			"Diameter": "18",
-			"distance": "0"
-		},
-		{
-			"name": "Uranus",
-			"Radius": "3.98",
-			"Diameter": "8",
-			"distance": "0"
-		},
-		{
-			"name": "Neptune",
-			"Radius": "3.86",
-			"Diameter": "7",
-			"distance": "0"
-		},
-		{
-			"name": "Earth",
-			"Radius": "1",
-			"Diameter": "2",
-			"distance": "0"
-		},
-		{
-			"name": "Venus",
-			"Radius": "0.950",
-			"Diameter": "2",
-			"distance": "0"
-		},
-		{
-			"name": "Mars",
-			"Radius": "0.532",
-			"Diameter": "1",
-			"distance": "0"
-		},
-		{
-			"name": "Mercury",
-			"Radius": "0.383",
-			"Diameter": "0.7",
-			"distance": "0"
-		},
-		{
-			"name": "Pluto",
-			"Radius": "0.181",
-			"Diameter": "0.3",
-			"distance": "0"
-		}
-	],
-	"dashboard": {
-		"filters": [{
-			"label": "Filter 1",
-			"columnName": "filter1"
-		}]
-	},
-	"rows": [
-		[{"width": 12, "widget": "chart1"}, {}, {}],
-		[{"width": 12, "widget": "map1"}, {}, {}]
-	],
-	"visualizations": {
-		"chart1": {
-			"uid": "chart1",
-			"type": "chart",
-			"title": "Chart Example",
-			"visualizationType": "Pie",
-			"palette": "qualitative-soft",
-			"filters": [{
-				"label": "Filter 2",
-				"columnName": "filter2"
-			}],
-			"aspectRatio": 1,
-			"dataFormat": {
-				"roundTo": 1,
-				"commas": false,
-				"prefix": "",
-				"suffix": ""
-			},
-			"yAxis": {
-				"label": "Insured Rate",
-				"dataKey": "Insured Rate"
-			},
-			"xAxis": {
-				"label": "State",
-				"dataKey": "state"
-			},
-			"legend": {
-				"hide": false
-			},
-			"table": {
-				"label": "Data Table",
-				"expanded": false
-			}
-		},
-		"map1": {
-			"uid": "map1",
-			"type": "map",
-			"defaultData": false,
-			"general": {
-				"title": "Map Example",
-				"subtext": "",
-				"territoriesLabel": "Territories",
-				"type": "data",
-				"geoType": "us",
-				"headerColor": "theme-blue",
-				"showSidebar": true,
-				"showTitle": true,
-				"geoBorderColor": "darkGray",
-				"showDownloadButton": true,
-				"expandDataTable": true
-			},
-			"color": "pinkpurple",
-			"columns": {
-				"geo": {
-					"name": "state",
-					"label": "Location",
-					"tooltip": false,
-					"dataTable": true
-				},
-				"primary": {
-					"name": "Insured Rate",
-					"label": "Data Label",
-					"prefix": "",
-					"suffix": "%",
-					"dataTable": true,
-					"tooltip": true
-				},
-				"navigate": {
-					"name": "link",
-					"tooltip": false,
-					"dataTable": false
-				}
-			},
-			"legend": {
-				"numberOfItems": 3,
-				"position": "side",
-				"title": "Legend Title",
-				"description": "Legend Text",
-				"type": "equalnumber",
-				"specialClasses": ["N/A"]
-			},
-			"filters": [{
-				"label": "Filter 2",
-				"columnName": "filter2"
-			}]
-		}
-	}
+  "type": "dashboard",
+  "data": [
+    {
+      "name": "Jupiter",
+      "Radius": "10.97",
+      "Diameter": "22",
+      "distance": "0"
+    },
+    {
+      "name": "Saturn",
+      "Radius": "9.14",
+      "Diameter": "18",
+      "distance": "0"
+    },
+    {
+      "name": "Uranus",
+      "Radius": "3.98",
+      "Diameter": "8",
+      "distance": "0"
+    },
+    {
+      "name": "Neptune",
+      "Radius": "3.86",
+      "Diameter": "7",
+      "distance": "0"
+    },
+    {
+      "name": "Earth",
+      "Radius": "1",
+      "Diameter": "2",
+      "distance": "0"
+    },
+    {
+      "name": "Venus",
+      "Radius": "0.950",
+      "Diameter": "2",
+      "distance": "0"
+    },
+    {
+      "name": "Mars",
+      "Radius": "0.532",
+      "Diameter": "1",
+      "distance": "0"
+    },
+    {
+      "name": "Mercury",
+      "Radius": "0.383",
+      "Diameter": "0.7",
+      "distance": "0"
+    },
+    {
+      "name": "Pluto",
+      "Radius": "0.181",
+      "Diameter": "0.3",
+      "distance": "0"
+    }
+  ],
+  "dashboard": {
+    "filters": [
+      {
+        "label": "Filter 1",
+        "columnName": "filter1"
+      }
+    ]
+  },
+  "rows": [
+    [{ "width": 12, "widget": "chart1" }, {}, {}],
+    [{ "width": 12, "widget": "map1" }, {}, {}]
+  ],
+  "visualizations": {
+    "chart1": {
+      "uid": "chart1",
+      "type": "chart",
+      "title": "Chart Example",
+      "visualizationType": "Pie",
+      "palette": "qualitative-soft",
+      "filters": [
+        {
+          "label": "Filter 2",
+          "columnName": "filter2"
+        }
+      ],
+      "aspectRatio": 1,
+      "dataFormat": {
+        "roundTo": 1,
+        "commas": false,
+        "prefix": "",
+        "suffix": ""
+      },
+      "yAxis": {
+        "label": "Insured Rate",
+        "dataKey": "Insured Rate"
+      },
+      "xAxis": {
+        "label": "State",
+        "dataKey": "state"
+      },
+      "legend": {
+        "hide": false
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false
+      }
+    },
+    "map1": {
+      "uid": "map1",
+      "type": "map",
+      "defaultData": false,
+      "general": {
+        "title": "Map Example",
+        "subtext": "",
+        "territoriesLabel": "Territories",
+        "type": "data",
+        "geoType": "us",
+        "headerColor": "theme-blue",
+        "showSidebar": true,
+        "showTitle": true,
+        "geoBorderColor": "darkGray",
+        "showDownloadButton": true,
+        "expandDataTable": true
+      },
+      "color": "pinkpurple",
+      "columns": {
+        "geo": {
+          "name": "state",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "name": "Insured Rate",
+          "label": "Data Label",
+          "prefix": "",
+          "suffix": "%",
+          "dataTable": true,
+          "tooltip": true
+        },
+        "navigate": {
+          "name": "link",
+          "tooltip": false,
+          "dataTable": false
+        }
+      },
+      "legend": {
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "Legend Title",
+        "description": "Legend Text",
+        "type": "equalnumber",
+        "specialClasses": ["N/A"]
+      },
+      "filters": [
+        {
+          "label": "Filter 2",
+          "columnName": "filter2"
+        }
+      ]
+    }
+  }
 }

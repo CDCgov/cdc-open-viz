@@ -1,125 +1,125 @@
 {
-	"type": "chart",
-	"title": "Example Line Chart",
-	"theme": "theme-green",
-	"fontSize": "medium",
-	"height": "375",
-	"padding": {
-		"left": 5,
-		"right": 5
-	},
-	"yAxis": {
-		"size": "75",
-		"gridLines": false,
-		"label": "Y-Axis Example Label",
-		"numTicks": "9"
-	},
-	"barThickness": 0.35,
-	"xAxis": {
-		"size": "77",
-		"tickRotation": "25",
-		"dataKey": "Date",
-		"label": "X-Axis Example Label",
-		"type": "date",
-		"dateParseFormat": "%d/%m/%Y",
-		"dateDisplayFormat": "%d/%m/%Y"
-	},
-	"table": {
-		"label": "Data Table",
-		"expanded": true,
-		"download": true
-	},
-	"legend": {
-		"behavior": "isolate",
-		"position": "right",
-		"label": "Type of Data",
-		"dynamicLegend": true
-	},
-	"palette": "qualitative-bold",
-	"labels": false,
-	"dataFormat": {},
-	"confidenceKeys": {},
-	"data": [
-		{
-			"Date": "1/15/2016",
-			"Alabama": "90",
-			"Alaska": "135",
-			"Arizona": "300",
-			"Arkansas": "95",
-			"California": "120",
-			"Colorado": "310"
-		},
-		{
-			"Date": "2/15/2016",
-			"Alabama": "40",
-			"Alaska": "90",
-			"Arizona": "240",
-			"Arkansas": "60",
-			"California": "160",
-			"Colorado": "200"
-		},
-		{
-			"Date": "3/15/2016",
-			"Alabama": "50",
-			"Alaska": "300",
-			"Arizona": "290",
-			"Arkansas": "100",
-			"California": "200",
-			"Colorado": "250"
-		},
-		{
-			"Date": "4/15/2016",
-			"Alabama": "120",
-			"Alaska": "160",
-			"Arizona": "230",
-			"Arkansas": "180",
-			"California": "160",
-			"Colorado": "220"
-		},
-		{
-			"Date": "5/15/2016",
-			"Alabama": "80",
-			"Alaska": "350",
-			"Arizona": "300",
-			"Arkansas": "150",
-			"California": "130",
-			"Colorado": "100"
-		},
-		{
-			"Date": "6/15/2016",
-			"Alabama": "90",
-			"Alaska": "220",
-			"Arizona": "320",
-			"Arkansas": "100",
-			"California": "220",
-			"Colorado": "300"
-		}
-	],
-	"visualizationType": "Line",
-	"series": [
-		{
-			"dataKey": "Alabama",
-			"type": "Bar"
-		},
-		{
-			"dataKey": "Alaska",
-			"type": "Bar"
-		},
-		{
-			"dataKey": "Arizona",
-			"type": "Bar"
-		},
-		{
-			"dataKey": "Arkansas",
-			"type": "Bar"
-		},
-		{
-			"dataKey": "California",
-			"type": "Bar"
-		},
-		{
-			"dataKey": "Colorado",
-			"type": "Bar"
-		}
-	]
+  "type": "chart",
+  "title": "Example Line Chart",
+  "theme": "theme-green",
+  "fontSize": "medium",
+  "height": "375",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "size": "75",
+    "gridLines": false,
+    "label": "Y-Axis Example Label",
+    "numTicks": "9"
+  },
+  "barThickness": 0.35,
+  "xAxis": {
+    "size": "77",
+    "tickRotation": "25",
+    "dataKey": "Date",
+    "label": "X-Axis Example Label",
+    "type": "date",
+    "dateParseFormat": "%d/%m/%Y",
+    "dateDisplayFormat": "%d/%m/%Y"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "download": true
+  },
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "label": "Type of Data",
+    "dynamicLegend": true
+  },
+  "palette": "qualitative-bold",
+  "labels": false,
+  "dataFormat": {},
+  "confidenceKeys": {},
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Alabama": "90",
+      "Alaska": "135",
+      "Arizona": "300",
+      "Arkansas": "95",
+      "California": "120",
+      "Colorado": "310"
+    },
+    {
+      "Date": "2/15/2016",
+      "Alabama": "40",
+      "Alaska": "90",
+      "Arizona": "240",
+      "Arkansas": "60",
+      "California": "160",
+      "Colorado": "200"
+    },
+    {
+      "Date": "3/15/2016",
+      "Alabama": "50",
+      "Alaska": "300",
+      "Arizona": "290",
+      "Arkansas": "100",
+      "California": "200",
+      "Colorado": "250"
+    },
+    {
+      "Date": "4/15/2016",
+      "Alabama": "120",
+      "Alaska": "160",
+      "Arizona": "230",
+      "Arkansas": "180",
+      "California": "160",
+      "Colorado": "220"
+    },
+    {
+      "Date": "5/15/2016",
+      "Alabama": "80",
+      "Alaska": "350",
+      "Arizona": "300",
+      "Arkansas": "150",
+      "California": "130",
+      "Colorado": "100"
+    },
+    {
+      "Date": "6/15/2016",
+      "Alabama": "90",
+      "Alaska": "220",
+      "Arizona": "320",
+      "Arkansas": "100",
+      "California": "220",
+      "Colorado": "300"
+    }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Alabama",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Alaska",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Arizona",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Arkansas",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "California",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Colorado",
+      "type": "Bar"
+    }
+  ]
 }

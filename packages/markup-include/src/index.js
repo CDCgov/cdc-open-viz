@@ -8,11 +8,11 @@ const domContainers = document.querySelectorAll('.react-container')
 
 let isEditor = window.location.href.includes('editor=true')
 
-domContainers.forEach((domContainer) => {
+domContainers.forEach(domContainer => {
   render(
     <React.StrictMode>
       <GlobalContextProvider>
-        <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor}/>
+        <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
       </GlobalContextProvider>
     </React.StrictMode>,
     domContainer

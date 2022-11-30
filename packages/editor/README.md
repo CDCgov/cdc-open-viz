@@ -5,10 +5,11 @@
 React component for creating configurations for the [dashboard](https://github.com/CDCgov/cdc-open-viz/tree/integration/main/dashboard), [map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map), [chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart) and [data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) packages. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
 
 **Examples**
-* [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
-* [World Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-world-data-map.html)
-* [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
-* [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
+
+- [Numeric Maps](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps.html)
+- [World Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-world-data-map.html)
+- [Categorical Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-categorical-maps.html)
+- [Filterable Map](https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-numeric-maps-filterable.html)
 
 ### Installation and Usage
 
@@ -42,6 +43,6 @@ For more information and example data files, see the [CDC's official guidance](h
 
 ### Properties
 
-| Property          | Type     | Description                                                                                                                                                                                                                                                                             |
-|-------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| config            | Object   | You can pass an existing config object to make changes to it with the editor. If no config is passed, it lets you start from scratch.|                                                                                                                                                                                                        |
+| Property | Type   | Description                                                                                                                           |
+| -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| config   | Object | You can pass an existing config object to make changes to it with the editor. If no config is passed, it lets you start from scratch. |     |

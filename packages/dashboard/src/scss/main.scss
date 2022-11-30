@@ -1,5 +1,5 @@
 @import '~@cdc/core/styles/base';
-@import "~@cdc/core/styles/heading-colors";
+@import '~@cdc/core/styles/heading-colors';
 @import 'mixins';
 @import 'variables';
 
@@ -12,7 +12,7 @@
 
   .editor-heading {
     background-color: #ddd;
-    border-bottom: #C7C7C7 1px solid;
+    border-bottom: #c7c7c7 1px solid;
     padding: 0 1em;
     display: flex;
     height: 6em;
@@ -32,17 +32,17 @@
         display: flex;
         span {
           font-weight: bold;
-          padding-right: .3em;
+          padding-right: 0.3em;
         }
       }
     }
 
     .heading-body {
-      padding: .5em;
+      padding: 0.5em;
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         margin-right: 2em;
-        margin-left: .5em;
+        margin-left: 0.5em;
       }
 
       .table-height-input {
@@ -58,9 +58,9 @@
       position: relative;
       bottom: -1px;
       li {
-        padding: .3em 1.5em;
+        padding: 0.3em 1.5em;
         color: $mediumGray;
-        border-bottom: #C7C7C7 1px solid;
+        border-bottom: #c7c7c7 1px solid;
         cursor: pointer;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -86,7 +86,7 @@
       border-radius: 1em;
       border: 1px solid gray;
       background-color: white;
-      padding: .5em;
+      padding: 0.5em;
       margin-right: 1em;
     }
   }
@@ -111,11 +111,11 @@
     background: #005eaa;
     color: #fff;
     border: 0;
-    padding: .4em .8em;
-    font-size: .9em;
+    padding: 0.4em 0.8em;
+    font-size: 0.9em;
     display: block;
     border-radius: 5px;
-    transition: .1s all;
+    transition: 0.1s all;
     cursor: pointer;
 
     &[disabled] {
@@ -139,7 +139,7 @@
 
   div.dashboard-title {
     color: white;
-    padding: .6em .8em;
+    padding: 0.6em 0.8em;
     border-bottom-width: 3px;
     border-bottom-style: solid;
     margin: 0;
@@ -154,7 +154,7 @@
     }
     &:not(:empty) {
       margin: 0 0 1rem 0 !important;
-      padding: .6em .8em;
+      padding: 0.6em 0.8em;
       border-bottom-width: 3px;
       border-bottom-style: solid;
     }
@@ -172,7 +172,8 @@
   .dashboard-col {
     margin: 0;
     // Disable the module individual margin
-    .map-container, .cdc-chart-inner-container > * {
+    .map-container,
+    .cdc-chart-inner-container > * {
       margin-left: 0;
       margin-right: 0;
     }
