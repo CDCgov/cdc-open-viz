@@ -290,7 +290,7 @@ export default function LinearChart() {
 
         {/* Right Axis */}
         {hasRightAxis && (
-          <AxisRight scale={yScaleRight} left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
+          <AxisRight scale={yScaleRight} left={width - config.yAxis.rightAxisSize} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
