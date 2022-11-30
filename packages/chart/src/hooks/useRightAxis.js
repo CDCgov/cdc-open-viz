@@ -17,7 +17,7 @@ export default function useRightAxis({ config, yMax = 0, data = [], updateConfig
   const max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
 
   const yScaleRight = scaleLinear({
-    domain: [min, max],
+    domain: [0, max],
     range: [yMax, 0]
   })
 
