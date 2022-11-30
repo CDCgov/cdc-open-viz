@@ -1,17 +1,11 @@
-
-import { useEffect, useRef, useState } from "react"
-import {
-  zoom as d3Zoom,
-  zoomIdentity as d3ZoomIdentity,
-} from "d3-zoom"
-import {
-  select as d3Select,
-} from "d3-selection"
+import { useEffect, useRef, useState } from 'react'
+import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
+import { select as d3Select } from 'd3-selection'
 
 function getCoords(w, h, t) {
-    const xOffset = (w * t.k - w) / 2
-    const yOffset = (h * t.k - h) / 2
-    return [w / 2 - (xOffset + t.x) / t.k, h / 2 - (yOffset + t.y) / t.k]
+  const xOffset = (w * t.k - w) / 2
+  const yOffset = (h * t.k - h) / 2
+  return [w / 2 - (xOffset + t.x) / t.k, h / 2 - (yOffset + t.y) / t.k]
 }
 
 export default function useZoomPan({
@@ -20,14 +14,16 @@ export default function useZoomPan({
   onMoveStart,
   onMoveEnd,
   onMove,
-  translateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]],
+  translateExtent = [
+    [-Infinity, -Infinity],
+    [Infinity, Infinity]
+  ],
   scaleExtent = [1, 8],
   zoom = 1,
   width,
   height,
   projection
 }) {
-
   const [lon, lat] = center
   const [position, setPosition] = useState({ x: 0, y: 0, k: 1 })
   const lastPosition = useRef({ x: 0, y: 0, k: 1 })
@@ -47,15 +43,15 @@ export default function useZoomPan({
       if (!onMoveStart || bypassEvents.current) return
       onMoveStart({ coordinates: projection.invert(getCoords(width, height, d3Event.transform)), zoom: d3Event.transform.k }, d3Event)
     }
-  
+
     function handleZoom(d3Event) {
       if (bypassEvents.current) return
-      const {transform, sourceEvent} = d3Event
+      const { transform, sourceEvent } = d3Event
       setPosition({ x: transform.x, y: transform.y, k: transform.k, dragging: sourceEvent })
       if (!onMove) return
       onMove({ x: transform.x, y: transform.y, k: transform.k, dragging: sourceEvent }, d3Event)
     }
-  
+
     function handleZoomEnd(d3Event) {
       if (bypassEvents.current) {
         bypassEvents.current = false
@@ -77,10 +73,13 @@ export default function useZoomPan({
     const zoom = d3Zoom()
       .filter(filterFunc)
       .scaleExtent([minZoom, maxZoom])
-      .translateExtent([[a1, a2], [b1, b2]])
-      .on("start", handleZoomStart)
-      .on("zoom", handleZoom)
-      .on("end", handleZoomEnd)
+      .translateExtent([
+        [a1, a2],
+        [b1, b2]
+      ])
+      .on('start', handleZoomStart)
+      .on('zoom', handleZoom)
+      .on('end', handleZoomEnd)
 
     zoomRef.current = zoom
     svg.call(zoom)
@@ -105,6 +104,6 @@ export default function useZoomPan({
   return {
     mapRef,
     position,
-    transformString: `translate(${position.x} ${position.y}) scale(${position.k})`,
+    transformString: `translate(${position.x} ${position.y}) scale(${position.k})`
   }
 }

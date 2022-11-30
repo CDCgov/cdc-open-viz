@@ -1,57 +1,64 @@
 {
-    "title": "Average Temperature By City (Line Example)",
-    "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
-    "dataUrl":  "/examples/temp-example-data.json",
-    "visualizationType": "Line",
-    "series": [{"dataKey": "New York", "label": "NY"}, {"dataKey": "San Francisco", "label": "SF"}, {"dataKey":"Austin", "label": "AU"}],
-    "filters":[{
-        "label": "Wind",
-        "columnName": "wind"
-    },{
-        "label": "Humidity",
-        "columnName": "humidity"
-    }],
-    "seriesLabel": "City",
-    "fontSize": "large",
-    "dataFormat": {
-        "commas": false,
-        "prefix": "",
-        "suffix": "°"
+  "title": "Average Temperature By City (Line Example)",
+  "description": "<p>Average temperature from October 1st through August 29th in:</p><ul><li>New York</li><li>San Francisco</li><li>Austin</li></ul>",
+  "dataUrl": "/examples/temp-example-data.json",
+  "visualizationType": "Line",
+  "series": [
+    { "dataKey": "New York", "label": "NY" },
+    { "dataKey": "San Francisco", "label": "SF" },
+    { "dataKey": "Austin", "label": "AU" }
+  ],
+  "filters": [
+    {
+      "label": "Wind",
+      "columnName": "wind"
     },
-    "padding": {
-        "left": 15,
-        "right": 15
-    },
-    "yAxis": {
-        "label": "Temperature",
-        "paddingPercent": 0.15
-    },
-    "xAxis": {
-        "label": "Date",
-        "dataKey": "date",
-        "type": "date",
-        "dateParseFormat": "%Y-%m-%d",
-        "dateDisplayFormat": "%b %d",
-        "numTicks": 8,
-        "tickRotation": 50
-    },
-    "legend": {
-        "label": "Legend",
-        "above": true,
-        "left": true
-    },
-    "table": {
-        "label": "Data Table",
-        "expanded": false,
-        "download": true
-    },
-    "regions": [
-        {
-            "label": "Region",
-            "color": "black",
-            "background": "green",
-            "from": "2011-10-02",
-            "to": "2011-10-03"
-        }
-    ]
+    {
+      "label": "Humidity",
+      "columnName": "humidity"
+    }
+  ],
+  "seriesLabel": "City",
+  "fontSize": "large",
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "°"
+  },
+  "padding": {
+    "left": 15,
+    "right": 15
+  },
+  "yAxis": {
+    "label": "Temperature",
+    "paddingPercent": 0.15
+  },
+  "xAxis": {
+    "label": "Date",
+    "dataKey": "date",
+    "type": "date",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%b %d",
+    "numTicks": 8,
+    "tickRotation": 50
+  },
+  "legend": {
+    "label": "Legend",
+    "above": true,
+    "left": true
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "download": true
+  },
+  "regions": [
+    {
+      "label": "Region",
+      "color": "black",
+      "background": "green",
+      "from": "2011-10-02",
+      "to": "2011-10-03"
+    }
+  ]
 }
