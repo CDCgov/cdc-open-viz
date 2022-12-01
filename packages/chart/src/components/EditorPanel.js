@@ -602,6 +602,10 @@ const EditorPanel = () => {
     )
   }
 
+  const checkIsLine = type => {
+    return type === ('Line' || 'dashed-sm')
+  }
+
   const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -901,8 +905,8 @@ const EditorPanel = () => {
                     <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {config.series && config.series.filter(series => series.type === 'Line').length === 0 && <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>}
-                    {config.series && config.series.filter(series => series.type === 'Line').length !== 0 && (
+                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
+                    {config.series && config.series.filter(series => checkIsLine(series.type)) && (
                       <>
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
@@ -1390,13 +1394,11 @@ const EditorPanel = () => {
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                     <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
                   )}
-                  <Select value={config.legend.behavior} section="legend" fieldName="behavior" label="Legend Behavior (When clicked)" updateField={updateField} options={[ 'highlight', 'isolate' ]}/>
-                  <TextField value={config.legend.label} section="legend" fieldName="label" label="Title" updateField={updateField}/>
-                  <Select value={config.legend.position} section="legend" fieldName="position" label="Position" updateField={updateField} options={[ 'right', 'left','bottom' ]}/>
-                  {config.legend.position==='bottom' && (
-                    <CheckBox value={config.legend.singleRow} section="legend" fieldName="singleRow" label="Single Row Legend" updateField={updateField} />
-                  )}
-                  <TextField type='textarea' value={config.legend.description} 	updateField={updateField} 	section='legend' 	fieldName='description' 	label='Legend Description' />
+                  <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
+                  <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
+                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
+                  {config.legend.position === 'bottom' && <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />}
+                  <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>
 
