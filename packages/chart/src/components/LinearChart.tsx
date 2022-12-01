@@ -27,11 +27,11 @@ import useTopAxis from '../hooks/useTopAxis'
 // TODO: consider moving logic into hooks
 // TODO: formatting
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels ,updateConfig} = useContext<any>(Context);
-  let [ width ] = dimensions;
-  const {minValue,maxValue,existPositiveValue} = useReduceData(config,data)
-  const [animatedChart, setAnimatedChart] = useState<boolean>(false);
-  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false);
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context)
+  let [width] = dimensions
+  const { minValue, maxValue, existPositiveValue } = useReduceData(config, data)
+  const [animatedChart, setAnimatedChart] = useState<boolean>(false)
+  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -46,9 +46,9 @@ export default function LinearChart() {
     }
   }, [dataRef?.isIntersecting, config.animate])
 
-  if(config && config.legend && !config.legend.hide && config.legend.position !=='bottom' && (currentViewport === 'lg' || currentViewport === 'md'))  {
-    width = width * 0.73;
-  };
+  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && (currentViewport === 'lg' || currentViewport === 'md')) {
+    width = width * 0.73
+  }
 
   const height = config.aspectRatio ? width * config.aspectRatio : config.height
   const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
@@ -290,7 +290,7 @@ export default function LinearChart() {
 
         {/* Right Axis */}
         {hasRightAxis && (
-          <AxisRight scale={yScaleRight} left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize - config.yAxis.size} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
+          <AxisRight scale={yScaleRight} left={width - config.yAxis.rightAxisSize} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
