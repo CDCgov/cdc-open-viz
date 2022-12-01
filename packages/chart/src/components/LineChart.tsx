@@ -45,7 +45,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               {data.map((d, dataIndex) => {
                 let seriesAxis = config.series.filter(s => s.dataKey === seriesKey)[0].axis
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
-                let yAxisTooltip = ''
+                const yAxisValue = formatNumber(getYAxisData(d, seriesKey));
+                let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${seriesKey}: ${yAxisValue} ` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue;
                 let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                 if (seriesAxis === 'Left') {
                   yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
