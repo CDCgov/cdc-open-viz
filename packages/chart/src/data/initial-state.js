@@ -54,7 +54,8 @@ export default {
     max: '',
     labelColor: '#333',
     tickLabelColor: '#333',
-    tickColor: '#333'
+    tickColor: '#333',
+    isLegendValue:false
   },
   table: {
     label: 'Data Table',
