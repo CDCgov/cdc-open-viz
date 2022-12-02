@@ -171,6 +171,33 @@ export default function LinearChart() {
     }
   }
 
+   
+  const countNumOfTicks = (axis)=>{
+    // function get number of ticks based on bar type & users value
+    const isHorizontal = config.orientation ==='horizontal';
+    const {numTicks} = config.runtime[axis];
+    let tickCount = undefined;
+
+    if(axis === 'yAxis'){
+      tickCount = (
+         (isHorizontal && !numTicks) ? data.length 
+       : (isHorizontal &&  numTicks) ? numTicks
+       :(!isHorizontal && !numTicks) ? undefined
+       :(!isHorizontal &&  numTicks) && numTicks
+      );
+    };
+
+    if(axis === 'xAxis'){
+      tickCount = (
+         (isHorizontal && !numTicks) ? undefined
+       : (isHorizontal &&  numTicks) ? numTicks
+       :(!isHorizontal && !numTicks) ? undefined
+       :(!isHorizontal &&  numTicks) && numTicks
+      );
+    };
+    return tickCount;
+  };
+
   useEffect(() => {
     ReactTooltip.rebuild()
   })
@@ -217,7 +244,7 @@ export default function LinearChart() {
             label={config.runtime.yAxis.label}
             stroke='#333'
             tickFormat={tick => (config.runtime.yAxis.type === 'date' ? formatDate(parseDate(tick)) : config.orientation === 'vertical' ? formatNumber(tick) : tick)}
-            numTicks={config.runtime.yAxis.numTicks || data.length}
+            numTicks={countNumOfTicks('yAxis')}
           >
             {props => {
               const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
@@ -344,7 +371,7 @@ export default function LinearChart() {
             scale={xScale}
             stroke='#333'
             tickStroke='#333'
-            numTicks={config.runtime.xAxis.numTicks || undefined}
+            numTicks={countNumOfTicks('xAxis')}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
