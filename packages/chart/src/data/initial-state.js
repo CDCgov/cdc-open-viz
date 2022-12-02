@@ -35,7 +35,9 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    isLegendValue:false
+    isLegendValue:false,
+    numTicks:''
+
   },
   topAxis: {
     hasLine: false
@@ -55,7 +57,8 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    isLegendValue:false
+    isLegendValue:false,
+    numTicks:''
   },
   table: {
     label: 'Data Table',
