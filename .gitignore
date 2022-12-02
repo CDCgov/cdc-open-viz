@@ -26,7 +26,6 @@ composer.lock
 /packages/**/example/dev
 /packages/**/examples/dev
 /node_modules
-/docs
 /**/**/node_modules
 *.log
 /lib
