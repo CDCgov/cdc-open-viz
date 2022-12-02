@@ -51,7 +51,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 if (seriesAxis === 'Left') {
                   yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
                 } else {
-                  yAxisTooltip = config.yAxis.rightLabel ? `${config.yAxis.rightLabel}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+                  yAxisTooltip = config.runtime.yAxis.rightLabel ? `${config.runtime.yAxis.rightLabel}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
                 }
                 const tooltip = `<div>
                     ${yAxisTooltip}<br />
