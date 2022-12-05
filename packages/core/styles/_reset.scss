@@ -117,6 +117,13 @@
     box-sizing: border-box;
   }
 
+  .cove .map-title sup,
+   .map-title sup {
+     top: unset;
+     margin: .5em 0;
+     display: block;
+   }
+
   sub,
   sup {
     /* Specified in % so that the sup/sup is the

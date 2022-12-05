@@ -1496,11 +1496,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
         <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
-          {state.general.title && (
+          {(state.general.title || general.superTitle) && (
             <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
               <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
-                <sup>{general.superTitle}</sup>
-                <div>{parse(title)}</div>
+                {general.superTitle && <sup>{parse(general.superTitle)}</sup>}
+                <h2>{parse(title)}</h2>
               </div>
             </header>
           )}
