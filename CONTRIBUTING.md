@@ -2,14 +2,14 @@
 
 Table of Contents
 - [Contributing to COVE](#contributing-to-cove)
-	- [Introduction](#introduction)
-	- [How Can I Contribute?](#how-can-i-contribute)
-	- [How to Request New Features and Report Bugs](#how-to-request-new-features-and-report-bugs)
-	- [Asking for Help](#asking-for-help)
-	- [Project Setup Instructions](#project-setup-instructions)
-		- [Branching Information](#branching-information)
-	- [Opening a Pull Request](#opening-a-pull-request)
-	- [Thank You!](#thank-you)
+  - [Introduction](#introduction)
+  - [How Can I Contribute?](#how-can-i-contribute)
+  - [How to Request New Features and Report Bugs](#how-to-request-new-features-and-report-bugs)
+  - [Asking for Help](#asking-for-help)
+  - [Project Setup Instructions](#project-setup-instructions)
+    - [Branching Information](#branching-information)
+  - [Opening a Pull Request](#opening-a-pull-request)
+  - [Thank You!](#thank-you)
 
 ## Introduction
 Welcome! We’re excited that you’re interested in using the CDC Open Visualization Environment (COVE), and are looking forward to working with you on this project. As you work through the projects initial setup, you’re in the best position to report any issues you might run into (ie. compilation errors or gaps in our documentation).
@@ -27,12 +27,12 @@ We welcome many different types of contributions including:
 Please see the additional sections below before initiating a pull request. All ideas and questions should be routed through a Github Issue.
 
 ## How to Request New Features and Report Bugs
-Please start all feature requests, bug reports, and ideas by [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues) so that our internal project maintainers are aware of the work you want to contribute. We can't accomadate all requests and our internal team makes final decisions on how the project is structured. Pitching your ideas early will help avoid unnecessary work and increase your chances of a successful pull request.
+Please start all feature requests, bug reports, and ideas by [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues) so that our internal project maintainers are aware of the ideas you want to contribute. We'll do our best to accomadate your request, however, our internal team makes final decisions on how the project is structured. Pitching your ideas early will help avoid unnecessary work and increase your chances of a successful pull request.
 
 *Issues labeled "Help Wanted" are a great place to start for a first contribution.*
 
 ## Asking for Help
-If you have questions, the best way to get them answered is [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues). We treat Github Issues the same as our internal communication tools and will respond in a timely manner. In the future, we hope to provide additional communication tools for project support.
+The best way to get questions answered is by [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues). We treat Github Issues the same as our internal communication tools and will respond in a timely manner. In the future, we hope to provide additional communication tools for project support.
 
 ## Project Setup Instructions
 This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [yarn](https://yarnpkg.com/) for package management. Make sure you have yarn installed before beginning. To work on individual packages you must setup the entire monorepo.
