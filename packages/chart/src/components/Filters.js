@@ -32,13 +32,25 @@ const useFilters = () => {
     setShowApplyButton(false)
   }
 
-  return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton }
+  const handleReset = () => {
+    let newFilters = config.filters
+
+    // reset to first item in values array.
+    newFilters.map( filter => {
+      filter.active = filter.values[0]
+    })
+
+    setFilteredData(filterData(newFilters, excludedData))
+    setConfig({...config, filters: newFilters })
+  }
+
+  return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
 }
 
 const Filters = () => {
 
   const { config, setConfig, filteredData, setFilteredData } = useContext(Context)
-  const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton } = useFilters()
+  const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
   const { filters  } = config
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
@@ -97,11 +109,21 @@ const Filters = () => {
   }
 
   return (
-    <section className='filters-section' style={{ flexWrap: 'wrap', display: 'flex', gap: 'unset' }}>
-      <FilterList />
-      <div className="filter-section__buttons" style={{ width: '100%' }}>
-        <Button onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
-        <a href="#!" role="button">{resetText}</a>
+    <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
+      {config.filters.length > 0 &&
+      <>
+        <h3 className="filters-section__title">Filters</h3>
+        <hr />
+      </>
+      }
+      <div className="filters-section__wrapper" style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px'}}>
+        <FilterList />
+        {config.filters.length > 0 &&
+          <div className="filter-section__buttons" style={{ width: '100%' }}>
+            <Button style={{ color: 'transparent' }} onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
+            <a href="#!" role="button" onClick={handleReset}>{resetText}</a>
+          </div>
+        }
       </div>
     </section>
   )
