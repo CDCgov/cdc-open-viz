@@ -120,7 +120,7 @@ const Filters = () => {
         <FilterList />
         {config.filters.length > 0 &&
           <div className="filter-section__buttons" style={{ width: '100%' }}>
-            <Button style={{ color: 'transparent' }} onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
+            <Button onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
             <a href="#!" role="button" onClick={handleReset}>{resetText}</a>
           </div>
         }

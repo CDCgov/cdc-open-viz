@@ -140,7 +140,6 @@ const Sidebar = props => {
         </section>
         {filtersList.length > 0 && (
           <section className='filters-section' aria-label='Map Filters'>
-            <span className='heading-3'>Filters</span>
             <form>{filtersList}</form>
           </section>
         )}
