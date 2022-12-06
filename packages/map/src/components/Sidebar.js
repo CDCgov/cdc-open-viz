@@ -138,11 +138,6 @@ const Sidebar = props => {
             {legendList}
           </ul>
         </section>
-        {filtersList.length > 0 && (
-          <section className='filters-section' aria-label='Map Filters'>
-            <form>{filtersList}</form>
-          </section>
-        )}
       </aside>
     </ErrorBoundary>
   )
