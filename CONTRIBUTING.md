@@ -12,7 +12,7 @@ Table of Contents
   - [Thank You!](#thank-you)
 
 ## Introduction
-Welcome! We’re excited that you’re interested in using the CDC Open Visualization Environment (COVE), and are looking forward to working with you on this project. As you work through the projects initial setup, you’re in the best position to report any issues you might run into (ie. compilation errors or gaps in our documentation).
+Welcome! We’re excited that you’re interested in using the CDC Open Visualization Environment (COVE), and are looking forward to working with you on this project. As you work through the project's initial setup, you’re in the best position to report any issues you might run into (ie. compilation errors or gaps in our documentation).
 If something doesn't make sense, please [open an issue](https://github.com/CDCgov/cdc-open-viz/issues) and let us know!
 
 ## How Can I Contribute?
@@ -27,7 +27,7 @@ We welcome many different types of contributions including:
 Please see the additional sections below before initiating a pull request. All ideas and questions should be routed through a Github Issue.
 
 ## How to Request New Features and Report Bugs
-Please start all feature requests, bug reports, and ideas by [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues) so that our internal project maintainers are aware of the ideas you want to contribute. We'll do our best to accomadate your request, however, our internal team makes final decisions on how the project is structured. Pitching your ideas early will help avoid unnecessary work and increase your chances of a successful pull request.
+Please start all feature requests, bug reports, and ideas by [opening an issue](https://github.com/CDCgov/cdc-open-viz/issues) so that our internal project maintainers are aware of the ideas you want to contribute. We'll do our best to accommodate your request, however, our internal team makes final decisions on how the project is structured. Pitching your ideas early will help avoid unnecessary work and increase your chances of a successful pull request.
 
 *Issues labeled "Help Wanted" are a great place to start for a first contribution.*
 
@@ -69,4 +69,4 @@ Steps for submitting a pull request:
 - One of our project maintainers will provide timely feedback
 
 ## Thank You!
-The COVE team thanks you for considering our project. Once your pull request is accepted and merged through our internal release process you'll be able to see your updates on the main branch and npm.
+The COVE team thanks you for considering our project. Once your pull request is accepted and merged through our internal release process, you'll be able to see your updates on the main branch and npm.
