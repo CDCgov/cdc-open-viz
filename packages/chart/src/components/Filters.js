@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useContext } from 'react'
 import Context from './../context'
+import Button from '@cdc/core/components/elements/Button'
 
 const useFilters = () => {
   const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = useContext(Context)
@@ -38,8 +39,9 @@ const Filters = () => {
 
   const { config, setConfig, filteredData, setFilteredData } = useContext(Context)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton } = useFilters()
-
   const { filters  } = config
+  const buttonText = 'Apply Filters'
+  const resetText = 'Reset All'
 
   // A List of Dropdowns
   const FilterList = () => {
@@ -95,11 +97,12 @@ const Filters = () => {
   }
 
   return (
-    <section className='filters-section'>
+    <section className='filters-section' style={{ flexWrap: 'wrap', display: 'flex', gap: 'unset' }}>
       <FilterList />
-      {showApplyButton &&
-        <button className='btn' onClick={ () => handleApplyButton(filters) }>Apply</button>
-      }
+      <div className="filter-section__buttons" style={{ width: '100%' }}>
+        <Button onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
+        <a href="#!" role="button">{resetText}</a>
+      </div>
     </section>
   )
 }
