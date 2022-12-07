@@ -1463,7 +1463,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setSharedFilterValue,
     hasZoom: state.general.allowMapZoom,
     handleMapAriaLabels,
-    runtimeFilters
+    runtimeFilters,
+    setRuntimeFilters
   }
 
 
@@ -1619,4 +1620,4 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   )
 }
 
-export default memo(CdcMap)
+export default CdcMap
