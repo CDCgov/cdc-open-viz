@@ -24,8 +24,8 @@ const useFilters = () => {
     setShowApplyButton(true)
   }
 
-  const handleApplyButton = (newFilters) => {
-    setConfig({ ...config, filters: newFilters })
+  const handleApplyButton = () => {
+    setConfig({ ...config, filters: runtimeFilters })
     setShowApplyButton(false)
   }
 
@@ -53,8 +53,11 @@ export const Filters = () => {
 
   const { filters  } = config
 
+  if(filters.length === 0) return false;
 
-  const FilterList = () => {
+
+
+  const FilterList = ({filters: runtimeFilters}) => {
 
     if (runtimeFilters) {
       return runtimeFilters.map((singleFilter, idx) => {
@@ -99,9 +102,9 @@ export const Filters = () => {
       <h3 className="filters-section__title">Filters</h3>
       <hr />
       <div className="filters-section__wrapper" style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px'}}>
-          <FilterList />
+          <FilterList filters={runtimeFilters}/>
           <div className="filter-section__buttons" style={{ width: '100%' }}>
-          <Button onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
+          <Button onClick={ handleApplyButton } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
             <a href="#!" role="button" onClick={handleReset}>{resetText}</a>
           </div>
       </div>

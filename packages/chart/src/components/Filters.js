@@ -3,7 +3,7 @@ import Context from './../context'
 import Button from '@cdc/core/components/elements/Button'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData } = useContext(Context)
+  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(Context)
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {

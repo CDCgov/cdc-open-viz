@@ -1363,7 +1363,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       specialClasses: state.legend.specialClasses,
       geoType: state.general.geoType,
       data: state.data,
-      ...runtimeLegend
+      ...runtimeLegend,
+      ...runtimeFilters
     })
 
     const hashData = hashObj({
@@ -1374,7 +1375,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       primary: state.columns.primary.name,
       data: state.data,
       ...runtimeFilters,
-      mapPosition: state.mapPosition
+      mapPosition: state.mapPosition,
+      ...runtimeFilters
     })
 
     // Data
