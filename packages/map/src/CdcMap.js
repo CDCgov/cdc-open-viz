@@ -1498,7 +1498,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
           {(state.general.title || general.superTitle) && (
             <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-              <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
+              <div className={'map-title ' + general.headerColor} tabIndex='0'>
                 {general.superTitle && <div>{parse(general.superTitle)}</div>}
                 <h2 tabIndex='0'>{parse(title)}</h2>
               </div>

@@ -644,10 +644,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           <div className='cdc-chart-inner-container'>
             {/* Title */}
 
-            {title && (
+            {(title || config.superTitle) && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
-                {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
-                <div>{parse(title)}</div>
+                {config && <div className='superTitle'>{parse(config.superTitle || '')}</div>}
+                <h2 tabIndex={0}>{parse(title)}</h2>
               </div>
             )}
             <a id='skip-chart-container' className='cdcdataviz-sr-only-focusable' href={handleChartTabbing}>
@@ -659,7 +659,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className="introText">{parse(config.introText)}</section>}
             <div
               className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : "" 
+              }${config.legend.hide ? " legend-hidden" : ""
               }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
