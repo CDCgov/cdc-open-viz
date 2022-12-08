@@ -50,7 +50,7 @@ console.log('seriesStyle', seriesStyle)
             </div>`
 
               let circleRadii = 4.5
-              return (d[seriesKey] !== undefined && d[seriesKey] !== "") && (
+              return (d[seriesKey] !== undefined && d[seriesKey] !== "" && d[seriesKey] !== null) && (
                 <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                 
                 <Text
@@ -91,7 +91,7 @@ console.log('seriesStyle', seriesStyle)
                 shapeRendering="geometricPrecision"
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item,i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== "";
+                  return item[config.runtime.seriesLabels[seriesKey]] !== "" && item[config.runtime.seriesLabels[seriesKey]] !== null;
                 }}
               />
           </Group>
