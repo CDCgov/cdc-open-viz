@@ -61,7 +61,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 let circleRadii = 4.5
                 return (
                   d[seriesKey] !== undefined &&
-                  d[seriesKey] !== '' && (
+                  d[seriesKey] !== '' &&
+                  d[seriesKey] !== null && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       <Text
                         display={config.labels ? 'block' : 'none'}
@@ -106,8 +107,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== ''
+                defined={(item,i) => {
+                  return item[config.runtime.seriesLabels[seriesKey]] !== "" && item[config.runtime.seriesLabels[seriesKey]] !== null;
                 }}
               />
             </Group>
