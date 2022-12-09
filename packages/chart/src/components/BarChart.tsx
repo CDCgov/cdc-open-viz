@@ -164,8 +164,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     const xAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     let yAxisTooltip = config.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.yAxis.label ? `${config.yAxis.label}: ${yAxisValue}` :`${yAxisValue}`
                     let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
-                    // let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
-                    // let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index].name}`
                     
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
@@ -176,6 +174,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     const barsPerGroup = config.series.length
                     let barHeight = config.barHeight ? config.barHeight : 25
                     let barPadding = barHeight
+                    // update bar Y so it begins from 0
+                    const updatedY = bar.y-barStack.bars[0].y;
 
                     config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index)
@@ -196,19 +196,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                     let labelColor = '#000000'
 
-                    let textPosition = bar.y - config.barPadding / 2 - Number(config.barHeight / 2) + Number(config.barHeight) + 5
-
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF'
                     }
-
+                      
                     return (
                       <Group key={index}>
                         <foreignObject
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
                           x={bar.x}
-                          y={bar.y - config.barPadding / 2 - config.barHeight / 2}
+                          y={updatedY}
                           width={bar.width}
                           height={config.barHeight}
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
@@ -221,7 +219,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
                           <Text
                             x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
-                            y={textPosition}
+                            y={updatedY+config.barHeight *1.3}
                             fill={'#000000'}
                             textAnchor='start'
                             verticalAnchor='start'
@@ -234,7 +232,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           <Text
                             display={displayBar ? 'block' : 'none'}
                             x={bar.x + barStack.bars[bar.index].width / 2} // padding
-                            y={textPosition - 5 - config.barHeight / 2}
+                            y={updatedY+(config.barHeight/2)}
                             fill={labelColor}
                             textAnchor='middle'
                             verticalAnchor='middle'
@@ -302,7 +300,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   <Group
                     className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${barType}`}
                     key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
-                    top={config.runtime.horizontal ? (yMax / barGroups.length) * barGroup.index : 0}
+                    top={config.runtime.horizontal ? (barGroup.x0 - barGroups[0].x0) : 0}
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
@@ -385,7 +383,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                               x={config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                              y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1) + (config.isLollipopChart && isLabelOnYAxis ? offset : 0) : barY}
+                              y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1)  : barY}
                               width={config.runtime.horizontal ? bar.y : barWidth}
                               height={config.runtime.horizontal ? barWidth : barHeight}
                               style={{
@@ -401,7 +399,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             {config.isLollipopChart && config.lollipopShape === 'circle' && (
                               <circle
                                 cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize / 3.5}
-                                cy={orientation === 'horizontal' ? lollipopShapeSize / 3.5 + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) : bar.y}
+                                cy={orientation === 'horizontal' ? 0 +lollipopBarWidth/2 : bar.y}
                                 r={lollipopShapeSize / 2}
                                 fill={barColor}
                                 key={`circle--${bar.index}`}
@@ -413,7 +411,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             {config.isLollipopChart && config.lollipopShape === 'square' && (
                               <rect
                                 x={orientation === 'horizontal' && bar.y > 10 ? bar.y - lollipopShapeSize / 2 : orientation === 'horizontal' && bar.y < 10 ? 0 : orientation !== 'horizontal' ? offset - lollipopBarWidth / 2 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25}
-                                y={orientation === 'horizontal' ? 0 - lollipopBarWidth / 2 + (isLabelBelowBar ? 0 : offset) : config.height - bar.y > 10 ? bar.y - lollipopShapeSize / 2 : 0}
+                                y={orientation === 'horizontal' ? 0 - lollipopBarWidth/2 : barY}
                                 width={lollipopShapeSize}
                                 height={lollipopShapeSize}
                                 fill={barColor}
@@ -526,7 +524,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                     <Text
                                       display={displayBar ? 'block' : 'none'}
                                       x={`${bar.y + (config.isLollipopChart ? 15 : 5)}`} // padding
-                                      y={config.isLollipopChart ? config.barHeight * (barGroup.bars.length - bar.index - 1) + offset : config.barHeight * (barGroup.bars.length - bar.index - 1) + config.barHeight / 2}
+                                      y={config.isLollipopChart ? 0+barHeight/2 : config.barHeight * (barGroup.bars.length - bar.index - 1) + config.barHeight / 2}
                                       fill={'#000000'}
                                       textAnchor='start'
                                       verticalAnchor='middle'

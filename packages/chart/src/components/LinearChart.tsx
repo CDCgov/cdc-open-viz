@@ -190,7 +190,7 @@ export default function LinearChart() {
               const width = to - from
 
               return (
-                <Group className='regions' left={config.runtime.yAxis.size} key={region.label}>
+                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
                   <path
                     stroke='#333'
                     d={`M${from} -5
@@ -213,7 +213,7 @@ export default function LinearChart() {
         {config.visualizationType !== 'Spark Line' && (
           <AxisLeft
             scale={yScale}
-            left={config.runtime.yAxis.size}
+            left={Number(config.runtime.yAxis.size)}
             label={config.runtime.yAxis.label}
             stroke='#333'
             tickFormat={tick => (config.runtime.yAxis.type === 'date' ? formatDate(parseDate(tick)) : config.orientation === 'vertical' ? formatNumber(tick) : tick)}
@@ -227,6 +227,10 @@ export default function LinearChart() {
               return (
                 <Group className='left-axis'>
                   {props.ticks.map((tick, i) => {
+                    // dynamicly alighn  labels on horizontal bars when labelPlacement === 'On Date/Category Axis
+                    let dy = (config.runtime.seriesKeys.length === 1 ? 5 : config.runtime.seriesKeys.length * 10 );
+                    let minY = props.ticks[0].to.y;
+                    
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
@@ -234,23 +238,18 @@ export default function LinearChart() {
                         {config.runtime.yAxis.gridLines ? <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                          // 17 is a magic number from the offset in barchart.
-                          <Fragment>
-                            <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.from.y : tick.from.y - 17}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'middle'} textAnchor={'end'}>
+                            <Text  dy={dy} transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.from.y-minY : tick.from.y-minY}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'start'} textAnchor={'end'}>
                               {tick.formattedValue}
                             </Text>
-                          </Fragment>
                         )}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType === 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                          // 17 is a magic number from the offset in barchart.
-                          <Text transform={`translate(${tick.to.x - 5}, ${tick.from.y - config.barHeight / 2 - 3}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'middle'} textAnchor={'end'}>
+                          <Text dy={5} transform={`translate(${tick.to.x - 5}, ${tick.from.y-minY}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'start'}  textAnchor={'end'}>
                             {tick.formattedValue}
                           </Text>
                         )}
 
                         {config.orientation === 'horizontal' && config.visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
-                          // 17 is a magic number from the offset in barchart.
                           <Text transform={`translate(${-15}, ${tick.from.y}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'middle'} textAnchor={'end'}>
                             {tick.formattedValue}
                           </Text>
@@ -290,7 +289,7 @@ export default function LinearChart() {
 
         {/* Right Axis */}
         {hasRightAxis && (
-          <AxisRight scale={yScaleRight} left={width - config.yAxis.rightAxisSize} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
+          <AxisRight scale={yScaleRight} left={Number(width - config.yAxis.rightAxisSize)} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -324,7 +323,7 @@ export default function LinearChart() {
         {hasTopAxis && config.topAxis.hasLine && (
           <AxisTop
             stroke='#333'
-            left={config.runtime.yAxis.size}
+            left={Number(config.runtime.yAxis.size)}
             scale={xScale}
             hideTicks
             hideZero
@@ -338,7 +337,7 @@ export default function LinearChart() {
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
           <AxisBottom
             top={yMax}
-            left={config.runtime.yAxis.size}
+            left={Number(config.runtime.yAxis.size)}
             label={config.runtime.xAxis.label}
             tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
             scale={xScale}
@@ -381,7 +380,7 @@ export default function LinearChart() {
 
         {config.visualizationType === 'Paired Bar' && (
           <>
-            <AxisBottom top={yMax} left={config.runtime.yAxis.size} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
+            <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
               {props => {
                 const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
@@ -406,7 +405,7 @@ export default function LinearChart() {
             </AxisBottom>
             <AxisBottom
               top={yMax}
-              left={config.runtime.yAxis.size}
+              left={Number(config.runtime.yAxis.size)}
               label={config.runtime.xAxis.label}
               tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : config.runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick}
               scale={g2xScale}

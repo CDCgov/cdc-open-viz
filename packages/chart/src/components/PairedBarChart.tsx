@@ -97,7 +97,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
 				`}
         </style>
         <svg id='cdc-visualization__paired-bar-chart' width={width} height={height} viewBox={`0 0 ${width} ${height}`} role='img' tabIndex={0}>
-          <Group top={0} left={config.xAxis.size}>
+          <Group top={0} left={Number(config.xAxis.size)}>
             {data
               .filter(item => config.series[0].dataKey === groupOne.dataKey)
               .map((d, index) => {
