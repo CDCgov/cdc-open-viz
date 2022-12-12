@@ -1,35 +1,37 @@
 {
-    "title": "Planet Radius (Bar Example)",
-    "dataUrl":  "/examples/planet-example-data.json",
-    "visualizationType": "Bar",
-    "visualizationSubType": "regular",
-    "series": [{"dataKey": "Radius"}],
-    "fontSize": "medium",
-    "dataCutoff": "0.5",
-    "orientation": "horizontal",
-    "dataFormat": {
-        "roundTo": 1,
-        "commas": false,
-        "prefix": "",
-        "suffix": "km"
-    },
-    "padding": {
-        "left": 5,
-        "right": 5
-    },
-    "yAxis": {
-        "label": "Measurement (1000km)"
-    },
-    "xAxis": {
-        "label": "Planet",
-        "dataKey": "name",
-        "tickRotation": 30
-    },
-    "legend": {
-        "hide": false
-    },
-    "table": {
-        "label": "Data Table",
-        "expanded": false
-    }
+  "title": "Planet Radius (Bar Example)",
+  "dataUrl": "/examples/planet-example-data.json",
+  "visualizationType": "Bar",
+  "visualizationSubType": "regular",
+  "series": [{ "dataKey": "Radius" }],
+  "fontSize": "medium",
+  "dataCutoff": "0.5",
+  "orientation": "vertical",
+  "dataFormat": {
+    "roundTo": 1,
+    "commas": false,
+    "prefix": "",
+    "suffix": "km"
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "label": "Measurement (1000km)",
+    "rightSeries": "Diameter",
+    "rightLabel": "testing"
+  },
+  "xAxis": {
+    "label": "Planet",
+    "dataKey": "name",
+    "tickRotation": 30
+  },
+  "legend": {
+    "hide": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false
+  }
 }

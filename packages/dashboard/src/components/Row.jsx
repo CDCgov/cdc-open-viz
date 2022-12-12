@@ -29,11 +29,11 @@ const RowMenu = ({ rowIdx, row }) => {
     return res.join('')
   }
 
-  const [ curr, setCurr ] = useState(getCurr())
-  const [ equalHeight, setEqualHeight ] = useState(false)
+  const [curr, setCurr] = useState(getCurr())
+  const [equalHeight, setEqualHeight] = useState(false)
 
-  const setRowLayout = (layout) => {
-    const newRows = [ ...rows ]
+  const setRowLayout = layout => {
+    const newRows = [...rows]
     const r = newRows[rowIdx]
 
     for (let i = 0; i < r.length; i++) {
@@ -64,8 +64,8 @@ const RowMenu = ({ rowIdx, row }) => {
     let calcRowMove = dir === 'down' ? 202 : -202
     let calcRowMove2 = dir === 'down' ? -202 : 202
 
-    let rowEle = document.querySelector('[data-row-id=\'' + rowIdx + '\']')
-    let rowNewEle = document.querySelector('[data-row-id=\'' + newIdx + '\']')
+    let rowEle = document.querySelector("[data-row-id='" + rowIdx + "']")
+    let rowNewEle = document.querySelector("[data-row-id='" + newIdx + "']")
 
     rowEle.style.pointerEvents = 'none'
     rowNewEle.style.pointerEvents = 'none'
@@ -98,68 +98,50 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const layoutList = [
-    <li className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`}
-        onClick={() => setRowLayout([ 12 ])} key="12" title="1 Column">
-      <OneColIcon/>
+    <li className={curr === '12' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([12])} key='12' title='1 Column'>
+      <OneColIcon />
     </li>,
-    <li className={curr === '66' ? `current row-menu__list--item` : `row-menu__list--item`}
-        onClick={() => setRowLayout([ 6, 6 ])} key="66" title="2 Columns">
-      <TwoColIcon/>
+    <li className={curr === '66' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([6, 6])} key='66' title='2 Columns'>
+      <TwoColIcon />
     </li>,
-    <li className={curr === '444' ? `current row-menu__list--item` : `row-menu__list--item`}
-        onClick={() => setRowLayout([ 4, 4, 4 ])} key="444" title="3 Columns">
-      <ThreeColIcon/>
+    <li className={curr === '444' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([4, 4, 4])} key='444' title='3 Columns'>
+      <ThreeColIcon />
     </li>,
-    <li className={curr === '48' ? `current row-menu__list--item` : `row-menu__list--item`}
-        onClick={() => setRowLayout([ 4, 8 ])} key="48" title="2 Columns">
-      <FourEightColIcon/>
+    <li className={curr === '48' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([4, 8])} key='48' title='2 Columns'>
+      <FourEightColIcon />
     </li>,
-    <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`}
-        onClick={() => setRowLayout([ 8, 4 ])} key="84" title="2 Columns">
-      <EightFourColIcon/>
+    <li className={curr === '84' ? `current row-menu__list--item` : `row-menu__list--item`} onClick={() => setRowLayout([8, 4])} key='84' title='2 Columns'>
+      <EightFourColIcon />
     </li>
   ]
 
   const rowSettings = (
     <Modal>
-      <Modal.Header>
-        Row Settings
-      </Modal.Header>
+      <Modal.Header>Row Settings</Modal.Header>
       <Modal.Content>
-        <InputToggle
-          label="Visualizations in this row should be equal height"
-          fieldName={`toggleEqualHeight${rowIdx}`}
-          value={row.equalHeight ? row.equalHeight : false}
-          updateField={rowItemsHeight}
-        ></InputToggle>
+        <InputToggle label='Visualizations in this row should be equal height' fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}></InputToggle>
       </Modal.Content>
     </Modal>
   )
 
   return (
-    <nav className="row-menu">
-      <div className="row-menu__btn">
-        <ul className="row-menu__flyout">
-          {layoutList}
-        </ul>
+    <nav className='row-menu'>
+      <div className='row-menu__btn'>
+        <ul className='row-menu__flyout'>{layoutList}</ul>
       </div>
-      <div className="spacer"></div>
+      <div className='spacer'></div>
       {/*<button className={'row-menu__btn'} title="Row Settings"*/}
       {/*        onClick={() => overlay?.actions.openOverlay(rowSettings)}>*/}
       {/*  <Icon display="edit" color="#fff" size={25}/>*/}
       {/*</button>*/}
-      <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title="Move Row Up"
-              onClick={() => moveRow('up')}>
-        <Icon display="caretUp" color="#fff" size={25}/>
+      <button className={rowIdx === 0 ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title='Move Row Up' onClick={() => moveRow('up')}>
+        <Icon display='caretUp' color='#fff' size={25} />
       </button>
-      <button className={rowIdx + 1 === rows.length ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'}
-              title="Move Row Down" onClick={() => moveRow('down')}>
-        <Icon display="caretDown" color="#fff" size={25}/>
+      <button className={rowIdx + 1 === rows.length ? 'row-menu__btn row-menu__btn-disabled' : 'row-menu__btn'} title='Move Row Down' onClick={() => moveRow('down')}>
+        <Icon display='caretDown' color='#fff' size={25} />
       </button>
-      <button
-        className={rowIdx === 0 && rows.length === 1 ? 'row-menu__btn row-menu__btn--remove row-menu__btn-disabled' : 'row-menu__btn row-menu__btn--remove'}
-        title="Delete Row" onClick={deleteRow}>
-        <Icon display="close" color="#fff" size={25}/>
+      <button className={rowIdx === 0 && rows.length === 1 ? 'row-menu__btn row-menu__btn--remove row-menu__btn-disabled' : 'row-menu__btn row-menu__btn--remove'} title='Delete Row' onClick={deleteRow}>
+        <Icon display='close' color='#fff' size={25} />
       </button>
     </nav>
   )
@@ -167,12 +149,14 @@ const RowMenu = ({ rowIdx, row }) => {
 
 const Row = ({ row, idx: rowIdx, uuid }) => {
   return (
-    <div className="builder-row" data-row-id={rowIdx}>
-      <RowMenu rowIdx={rowIdx} row={row}/>
-      <div className="column-container">
-        {row.filter(column => column.width).map((column, colIdx) => <Column data={column}
-                                                                            key={`row-${uuid}-col-${colIdx}`}
-                                                                            rowIdx={rowIdx} colIdx={colIdx}/>)}
+    <div className='builder-row' data-row-id={rowIdx}>
+      <RowMenu rowIdx={rowIdx} row={row} />
+      <div className='column-container'>
+        {row
+          .filter(column => column.width)
+          .map((column, colIdx) => (
+            <Column data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
+          ))}
       </div>
     </div>
   )
