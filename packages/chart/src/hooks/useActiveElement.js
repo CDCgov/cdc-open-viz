@@ -1,19 +1,19 @@
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 // Use for accessibility testing
 const useActiveElement = () => {
-	const [active, setActive] = useState(document.activeElement);
+  const [active, setActive] = useState(document.activeElement)
 
-	const handleFocusIn = (e) => {
-		setActive(document.activeElement);
-	}
+  const handleFocusIn = e => {
+    setActive(document.activeElement)
+  }
 
-	useEffect(() => {
-		document.addEventListener('focusin', handleFocusIn)
-		return () => {
-			document.removeEventListener('focusin', handleFocusIn)
-		};
-	}, [])
+  useEffect(() => {
+    document.addEventListener('focusin', handleFocusIn)
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn)
+    }
+  }, [])
 
-	return active;
+  return active
 }
-export default useActiveElement;
+export default useActiveElement

@@ -1,7 +1,7 @@
 {
   "title": "Case Rate Data",
   "theme": "theme-blue",
-  "dataUrl":  "/examples/case-rate-example-data.json",
+  "dataUrl": "/examples/case-rate-example-data.json",
   "visualizationType": "Bar",
   "visualizationSubType": "horizontal",
   "series": [],
