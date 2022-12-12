@@ -613,10 +613,10 @@ const EditorPanel = () => {
     let filters = [...config.filters]
     let filterItem = { ...config.filters[filterIndex] }
     filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
+    filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    setFilteredData(filters)
+    updateConfig({ ...config, filters });
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
