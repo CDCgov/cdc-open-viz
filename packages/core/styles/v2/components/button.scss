@@ -1,5 +1,5 @@
-@import "../utils/variables";
-@import "../themes/index";
+@import '../utils/variables';
+@import '../themes/index';
 
 .sbdocs .cove-button {
   margin-right: 1rem;
@@ -56,7 +56,7 @@
         position: absolute;
         inset: 0;
         outline: 2px solid rgba(161, 161, 161, 0.6);
-        border-radius: .3125em;
+        border-radius: 0.3125em;
         margin: -2px;
         pointer-events: none;
       }

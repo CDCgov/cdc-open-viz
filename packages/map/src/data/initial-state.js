@@ -42,13 +42,16 @@ export default {
     },
     navigate: {
       name: ''
-    }
+    },
+    latitude: { name: "" },
+    longitude: { name: "" }
   },
   legend: {
     descriptions: {},
     specialClasses: [],
     unified: false,
     singleColumn: false,
+    singleRow: false,
     dynamicDescription: false,
     type: "equalnumber",
     numberOfItems: 3,

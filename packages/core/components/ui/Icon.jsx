@@ -27,36 +27,38 @@ import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 import iconGear from '../../assets/icon-gear.svg'
 import iconTools from '../../assets/icon-tools.svg'
+import iconText from '../../assets/filtered-text.svg'
 
 import '../../styles/v2/components/icon.scss'
 
 const iconHash = {
-  'caretUp': iconCaretUp,
-  'caretDown': iconCaretDown,
-  'caretFilledUp': iconCaretFilledUp,
-  'caretFilledDown': iconCaretFilledDown,
-  'chartBar': iconChartBar,
-  'chartLine': iconChartLine,
-  'chartPie': iconChartPie,
-  'close': iconClose,
-  'code': iconCode,
-  'databite': iconDataBite,
-  'edit': iconEdit,
-  'fileUpload': iconFileUpload,
-  'filterBars': iconFilterBars,
-  'grid': iconGrid,
-  'info': iconInfo,
-  'link': iconLink,
-  'mapAl': iconMapAl,
-  'mapUsa': iconMapUsa,
-  'mapWorld': iconMapWorld,
-  'move': iconMove,
-  'question': iconQuestion,
-  'upload': iconUpload,
-  'warningCircle': iconWarningCircle,
-  'warningTriangle': iconWarningTriangle,
-  'gear': iconGear,
-  'tools': iconTools
+  caretUp: iconCaretUp,
+  caretDown: iconCaretDown,
+  caretFilledUp: iconCaretFilledUp,
+  caretFilledDown: iconCaretFilledDown,
+  chartBar: iconChartBar,
+  chartLine: iconChartLine,
+  chartPie: iconChartPie,
+  close: iconClose,
+  code: iconCode,
+  databite: iconDataBite,
+  edit: iconEdit,
+  fileUpload: iconFileUpload,
+  filterBars: iconFilterBars,
+  grid: iconGrid,
+  info: iconInfo,
+  link: iconLink,
+  mapAl: iconMapAl,
+  mapUsa: iconMapUsa,
+  mapWorld: iconMapWorld,
+  move: iconMove,
+  question: iconQuestion,
+  upload: iconUpload,
+  warningCircle: iconWarningCircle,
+  warningTriangle: iconWarningTriangle,
+  gear: iconGear,
+  tools: iconTools,
+  'filtered-text': iconText
 }
 
 const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {
@@ -73,14 +75,13 @@ const Icon = ({ display = null, base, alt = '', size, color, style, ...attribute
 
   return (
     <>
-      {base
-        ? <IconObj title={alt}/>
-        : (
-          <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={styles} {...filteredAttrs}>
-            <IconObj title={alt}/>
-          </span>
-        )
-      }
+      {base ? (
+        <IconObj title={alt} />
+      ) : (
+        <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={styles} {...filteredAttrs}>
+          <IconObj title={alt} />
+        </span>
+      )}
     </>
   )
 }

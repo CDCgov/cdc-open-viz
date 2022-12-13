@@ -1,25 +1,25 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 
-import getViewport from '@cdc/core/helpers/getViewport';
+import getViewport from '@cdc/core/helpers/getViewport'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-import GlobalState from './context';
+import GlobalState from './context'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 
-import DataImport from './components/DataImport';
-import ChooseTab from './components/ChooseTab';
-import ConfigureTab from './components/ConfigureTab';
-import TabPane from './components/TabPane';
-import Tabs from './components/Tabs';
+import DataImport from './components/DataImport'
+import ChooseTab from './components/ChooseTab'
+import ConfigureTab from './components/ConfigureTab'
+import TabPane from './components/TabPane'
+import Tabs from './components/Tabs'
 
-import './scss/main.scss';
+import './scss/main.scss'
 
-export default function CdcEditor({ config: configObj = {newViz: true}, hostname, containerEl, sharepath }) {
+export default function CdcEditor({ config: configObj = { newViz: true }, hostname, containerEl, sharepath }) {
   const [config, setConfig] = useState(configObj)
   const [tempConfig, setTempConfig] = useState(null)
   const [errors, setErrors] = useState([])
@@ -27,79 +27,79 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [dimensions, setDimensions] = useState([])
 
-  let startingTab = 0;
+  let startingTab = 0
 
-  if(config.data && config.type) {
+  if (config.data && config.type) {
     startingTab = 2
   }
 
   // Legacy support - dashboards using a single dataset
-  if(config.type === 'dashboard'){
-    let legacyUpdateNeeded = false;
-    let newConfig;
+  if (config.type === 'dashboard') {
+    let legacyUpdateNeeded = false
+    let newConfig
 
-    if(config.data || config.dataUrl){
-      legacyUpdateNeeded = true;
-      newConfig = {...config};
+    if (config.data || config.dataUrl) {
+      legacyUpdateNeeded = true
+      newConfig = { ...config }
 
-      newConfig.datasets = {};
+      newConfig.datasets = {}
       newConfig.datasets[config.dataFileName || 'dataset-1'] = {
         data: config.data,
         dataUrl: config.dataUrl,
         dataFileName: config.dataFileName || 'dataset-1',
         dataFileSourceType: config.dataFileSourceType
-      };
+      }
 
       Object.keys(newConfig.visualizations).forEach(vizKey => {
-        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1';
-        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription;
-        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData;
-      });
+        newConfig.visualizations[vizKey].dataKey = config.dataFileName || 'dataset-1'
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
+      })
 
-      delete newConfig.data;
-      delete newConfig.dataUrl,
-      delete newConfig.dataFileName;
-      delete newConfig.dataFileSourceType;
-      delete newConfig.dataDescription;
-      delete newConfig.formattedData;
+      delete newConfig.data
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
+      delete newConfig.dataFileSourceType
+      delete newConfig.dataDescription
+      delete newConfig.formattedData
     }
 
-    if(config.dashboard && config.dashboard.filters){
-      legacyUpdateNeeded = true;
-      newConfig = {...config};
+    if (config.dashboard && config.dashboard.filters) {
+      legacyUpdateNeeded = true
+      newConfig = { ...config }
 
-      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || [];
+      newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
       newConfig.dashboard.filters.forEach(filter => {
-        newConfig.dashboard.sharedFilters.push({...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations)});
-      });
+        newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
+      })
 
-      delete newConfig.dashboard.filters;
+      delete newConfig.dashboard.filters
     }
-    
-    if(legacyUpdateNeeded){
-      setConfig(newConfig);
+
+    if (legacyUpdateNeeded) {
+      setConfig(newConfig)
     }
   }
 
-  const [globalActive, setGlobalActive] = useState(startingTab);
+  const [globalActive, setGlobalActive] = useState(startingTab)
 
-  const resizeObserver = new ResizeObserver(([ container ]) => {
+  const resizeObserver = new ResizeObserver(([container]) => {
     let { width, height } = container.contentRect
     let newViewport = getViewport(width)
 
     setDimensions([width, height])
     setCurrentViewport(newViewport)
-  });
+  })
 
   const outerContainerRef = useCallback(node => {
     if (node !== null) {
-        resizeObserver.observe(node);
+      resizeObserver.observe(node)
     }
-  },[]);
+  }, [])
 
   // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
   useEffect(() => {
-    if(null !== tempConfig) {
+    if (null !== tempConfig) {
       const parsedData = JSON.stringify(tempConfig)
       // Emit the data in a regular JS event so it can be consumed by anything.
       const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
@@ -110,29 +110,29 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
   useEffect(() => {
     const parsedData = JSON.stringify(config)
     // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: parsedData})
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
     window.dispatchEvent(event)
   }, [config])
 
   useEffect(() => {
-    if(globalActive > -1) {
+    if (globalActive > -1) {
       setGlobalActive(-1)
     }
   }, [globalActive])
 
-  const maxFileSize = 10; // Represents number of MB. Maybe move this to a prop eventually but static for now.
+  const maxFileSize = 10 // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
   const errorMessages = {
-    emptyCols: "It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.",
-    emptyData: "Your data file is empty.",
-    dataType: "Your datatype is not supported.",
-    fileType: "The file type that you are trying to upload is not supported.",
-    formatting: "Please check the formatting of your data file.",
-    failedFetch: "Error fetching or parsing data file.",
-    urlInvalid: "Please make sure to use a valid URL.",
+    emptyCols: 'It looks like your column headers are missing some data. Please make sure all of your columns have titles and upload your file again.',
+    emptyData: 'Your data file is empty.',
+    dataType: 'Your datatype is not supported.',
+    fileType: 'The file type that you are trying to upload is not supported.',
+    formatting: 'Please check the formatting of your data file.',
+    failedFetch: 'Error fetching or parsing data file.',
+    urlInvalid: 'Please make sure to use a valid URL.',
     cannotReach: "Cannot reach URL, please make sure it's correct.",
     fileTooLarge: `File is too large. Maximum file size is ${maxFileSize}MB.`
-  };
+  }
 
   const state = {
     config,
@@ -149,15 +149,15 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     sharepath
   }
 
-  let configureDisabled = true;
+  let configureDisabled = true
 
-  if(config.type !== 'dashboard'){
-    if(config.formattedData){
-      configureDisabled = false;
+  if (config.type !== 'dashboard') {
+    if (config.formattedData) {
+      configureDisabled = false
     }
   } else {
-    if(config.datasets && Object.keys(config.datasets).length > 0){
-      configureDisabled = false;
+    if (config.datasets && Object.keys(config.datasets).length > 0) {
+      configureDisabled = false
     }
   }
 
@@ -165,21 +165,21 @@ export default function CdcEditor({ config: configObj = {newViz: true}, hostname
     <GlobalContextProvider>
       <GlobalState.Provider value={state}>
         <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
-          <Tabs className="top-level" startingTab={globalActive}>
-            <TabPane title="1. Choose Visualization Type" className="choose-type">
+          <Tabs className='top-level' startingTab={globalActive}>
+            <TabPane title='1. Choose Visualization Type' className='choose-type'>
               <ChooseTab />
             </TabPane>
-            <TabPane title="2. Import Data" className="data-designer" disableRule={!config.type}>
+            <TabPane title='2. Import Data' className='data-designer' disableRule={!config.type}>
               <DataImport />
             </TabPane>
-            
-            <TabPane title="3. Configure" className="configure" disableRule={configureDisabled}>
-              <ConfigureTab containerEl={containerEl }/>
+
+            <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
+              <ConfigureTab containerEl={containerEl} />
             </TabPane>
           </Tabs>
         </div>
       </GlobalState.Provider>
-      <OverlayFrame/>
+      <OverlayFrame />
     </GlobalContextProvider>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-export default function LegendCircle({fill}) {
+export default function LegendCircle({ fill }) {
   const styles = {
     marginRight: '5px',
     borderRadius: '300px',
@@ -12,5 +12,5 @@ export default function LegendCircle({fill}) {
     backgroundColor: fill
   }
 
-  return <span className="legend-item" style={styles} />
+  return <span className='legend-item' style={styles} />
 }

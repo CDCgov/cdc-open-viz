@@ -9,7 +9,7 @@ $red: #f74242;
   background-color: #fff;
   padding: 1em;
   width: 350px;
-  border-right: #C7C7C7 1px solid;
+  border-right: #c7c7c7 1px solid;
   position: fixed;
   top: 6em;
   bottom: 0;
@@ -23,7 +23,7 @@ $red: #f74242;
 
 .config-needed {
   color: $red;
-  font-size: .75em;
+  font-size: 0.75em;
 }
 
 .builder-grid {
@@ -39,9 +39,9 @@ $red: #f74242;
   position: relative;
   top: 0;
   padding: 1em;
-  border: 1px solid #C2C2C2;
+  border: 1px solid #c2c2c2;
   transition: border 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  background-color: #F2F2F2;
+  background-color: #f2f2f2;
   user-select: none;
 
   &.can-drop {
@@ -59,7 +59,7 @@ $red: #f74242;
   bottom: -1px;
 
   > li:not(.spacer) + li:not(.spacer) {
-    margin-left: .3em;
+    margin-left: 0.3em;
   }
 
   .spacer {
@@ -78,7 +78,7 @@ $red: #f74242;
 }
 
 .row-menu__btn:hover .row-menu__flyout {
-  transition: width .2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   width: 144px;
 
   li {
@@ -86,7 +86,7 @@ $red: #f74242;
   }
 
   li + li {
-    margin-left: .3em;
+    margin-left: 0.3em;
   }
 }
 
@@ -95,7 +95,7 @@ $red: #f74242;
   display: flex;
   justify-content: flex-start;
   overflow: hidden;
-  transition: width .2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1;
   width: 25px;
 
@@ -104,10 +104,11 @@ $red: #f74242;
   }
 
   li svg {
-    opacity: .7;
+    opacity: 0.7;
   }
 
-  li:hover svg, li.current svg {
+  li:hover svg,
+  li.current svg {
     opacity: 1;
   }
 
@@ -117,23 +118,23 @@ $red: #f74242;
 }
 
 .row-menu__btn {
-  background-color: #C2C2C2;
-  border-radius: .2em .2em 0 0;
+  background-color: #c2c2c2;
+  border-radius: 0.2em 0.2em 0 0;
   outline: none;
   transition: background-color 300ms cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  padding: .2em .3em;
+  padding: 0.2em 0.3em;
   display: flex;
   fill: #fff;
 
   + .row-menu__btn {
-    margin-left: .2em;
+    margin-left: 0.2em;
   }
 }
 
 .row-menu__btn-disabled {
   pointer-events: none;
-  opacity: .3;
+  opacity: 0.3;
 }
 
 .row-menu__btn--edit {
@@ -150,7 +151,7 @@ $red: #f74242;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   background-color: transparent;
-  border: 2px dashed #C2C2C2;
+  border: 2px dashed #c2c2c2;
   flex: 1 1 auto;
 
   &:hover {
@@ -235,8 +236,8 @@ $red: #f74242;
 
   .drag-icon {
     position: absolute;
-    top: .3em;
-    left: .3em;
+    top: 0.3em;
+    left: 0.3em;
     width: 10px;
   }
 }
@@ -273,7 +274,7 @@ $red: #f74242;
   justify-content: center;
 
   svg {
-    margin-bottom: .5em;
+    margin-bottom: 0.5em;
   }
 }
 
@@ -340,7 +341,6 @@ $red: #f74242;
       max-width: 100px;
       max-height: 80px;
       flex-grow: 1;
-      margin-top: 40px;
     }
   }
 

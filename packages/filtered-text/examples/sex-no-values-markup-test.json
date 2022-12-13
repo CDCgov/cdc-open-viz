@@ -1,14 +1,14 @@
 [
-    {
-      "Sex": "Male",
-      "Text": "<strong>Male</strong> Text Test:  Lorem ipsum dolor sit amet, <em>consectetur</em> adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<sub>Sub Text</sub>  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<sup>14</sup> Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <a href=\"https://www.cdc.gov/wcms/4.0/cdc-wp/index.html\">Link Text</a> <sub>Sub Text</sub> END"
-    },
-    {
-      "Sex": "Female",
-      "Text": "<strong>Female</strong> Text Test:  Lorem ipsum dolor sit amet, <em>consectetur</em> adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<sub>Sub Text</sub>  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<sup>14</sup> Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <a href=\"https://www.cdc.gov/wcms/4.0/cdc-wp/index.html\">Link Text</a> <sub>Sub Text</sub> END"
-    },
-    {
-      "Sex": "x",
-      "Text": ""
-    }
-  ]
+  {
+    "Sex": "Male",
+    "Text": "<strong>Male</strong> Text Test:  Lorem ipsum dolor sit amet, <em>consectetur</em> adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<sub>Sub Text</sub>  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<sup>14</sup> Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <a href=\"https://www.cdc.gov/wcms/4.0/cdc-wp/index.html\">Link Text</a> <sub>Sub Text</sub> END"
+  },
+  {
+    "Sex": "Female",
+    "Text": "<strong>Female</strong> Text Test:  Lorem ipsum dolor sit amet, <em>consectetur</em> adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<sub>Sub Text</sub>  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<sup>14</sup> Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <a href=\"https://www.cdc.gov/wcms/4.0/cdc-wp/index.html\">Link Text</a> <sub>Sub Text</sub> END"
+  },
+  {
+    "Sex": "x",
+    "Text": ""
+  }
+]

@@ -1,4 +1,4 @@
-@import "../../../core/styles/variables";
+@import '../../../core/styles/variables';
 
 &.is-editor {
   position: relative;
@@ -112,7 +112,7 @@
   top: 0;
   padding: 0.6rem 0.8rem;
   color: white;
-  font-size:1.1em;
+  font-size: 1.1em;
   &:empty {
     min-height: 5px;
   }
@@ -122,7 +122,6 @@
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
 .cove-component__inner {
-
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -130,18 +129,22 @@
 
   // General: Bite Style > Graphic
   .bite__style--graphic {
-    .bite-content { flex: 1; }
+    .bite-content {
+      flex: 1;
+    }
   }
-  
+
   // General: Bite Style > End
-  &.bite__style--end .bite-text { margin-bottom: 0 !important; }
-  
+  &.bite__style--end .bite-text {
+    margin-bottom: 0 !important;
+  }
+
   // General: Bite Style > Split
   &.bite__style--split {
     .bite-content {
       flex-direction: row !important;
     }
-    .bite-value { 
+    .bite-value {
       flex-basis: 25%;
       align-self: center;
       text-align: center;
@@ -163,7 +166,9 @@
     align-items: center;
   }
 
-  .cove-component__header + .bite { border-top: 0; }
+  .cove-component__header + .bite {
+    border-top: 0;
+  }
   .bite {
     position: relative;
     overflow: hidden;
@@ -172,11 +177,11 @@
     border-bottom-right-radius: 3px;
 
     &-header {
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
     }
 
-    .bite-content-container.component--hideBackgroundColor  {
+    .bite-content-container.component--hideBackgroundColor {
       background: transparent;
     }
 
@@ -184,8 +189,7 @@
       border: none;
     }
 
-
-    &-content__text-wrap { 
+    &-content__text-wrap {
       height: 100%;
       display: flex;
       flex-wrap: wrap;
@@ -301,7 +305,7 @@
       width: 100%;
       min-width: 100px;
       align-self: center;
-      border-radius: .3em;
+      border-radius: 0.3em;
     }
 
     .cove-component__content {
@@ -330,7 +334,7 @@
         }
 
         .bite-subtext {
-          font-size: .9em;
+          font-size: 0.9em;
           font-style: italic;
           flex-basis: 100%;
           width: 100%;
@@ -420,10 +424,11 @@
       align-items: center;
     }
 
-    .cove-component__header + .bite { border-top: 0; }
+    .cove-component__header + .bite {
+      border-top: 0;
+    }
   }
 }
-
 
 .cove-component__content {
   background: $lightestGray;
