@@ -2,6 +2,7 @@
 @import "~@cdc/core/styles/heading-colors";
 @import "variables";
 @import "editor-panel";
+@import "filters";
 
 .cdc-map-outer-container {
   position: relative;
@@ -185,7 +186,7 @@
       > div.select-heading {
         font-size: 1.1em;
         font-weight: 600;
-        margin-bottom: .75em; 
+        margin-bottom: .75em;
       }
     }
     form {
@@ -215,5 +216,5 @@
   [tabIndex]:focus {
     outline-color: rgb(0, 95, 204)
   }
-  
+
 }
