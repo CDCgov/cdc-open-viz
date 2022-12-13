@@ -1,8 +1,5 @@
 ## Briefly describe your changes
 
-## Issue ticket number and link
-[DEV-ISSUE-12345](#!)
-
 ## Checklist before requesting a review
 - [ ] My pull request was branched from and targets the test branch
 - [ ] I have performed a self-review of my code
