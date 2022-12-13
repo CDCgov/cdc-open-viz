@@ -1,16 +1,32 @@
 @import '~@cdc/core/styles/v2/main';
 
 .markup-include {
+  .checkbox-group {
+    padding: 16px;
+    border: 1px solid #c4c4c4;
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
 
-  .cove-component__header { 
+  .cove-component__header {
     font-size: unset;
   }
-  
+
   .cove-component__content {
     background-color: #f2f2f2;
     font-size: 14px;
   }
   .cove-component__content.component--hideBackgroundColor {
     background: transparent;
+  }
+}
+
+.cove-accordion__panel-section {
+  overflow: auto;
+
+  label {
+    display: block;
+    float: left;
   }
 }

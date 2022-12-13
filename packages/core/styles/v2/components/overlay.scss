@@ -1,5 +1,5 @@
-@import "../utils/variables";
-@import "../themes/index";
+@import '../utils/variables';
+@import '../themes/index';
 
 .cove-overlay {
   display: flex;
@@ -35,12 +35,12 @@
 
   &.show {
     .cove-overlay__bg {
-      opacity: 1
+      opacity: 1;
     }
 
     .cove-overlay__container {
       opacity: 1;
-      transform: translateY(0)
+      transform: translateY(0);
     }
   }
 }

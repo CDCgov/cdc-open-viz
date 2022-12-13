@@ -7,11 +7,11 @@ strong {
 }
 
 .error-box {
-  background: #FFC2C2;
+  background: #ffc2c2;
   display: flex;
   justify-content: space-between;
-  padding: .3rem 1rem;
-  font-size: .9rem;
+  padding: 0.3rem 1rem;
+  font-size: 0.9rem;
   strong {
     font-weight: 600;
   }
@@ -20,7 +20,7 @@ strong {
   }
   .dismiss-error {
     flex-shrink: 0;
-    font-size: .8rem;
+    font-size: 0.8rem;
     cursor: pointer;
   }
 }
@@ -42,7 +42,7 @@ strong {
 .inline-icon {
   width: 1em !important;
   height: auto !important;
-  @media all and (-ms-high-contrast:none) {
+  @media all and (-ms-high-contrast: none) {
     height: 30px !important;
   }
   font-size: 1rem;
@@ -56,26 +56,26 @@ strong {
   background: #005eaa;
   color: #fff;
   border: 0;
-  padding: .4em .8em;
+  padding: 0.4em 0.8em;
   font-size: 1em;
   display: block;
-  border-radius: .3em;
-  transition: .1s background-color;
+  border-radius: 0.3em;
+  transition: 0.1s background-color;
   cursor: pointer;
   &.full-width {
     width: 100%;
   }
   &:hover {
-    transition: .1s background-color;
+    transition: 0.1s background-color;
   }
   &.secondary {
-    font-size: .8em;
-    padding: .3em 1em;
+    font-size: 0.8em;
+    padding: 0.3em 1em;
     background: rgba(0, 0, 0, 0.3);
     display: inline-block;
     margin-bottom: 1em;
     &:hover {
-      background: rgba(0,0,0,.5);
+      background: rgba(0, 0, 0, 0.5);
     }
   }
   &.danger {
@@ -87,7 +87,7 @@ strong {
   }
 
   &:hover {
-    transition: .1s all;
+    transition: 0.1s all;
     background: lighten(#005eaa, 5%);
   }
 
@@ -100,14 +100,19 @@ strong {
   }
 }
 
-input[type="text"], input[type="date"], input[role="combobox"], input[type="number"], input[type="search"], textarea {
-  padding: .5em .5em;
+input[type='text'],
+input[type='date'],
+input[role='combobox'],
+input[type='number'],
+input[type='search'],
+textarea {
+  padding: 0.5em 0.5em;
   font-size: 1em;
   font-weight: normal;
   font-family: sans-serif;
-  border: rgba(0,0,0,.3) 1px solid !important;
+  border: rgba(0, 0, 0, 0.3) 1px solid !important;
   &:focus {
-    border: rgba(0,0,0,.7) 1px solid !important;
+    border: rgba(0, 0, 0, 0.7) 1px solid !important;
     outline: 0;
   }
 }
@@ -129,16 +134,16 @@ select {
 
 .guidance-link {
   margin: 2em 0 1em;
-  padding: .75em 1em;
+  padding: 0.75em 1em;
   display: flex;
   text-decoration: none;
   color: #444;
   border: $lightGray 1px solid;
   position: relative;
-  transition: .2s all;
+  transition: 0.2s all;
   font-size: 1em;
   &:before {
-    content: " ";
+    content: ' ';
     width: 5px;
     background: $blue;
     left: -1px;
@@ -148,11 +153,11 @@ select {
   }
   &:hover {
     background: $lightestGray;
-    transition: .2s all;
+    transition: 0.2s all;
     color: #444;
   }
   > div {
-    font-size: .9em;
+    font-size: 0.9em;
   }
   svg {
     width: 60px;
@@ -173,7 +178,7 @@ section.introText {
 }
 
 section.footnotes {
-  border-top: 1px solid #DDD;
+  border-top: 1px solid #ddd;
   margin-top: 20px;
   padding: 15px;
 }
