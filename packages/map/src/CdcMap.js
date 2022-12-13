@@ -49,6 +49,9 @@ import DataTable from './components/DataTable' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
+import Filters from './components/Filters'
+import Context from './context'
+
 
 import { publish } from '@cdc/core/helpers/events'
 
@@ -1356,7 +1359,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       specialClasses: state.legend.specialClasses,
       geoType: state.general.geoType,
       data: state.data,
-      ...runtimeLegend
+      ...runtimeLegend,
+      ...runtimeFilters
     })
 
     const hashData = hashObj({
@@ -1367,7 +1371,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       primary: state.columns.primary.name,
       data: state.data,
       ...runtimeFilters,
-      mapPosition: state.mapPosition
+      mapPosition: state.mapPosition,
+      ...runtimeFilters
     })
 
     // Data
@@ -1455,8 +1460,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setPosition,
     setSharedFilterValue,
     hasZoom: state.general.allowMapZoom,
-    handleMapAriaLabels
+    handleMapAriaLabels,
+    runtimeFilters,
+    setRuntimeFilters
   }
+
 
   if (!mapProps.data || !state.data) return <Loading />
 
@@ -1487,123 +1495,127 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tabId = handleMapTabbing()
 
   return (
-    <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-      {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
-      {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-        <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-          {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
-          {state.general.title && (
-            <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-              <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
-                <sup>{general.superTitle}</sup>
-                <div>{parse(title)}</div>
-              </div>
-            </header>
-          )}
-
-          <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
-
-          <section
-            role='button'
-            tabIndex='0'
-            className={mapContainerClasses.join(' ')}
-            onClick={e => closeModal(e)}
-            onKeyDown={e => {
-              if (e.keyCode === 13) {
-                closeModal(e)
-              }
-            }}
-          >
-            {general.showDownloadMediaButton === true && (
-              <div className='map-downloads' data-html2canvas-ignore>
-                <div className='map-downloads__ui btn-group'>
-                  <button className='btn' title='Download Map as Image' onClick={() => generateMedia(outerContainerRef.current, 'image')}>
-                    <DownloadImg className='btn__icon' title='Download Map as Image' />
-                  </button>
-                  <button className='btn' title='Download Map as PDF' onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
-                    <DownloadPdf className='btn__icon' title='Download Map as PDF' />
-                  </button>
+    <Context.Provider value={mapProps}>
+      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
+        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
+        {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+            {state.general.title && (
+              <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
+                <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
+                  <sup>{general.superTitle}</sup>
+                  <div>{parse(title)}</div>
                 </div>
-              </div>
+              </header>
             )}
 
-            <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
-              Skip Over Map Container
-            </a>
+            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
 
-            <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
-              {currentViewport && (
-                <section className='geography-container' ref={mapSvg}>
-                  {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
-                  {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                  {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                  {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                  {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
-                </section>
+            <Filters />
+
+            <section
+              role='button'
+              tabIndex='0'
+              className={mapContainerClasses.join(' ')}
+              onClick={e => closeModal(e)}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  closeModal(e)
+                }
+              }}
+            >
+              {general.showDownloadMediaButton === true && (
+                <div className='map-downloads' data-html2canvas-ignore>
+                  <div className='map-downloads__ui btn-group'>
+                    <button className='btn' title='Download Map as Image' onClick={() => generateMedia(outerContainerRef.current, 'image')}>
+                      <DownloadImg className='btn__icon' title='Download Map as Image' />
+                    </button>
+                    <button className='btn' title='Download Map as PDF' onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
+                      <DownloadPdf className='btn__icon' title='Download Map as PDF' />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+                Skip Over Map Container
+              </a>
+
+              <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
+                {currentViewport && (
+                  <section className='geography-container' ref={mapSvg}>
+                    {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                    {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                    {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                    {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                  </section>
+                )}
+              </section>
+
+              {general.showSidebar && 'navigation' !== general.type && (
+                <Sidebar
+                  viewport={currentViewport}
+                  legend={state.legend}
+                  runtimeLegend={runtimeLegend}
+                  setRuntimeLegend={setRuntimeLegend}
+                  runtimeFilters={runtimeFilters}
+                  columns={state.columns}
+                  sharing={state.sharing}
+                  prefix={state.columns.primary.prefix}
+                  suffix={state.columns.primary.suffix}
+                  setState={setState}
+                  resetLegendToggles={resetLegendToggles}
+                  changeFilterActive={changeFilterActive}
+                  setAccessibleStatus={setAccessibleStatus}
+                  displayDataAsText={displayDataAsText}
+                />
               )}
             </section>
 
-            {general.showSidebar && 'navigation' !== general.type && (
-              <Sidebar
-                viewport={currentViewport}
-                legend={state.legend}
-                runtimeLegend={runtimeLegend}
-                setRuntimeLegend={setRuntimeLegend}
-                runtimeFilters={runtimeFilters}
+            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
+
+            {link && link}
+
+            {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+            {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+              <DataTable
+                state={state}
+                rawData={state.data}
+                navigationHandler={navigationHandler}
+                expandDataTable={general.expandDataTable}
+                headerColor={general.headerColor}
                 columns={state.columns}
-                sharing={state.sharing}
-                prefix={state.columns.primary.prefix}
-                suffix={state.columns.primary.suffix}
-                setState={setState}
-                resetLegendToggles={resetLegendToggles}
-                changeFilterActive={changeFilterActive}
-                setAccessibleStatus={setAccessibleStatus}
+                showDownloadButton={general.showDownloadButton}
+                runtimeLegend={runtimeLegend}
+                runtimeData={runtimeData}
                 displayDataAsText={displayDataAsText}
+                displayGeoName={displayGeoName}
+                applyLegendToRow={applyLegendToRow}
+                tableTitle={dataTable.title}
+                indexTitle={dataTable.indexLabel}
+                mapTitle={general.title}
+                viewport={currentViewport}
+                formatLegendLocation={formatLegendLocation}
+                setFilteredCountryCode={setFilteredCountryCode}
+                tabbingId={tabId}
               />
             )}
+
+            {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
           </section>
+        )}
 
-          {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
-
-          {link && link}
-
-          {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
-
-          {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
-            <DataTable
-              state={state}
-              rawData={state.data}
-              navigationHandler={navigationHandler}
-              expandDataTable={general.expandDataTable}
-              headerColor={general.headerColor}
-              columns={state.columns}
-              showDownloadButton={general.showDownloadButton}
-              runtimeLegend={runtimeLegend}
-              runtimeData={runtimeData}
-              displayDataAsText={displayDataAsText}
-              displayGeoName={displayGeoName}
-              applyLegendToRow={applyLegendToRow}
-              tableTitle={dataTable.title}
-              indexTitle={dataTable.indexLabel}
-              mapTitle={general.title}
-              viewport={currentViewport}
-              formatLegendLocation={formatLegendLocation}
-              setFilteredCountryCode={setFilteredCountryCode}
-              tabbingId={tabId}
-            />
-          )}
-
-          {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
-        </section>
-      )}
-
-      <div aria-live='assertive' className='cdcdataviz-sr-only'>
-        {accessibleStatus}
+        <div aria-live='assertive' className='cdcdataviz-sr-only'>
+          {accessibleStatus}
+        </div>
       </div>
-    </div>
+    </Context.Provider>
   )
 }
 
-export default memo(CdcMap)
+export default CdcMap

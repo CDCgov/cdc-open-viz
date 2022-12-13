@@ -30,6 +30,7 @@ import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
+import Filters from './components/Filters'
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -554,74 +555,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Pie: <PieChart />
   }
 
-  const Filters = () => {
-    const changeFilterActive = (index, value) => {
-      let newFilters = config.filters
-
-      newFilters[index].active = value
-
-      setConfig({ ...config, filters: newFilters })
-
-      setFilteredData(filterData(newFilters, excludedData))
-    }
-
-    const announceChange = text => {}
-
-    let filterList = ''
-    if (config.filters) {
-      filterList = config.filters.map((singleFilter, index) => {
-        const values = []
-        const sortAsc = (a, b) => {
-          return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
-        }
-
-        const sortDesc = (a, b) => {
-          return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
-        }
-
-        if (!singleFilter.order || singleFilter.order === '') {
-          singleFilter.order = 'asc'
-        }
-
-        if (singleFilter.order === 'desc') {
-          singleFilter.values = singleFilter.values.sort(sortDesc)
-        }
-
-        if (singleFilter.order === 'asc') {
-          singleFilter.values = singleFilter.values.sort(sortAsc)
-        }
-
-        singleFilter.values.forEach((filterOption, index) => {
-          values.push(
-            <option key={index} value={filterOption}>
-              {filterOption}
-            </option>
-          )
-        })
-
-        return (
-          <div className='single-filter' key={index}>
-            <label htmlFor={`filter-${index}`}>{singleFilter.label}</label>
-            <select
-              id={`filter-${index}`}
-              className='filter-select'
-              data-index='0'
-              value={singleFilter.active}
-              onChange={val => {
-                changeFilterActive(index, val.target.value)
-                announceChange(`Filter ${singleFilter.label} value has been changed to ${val.target.value}, please reference the data table to see updated values.`)
-              }}
-            >
-              {values}
-            </select>
-          </div>
-        )
-      })
-    }
-
-    return <section className='filters-section'>{filterList}</section>
-  }
-
   const missingRequiredSections = () => {
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
@@ -666,7 +599,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className="introText">{parse(config.introText)}</section>}
             <div
               className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : "" 
+              }${config.legend.hide ? " legend-hidden" : ""
               }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
@@ -736,7 +669,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     legend,
     setSeriesHighlight,
     dynamicLegendItems,
-    setDynamicLegendItems
+    setDynamicLegendItems,
+    filterData
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
