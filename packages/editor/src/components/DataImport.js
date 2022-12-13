@@ -160,14 +160,32 @@ export default function DataImport() {
     }
 
     let path = fileBlob?.name || externalURL || fileName
-    let fileExtension = path.match(/(?:\.([^.]+))?$/g)
 
-    if (fileExtension.length === 0) {
-      fileExtension = '.csv'
-    } else {
-      fileExtension = fileExtension[0]
+    // checking the file source type allows us to handle real urls better
+    // For example, query parameters in API's and cache busting strings
+    // file matching can handle .csv and .json, but doesn't handle
+    // .csv?version=1 or .json?version=1
+    const handleFileExtension = (fileSourceType) => {
+      let fileExtension;
+      if(fileSourceType === "file") {
+        fileExtension = path.match(/(?:\.([^.]+))?$/g)
+
+        if (fileExtension.length === 0) {
+          fileExtension = '.csv'
+        } else {
+          fileExtension = fileExtension[0]
+        }
+      }
+
+      if(fileSourceType === "url") {
+        let urlData = new URL(path)
+        fileExtension = Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
+      }
+
+      return fileExtension;
     }
 
+    let fileExtension = handleFileExtension(fileSourceType)
     let mimeType = supportedDataTypes[fileExtension]
 
     // Convert from blob into raw text

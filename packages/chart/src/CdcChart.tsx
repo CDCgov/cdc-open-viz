@@ -183,7 +183,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.filters.forEach((filter, index) => {
         let filterValues = []
 
-        filterValues = generateValuesForFilter(filter.columnName, newExcludedData)
+        filterValues = filter.orderedValues || generateValuesForFilter(filter.columnName, newExcludedData)
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
