@@ -1,427 +1,427 @@
 {
-	"defaultData": true,
-	"general": {
-		"title": "Default World Map",
-		"subtext": "",
-		"type": "bubble",
-		"geoType": "world",
-		"headerColor": "theme-blue",
-		"geoBorderColor": "darkGray",
-		"showSidebar": true,
-		"showTitle": true,
-		"showDownloadButton": true,
-		"expandDataTable": true
-	},
-	"color": "redreverse",
-	"columns": {
-		"geo": {
-			"name": "Country",
-			"label": "Location",
-			"tooltip": false,
-			"dataTable": true
-		},
-		"primary": {
-			"name": "Cases",
-			"label": "Total Confirmed Cases",
-			"prefix": "",
-			"suffix": "",
-			"dataTable": true,
-			"tooltip": true
-		},
-		"navigate": {
-			"name": "Link",
-			"tooltip": false,
-			"dataTable": false
-		}
-	},
-	"legend": {
-		"numberOfItems": 1,
-		"position": "side",
-		"title": "Legend Title",
-		"description": "Legend Text",
-		"type": "equalnumber",
-		"specialClasses": [
-			"N/A"
-		]
-	},
-	"data": [
-		{
-			"Country": "Argentina",
-			"Cases": "9",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Australia",
-			"Cases": "23",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Austria",
-			"Cases": "62",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Bahamas",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Belgium",
-			"Cases": "168",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Benin",
-			"Cases": "3",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Brazil",
-			"Cases": "218",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Bulgaria",
-			"Cases": "3",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Cameroon",
-			"Cases": "3",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Canada",
-			"Cases": "375",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Central African Republic",
-			"Cases": "8",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Chile",
-			"Cases": "13",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Colombia",
-			"Cases": "6",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Croatia",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Czechia",
-			"Cases": "11",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Democratic Republic of the Congo",
-			"Cases": "107",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Denmark",
-			"Cases": "29",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Dominican Republic",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Ecuador",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Estonia",
-			"Cases": "2",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Finland",
-			"Cases": "13",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "France",
-			"Cases": "721",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Georgia",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Germany",
-			"Cases": "1556",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Ghana",
-			"Cases": "19",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Gibraltar",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Greece",
-			"Cases": "11",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Hungary",
-			"Cases": "24",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Iceland",
-			"Cases": "6",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Ireland",
-			"Cases": "44",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Israel",
-			"Cases": "66",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Italy",
-			"Cases": "255",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Jamaica",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Latvia",
-			"Cases": "2",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Lebanon",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Luxembourg",
-			"Cases": "6",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Malta",
-			"Cases": "8",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Mexico",
-			"Cases": "35",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Morocco",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Netherlands",
-			"Cases": "503",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Nigeria",
-			"Cases": "84",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Norway",
-			"Cases": "19",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Panama",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Peru",
-			"Cases": "18",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Poland",
-			"Cases": "19",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Portugal",
-			"Cases": "473",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Republic of the Congo",
-			"Cases": "2",
-			"Category": "Has historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Romania",
-			"Cases": "14",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Serbia",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Singapore",
-			"Cases": "2",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Slovakia",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Slovenia",
-			"Cases": "18",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "South Africa",
-			"Cases": "3",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "South Korea",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Spain",
-			"Cases": "2034",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Sweden",
-			"Cases": "43",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Switzerland",
-			"Cases": "163",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Taiwan",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Turkey",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "United Arab Emirates",
-			"Cases": "13",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "United Kingdom",
-			"Cases": "1552",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "United States",
-			"Cases": "0",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		},
-		{
-			"Country": "Venezuela",
-			"Cases": "1",
-			"Category": "Has not historically reported monkeypox",
-			"AsOf": "11 Jul 2022 5:00 PM EDT"
-		}
-	]
+  "defaultData": true,
+  "general": {
+    "title": "Default World Map",
+    "subtext": "",
+    "type": "bubble",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "geoBorderColor": "darkGray",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": true
+  },
+  "color": "redreverse",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Cases",
+      "label": "Total Confirmed Cases",
+      "prefix": "",
+      "suffix": "",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "navigate": {
+      "name": "Link",
+      "tooltip": false,
+      "dataTable": false
+    }
+  },
+  "legend": {
+    "numberOfItems": 1,
+    "position": "side",
+    "title": "Legend Title",
+    "description": "Legend Text",
+    "type": "equalnumber",
+    "specialClasses": [
+      "N/A"
+    ]
+  },
+  "data": [
+    {
+      "Country": "Argentina",
+      "Cases": "0",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Australia",
+      "Cases": "23",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Austria",
+      "Cases": "62",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Bahamas",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Belgium",
+      "Cases": "168",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Benin",
+      "Cases": "3",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Brazil",
+      "Cases": "218",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Bulgaria",
+      "Cases": "3",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Cameroon",
+      "Cases": "3",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Canada",
+      "Cases": "375",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Central African Republic",
+      "Cases": "8",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Chile",
+      "Cases": "13",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Colombia",
+      "Cases": "6",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Croatia",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Czechia",
+      "Cases": "11",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Democratic Republic of the Congo",
+      "Cases": "107",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Denmark",
+      "Cases": "29",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Dominican Republic",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Ecuador",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Estonia",
+      "Cases": "2",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Finland",
+      "Cases": "13",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "France",
+      "Cases": "721",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Georgia",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Germany",
+      "Cases": "1556",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Ghana",
+      "Cases": "19",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Gibraltar",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Greece",
+      "Cases": "11",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Hungary",
+      "Cases": "24",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Iceland",
+      "Cases": "6",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Ireland",
+      "Cases": "44",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Israel",
+      "Cases": "66",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Italy",
+      "Cases": "255",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Jamaica",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Latvia",
+      "Cases": "2",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Lebanon",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Luxembourg",
+      "Cases": "6",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Malta",
+      "Cases": "8",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Mexico",
+      "Cases": "35",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Morocco",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Netherlands",
+      "Cases": "503",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Nigeria",
+      "Cases": "84",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Norway",
+      "Cases": "19",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Panama",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Peru",
+      "Cases": "18",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Poland",
+      "Cases": "19",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Portugal",
+      "Cases": "473",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Republic of the Congo",
+      "Cases": "2",
+      "Category": "Has historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Romania",
+      "Cases": "14",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Serbia",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Singapore",
+      "Cases": "2",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Slovakia",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Slovenia",
+      "Cases": "18",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "South Africa",
+      "Cases": "3",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "South Korea",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Spain",
+      "Cases": "2034",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Sweden",
+      "Cases": "43",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Switzerland",
+      "Cases": "163",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Taiwan",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Turkey",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "United Arab Emirates",
+      "Cases": "13",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "United Kingdom",
+      "Cases": "1552",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "United States",
+      "Cases": "0",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    },
+    {
+      "Country": "Venezuela",
+      "Cases": "1",
+      "Category": "Has not historically reported monkeypox",
+      "AsOf": "11 Jul 2022 5:00 PM EDT"
+    }
+  ]
 }
