@@ -7,7 +7,7 @@ import Widget from './Widget'
 const Column = ({ data, rowIdx, colIdx }) => {
   const { visualizations } = useContext(ConfigContext)
 
-  const [ { isOver, canDrop }, drop ] = useDrop(() => ({
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'vis-widget',
     drop: () => ({
       rowIdx,
@@ -15,7 +15,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
       canDrop
     }),
     canDrop: () => !data.widget,
-    collect: (monitor) => ({
+    collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: !!monitor.canDrop()
     })
@@ -23,10 +23,7 @@ const Column = ({ data, rowIdx, colIdx }) => {
 
   const widget = data.widget ? visualizations[data.widget] : null
 
-  let classNames = [
-    'builder-column',
-    'column-size--' + data.width,
-  ]
+  let classNames = ['builder-column', 'column-size--' + data.width]
 
   if (isOver && canDrop) {
     classNames.push('column--drop')
@@ -38,9 +35,13 @@ const Column = ({ data, rowIdx, colIdx }) => {
 
   return (
     <div className={classNames.join(' ')} ref={drop}>
-      {widget ?
-        <Widget data={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType}/> :
-        <p className="builder-column__text">Drag and drop <br/> visualization</p>}
+      {widget ? (
+        <Widget data={{ rowIdx, colIdx, ...widget }} type={widget.visualizationType ?? widget.general?.geoType} />
+      ) : (
+        <p className='builder-column__text'>
+          Drag and drop <br /> visualization
+        </p>
+      )}
     </div>
   )
 }

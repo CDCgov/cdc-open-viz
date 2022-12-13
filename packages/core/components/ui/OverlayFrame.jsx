@@ -6,11 +6,7 @@ import Overlay from './Overlay'
 
 const OverlayFrame = () => {
   const { overlay } = useGlobalContext()
-  return (
-    <Overlay disableBgClose={overlay.disableBgClose}>
-      { overlay.object }
-    </Overlay>
-  )
+  return <Overlay disableBgClose={overlay.disableBgClose}>{overlay.object}</Overlay>
 }
 
 export default OverlayFrame

@@ -30,11 +30,14 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     rightHideAxis: true,
-    rightAxisSize: 0,
+    rightAxisSize: 50,
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
-    rightAxisTickColor: '#333'
+    rightAxisTickColor: '#333',
+    isLegendValue:false,
+    numTicks:''
+
   },
   topAxis: {
     hasLine: false
@@ -53,7 +56,9 @@ export default {
     max: '',
     labelColor: '#333',
     tickLabelColor: '#333',
-    tickColor: '#333'
+    tickColor: '#333',
+    isLegendValue:false,
+    numTicks:''
   },
   table: {
     label: 'Data Table',
@@ -66,6 +71,7 @@ export default {
   legend: {
     behavior: 'isolate',
     position: 'right',
+    singleRow: false,
     colorCode: '',
     reverseLabelOrder: false,
     description: '',
