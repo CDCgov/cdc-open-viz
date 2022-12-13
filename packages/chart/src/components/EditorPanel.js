@@ -602,6 +602,10 @@ const EditorPanel = () => {
     )
   }
 
+  const checkIsLine = type => {
+    return type === ('Line' || 'dashed-sm')
+  }
+
   const handleFilterChange = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -609,10 +613,10 @@ const EditorPanel = () => {
     let filters = [...config.filters]
     let filterItem = { ...config.filters[filterIndex] }
     filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
+    filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    setFilteredData(filters)
+    updateConfig({ ...config, filters });
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -901,8 +905,8 @@ const EditorPanel = () => {
                     <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    {config.series && config.series.filter(series => series.type === 'Line').length === 0 && <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>}
-                    {config.series && config.series.filter(series => series.type === 'Line').length !== 0 && (
+                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
+                    {config.series && config.series.filter(series => checkIsLine(series.type)) && (
                       <>
                         <fieldset>
                           <legend className='edit-label float-left'>Displaying</legend>
@@ -992,6 +996,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
+                      <CheckBox  value={config.yAxis.isLegendValue} section='yAxis'  fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField}   /> 
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
@@ -1392,7 +1397,8 @@ const EditorPanel = () => {
                   )}
                   <Select value={config.legend.behavior} section='legend' fieldName='behavior' label='Legend Behavior (When clicked)' updateField={updateField} options={['highlight', 'isolate']} />
                   <TextField value={config.legend.label} section='legend' fieldName='label' label='Title' updateField={updateField} />
-                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left']} />
+                  <Select value={config.legend.position} section='legend' fieldName='position' label='Position' updateField={updateField} options={['right', 'left', 'bottom']} />
+                  {config.legend.position === 'bottom' && <CheckBox value={config.legend.singleRow} section='legend' fieldName='singleRow' label='Single Row Legend' updateField={updateField} />}
                   <TextField type='textarea' value={config.legend.description} updateField={updateField} section='legend' fieldName='description' label='Legend Description' />
                 </AccordionItemPanel>
               </AccordionItem>

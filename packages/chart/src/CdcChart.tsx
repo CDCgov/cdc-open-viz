@@ -183,7 +183,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.filters.forEach((filter, index) => {
         let filterValues = []
 
-        filterValues = generateValuesForFilter(filter.columnName, newExcludedData)
+        filterValues = filter.orderedValues || generateValuesForFilter(filter.columnName, newExcludedData)
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
@@ -663,8 +663,12 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
-            <div className={`chart-container${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
+            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
+            <div
+              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
+              }${config.legend.hide ? " legend-hidden" : "" 
+              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+            >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 

@@ -1,9 +1,9 @@
 .cove-alert__error {
   display: flex;
   justify-content: space-between;
-  padding: .3rem 1rem;
-  font-size: .9rem;
-  background: #FFC2C2;
+  padding: 0.3rem 1rem;
+  font-size: 0.9rem;
+  background: #ffc2c2;
   border-radius: 0.1875rem;
 
   strong {
@@ -15,19 +15,19 @@
   }
 
   .cove-alert__error-dismiss {
-    font-size: .8rem;
+    font-size: 0.8rem;
     flex-shrink: 0;
     cursor: pointer;
   }
 }
 
 .cove-alert__warning {
-  padding: .75rem 1rem;
+  padding: 0.75rem 1rem;
   margin: 1rem 0;
   font-size: 0.8rem;
-  color: #D8000C;
-  background-color: #FFD2D2;
-  border: #D8000C 1px solid;
+  color: #d8000c;
+  background-color: #ffd2d2;
+  border: #d8000c 1px solid;
   border-radius: 0.1875rem;
 
   strong {

@@ -1,10 +1,10 @@
-@import "../utils/variables";
-@import "../themes/color-definitions";
+@import '../utils/variables';
+@import '../themes/color-definitions';
 
 .cove-modal__content {
   .dataset-selector-container {
     padding: 1em;
-    
+
     .dataset-selector {
       margin: 0 0.5em;
       padding: 0.5em;
@@ -71,7 +71,7 @@
   }
 
   p {
-    font-size: .8rem;
+    font-size: 0.8rem;
     margin-bottom: 1rem;
   }
 
@@ -80,7 +80,7 @@
   }
 
   table {
-    font-size: .8rem;
+    font-size: 0.8rem;
     background-color: #fff;
     border: 1px solid $lightGray;
     border-collapse: collapse;
@@ -91,7 +91,8 @@
       background-color: $primary;
     }
 
-    th, td {
+    th,
+    td {
       padding: 0 5px;
       border-top: 1px solid $lightGray;
       border-bottom: 1px solid $lightGray;
