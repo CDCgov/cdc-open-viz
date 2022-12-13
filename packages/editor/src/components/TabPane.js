@@ -1,5 +1,5 @@
-import React from 'react';
+import React from 'react'
 
-const TabPane = ({ children, className = '' }) => <div className={`tab-content ${className}`}>{children}</div>;
+const TabPane = ({ children, className = '' }) => <div className={`tab-content ${className}`}>{children}</div>
 
-export default TabPane;
+export default TabPane

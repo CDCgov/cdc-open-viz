@@ -11,7 +11,7 @@ const Grid = () => {
       ...config,
       rows: [
         ...rows,
-        [ { width: 12 }, { equalHeight: false }, {}, {} ]
+        [{ width: 12 }, { equalHeight: false }, {}, {}]
         //[{width: 12}, {}, {}]      ],
       ],
       uuid: Date.now()
@@ -19,9 +19,13 @@ const Grid = () => {
   }
 
   return (
-    <div className="builder-grid">
-      {rows.map((row, idx) => <Row row={row} idx={idx} uuid={row.uuid} key={idx}/>)}
-      <button className="btn add-row" onClick={addRow}>Add Row</button>
+    <div className='builder-grid'>
+      {rows.map((row, idx) => (
+        <Row row={row} idx={idx} uuid={row.uuid} key={idx} />
+      ))}
+      <button className='btn add-row' onClick={addRow}>
+        Add Row
+      </button>
     </div>
   )
 }

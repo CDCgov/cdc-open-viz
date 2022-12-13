@@ -46,7 +46,7 @@ export default function LinearChart() {
     }
   }, [dataRef?.isIntersecting, config.animate])
 
-  if (config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
+  if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73
   }
 
@@ -171,6 +171,33 @@ export default function LinearChart() {
     }
   }
 
+   
+  const countNumOfTicks = (axis)=>{
+    // function get number of ticks based on bar type & users value
+    const isHorizontal = config.orientation ==='horizontal';
+    const {numTicks} = config.runtime[axis];
+    let tickCount = undefined;
+
+    if(axis === 'yAxis'){
+      tickCount = (
+         (isHorizontal && !numTicks) ? data.length 
+       : (isHorizontal &&  numTicks) ? numTicks
+       :(!isHorizontal && !numTicks) ? undefined
+       :(!isHorizontal &&  numTicks) && numTicks
+      );
+    };
+
+    if(axis === 'xAxis'){
+      tickCount = (
+         (isHorizontal && !numTicks) ? undefined
+       : (isHorizontal &&  numTicks) ? numTicks
+       :(!isHorizontal && !numTicks) ? undefined
+       :(!isHorizontal &&  numTicks) && numTicks
+      );
+    };
+    return tickCount;
+  };
+
   useEffect(() => {
     ReactTooltip.rebuild()
   })
@@ -217,7 +244,7 @@ export default function LinearChart() {
             label={config.runtime.yAxis.label}
             stroke='#333'
             tickFormat={tick => (config.runtime.yAxis.type === 'date' ? formatDate(parseDate(tick)) : config.orientation === 'vertical' ? formatNumber(tick) : tick)}
-            numTicks={config.runtime.yAxis.numTicks || data.length}
+            numTicks={countNumOfTicks('yAxis')}
           >
             {props => {
               const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
@@ -290,7 +317,7 @@ export default function LinearChart() {
 
         {/* Right Axis */}
         {hasRightAxis && (
-          <AxisRight scale={yScaleRight} left={width + config.runtime.yAxis.size - config.yAxis.rightAxisSize - config.yAxis.size} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
+          <AxisRight scale={yScaleRight} left={width - config.yAxis.rightAxisSize} label={config.yAxis.rightLabel} tickFormat={tick => formatNumber(tick, 'right')} numTicks={config.runtime.yAxis.rightNumTicks || undefined} labelOffset={45}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -344,7 +371,7 @@ export default function LinearChart() {
             scale={xScale}
             stroke='#333'
             tickStroke='#333'
-            numTicks={config.runtime.xAxis.numTicks || undefined}
+            numTicks={countNumOfTicks('xAxis')}
           >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2

@@ -43,20 +43,26 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
               {data.map((d, dataIndex) => {
+                let seriesAxis = config.series.filter(s => s.dataKey === seriesKey)[0].axis
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
-                let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+                const yAxisValue = formatNumber(getYAxisData(d, seriesKey));
+                let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${seriesKey}: ${yAxisValue} ` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue;
                 let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-
+                if (seriesAxis === 'Left') {
+                  yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+                } else {
+                  yAxisTooltip = config.runtime.yAxis.rightLabel ? `${config.runtime.yAxis.rightLabel}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
+                }
                 const tooltip = `<div>
-              ${yAxisTooltip}<br />
-              ${xAxisTooltip}<br />
-              ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
-            </div>`
-
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}<br />
+                    ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
+                  </div>`
                 let circleRadii = 4.5
                 return (
                   d[seriesKey] !== undefined &&
-                  d[seriesKey] !== '' && (
+                  d[seriesKey] !== '' &&
+                  d[seriesKey] !== null && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       <Text
                         display={config.labels ? 'block' : 'none'}
@@ -101,8 +107,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== ''
+                defined={(item,i) => {
+                  return item[config.runtime.seriesLabels[seriesKey]] !== "" && item[config.runtime.seriesLabels[seriesKey]] !== null;
                 }}
               />
             </Group>
