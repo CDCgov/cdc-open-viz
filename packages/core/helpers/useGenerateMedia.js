@@ -35,11 +35,14 @@ const useGenerateMedia = () => {
     // Handles different state title locations between components
     // Apparently some packages use state.title where others use state.general.title
     const handleFileName = state => {
-      if (state.general?.title) {
-        return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
-      } else {
-        return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
-      }
+      // dashboard titles
+      if (state.type === 'dashboard' && state.dashboard.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+
+      // map titles
+      if (state.general?.title) return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+
+      // chart titles
+      return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
     }
 
     // Construct filename with timestamp
