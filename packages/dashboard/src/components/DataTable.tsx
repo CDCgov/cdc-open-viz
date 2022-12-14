@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -10,6 +11,7 @@ export default function DataTable(props) {
 
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const DownloadButton = memo(({ data }: any) => {
     const fileName = `${config.title ? config.title.substring(0, 50) : 'cdc-open-viz'}.csv`
@@ -144,6 +146,10 @@ export default function DataTable(props) {
           </table>
         </div>
         {config.table.download && <DownloadButton data={data} />}
+
+        {/* Image or PDF Inserts */}
+        {config.table.downloadImageButton && <MediaDownloadButton title='Download Dashboard as Image' elementToCapture={'body'} type='image' state={config} text='Download Image' />}
+        {config.table.downloadPdfButton && <MediaDownloadButton title='Download Dashboard as PDF' elementToCapture={'body'} type='pdf' state={config} text='Download PDF' />}
       </section>
     </ErrorBoundary>
   )

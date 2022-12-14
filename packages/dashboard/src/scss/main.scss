@@ -24,6 +24,7 @@
       height: 3em;
     }
     .heading-1 {
+      min-width: 335px;
       font-size: 1.2em;
       padding-right: 1em;
       margin: 0.5em 1em 0.5em 0;
@@ -35,13 +36,39 @@
           padding-right: 0.3em;
         }
       }
+      input[type='text'] {
+        width: 100%;
+        margin-top: 10px;
+      }
+    }
+
+    .heading-body {
+      display: flex;
+
+      .wrap {
+        display: inline-flex;
+        flex-wrap: wrap;
+        width: 25%;
+
+        .table-height-input {
+          width: 100%;
+        }
+
+        label {
+          display: block;
+          width: 100%;
+        }
+      }
+    }
+
+    .heading-2 {
     }
 
     .heading-body {
       padding: 0.5em;
 
       input[type='checkbox'] {
-        margin-right: 2em;
+        margin-right: 5px;
         margin-left: 0.5em;
       }
 
@@ -57,23 +84,28 @@
       align-self: stretch;
       position: relative;
       bottom: -1px;
+      border-bottom: #c7c7c7 1px solid;
       li {
         padding: 0.3em 1.5em;
         color: $mediumGray;
-        border-bottom: #c7c7c7 1px solid;
         cursor: pointer;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         &.active {
-          border-bottom-width: 5px;
           border-bottom-color: $mediumGray;
+          border-bottom-style: inherit;
+          border-bottom-width: 5px;
           color: $darkGray;
         }
         &:hover {
           border-bottom-color: $darkGray;
           color: $darkGray;
         }
+      }
+
+      &__wrapper {
+        width: 100%;
       }
     }
 
