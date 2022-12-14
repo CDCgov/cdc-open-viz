@@ -2,15 +2,17 @@ import React, { useContext, useEffect, useState, useMemo, memo, Fragment } from 
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import { generateMedia } from '@cdc/core/helpers/generateMedia'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import Context from '../context'
 
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext<any>(Context)
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -210,17 +212,8 @@ export default function DataTable() {
         {config.table.download && <DownloadButton data={rawData} />}
 
         {/* show pdf or image button */}
-        {config.table.showDownloadImgButton && (
-          <button className={`btn ${config.theme} btn-download`} title='Download Map as Image' onClick={() => generateMedia(config, 'image')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
-            Download Image
-          </button>
-        )}
-
-        {config.table.showDownloadPdfButton && (
-          <button className={`btn ${config.theme} btn-download`} title='Download Map as PDF' onClick={() => generateMedia(config, 'pdf')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
-            Download PDF
-          </button>
-        )}
+        {config.table.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture='.cdc-open-viz-module' />}
+        {config.table.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture='.cdc-open-viz-module' />}
       </section>
     </ErrorBoundary>
   )

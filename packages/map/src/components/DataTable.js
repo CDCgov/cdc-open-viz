@@ -5,7 +5,7 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import { generateMedia } from '@cdc/core/helpers/generateMedia'
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 import Loading from '@cdc/core/components/Loading'
 
@@ -31,7 +31,8 @@ const DataTable = props => {
     viewport,
     formatLegendLocation,
     tabbingId,
-    setFilteredCountryCode
+    setFilteredCountryCode,
+    innerContainerRef
   } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
@@ -41,6 +42,8 @@ const DataTable = props => {
   const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
+
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
@@ -348,16 +351,8 @@ const DataTable = props => {
         </div>
         {showDownloadButton === true && <DownloadButton />}
 
-        {showDownloadImgButton && (
-          <button className={`btn ${state.general.headerColor} btn-download`} title='Download Map as Image' onClick={() => generateMedia(state, 'image')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
-            Download Image
-          </button>
-        )}
-        {showDownloadPdfButton && (
-          <button className={`btn ${state.general.headerColor} btn-download`} title='Download Map as PDF' onClick={() => generateMedia(state, 'pdf')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
-            Download PDF
-          </button>
-        )}
+        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} />}
+        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} />}
       </section>
     </ErrorBoundary>
   )
