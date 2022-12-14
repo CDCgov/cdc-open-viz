@@ -116,6 +116,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [container, setContainer] = useState()
 
   let legendMemo = useRef(new Map())
+  let innerContainerRef = useRef()
 
   useEffect(() => {
     try {
@@ -802,31 +803,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
-  const saveImageAs = (uri, filename) => {
-    const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
-    const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
-    const ieEdge = navigator.userAgent.match(/Edge/g)
-    const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
-
-    if (ieVer > -1) {
-      const fileAsBlob = new Blob([uri], {
-        type: 'image/png'
-      })
-      window.navigator.msSaveBlob(fileAsBlob, filename)
-    } else {
-      const link = document.createElement('a')
-      if (typeof link.download === 'string') {
-        link.href = uri
-        link.download = filename
-        link.onclick = e => document.body.removeChild(e.target)
-        document.body.appendChild(link)
-        link.click()
-      } else {
-        window.open(uri)
-      }
-    }
-  }
-
   const changeFilterActive = async (idx, activeValue) => {
     // Reset active legend toggles
     resetLegendToggles()
@@ -1382,7 +1358,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     hasZoom: state.general.allowMapZoom,
     handleMapAriaLabels,
     runtimeFilters,
-    setRuntimeFilters
+    setRuntimeFilters,
+    innerContainerRef
   }
 
   if (!mapProps.data || !state.data) return <Loading />
@@ -1418,7 +1395,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
@@ -1511,6 +1488,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 tabbingId={tabId}
                 showDownloadImgButton={state.general.showDownloadImgButton}
                 showDownloadPdfButton={state.general.showDownloadPdfButton}
+                innerContainerRef={innerContainerRef}
+                outerContainerRef={outerContainerRef}
               />
             )}
 
