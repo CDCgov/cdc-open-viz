@@ -10,9 +10,6 @@ import ResizeObserver from 'resize-observer-polyfill'
 import ReactTooltip from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
-import html2pdf from 'html2pdf.js'
-import html2canvas from 'html2canvas'
-import Canvg from 'canvg'
 
 // Data
 import colorPalettes from '../../core/data/colorPalettes'
@@ -24,11 +21,6 @@ import { countryCoordinates } from './data/country-coordinates'
 // Sass
 import './scss/main.scss'
 import './scss/btn.scss'
-
-// Images
-// TODO: Move to Icon component
-import DownloadImg from './images/icon-download-img.svg'
-import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading'
@@ -51,7 +43,6 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
 import Filters from './components/Filters'
 import Context from './context'
-
 
 import { publish } from '@cdc/core/helpers/events'
 
@@ -412,7 +403,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       // Apply custom sorting or regular sorting
       let configuredOrder = obj.legend.categoryValuesOrder ?? []
-
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
@@ -834,76 +824,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       } else {
         window.open(uri)
       }
-    }
-  }
-
-  const generateMedia = (target, type) => {
-    // Convert SVG to canvas
-    const baseSvg = mapSvg.current.querySelector('.rsm-svg')
-
-    const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
-    const calcHeight = ratio * 1440
-    const xmlSerializer = new XMLSerializer()
-    const svgStr = xmlSerializer.serializeToString(baseSvg)
-    const options = { log: false, ignoreMouse: true }
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    ctx.canvas.width = 1440
-    ctx.canvas.height = calcHeight
-    const canvg = Canvg.fromString(ctx, svgStr, options)
-    canvg.start()
-
-    // Generate DOM <img> from svg data
-    const generatedImage = document.createElement('img')
-    generatedImage.src = canvas.toDataURL('image/png')
-    generatedImage.style.width = '100%'
-    generatedImage.style.height = 'auto'
-
-    baseSvg.style.display = 'none' // Hide default SVG during media generation
-    baseSvg.parentNode.insertBefore(generatedImage, baseSvg.nextSibling) // Insert png generated from canvas of svg
-
-    // Construct filename with timestamp
-    const date = new Date()
-    const filename = state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
-
-    switch (type) {
-      case 'image':
-        return html2canvas(target, {
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          width: 1440,
-          windowWidth: 1440,
-          scale: 1,
-          logging: false
-        })
-          .then(canvas => {
-            saveImageAs(canvas.toDataURL(), filename + '.png')
-          })
-          .then(() => {
-            generatedImage.remove() // Remove generated png
-            baseSvg.style.display = null // Re-display initial svg map
-          })
-      case 'pdf':
-        let opt = {
-          margin: 0.2,
-          filename: filename + '.pdf',
-          image: { type: 'png' },
-          html2canvas: { scale: 2, logging: false },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        }
-
-        html2pdf()
-          .set(opt)
-          .from(target)
-          .save()
-          .then(() => {
-            generatedImage.remove() // Remove generated png
-            baseSvg.style.display = null // Re-display initial svg map
-          })
-        break
-      default:
-        console.warn("generateMedia param 2 type must be 'image' or 'pdf'")
-        break
     }
   }
 
@@ -1465,7 +1385,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setRuntimeFilters
   }
 
-
   if (!mapProps.data || !state.data) return <Loading />
 
   const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
@@ -1525,19 +1444,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 }
               }}
             >
-              {general.showDownloadMediaButton === true && (
-                <div className='map-downloads' data-html2canvas-ignore>
-                  <div className='map-downloads__ui btn-group'>
-                    <button className='btn' title='Download Map as Image' onClick={() => generateMedia(outerContainerRef.current, 'image')}>
-                      <DownloadImg className='btn__icon' title='Download Map as Image' />
-                    </button>
-                    <button className='btn' title='Download Map as PDF' onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
-                      <DownloadPdf className='btn__icon' title='Download Map as PDF' />
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                 Skip Over Map Container
               </a>
@@ -1603,6 +1509,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 formatLegendLocation={formatLegendLocation}
                 setFilteredCountryCode={setFilteredCountryCode}
                 tabbingId={tabId}
+                showDownloadImgButton={state.general.showDownloadImgButton}
+                showDownloadPdfButton={state.general.showDownloadPdfButton}
               />
             )}
 
