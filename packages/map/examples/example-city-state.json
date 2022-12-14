@@ -15,7 +15,13 @@
     "language": "en",
     "hasRegions": false
   },
-  "filters": [{ "label": "", "values": [], "columnName": "Condition" }],
+  "filters": [
+    {
+      "label": "",
+      "values": [],
+      "columnName": "Condition"
+    }
+  ],
   "columns": {
     "geo": {
       "dataTable": true,
@@ -492,6 +498,24 @@
     },
     {
       "STATE": "Philadelphia",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Newark",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Juan",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Little Rock",
       "Rate": 14,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
