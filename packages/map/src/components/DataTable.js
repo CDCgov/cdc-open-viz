@@ -5,11 +5,34 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import { generateMedia } from '@cdc/core/helpers/generateMedia'
 
 import Loading from '@cdc/core/components/Loading'
 
 const DataTable = props => {
-  const { state, tableTitle, indexTitle, mapTitle, rawData, showDownloadButton, runtimeData, runtimeLegend, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  const {
+    state,
+    tableTitle,
+    indexTitle,
+    mapTitle,
+    rawData,
+    showDownloadImgButton,
+    showDownloadPdfButton,
+    showDownloadButton,
+    runtimeData,
+    runtimeLegend,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToRow,
+    displayGeoName,
+    navigationHandler,
+    viewport,
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode
+  } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -324,6 +347,17 @@ const DataTable = props => {
           </table>
         </div>
         {showDownloadButton === true && <DownloadButton />}
+
+        {showDownloadImgButton && (
+          <button className={`btn ${state.general.headerColor} btn-download`} title='Download Map as Image' onClick={() => generateMedia(state, 'image')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
+            Download Image
+          </button>
+        )}
+        {showDownloadPdfButton && (
+          <button className={`btn ${state.general.headerColor} btn-download`} title='Download Map as PDF' onClick={() => generateMedia(state, 'pdf')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
+            Download PDF
+          </button>
+        )}
       </section>
     </ErrorBoundary>
   )

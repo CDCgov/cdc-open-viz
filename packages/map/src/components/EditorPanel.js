@@ -367,12 +367,21 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'toggleDownloadMediaButton':
+      case 'toggleDownloadImgButton':
         setState({
           ...state,
           general: {
             ...state.general,
-            showDownloadMediaButton: !state.general.showDownloadMediaButton
+            showDownloadImgButton: !state.general.showDownloadImgButton
+          }
+        })
+        break
+      case 'toggleDownloadPdfButton':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showDownloadPdfButton: !state.general.showDownloadPdfButton
           }
         })
         break
@@ -2194,6 +2203,26 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Enable Download CSV Button</span>
+                    </label>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showDownloadImgButton}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Image Download</span>
+                    </label>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showDownloadPdfButton}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadPdfButton', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Pdf Download</span>
                     </label>
                   </AccordionItemPanel>
                 </AccordionItem>
