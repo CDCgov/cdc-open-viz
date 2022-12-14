@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useMemo, memo, Fragment } from 
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
+import { generateMedia } from '@cdc/core/helpers/generateMedia'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -207,6 +208,19 @@ export default function DataTable() {
           )}
         </div>
         {config.table.download && <DownloadButton data={rawData} />}
+
+        {/* show pdf or image button */}
+        {config.table.showDownloadImgButton && (
+          <button className={`btn ${config.theme} btn-download`} title='Download Map as Image' onClick={() => generateMedia(config, 'image')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
+            Download Image
+          </button>
+        )}
+
+        {config.table.showDownloadPdfButton && (
+          <button className={`btn ${config.theme} btn-download`} title='Download Map as PDF' onClick={() => generateMedia(config, 'pdf')} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
+            Download PDF
+          </button>
+        )}
       </section>
     </ErrorBoundary>
   )

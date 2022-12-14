@@ -5,9 +5,17 @@ const generateMedia = (state, type) => {
   // Identify Selector
   const baseSvg = document.querySelector('.cdc-open-viz-module')
 
+  const handleFileName = state => {
+    if (state.general?.title) {
+      return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+    } else {
+      return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+    }
+  }
+
   // Construct filename with timestamp
   const date = new Date()
-  const filename = state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+  const filename = handleFileName(state)
 
   switch (type) {
     case 'image':
