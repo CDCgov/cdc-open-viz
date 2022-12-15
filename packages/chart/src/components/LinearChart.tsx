@@ -254,10 +254,9 @@ export default function LinearChart() {
               return (
                 <Group className='left-axis'>
                   {props.ticks.map((tick, i) => {
-                    // dynamicly alighn  labels on horizontal bars when labelPlacement === 'On Date/Category Axis
-                    let dy = (config.runtime.seriesKeys.length === 1 ? 5 : config.runtime.seriesKeys.length * 10 );
-                    let minY = props.ticks[0].to.y;
-                    
+                    let minY =  props.ticks[0].to.y ;
+                    const barMinHeight = 15; // 15 is the min height for bars by default
+                  
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
@@ -265,13 +264,13 @@ export default function LinearChart() {
                         {config.runtime.yAxis.gridLines ? <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                            <Text  dy={dy} transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.from.y-minY : tick.from.y-minY}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'start'} textAnchor={'end'}>
+                            <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.from.y-minY: ((tick.from.y-minY )+ ((Number(config.barHeight *config.series.length) - barMinHeight)/2))}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'} textAnchor={'end'}>
                               {tick.formattedValue}
                             </Text>
                         )}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType === 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                          <Text dy={5} transform={`translate(${tick.to.x - 5}, ${tick.from.y-minY}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'start'}  textAnchor={'end'}>
+                          <Text transform={`translate(${tick.to.x - 5}, ${((tick.from.y-minY )+ ((Number(config.barHeight) - barMinHeight)/2)) }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'}  textAnchor={'end'}>
                             {tick.formattedValue}
                           </Text>
                         )}
