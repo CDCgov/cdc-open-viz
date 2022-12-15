@@ -45,7 +45,34 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
 
     return style
-  }
+  };
+
+  const updateBars  = (defaultBars)=>{
+    if(config.visualizationType !=='Bar' && !isHorizontal ) return defaultBars;
+
+    const textSize = {small:14,medium:16,large:18};
+    const barsArr = [...defaultBars];
+    const barHeight = Number(config.barHeight) || 25;
+    // bar space the one user enters under visual/Bar Space
+    const barSpace = isLabelBelowBar ? barHeight/2 :  Number(config.barSpace);
+
+    const textHeight = isLabelBelowBar ? textSize[config.fontSize||'medium'] : 0;
+    const totalHeight  = barsArr.length * (barHeight + textHeight + barSpace);
+    // update bar height dynamicly
+    config.height = totalHeight;
+
+    const updatedBars = barsArr.map((bar,index)=>{
+      bar.index===0 ? bar.y = 0 : bar.y = (barHeight  + barSpace+ textHeight) * index;
+    
+      const newbar = {
+        ...bar,
+        height:barHeight,
+      }
+      return newbar;
+    });
+
+    return updatedBars;
+  };
 
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null)
@@ -87,7 +114,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   }, [config.barStyle])
 
-  // config.runtime.seriesKeys.sort().reverse();
 
   return (
     <ErrorBoundary component='BarChart'>
@@ -159,7 +185,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
-                  barStack.bars.map((bar, index) => {
+                  updateBars(barStack.bars).map((bar, index) => {
                     const yAxisValue = formatNumber(data[bar.index][bar.key]);
                     const xAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     let yAxisTooltip = config.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.yAxis.label ? `${config.yAxis.label}: ${yAxisValue}` :`${yAxisValue}`
@@ -171,44 +197,24 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                    const barsPerGroup = config.series.length
-                    let barHeight = config.barHeight ? config.barHeight : 25
-                    let barPadding = barHeight
-                    // update bar Y so it begins from 0
-                    const updatedY = bar.y-barStack.bars[0].y;
-
                     config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index)
-
-                    if (orientation === 'horizontal') {
-                      if (isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
-                        if (barHeight < 40) {
-                          config.barPadding = 40
-                        } else {
-                          config.barPadding = Number(barPadding)
-                        }
-                      } else {
-                        config.barPadding = Number(barPadding) / 2
-                      }
-                    }
-
-                    config.height = Number(barHeight) * data.length + Number(config.barPadding) * data.length
 
                     let labelColor = '#000000'
 
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF'
                     }
-                      
+
                     return (
                       <Group key={index}>
                         <foreignObject
                           key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
                           className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
                           x={bar.x}
-                          y={updatedY}
+                          y={bar.y}
                           width={bar.width}
-                          height={config.barHeight}
+                          height={bar.height}
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
@@ -219,7 +225,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
                           <Text
                             x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
-                            y={updatedY+config.barHeight *1.3}
+                            y={bar.y+bar.height *1.2}
                             fill={'#000000'}
                             textAnchor='start'
                             verticalAnchor='start'
@@ -232,7 +238,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           <Text
                             display={displayBar ? 'block' : 'none'}
                             x={bar.x + barStack.bars[bar.index].width / 2} // padding
-                            y={updatedY+(config.barHeight/2)}
+                            y={bar.y+(bar.height/2)}
                             fill={labelColor}
                             textAnchor='middle'
                             verticalAnchor='middle'
