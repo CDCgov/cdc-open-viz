@@ -351,8 +351,8 @@ const DataTable = props => {
         </div>
         {showDownloadButton === true && <DownloadButton />}
 
-        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} />}
-        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} />}
+        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} elementToCapture='.cdc-open-viz-module' />}
+        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} elementToCapture='.cdc-open-viz-module' />}
       </section>
     </ErrorBoundary>
   )

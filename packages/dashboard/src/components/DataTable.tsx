@@ -7,8 +7,7 @@ import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 export default function DataTable(props) {
-  const { data, datasetKey, config } = props
-
+  const { data, datasetKey, config, imageRef } = props
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
   const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
@@ -148,8 +147,8 @@ export default function DataTable(props) {
         {config.table.download && <DownloadButton data={data} />}
 
         {/* Image or PDF Inserts */}
-        {config.table.downloadImageButton && <MediaDownloadButton title='Download Dashboard as Image' elementToCapture={'body'} type='image' state={config} text='Download Image' />}
-        {config.table.downloadPdfButton && <MediaDownloadButton title='Download Dashboard as PDF' elementToCapture={'body'} type='pdf' state={config} text='Download PDF' />}
+        {config.table.downloadImageButton && <MediaDownloadButton title='Download Dashboard as Image' type='image' state={config} text='Download Image' elementToCapture={imageRef} />}
+        {config.table.downloadPdfButton && <MediaDownloadButton title='Download Dashboard as PDF' type='pdf' state={config} text='Download PDF' elementToCapture={imageRef} />}
       </section>
     </ErrorBoundary>
   )
