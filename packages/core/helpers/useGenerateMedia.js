@@ -30,19 +30,21 @@ const useGenerateMedia = () => {
 
   const generateMedia = (state, type, elementToCapture) => {
     // Identify Selector
-    const baseSvg = document.querySelector(`#${elementToCapture}`)
+    const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
     // Handles different state title locations between components
     // Apparently some packages use state.title where others use state.general.title
     const handleFileName = state => {
       // dashboard titles
-      if (state.type === 'dashboard' && state.dashboard.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+      if (state.dashboard.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
       // map titles
       if (state.general?.title) return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
       // chart titles
       return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+
+      return 'no-title'
     }
 
     // Construct filename with timestamp

@@ -690,7 +690,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} id={imageId} >
+        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId} >
           {body}
         </div>
         <OverlayFrame />
