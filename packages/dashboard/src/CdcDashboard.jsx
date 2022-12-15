@@ -106,6 +106,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [preview, setPreview] = useState(false)
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const { title, description } = config.dashboard || config
 
@@ -618,7 +619,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               })}
 
           {/* Data Table */}
-          {config.table && config.table.show && config.data && <DataTable data={config.data} config={config} />}
+          {config.table && config.table.show && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
           {config.table &&
             config.table.show &&
             config.datasets &&
@@ -657,7 +658,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
                 </div>
               )
             })}
@@ -675,13 +676,21 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     loading,
     updateConfig,
     setParentConfig,
-    setPreview
+    setPreview,
+    outerContainerRef
   }
+
+
+  const dashboardContainerClasses = [
+    'cdc-open-viz-module',
+    'type-dashboard',
+    `${currentViewport}`
+  ]
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
+        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} id={imageId} >
           {body}
         </div>
         <OverlayFrame />

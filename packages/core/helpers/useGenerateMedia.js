@@ -28,9 +28,9 @@ const useGenerateMedia = () => {
     }
   }
 
-  const generateMedia = (state, type, elementToCapture = '.cdc-open-viz-module') => {
+  const generateMedia = (state, type, elementToCapture) => {
     // Identify Selector
-    const baseSvg = document.querySelector(elementToCapture)
+    const baseSvg = document.querySelector(`#${elementToCapture}`)
 
     // Handles different state title locations between components
     // Apparently some packages use state.title where others use state.general.title
@@ -89,6 +89,7 @@ const useGenerateMedia = () => {
 
   // TODO: convert to standardized COVE button
   const DownloadButton = ({ state, text, type, title, elementToCapture }) => {
+    console.log('e', elementToCapture)
     const buttonClasses = ['btn', 'btn-download', `${handleTheme(state)}`]
     return (
       <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(state, type, elementToCapture)} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
