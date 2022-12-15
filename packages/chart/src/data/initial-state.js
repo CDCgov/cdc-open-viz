@@ -44,6 +44,7 @@ export default {
   },
   barThickness: 0.35,
   barHeight: 25,
+  barSpace:20,
   height: 300,
   xAxis: {
     type: 'categorical',
