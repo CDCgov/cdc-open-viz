@@ -678,7 +678,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} id={imageId}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
         {body}
       </div>
     </Context.Provider>

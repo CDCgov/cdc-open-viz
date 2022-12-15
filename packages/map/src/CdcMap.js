@@ -1393,7 +1393,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <Context.Provider value={mapProps}>
-      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} id={imageId}>
+      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
