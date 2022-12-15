@@ -74,6 +74,34 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return updatedBars;
   };
 
+
+  const updateGroups = (defaultGroups) =>{
+
+    const groups  = [...defaultGroups];
+    const keysCount = config.series.length;
+    const barHeight = Number(config.barHeight);
+    const barSpace =  Number(config.barSpace);
+
+    const totalHeight  = ( (barHeight* keysCount) * groups.length ) + barSpace *groups.length;
+    // update bar height dynamicly
+    config.height = totalHeight;
+
+    const updatedGroups = groups.map((group,i)=>{
+      let y = 0 
+       group.index=== 0 ? y = 0  :  y  = y + (((barHeight * keysCount) + barSpace )  * i) 
+      const newGroup = {
+        ...group,
+        y:y ,
+        x:0
+      }
+
+      return newGroup
+    })
+
+    return updatedGroups
+  }
+ 
+
   // Using State
   const [horizBarHeight, setHorizBarHeight] = useState(null)
   const [textWidth, setTextWidth] = useState(null)
@@ -302,11 +330,11 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   config.height = barsPerGroup * barHeight * barGroups.length + config.barPadding * barGroups.length
                 }
 
-                return barGroups.map((barGroup, index) => (
+                return updateGroups(barGroups).map((barGroup, index) => (
                   <Group
                     className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${barType}`}
                     key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
-                    top={config.runtime.horizontal ? (barGroup.x0 - barGroups[0].x0) : 0}
+                    top={config.runtime.horizontal ? barGroup.y : 0}
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
                   >
                     {barGroup.bars.map((bar, index) => {
