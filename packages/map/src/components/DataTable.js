@@ -32,7 +32,8 @@ const DataTable = props => {
     formatLegendLocation,
     tabbingId,
     setFilteredCountryCode,
-    innerContainerRef
+    innerContainerRef,
+    imageRef
   } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
@@ -351,8 +352,8 @@ const DataTable = props => {
         </div>
         {showDownloadButton === true && <DownloadButton />}
 
-        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} elementToCapture='.cdc-open-viz-module' />}
-        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} elementToCapture='.cdc-open-viz-module' />}
+        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} elementToCapture={imageRef} />}
+        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} elementToCapture={imageRef} />}
       </section>
     </ErrorBoundary>
   )

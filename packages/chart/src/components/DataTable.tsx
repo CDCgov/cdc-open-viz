@@ -11,7 +11,7 @@ import Context from '../context'
 import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext<any>(Context)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
   const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const legendGlyphSize = 15
@@ -212,8 +212,8 @@ export default function DataTable() {
         {config.table.download && <DownloadButton data={rawData} />}
 
         {/* show pdf or image button */}
-        {config.table.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture='.cdc-open-viz-module' />}
-        {config.table.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture='.cdc-open-viz-module' />}
+        {config.table.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+        {config.table.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
       </section>
     </ErrorBoundary>
   )

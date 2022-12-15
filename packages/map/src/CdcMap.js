@@ -114,6 +114,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -1392,7 +1393,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <Context.Provider value={mapProps}>
-      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
+      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
@@ -1490,6 +1491,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 showDownloadPdfButton={state.general.showDownloadPdfButton}
                 innerContainerRef={innerContainerRef}
                 outerContainerRef={outerContainerRef}
+                imageRef={imageId}
               />
             )}
 

@@ -60,6 +60,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -665,7 +666,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSeriesHighlight,
     dynamicLegendItems,
     setDynamicLegendItems,
-    filterData
+    filterData,
+    imageId
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
@@ -676,7 +678,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} id={imageId}>
         {body}
       </div>
     </Context.Provider>
