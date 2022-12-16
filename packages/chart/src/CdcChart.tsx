@@ -12,6 +12,7 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
+import { Base64 } from 'js-base64'
 
 // Primary Components
 import Context from './context'
@@ -31,6 +32,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from './components/Filters'
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -42,7 +44,7 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }: { configUrl?: string; config?: any; isEditor?: boolean; isDashboard?: boolean; setConfig?; setEditing?; hostname?; link?: any }) {
   const transform = new DataTransform()
-
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
   interface keyable {
     [key: string]: any
   }
@@ -473,6 +475,35 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
+  const DownloadButton = ({ data }: any, type = 'link') => {
+    const fileName = `${config.title.substring(0, 50)}.csv`
+
+    const csvData = Papa.unparse(data)
+
+    const saveBlob = () => {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        //@ts-ignore
+        window.navigator.msSaveBlob(dataBlob, fileName)
+      }
+    }
+
+    if (type === 'download') {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    } else {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    }
+  }
+
   // Format numeric data based on settings in config
   const formatNumber = (num, axis) => {
     // check if value contains comma and remove it. later will add comma below.
@@ -622,10 +653,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
-            {/* Data Table */}
 
+            {/* buttons */}
+            <section className='download-buttons'>
+              {config.table.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </section>
+
+            {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+            {/* show pdf or image button */}
           </div>
         )}
       </>

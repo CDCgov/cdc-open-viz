@@ -36,13 +36,13 @@ const useGenerateMedia = () => {
     // Apparently some packages use state.title where others use state.general.title
     const handleFileName = state => {
       // dashboard titles
-      if (state.dashboard.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+      if (state?.dashboard?.title) return state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
       // map titles
-      if (state.general?.title) return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+      if (state?.general?.title) return state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
       // chart titles
-      return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+      if (state?.title) return state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
 
       return 'no-title'
     }
@@ -94,7 +94,7 @@ const useGenerateMedia = () => {
     console.log('e', elementToCapture)
     const buttonClasses = ['btn', 'btn-download', `${handleTheme(state)}`]
     return (
-      <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(state, type, elementToCapture)} style={{ marginRight: '10px', lineHeight: '1.4em' }}>
+      <button className={buttonClasses.join(' ')} title={title} onClick={() => generateMedia(state, type, elementToCapture)} style={{ lineHeight: '1.4em' }}>
         {text}
       </button>
     )
