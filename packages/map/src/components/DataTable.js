@@ -150,26 +150,6 @@ const DataTable = props => {
     [columns.navigate, navigationHandler]
   )
 
-  const DownloadButton = memo(() => {
-    const csvData = Papa.unparse(rawData)
-
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-
-    const saveBlob = () => {
-      //@ts-ignore
-      if (typeof window.navigator.msSaveBlob === 'function') {
-        //@ts-ignore
-        navigator.msSaveBlob(blob, fileName)
-      }
-    }
-
-    return (
-      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} btn btn-download no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
-        Download Data (CSV)
-      </a>
-    )
-  }, [rawData])
-
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
     const newTableColumns = []
@@ -350,10 +330,6 @@ const DataTable = props => {
             </tbody>
           </table>
         </div>
-        {showDownloadButton === true && <DownloadButton />}
-
-        {showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Map as Image' type='image' state={state} elementToCapture={imageRef} />}
-        {showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Map as PDF' type='pdf' state={state} elementToCapture={imageRef} />}
       </section>
     </ErrorBoundary>
   )

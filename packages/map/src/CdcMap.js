@@ -10,6 +10,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import ReactTooltip from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
+import Papa from 'papaparse'
 
 // Data
 import colorPalettes from '../../core/data/colorPalettes'
@@ -17,6 +18,7 @@ import ExternalIcon from './images/external-link.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 // Sass
 import './scss/main.scss'
@@ -115,9 +117,33 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
+
+  const DownloadButton = memo(() => {
+    let rawData = state.data || {}
+    const fileName = `${state.general.title || 'data-table'}.csv`
+
+    const csvData = Papa.unparse(rawData)
+
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+
+    const saveBlob = () => {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        //@ts-ignore
+        navigator.msSaveBlob(blob, fileName)
+      }
+    }
+
+    return (
+      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${state.headerColor} btn btn-download no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
+        Download Data (CSV)
+      </a>
+    )
+  }, [state.data])
 
   useEffect(() => {
     try {
@@ -1465,6 +1491,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+            {/* buttons */}
+            <section className='download-buttons'>
+              {state.general.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+              {/* {config.table.download && <DownloadButton data={stateData ?? {}} />} */}
+              {state.general.showDownloadPdfButton === true && <DownloadButton />}
+            </section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
