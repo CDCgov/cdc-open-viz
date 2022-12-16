@@ -150,6 +150,26 @@ const DataTable = props => {
     [columns.navigate, navigationHandler]
   )
 
+  const DownloadButton = memo(() => {
+    const csvData = Papa.unparse(rawData)
+
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+
+    const saveBlob = () => {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        //@ts-ignore
+        navigator.msSaveBlob(blob, fileName)
+      }
+    }
+
+    return (
+      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
+        Download Data (CSV)
+      </a>
+    )
+  }, [rawData])
+
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
     const newTableColumns = []
@@ -262,6 +282,7 @@ const DataTable = props => {
   if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
+      <section className='download-links'>{showDownloadButton === true && <DownloadButton />}</section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
