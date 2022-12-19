@@ -17,7 +17,7 @@ import ExternalIcon from './images/external-link.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 // Sass
 import './scss/main.scss'
@@ -116,7 +116,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
-  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -1468,11 +1467,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            {/* buttons */}
-            <section className='download-buttons'>
-              {state.general.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </section>
+            <CoveMediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </CoveMediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable

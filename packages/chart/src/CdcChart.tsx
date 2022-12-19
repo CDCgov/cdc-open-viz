@@ -32,7 +32,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from './components/Filters'
-import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -44,7 +44,6 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }: { configUrl?: string; config?: any; isEditor?: boolean; isDashboard?: boolean; setConfig?; setEditing?; hostname?; link?: any }) {
   const transform = new DataTransform()
-  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
   interface keyable {
     [key: string]: any
   }
@@ -655,10 +654,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
             {/* buttons */}
-            <section className='download-buttons'>
-              {config.table.showDownloadImgButton && <MediaDownloadButton text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <MediaDownloadButton text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </section>
+            <CoveMediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </CoveMediaControls.Section>
 
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}

@@ -5,7 +5,7 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 
@@ -43,8 +43,6 @@ const DataTable = props => {
   const [ready, setReady] = useState(false)
 
   const fileName = `${mapTitle || 'data-table'}.csv`
-
-  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   // Catch all sorting method used on load by default but also on user click
   // Having a custom method means we can add in any business logic we want going forward
@@ -282,7 +280,10 @@ const DataTable = props => {
   if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
-      <section className='download-links'>{showDownloadButton === true && <DownloadButton />}</section>
+      <CoveMediaControls.Section classes={['download-links']}>
+        <CoveMediaControls.Link config={state} />
+        {state.general.showDownloadButton && <DownloadButton />}
+      </CoveMediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content

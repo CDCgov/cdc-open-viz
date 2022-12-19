@@ -32,6 +32,8 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
+import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
@@ -107,6 +109,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
   const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const { title, description } = config.dashboard || config
 
@@ -617,6 +620,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                   </div>
                 )
               })}
+
+          {/* Image or PDF Inserts */}
+          <section className='download-buttons'>
+            {config.table.downloadImageButton && <MediaDownloadButton title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table.downloadPdfButton && <MediaDownloadButton title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+          </section>
 
           {/* Data Table */}
           {config.table && config.table.show && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}

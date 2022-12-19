@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -10,7 +9,6 @@ export default function DataTable(props) {
   const { data, datasetKey, config, imageRef } = props
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
-  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const DownloadButton = memo(({ data }: any) => {
     const fileName = `${config.title ? config.title.substring(0, 50) : 'cdc-open-viz'}.csv`
@@ -27,7 +25,7 @@ export default function DataTable(props) {
     }
 
     return (
-      <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+      <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border dashboard-download-link`}>
         Download {datasetKey ? `"${datasetKey}"` : 'Data'} (CSV)
       </a>
     )
@@ -92,6 +90,7 @@ export default function DataTable(props) {
 
   return (
     <ErrorBoundary component='DataTable'>
+      <section className='download-links'>{config.table.download && <DownloadButton data={data} />}</section>
       <section className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
@@ -144,11 +143,6 @@ export default function DataTable(props) {
             )}
           </table>
         </div>
-        {config.table.download && <DownloadButton data={data} />}
-
-        {/* Image or PDF Inserts */}
-        {config.table.downloadImageButton && <MediaDownloadButton title='Download Dashboard as Image' type='image' state={config} text='Download Image' elementToCapture={imageRef} />}
-        {config.table.downloadPdfButton && <MediaDownloadButton title='Download Dashboard as PDF' type='pdf' state={config} text='Download PDF' elementToCapture={imageRef} />}
       </section>
     </ErrorBoundary>
   )
