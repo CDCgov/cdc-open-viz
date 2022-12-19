@@ -169,6 +169,17 @@
     }
   }
 
+  .multi-table-container {
+    margin: 15px 0 0;
+  }
+
+  .data-table-container {
+    margin: 0;
+    @include breakpointClass(md) {
+      margin: 15px 0;
+    }
+  }
+
   div.dashboard-title {
     color: white;
     padding: 0.6em 0.8em;
@@ -190,6 +201,10 @@
       border-bottom-width: 3px;
       border-bottom-style: solid;
     }
+  }
+
+  .dashboard-download-link {
+    font-size: 14px;
   }
 
   .dashboard-description {

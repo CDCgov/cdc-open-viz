@@ -8,11 +8,10 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import Context from '../context'
 
-import useGenerateMedia from '@cdc/core/helpers/useGenerateMedia'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
-  const { DownloadButton: MediaDownloadButton } = useGenerateMedia()
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -129,7 +128,11 @@ export default function DataTable() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
   return (
     <ErrorBoundary component='DataTable'>
-      <section className='download-links'>{config.table.download && <DownloadButton data={rawData} type='link' />}</section>
+      <CoveMediaControls.Section classes={['download-links']}>
+        <CoveMediaControls.Link config={config} />
+        {config.table.download && <DownloadButton data={rawData} type='link' />}
+      </CoveMediaControls.Section>
+
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
