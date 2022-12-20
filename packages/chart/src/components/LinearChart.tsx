@@ -38,12 +38,20 @@ export default function LinearChart() {
     freezeOnceVisible: false
   });
   // If the chart is in view and set to animate and it has not already played
-  useEffect( () => {
-    if( dataRef?.isIntersecting === true && config.animate ) {
-      setTimeout(() => {
-        setAnimatedChart(prevState => true);
-      }, 500);
+  useEffect(() => {
+    const element = document.querySelector('.isEditor');
+    if (element) {
+      // parent element is visible
+      setAnimatedChart(prevState => true);
     }
+  });
+
+  useEffect( () => {
+    setTimeout(() => {
+      if( dataRef?.isIntersecting === true && config.animate ) {
+          setAnimatedChart(prevState => true);
+      }
+    }, 500);
   }, [dataRef?.isIntersecting, config.animate]);
 
   if(config && config.legend && !config.legend.hide && (currentViewport === 'lg' || currentViewport === 'md')) {
@@ -84,7 +92,7 @@ export default function LinearChart() {
       // if all values in data are negative set max = 0
       max = existPositiveValue ? maxValue : 0;
     }
-    
+
     //Adds Y Axis data padding if applicable
     if(config.runtime.yAxis.paddingPercent) {
       let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent;
@@ -150,9 +158,9 @@ export default function LinearChart() {
         });
       }
 
-      
+
     if(config.visualizationType === 'Paired Bar') {
-      
+
 
       let groupOneMax = Math.max.apply(Math, data.map(d => d[config.series[0].dataKey]))
       let groupTwoMax = Math.max.apply(Math, data.map(d => d[config.series[1].dataKey]))
@@ -172,7 +180,7 @@ export default function LinearChart() {
     }
   }
 
-  
+
 
   useEffect(() => {
     ReactTooltip.rebuild();
@@ -266,7 +274,7 @@ export default function LinearChart() {
 
                         {( config.orientation === "horizontal" && config.visualizationSubType !== 'stacked') && (config.yAxis.labelPlacement === 'On Date/Category Axis' ) && !config.yAxis.hideLabel &&
                             // 17 is a magic number from the offset in barchart.
-                            <Fragment> 
+                            <Fragment>
                             <Text
                               transform={`translate(${tick.to.x - 5}, ${ config.isLollipopChart  ?  tick.from.y  : tick.from.y  - 17 }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`}
                               verticalAnchor={ config.isLollipopChart ? "middle" : "middle"}
@@ -425,12 +433,12 @@ export default function LinearChart() {
               }}
 
             </AxisRight>
-          
-          
+
+
           }
 
           {hasTopAxis && config.topAxis.hasLine &&
-            <AxisTop 
+            <AxisTop
               stroke="#333"
               left={config.runtime.yAxis.size}
               scale={xScale}
@@ -633,7 +641,7 @@ export default function LinearChart() {
           { config.visualizationType === 'Paired Bar' && (
             <PairedBarChart  width={xMax} height={yMax} />
           ) }
-          
+
           {/* Bar chart */}
           { (config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar') && (
               <>
