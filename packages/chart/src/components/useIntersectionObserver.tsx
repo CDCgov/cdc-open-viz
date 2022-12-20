@@ -10,17 +10,19 @@ export default function useIntersectionObserver(elementRef, { threshold = 0, roo
   }
 
   useEffect(() => {
-    const node = elementRef?.current
-    const hasIOSupport = !!window.IntersectionObserver
+    setTimeout(() => {
+      const node = elementRef?.current
+      const hasIOSupport = !!window.IntersectionObserver
 
-    if (!hasIOSupport || frozen || !node) return
+      if (!hasIOSupport || frozen || !node) return
 
-    const observerParams = { threshold, root, rootMargin }
-    const observer = new IntersectionObserver(updateEntry, observerParams)
+      const observerParams = { threshold, root, rootMargin }
+      const observer = new IntersectionObserver(updateEntry, observerParams)
 
-    observer.observe(node)
+      observer.observe(node)
 
-    return () => observer.disconnect()
+      return () => observer.disconnect()
+    }, 500);
   }, [elementRef, threshold, root, rootMargin, frozen])
 
   return entry
