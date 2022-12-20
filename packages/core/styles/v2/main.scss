@@ -9,7 +9,7 @@
 
   :focus,
   [tabindex]:focus-visible {
-    outline: 2px solid rgba(255,102,1,.9);
+    outline: 2px solid rgba(255, 102, 1, 0.9);
   }
 
   margin: 0;
@@ -29,13 +29,13 @@
   }
 
   .warning {
-    padding: .75em 1em;
+    padding: 0.75em 1em;
     margin: 1em 0;
-    background-color: #FFD2D2;
-    color: #D8000C;
-    font-size: .8em;
-    border: #D8000C 1px solid;
-    border-radius: .4em;
+    background-color: #ffd2d2;
+    color: #d8000c;
+    font-size: 0.8em;
+    border: #d8000c 1px solid;
+    border-radius: 0.4em;
 
     strong {
       font-weight: 600;

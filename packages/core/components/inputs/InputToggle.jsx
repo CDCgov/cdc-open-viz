@@ -3,41 +3,37 @@ import PropTypes from 'prop-types'
 
 import '../../styles/v2/components/input/index.scss'
 
-const InputSlider = (
-  {
-    label,
-    sliderType = 'flat',
-    size = 'medium',
-    activeColor = null,
-    section = null,
-    subsection = null,
-    fieldName,
-    updateField,
-    value: stateValue,
+const InputSlider = ({
+  label,
+  sliderType = 'flat',
+  size = 'medium',
+  activeColor = null,
+  section = null,
+  subsection = null,
+  fieldName,
+  updateField,
+  value: stateValue,
 
-    i = null, min = null, max = null,
-    ...attributes
-  }
-) => {
-
-  const [ value, setValue ] = useState(stateValue)
+  i = null,
+  min = null,
+  max = null,
+  ...attributes
+}) => {
+  const [value, setValue] = useState(stateValue)
 
   let name = () => {
     let str = ''
-    if (section)
-      str += section + '-'
-    if (subsection)
-      str += subsection + '-'
-    if (fieldName)
-      str += fieldName
+    if (section) str += section + '-'
+    if (subsection) str += subsection + '-'
+    if (fieldName) str += fieldName
     return str
   }
 
   const sliderTypeClass = () => {
     const typeArr = {
-      'flat': ' slider--flat',
-      'block': ' slider--block',
-      'pill': ' slider--pill',
+      flat: ' slider--flat',
+      block: ' slider--block',
+      pill: ' slider--pill',
       '3d': ' slider--3d'
     }
     return typeArr[sliderType] || ''
@@ -47,21 +43,21 @@ const InputSlider = (
     if (stateValue !== undefined && stateValue !== value) {
       setValue(stateValue)
     }
-  }, [ stateValue ])
+  }, [stateValue])
 
   useEffect(() => {
     if (stateValue !== undefined && stateValue !== value && updateField) {
       updateField(section, subsection, fieldName, value, i)
     }
-  }, [ value ])
+  }, [value])
 
   return (
-    <div className="input-group">
+    <div className='input-group'>
       {label && <label>{label}</label>}
-      <div className={'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (sliderTypeClass()) + (value ? ' active' : '')} onClick={() => setValue(!value)}>
-        <div className="cove-input__slider-button"/>
-        <div className="cove-input__slider-track" style={value && activeColor ? { backgroundColor: activeColor } : null }/>
-        <input className="cove-input--hidden" type="checkbox" name={name()} checked={value || false} readOnly/>
+      <div className={'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + sliderTypeClass() + (value ? ' active' : '')} onClick={() => setValue(!value)}>
+        <div className='cove-input__slider-button' />
+        <div className='cove-input__slider-track' style={value && activeColor ? { backgroundColor: activeColor } : null} />
+        <input className='cove-input--hidden' type='checkbox' name={name()} checked={value || false} readOnly />
       </div>
     </div>
   )
