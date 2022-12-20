@@ -1707,6 +1707,7 @@ const EditorPanel = () => {
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
                   <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
                   <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} />
                   <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />

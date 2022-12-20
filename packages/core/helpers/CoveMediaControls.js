@@ -107,6 +107,16 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 
 // Link to CSV/JSON data
 const Link = ({ config }) => {
+  // Handles Maps & Charts
+  if (config.dataFileSourceType === 'url' && config.dataFileName && config.table.showDownloadUrl) {
+    return (
+      <a href={config.dataFileName} title={buttonText.link} target='_blank'>
+        {buttonText.link}
+      </a>
+    )
+  }
+
+  // Handles Dashboards
   return config?.table?.showDownloadUrl && config.dataUrl ? (
     <a href={config.dataUrl} title='Link to view full data set' target='_blank'>
       {buttonText.link}
