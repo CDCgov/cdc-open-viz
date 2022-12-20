@@ -2204,16 +2204,10 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    {!state.dataUrl && (
-                      <div className='info' style={{ display: 'block', width: '100%' }}>
-                        Note: File uploads won't have links to data sets.
-                      </div>
-                    )}
                     <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.table.showDownloadUrl}
-                        disabled={!state.dataUrl}
                         onChange={event => {
                           handleEditorChanges('toggleDataUrl', event.target.checked)
                         }}
