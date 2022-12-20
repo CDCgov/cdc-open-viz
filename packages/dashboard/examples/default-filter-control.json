@@ -73,13 +73,29 @@
         "key": "sharedFilter1",
         "columnName": "state",
         "setBy": "map1",
-        "usedBy": ["chart1"]
+        "usedBy": [
+          "chart1"
+        ]
       }
     ]
   },
   "rows": [
-    [{ "width": 12, "widget": "map1" }, {}, {}],
-    [{ "width": 12, "widget": "chart1" }, {}, {}]
+    [
+      {
+        "width": 12,
+        "widget": "map1"
+      },
+      {},
+      {}
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "chart1"
+      },
+      {},
+      {}
+    ]
   ],
   "visualizations": {
     "map1": {
@@ -128,7 +144,9 @@
         "title": "Legend Title",
         "description": "Legend Text",
         "type": "equalnumber",
-        "specialClasses": ["N/A"]
+        "specialClasses": [
+          "N/A"
+        ]
       }
     },
     "chart1": {
@@ -138,7 +156,12 @@
       "title": "Test",
       "description": "<p>Test</p>",
       "visualizationType": "Line",
-      "series": [{ "dataKey": "Insured Rate", "label": "Insured Rate" }],
+      "series": [
+        {
+          "dataKey": "Insured Rate",
+          "label": "Insured Rate"
+        }
+      ],
       "fontSize": "large",
       "dataFormat": {
         "commas": false,
@@ -173,5 +196,11 @@
         "download": true
       }
     }
+  },
+  "table": {
+    "downloadImageButton": true,
+    "downloadPdfButton": true,
+    "download": true,
+    "show": true
   }
 }
