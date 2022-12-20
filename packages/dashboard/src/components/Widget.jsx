@@ -12,43 +12,43 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
 
 const iconHash = {
-  'data-bite': <Icon display="databite" base/>,
-  'Bar': <Icon display="chartBar" base/>,
-  'Spark Line': <Icon display="chartLine" />,
-  'waffle-chart': <Icon display="grid" base/>,
-  'markup-include': <Icon display="code" base/>,
-  'Line': <Icon display="chartLine" base/>,
-  'Pie': <Icon display="chartPie" base/>,
-  'us': <Icon display="mapUsa" base/>,
-  'us-county': <Icon display="mapUsa" base/>,
-  'world': <Icon display="mapWorld" base/>,
-  'single-state': <Icon display="mapAl" base/>,
-  'gear': <Icon display="gear" base/>,
-  'tools': <Icon display="tools" base/>,
-  'filtered-text': <Icon display='filtered-text' base/>
+  'data-bite': <Icon display='databite' base />,
+  Bar: <Icon display='chartBar' base />,
+  'Spark Line': <Icon display='chartLine' />,
+  'waffle-chart': <Icon display='grid' base />,
+  'markup-include': <Icon display='code' base />,
+  Line: <Icon display='chartLine' base />,
+  Pie: <Icon display='chartPie' base />,
+  us: <Icon display='mapUsa' base />,
+  'us-county': <Icon display='mapUsa' base />,
+  world: <Icon display='mapWorld' base />,
+  'single-state': <Icon display='mapAl' base />,
+  gear: <Icon display='gear' base />,
+  tools: <Icon display='tools' base />,
+  'filtered-text': <Icon display='filtered-text' base />
 }
 
 const labelHash = {
   'data-bite': 'Data Bite',
   'waffle-chart': 'Waffle Chart',
   'markup-include': 'Markup Include',
-  'Bar': 'Bar',
-  'Line': 'Line',
+  Bar: 'Bar',
+  Line: 'Line',
   'Spark Line': 'Spark Line',
-  'Pie': 'Pie',
-  'us': 'United States (State- or County-Level)',
+  Pie: 'Pie',
+  us: 'United States (State- or County-Level)',
   'us-county': 'United States (State- or County-Level)',
-  'world': 'World',
+  world: 'World',
   'single-state': 'U.S. State',
-  'filtered-text':'filtered-text'
+  'filtered-text': 'filtered-text'
 }
 
 const Widget = ({ data = {}, addVisualization, type }) => {
   const { overlay } = useGlobalContext()
   const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
 
-  const dataRef = useRef();
-  dataRef.current = data;
+  const dataRef = useRef()
+  dataRef.current = data
 
   const transform = new DataTransform()
 
@@ -73,10 +73,10 @@ const Widget = ({ data = {}, addVisualization, type }) => {
     updateConfig({ ...config, rows, visualizations })
   }
 
-  const [ { isDragging, ...collected }, drag ] = useDrag({
+  const [{ isDragging, ...collected }, drag] = useDrag({
     type: 'vis-widget',
     end: handleWidgetMove,
-    collect: (monitor) => ({
+    collect: monitor => ({
       isDragging: monitor.isDragging()
     })
   })
@@ -86,12 +86,12 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     delete visualizations[data.uid]
 
-    if(config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0){
+    if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
       config.dashboard.sharedFilters.forEach(sharedFilter => {
-        if(sharedFilter.usedBy.indexOf(data.uid) !== -1){
-          sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1);
+        if (sharedFilter.usedBy.indexOf(data.uid) !== -1) {
+          sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1)
         }
-      });
+      })
     }
 
     updateConfig({ ...config, rows, visualizations })
@@ -132,34 +132,44 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
     overlay?.actions.openOverlay(dataDesignerModal(newVisualizations[visualizationKey]))
   }
- 
-  const dataDesignerModal = (configureData, dataKeyOverride) => {
-    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? (data.dataKey || dataRef.current.dataKey) : dataKeyOverride;
 
-    overlay?.actions.toggleOverlay();
+  const dataDesignerModal = (configureData, dataKeyOverride) => {
+    const dataKey = !dataKeyOverride && dataKeyOverride !== '' ? data.dataKey || dataRef.current.dataKey : dataKeyOverride
+
+    overlay?.actions.toggleOverlay()
 
     return (
       <Modal>
         <Modal.Content>
-          <div className="dataset-selector-container">
+          <div className='dataset-selector-container'>
             Select a dataset:&nbsp;
-            <select className="dataset-selector" defaultValue={dataKey} onChange={(e) => {
-              changeDataset(data.uid, e.target.value)
-              overlay?.actions.openOverlay(dataDesignerModal(data, e.target.value || ''))
-            }}>
-              <option value="">Select a dataset</option>
-              {config.datasets && Object.keys(config.datasets).map(datasetKey => (
-                <option key={datasetKey}>{datasetKey}</option>
-              ))}
+            <select
+              className='dataset-selector'
+              defaultValue={dataKey}
+              onChange={e => {
+                changeDataset(data.uid, e.target.value)
+                overlay?.actions.openOverlay(dataDesignerModal(data, e.target.value || ''))
+              }}
+            >
+              <option value=''>Select a dataset</option>
+              {config.datasets && Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
             </select>
           </div>
-          {dataKey && <DataDesigner {...{
-            configureData, 
-            visualizationKey: data.uid,
-            dataKey: dataKey,
-            updateDescriptionProp
-          }}/>}
-          {configureData.formattedData && <button style={{margin: '1em'}} className="cove-button" onClick={() => overlay?.actions.toggleOverlay()}>Continue</button>}
+          {dataKey && (
+            <DataDesigner
+              {...{
+                configureData,
+                visualizationKey: data.uid,
+                dataKey: dataKey,
+                updateDescriptionProp
+              }}
+            />
+          )}
+          {configureData.formattedData && (
+            <button style={{ margin: '1em' }} className='cove-button' onClick={() => overlay?.actions.toggleOverlay()}>
+              Continue
+            </button>
+          )}
         </Modal.Content>
       </Modal>
     )
@@ -167,7 +177,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
   useEffect(() => {
     if (data.openModal) {
-        overlay?.actions.openOverlay(dataDesignerModal(dataRef.current));
+      overlay?.actions.openOverlay(dataDesignerModal(dataRef.current))
 
       visualizations[data.uid].openModal = false
 
@@ -177,26 +187,39 @@ const Widget = ({ data = {}, addVisualization, type }) => {
 
   return (
     <>
-      <div className="widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
-        <Icon display="move" className="drag-icon"/>
-        <div className="widget__content">
+      <div className='widget' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+        <Icon display='move' className='drag-icon' />
+        <div className='widget__content'>
           {data.rowIdx !== undefined && (
-            <div className="widget-menu">
-              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') &&
-                <button title="Configure Visualization" className="btn btn-configure" onClick={editWidget}>{iconHash['tools']}</button>
-              }
-              {type !== 'markup-include' && <button title="Configure Data" className="btn btn-configure" onClick={() => {
-                overlay?.actions.openOverlay(dataDesignerModal(data))
-              }}>{iconHash['gear']}
-              </button>}
-              <div className="widget-menu-item" onClick={deleteWidget}>
-                <Icon display="close" base/>
+            <div className='widget-menu'>
+              {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') && (
+                <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+                  {iconHash['tools']}
+                </button>
+              )}
+              {type !== 'markup-include' && (
+                <button
+                  title='Configure Data'
+                  className='btn btn-configure'
+                  onClick={() => {
+                    overlay?.actions.openOverlay(dataDesignerModal(data))
+                  }}
+                >
+                  {iconHash['gear']}
+                </button>
+              )}
+              <div className='widget-menu-item' onClick={deleteWidget}>
+                <Icon display='close' base />
               </div>
             </div>
           )}
           {iconHash[type]}
           <span>{labelHash[type]}</span>
-          {data.newViz && <span onClick={editWidget} className="config-needed">Configuration needed</span>}
+          {data.newViz && (
+            <span onClick={editWidget} className='config-needed'>
+              Configuration needed
+            </span>
+          )}
         </div>
       </div>
     </>

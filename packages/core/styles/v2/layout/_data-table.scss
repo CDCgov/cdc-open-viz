@@ -18,7 +18,7 @@
   //TODO find fix
   //background-image: url(~@cdc/core/assets/icon-minus.svg);
   background-size: 15px 15px; // Need to define both for IE11
-  background-position: right .7em center;
+  background-position: right 0.7em center;
   background-repeat: no-repeat;
   border: $lightGray 1px solid;
   border-bottom: 0;
@@ -46,7 +46,7 @@
   appearance: none;
 
   * {
-    box-sizing: border-box
+    box-sizing: border-box;
   }
 
   thead {
@@ -61,7 +61,7 @@
 
     th,
     td {
-      padding: .5em 1.3em .5em .7em;
+      padding: 0.5em 1.3em 0.5em 0.7em;
       line-height: normal;
       position: relative;
       text-align: left;
@@ -75,7 +75,7 @@
 
     th:last-child,
     td:last-child {
-      border-right: 0
+      border-right: 0;
     }
   }
 
@@ -84,7 +84,7 @@
       width: 100%;
 
       &:hover {
-        background: rgba(0, 0, 0, 0.05)
+        background: rgba(0, 0, 0, 0.05);
       }
     }
   }
@@ -94,17 +94,17 @@
     min-width: 100%; // Needed to fill content up
 
     &:last-child {
-      border-bottom: 0
+      border-bottom: 0;
     }
   }
 
   td {
     position: relative;
-    padding: .3em .7em;
+    padding: 0.3em 0.7em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
 
     a {
-      padding: .3em .7em;
+      padding: 0.3em 0.7em;
       position: absolute;
       top: 0;
       bottom: 0;
@@ -146,7 +146,7 @@
   .sort {
     background-color: darken($mediumGray, 10%);
     background-repeat: no-repeat;
-    background-position: right .5em center;
+    background-position: right 0.5em center;
     background-size: 10px 5px;
   }
 
@@ -185,11 +185,12 @@
   position: relative;
   user-select: none;
 
-  th, td {
+  th,
+  td {
     width: 50%;
 
     &::before {
-      content: "\00a0";
+      content: '\00a0';
     }
   }
 }

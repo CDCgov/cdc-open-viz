@@ -1,7 +1,6 @@
-export default function useTopAxis( config ) {
+export default function useTopAxis(config) {
+  // When to show top axis
+  const hasTopAxis = config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Line'
 
-	// When to show top axis
-	const hasTopAxis = (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || config.visualizationType === 'Line')
-
-	return { hasTopAxis };
+  return { hasTopAxis }
 }

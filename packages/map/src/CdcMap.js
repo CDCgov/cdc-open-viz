@@ -17,16 +17,7 @@ import Canvg from 'canvg'
 // Data
 import colorPalettes from '../../core/data/colorPalettes'
 import ExternalIcon from './images/external-link.svg'
-import {
-  supportedStates,
-  supportedTerritories,
-  supportedCountries,
-  supportedCounties,
-  supportedCities,
-  supportedStatesFipsCodes,
-  stateFipsToTwoDigit,
-  supportedRegions
-} from './data/supported-geos'
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
 
@@ -40,12 +31,12 @@ import DownloadImg from './images/icon-download-img.svg'
 import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
-import Loading from '@cdc/core/components/Loading';
-import { DataTransform } from '@cdc/core/helpers/DataTransform';
-import getViewport from '@cdc/core/helpers/getViewport';
-import numberFromString from '@cdc/core/helpers/numberFromString';
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData';
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString';
+import Loading from '@cdc/core/components/Loading'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import getViewport from '@cdc/core/helpers/getViewport'
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
 // Child Components
 import Sidebar from './components/Sidebar'
@@ -58,6 +49,9 @@ import DataTable from './components/DataTable' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
+import Filters from './components/Filters'
+import Context from './context'
+
 
 import { publish } from '@cdc/core/helpers/events'
 
@@ -73,14 +67,10 @@ const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
   let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
 
-  return [
-    color,
-    hoverColor,
-    colorObj.darken(0.3).hex()
-  ]
+  return [color, hoverColor, colorObj.darken(0.3).hex()]
 }
 
-const hashObj = (row) => {
+const hashObj = row => {
   try {
     if (!row) throw new Error('No row supplied to hashObj')
 
@@ -91,7 +81,7 @@ const hashObj = (row) => {
 
     for (let i = 0; i < str.length; i++) {
       let char = str.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash
     }
 
@@ -119,20 +109,20 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
-  const [ showLoadingMessage, setShowLoadingMessage ] = useState(false)
+  const [showLoadingMessage, setShowLoadingMessage] = useState(false)
   const transform = new DataTransform()
-  const [ state, setState ] = useState({ ...initialState })
-  const [ loading, setLoading ] = useState(true)
-  const [ currentViewport, setCurrentViewport ] = useState()
-  const [ runtimeFilters, setRuntimeFilters ] = useState([])
-  const [ runtimeLegend, setRuntimeLegend ] = useState([])
-  const [ runtimeData, setRuntimeData ] = useState({ init: true })
-  const [ modal, setModal ] = useState(null)
-  const [ accessibleStatus, setAccessibleStatus ] = useState('')
-  const [ filteredCountryCode, setFilteredCountryCode ] = useState()
-  const [ position, setPosition ] = useState(state.mapPosition)
-  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
-  const [ container, setContainer ] = useState()
+  const [state, setState] = useState({ ...initialState })
+  const [loading, setLoading] = useState(true)
+  const [currentViewport, setCurrentViewport] = useState()
+  const [runtimeFilters, setRuntimeFilters] = useState([])
+  const [runtimeLegend, setRuntimeLegend] = useState([])
+  const [runtimeData, setRuntimeData] = useState({ init: true })
+  const [modal, setModal] = useState(null)
+  const [accessibleStatus, setAccessibleStatus] = useState('')
+  const [filteredCountryCode, setFilteredCountryCode] = useState()
+  const [position, setPosition] = useState(state.mapPosition)
+  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
+  const [container, setContainer] = useState()
 
   let legendMemo = useRef(new Map())
 
@@ -143,7 +133,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
-        const reversedCoordinates = [ long, lat ]
+        const reversedCoordinates = [long, lat]
 
         setState({
           ...state,
@@ -153,7 +143,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     } catch (e) {
       console.error('Failed to set world map zoom.')
     }
-  }, [ filteredCountryCode ])
+  }, [filteredCountryCode])
 
   useEffect(() => {
     setTimeout(() => {
@@ -165,15 +155,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         setRuntimeData(tmpData)
       }
     }, 100)
-  }, [ filteredCountryCode ])
+  }, [filteredCountryCode])
 
   useEffect(() => {
     if (state.mapPosition) {
       setPosition(state.mapPosition)
     }
-  }, [ state.mapPosition, setPosition ])
+  }, [state.mapPosition, setPosition])
 
-  const setZoom = (reversedCoordinates) => {
+  const setZoom = reversedCoordinates => {
     setState({
       ...state,
       mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
@@ -207,16 +197,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // States
-        uid = stateKeys.find((key) => supportedStates[key].includes(geoName))
+        uid = stateKeys.find(key => supportedStates[key].includes(geoName))
 
         // Territories
         if (!uid) {
-          uid = territoryKeys.find((key) => supportedTerritories[key].includes(geoName))
+          uid = territoryKeys.find(key => supportedTerritories[key].includes(geoName))
         }
 
         // Cities
         if (!uid) {
-          uid = cityKeys.find((key) => key === geoName)
+          uid = cityKeys.find(key => key === geoName)
         }
       }
 
@@ -230,20 +220,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // Regions
-        uid = regionKeys.find((key) => supportedRegions[key].includes(geoName))
+        uid = regionKeys.find(key => supportedRegions[key].includes(geoName))
       }
 
       // World Check
       if ('world' === obj.general.geoType) {
         const geoName = row[obj.columns.geo.name]
 
-        uid = countryKeys.find((key) => supportedCountries[key].includes(geoName))
+        uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
       }
 
       // County Check
       if (('us-county' === obj.general.geoType || 'single-state' === obj.general.geoType) && 'us-geocode' !== obj.general.type) {
         const fips = row[obj.columns.geo.name]
-        uid = countyKeys.find((key) => key === fips)
+        uid = countyKeys.find(key => key === fips)
       }
 
       if ('us-geocode' === state.general.type) {
@@ -263,8 +253,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
-    const
-      primaryCol = obj.columns.primary.name,
+    const primaryCol = obj.columns.primary.name,
       isData = obj.general.type === 'data',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
@@ -281,19 +270,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
 
     const colorDistributions = {
-      1: [ 1 ],
-      2: [ 1, 3 ],
-      3: [ 1, 3, 5 ],
-      4: [ 0, 2, 4, 6 ],
-      5: [ 0, 2, 4, 6, 7 ],
-      6: [ 0, 2, 3, 4, 5, 7 ],
-      7: [ 0, 2, 3, 4, 5, 6, 7 ],
-      8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
-      9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ],
-      10: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+      1: [1],
+      2: [1, 3],
+      3: [1, 3, 5],
+      4: [0, 2, 4, 6],
+      5: [0, 2, 4, 6, 7],
+      6: [0, 2, 3, 4, 5, 7],
+      7: [0, 2, 3, 4, 5, 6, 7],
+      8: [0, 2, 3, 4, 5, 6, 7, 8],
+      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
 
-    const applyColorToLegend = (legendIdx) => {
+    const applyColorToLegend = legendIdx => {
       // Default to "bluegreen" color scheme if the passed color isn't valid
       let mapColorPalette = obj.customColors || colorPalettes[obj.color] || colorPalettes['bluegreen']
 
@@ -310,7 +299,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       // Special Classes (No Data)
       if (result[legendIdx].special) {
-        const specialClassColors = chroma.scale([ '#D4D4D4', '#939393' ]).colors(specialClasses)
+        const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
 
         return specialClassColors[legendIdx]
       }
@@ -410,7 +399,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (undefined === value) continue
 
         if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [ hashObj(row) ])
+          uniqueValues.set(value, [hashObj(row)])
           count++
         } else {
           uniqueValues.get(value).push(hashObj(row))
@@ -419,15 +408,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (count === 10) break // Can only have 10 categorical items for now
       }
 
-      let sorted = [ ...uniqueValues.keys() ]
+      let sorted = [...uniqueValues.keys()]
 
       // Apply custom sorting or regular sorting
       let configuredOrder = obj.legend.categoryValuesOrder ?? []
 
-      // Coerce strings to numbers inside configuredOrder property
-      for(let i = 0; i < configuredOrder.length; i++) {
-          configuredOrder[i] = numberFromString(configuredOrder[i])
-      }
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
@@ -438,9 +423,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       // Add legend item for each
-      sorted.forEach((val) => {
+      sorted.forEach(val => {
         result.push({
-          value: val,
+          value: val
         })
 
         let lastIdx = result.length - 1
@@ -500,12 +485,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Sort data for use in equalnumber or equalinterval
     if (state.general.type !== 'us-geocode') {
-      dataSet = dataSet.filter(row => typeof row[primaryCol] === 'number').sort((a, b) => {
-        let aNum = a[primaryCol]
-        let bNum = b[primaryCol]
+      dataSet = dataSet
+        .filter(row => typeof row[primaryCol] === 'number')
+        .sort((a, b) => {
+          let aNum = a[primaryCol]
+          let bNum = b[primaryCol]
 
-        return aNum - bNum
-      })
+          return aNum - bNum
+        })
     }
 
     // Equal Number
@@ -558,8 +545,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         let colors = colorPalettes[state.color]
         let colorRange = colors.slice(0, state.legend.numberOfItems)
 
-        let scale = d3.scaleQuantile()
-          .domain([ ...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name]))) ]) // min/max values
+        let scale = d3
+          .scaleQuantile()
+          .domain([...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
           .range(colorRange) // set range to our colors array
 
         let breaks = scale.quantiles()
@@ -572,7 +560,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         breaks.map((item, index) => {
-          const setMin = (index) => {
+          const setMin = index => {
             //debugger;
             let min = breaks[index]
 
@@ -665,7 +653,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       for (let i = 0; i < legendNumber; i++) {
         let interval = Math.abs(dataMax - dataMin) / legendNumber
 
-        let min = dataMin + (interval * i)
+        let min = dataMin + interval * i
         let max = min + interval
 
         // If this is the last loop, assign actual max of data as the end point
@@ -679,7 +667,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         let range = {
           min: Math.round(min * 100) / 100,
-          max: Math.round(max * 100) / 100,
+          max: Math.round(max * 100) / 100
         }
 
         result.push(range)
@@ -768,11 +756,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (undefined === row.uid) return false // No UID for this row, we can't use for mapping
 
         // When on a single state map filter runtime data by state
-        if (
-          !(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) &&
-          obj.general.geoType === 'single-state' &&
-          obj.general.type !== 'us-geocode'
-        ) {
+        if (!(String(row[obj.columns.geo.name]).substring(0, 2) === obj.general?.statePicked?.fipsCode) && obj.general.geoType === 'single-state' && obj.general.type !== 'us-geocode') {
           return false
         }
 
@@ -832,10 +816,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
     const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
     const ieEdge = navigator.userAgent.match(/Edge/g)
-    const ieVer = (ie ? ie[1] : (ie11 ? 11 : (ieEdge ? 12 : -1)))
+    const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
 
     if (ieVer > -1) {
-      const fileAsBlob = new Blob([ uri ], {
+      const fileAsBlob = new Blob([uri], {
         type: 'image/png'
       })
       window.navigator.msSaveBlob(fileAsBlob, filename)
@@ -844,7 +828,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       if (typeof link.download === 'string') {
         link.href = uri
         link.download = filename
-        link.onclick = (e) => document.body.removeChild(e.target)
+        link.onclick = e => document.body.removeChild(e.target)
         document.body.appendChild(link)
         link.click()
       } else {
@@ -891,12 +875,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           windowWidth: 1440,
           scale: 1,
           logging: false
-        }).then(canvas => {
-          saveImageAs(canvas.toDataURL(), filename + '.png')
-        }).then(() => {
-          generatedImage.remove() // Remove generated png
-          baseSvg.style.display = null // Re-display initial svg map
         })
+          .then(canvas => {
+            saveImageAs(canvas.toDataURL(), filename + '.png')
+          })
+          .then(() => {
+            generatedImage.remove() // Remove generated png
+            baseSvg.style.display = null // Re-display initial svg map
+          })
       case 'pdf':
         let opt = {
           margin: 0.2,
@@ -906,13 +892,17 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         }
 
-        html2pdf().set(opt).from(target).save().then(() => {
-          generatedImage.remove() // Remove generated png
-          baseSvg.style.display = null // Re-display initial svg map
-        })
+        html2pdf()
+          .set(opt)
+          .from(target)
+          .save()
+          .then(() => {
+            generatedImage.remove() // Remove generated png
+            baseSvg.style.display = null // Re-display initial svg map
+          })
         break
       default:
-        console.warn('generateMedia param 2 type must be \'image\' or \'pdf\'')
+        console.warn("generateMedia param 2 type must be 'image' or 'pdf'")
         break
     }
   }
@@ -922,11 +912,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     resetLegendToggles()
 
     try {
-      const isEmpty = (obj) => {
+      const isEmpty = obj => {
         return Object.keys(obj).length === 0
       }
 
-      let filters = [ ...runtimeFilters ]
+      let filters = [...runtimeFilters]
 
       filters[idx] = { ...filters[idx] }
       filters[idx].active = activeValue
@@ -988,7 +978,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return formattedValue
   }
 
-  const applyLegendToRow = (rowObj) => {
+  const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
       // Navigation map
@@ -1013,16 +1003,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const applyTooltipsToGeo = (geoName, row, returnType = 'string') => {
-
-    if(!row) return;
+    if (!row) return
     let toolTipText = ''
 
     // Adds geo label, ie State: Georgia
-    let stateOrCounty = state.general.geoType === 'us'
-      ? 'State: '
-      : (state.general.geoType === 'us-county' || state.general.geoType === 'single-state')
-        ? 'County: '
-        : ''
+    let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
 
     if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
       let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
@@ -1036,7 +1021,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode') && undefined !== row) {
       toolTipText += `<dl>`
 
-      Object.keys(state.columns).forEach((columnKey) => {
+      Object.keys(state.columns).forEach(columnKey => {
         const column = state.columns[columnKey]
 
         if (true === column.tooltip) {
@@ -1057,7 +1042,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             value = displayDataAsText(row[column.name], columnKey)
           }
 
-          if (0 < value.length) { // Only spit out the tooltip if there's a value there
+          if (0 < value.length) {
+            // Only spit out the tooltip if there's a value there
             toolTipText += state.general.hidePrimaryColumnInTooltip ? `<div><dd>${value}</dd></div>` : `<div><dt>${label}</dt><dd>${value}</dd></div>`
           }
         }
@@ -1067,23 +1053,31 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
     if ('jsx' === returnType) {
-      toolTipText = [ (<div key="modal-content">{parse(toolTipText)}</div>) ]
+      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
-        toolTipText.push((<span className="navigation-link" key="modal-navigation-link" onClick={() => navigationHandler(row[state.columns.navigate.name])}>{state.tooltips.linkLabel}<ExternalIcon className="inline-icon ml-1"/></span>))
+        toolTipText.push(
+          <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+            {state.tooltips.linkLabel}
+            <ExternalIcon className='inline-icon ml-1' />
+          </span>
+        )
       }
     }
 
     return toolTipText
   }
 
-  const titleCase = (string) => {
-    return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()).join(' ')
+  const titleCase = string => {
+    return string
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+      .join(' ')
   }
 
   // This resets all active legend toggles.
   const resetLegendToggles = async () => {
-    let newLegend = [ ...runtimeLegend ]
+    let newLegend = [...runtimeLegend]
 
     newLegend.forEach(legendItem => {
       delete legendItem.disabled
@@ -1092,7 +1086,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setRuntimeLegend(newLegend)
   }
 
-  const formatLegendLocation = (key) => {
+  const formatLegendLocation = key => {
     let value = key
     let formattedName = ''
     let stateName = stateFipsToTwoDigit[key.substring(0, 2)]
@@ -1109,7 +1103,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   // Attempts to find the corresponding value
-  const displayGeoName = (key) => {
+  const displayGeoName = key => {
     let value = key
 
     // Map to first item in values array which is the preferred label
@@ -1132,9 +1126,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     const dict = {
       'Washington D.C.': 'District of Columbia',
       'WASHINGTON DC': 'District of Columbia',
-      'DC': 'District of Columbia',
+      DC: 'District of Columbia',
       'WASHINGTON DC.': 'District of Columbia',
-      'Congo': 'Republic of the Congo'
+      Congo: 'Republic of the Congo'
     }
 
     if (true === Object.keys(dict).includes(value)) {
@@ -1143,7 +1137,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return titleCase(value)
   }
 
-  const navigationHandler = (urlString) => {
+  const navigationHandler = urlString => {
     // Call custom navigation method if passed
     if (customNavigationHandler) {
       customNavigationHandler(urlString)
@@ -1182,12 +1176,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
-  const validateFipsCodeLength = (newState) => {
-    if (newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || newState.general.geoType === 'us' && newState?.data) {
-
+  const validateFipsCodeLength = newState => {
+    if (newState.general.geoType === 'us-county' || newState.general.geoType === 'single-state' || (newState.general.geoType === 'us' && newState?.data)) {
       newState?.data.forEach(dataPiece => {
         if (dataPiece[newState.columns.geo.name]) {
-
           if (!isNaN(parseInt(dataPiece[newState.columns.geo.name])) && dataPiece[newState.columns.geo.name].length === 4) {
             dataPiece[newState.columns.geo.name] = 0 + dataPiece[newState.columns.geo.name]
           }
@@ -1234,7 +1226,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
-  const loadConfig = async (configObj) => {
+  const loadConfig = async configObj => {
     // Set loading flag
     if (!loading) setLoading(true)
 
@@ -1244,16 +1236,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       ...configObj
     }
 
+    // If a dataUrl property exists, always pull from that.
+    if (newState.dataUrl) {
+      if (newState.dataUrl[0] === '/') {
+        newState.dataUrl = 'http://' + hostname + newState.dataUrl
+      }
 
-        // If a dataUrl property exists, always pull from that.
-        if (newState.dataUrl) {
-            if(newState.dataUrl[0] === '/') {
-                newState.dataUrl = 'http://' + hostname + newState.dataUrl
-            }
-
-            // handle urls with spaces in the name.
-            if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
-            let newData = await fetchRemoteData(newState.dataUrl )
+      // handle urls with spaces in the name.
+      if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
+      let newData = await fetchRemoteData(newState.dataUrl)
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
@@ -1268,10 +1259,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     // This code goes through and adds the defaults for every property declaring in the initial state at the top.
     // This allows you to easily add new properties to the config without having to worry about accounting for backwards compatibility.
     // Right now this does not work recursively -- only on first and second level properties. So state -> prop1 -> childprop1
-    Object.keys(newState).forEach((key) => {
+    Object.keys(newState).forEach(key => {
       if ('object' === typeof newState[key] && false === Array.isArray(newState[key])) {
         if (initialState[key]) {
-          Object.keys(initialState[key]).forEach((property) => {
+          Object.keys(initialState[key]).forEach(property => {
             if (undefined === newState[key][property]) {
               newState[key][property] = initialState[key][property]
             }
@@ -1323,14 +1314,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [ state, container ])
+  }, [state, container])
 
   useEffect(() => {
     if (state.data) {
       let newData = generateRuntimeData(state)
       setRuntimeData(newData)
     }
-  }, [ state.general.statePicked ])
+  }, [state.general.statePicked])
 
   // When geotype changes
   useEffect(() => {
@@ -1338,7 +1329,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
-  }, [ state ])
+  }, [state])
 
   useEffect(() => {
     // UID
@@ -1368,7 +1359,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       specialClasses: state.legend.specialClasses,
       geoType: state.general.geoType,
       data: state.data,
-      ...runtimeLegend
+      ...runtimeLegend,
+      ...runtimeFilters
     })
 
     const hashData = hashObj({
@@ -1379,7 +1371,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       primary: state.columns.primary.name,
       data: state.data,
       ...runtimeFilters,
-      mapPosition: state.mapPosition
+      mapPosition: state.mapPosition,
+      ...runtimeFilters
     })
 
     // Data
@@ -1394,8 +1387,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-
-  }, [ state ])
+  }, [state])
 
   useEffect(() => {
     const hashLegend = hashObj({
@@ -1415,13 +1407,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, runtimeData)
       setRuntimeLegend(legend)
     }
-
-  }, [ runtimeData ])
+  }, [runtimeData])
 
   if (config) {
     useEffect(() => {
       loadConfig(config)
-    }, [ config.data ])
+    }, [config.data])
   }
 
   // Destructuring for more readable JSX
@@ -1429,24 +1420,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const { title = '', subtext = '' } = general
 
   // Outer container classes
-  let outerContainerClasses = [
-    'cdc-open-viz-module',
-    'cdc-map-outer-container',
-    currentViewport
-  ]
+  let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
 
   if (className) {
     outerContainerClasses.push(className)
   }
 
   // Map container classes
-  let mapContainerClasses = [
-    'map-container',
-    state.legend.position,
-    state.general.type,
-    state.general.geoType,
-    'outline-none'
-  ]
+  let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
 
   if (modal) {
     mapContainerClasses.push('modal-background')
@@ -1479,10 +1460,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setPosition,
     setSharedFilterValue,
     hasZoom: state.general.allowMapZoom,
-    handleMapAriaLabels
+    handleMapAriaLabels,
+    runtimeFilters,
+    setRuntimeFilters
   }
 
-  if (!mapProps.data || !state.data) return <Loading/>
+
+  if (!mapProps.data || !state.data) return <Loading />
 
   const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
 
@@ -1511,183 +1495,127 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tabId = handleMapTabbing()
 
   return (
-    <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
-      {isEditor && (
-        <EditorPanel
-          isDashboard={isDashboard}
-          state={state}
-          setState={setState}
-          loadConfig={loadConfig}
-          setParentConfig={setConfig}
-          setRuntimeFilters={setRuntimeFilters}
-          runtimeFilters={runtimeFilters}
-          runtimeLegend={runtimeLegend}
-          columnsInData={Object.keys(state.data[0])}
-        />
-      )}
-      {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
-        {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && (
-          <ReactTooltip
-            id="tooltip"
-            place="right"
-            type="light"
-            html={true}
-            className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}
-          />
-        )}
-        {state.general.title &&
-          <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
-            <div role="heading" className={'map-title ' + general.headerColor} tabIndex="0" aria-level="2">
-              <sup>{general.superTitle}</sup>
-              <div>{parse(title)}</div>
-            </div>
-          </header>
-        }
+    <Context.Provider value={mapProps}>
+      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
+        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
+        {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+            {state.general.title && (
+              <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
+                <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
+                  <sup>{general.superTitle}</sup>
+                  <div>{parse(title)}</div>
+                </div>
+              </header>
+            )}
 
-        <div>
-          {general.introText && <section className="introText">{parse(general.introText)}</section>}
-        </div>
+            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
 
-        <section
-          role="button"
-          tabIndex="0"
-          className={mapContainerClasses.join(' ')}
-          onClick={(e) => closeModal(e)}
-          onKeyDown={(e) => {
-            if (e.keyCode === 13) {
-              closeModal(e)
-            }
-          }}
-        >
-          {general.showDownloadMediaButton === true && (
-            <div className="map-downloads" data-html2canvas-ignore>
-              <div className="map-downloads__ui btn-group">
-                <button
-                  className="btn"
-                  title="Download Map as Image"
-                  onClick={() => generateMedia(outerContainerRef.current, 'image')}
-                >
-                  <DownloadImg className="btn__icon" title="Download Map as Image"/>
-                </button>
-                <button
-                  className="btn"
-                  title="Download Map as PDF"
-                  onClick={() => generateMedia(outerContainerRef.current, 'pdf')}
-                >
-                  <DownloadPdf className="btn__icon" title="Download Map as PDF"/>
-                </button>
-              </div>
-            </div>
-          )}
+            <Filters />
 
-          <a id="skip-geo-container" className="cdcdataviz-sr-only-focusable" href={tabId}>
-            Skip Over Map Container
-          </a>
+            <section
+              role='button'
+              tabIndex='0'
+              className={mapContainerClasses.join(' ')}
+              onClick={e => closeModal(e)}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  closeModal(e)
+                }
+              }}
+            >
+              {general.showDownloadMediaButton === true && (
+                <div className='map-downloads' data-html2canvas-ignore>
+                  <div className='map-downloads__ui btn-group'>
+                    <button className='btn' title='Download Map as Image' onClick={() => generateMedia(outerContainerRef.current, 'image')}>
+                      <DownloadImg className='btn__icon' title='Download Map as Image' />
+                    </button>
+                    <button className='btn' title='Download Map as PDF' onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
+                      <DownloadPdf className='btn__icon' title='Download Map as PDF' />
+                    </button>
+                  </div>
+                </div>
+              )}
 
-          <section className="geography-container outline-none" ref={mapSvg} tabIndex="0">
-            {currentViewport && (
-              <section className="geography-container" ref={mapSvg}>
-                {modal && (
-                  <Modal
-                    type={general.type}
-                    viewport={currentViewport}
-                    applyTooltipsToGeo={applyTooltipsToGeo}
-                    applyLegendToRow={applyLegendToRow}
-                    capitalize={state.tooltips.capitalizeLabels}
-                    content={modal}
-                  />
+              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+                Skip Over Map Container
+              </a>
+
+              <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
+                {currentViewport && (
+                  <section className='geography-container' ref={mapSvg}>
+                    {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                    {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
+                    {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                    {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                  </section>
                 )}
-                {'single-state' === general.geoType && (
-                  <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />
-                )}
-                {('us' === general.geoType && 'us-geocode' !== state.general.type) && (
-                  <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />
-                )}
-                {'us-region' === general.geoType && (
-                  <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />
-                )}
-                {'world' === general.geoType && (
-                  <WorldMap supportedCountries={supportedCountries} {...mapProps} />
-                )}
-                {('us-county' === general.geoType) && (
-                  <CountyMap
-                    supportedCountries={supportedCountries}
-                    {...mapProps}
-                  />
-                )}
-                {'data' === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
               </section>
 
+              {general.showSidebar && 'navigation' !== general.type && (
+                <Sidebar
+                  viewport={currentViewport}
+                  legend={state.legend}
+                  runtimeLegend={runtimeLegend}
+                  setRuntimeLegend={setRuntimeLegend}
+                  runtimeFilters={runtimeFilters}
+                  columns={state.columns}
+                  sharing={state.sharing}
+                  prefix={state.columns.primary.prefix}
+                  suffix={state.columns.primary.suffix}
+                  setState={setState}
+                  resetLegendToggles={resetLegendToggles}
+                  changeFilterActive={changeFilterActive}
+                  setAccessibleStatus={setAccessibleStatus}
+                  displayDataAsText={displayDataAsText}
+                />
+              )}
+            </section>
+
+            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
+
+            {link && link}
+
+            {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+            {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
+              <DataTable
+                state={state}
+                rawData={state.data}
+                navigationHandler={navigationHandler}
+                expandDataTable={general.expandDataTable}
+                headerColor={general.headerColor}
+                columns={state.columns}
+                showDownloadButton={general.showDownloadButton}
+                runtimeLegend={runtimeLegend}
+                runtimeData={runtimeData}
+                displayDataAsText={displayDataAsText}
+                displayGeoName={displayGeoName}
+                applyLegendToRow={applyLegendToRow}
+                tableTitle={dataTable.title}
+                indexTitle={dataTable.indexLabel}
+                mapTitle={general.title}
+                viewport={currentViewport}
+                formatLegendLocation={formatLegendLocation}
+                setFilteredCountryCode={setFilteredCountryCode}
+                tabbingId={tabId}
+              />
             )}
+
+            {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
           </section>
-
-          {general.showSidebar && 'navigation' !== general.type && (
-            <Sidebar
-              viewport={currentViewport}
-              legend={state.legend}
-              runtimeLegend={runtimeLegend}
-              setRuntimeLegend={setRuntimeLegend}
-              runtimeFilters={runtimeFilters}
-              columns={state.columns}
-              sharing={state.sharing}
-              prefix={state.columns.primary.prefix}
-              suffix={state.columns.primary.suffix}
-              setState={setState}
-              resetLegendToggles={resetLegendToggles}
-              changeFilterActive={changeFilterActive}
-              setAccessibleStatus={setAccessibleStatus}
-              displayDataAsText={displayDataAsText}
-            />
-          )}
-        </section>
-
-        {'navigation' === general.type && (
-          <NavigationMenu
-            mapTabbingID={tabId}
-            displayGeoName={displayGeoName}
-            data={runtimeData}
-            options={general}
-            columns={state.columns}
-            navigationHandler={(val) => navigationHandler(val)}
-          />
         )}
 
-        {link && link}
-
-        {subtext.length > 0 && <p className="subtext">{parse(subtext)}</p>}
-
-        {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
-          <DataTable
-            state={state}
-            rawData={state.data}
-            navigationHandler={navigationHandler}
-            expandDataTable={general.expandDataTable}
-            headerColor={general.headerColor}
-            columns={state.columns}
-            showDownloadButton={general.showDownloadButton}
-            runtimeLegend={runtimeLegend}
-            runtimeData={runtimeData}
-            displayDataAsText={displayDataAsText}
-            displayGeoName={displayGeoName}
-            applyLegendToRow={applyLegendToRow}
-            tableTitle={dataTable.title}
-            indexTitle={dataTable.indexLabel}
-            mapTitle={general.title}
-            viewport={currentViewport}
-            formatLegendLocation={formatLegendLocation}
-            setFilteredCountryCode={setFilteredCountryCode}
-            tabbingId={tabId}
-          />
-        )}
-
-        {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
-      </section>}
-
-      <div aria-live="assertive" className="cdcdataviz-sr-only">
-        {accessibleStatus}
+        <div aria-live='assertive' className='cdcdataviz-sr-only'>
+          {accessibleStatus}
+        </div>
       </div>
-    </div>
+    </Context.Provider>
   )
 }
 
-export default memo(CdcMap)
+export default CdcMap
