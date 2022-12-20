@@ -146,7 +146,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component='PieChart'>
-      <svg width={width} height={height} className={`group ${animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+      <svg width={width} height={height} className={`animated-pie group ${animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
             {pie => <AnimatedPie<any> {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}

@@ -37,6 +37,15 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  // Make sure the chart is visible if in the editor
+  useEffect(() => {
+    const element = document.querySelector('.isEditor');
+    if (element) {
+      // parent element is visible
+      setAnimatedChart(prevState => true);
+    }
+  });
+
   // If the chart is in view and set to animate and it has not already played
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
@@ -171,7 +180,7 @@ export default function LinearChart() {
     }
   }
 
-   
+
   const countNumOfTicks = (axis)=>{
     // function get number of ticks based on bar type & users value
     const isHorizontal = config.orientation ==='horizontal';
@@ -180,7 +189,7 @@ export default function LinearChart() {
 
     if(axis === 'yAxis'){
       tickCount = (
-         (isHorizontal && !numTicks) ? data.length 
+         (isHorizontal && !numTicks) ? data.length
        : (isHorizontal &&  numTicks) ? numTicks
        :(!isHorizontal && !numTicks) ? undefined
        :(!isHorizontal &&  numTicks) && numTicks
