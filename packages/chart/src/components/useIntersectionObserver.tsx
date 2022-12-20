@@ -13,17 +13,19 @@ export default function useIntersectionObserver(
     };
 
     useEffect(() => {
+      setTimeout(() => {
         const node = elementRef?.current;
         const hasIOSupport = !!window.IntersectionObserver;
 
         if (!hasIOSupport || frozen || !node) return;
 
-        const observerParams = { threshold, root, rootMargin };
+        const observerParams = {threshold, root, rootMargin};
         const observer = new IntersectionObserver(updateEntry, observerParams);
 
         observer.observe(node);
 
         return () => observer.disconnect();
+      }, 500);
     }, [elementRef, threshold, root, rootMargin, frozen]);
 
     return entry;
