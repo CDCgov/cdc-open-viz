@@ -331,10 +331,9 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
                 <div className="wrap">
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
-                    Show CSV Button
-                  </label><br />
-
+                    <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
+                    Show PDF Button
+                  </label>
                   <label>
                     <input type='checkbox' defaultChecked={config.table.downloadImageButton} onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)} />
                     Show Image Button
@@ -343,25 +342,29 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
                 <div className="wrap">
                   <label>
-                    <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
-                    Show PDF Button
-                  </label>
-                  <label>
                     <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
                     Limit Table Height
                   </label>
-                </div>
-                <div className="wrap">
                   {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
                 </div>
 
-
+                <div className="wrap">
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
+                    Show CSV Button
+                  </label>
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
+                    Show Link to Dataset
+                  </label>
+                </div>
               </>
             )}
           </div>
-        </div>
-      )}
-    </div>
+        </div >
+      )
+      }
+    </div >
   )
 }
 

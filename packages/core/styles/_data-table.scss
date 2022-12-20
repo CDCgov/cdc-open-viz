@@ -260,7 +260,7 @@ table.data-table {
 }
 .cove,
 .cdc-open-viz-module {
-  .download-links a {
+  .download-links a:not(:last-child) {
     margin-right: 10px;
     display: inline-block;
   }

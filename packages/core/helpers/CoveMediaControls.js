@@ -106,7 +106,7 @@ const Button = ({ state, text, type, title, elementToCapture }) => {
 }
 
 // Link to CSV/JSON data
-const Link = ({ config, title = 'Link to view full data set' }) => {
+const Link = ({ config }) => {
   return config?.table?.showDownloadUrl && config.dataUrl ? (
     <a href={config.dataUrl} title='Link to view full data set' target='_blank'>
       {buttonText.link}
