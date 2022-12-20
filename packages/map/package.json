@@ -24,7 +24,6 @@
     "@emotion/core": "^10.0.28",
     "@emotion/react": "^11.1.5",
     "@visx/geo": "^1.13.0",
-    "canvg": "^3.0.7",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
     "d3": "^6.6.0",
