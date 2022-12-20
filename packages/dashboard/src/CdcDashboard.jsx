@@ -32,6 +32,8 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+
 
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
@@ -106,6 +108,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [preview, setPreview] = useState(false)
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const { title, description } = config.dashboard || config
 
@@ -331,7 +334,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => {}
+    const announceChange = text => { }
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return
@@ -617,10 +620,15 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 )
               })}
 
+          {/* Image or PDF Inserts */}
+          <section className='download-buttons'>
+            {config.table.downloadImageButton && <CoveMediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table.downloadPdfButton && <CoveMediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+          </section>
+
           {/* Data Table */}
-          {config.table && config.table.show && config.data && <DataTable data={config.data} config={config} />}
+          {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
           {config.table &&
-            config.table.show &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
               //For each dataset, find any shared filters that apply to all visualizations using the dataset
@@ -655,9 +663,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 }
               }
 
+
+              let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
+
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} datasetKey={datasetKey} config={config}></DataTable>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
                 </div>
               )
             })}
@@ -675,13 +686,21 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     loading,
     updateConfig,
     setParentConfig,
-    setPreview
+    setPreview,
+    outerContainerRef
   }
+
+
+  const dashboardContainerClasses = [
+    'cdc-open-viz-module',
+    'type-dashboard',
+    `${currentViewport}`
+  ]
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={`cdc-open-viz-module type-dashboard ${currentViewport}`} ref={outerContainerRef}>
+        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId} >
           {body}
         </div>
         <OverlayFrame />
