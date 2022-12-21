@@ -75,7 +75,8 @@ export default {
     maxBubbleSize: 20,
     extraBubbleBorder: false,
     cityStyle: 'circle',
-    geoCodeCircleSize: 2
+    geoCodeCircleSize: 2,
+    showBubbleZeros: false
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 }
 }

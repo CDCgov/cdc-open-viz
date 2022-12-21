@@ -7,7 +7,8 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types", "./src/@types"]
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": ["node_modules", "webpack","*.js"]
 }

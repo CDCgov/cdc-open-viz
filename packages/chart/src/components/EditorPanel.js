@@ -1022,6 +1022,7 @@ const EditorPanel = () => {
                   )}
                   <span className='divider-heading'>Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
+                  <CheckBox value={config.dataFormat.useFormat} section='dataFormat' fieldName='useFormat' label='Use Formatted Number' updateField={updateField} />
                   <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField

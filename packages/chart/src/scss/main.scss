@@ -131,7 +131,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: flex-start;
-   
+
          & >div{
           padding:0 1.2em 1em 0;
         }
@@ -259,6 +259,10 @@
       width: 100% !important;
     }
 
+    .legend-container {
+      margin-top: 1rem;
+    }
+
     > svg {
       overflow: visible;
       font-size: 14px;
@@ -323,6 +327,28 @@
   }
 
   .filters-section {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+    &__title {
+      margin: 15px 0;
+    }
+
+    &__wrapper {
+      margin-bottom: 40px;
+
+      hr {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: inherit;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+    }
+
     @include breakpoint(md) {
       display: flex;
       gap: 30px;
@@ -377,6 +403,8 @@
     .chart-container {
       flex-wrap: nowrap;
 
+      .no-wrap { flex-wrap: nowrap; }
+
       .legend-container {
         width: 25%;
         margin-left: 1em;
@@ -422,8 +450,8 @@
     }
   }
 
- 
-  
+
+
   @include breakpointClass(lg) {
     &.font-small {
       font-size: 1em;
