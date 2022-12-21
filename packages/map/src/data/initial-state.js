@@ -15,22 +15,22 @@ export default {
     expandDataTable: true,
     fullBorder: false,
     type: 'data',
-    palette:{
-      isReversed:false
+    palette: {
+      isReversed: false
     },
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false
   },
-  
-  type: "map",
+
+  type: 'map',
   color: 'pinkpurple',
   columns: {
     geo: {
       name: 'FIPS Codes',
       label: 'Location',
-			tooltip: false,
-      dataTable: true,
+      tooltip: false,
+      dataTable: true
     },
     primary: {
       dataTable: true,
@@ -43,8 +43,8 @@ export default {
     navigate: {
       name: ''
     },
-    latitude: { name: "" },
-    longitude: { name: "" }
+    latitude: { name: '' },
+    longitude: { name: '' }
   },
   legend: {
     descriptions: {},
@@ -53,10 +53,10 @@ export default {
     singleColumn: false,
     singleRow: false,
     dynamicDescription: false,
-    type: "equalnumber",
+    type: 'equalnumber',
     numberOfItems: 3,
-    position: "side",
-    title: "Legend",
+    position: 'side',
+    title: 'Legend'
   },
   filters: [],
   dataTable: {
@@ -74,8 +74,8 @@ export default {
     minBubbleSize: 1,
     maxBubbleSize: 20,
     extraBubbleBorder: false,
-    cityStyle: 'circle'
+    cityStyle: 'circle',
+    geoCodeCircleSize: 2
   },
-  mapPosition: 
-    { coordinates: [0, 30], zoom: 1 }
-};
+  mapPosition: { coordinates: [0, 30], zoom: 1 }
+}
