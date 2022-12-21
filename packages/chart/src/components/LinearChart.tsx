@@ -302,7 +302,7 @@ export default function LinearChart() {
                       </Group>
                     )
                   })}
-                  {!config.yAxis.hideAxis && <Line from={{x:0,y:0}} to={config.runtime.horizontal ? {x:0, y:Number(config.height)} : props.axisToPoint } stroke='#333' />}
+                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={config.runtime.horizontal ? {x:0, y:Number(config.height)} : props.axisToPoint } stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                     {props.label}
