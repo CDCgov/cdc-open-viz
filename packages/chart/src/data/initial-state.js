@@ -88,7 +88,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '' },
+  dataFormat: { commas: false, prefix: '', suffix: '', useFormat: false },
   confidenceKeys: {},
   visual: {
     border: true,
