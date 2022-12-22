@@ -518,7 +518,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let result = ''
 
     if (config.dataFormat.useFormat) {
-      console.log('num', num)
       num = formatSuffix(num)
     }
 
@@ -552,7 +551,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
-    Pie: <PieChart />
+    Pie: <PieChart />,
+    'Box Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
@@ -596,12 +596,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
-            <div
-              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : ""
-              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
+            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            <div className={`chart-container ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 
@@ -628,7 +624,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
             {/* Data Table */}
 
-            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
+            {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && config.visulizationType !== 'Box Plot' && <DataTable />}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
           </div>
         )}

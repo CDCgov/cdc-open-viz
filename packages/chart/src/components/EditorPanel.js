@@ -616,7 +616,7 @@ const EditorPanel = () => {
     filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters });
+    updateConfig({ ...config, filters })
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -696,7 +696,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line']} />
+                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Box Plot']} />
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
@@ -996,7 +996,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      <CheckBox  value={config.yAxis.isLegendValue} section='yAxis'  fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField}   /> 
+                      <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}

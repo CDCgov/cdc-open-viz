@@ -29,6 +29,7 @@
     "@visx/mock-data": "^1.0.0",
     "@visx/scale": "^1.0.0",
     "@visx/shape": "^1.0.0",
+    "@visx/stats": "^2.17.0",
     "@visx/tooltip": "^1.1.0",
     "chroma-js": "^2.1.2",
     "d3-array": "^2.8.0",
