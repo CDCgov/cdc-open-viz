@@ -11,6 +11,9 @@ import Context from '../context'
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext<any>(Context)
 
+  // Debugging.
+  if (config.visualizationType === 'Box Plot') return null
+
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
