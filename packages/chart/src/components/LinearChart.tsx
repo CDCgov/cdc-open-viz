@@ -183,29 +183,36 @@ export default function LinearChart() {
     return tickCount
   }
 
+  // Box Plot Scaling
   if (config.visualizationType === 'Box Plot') {
     const values = data.reduce((allValues, d) => {
-      allValues.push(d.min, d.max)
+      const hasOutliers = data.filter(d => d.outliers).length > 0
+      let outlierMax = Math.max.apply(null, d.outliers)
+      let outlierMin = Math.min.apply(null, d.outliers)
+
+      // If the chart includes an array of outliers, factor them into the height of the chart.
+      if (!hasOutliers) {
+        allValues.push(d.min, d.max)
+      } else {
+        allValues.push(outlierMin, outlierMax)
+      }
       return allValues
     }, [])
-
     const minYValue = Math.min(...values)
     const maxYValue = Math.max(...values)
-
-    console.log('values', values)
-    console.table({ minYValue, maxYValue })
+    const seriesNames = data.map(d => d.x)
 
     // Set Scales
-    const yScale = scaleLinear({
+    yScale = scaleLinear({
       range: [yMax, 0],
       round: true,
       domain: [minYValue, maxYValue]
     })
 
-    const xScale = scaleBand({
+    xScale = scaleBand({
       range: [0, xMax],
       round: true,
-      domain: ['Statistics 0', 'Statistics 1', 'Statistics 2'],
+      domain: seriesNames,
       padding: 0.4
     })
   }
