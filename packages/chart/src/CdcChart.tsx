@@ -546,6 +546,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { legend, title, description, visualizationType } = config
 
   // Select appropriate chart type
+  console.log('hit', visualizationType)
   const chartComponents = {
     'Paired Bar': <LinearChart />,
     Bar: <LinearChart />,
