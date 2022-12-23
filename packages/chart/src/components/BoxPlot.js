@@ -6,17 +6,21 @@ import Context from '../context'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  // accessors
-  const x = d => d.x
-  const min = d => d.min
-  const max = d => d.max
-  const median = d => d.median
-  const firstQuartile = d => d.firstQuartile
-  const thirdQuartile = d => d.thirdQuartile
-  const outliers = d => d.outliers
-
   // Get Data Here
   const { transformedData: data, config } = useContext(Context)
+
+  const {
+    boxplot: { columnFirstQuartile, columnThirdQuartile, columnMax, columnMin, columnMedian }
+  } = config
+
+  // accessors
+  const x = d => d.x
+  const min = d => d[columnMin]
+  const max = d => d[columnMax]
+  const median = d => d[columnMedian]
+  const firstQuartile = d => d[columnFirstQuartile]
+  const thirdQuartile = d => d[columnThirdQuartile]
+  const outliers = d => d.outliers
 
   // Get yMax
   const yMax = config.height - config.runtime.xAxis.size

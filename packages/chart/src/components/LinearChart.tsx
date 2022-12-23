@@ -192,7 +192,7 @@ export default function LinearChart() {
 
       // If the chart includes an array of outliers, factor them into the height of the chart.
       if (!hasOutliers) {
-        allValues.push(d.min, d.max)
+        allValues.push(d[config.boxplot.columnMin], d[config.boxplot.columnMax])
       } else {
         allValues.push(outlierMin, outlierMax)
       }
