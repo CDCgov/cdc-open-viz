@@ -38,6 +38,13 @@ export default {
     isLegendValue: false,
     numTicks: ''
   },
+  boxplot: {
+    columnFirstQuartile: '',
+    columnThirdQuartile: '',
+    columnMedian: '',
+    columnMin: '',
+    columnMax: ''
+  },
   topAxis: {
     hasLine: false
   },

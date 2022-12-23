@@ -709,8 +709,21 @@ const EditorPanel = () => {
                     config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
 
+                  {config.visualizationType === 'Box Plot' && (
+                    <>
+                      <legend>Box Plot Column Selections</legend>
+                      <fieldset style={{ border: '1px solid gray', padding: '10px', borderRadius: '5px', marginTop: '0px' }}>
+                        <Select section='boxplot' fieldName='columnFirstQuartile' label='First Quartile' updateField={updateField} options={getColumns()} />
+                        <Select section='boxplot' fieldName='columnThirdQuartile' label='Third Quartile' updateField={updateField} options={getColumns()} />
+                        <Select section='boxplot' fieldName='columnMedian' label='Median' updateField={updateField} options={getColumns()} />
+                        <Select section='boxplot' fieldName='columnMin' label='Minimum' updateField={updateField} options={getColumns()} />
+                        <Select section='boxplot' fieldName='columnMax' label='Maximum' updateField={updateField} options={getColumns()} />
+                      </fieldset>
+                    </>
+                  )}
+
+                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
