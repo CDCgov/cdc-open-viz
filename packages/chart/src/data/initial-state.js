@@ -43,7 +43,8 @@ export default {
     columnThirdQuartile: '',
     columnMedian: '',
     columnMin: '',
-    columnMax: ''
+    columnMax: '',
+    columnOutliers: ''
   },
   topAxis: {
     hasLine: false

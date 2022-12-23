@@ -183,17 +183,19 @@ export default function LinearChart() {
     return tickCount
   }
 
-  // Box Plot Scaling
+  // Handle Box Plots
   if (config.visualizationType === 'Box Plot') {
     const values = data.reduce((allValues, d) => {
-      const hasOutliers = data.filter(d => d.outliers).length > 0
-      let outlierMax = Math.max.apply(null, d.outliers)
-      let outlierMin = Math.min.apply(null, d.outliers)
+      const csvInDataUrl = config?.dataUrl && config?.dataUrl.split('.')[1] === 'csv'
+      const csvInDataFileName = config?.dataFilename && config?.dataFileName.split('.')[1] === 'csv'
+      const hasOutliers = data.filter(d => d[config.boxplot.columnOutliers]).length > 0
 
       // If the chart includes an array of outliers, factor them into the height of the chart.
       if (!hasOutliers) {
         allValues.push(d[config.boxplot.columnMin], d[config.boxplot.columnMax])
       } else {
+        let outlierMax = Math.max.apply(null, d[config.boxplot.columnOutliers])
+        let outlierMin = Math.min.apply(null, d[config.boxplot.columnOutliers])
         allValues.push(outlierMin, outlierMax)
       }
       return allValues
