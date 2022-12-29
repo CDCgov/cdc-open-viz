@@ -613,10 +613,10 @@ const EditorPanel = () => {
     let filters = [...config.filters]
     let filterItem = { ...config.filters[filterIndex] }
     filterItem.active = filter.values[0]
-    filterItem.values = filterOrder
+    filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    setFilteredData(filters)
+    updateConfig({ ...config, filters })
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -996,7 +996,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      <CheckBox  value={config.yAxis.isLegendValue} section='yAxis'  fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField}   /> 
+                      <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
@@ -1022,6 +1022,7 @@ const EditorPanel = () => {
                   )}
                   <span className='divider-heading'>Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
+                  <CheckBox value={config.dataFormat.useFormat} section='dataFormat' fieldName='useFormat' label='Use Formatted Number' updateField={updateField} />
                   <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
@@ -1706,6 +1707,9 @@ const EditorPanel = () => {
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} />
                   <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>

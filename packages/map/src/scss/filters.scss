@@ -1,0 +1,41 @@
+.cdc-open-viz-module .cdc-map-inner-container .filters-section,
+.cove .cdc-map-inner-container .filters-section {
+  margin-left: 1rem;
+  margin-right: 1rem;
+
+  &__title {
+    margin: 15px 0;
+  }
+
+  &__wrapper {
+    margin-bottom: 40px;
+
+    hr {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: inherit;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+  }
+
+  @include breakpoint(md) {
+    display: flex;
+    gap: 30px;
+  }
+
+  label:not(:empty) {
+    margin-right: 0.4em;
+  }
+
+  select {
+    font-size: 1em;
+  }
+
+  .single-filter {
+    margin-bottom: 0.5em;
+  }
+}

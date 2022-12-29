@@ -35,9 +35,8 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    isLegendValue:false,
-    numTicks:''
-
+    isLegendValue: false,
+    numTicks: ''
   },
   topAxis: {
     hasLine: false
@@ -58,15 +57,16 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    isLegendValue:false,
-    numTicks:''
+    isLegendValue: false,
+    numTicks: ''
   },
   table: {
     label: 'Data Table',
     expanded: true,
     limitHeight: false,
     height: '',
-    caption: ''
+    caption: '',
+    showDownloadUrl: true
   },
   orientation: 'vertical',
   legend: {
@@ -89,7 +89,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '' },
+  dataFormat: { commas: false, prefix: '', suffix: '', useFormat: false },
   confidenceKeys: {},
   visual: {
     border: true,
