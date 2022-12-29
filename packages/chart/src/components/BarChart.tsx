@@ -29,6 +29,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
   const stackCount = config.runtime.seriesKeys.length
   const barBorderWidth = 1
+  const fontSize = {small:14,medium:16,large:18};
 
   const applyRadius = (index: number) => {
     if (index === undefined || index === null || !isRounded) return
@@ -47,58 +48,52 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return style
   };
 
-  const updateBars  = (defaultBars)=>{
-    if(config.visualizationType !=='Bar' && !isHorizontal ) return defaultBars;
 
-    const textSize = {small:14,medium:16,large:18};
-    const barsArr = [...defaultBars];
-    const barHeight = Number(config.barHeight) || 25;
-    // bar space the one user enters under visual/Bar Space
-    const barSpace = isLabelBelowBar ? barHeight/2 :  Number(config.barSpace);
+  const updateBars = (defaultBars)=>{
+    // function updates  stacked && regular && lollipop horizontal bars
+      if(config.visualizationType !=='Bar' && !isHorizontal ) return defaultBars;
 
-    const textHeight = isLabelBelowBar ? textSize[config.fontSize||'medium'] : 0;
-    const totalHeight  = barsArr.length * (barHeight + textHeight + barSpace);
-    // update bar height dynamicly
-    config.height = totalHeight;
+      const barsArr = [...defaultBars];
+      const keysCount = config.series.length;
+      let barHeight = !isStacked ?  (config.barHeight * keysCount) : config.barHeight;
+       config.isLollipopChart ? barHeight = lollipopBarWidth : barHeight;
+      const textHeight = isLabelBelowBar ? fontSize[config.fontSize||'medium'] : 0;
+      let barSpace = isLabelBelowBar ? barHeight/2 :  Number(config.barSpace);
 
-    const updatedBars = barsArr.map((bar,index)=>{
-      bar.index===0 ? bar.y = 0 : bar.y = (barHeight  + barSpace+ textHeight) * index;
-    
-      const newbar = {
-        ...bar,
-        height:barHeight,
-      }
-      return newbar;
-    });
+      if(config.isLollipopChart && isLabelBelowBar && !isStacked ){
+        barSpace = 20 ;  // 20 is hard coded space.
+      };
+      // calculate height of container based height, space and fontSize of labels
+      let totalHeight  =  barsArr.length * (barHeight + textHeight + barSpace) 
 
-    return updatedBars;
+      if(isHorizontal ){
+        config.height = totalHeight;
+      };
+
+      const updatedBars = barsArr.map((bar,i)=>{
+        // set bars Y dynamycly to handle space between bars
+        let y = 0 
+        bar.index !==0  && (y = (barHeight  + barSpace + textHeight) * i)
+      
+        const newbar = {
+          ...bar,
+          y:y,
+          height:barHeight,
+        }
+        return newbar;
+      });
+  
+      return updatedBars;
   };
 
-
-  const updateGroups = (defaultGroups) =>{
-
-    const groups  = [...defaultGroups];
-    const keysCount = config.series.length;
-    const barHeight = Number(config.barHeight);
-    const barSpace =  Number(config.barSpace);
-
-    const totalHeight  = ( (barHeight* keysCount) * groups.length ) + barSpace *groups.length;
-    // update bar height dynamicly
-    config.height = totalHeight;
-
-    const updatedGroups = groups.map((group,i)=>{
-      let y = 0 
-       group.index=== 0 ? y = 0  :  y  = y + (((barHeight * keysCount) + barSpace )  * i) 
-      const newGroup = {
-        ...group,
-        y:y ,
-        x:0
-      }
-
-      return newGroup
-    })
-
-    return updatedGroups
+  function getTextWidth(text, font) {
+    // function calculates the width of given text and its font-size
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+  
+    context.font = font || getComputedStyle(document.body).font;
+  
+    return Math.ceil(context.measureText(text).width);
   }
  
 
@@ -181,7 +176,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       `}
                       </style>
                       <Group key={`bar-stack-${barStack.index}-${bar.index}`} id={`barStack${barStack.index}-${bar.index}`} className='stack vertical'>
-                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * (bar.index + 0.5) + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
+                        <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barThickness * (bar.index ) + offset} y={bar.y - 5} fill={bar.color} textAnchor='middle'>
                           {formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)}
                         </Text>
                         <foreignObject
@@ -306,33 +301,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               }}
             >
               {barGroups => {
-                let barType = 'vertical'
-                if (orientation === 'horizontal') {
-                  const barsPerGroup = config.series.length
-                  let barHeight = config.barHeight ? config.barHeight : 25
-                  let barPadding = barHeight
-                  barType = 'horizontal'
-
-                  if (isLabelBelowBar || isLabelMissing || isLabelOnYAxis) {
-                    if (barHeight < 40) {
-                      config.barPadding = 40
-                    } else {
-                      config.barPadding = barPadding
-                    }
-                  } else {
-                    config.barPadding = barPadding / 2
-                  }
-
-                  if (config.isLollipopChart && config.yAxis.labelPlacement === 'Below Bar') {
-                    config.barPadding = config.barPadding + 7
-                  }
-                  config.barHeight = config.isLollipopChart ? lollipopBarWidth : barHeight
-                  config.height = barsPerGroup * barHeight * barGroups.length + config.barPadding * barGroups.length
-                }
-
-                return updateGroups(barGroups).map((barGroup, index) => (
+                return updateBars(barGroups).map((barGroup, index) => (
                   <Group
-                    className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${barType}`}
+                    className={`bar-group-${barGroup.index}-${barGroup.x0}--${index} ${config.orientation}`}
                     key={`bar-group-${barGroup.index}-${barGroup.x0}--${index}`}
                     top={config.runtime.horizontal ? barGroup.y : 0}
                     left={config.runtime.horizontal ? 0 : (xMax / barGroups.length) * barGroup.index}
@@ -349,7 +320,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       if (config.isLollipopChart) {
                         offset = (config.runtime.horizontal ? yMax : xMax) / barGroups.length / 2 - lollipopBarWidth / 2
                       }
-
                       const set = new Set()
                       data.forEach(d => set.add(d[config.legend.colorCode]))
                       const uniqValues = Array.from(set)
@@ -371,32 +341,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         yAxisValue = xAxisValue
                         xAxisValue = tempValue
                         barWidth = config.barHeight
-                      }
+                      };
 
                       let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${bar.key} : ${yAxisValue}`: config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` :yAxisValue;
                       let xAxisTooltip =config.runtime.xAxis.isLegendValue ? ` ${bar.key} :${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                      let horizBarLabelPadding = null
                       let labelColor = '#000000'
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
                         labelColor = '#FFFFFF'
                       }
-
-                      // font size and text spacing used for centering text on bar
-                      if (config.fontSize === 'small') {
-                        horizBarLabelPadding = 16
-                      } else if (config.fontSize === 'medium') {
-                        horizBarLabelPadding = 18
-                      } else {
-                        horizBarLabelPadding = 20
-                      }
-                      const onBarTextSpacing = 25
+                  
                       const tooltip = `<div>
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                       const style = applyRadius(index)
+                      
+                      // check if bar text/value string fits into  each bars. 
+                      let textWidth = getTextWidth(xAxisValue,config.fontSize);
+                      let isTextFit =(textWidth / bar.y)*100 < 48 
 
                       return (
                         <>
@@ -409,17 +373,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             }
                           `}
                           </style>
-                          <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
-                            <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
-                              {formatNumber(bar.value)}
-                            </Text>
+                          <Group  key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
                             <foreignObject
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
                               x={config.runtime.horizontal ? 0 : barWidth * (barGroup.bars.length - bar.index - 1) + offset}
-                              y={config.runtime.horizontal ? barWidth * (barGroup.bars.length - bar.index - 1)  : barY}
+                              y={config.runtime.horizontal ?  barWidth * (barGroup.bars.length - bar.index - 1)  : barY}
                               width={config.runtime.horizontal ? bar.y : barWidth}
-                              height={config.runtime.horizontal ? barWidth : barHeight}
+                              height={(isHorizontal && !config.isLollipopChart) ? barWidth : (isHorizontal && config.isLollipopChart) ? lollipopBarWidth :barHeight}
                               style={{
                                 background: config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor : config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor,
                                 border: `${config.isLollipopChart ? 0 : config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`,
@@ -430,6 +391,64 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               data-tip={tooltip}
                               data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
+
+                            {(orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar) && (
+                                <Text
+                                display={displayBar ? 'block' : 'none'}
+                                x={bar.y} 
+                                y={config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
+                                fill={labelColor}
+                                dx={isTextFit ? -5 : 5}
+                                verticalAnchor='middle'
+                                textAnchor={isTextFit ? 'end' : 'start'}
+                              >
+                                {xAxisValue}
+                              </Text>
+                            )};
+
+                            {(orientation === 'horizontal' && config.isLollipopChart && displayNumbersOnBar)&& (
+                              <Text
+                                display={displayBar ? 'block' : 'none'}
+                                x={`${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0)}`} // padding
+                                y={0}
+                                fill={'#000000'}
+                                textAnchor='start'
+                                verticalAnchor='middle'
+                                fontWeight={'normal'}
+                              >
+                                {xAxisValue}
+                            </Text>
+                            )}
+                           
+
+                              {orientation === 'horizontal' && isLabelBelowBar && !config.yAxis.hideLabel && (
+                                  <Text
+                                  x={config.yAxis.hideAxis ? 0 : 5} 
+                                  y={barGroup.height}
+                                  dy={4}
+                                  verticalAnchor={'start'}
+                                  textAnchor={'start'}
+                                >
+                                  {config.runtime.yAxis.type === 'date'
+                                    ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
+                                    : isHorizontal
+                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
+                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
+                                </Text>
+                              )};
+
+                              {(orientation === 'vertical' ) && (
+                                <Text 
+                                display={config.labels && displayBar ? 'block' : 'none'} 
+                                opacity={transparentBar ? 0.5 : 1} 
+                                x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset} 
+                                y={barY - 5} 
+                                fill={barColor} 
+                                textAnchor='middle'>
+                                {bar.value}
+                              </Text>
+                              )};
+
                             {config.isLollipopChart && config.lollipopShape === 'circle' && (
                               <circle
                                 cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize / 3.5}
@@ -442,6 +461,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 style={{ filter: 'unset', opacity: 1 }}
                               />
                             )}
+
                             {config.isLollipopChart && config.lollipopShape === 'square' && (
                               <rect
                                 x={orientation === 'horizontal' && bar.y > 10 ? bar.y - lollipopShapeSize / 2 : orientation === 'horizontal' && bar.y < 10 ? 0 : orientation !== 'horizontal' ? offset - lollipopBarWidth / 2 : barWidth * (barGroup.bars.length - bar.index - 1) + offset - 5.25}
@@ -456,120 +476,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               >
                                 <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                               </rect>
-                            )}
-                            {orientation === 'horizontal' && textWidth + 100 < bar.y
-                              ? config.yAxis.labelPlacement === 'On Bar' && (
-                                  <Group>
-                                    <Text
-                                      innerRef={e => {
-                                        if (e) {
-                                          // use font sizes and padding to set the bar height
-                                          let elem = e.getBBox()
-                                          setTextWidth(elem.width)
-                                          config.barHeight = elem.height * 2 + horizBarLabelPadding * 2 + onBarTextSpacing / 2
-                                          config.barPadding = horizBarHeight / 2
-                                        }
-                                      }}
-                                      x={bar.y - horizBarLabelPadding}
-                                      y={barHeight * (barGroup.bars.length - bar.index - 1) + horizBarLabelPadding * 2}
-                                      fill={labelColor}
-                                      textAnchor='end'
-                                    >
-                                      {yAxisValue}
-                                    </Text>
-                                    <Text x={bar.y - horizBarLabelPadding} y={barWidth * (barGroup.bars.length - bar.index - 1) + horizBarLabelPadding * 2 + onBarTextSpacing} fill={labelColor} textAnchor='end'>
-                                      {xAxisValue}
-                                    </Text>
-                                  </Group>
-                                )
-                              : isLabelOnBar && (
-                                  <Group>
-                                    {/* hide y label if we're only showing data on bar */}
-                                    <Text x={bar.y + horizBarLabelPadding} y={barWidth * (barGroup.bars.length - bar.index - 1) + horizBarLabelPadding * 2} fill={'#000'} textAnchor='start' verticalAnchor='end'>
-                                      {yAxisValue}
-                                    </Text>
-                                    <Text x={bar.y + horizBarLabelPadding} y={barWidth * (barGroup.bars.length - bar.index - 1) + horizBarLabelPadding * 2 + onBarTextSpacing} fill={'#000'} textAnchor='start' verticalAnchor='start'>
-                                      {xAxisValue}
-                                    </Text>
-                                  </Group>
-                                )}
-
-                            {orientation === 'horizontal' && isLabelBelowBar && !config.yAxis.hideLabel && (
-                              <>
-                                <Text
-                                  x={config.yAxis.hideAxis ? 0 : 5} // padding
-                                  y={config.isLollipopChart ? lollipopShapeSize * config.series.length + 2 : barWidth * config.series.length + 7}
-                                  verticalAnchor={'start'}
-                                  textAnchor={'start'}
-                                >
-                                  {config.runtime.yAxis.type === 'date'
-                                    ? formatDate(parseDate(data[barGroup.index][config.runtime.originalXAxis.dataKey]))
-                                    : isHorizontal
-                                    ? data[barGroup.index][config.runtime.originalXAxis.dataKey]
-                                    : formatNumber(data[barGroup.index][config.runtime.originalXAxis.dataKey])}
-                                </Text>
-
-                                {displayNumbersOnBar ? (
-                                  textWidth + 100 < bar.y && !config.isLollipopChart ? (
-                                    <Text
-                                      display={displayBar ? 'block' : 'none'}
-                                      x={bar.y - 5} // padding
-                                      y={config.isLollipopChart ? offset : config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
-                                      fill={labelColor}
-                                      textAnchor='end'
-                                      verticalAnchor='middle'
-                                    >
-                                      {xAxisValue}
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      display={displayBar ? 'block' : 'none'}
-                                      x={`${bar.y + (config.isLollipopChart ? 15 : 5) + (config.isLollipopChart && barGroup.bars.length === bar.index ? offset : 0)}`} // padding
-                                      y={config.isLollipopChart ? 0 : config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
-                                      fill={'#000000'}
-                                      textAnchor='start'
-                                      verticalAnchor='middle'
-                                      fontWeight={'normal'}
-                                    >
-                                      {xAxisValue}
-                                    </Text>
-                                  )
-                                ) : (
-                                  ''
-                                )}
-                              </>
-                            )}
-
-                            {isLabelOnYAxis && orientation === 'horizontal' && (
-                              <>
-                                {displayNumbersOnBar ? (
-                                  textWidth + 100 < bar.y && !config.isLollipopChart ? (
-                                    <Text
-                                      display={displayBar ? 'block' : 'none'}
-                                      x={bar.y - 5} // padding
-                                      y={config.isLollipopChart ? config.barHeight * (barGroup.bars.length - bar.index - 1) + offset : config.barHeight * (barGroup.bars.length - bar.index - 1) + config.barHeight / 2}
-                                      fill={labelColor}
-                                      textAnchor='end'
-                                      verticalAnchor='middle'
-                                    >
-                                      {formatNumber(xAxisValue)}
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      display={displayBar ? 'block' : 'none'}
-                                      x={`${bar.y + (config.isLollipopChart ? 15 : 5)}`} // padding
-                                      y={config.isLollipopChart ? 0+barHeight/2 : config.barHeight * (barGroup.bars.length - bar.index - 1) + config.barHeight / 2}
-                                      fill={'#000000'}
-                                      textAnchor='start'
-                                      verticalAnchor='middle'
-                                    >
-                                      {formatNumber(xAxisValue)}
-                                    </Text>
-                                  )
-                                ) : (
-                                  ''
-                                )}
-                              </>
                             )}
                           </Group>
                         </>

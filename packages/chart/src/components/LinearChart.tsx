@@ -126,7 +126,7 @@ export default function LinearChart() {
         range: [0, yMax]
       })
 
-      yScale.rangeRound([0, yMax])
+      yScale.rangeRound([0, height])
     } else {
       min = min < 0 ? min * 1.11 : min
 
@@ -198,6 +198,7 @@ export default function LinearChart() {
     return tickCount;
   };
 
+
   useEffect(() => {
     ReactTooltip.rebuild()
   })
@@ -247,16 +248,16 @@ export default function LinearChart() {
             numTicks={countNumOfTicks('yAxis')}
           >
             {props => {
-              const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
-              const belowBarPaddingFromTop = 9
               return (
-                <Group className='left-axis'>
+                <Group  className='left-axis'>
                   {props.ticks.map((tick, i) => {
-                    let minY =  props.ticks[0].to.y ;
+                    
+                    const minY = props.ticks[0].to.y;
                     const barMinHeight = 15; // 15 is the min height for bars by default
-                  
+                    
+
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                         {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke={config.yAxis.tickColor} display={config.runtime.horizontal ? 'none' : 'block'} />}
@@ -264,13 +265,13 @@ export default function LinearChart() {
                         {config.runtime.yAxis.gridLines ? <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='rgba(0,0,0,0.3)' /> : ''}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType !== 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                            <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.from.y-minY: ((tick.from.y-minY )+ ((Number(config.barHeight *config.series.length) - barMinHeight)/2))}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'} textAnchor={'end'}>
+                            <Text transform={`translate(${tick.to.x - 5}, ${config.isLollipopChart ? tick.to.y - minY: ((tick.to.y - minY)+ ((Number(config.barHeight *config.series.length) - barMinHeight)/2))}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'} textAnchor={'end'}>
                               {tick.formattedValue}
                             </Text>
                         )}
 
                         {config.orientation === 'horizontal' && config.visualizationSubType === 'stacked' && config.yAxis.labelPlacement === 'On Date/Category Axis' && !config.yAxis.hideLabel && (
-                          <Text transform={`translate(${tick.to.x - 5}, ${((tick.from.y-minY )+ ((Number(config.barHeight) - barMinHeight)/2)) }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'}  textAnchor={'end'}>
+                          <Text transform={`translate(${tick.to.x - 5}, ${((tick.to.y - minY)+ ((Number(config.barHeight) - barMinHeight)/2)) }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={'start'}  textAnchor={'end'}>
                             {tick.formattedValue}
                           </Text>
                         )}
