@@ -54,7 +54,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       if(config.visualizationType !=='Bar' && !isHorizontal ) return defaultBars;
 
       const barsArr = [...defaultBars];
-      let barHeight = !isStacked ? (config.barHeight * stackCount) :(!isStacked && config.isLollipopChart) ? lollipopBarWidth : config.barHeight; 
+      let barHeight = !isStacked ? (config.barHeight * stackCount) : config.barHeight; 
+      (!isStacked && config.isLollipopChart) ? barHeight=  lollipopBarWidth : barHeight
+
       const labelHeight = isLabelBelowBar ? fontSize[config.fontSize||'medium'] : 0;
       let barSpace = isLabelBelowBar ? barHeight/2 :  Number(config.barSpace);
 
