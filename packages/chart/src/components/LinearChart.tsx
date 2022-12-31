@@ -75,22 +75,20 @@ export default function LinearChart() {
       if((config.visualizationType === 'Bar' ||( config.visualizationType === 'Combo' && !isAllLine )) && min > 0) {
         min = 0
       };
-
       if(config.visualizationType === 'Combo' && isAllLine ){
         if((enteredMinValue===undefined || enteredMinValue === null || enteredMinValue==='') && min > 0 ){
           min = 0
         };
       if(enteredMinValue) {
-        const isMinValid = enteredMinValue < minValue
-        min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+        const isMinValid = +enteredMinValue < minValue
+        min = +enteredMinValue && isMinValid ? enteredMinValue : minValue
         };
       };
 
       if(config.visualizationType === 'Line') {
-        const isMinValid = enteredMinValue < minValue
+        const isMinValid =  enteredMinValue < minValue;
         min = enteredMinValue && isMinValid ? enteredMinValue : minValue
       };
-
         //If data value max wasn't provided, calculate it
       if (max === Number.MIN_VALUE) {
         // if all values in data are negative set max = 0
