@@ -29,7 +29,7 @@ import useTopAxis from '../hooks/useTopAxis'
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context)
   let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue } = useReduceData(config, data)
+  const { minValue, maxValue, existPositiveValue,isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState<boolean>(false)
   const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false)
 
@@ -64,33 +64,45 @@ export default function LinearChart() {
   let yScale
   let seriesScale
 
-  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
-  const isMaxValid = existPositiveValue ? numberFromString(enteredMaxValue) >= numberFromString(maxValue) : numberFromString(enteredMaxValue) >= 0
-  const isMinValid = (numberFromString(enteredMinValue) <= 0 && numberFromString(minValue) >= 0) || (numberFromString(enteredMinValue) <= minValue && minValue < 0)
+  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis;
+  const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0;
+  const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0);
 
   if (data) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
-    if ((config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && min > 0) {
-      min = 0
-    }
-    if (config.visualizationType === 'Line') {
-      const isMinValid = Number(enteredMinValue) < Number(minValue)
-      min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
-    }
-    //If data value max wasn't provided, calculate it
-    if (max === Number.MIN_VALUE) {
-      // if all values in data are negative set max = 0
-      max = existPositiveValue ? maxValue : 0
-    }
+      if((config.visualizationType === 'Bar' ||( config.visualizationType === 'Combo' && !isAllLine )) && min > 0) {
+        min = 0
+      };
 
-    //Adds Y Axis data padding if applicable
-    if (config.runtime.yAxis.paddingPercent) {
-      let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
-      min -= paddingValue
-      max += paddingValue
-    }
+      if(config.visualizationType === 'Combo' && isAllLine ){
+        if((enteredMinValue===undefined || enteredMinValue === null || enteredMinValue==='') && min > 0 ){
+          min = 0
+        };
+      if(enteredMinValue) {
+        const isMinValid = enteredMinValue < minValue
+        min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+        };
+      };
+
+      if(config.visualizationType === 'Line') {
+        const isMinValid = enteredMinValue < minValue
+        min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+      };
+
+        //If data value max wasn't provided, calculate it
+      if (max === Number.MIN_VALUE) {
+        // if all values in data are negative set max = 0
+        max = existPositiveValue ? maxValue : 0
+      }
+
+      //Adds Y Axis data padding if applicable
+      if (config.runtime.yAxis.paddingPercent) {
+        let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
+        min -= paddingValue
+        max += paddingValue
+      }
 
     let xAxisDataMapped = data.map(d => getXAxisData(d))
 
