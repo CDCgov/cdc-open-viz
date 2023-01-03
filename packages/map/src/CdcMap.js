@@ -1412,7 +1412,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             <Filters />
 
-            <section
+            <div
               role='button'
               tabIndex='0'
               className={mapContainerClasses.join(' ')}
@@ -1459,7 +1459,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   displayDataAsText={displayDataAsText}
                 />
               )}
-            </section>
+            </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
