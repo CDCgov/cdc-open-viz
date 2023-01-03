@@ -38,14 +38,7 @@ export default {
     isLegendValue: false,
     numTicks: ''
   },
-  boxplot: {
-    columnFirstQuartile: '',
-    columnThirdQuartile: '',
-    columnMedian: '',
-    columnMin: '',
-    columnMax: '',
-    columnOutliers: ''
-  },
+  boxplot: [],
   topAxis: {
     hasLine: false
   },

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
+import * as d3 from 'd3-array'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -211,6 +212,47 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             return series.dataKey
           })
         : []
+    }
+
+    if (newConfig.visualizationType === 'Box Plot') {
+      // stats
+      let groups = []
+      let uniqueGroups = new Set(data.map(d => d[newConfig.dataDescription.xKey]))
+      uniqueGroups.forEach(value => groups.push(value))
+      let allValues = data.map(d => Number(d[newConfig.dataDescription.valueKey]))
+
+      // group specific statistics
+      groups.map(g => {
+        // filter data by group
+        let filteredData = data.filter(item => item[newConfig.dataDescription.xKey] === g)
+        let filteredDataValues = filteredData.map(item => Number(item[newConfig.dataDescription.valueKey]))
+
+        const q1 = d3.quantile(filteredDataValues, 0.25)
+        const q3 = d3.quantile(filteredDataValues, 0.75)
+        const iqr = q3 - q1
+        const lowerBounds = q1 - (q3 - q1) * 1.5
+        const upperBounds = q3 + (q3 - q1) * 1.5
+        const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+
+        newConfig.boxplot.push({
+          columnCategory: g,
+          columnMean: d3.mean(filteredDataValues),
+          columnMedian: d3.median(filteredDataValues),
+          columnFirstQuartile: q1,
+          columnThirdQuartile: q3,
+          columnMin: q1 - 1.5 * iqr,
+          columnMax: q3 + 1.5 * iqr,
+          columnIqr: iqr,
+          columnOutliers: outliers,
+          values: filteredDataValues
+        })
+      })
+
+      // any other data we can add to boxplots
+      newConfig.boxplot['allValues'] = allValues
+      newConfig.boxplot['categories'] = uniqueGroups
+
+      console.log('new here', newConfig)
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {

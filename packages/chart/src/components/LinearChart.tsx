@@ -186,62 +186,34 @@ export default function LinearChart() {
 
   // Handle Box Plots
   if (config.visualizationType === 'Box Plot') {
-    const values = data.reduce((allValues, d) => {
-      const csvInDataUrl = config?.dataUrl && config?.dataUrl.split('.')[1] === 'csv'
-      const csvInDataFileName = config?.dataFilename && config?.dataFileName.split('.')[1] === 'csv'
+    console.log('min', config)
+    let minYValue
+    let maxYValue
+    let allOutliers = []
+    let allLowerBounds = config.boxplot.map(plot => plot.columnMin)
+    let allUpperBounds = config.boxplot.map(plot => plot.columnMax)
 
-      console.log('csvInDataUrl', csvInDataUrl)
-      console.log('csvInDataFileName', csvInDataFileName)
-      console.log('c', config)
+    console.log(allLowerBounds)
+    console.log(allUpperBounds)
+    minYValue = Math.min(...allLowerBounds)
+    maxYValue = Math.max(...allUpperBounds)
 
-      // get all groups
-      let groups = []
-      let uniqueGroups = new Set(data.map(d => d[config.dataDescription.xKey]))
-      uniqueGroups.forEach(value => groups.push(value))
+    console.log('min', minYValue)
+    const hasOutliers = config.boxplot.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier)))
 
-      // stats
-      let boxPlotSettings = []
+    if (hasOutliers) {
+      let outlierMin = Math.min(...allOutliers)
+      let outlierMax = Math.max(...allOutliers)
 
-      groups.map(g => {
-        // filter data by group
-        let filteredData = data.filter(item => item[config.dataDescription.xKey] === g)
-        let filteredDataValues = filteredData.map(item => Number(item[config.dataDescription.valueKey]))
+      console.log('outlierMax', allOutliers)
+      // check if outliers exceed standard bounds
+      if (outlierMin < minYValue) minYValue = outlierMin
+      if (outlierMax > maxYValue) maxYValue = outlierMax
+    }
 
-        const q1 = d3.quantile(filteredDataValues, 0.25)
-        const q3 = d3.quantile(filteredDataValues, 0.75)
-        const iqr = q3 - q1
-        const lowerBounds = q1 - (q3 - q1) * 1.5
-        const upperBounds = q3 + (q3 - q1) * 1.5
-        const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
-
-        boxPlotSettings.push({
-          category: g,
-          mean: d3.mean(filteredDataValues),
-          median: d3.median(filteredDataValues),
-          q1,
-          q3,
-          min: Math.min(...filteredDataValues),
-          max: Math.max(...filteredDataValues),
-          iqr,
-          outliers
-        })
-      })
-
-      const hasOutliers = data.filter(d => d[config.boxplot.columnOutliers]).length > 0
-
-      // If the chart includes an array of outliers, factor them into the height of the chart.
-      if (!hasOutliers) {
-        allValues.push(d[config.boxplot.columnMin], d[config.boxplot.columnMax])
-      } else {
-        let outlierMax = Math.max.apply(null, d[config.boxplot.columnOutliers])
-        let outlierMin = Math.min.apply(null, d[config.boxplot.columnOutliers])
-        allValues.push(outlierMin, outlierMax)
-      }
-      return allValues
-    }, [])
-    const minYValue = Math.min(...values)
-    const maxYValue = Math.max(...values)
     const seriesNames = data.map(d => d[config.xAxis.dataKey])
+
+    console.log('hasOutliers', hasOutliers)
 
     // Set Scales
     yScale = scaleLinear({
@@ -253,7 +225,7 @@ export default function LinearChart() {
     xScale = scaleBand({
       range: [0, xMax],
       round: true,
-      domain: seriesNames,
+      domain: config.boxplot.categories,
       padding: 0.4
     })
   }
