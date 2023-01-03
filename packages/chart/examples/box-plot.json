@@ -39,14 +39,6 @@
     "numTicks": "",
     "label": "Observations"
   },
-  "boxplot": {
-    "columnFirstQuartile": "firstQuartile",
-    "columnThirdQuartile": "thirdQuartile",
-    "columnMedian": "median",
-    "columnMin": "min",
-    "columnMax": "max",
-    "columnOutliers": "outliers"
-  },
   "topAxis": {
     "hasLine": false
   },

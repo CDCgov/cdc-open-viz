@@ -15,14 +15,6 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
     height
   } = config
 
-  // accessors
-  const x = d => d[config.xAxis.dataKey]
-  const min = d => d[columnMin]
-  const max = d => d[columnMax]
-  const median = d => d[columnMedian]
-  const firstQuartile = d => d[columnFirstQuartile]
-  const thirdQuartile = d => d[columnThirdQuartile]
-  const outliers = d => d[columnOutliers]
   const yMax = config.height - config.runtime.xAxis.size
   const xMax = config.width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
   const boxWidth = xScale.bandwidth()
@@ -32,24 +24,24 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key='boxplot-wrapper'>
-        {data.map((d, i) => {
+        {config.boxplot.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           return (
             <BoxPlot
               key={`box-plot-${i}`}
-              min={min(d)}
-              max={max(d)}
-              left={xScale(x(d)) + config.yAxis.size + offset / 2}
-              firstQuartile={firstQuartile(d)}
-              thirdQuartile={thirdQuartile(d)}
-              median={median(d)}
+              min={d.columnMin}
+              max={d.columnMax}
+              left={xScale(d.columnCategory) + config.yAxis.size + offset / 2}
+              firstQuartile={d.columnFirstQuartile}
+              thirdQuartile={d.columnThirdQuartile}
+              median={d.columnMedian}
               boxWidth={constrainedWidth}
               fill={color_0}
               fillOpacity={0.5}
               stroke='black'
               strokeWidth={1}
               valueScale={yScale}
-              outliers={outliers(d)}
+              outliers={d.columnOutliers}
               outlierProps={{
                 style: {
                   fill: `${color_0}`,
