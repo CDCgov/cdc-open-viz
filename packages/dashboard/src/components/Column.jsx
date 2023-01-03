@@ -29,10 +29,6 @@ const Column = ({ data, rowIdx, colIdx }) => {
     classNames.push('column--drop')
   }
 
-  var test = e => {
-    return ['Test']
-  }
-
   if (widget) {
     classNames.push('column--populated')
   }
