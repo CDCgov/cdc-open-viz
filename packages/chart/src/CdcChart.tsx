@@ -12,6 +12,7 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
+import { Base64 } from 'js-base64'
 
 // Primary Components
 import Context from './context'
@@ -31,6 +32,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from './components/Filters'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -42,7 +44,6 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }: { configUrl?: string; config?: any; isEditor?: boolean; isDashboard?: boolean; setConfig?; setEditing?; hostname?; link?: any }) {
   const transform = new DataTransform()
-
   interface keyable {
     [key: string]: any
   }
@@ -60,6 +61,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -472,6 +474,35 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
+  const DownloadButton = ({ data }: any, type = 'link') => {
+    const fileName = `${config.title.substring(0, 50)}.csv`
+
+    const csvData = Papa.unparse(data)
+
+    const saveBlob = () => {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        //@ts-ignore
+        window.navigator.msSaveBlob(dataBlob, fileName)
+      }
+    }
+
+    if (type === 'download') {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    } else {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    }
+  }
+
   // Format numeric data based on settings in config
   const formatNumber = (num, axis) => {
     // check if value contains comma and remove it. later will add comma below.
@@ -518,7 +549,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let result = ''
 
     if (config.dataFormat.useFormat) {
-      console.log('num', num)
       num = formatSuffix(num)
     }
 
@@ -596,12 +626,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
-            <div
-              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : ""
-              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
-            >
+            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
+            <div className={`chart-container ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}>
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
 
@@ -626,10 +652,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
-            {/* Data Table */}
 
+            {/* buttons */}
+            <CoveMediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </CoveMediaControls.Section>
+
+            {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+            {/* show pdf or image button */}
           </div>
         )}
       </>
@@ -670,7 +703,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSeriesHighlight,
     dynamicLegendItems,
     setDynamicLegendItems,
-    filterData
+    filterData,
+    imageId
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
@@ -681,7 +715,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
         {body}
       </div>
     </Context.Provider>

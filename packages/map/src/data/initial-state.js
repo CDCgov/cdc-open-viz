@@ -62,6 +62,9 @@ export default {
   dataTable: {
     title: 'Data Table'
   },
+  table: {
+    showDownloadUrl: true
+  },
   tooltips: {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
