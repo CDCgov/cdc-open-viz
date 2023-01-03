@@ -213,7 +213,7 @@ const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 const EditorPanel = () => {
   const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, transformedData, isDashboard, setParentConfig, missingRequiredSections, setFilteredData } = useContext(Context)
 
-  const { minValue, maxValue, existPositiveValue } = useReduceData(config, unfilteredData)
+  const { minValue, maxValue, existPositiveValue ,isAllLine} = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
     if (paletteName) updateConfig({ ...config, palette: paletteName })
@@ -658,7 +658,10 @@ const EditorPanel = () => {
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case (config.visualizationType === 'Combo'  && isAllLine) && enteredValue && parseFloat(enteredValue) > minVal:
+        message = 'Value must be less than ' + minValue;
+        break
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
       case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
@@ -670,8 +673,7 @@ const EditorPanel = () => {
     setWarningMsg(function (prevMsg) {
       return { ...prevMsg, minMsg: message }
     })
-  }
-
+  };
   useEffect(() => {
     validateMinValue()
     validateMaxValue()
