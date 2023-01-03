@@ -6,6 +6,7 @@ import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
+import * as d3 from 'd3-array'
 
 import BarChart from './BarChart'
 import LineChart from './LineChart'
@@ -188,6 +189,44 @@ export default function LinearChart() {
     const values = data.reduce((allValues, d) => {
       const csvInDataUrl = config?.dataUrl && config?.dataUrl.split('.')[1] === 'csv'
       const csvInDataFileName = config?.dataFilename && config?.dataFileName.split('.')[1] === 'csv'
+
+      console.log('csvInDataUrl', csvInDataUrl)
+      console.log('csvInDataFileName', csvInDataFileName)
+      console.log('c', config)
+
+      // get all groups
+      let groups = []
+      let uniqueGroups = new Set(data.map(d => d[config.dataDescription.xKey]))
+      uniqueGroups.forEach(value => groups.push(value))
+
+      // stats
+      let boxPlotSettings = []
+
+      groups.map(g => {
+        // filter data by group
+        let filteredData = data.filter(item => item[config.dataDescription.xKey] === g)
+        let filteredDataValues = filteredData.map(item => Number(item[config.dataDescription.valueKey]))
+
+        const q1 = d3.quantile(filteredDataValues, 0.25)
+        const q3 = d3.quantile(filteredDataValues, 0.75)
+        const iqr = q3 - q1
+        const lowerBounds = q1 - (q3 - q1) * 1.5
+        const upperBounds = q3 + (q3 - q1) * 1.5
+        const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+
+        boxPlotSettings.push({
+          category: g,
+          mean: d3.mean(filteredDataValues),
+          median: d3.median(filteredDataValues),
+          q1,
+          q3,
+          min: Math.min(...filteredDataValues),
+          max: Math.max(...filteredDataValues),
+          iqr,
+          outliers
+        })
+      })
+
       const hasOutliers = data.filter(d => d[config.boxplot.columnOutliers]).length > 0
 
       // If the chart includes an array of outliers, factor them into the height of the chart.
@@ -202,7 +241,7 @@ export default function LinearChart() {
     }, [])
     const minYValue = Math.min(...values)
     const maxYValue = Math.max(...values)
-    const seriesNames = data.map(d => d.x)
+    const seriesNames = data.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({
