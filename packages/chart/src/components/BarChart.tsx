@@ -144,9 +144,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
 
                   const tooltip = `<div>
+                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    ${xAxisTooltip}`
 
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
@@ -204,9 +204,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
 
                     const tooltip = `<div>
+                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    ${xAxisTooltip}`
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
@@ -342,9 +342,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const tooltip = `<div>
+                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    ${xAxisTooltip}`
                       const style = applyRadius(index)
 
                       // check if bar text/value string fits into  each bars.
