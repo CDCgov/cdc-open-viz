@@ -216,43 +216,51 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     if (newConfig.visualizationType === 'Box Plot') {
       // stats
-      let groups = []
-      let uniqueGroups = new Set(data.map(d => d[newConfig.dataDescription.xKey]))
-      uniqueGroups.forEach(value => groups.push(value))
+      let allKeys = data.map(d => d[newConfig.dataDescription.xKey])
       let allValues = data.map(d => Number(d[newConfig.dataDescription.valueKey]))
 
-      // group specific statistics
-      groups.map(g => {
-        // filter data by group
-        let filteredData = data.filter(item => item[newConfig.dataDescription.xKey] === g)
-        let filteredDataValues = filteredData.map(item => Number(item[newConfig.dataDescription.valueKey]))
-
-        const q1 = d3.quantile(filteredDataValues, 0.25)
-        const q3 = d3.quantile(filteredDataValues, 0.75)
-        const iqr = q3 - q1
-        const lowerBounds = q1 - (q3 - q1) * 1.5
-        const upperBounds = q3 + (q3 - q1) * 1.5
-        const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
-
-        newConfig.boxplot.push({
-          columnCategory: g,
-          columnMean: d3.mean(filteredDataValues),
-          columnMedian: d3.median(filteredDataValues),
-          columnFirstQuartile: q1,
-          columnThirdQuartile: q3,
-          columnMin: q1 - 1.5 * iqr,
-          columnMax: q3 + 1.5 * iqr,
-          columnIqr: iqr,
-          columnOutliers: outliers,
-          values: filteredDataValues
+      const uniqueArray = function (arrArg) {
+        return arrArg.filter(function (elem, pos, arr) {
+          return arr.indexOf(elem) == pos
         })
-      })
+      }
+
+      const groups = uniqueArray(allKeys)
+      const plots = []
+
+      // group specific statistics
+      // prevent re-renders
+      newConfig?.boxplot?.length < 1 &&
+        groups.map((g, index) => {
+          console.log('index', g)
+          // filter data by group
+          let filteredData = data.filter(item => item[newConfig.dataDescription.xKey] === g)
+          let filteredDataValues = filteredData.map(item => Number(item[newConfig.dataDescription.valueKey]))
+
+          const q1 = d3.quantile(filteredDataValues, 0.25)
+          const q3 = d3.quantile(filteredDataValues, 0.75)
+          const iqr = q3 - q1
+          const lowerBounds = q1 - (q3 - q1) * 1.5
+          const upperBounds = q3 + (q3 - q1) * 1.5
+          const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+          plots.push({
+            columnCategory: g,
+            columnMean: d3.mean(filteredDataValues),
+            columnMedian: d3.median(filteredDataValues),
+            columnFirstQuartile: q1,
+            columnThirdQuartile: q3,
+            columnMin: q1 - 1.5 * iqr,
+            columnMax: q3 + 1.5 * iqr,
+            columnIqr: iqr,
+            columnOutliers: outliers,
+            values: filteredDataValues
+          })
+        })
 
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
-      newConfig.boxplot['categories'] = uniqueGroups
-
-      console.log('new here', newConfig)
+      newConfig.boxplot['categories'] = groups
+      newConfig.boxplot.push(...plots)
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {

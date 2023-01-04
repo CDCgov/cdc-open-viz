@@ -23,7 +23,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": 50,
-    "gridLines": false,
+    "gridLines": true,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -39,6 +39,7 @@
     "numTicks": "",
     "label": "Observations"
   },
+  "boxplot": [],
   "topAxis": {
     "hasLine": false
   },
@@ -88,7 +89,7 @@
     "active": false,
     "keys": []
   },
-  "palette": "qualitative2",
+  "palette": "qualitative1",
   "isPaletteReversed": false,
   "labels": false,
   "dataFormat": {
