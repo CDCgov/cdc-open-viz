@@ -186,34 +186,27 @@ export default function LinearChart() {
 
   // Handle Box Plots
   if (config.visualizationType === 'Box Plot') {
-    console.log('min', config)
     let minYValue
     let maxYValue
     let allOutliers = []
     let allLowerBounds = config.boxplot.map(plot => plot.columnMin)
     let allUpperBounds = config.boxplot.map(plot => plot.columnMax)
 
-    console.log(allLowerBounds)
-    console.log(allUpperBounds)
     minYValue = Math.min(...allLowerBounds)
     maxYValue = Math.max(...allUpperBounds)
 
-    console.log('min', minYValue)
     const hasOutliers = config.boxplot.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier)))
 
     if (hasOutliers) {
       let outlierMin = Math.min(...allOutliers)
       let outlierMax = Math.max(...allOutliers)
 
-      console.log('outlierMax', allOutliers)
       // check if outliers exceed standard bounds
       if (outlierMin < minYValue) minYValue = outlierMin
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
     const seriesNames = data.map(d => d[config.xAxis.dataKey])
-
-    console.log('hasOutliers', hasOutliers)
 
     // Set Scales
     yScale = scaleLinear({
@@ -233,8 +226,6 @@ export default function LinearChart() {
   useEffect(() => {
     ReactTooltip.rebuild()
   })
-
-  console.log('config.visualizationType', config.visualizationType)
 
   return isNaN(width) ? (
     <></>
