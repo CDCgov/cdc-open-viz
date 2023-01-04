@@ -8,8 +8,10 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import Context from '../context'
 
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes } = useContext<any>(Context)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
 
   // Debugging.
   if (config.visualizationType === 'Box Plot') return null
@@ -20,7 +22,7 @@ export default function DataTable() {
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
-  const DownloadButton = ({ data }: any) => {
+  const DownloadButton = ({ data }: any, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
 
     const csvData = Papa.unparse(data)
@@ -34,11 +36,20 @@ export default function DataTable() {
       }
     }
 
-    return (
-      <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
-        Download Data (CSV)
-      </a>
-    )
+    switch (type) {
+      case 'download':
+        return (
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+            Download Data (CSV)
+          </a>
+        )
+      default:
+        return (
+          <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border`}>
+            Download Data (CSV)
+          </a>
+        )
+    }
   }
 
   // Creates columns structure for the table
@@ -120,6 +131,11 @@ export default function DataTable() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
   return (
     <ErrorBoundary component='DataTable'>
+      <CoveMediaControls.Section classes={['download-links']}>
+        <CoveMediaControls.Link config={config} />
+        {config.table.download && <DownloadButton data={rawData} type='link' />}
+      </CoveMediaControls.Section>
+
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div
           role='button'
@@ -209,7 +225,6 @@ export default function DataTable() {
             ''
           )}
         </div>
-        {config.table.download && <DownloadButton data={rawData} />}
       </section>
     </ErrorBoundary>
   )

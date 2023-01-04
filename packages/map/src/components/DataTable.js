@@ -5,11 +5,36 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 
 const DataTable = props => {
-  const { state, tableTitle, indexTitle, mapTitle, rawData, showDownloadButton, runtimeData, runtimeLegend, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, setFilteredCountryCode } = props
+  const {
+    state,
+    tableTitle,
+    indexTitle,
+    mapTitle,
+    rawData,
+    showDownloadImgButton,
+    showDownloadPdfButton,
+    showDownloadButton,
+    runtimeData,
+    runtimeLegend,
+    headerColor,
+    expandDataTable,
+    columns,
+    displayDataAsText,
+    applyLegendToRow,
+    displayGeoName,
+    navigationHandler,
+    viewport,
+    formatLegendLocation,
+    tabbingId,
+    setFilteredCountryCode,
+    innerContainerRef,
+    imageRef
+  } = props
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
@@ -137,7 +162,7 @@ const DataTable = props => {
     }
 
     return (
-      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} btn btn-download no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
+      <a download={fileName} type='button' onClick={saveBlob} href={URL.createObjectURL(blob)} aria-label='Download this data in a CSV file format.' className={`${headerColor} no-border`} id={`${skipId}`} data-html2canvas-ignore role='button'>
         Download Data (CSV)
       </a>
     )
@@ -255,6 +280,10 @@ const DataTable = props => {
   if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
+      <CoveMediaControls.Section classes={['download-links']}>
+        <CoveMediaControls.Link config={state} />
+        {state.general.showDownloadButton && <DownloadButton />}
+      </CoveMediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content
@@ -323,7 +352,6 @@ const DataTable = props => {
             </tbody>
           </table>
         </div>
-        {showDownloadButton === true && <DownloadButton />}
       </section>
     </ErrorBoundary>
   )
