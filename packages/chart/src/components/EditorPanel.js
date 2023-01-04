@@ -619,6 +619,13 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters })
   }
 
+  const handleSeriesChange = (idx1, idx2) => {
+    let seriesOrder = config.series;
+    let [movedItem] = seriesOrder.splice(idx1, 1);
+    seriesOrder.splice(idx2, 0, movedItem);
+    updateConfig({ ...config, series: seriesOrder})
+  }
+
   if (config.isLollipopChart && config?.series?.length > 1) {
     config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series'
   }
@@ -810,69 +817,88 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         </fieldset>
-                        <ul className='series-list'>
-                          {config.series &&
-                            config.series.map((series, i) => {
-                              if (config.visualizationType === 'Combo') {
-                                let changeType = (i, value) => {
-                                  let series = [...config.series]
-                                  series[i].type = value
 
-                                  series[i].axis = 'Left'
+                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                          <Droppable droppableId='filter_order'>
+                            {provided => (
+                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                {config.series.map((series, i) => {
+                                  if (config.visualizationType === 'Combo') {
+                                    let changeType = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].type = value
 
-                                  updateConfig({ ...config, series })
-                                }
+                                      series[i].axis = 'Left'
 
-                                let typeDropdown = (
-                                  <select
-                                    value={series.type}
-                                    onChange={event => {
-                                      changeType(i, event.target.value)
-                                    }}
-                                    style={{ width: '100px', marginRight: '10px' }}
-                                  >
-                                    <option value='' default>
-                                      Select
-                                    </option>
-                                    <option value='Bar'>Bar</option>
-                                    <option value='Line'>Solid Line</option>
-                                    <option value='dashed-sm'>Small Dashed</option>
-                                    <option value='dashed-md'>Medium Dashed</option>
-                                    <option value='dashed-lg'>Large Dashed</option>
-                                  </select>
-                                )
+                                      updateConfig({ ...config, series })
+                                    }
 
-                                return (
-                                  <li key={series.dataKey}>
-                                    <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                      <div className='series-list__name-text'>{series.dataKey}</div>
-                                    </div>
-                                    <span>
-                                      <span className='series-list__dropdown'>{typeDropdown}</span>
-                                      {config.series && config.series.length > 1 && (
-                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                          &#215;
-                                        </button>
+                                    let typeDropdown = (
+                                      <select
+                                        value={series.type}
+                                        onChange={event => {
+                                          changeType(i, event.target.value)
+                                        }}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                      >
+                                        <option value='' default>
+                                          Select
+                                        </option>
+                                        <option value='Bar'>Bar</option>
+                                        <option value='Line'>Solid Line</option>
+                                        <option value='dashed-sm'>Small Dashed</option>
+                                        <option value='dashed-md'>Medium Dashed</option>
+                                        <option value='dashed-lg'>Large Dashed</option>
+                                      </select>
+                                    )
+
+                                    return (
+                                      <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+                                        {(provided, snapshot) => (
+                                          <li>
+                                            <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                              <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                                <div className='series-list__name-text'>{series.dataKey}</div>
+                                              </div>
+                                              <span>
+                                                <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                {config.series && config.series.length > 1 && (
+                                                  <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                    &#215;
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    ) 
+                                  }
+                                  
+                                  return (
+                                    <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+                                      {(provided, snapshot) => (
+                                        <li key={series.dataKey} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                          {/*<div  className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>*/}
+                                            <div className='series-list__name' data-title={series.dataKey}>
+                                              <div className='series-list__name--text'>{series.dataKey}</div>
+                                            </div>
+                                            {config.series && config.series.length > 1 && (
+                                              <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                &#215;
+                                              </button>
+                                            )}
+                                          {/*</div>*/}
+                                        </li>
                                       )}
-                                    </span>
-                                  </li>
-                                )
-                              }
-
-                              return (
-                                <li key={series.dataKey}>
-                                  <div className='series-list__name' data-title={series.dataKey}>
-                                    <div className='series-list__name--text'>{series.dataKey}</div>
-                                  </div>
-                                  {config.series && config.series.length > 1 && (
-                                    <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                      &#215;
-                                    </button>
-                                  )}
-                                </li>
-                              )
-                            })}
-                        </ul>
+                                    </Draggable>
+                                  )
+                                })}
+                                {provided.placeholder}
+                              </ul>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
                       </>
                     )}
 
