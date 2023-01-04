@@ -710,20 +710,6 @@ const EditorPanel = () => {
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
 
-                  {config.visualizationType === 'Box Plot' && (
-                    <>
-                      <legend>Box Plot Columns</legend>
-                      <fieldset style={{ border: '1px solid gray', padding: '10px', borderRadius: '5px', marginTop: '0px' }}>
-                        <Select section='boxplot' fieldName='columnFirstQuartile' label='First Quartile' updateField={updateField} options={getColumns()} value={config.boxplot.columnFirstQuartile} initial='Select' />
-                        <Select section='boxplot' fieldName='columnThirdQuartile' label='Third Quartile' updateField={updateField} options={getColumns()} value={config.boxplot.columnThirdQuartile} initial='Select' />
-                        <Select section='boxplot' fieldName='columnMedian' label='Median' updateField={updateField} options={getColumns()} value={config.boxplot.columnMedian} initial='Select' />
-                        <Select section='boxplot' fieldName='columnMin' label='Minimum' updateField={updateField} options={getColumns()} value={config.boxplot.columnMin} initial='Select' />
-                        <Select section='boxplot' fieldName='columnMax' label='Maximum' updateField={updateField} options={getColumns()} value={config.boxplot.columnMax} initial='Select' />
-                        <Select section='boxplot' fieldName='columnOutliers' label='Outliers' updateField={updateField} options={getColumns()} value={config.boxplot.columnOutliers} initial='Select' />
-                      </fieldset>
-                    </>
-                  )}
-
                   <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
