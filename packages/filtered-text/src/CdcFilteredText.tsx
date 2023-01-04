@@ -22,7 +22,9 @@ interface Props {
 type Defaults = typeof defaults
 
 const CdcFilteredText: FC<Props> = props => {
-  const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+  const { configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props;
+  const configObj: any = props.config;
+
 
   const transform = new DataTransform()
   // Default States
@@ -103,6 +105,15 @@ const CdcFilteredText: FC<Props> = props => {
   useEffect(() => {
     loadConfig().catch(err => console.log(err))
   }, [])
+
+  useEffect(() => {
+    if(!configObj.dataUrl){
+      updateConfig({...defaults, ...configObj});
+      setStateData(configObj.data);
+      setExcludedData(configObj.data);
+    }
+  }, [configObj.data])
+
   let content = <Loading />
 
   if (loading === false) {
