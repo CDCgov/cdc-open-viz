@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, FC } from 'react'
+import React, { useEffect, useState, FC } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import DataTransform from '@cdc/core/helpers/DataTransform'
@@ -22,20 +22,19 @@ interface Props {
 type Defaults = typeof defaults
 
 const CdcFilteredText: FC<Props> = props => {
-  const { configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props;
-  const configObj: any = props.config;
-
+  const { configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
+  const configObj: any = props.config
 
   const transform = new DataTransform()
   // Default States
   const [config, setConfig] = useState<Defaults>(defaults)
   const [loading, setLoading] = useState(true)
   const [stateData, setStateData] = useState<Array<any>>(config.data || [])
-  const [excludedData, setExcludedData] = useState<Array<Object>>()
+  const [excludedData, setExcludedData] = useState<Array<Object>>() // eslint-disable-line
   let { title, filters } = config
   const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
 
-  const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
+  const { contentClasses } = useDataVizClasses(config)
 
   // Default Functions
 
@@ -104,15 +103,15 @@ const CdcFilteredText: FC<Props> = props => {
   //Load initial config
   useEffect(() => {
     loadConfig().catch(err => console.log(err))
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
-    if(!configObj.dataUrl){
-      updateConfig({...defaults, ...configObj});
-      setStateData(configObj.data);
-      setExcludedData(configObj.data);
+    if (!configObj.dataUrl) {
+      updateConfig({ ...defaults, ...configObj })
+      setStateData(configObj.data)
+      setExcludedData(configObj.data)
     }
-  }, [configObj.data])
+  }, [configObj.data]) // eslint-disable-line
 
   let content = <Loading />
 
