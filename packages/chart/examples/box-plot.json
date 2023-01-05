@@ -18,6 +18,7 @@
     "right": 5
   },
   "yAxis": {
+    "dataKey": "Value",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -116,7 +117,7 @@
   },
   "series": [
     {
-      "dataKey": "Group_Category",
+      "dataKey": "Value",
       "type": "Bar"
     }
   ]
