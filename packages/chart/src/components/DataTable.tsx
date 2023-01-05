@@ -14,10 +14,8 @@ export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
 
   // Debugging.
-  if (config.visualizationType === 'Box Plot') return null
+  // if (config.visualizationType === 'Box Plot') return null
 
-  const legendGlyphSize = 15
-  const legendGlyphSizeHalf = legendGlyphSize / 2
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -86,13 +84,13 @@ export default function DataTable() {
             }
           ]
 
-    data.forEach(d => {
+    data.forEach((d, index) => {
       const newCol = {
         Header: config.runtime[section].type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
         Cell: ({ row }) => {
           return <>{numberFormatter(d[row.original])}</>
         },
-        id: d[config.runtime.originalXAxis.dataKey],
+        id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
         canSort: true
       }
 
