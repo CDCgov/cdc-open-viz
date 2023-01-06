@@ -30,7 +30,7 @@
     "d3-composite-projections": "^1.4.0",
     "html-react-parser": "1.4.9",
     "html2canvas": "^1.0.0-rc.7",
-    "html2pdf.js": "^0.9.2",
+    "html2pdf.js": "^0.10.1",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.0.1",
     "react-beautiful-dnd": "^13.0.0",
