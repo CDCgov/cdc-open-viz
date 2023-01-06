@@ -38,6 +38,7 @@ export default {
     isLegendValue: false,
     numTicks: ''
   },
+  boxplot: [],
   topAxis: {
     hasLine: false
   },
