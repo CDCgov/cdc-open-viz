@@ -165,16 +165,22 @@ const DataDesigner = props => {
                     </select>
                   </div>
                   <div className='mb-2'>
-                    <div className='mb-1'>Which property in the dataset represents the numeric value?</div>
+                    <div className='mb-1'>Which properties in the dataset represent the numeric value?  (all remaining properties will be treated as filters)</div>
+                    <ul>
+                      {configureData.dataDescription.valueKeys && configureData.dataDescription.valueKeys.map(valueKey => (
+                        <li>{valueKey}</li>
+                      ))}
+                    </ul>
                     <select
                       onChange={e => {
-                        updateDescriptionProp(visualizationKey, dataKey, 'valueKey', e.target.value)
+                        if(e.target.value && (!configureData.dataDescription.valueKeys || configureData.dataDescription.valueKeys.indexOf(e.target.value) === -1)){
+                          updateDescriptionProp(visualizationKey, dataKey, 'valueKeys', [...(configureData.dataDescription.valueKeys || []), e.target.value])
+                        }
                       }}
-                      defaultValue={configureData.dataDescription.valueKey}
                     >
                       <option value=''>Choose an option</option>
                       {Object.keys(configureData.data[0]).map((value, index) => (
-                        <option value={value} key={index}>
+                        <option value={value} key={`value-keys-option-${index}`}>
                           {value}
                         </option>
                       ))}
