@@ -232,12 +232,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       const groups = uniqueArray(allKeys)
       const plots = []
 
-      console.log('d', data)
-      console.log('newConfig', newConfig)
-      console.log('groups', groups)
-      console.log('allKeys', allKeys)
-      console.log('allValues', allValues)
-
       // group specific statistics
       // prevent re-renders
       groups.map((g, index) => {
@@ -245,10 +239,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         // filter data by group
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
-        console.log('g', g)
-        console.log('item', filteredData)
-        console.log('item', newConfig)
-        // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
         const q1 = d3.quantile(filteredDataValues, 0.25)
         const q3 = d3.quantile(filteredDataValues, 0.75)
@@ -644,7 +634,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Line: <LinearChart />,
     Combo: <LinearChart />,
     Pie: <PieChart />,
-    'Box Plot': <LinearChart />
+    'Box Plot': <LinearChart />,
+    'Area Chart': <LinearChart />
   }
 
   const missingRequiredSections = () => {
