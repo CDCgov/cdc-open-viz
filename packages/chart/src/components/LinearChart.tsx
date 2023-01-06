@@ -4,15 +4,16 @@ import ReactTooltip from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint } from '@visx/scale'
+import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
+import * as d3 from 'd3-array'
 
 import BarChart from './BarChart'
 import LineChart from './LineChart'
 import Context from '../context'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
-import SparkLine from './SparkLine'
+import CoveBoxPlot from './BoxPlot'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -22,10 +23,6 @@ import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
 
 // TODO: Move scaling functions into hooks to manage complexity
-
-// TODO: remove unused imports/variables
-// TODO: consider moving logic into hooks
-// TODO: formatting
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context)
   let [width] = dimensions
@@ -181,32 +178,60 @@ export default function LinearChart() {
     }
   }
 
-   
-  const countNumOfTicks = (axis)=>{
+  const countNumOfTicks = axis => {
     // function get number of ticks based on bar type & users value
-    const isHorizontal = config.orientation ==='horizontal';
-    const {numTicks} = config.runtime[axis];
-    let tickCount = undefined;
+    const isHorizontal = config.orientation === 'horizontal'
+    const { numTicks } = config.runtime[axis]
+    let tickCount = undefined
 
-    if(axis === 'yAxis'){
-      tickCount = (
-         (isHorizontal && !numTicks) ? data.length 
-       : (isHorizontal &&  numTicks) ? numTicks
-       :(!isHorizontal && !numTicks) ? undefined
-       :(!isHorizontal &&  numTicks) && numTicks
-      );
-    };
+    if (axis === 'yAxis') {
+      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+    }
 
-    if(axis === 'xAxis'){
-      tickCount = (
-         (isHorizontal && !numTicks) ? undefined
-       : (isHorizontal &&  numTicks) ? numTicks
-       :(!isHorizontal && !numTicks) ? undefined
-       :(!isHorizontal &&  numTicks) && numTicks
-      );
-    };
-    return tickCount;
-  };
+    if (axis === 'xAxis') {
+      tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+    }
+    return tickCount
+  }
+
+  // Handle Box Plots
+  if (config.visualizationType === 'Box Plot') {
+    let minYValue
+    let maxYValue
+    let allOutliers = []
+    let allLowerBounds = config.boxplot.map(plot => plot.columnMin)
+    let allUpperBounds = config.boxplot.map(plot => plot.columnMax)
+
+    minYValue = Math.min(...allLowerBounds)
+    maxYValue = Math.max(...allUpperBounds)
+
+    const hasOutliers = config.boxplot.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier)))
+
+    if (hasOutliers) {
+      let outlierMin = Math.min(...allOutliers)
+      let outlierMax = Math.max(...allOutliers)
+
+      // check if outliers exceed standard bounds
+      if (outlierMin < minYValue) minYValue = outlierMin
+      if (outlierMax > maxYValue) maxYValue = outlierMax
+    }
+
+    const seriesNames = data.map(d => d[config.xAxis.dataKey])
+
+    // Set Scales
+    yScale = scaleLinear({
+      range: [yMax, 0],
+      round: true,
+      domain: [minYValue, maxYValue]
+    })
+
+    xScale = scaleBand({
+      range: [0, xMax],
+      round: true,
+      domain: config.boxplot.categories,
+      padding: 0.4
+    })
+  }
 
 
   useEffect(() => {
@@ -484,18 +509,20 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
+
+        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
