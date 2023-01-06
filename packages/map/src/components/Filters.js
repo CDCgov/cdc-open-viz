@@ -1,4 +1,4 @@
-import React, {useState, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import Context from './../context'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -18,7 +18,7 @@ const useFilters = () => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters =  runtimeFilters
+    let newFilters = runtimeFilters
     newFilters[index].active = value
     setRuntimeFilters(newFilters)
     setShowApplyButton(true)
@@ -33,32 +33,28 @@ const useFilters = () => {
     let newFilters = runtimeFilters
 
     // reset to first item in values array.
-    newFilters.map( filter => {
+    newFilters.map(filter => {
       filter.active = filter.values[0]
     })
 
-    setConfig({...config, filters: newFilters })
+    setConfig({ ...config, filters: newFilters })
   }
 
-  return { announceChange, sortAsc, sortDesc, changeFilterActive, showApplyButton, handleReset, handleApplyButton  }
+  return { announceChange, sortAsc, sortDesc, changeFilterActive, showApplyButton, handleReset, handleApplyButton }
 }
 
 export const Filters = () => {
-
-  const { runtimeFilters,  state: config } = useContext(Context)
+  const { runtimeFilters, state: config } = useContext(Context)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
 
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
 
-  const { filters  } = config
+  const { filters } = config
 
-  if(filters.length === 0) return false;
+  if (filters.length === 0) return false
 
-
-
-  const FilterList = ({filters: runtimeFilters}) => {
-
+  const FilterList = ({ filters: runtimeFilters }) => {
     if (runtimeFilters) {
       return runtimeFilters.map((singleFilter, idx) => {
         const values = []
@@ -74,14 +70,14 @@ export const Filters = () => {
         })
 
         return (
-          <section className='filter-col' key={idx}>
+          <section className='filter-col single-filter' key={idx}>
             {singleFilter.label.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
             <select
               id={`filter-${idx}`}
               className='filter-select'
               aria-label='select filter'
               value={singleFilter.active}
-              onChange={ e => {
+              onChange={e => {
                 changeFilterActive(idx, e.target.value)
                 announceChange(`Filter ${singleFilter.label} value has been changed to ${e.target.value}, please reference the data table to see updated values.`)
               }}
@@ -92,24 +88,27 @@ export const Filters = () => {
         )
       })
     } else {
-      return null;
+      return null
     }
-
   }
 
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      <h3 className="filters-section__title">Filters</h3>
+      <h3 className='filters-section__title'>Filters</h3>
       <hr />
-      <div className="filters-section__wrapper" style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px'}}>
-          <FilterList filters={runtimeFilters}/>
-          <div className="filter-section__buttons" style={{ width: '100%' }}>
-          <Button onClick={ handleApplyButton } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
-            <a href="#!" role="button" onClick={handleReset}>{resetText}</a>
-          </div>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px' }}>
+        <FilterList filters={runtimeFilters} />
+        <div className='filter-section__buttons' style={{ width: '100%' }}>
+          <Button onClick={handleApplyButton} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
+            {buttonText}
+          </Button>
+          <a href='#!' role='button' onClick={handleReset}>
+            {resetText}
+          </a>
+        </div>
       </div>
     </section>
   )
 }
 
-export default Filters;
+export default Filters
