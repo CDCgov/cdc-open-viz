@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 
 // IE11
@@ -101,7 +101,6 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
-  const [showLoadingMessage, setShowLoadingMessage] = useState(false)
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -115,7 +114,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -123,7 +122,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   useEffect(() => {
     try {
       if (filteredCountryCode) {
-        const filteredCountryObj = runtimeData[filteredCountryCode]
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
@@ -156,13 +154,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const setZoom = reversedCoordinates => {
-    setState({
-      ...state,
-      mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -248,7 +239,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const primaryCol = obj.columns.primary.name,
-      isData = obj.general.type === 'data',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
