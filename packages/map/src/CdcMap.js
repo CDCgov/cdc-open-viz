@@ -967,10 +967,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
+    // If city/country name includes a hyphen return the original.
+    if (!string.includes('–') && !string.includes('-')) {
+      return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+    }
     return string
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-      .join(' ')
   }
 
   // This resets all active legend toggles.
@@ -1003,7 +1007,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     let value = key
-
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
       value = titleCase(supportedStates[key][0])
