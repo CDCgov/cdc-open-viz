@@ -1083,7 +1083,7 @@ const EditorPanel = props => {
             Filter Column{' '}
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
               </Tooltip.Target>
               <Tooltip.Content>
                 <p>Selecting a column will add a dropdown menu below the map legend and allow users to filter based on the values in this column.</p>
@@ -1332,7 +1332,7 @@ const EditorPanel = props => {
                       Map Type
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Select "Data" to create a color-coded data map. To create a navigation-only map, select "Navigation."</p>
@@ -1408,7 +1408,7 @@ const EditorPanel = props => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>For accessibility reasons, you should enter a title even if you are not planning on displaying it.</p>
@@ -1425,7 +1425,7 @@ const EditorPanel = props => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Super Title</p>
@@ -1443,7 +1443,7 @@ const EditorPanel = props => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Intro Text</p>
@@ -1461,7 +1461,7 @@ const EditorPanel = props => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
@@ -1479,7 +1479,7 @@ const EditorPanel = props => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Footnotes</p>
@@ -1506,7 +1506,7 @@ const EditorPanel = props => {
                       Geography
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
@@ -1530,7 +1530,7 @@ const EditorPanel = props => {
                           Data Column
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Select the source column containing the categorical or numeric values to be mapped.</p>
@@ -1556,7 +1556,7 @@ const EditorPanel = props => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Enter a data label for use in tooltips and the data table.</p>
@@ -1617,7 +1617,7 @@ const EditorPanel = props => {
                           Category Column
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Select the source column containing the categorical bubble values to be mapped.</p>
@@ -1666,7 +1666,7 @@ const EditorPanel = props => {
                           Special Classes
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>For secondary values such as "NA", the system can automatically color-code them in shades of gray, one shade for each special class.</p>
@@ -1738,7 +1738,7 @@ const EditorPanel = props => {
                       Navigation
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>To provide end users with navigation functionality, select the source column containing the navigation URLs.</p>
@@ -1761,7 +1761,7 @@ const EditorPanel = props => {
                           Additional Columns
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
@@ -1930,7 +1930,7 @@ const EditorPanel = props => {
                           Separate Zero
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>For numeric data, you can separate the zero value as its own data class.</p>
@@ -1953,7 +1953,7 @@ const EditorPanel = props => {
                         <span className='edit-label'>Use new quantile legend</span>
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
@@ -1967,7 +1967,7 @@ const EditorPanel = props => {
                           Number of Items
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>For numeric maps, select the number of data classes. Do not include designated special classes.</p>
@@ -1997,7 +1997,7 @@ const EditorPanel = props => {
                             Category Order
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>Drag map categories into preferred legend order. </p>
@@ -2066,7 +2066,7 @@ const EditorPanel = props => {
                           Dynamic Legend Description
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Check this option if the map has multiple filter controls and you want to specify a description for each filter selection.</p>
@@ -2082,7 +2082,7 @@ const EditorPanel = props => {
                           Unified Legend
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>
@@ -2136,7 +2136,7 @@ const EditorPanel = props => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>To comply with 508 standards, if the first column in the data table has no header, enter a brief one here.</p>
@@ -2154,7 +2154,7 @@ const EditorPanel = props => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Enter a description of the data table to be read by screen readers.</p>
@@ -2175,7 +2175,7 @@ const EditorPanel = props => {
                         Show Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
@@ -2259,7 +2259,7 @@ const EditorPanel = props => {
                       Detail displays on{' '}
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>At mobile sizes, information always appears in a popover modal when a user taps on an item.</p>

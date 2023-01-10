@@ -1,0 +1,101 @@
+.cove-data-byte {
+}
+
+.cove-data-byte__container {
+  display: flex;
+  justify-content: space-between;
+
+  &[flow="top"] {
+    flex-direction: column;
+  }
+
+  &[flow="right"] {
+    flex-direction: row-reverse;
+  }
+
+  &[flow="bottom"] {
+    flex-direction: column;
+  }
+}
+
+.cove-data-byte__callout { //The SVG
+  flex-shrink: 0;
+
+  > svg {
+    width: 100%;
+  }
+
+  @at-root {
+    .cove-data-byte__container[flow="top"] #{&} {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 1.25rem;
+      max-width: 75%;
+    }
+
+    .cove-data-byte__container[flow="right"] #{&} {
+      width: 33%;
+      margin-left: 1.25rem;
+    }
+
+    .cove-data-byte__container[flow="bottom"] #{&} {
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 1.25rem;
+      max-width: 75%;
+    }
+
+    .cove-data-byte__container[flow="left"] #{&} {
+      width: 33%;
+      margin-right: 1.25rem;
+    }
+  }
+}
+
+.cove-data-byte__image { //The embedded image
+  align-self: center;
+  width: 100%;
+  min-width: 100px;
+  border-radius: .375rem;
+
+  @at-root {
+    .cove-data-byte__container[flow="top"] #{&} {
+      margin-bottom: 1.25rem;
+    }
+
+    .cove-data-byte__container[flow="right"] #{&} {
+      margin-left: 1.25rem;
+    }
+
+    .cove-data-byte__container[flow="bottom"] #{&} {
+      margin-top: 1.25rem;
+    }
+
+    .cove-data-byte__container[flow="left"] #{&} {
+      margin-right: 1.25rem;
+    }
+  }
+}
+
+.cove-data-byte__content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.cove-data-byte__value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.25em;
+}
+
+.cove-data-byte__text {
+  flex: 1 0 auto;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.cove-data-byte__subtext {
+  font-size: .875rem;
+  font-style: italic;
+}

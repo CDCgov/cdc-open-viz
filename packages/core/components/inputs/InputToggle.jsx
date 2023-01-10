@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import '../../styles/v2/components/input/index.scss'
 
-const InputSlider = ({
+const InputToggle = ({
   label,
-  sliderType = 'flat',
+  toggleType = 'flat',
   size = 'medium',
   activeColor = null,
   section = null,
@@ -29,14 +29,14 @@ const InputSlider = ({
     return str
   }
 
-  const sliderTypeClass = () => {
+  const toggleTypeClass = () => {
     const typeArr = {
-      flat: ' slider--flat',
-      block: ' slider--block',
-      pill: ' slider--pill',
-      '3d': ' slider--3d'
+      flat: ' toggle--flat',
+      block: ' toggle--block',
+      pill: ' toggle--pill',
+      '3d': ' toggle--3d'
     }
-    return typeArr[sliderType] || ''
+    return typeArr[toggleType] || ''
   }
 
   useEffect(() => {
@@ -54,23 +54,23 @@ const InputSlider = ({
   return (
     <div className='input-group'>
       {label && <label>{label}</label>}
-      <div className={'cove-input__slider' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + sliderTypeClass() + (value ? ' active' : '')} onClick={() => setValue(!value)}>
-        <div className='cove-input__slider-button' />
-        <div className='cove-input__slider-track' style={value && activeColor ? { backgroundColor: activeColor } : null} />
+      <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + toggleTypeClass() + (value ? ' active' : '')} onClick={() => setValue(!value)}>
+        <div className='cove-input__toggle-button' />
+        <div className='cove-input__toggle-track' style={value && activeColor ? { backgroundColor: activeColor } : null} />
         <input className='cove-input--hidden' type='checkbox' name={name()} checked={value || false} readOnly />
       </div>
     </div>
   )
 }
 
-InputSlider.propTypes = {
+InputToggle.propTypes = {
   /** Add label to the input field */
   label: PropTypes.string,
-  /** Select the preferred display style of the slider */
-  sliderType: PropTypes.oneOf(['flat', 'block', 'pill', '3d']),
-  /** Select the preferred size of the slider */
+  /** Select the preferred display style of the toggle */
+  toggleType: PropTypes.oneOf(['flat', 'block', 'pill', '3d']),
+  /** Select the preferred size of the toggle */
   size: PropTypes.oneOf(['small', 'medium', 'large']),
-  /** Select the preferred color for the slider when active */
+  /** Select the preferred color for the toggle when active */
   activeColor: PropTypes.string,
   /** Parent key value of nested target config option
    *
@@ -88,4 +88,4 @@ InputSlider.propTypes = {
   stateValue: PropTypes.object
 }
 
-export default InputSlider
+export default InputToggle

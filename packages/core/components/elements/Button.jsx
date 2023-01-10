@@ -1,22 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
+// Components
 import LoadSpin from '../ui/LoadSpin'
 
-import '../../styles/v2/components/button.scss'
+// Styles
+import '../../styles/v2/components/element/button.scss'
 
-const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, loadingText = 'Loading...', flexCenter, active = false, onClick, children, ...attributes }) => {
+const Button = ({
+                  style,
+                  role,
+                  hoverStyle = {},
+                  fluid = false,
+                  loading = false,
+                  loadingText = "Loading...",
+                  flexCenter,
+                  active = false,
+                  onClick,
+                  children, ...attributes
+                }) => {
+
   const buttonRef = useRef(null)
 
-  const [buttonState, setButtonState] = useState('out')
-  const [customStyles, setCustomStyles] = useState({ ...style })
-  const [childrenWidth, setChildrenWidth] = useState()
-  const [loadtextWidth, setLoadtextWidth] = useState()
+  const [ buttonState, setButtonState ] = useState('out')
+  const [ customStyles, setCustomStyles ] = useState({ ...style })
+  const [ childrenWidth, setChildrenWidth ] = useState()
+  const [ loadtextWidth, setLoadtextWidth ] = useState()
 
   const attributesObj = {
     ...attributes,
     style: customStyles,
-    className: 'cove-button' + (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') + (fluid ? ' fluid' : '') + (loading ? ' loading' : '') + (attributes.className ? ' ' + attributes.className : ''),
+    className:
+      'cove-button' +
+      (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
+      (fluid ? ' fluid' : '') +
+      (loading ? ' loading' : '') +
+      (attributes.className ? ' ' + attributes.className : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
@@ -49,7 +68,7 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
       setChildrenWidth(ghostSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
       setLoadtextWidth(ghostLoaderSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
 
-      //Remove ghost objects form document
+      //Remove ghost objects from document
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }
@@ -60,49 +79,43 @@ const Button = ({ style, role, hoverStyle = {}, fluid = false, loading = false, 
     return buttonState === 'in'
       ? setCustomStyles(stateStyles => ({ ...stateStyles, ...hoverStyle }))
       : buttonState === 'out'
-      ? active //If button state is out, check if its 'active'; we want to keep hover styles applied to 'active' buttons
-        ? null //Button is active, so leave the 'hover' styles in place
-        : setCustomStyles({ ...style }) //Button is not 'active', so reset display styles back to default
-      : false //Button state is neither 'in' nor 'out' - do nothing
-  }, [buttonState, active])
+        ? active //If button state is out, check if its 'active'; we want to keep hover styles applied to 'active' buttons
+          ? null //Button is active, so leave the 'hover' styles in place
+          : setCustomStyles({ ...style }) //Button is not 'active', so reset display styles back to default
+        : false //Button state is neither 'in' nor 'out' - do nothing
+  }, [ buttonState, active ])
 
   return (
-    <button
-      {...attributesObj}
-      onClick={e => {
-        e.preventDefault()
-        return loading || onClick()
-      }}
-      disabled={loading || attributesObj.disabled}
-      ref={buttonRef}
-    >
-      {children && (
+    <button {...attributesObj}
+            onClick={(e) => {
+              e.preventDefault()
+              return loading || onClick()
+            }}
+            disabled={loading || attributesObj.disabled}
+            ref={buttonRef}>
+      {children &&
         <>
-          {'loader' === role && (
+          {'loader' === role &&
             <>
-              <span className='cove-button__text' style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}>
-                <div className='cove-button__text--loading' style={loading ? { opacity: 1 } : null}>
-                  {loadingText}
-                </div>
-                <div className='cove-button__text--children' style={loading ? { opacity: 0 } : null}>
-                  {children}
-                </div>
+              <span className="cove-button__text" style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}>
+                <div className="cove-button__text--loading" style={loading ? { opacity: 1 } : null}>{loadingText}</div>
+                <div className="cove-button__text--children" style={loading ? { opacity: 0 } : null}>{children}</div>
               </span>
-              <div className='cove-button__load-spin' style={loading ? { width: '28px', opacity: 1 } : null}>
-                <LoadSpin className='ml-1' size={20} />
+              <div className="cove-button__load-spin" style={loading ? { width: '28px', opacity: 1 } : null}>
+                <LoadSpin className="ml-1" size={20}/>
               </div>
             </>
-          )}
+          }
           {role !== 'loader' && children}
         </>
-      )}
+      }
     </button>
   )
 }
 
 Button.propTypes = {
   /** Specify special role type for button */
-  role: PropTypes.oneOf(['loader']),
+  role: PropTypes.oneOf([ 'loader' ]),
   /** Provide object with styles that overwrite base styles when hovered */
   hoverStyle: PropTypes.object,
   /** Enables button to stretch to the full width of the content */

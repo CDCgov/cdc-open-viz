@@ -11,6 +11,7 @@ import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
 
+// TODO: COVE Refactor - Below hashes are unnecessary. Run conversion for kebab-case if needed, or construct and reference map
 const iconHash = {
   'data-bite': <Icon display='databite' base />,
   Bar: <Icon display='chartBar' base />,
@@ -25,7 +26,7 @@ const iconHash = {
   'single-state': <Icon display='mapAl' base />,
   gear: <Icon display='gear' base />,
   tools: <Icon display='tools' base />,
-  'filtered-text': <Icon display='filtered-text' base />
+  'filtered-text': <Icon display='filteredText' base />
 }
 
 const labelHash = {

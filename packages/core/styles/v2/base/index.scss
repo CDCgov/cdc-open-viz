@@ -1,7 +1,7 @@
-//@import "reset"; TODO: Enable after cove refactor
-@import 'typography';
+@import "reset";
+@import "typography";
+@import "accessibility";
 
-@import 'general';
-@import 'heading';
+@import "general";
 
-@import 'file-selector';
+@import "heading";

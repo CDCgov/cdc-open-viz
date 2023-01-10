@@ -1,5 +1,7 @@
 export default {
+  title: 'Data Bite',
   type: 'data-bite',
+  theme: 'theme-blue',
   data: [],
   dataBite: '',
   dataFunction: '',
@@ -23,8 +25,6 @@ export default {
   biteStyle: 'graphic',
   filters: [],
   subtext: '',
-  title: '',
-  theme: 'theme-blue',
   shadow: false,
   visual: {
     border: false,

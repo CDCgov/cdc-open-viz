@@ -1,40 +1,60 @@
 import React, { Children } from 'react'
-import { Accordion as AccordionComponent, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+
+// Third Party
+import {
+  Accordion as AccordionComponent,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton,
+} from 'react-accessible-accordion'
 import PropTypes from 'prop-types'
 
+// Components
 import Icon from './Icon'
 import Tooltip from './Tooltip'
 
-import '../../styles/v2/components/accordion.scss'
+// Styles
+import '../../styles/v2/components/ui/accordion.scss'
 
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = () => null
 
 const Accordion = ({ children }) => {
   const childNodes = Children.toArray(children)
-  const accordionSections = childNodes.filter(child => child?.type === AccordionSection)
+  const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || children
+
+  const warningIcon = <Icon className="cove-icon--warning" display="warningCircle" size={14}/>
 
   return (
     <AccordionComponent allowZeroExpanded={true}>
-      {accordionSections &&
-        accordionSections.map((section, index) => (
-          <AccordionItem className='cove-accordion__item' key={index}>
-            <AccordionItemHeading className='cove-accordion__heading'>
-              <AccordionItemButton className='cove-accordion__button'>
-                {section.props.title}
-                {section.props.tooltipText ? (
-                  <Tooltip position='bottom'>
+      {accordionSections && accordionSections.map((section, index) => (
+        <AccordionItem className="cove-accordion__item" key={index}>
+          <AccordionItemHeading className="cove-accordion__heading">
+            <AccordionItemButton className="cove-accordion__button">
+              <span className="cove-accordion__button--text">
+                {section.props.label}{section.props.warnIf ? warningIcon : null}
+              </span>
+              {section.props.tooltip
+                ? (
+                  <Tooltip position="bottom">
                     <Tooltip.Target>
-                      <Icon display='question' size={14} />
+                      <Icon display="questionCircle" size={14}/>
                     </Tooltip.Target>
-                    <Tooltip.Content>{section.props.tooltipText}</Tooltip.Content>
+                    <Tooltip.Content>
+                      {section.props.tooltip}
+                    </Tooltip.Content>
                   </Tooltip>
-                ) : null}
-              </AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel className='cove-accordion__panel'>{section.props.children}</AccordionItemPanel>
-          </AccordionItem>
-        ))}
+                )
+                : null
+              }
+            </AccordionItemButton>
+          </AccordionItemHeading>
+          <AccordionItemPanel className="cove-accordion__panel">
+            {section.props.children}
+          </AccordionItemPanel>
+        </AccordionItem>
+      ))}
     </AccordionComponent>
   )
 }
@@ -43,10 +63,15 @@ const Accordion = ({ children }) => {
 Accordion.Section = AccordionSection
 
 Accordion.Section.propTypes = {
+  /* Show warning if supplied statement or value is truthy */
+  warnIf: PropTypes.any,
   /* Title for the accordion label*/
-  title: PropTypes.string,
+  label: PropTypes.string,
   /* Tooltip for the accordion label*/
-  tooltipText: PropTypes.object
+  tooltip: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string
+  ])
 }
 
 export default Accordion

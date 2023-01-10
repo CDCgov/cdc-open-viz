@@ -183,7 +183,7 @@ const EditorPanel = memo(props => {
           <span className='edit-label'>Data Point Filters</span>
           <Tooltip style={{ textTransform: 'none' }}>
             <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
             </Tooltip.Target>
             <Tooltip.Content>
               <p>To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").</p>

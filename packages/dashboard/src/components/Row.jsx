@@ -119,7 +119,7 @@ const RowMenu = ({ rowIdx, row }) => {
     <Modal>
       <Modal.Header>Row Settings</Modal.Header>
       <Modal.Content>
-        <InputToggle label='Visualizations in this row should be equal height' fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}></InputToggle>
+        <InputToggle label='Visualizations in this row should be equal height' fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}/>
       </Modal.Content>
     </Modal>
   )
