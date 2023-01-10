@@ -1564,7 +1564,7 @@ const EditorPanel = () => {
 
                   {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
