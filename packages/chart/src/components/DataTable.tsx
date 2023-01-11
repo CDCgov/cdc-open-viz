@@ -9,6 +9,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import Context from '../context'
 
 import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import { CONSTANTS as boxPlotConstants } from './BoxPlot'
 
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
@@ -52,9 +53,16 @@ export default function DataTable() {
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
+    const resolveTableHeaders = () => {}
     const newTableColumns =
       config.visualizationType === 'Pie'
         ? []
+        : config.visualizationType === 'Box Plot'
+        ? [
+            {
+              Header: boxPlotConstants.groupName
+            }
+          ]
         : [
             {
               Header: '',
@@ -83,19 +91,40 @@ export default function DataTable() {
               id: 'series-label'
             }
           ]
+    if (config.visualizationType !== 'Box Plot') {
+      data.forEach((d, index) => {
+        const resolveTableHeader = () => {
+          if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          return d[config.runtime.originalXAxis.dataKey]
+        }
+        const newCol = {
+          Header: resolveTableHeader(),
+          Cell: ({ row }) => {
+            return <>{numberFormatter(d[row.original])}</>
+          },
+          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
+          canSort: true
+        }
 
-    data.forEach((d, index) => {
-      const newCol = {
-        Header: config.runtime[section].type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
-        Cell: ({ row }) => {
-          return <>{numberFormatter(d[row.original])}</>
-        },
-        id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
-        canSort: true
-      }
+        newTableColumns.push(newCol)
+      })
+    }
 
-      newTableColumns.push(newCol)
-    })
+    if (config.visualizationType === 'Box Plot') {
+      config.boxplot.plots.map((plot, index) => {
+        const newCol = {
+          Header: plot.columnCategory,
+          Cell: ({ row }) => {
+            console.log('row', row)
+            return <>42</>
+          },
+          id: `${index}`,
+          canSort: true
+        }
+
+        newTableColumns.push(newCol)
+      })
+    }
 
     return newTableColumns
   }, [config, colorScale])
