@@ -31,6 +31,7 @@ export default {
     tickColor: '#333',
     rightHideAxis: true,
     rightAxisSize: 50,
+    rightLabel: 'right label',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
@@ -44,7 +45,7 @@ export default {
   },
   barThickness: 0.35,
   barHeight: 25,
-  barSpace:20,
+  barSpace: 20,
   height: 300,
   xAxis: {
     type: 'categorical',
