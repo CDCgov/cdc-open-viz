@@ -1,0 +1,35 @@
+// buttons that appear above data tables
+.download-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 1em; // align w/ data table
+
+  .btn:not(:last-child) {
+    margin-right: 10px;
+  }
+  .btn-download {
+    float: unset;
+  }
+}
+
+// links that appear above data tables
+.download-links {
+  padding: 0px 1em;
+  display: flex;
+  justify-content: flex-end;
+
+  a:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
+// odd wrapper thats different on dashboards
+.cdc-dashboard-inner-container {
+  .download-links {
+    padding: unset;
+    margin-bottom: 5px;
+  }
+  .download-buttons {
+    margin: unset;
+  }
+}

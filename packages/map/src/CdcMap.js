@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 
 // IE11
@@ -10,9 +10,6 @@ import ResizeObserver from 'resize-observer-polyfill'
 import ReactTooltip from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
-import html2pdf from 'html2pdf.js'
-import html2canvas from 'html2canvas'
-import Canvg from 'canvg'
 
 // Data
 import colorPalettes from '../../core/data/colorPalettes'
@@ -20,15 +17,11 @@ import ExternalIcon from './images/external-link.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 // Sass
 import './scss/main.scss'
 import './scss/btn.scss'
-
-// Images
-// TODO: Move to Icon component
-import DownloadImg from './images/icon-download-img.svg'
-import DownloadPdf from './images/icon-download-pdf.svg'
 
 // Core
 import Loading from '@cdc/core/components/Loading'
@@ -51,7 +44,6 @@ import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
 import Filters from './components/Filters'
 import Context from './context'
-
 
 import { publish } from '@cdc/core/helpers/events'
 
@@ -109,7 +101,6 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
-  const [showLoadingMessage, setShowLoadingMessage] = useState(false)
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -123,13 +114,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
 
   let legendMemo = useRef(new Map())
+  let innerContainerRef = useRef()
 
   useEffect(() => {
     try {
       if (filteredCountryCode) {
-        const filteredCountryObj = runtimeData[filteredCountryCode]
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
@@ -162,13 +154,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const setZoom = reversedCoordinates => {
-    setState({
-      ...state,
-      mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -254,7 +239,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const primaryCol = obj.columns.primary.name,
-      isData = obj.general.type === 'data',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -412,7 +396,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       // Apply custom sorting or regular sorting
       let configuredOrder = obj.legend.categoryValuesOrder ?? []
-
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
@@ -812,101 +795,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }
 
-  const saveImageAs = (uri, filename) => {
-    const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
-    const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
-    const ieEdge = navigator.userAgent.match(/Edge/g)
-    const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
-
-    if (ieVer > -1) {
-      const fileAsBlob = new Blob([uri], {
-        type: 'image/png'
-      })
-      window.navigator.msSaveBlob(fileAsBlob, filename)
-    } else {
-      const link = document.createElement('a')
-      if (typeof link.download === 'string') {
-        link.href = uri
-        link.download = filename
-        link.onclick = e => document.body.removeChild(e.target)
-        document.body.appendChild(link)
-        link.click()
-      } else {
-        window.open(uri)
-      }
-    }
-  }
-
-  const generateMedia = (target, type) => {
-    // Convert SVG to canvas
-    const baseSvg = mapSvg.current.querySelector('.rsm-svg')
-
-    const ratio = baseSvg.getBoundingClientRect().height / baseSvg.getBoundingClientRect().width
-    const calcHeight = ratio * 1440
-    const xmlSerializer = new XMLSerializer()
-    const svgStr = xmlSerializer.serializeToString(baseSvg)
-    const options = { log: false, ignoreMouse: true }
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    ctx.canvas.width = 1440
-    ctx.canvas.height = calcHeight
-    const canvg = Canvg.fromString(ctx, svgStr, options)
-    canvg.start()
-
-    // Generate DOM <img> from svg data
-    const generatedImage = document.createElement('img')
-    generatedImage.src = canvas.toDataURL('image/png')
-    generatedImage.style.width = '100%'
-    generatedImage.style.height = 'auto'
-
-    baseSvg.style.display = 'none' // Hide default SVG during media generation
-    baseSvg.parentNode.insertBefore(generatedImage, baseSvg.nextSibling) // Insert png generated from canvas of svg
-
-    // Construct filename with timestamp
-    const date = new Date()
-    const filename = state.general.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
-
-    switch (type) {
-      case 'image':
-        return html2canvas(target, {
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          width: 1440,
-          windowWidth: 1440,
-          scale: 1,
-          logging: false
-        })
-          .then(canvas => {
-            saveImageAs(canvas.toDataURL(), filename + '.png')
-          })
-          .then(() => {
-            generatedImage.remove() // Remove generated png
-            baseSvg.style.display = null // Re-display initial svg map
-          })
-      case 'pdf':
-        let opt = {
-          margin: 0.2,
-          filename: filename + '.pdf',
-          image: { type: 'png' },
-          html2canvas: { scale: 2, logging: false },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        }
-
-        html2pdf()
-          .set(opt)
-          .from(target)
-          .save()
-          .then(() => {
-            generatedImage.remove() // Remove generated png
-            baseSvg.style.display = null // Re-display initial svg map
-          })
-        break
-      default:
-        console.warn("generateMedia param 2 type must be 'image' or 'pdf'")
-        break
-    }
-  }
-
   const changeFilterActive = async (idx, activeValue) => {
     // Reset active legend toggles
     resetLegendToggles()
@@ -1069,10 +957,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
+    // If city/country name includes a hyphen return the original.
+    if (!string.includes('–') && !string.includes('-')) {
+      return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+    }
     return string
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-      .join(' ')
   }
 
   // This resets all active legend toggles.
@@ -1105,7 +997,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     let value = key
-
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
       value = titleCase(supportedStates[key][0])
@@ -1462,9 +1353,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     hasZoom: state.general.allowMapZoom,
     handleMapAriaLabels,
     runtimeFilters,
-    setRuntimeFilters
+    setRuntimeFilters,
+    innerContainerRef
   }
-
 
   if (!mapProps.data || !state.data) return <Loading />
 
@@ -1496,10 +1387,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   return (
     <Context.Provider value={mapProps}>
-      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef}>
+      <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title}>
+          <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
@@ -1514,7 +1405,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             <Filters />
 
-            <section
+            <div
               role='button'
               tabIndex='0'
               className={mapContainerClasses.join(' ')}
@@ -1525,19 +1416,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 }
               }}
             >
-              {general.showDownloadMediaButton === true && (
-                <div className='map-downloads' data-html2canvas-ignore>
-                  <div className='map-downloads__ui btn-group'>
-                    <button className='btn' title='Download Map as Image' onClick={() => generateMedia(outerContainerRef.current, 'image')}>
-                      <DownloadImg className='btn__icon' title='Download Map as Image' />
-                    </button>
-                    <button className='btn' title='Download Map as PDF' onClick={() => generateMedia(outerContainerRef.current, 'pdf')}>
-                      <DownloadPdf className='btn__icon' title='Download Map as PDF' />
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                 Skip Over Map Container
               </a>
@@ -1574,13 +1452,18 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   displayDataAsText={displayDataAsText}
                 />
               )}
-            </section>
+            </div>
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
             {link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+
+            <CoveMediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </CoveMediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable
@@ -1603,6 +1486,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 formatLegendLocation={formatLegendLocation}
                 setFilteredCountryCode={setFilteredCountryCode}
                 tabbingId={tabId}
+                showDownloadImgButton={state.general.showDownloadImgButton}
+                showDownloadPdfButton={state.general.showDownloadPdfButton}
+                innerContainerRef={innerContainerRef}
+                outerContainerRef={outerContainerRef}
+                imageRef={imageId}
               />
             )}
 

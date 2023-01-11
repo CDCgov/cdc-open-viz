@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 export default function DataTable(props) {
-  const { data, datasetKey, config } = props
-
+  const { data, datasetKey, config, imageRef, dataFileSourceType } = props
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -26,7 +26,7 @@ export default function DataTable(props) {
     }
 
     return (
-      <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+      <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`no-border dashboard-download-link`}>
         Download {datasetKey ? `"${datasetKey}"` : 'Data'} (CSV)
       </a>
     )
@@ -91,60 +91,69 @@ export default function DataTable(props) {
 
   return (
     <ErrorBoundary component='DataTable'>
-      <section className={`data-table-container`} aria-label={accessibilityLabel}>
-        <div
-          role='button'
-          className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
-          onClick={() => {
-            setTableExpanded(!tableExpanded)
-          }}
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              setTableExpanded(!tableExpanded)
-            }
-          }}
-        >
-          {config.table.label}
-          {datasetKey ? `: ${datasetKey}` : ''}
-        </div>
-        <div className='table-container' style={{ maxHeight: config.table && config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
-          <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!tableExpanded} {...getTableProps()}>
-            <caption className='visually-hidden'>{config.table.label}</caption>
-            <thead>
-              {headerGroups &&
-                headerGroups.map(headerGroup => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                      <th tabIndex='0' {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'} title={column.Header}>
-                        {column.render('Header')}
-                        <div {...column.getResizerProps()} className='resizer' />
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-            </thead>
-            {rows && (
-              <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
-                  prepareRow(row)
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells &&
-                        row.cells.map(cell => (
-                          <td tabIndex='0' {...cell.getCellProps()}>
-                            {cell.render('Cell')}
-                          </td>
-                        ))}
-                    </tr>
-                  )
-                })}
-              </tbody>
-            )}
-          </table>
-        </div>
+      <CoveMediaControls.Section classes={['download-links']}>
+        {config.table.showDownloadUrl && dataFileSourceType === 'url' && (
+          <a className='dashboard-download-link' href={config.datasets[datasetKey].dataFileName} title='Link to View Dataset' target='_blank'>
+            Link to View Dataset
+          </a>
+        )}
         {config.table.download && <DownloadButton data={data} />}
-      </section>
+      </CoveMediaControls.Section>
+      {config.table.show && (
+        <section className={`data-table-container`} aria-label={accessibilityLabel}>
+          <div
+            role='button'
+            className={tableExpanded ? 'data-table-heading' : 'collapsed data-table-heading'}
+            onClick={() => {
+              setTableExpanded(!tableExpanded)
+            }}
+            tabIndex={0}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                setTableExpanded(!tableExpanded)
+              }
+            }}
+          >
+            {config.table.label}
+            {datasetKey ? `: ${datasetKey}` : ''}
+          </div>
+          <div className='table-container' style={{ maxHeight: config.table && config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
+            <table className={tableExpanded ? 'data-table' : 'data-table cdcdataviz-sr-only'} hidden={!tableExpanded} {...getTableProps()}>
+              <caption className='visually-hidden'>{config.table.label}</caption>
+              <thead>
+                {headerGroups &&
+                  headerGroups.map(headerGroup => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                      {headerGroup.headers.map(column => (
+                        <th tabIndex='0' {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : 'sort'} title={column.Header}>
+                          {column.render('Header')}
+                          <div {...column.getResizerProps()} className='resizer' />
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+              </thead>
+              {rows && (
+                <tbody {...getTableBodyProps()}>
+                  {rows.map(row => {
+                    prepareRow(row)
+                    return (
+                      <tr {...row.getRowProps()}>
+                        {row.cells &&
+                          row.cells.map(cell => (
+                            <td tabIndex='0' {...cell.getCellProps()}>
+                              {cell.render('Cell')}
+                            </td>
+                          ))}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              )}
+            </table>
+          </div>
+        </section>
+      )}
     </ErrorBoundary>
   )
 }

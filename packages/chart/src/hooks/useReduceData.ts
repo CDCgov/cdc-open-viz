@@ -1,6 +1,8 @@
 function useReduceData(config, data) {
-  // for combo charts check all  Data Series set to Bar;
+  // for combo charts check if all  Data Series selected to Bar;
   const isBar = config?.series?.every(element => element?.type === 'Bar')
+  // for combo charts check if all Data series selected Line or dashed-md/sm/lg.
+  const isAllLine = config?.series?.every(el => el.type === 'Line' || el.type=== 'dashed-sm'|| el.type=== 'dashed-md' || el.type=== 'dashed-lg');
 
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
@@ -66,10 +68,11 @@ function useReduceData(config, data) {
     return existPositiveValue
   }
 
-  const maxValue = getMaxValueFromData()
-  const minValue = getMinValueFromData()
-  const existPositiveValue = findPositiveNum()
-  return { minValue, maxValue, existPositiveValue }
+  const maxValue = Number(getMaxValueFromData());
+  const minValue = Number(getMinValueFromData());
+  const existPositiveValue = findPositiveNum();
+
+  return {minValue, maxValue, existPositiveValue ,isAllLine}
 }
 
 export default useReduceData

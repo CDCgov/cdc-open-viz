@@ -54,9 +54,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   yAxisTooltip = config.runtime.yAxis.rightLabel ? `${config.runtime.yAxis.rightLabel}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
                 }
                 const tooltip = `<div>
+                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[seriesKey] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
+                    ${xAxisTooltip}
                   </div>`
                 let circleRadii = 4.5
                 return (

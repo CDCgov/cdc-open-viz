@@ -213,7 +213,7 @@ const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 const EditorPanel = () => {
   const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, transformedData, isDashboard, setParentConfig, missingRequiredSections, setFilteredData } = useContext(Context)
 
-  const { minValue, maxValue, existPositiveValue } = useReduceData(config, unfilteredData)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
     if (paletteName) updateConfig({ ...config, palette: paletteName })
@@ -619,6 +619,13 @@ const EditorPanel = () => {
     updateConfig({ ...config, filters })
   }
 
+  const handleSeriesChange = (idx1, idx2) => {
+    let seriesOrder = config.series
+    let [movedItem] = seriesOrder.splice(idx1, 1)
+    seriesOrder.splice(idx2, 0, movedItem)
+    updateConfig({ ...config, series: seriesOrder })
+  }
+
   if (config.isLollipopChart && config?.series?.length > 1) {
     config.runtime.editorErrorMessage = 'Lollipop charts must use only one data series'
   }
@@ -658,7 +665,10 @@ const EditorPanel = () => {
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
+      case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
+        message = 'Value must be less than ' + minValue
+        break
+      case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
         break
       case enteredValue && minVal < 0 && parseFloat(enteredValue) > minVal:
@@ -671,7 +681,6 @@ const EditorPanel = () => {
       return { ...prevMsg, minMsg: message }
     })
   }
-
   useEffect(() => {
     validateMinValue()
     validateMaxValue()
@@ -696,7 +705,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line']} />
+                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Box Plot']} />
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
@@ -709,8 +718,8 @@ const EditorPanel = () => {
                     config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
 
+                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
@@ -808,69 +817,95 @@ const EditorPanel = () => {
                             </Tooltip.Content>
                           </Tooltip>
                         </fieldset>
-                        <ul className='series-list'>
-                          {config.series &&
-                            config.series.map((series, i) => {
-                              if (config.visualizationType === 'Combo') {
-                                let changeType = (i, value) => {
-                                  let series = [...config.series]
-                                  series[i].type = value
 
-                                  series[i].axis = 'Left'
+                        <DragDropContext onDragEnd={({ source, destination }) => handleSeriesChange(source.index, destination.index)}>
+                          <Droppable droppableId='filter_order'>
+                            {provided => (
+                              <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
+                                {config.series.map((series, i) => {
+                                  if (config.visualizationType === 'Combo') {
+                                    let changeType = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].type = value
 
-                                  updateConfig({ ...config, series })
-                                }
+                                      series[i].axis = 'Left'
 
-                                let typeDropdown = (
-                                  <select
-                                    value={series.type}
-                                    onChange={event => {
-                                      changeType(i, event.target.value)
-                                    }}
-                                    style={{ width: '100px', marginRight: '10px' }}
-                                  >
-                                    <option value='' default>
-                                      Select
-                                    </option>
-                                    <option value='Bar'>Bar</option>
-                                    <option value='Line'>Solid Line</option>
-                                    <option value='dashed-sm'>Small Dashed</option>
-                                    <option value='dashed-md'>Medium Dashed</option>
-                                    <option value='dashed-lg'>Large Dashed</option>
-                                  </select>
-                                )
+                                      updateConfig({ ...config, series })
+                                    }
 
-                                return (
-                                  <li key={series.dataKey}>
-                                    <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                      <div className='series-list__name-text'>{series.dataKey}</div>
-                                    </div>
-                                    <span>
-                                      <span className='series-list__dropdown'>{typeDropdown}</span>
-                                      {config.series && config.series.length > 1 && (
-                                        <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                          &#215;
-                                        </button>
+                                    let typeDropdown = (
+                                      <select
+                                        value={series.type}
+                                        onChange={event => {
+                                          changeType(i, event.target.value)
+                                        }}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                      >
+                                        <option value='' default>
+                                          Select
+                                        </option>
+                                        <option value='Bar'>Bar</option>
+                                        <option value='Line'>Solid Line</option>
+                                        <option value='dashed-sm'>Small Dashed</option>
+                                        <option value='dashed-md'>Medium Dashed</option>
+                                        <option value='dashed-lg'>Large Dashed</option>
+                                      </select>
+                                    )
+
+                                    return (
+                                      <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+                                        {(provided, snapshot) => (
+                                          <li>
+                                            <div className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                              <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
+                                                <div className='series-list__name-text'>{series.dataKey}</div>
+                                              </div>
+                                              <span>
+                                                <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                {config.series && config.series.length > 1 && (
+                                                  <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                    &#215;
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
+                                          </li>
+                                        )}
+                                      </Draggable>
+                                    )
+                                  }
+
+                                  return (
+                                    <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
+                                      {(provided, snapshot) => (
+                                        <li
+                                          key={series.dataKey}
+                                          className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                        >
+                                          {/*<div  className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>*/}
+                                          <div className='series-list__name' data-title={series.dataKey}>
+                                            <div className='series-list__name--text'>{series.dataKey}</div>
+                                          </div>
+                                          {config.series && config.series.length > 1 && (
+                                            <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                              &#215;
+                                            </button>
+                                          )}
+                                          {/*</div>*/}
+                                        </li>
                                       )}
-                                    </span>
-                                  </li>
-                                )
-                              }
-
-                              return (
-                                <li key={series.dataKey}>
-                                  <div className='series-list__name' data-title={series.dataKey}>
-                                    <div className='series-list__name--text'>{series.dataKey}</div>
-                                  </div>
-                                  {config.series && config.series.length > 1 && (
-                                    <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                      &#215;
-                                    </button>
-                                  )}
-                                </li>
-                              )
-                            })}
-                        </ul>
+                                    </Draggable>
+                                  )
+                                })}
+                                {provided.placeholder}
+                              </ul>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
                       </>
                     )}
 
@@ -966,7 +1001,7 @@ const EditorPanel = () => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {config.visualizationType !== 'Pie' ? (config.visualizationType === 'Bar' ? 'Left Value Axis' : 'Left Value Axis') : 'Data Format'}
+                    {config.visualizationType !== 'Pie' ? (config.orientation !== 'horizontal' ? 'Left Value Axis' : 'Value Axis') : 'Data Format'}
                     {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
@@ -1545,7 +1580,7 @@ const EditorPanel = () => {
 
                   {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
@@ -1661,9 +1696,9 @@ const EditorPanel = () => {
                       />
                     </>
                   )}
-                  {config.orientation === 'horizontal' && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label='Bar Thickness' updateField={updateField} min='15' />}
+                  {config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-
+                  {config.orientation === 'horizontal' && config.yAxis.labelPlacement === 'On Date/Category Axis' && <TextField type='number' value={config.barSpace || '20'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                   {config.visualizationType === 'Spark Line' && (
@@ -1723,6 +1758,9 @@ const EditorPanel = () => {
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
+                  <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} />
                   <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>

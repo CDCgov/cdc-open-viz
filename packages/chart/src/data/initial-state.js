@@ -38,11 +38,13 @@ export default {
     isLegendValue: false,
     numTicks: ''
   },
+  boxplot: [],
   topAxis: {
     hasLine: false
   },
   barThickness: 0.35,
   barHeight: 25,
+  barSpace:20,
   height: 300,
   xAxis: {
     type: 'categorical',
@@ -64,7 +66,8 @@ export default {
     expanded: true,
     limitHeight: false,
     height: '',
-    caption: ''
+    caption: '',
+    showDownloadUrl: true
   },
   orientation: 'vertical',
   legend: {

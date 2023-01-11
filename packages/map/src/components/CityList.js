@@ -72,7 +72,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       styles.cursor = 'pointer'
     }
 
-    const radius = state.general.geoType === 'us' && !isGeoCodeMap ? 8 : isGeoCodeMap ? 2 : 4
+    const radius = state.general.geoType === 'us' && !isGeoCodeMap ? 8 : isGeoCodeMap ? state.visual.geoCodeCircleSize : 4
 
     const additionalProps = {
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
