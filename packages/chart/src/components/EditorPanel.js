@@ -616,7 +616,7 @@ const EditorPanel = () => {
     filterItem.orderedValues = filterOrder
     filterItem.order = 'cust'
     filters[filterIndex] = filterItem
-    updateConfig({ ...config, filters });
+    updateConfig({ ...config, filters })
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -996,7 +996,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      <CheckBox  value={config.yAxis.isLegendValue} section='yAxis'  fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField}   /> 
+                      <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
@@ -1022,7 +1022,23 @@ const EditorPanel = () => {
                   )}
                   <span className='divider-heading'>Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
-                  <CheckBox value={config.dataFormat.useFormat} section='dataFormat' fieldName='useFormat' label='Use Formatted Number' updateField={updateField} />
+                  <CheckBox
+                    value={config.dataFormat.abbreviated}
+                    section='dataFormat'
+                    fieldName='abbreviated'
+                    label='Abbreviate Axis Values'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
