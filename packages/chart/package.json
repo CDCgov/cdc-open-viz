@@ -1,6 +1,6 @@
 {
   "name": "@cdc/chart",
-  "version": "4.22.10",
+  "version": "4.22.11",
   "description": "React component for visualizing tabular data in various types of charts",
   "main": "dist/cdcchart",
   "scripts": {
@@ -29,6 +29,7 @@
     "@visx/mock-data": "^1.0.0",
     "@visx/scale": "^1.0.0",
     "@visx/shape": "^1.0.0",
+    "@visx/stats": "^2.17.0",
     "@visx/tooltip": "^1.1.0",
     "chroma-js": "^2.1.2",
     "d3-array": "^2.8.0",

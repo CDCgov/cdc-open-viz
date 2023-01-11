@@ -62,6 +62,9 @@ export default {
   dataTable: {
     title: 'Data Table'
   },
+  table: {
+    showDownloadUrl: true
+  },
   tooltips: {
     appearanceType: 'hover',
     linkLabel: 'Learn More',
@@ -75,6 +78,7 @@ export default {
     maxBubbleSize: 20,
     extraBubbleBorder: false,
     cityStyle: 'circle',
+    geoCodeCircleSize: 2,
     showBubbleZeros: false
   },
   mapPosition: { coordinates: [0, 30], zoom: 1 }
