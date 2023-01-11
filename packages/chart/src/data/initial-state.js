@@ -35,9 +35,8 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    isLegendValue:false,
-    numTicks:''
-
+    isLegendValue: false,
+    numTicks: ''
   },
   topAxis: {
     hasLine: false
@@ -57,8 +56,8 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    isLegendValue:false,
-    numTicks:''
+    isLegendValue: false,
+    numTicks: ''
   },
   table: {
     label: 'Data Table',
@@ -88,7 +87,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '', useFormat: false },
+  dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
   confidenceKeys: {},
   visual: {
     border: true,

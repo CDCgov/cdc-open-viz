@@ -21,11 +21,6 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useTopAxis from '../hooks/useTopAxis'
 
-// TODO: Move scaling functions into hooks to manage complexity
-
-// TODO: remove unused imports/variables
-// TODO: consider moving logic into hooks
-// TODO: formatting
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context)
   let [width] = dimensions
@@ -171,32 +166,27 @@ export default function LinearChart() {
     }
   }
 
-   
-  const countNumOfTicks = (axis)=>{
+  const handleLeftTickFormatting = tick => {
+    if (config.runtime.yAxis.type === 'date') return formatDate(parseDate(tick))
+    if (config.orientation === 'vertical') return formatNumber(tick, 'left')
+    return tick
+  }
+
+  const countNumOfTicks = axis => {
     // function get number of ticks based on bar type & users value
-    const isHorizontal = config.orientation ==='horizontal';
-    const {numTicks} = config.runtime[axis];
-    let tickCount = undefined;
+    const isHorizontal = config.orientation === 'horizontal'
+    const { numTicks } = config.runtime[axis]
+    let tickCount = undefined
 
-    if(axis === 'yAxis'){
-      tickCount = (
-         (isHorizontal && !numTicks) ? data.length 
-       : (isHorizontal &&  numTicks) ? numTicks
-       :(!isHorizontal && !numTicks) ? undefined
-       :(!isHorizontal &&  numTicks) && numTicks
-      );
-    };
+    if (axis === 'yAxis') {
+      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+    }
 
-    if(axis === 'xAxis'){
-      tickCount = (
-         (isHorizontal && !numTicks) ? undefined
-       : (isHorizontal &&  numTicks) ? numTicks
-       :(!isHorizontal && !numTicks) ? undefined
-       :(!isHorizontal &&  numTicks) && numTicks
-      );
-    };
-    return tickCount;
-  };
+    if (axis === 'xAxis') {
+      tickCount = isHorizontal && !numTicks ? undefined : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+    }
+    return tickCount
+  }
 
   useEffect(() => {
     ReactTooltip.rebuild()
@@ -238,14 +228,7 @@ export default function LinearChart() {
 
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
-          <AxisLeft
-            scale={yScale}
-            left={config.runtime.yAxis.size}
-            label={config.runtime.yAxis.label}
-            stroke='#333'
-            tickFormat={tick => (config.runtime.yAxis.type === 'date' ? formatDate(parseDate(tick)) : config.orientation === 'vertical' ? formatNumber(tick) : tick)}
-            numTicks={countNumOfTicks('yAxis')}
-          >
+          <AxisLeft scale={yScale} left={config.runtime.yAxis.size} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
             {props => {
               const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
