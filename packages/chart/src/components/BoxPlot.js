@@ -8,7 +8,19 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 import ReactTooltip from 'react-tooltip'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config } = useContext(Context)
+  const { transformedData: data, config, setConfig } = useContext(Context)
+
+  useEffect(() => {
+    if (config.visualizationType === 'Box Plot') {
+      setConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
+    }
+  }, [])
 
   const {
     boxplot: { columnFirstQuartile, columnThirdQuartile, columnMax, columnMin, columnMedian, columnOutliers },
