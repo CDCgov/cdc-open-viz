@@ -45,9 +45,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
       const hasMultipleSeries = Object.keys(seriesLabels).length > 1
 
       let label = yAxisType === 'Right' && rightLabel ? rightLabel : leftLabel ? leftLabel : ''
-      if (!hasMultipleSeries) {
-        label = isLegendValue ? seriesLabels[seriesKey] : label
-      }
+      if (!hasMultipleSeries) label = isLegendValue ? seriesLabels[seriesKey] : label
+
       return label as string
     },
 
@@ -76,16 +75,12 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
                 const yAxisValue = getYAxisData(d, seriesKey)
 
-                let yAxisTooltip
-                let xAxisTooltip
+                // if right axis doesnt exist always format Left axis by default.
+                const { format: formatLeftAxisVal } = axisConfigs.Left
+                let yAxisTooltip = formatLeftAxisVal(axisConfigs.getyAxisLabel(seriesKey), yAxisValue)
+                let xAxisTooltip = formatLeftAxisVal(axisConfigs.getxAxisLabel(), xAxisValue)
 
-                if (config.visualizationType === 'Line' || axis === 'Left') {
-                  //if (axis === 'Left')  or if Chart type Line
-                  const { format: formatLeftAxisVal } = axisConfigs.Left
-                  yAxisTooltip = formatLeftAxisVal(axisConfigs.getyAxisLabel(seriesKey), yAxisValue)
-                  xAxisTooltip = formatLeftAxisVal(axisConfigs.getxAxisLabel(), xAxisValue)
-                }
-
+                // if Right axis exist format Right axis values.
                 if (config.visualizationType === 'Combo' && axis === 'Right') {
                   // Create the y-axis yAxisRightValue tooltip using the format function.
                   const { format: formatRightAxisVal } = axisConfigs.Right
