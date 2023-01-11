@@ -34,6 +34,15 @@ export default function LinearChart() {
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  // Make sure the chart is visible if in the editor
+  useEffect(() => {
+    const element = document.querySelector('.isEditor');
+    if (element) {
+      // parent element is visible
+      setAnimatedChart(prevState => true);
+    }
+  });
+
   // If the chart is in view and set to animate and it has not already played
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
@@ -288,10 +297,10 @@ export default function LinearChart() {
               return (
                 <Group  className='left-axis'>
                   {props.ticks.map((tick, i) => {
-                    
+
                     const minY = props.ticks[0].to.y;
                     const barMinHeight = 15; // 15 is the min height for bars by default
-                    
+
 
                     return (
                       <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
