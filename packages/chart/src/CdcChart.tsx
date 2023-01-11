@@ -245,9 +245,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         // filter data by group
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
-        console.log('g', g)
-        console.log('item', filteredData)
-        console.log('item', newConfig)
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
         const q1 = d3.quantile(filteredDataValues, 0.25)
@@ -273,7 +270,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
-      newConfig.boxplot.push(...plots)
+      newConfig.boxplot.plots = plots
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {

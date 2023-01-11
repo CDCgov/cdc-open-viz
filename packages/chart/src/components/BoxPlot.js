@@ -45,10 +45,11 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       Median: ${d.columnMedian}
     `
   }
+  console.log('here', config.boxplot.plots)
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key='boxplot-wrapper'>
-        {config.boxplot.map((d, i) => {
+        {config.boxplot.plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           return (
             <BoxPlot
@@ -65,7 +66,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               stroke='black'
               strokeWidth={1}
               valueScale={yScale}
-              outliers={d.columnOutliers}
+              outliers={config.boxplot.hideOutliers ? [] : d.columnOutliers}
               outlierProps={{
                 style: {
                   fill: `${color_0}`,
@@ -99,6 +100,22 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       </Group>
     </ErrorBoundary>
   )
+}
+
+export const CONSTANTS = {
+  firstQuartile: 'First Quartile',
+  thirdQuartile: 'Third Quartile',
+  q1: 'Q1',
+  q3: 'Q3',
+  median: 'Median',
+  mode: 'Mode',
+  mean: 'Mean',
+  groupName: 'Measures',
+  maximum: 'Maximum',
+  minimum: 'Minimum',
+  standardDeviation: 'Standard Deviation',
+  count: 'Count',
+  outlierValues: 'Outlier Values'
 }
 
 export default CoveBoxPlot
