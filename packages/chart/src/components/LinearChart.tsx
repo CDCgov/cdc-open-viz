@@ -238,6 +238,8 @@ export default function LinearChart() {
     ReactTooltip.rebuild()
   })
 
+  console.log('yMax', yMax)
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -525,7 +527,7 @@ export default function LinearChart() {
         )}
 
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
-        {config.visualizationType === 'Area Chart' && <CoveAreaChart xScale={xScale} yScale={yScale} />}
+        {config.visualizationType === 'Area Chart' && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} />}
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
