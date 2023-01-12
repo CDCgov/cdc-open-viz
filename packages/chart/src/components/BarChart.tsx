@@ -122,7 +122,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
 
     if (isHorizontal) {
-      config.height = totalHeight
+      config.heights.horizontal = totalHeight
     }
 
     // return new updated bars/groupes
