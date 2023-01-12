@@ -31,7 +31,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   // Define an object that contains the configuration for the Left and Right axis.
   const axisConfigs = {
     Left: {
-      format: (label, value) => `${label}: ${formatNumber(value)}`
+      format: (label, value) => `${label}: ${formatNumber(value, 'left')}`
     },
     Right: {
       format: (label, value) => `${label}: ${formatNumber(value, 'right')}`
