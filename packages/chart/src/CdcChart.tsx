@@ -696,7 +696,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
                   </div>
                 </>
               )}
-              {!config.legend.hide && config.visualizationType !== 'Spark Line' && config.visualizationType !== 'Box Plot' && <Legend />}
+              {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
             </div>
             {/* Link */}
             {link && link}

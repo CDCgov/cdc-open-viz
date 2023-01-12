@@ -41,6 +41,7 @@ export default {
   boxplot: {
     plots: [],
     borders: 'true',
+    plotNonOutlierValues: false,
     plotOutlierValues: false,
     firstQuartilePercentage: 25,
     thirdQuartilePercentage: 75,
