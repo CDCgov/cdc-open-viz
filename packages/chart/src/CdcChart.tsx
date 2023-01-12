@@ -67,6 +67,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
 
+  // Destructure items from config for more readable JSX
+  const { legend, title, description, visualizationType } = config
   const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
@@ -566,27 +568,32 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Format numeric data based on settings in config
   const formatNumber = (num, axis) => {
-    // check if value contains comma and remove it. later will add comma below.
-    if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
     // if num is NaN return num
     if (isNaN(num) || !num) return num
 
-    let original = num
-    let prefix = config.dataFormat.prefix
-    let stringFormattingOptions
+    // destructure dataFormat values
+    let {
+      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, rightPrefix, rightSuffix }
+    } = config
     let formatSuffix = format('.2s')
+
+    // check if value contains comma and remove it. later will add comma below.
+    if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
+
+    let original = num
+    let stringFormattingOptions
 
     if (axis !== 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
-        minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
-        maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+        minimumFractionDigits: roundTo ? Number(roundTo) : 0,
+        maximumFractionDigits: roundTo ? Number(roundTo) : 0
       }
     } else {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0,
-        maximumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0
+        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
+        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
       }
     }
 
@@ -605,37 +612,42 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         num = cutoff
       }
     }
-    num = num.toLocaleString('en-US', stringFormattingOptions)
 
+    // When we're formatting the left axis
+    // Use commas also updates bars and the data table
+    // We can't use commas when we're formatting the dataFormatted number
+    // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
+    if (axis === 'left' && commas && abbreviated) {
+      num = num
+    } else {
+      num = num.toLocaleString('en-US', stringFormattingOptions)
+    }
     let result = ''
 
-    if (config.dataFormat.useFormat) {
-      num = formatSuffix(num)
+    if (abbreviated && axis === 'left') {
+      num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
 
     if (prefix && axis !== 'right') {
       result += prefix
     }
 
-    if (config.dataFormat.rightPrefix && axis === 'right') {
-      result += config.dataFormat.rightPrefix
+    if (rightPrefix && axis === 'right') {
+      result += rightPrefix
     }
 
     result += num
 
-    if (config.dataFormat.suffix && axis !== 'right') {
-      result += config.dataFormat.suffix
+    if (suffix && axis !== 'right') {
+      result += suffix
     }
 
-    if (config.dataFormat.rightSuffix && axis === 'right') {
-      result += config.dataFormat.rightSuffix
+    if (rightSuffix && axis === 'right') {
+      result += rightSuffix
     }
 
     return String(result)
   }
-
-  // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
 
   // Select appropriate chart type
   const chartComponents = {
