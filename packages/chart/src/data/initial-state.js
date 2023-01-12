@@ -31,6 +31,7 @@ export default {
     tickColor: '#333',
     rightHideAxis: true,
     rightAxisSize: 50,
+    rightLabel: 'right label',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
