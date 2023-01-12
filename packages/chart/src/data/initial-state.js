@@ -31,6 +31,7 @@ export default {
     tickColor: '#333',
     rightHideAxis: true,
     rightAxisSize: 50,
+    rightLabel: 'right label',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
@@ -38,12 +39,13 @@ export default {
     isLegendValue: false,
     numTicks: ''
   },
+  boxplot: [],
   topAxis: {
     hasLine: false
   },
   barThickness: 0.35,
   barHeight: 25,
-  barSpace:20,
+  barSpace: 20,
   height: 300,
   xAxis: {
     type: 'categorical',
@@ -89,7 +91,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '', useFormat: false },
+  dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
   confidenceKeys: {},
   visual: {
     border: true,
