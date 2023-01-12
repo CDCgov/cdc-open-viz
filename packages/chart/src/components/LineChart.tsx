@@ -28,29 +28,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     }
   }
 
-  // Define an object that contains the configuration for the Left and Right axis.
-  const axisConfigs = {
-    Left: {
-      format: (label, value) => `${label}: ${formatNumber(value, 'left')}`
-    },
-    Right: {
-      format: (label, value) => `${label}: ${formatNumber(value, 'right')}`
-    },
-    getyAxisLabel: (seriesKey: string, yAxisType?: string) => {
-      // method returns label based on what Axis Left or Right. Each axis has own label.
-      const {
-        seriesLabels,
-        yAxis: { rightLabel, label: leftLabel, isLegendValue }
-      } = config.runtime
-      const hasMultipleSeries = Object.keys(seriesLabels).length > 1
-
-      let label = yAxisType === 'Right' && rightLabel ? rightLabel : leftLabel ? leftLabel : ''
-      if (!hasMultipleSeries) label = isLegendValue ? seriesLabels[seriesKey] : label
-
-      return label as string
-    },
-
-    getxAxisLabel: () => (config.runtime.xAxis.label ? config.runtime.xAxis.label : '')
+  const handleAxisFormating = (axis = 'left', label, value) => {
+    axis = String(axis).toLocaleLowerCase()
+    label = label ? label : ''
+    return `${label}: ${formatNumber(value, axis)}`
   }
 
   return (
@@ -75,18 +56,15 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
                 const yAxisValue = getYAxisData(d, seriesKey)
 
-                // if right axis doesnt exist always format Left axis by default.
-                const { format: formatLeftAxisVal } = axisConfigs.Left
-                let yAxisTooltip = formatLeftAxisVal(axisConfigs.getyAxisLabel(seriesKey), yAxisValue)
-                let xAxisTooltip = formatLeftAxisVal(axisConfigs.getxAxisLabel(), xAxisValue)
+                const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+                const isLegendValue = config.runtime.yAxis.isLegendValue
+                const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
+                let label = config.runtime.yAxis[labeltype]
+                // if has muiltiple series dont show legend value on tooltip
+                if (!hasMultipleSeries) label = isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
 
-                // if Right axis exist format Right axis values.
-                if (config.visualizationType === 'Combo' && axis === 'Right') {
-                  // Create the y-axis yAxisRightValue tooltip using the format function.
-                  const { format: formatRightAxisVal } = axisConfigs.Right
-                  yAxisTooltip = formatRightAxisVal(axisConfigs.getyAxisLabel(seriesKey, 'Right'), yAxisValue)
-                  xAxisTooltip = formatRightAxisVal(axisConfigs.getxAxisLabel(), xAxisValue)
-                }
+                let yAxisTooltip = handleAxisFormating(axis, label, yAxisValue)
+                let xAxisTooltip = handleAxisFormating(axis, config.runtime.xAxis.label, xAxisValue)
 
                 const tooltip = `<div>
                     ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[seriesKey] || ''}<br/>` : ''}
