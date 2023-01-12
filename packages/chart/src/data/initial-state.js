@@ -40,7 +40,28 @@ export default {
   },
   boxplot: {
     plots: [],
-    hideOutliers: false
+    borders: 'true',
+    plotOutlierValues: false,
+    firstQuartilePercentage: 25,
+    thirdQuartilePercentage: 75,
+    boxWidthPercentage: 40,
+    legend: {
+      showHowToReadText: false,
+      howToReadText: 'How to read a boxplot...',
+      position: 'top'
+    },
+    labels: {
+      q1: 'Lower Quartile',
+      q2: 'q2',
+      q3: 'Upper Quartile',
+      q4: 'q4',
+      minimum: 'Minimum',
+      maximum: 'Maximum',
+      mean: 'Mean',
+      median: 'Median',
+      sd: 'Standard Deviation',
+      iqr: 'Interquartile Range'
+    }
   },
   topAxis: {
     hasLine: false
