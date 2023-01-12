@@ -244,6 +244,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         const lowerBounds = q1 - (q3 - q1) * 1.5
         const upperBounds = q3 + (q3 - q1) * 1.5
         const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+        let nonOutliers = filteredDataValues
+
+        nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
+
         plots.push({
           columnCategory: g,
           columnMean: d3.mean(filteredDataValues),
@@ -254,7 +258,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           columnMax: q3 + 1.5 * iqr,
           columnIqr: iqr,
           columnOutliers: outliers,
-          values: filteredDataValues
+          values: filteredDataValues,
+          nonOutlierValues: nonOutliers
         })
       })
 

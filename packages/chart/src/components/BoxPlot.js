@@ -47,50 +47,54 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       <Group className='boxplot' key='boxplot-wrapper'>
         {config.boxplot.plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
+          const radius = 4
           return (
-            <BoxPlot
-              key={`box-plot-${i}`}
-              min={d.columnMin}
-              max={d.columnMax}
-              left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
-              firstQuartile={d.columnFirstQuartile}
-              thirdQuartile={d.columnThirdQuartile}
-              median={d.columnMedian}
-              boxWidth={constrainedWidth}
-              fill={color_0}
-              fillOpacity={0.5}
-              stroke='black'
-              valueScale={yScale}
-              outliers={config.boxplot.plotOutlierValues ? d.columnOutliers : []}
-              outlierProps={{
-                style: {
-                  fill: `${color_0}`,
-                  opacity: 1
-                }
-              }}
-              medianProps={{
-                style: {
-                  stroke: 'black'
-                }
-              }}
-              boxProps={{
-                style: {
-                  stroke: 'black',
-                  strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
-                },
-                'data-tip': 'cool'
-              }}
-              maxProps={{
-                style: {
-                  stroke: 'black'
-                }
-              }}
-              container
-              containerProps={{
-                'data-tip': handleTooltip(d),
-                'data-for': tooltip_id
-              }}
-            />
+            <>
+              {config.boxplot.plotNonOutlierValues && d.nonOutlierValues.map(value => <circle cx={xScale(d.columnCategory) + offset + config.yAxis.size - radius - 0.5} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} />)}
+              <BoxPlot
+                key={`box-plot-${i}`}
+                min={d.columnMin}
+                max={d.columnMax}
+                left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
+                firstQuartile={d.columnFirstQuartile}
+                thirdQuartile={d.columnThirdQuartile}
+                median={d.columnMedian}
+                boxWidth={constrainedWidth}
+                fill={color_0}
+                fillOpacity={0.5}
+                stroke='black'
+                valueScale={yScale}
+                outliers={config.boxplot.plotOutlierValues ? d.columnOutliers : []}
+                outlierProps={{
+                  style: {
+                    fill: `${color_0}`,
+                    opacity: 1
+                  }
+                }}
+                medianProps={{
+                  style: {
+                    stroke: 'black'
+                  }
+                }}
+                boxProps={{
+                  style: {
+                    stroke: 'black',
+                    strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
+                  },
+                  'data-tip': 'cool'
+                }}
+                maxProps={{
+                  style: {
+                    stroke: 'black'
+                  }
+                }}
+                container
+                containerProps={{
+                  'data-tip': handleTooltip(d),
+                  'data-for': tooltip_id
+                }}
+              />
+            </>
           )
         })}
       </Group>
