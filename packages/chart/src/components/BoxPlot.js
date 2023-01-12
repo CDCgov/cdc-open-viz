@@ -38,8 +38,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       <strong>${d.columnCategory}</strong></br>
       ${config.boxplot.labels.q1}: ${d.columnFirstQuartile}<br/>
       ${config.boxplot.labels.q3}: ${d.columnThirdQuartile}<br/>
-      IQR: ${d.columnIqr}<br/>
-      Median: ${d.columnMedian}
+      ${config.boxplot.labels.iqr}: ${d.columnIqr}<br/>
+      ${config.boxplot.labels.median}: ${d.columnMedian}
     `
   }
   return (

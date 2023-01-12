@@ -598,6 +598,17 @@
       transform: scale(1);
     }
   }
+
+  .fieldset--boxplot {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 10px;
+
+    label {
+      margin: 5px 0;
+    }
+  }
 }
 
 .cdc-visualization__paired-bar-chart {
