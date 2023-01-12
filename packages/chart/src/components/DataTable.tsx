@@ -115,7 +115,6 @@ export default function DataTable() {
         const newCol = {
           Header: plot.columnCategory,
           Cell: ({ row }) => {
-            console.log('row', row)
             return <>42</>
           },
           id: `${index}`,

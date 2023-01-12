@@ -217,8 +217,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      console.log('hit', newConfig)
-
       // stats
       let allKeys = data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
@@ -232,12 +230,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       const groups = uniqueArray(allKeys)
       const plots = []
 
-      console.log('d', data)
-      console.log('newConfig', newConfig)
-      console.log('groups', groups)
-      console.log('allKeys', allKeys)
-      console.log('allValues', allValues)
-
       // group specific statistics
       // prevent re-renders
       groups.map((g, index) => {
@@ -246,9 +238,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
-
-        const q1 = d3.quantile(filteredDataValues, 0.25)
-        const q3 = d3.quantile(filteredDataValues, 0.75)
+        const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+        const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
         const iqr = q3 - q1
         const lowerBounds = q1 - (q3 - q1) * 1.5
         const upperBounds = q3 + (q3 - q1) * 1.5

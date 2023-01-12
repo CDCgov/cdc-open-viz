@@ -292,12 +292,27 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    // Top level
+    console.log('new value', newValue)
+    console.log('section', section)
+    console.log('sub', subsection)
+
+    if (section === 'boxplot' && subsection === 'labels') {
+      updateConfig({
+        ...config,
+        [section]: {
+          ...config[section],
+          [subsection]: {
+            ...config.boxplot[subsection],
+            [fieldName]: newValue
+          }
+        }
+      })
+      return
+    }
+
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
-
       enforceRestrictions(updatedConfig)
-
       updateConfig(updatedConfig)
       return
     }
@@ -305,6 +320,8 @@ const EditorPanel = () => {
     const isArray = Array.isArray(config[section])
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
+
+    console.log('section value', sectionValue)
 
     if (null !== subsection) {
       if (isArray) {
@@ -707,12 +724,6 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Box Plot']} />
 
-                  {config.visualizationType === 'Box Plot' && (
-                    <label>
-                      <CheckBox value={config.boxplot.hideOutliers} fieldName='hideOutliers' section='boxplot' label='Hide Outliers' updateField={updateField} />
-                    </label>
-                  )}
-
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
@@ -937,6 +948,191 @@ const EditorPanel = () => {
                     )}
 
                     {config.series && config.series.length === 1 && <Select fieldName='visualizationType' label='Rank by Value' initial='Select' onChange={e => sortSeries(e.target.value)} options={['asc', 'desc']} />}
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )}
+
+              {config.visualizationType === 'Box Plot' && (
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Measures</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <h4>Labels for 5-Number Summary</h4>
+
+                    {/* prettier-ignore */}
+                    {/* max */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.maximum}
+                      fieldName='maximum'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Maximum'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* prettier-ignore */}
+                    {/* Q3 */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.q3}
+                      fieldName='q3'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Upper Quartile'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* prettier-ignore */}
+                    {/* Q3 */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.median}
+                      fieldName='median'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Median'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* prettier-ignore */}
+                    {/* q1 */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.q1}
+                      fieldName='q1'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Lower Quartile'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* prettier-ignore */}
+                    {/* min */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.minimum}
+                      fieldName='q1'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Minimum'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* prettier-ignore */}
+                    {/* iqr */}
+                    <TextField
+                      type='text'
+                      value={config.boxplot.labels.iqr}
+                      fieldName='iqr'
+                      section='boxplot'
+                      subsection='labels'
+                      label='Interquartile Range'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    <br />
+                    <h4>Percentages for Quartiles</h4>
+                    <TextField
+                      type='number'
+                      value={config.boxplot.firstQuartilePercentage}
+                      fieldName='firstQuartilePercentage'
+                      section='boxplot'
+                      label='Lower Quartile'
+                      max={100}
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    <TextField
+                      type='number'
+                      value={config.boxplot.thirdQuartilePercentage}
+                      fieldName='thirdQuartilePercentage'
+                      label='Upper Quartile'
+                      section='boxplot'
+                      max={100}
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Represented by top line of box. 25% of data are higher.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -1567,9 +1763,14 @@ const EditorPanel = () => {
                     </>
                   )}
 
-                  <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
+                  <fieldset>
+                    <legend className=''>Box Plot Settings</legend>
+                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
+                    {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
+                  </fieldset>
 
-                  {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
+                  <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
+                  {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
                   {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
 

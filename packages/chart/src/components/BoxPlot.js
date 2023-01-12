@@ -1,11 +1,9 @@
 import React, { useContext, useEffect } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
-import { scaleBand, scaleLinear } from '@visx/scale'
 import Context from '../context'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import ReactTooltip from 'react-tooltip'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { transformedData: data, config, setConfig } = useContext(Context)
@@ -28,10 +26,9 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
     height
   } = config
 
-  const yMax = config.height - config.runtime.xAxis.size
-  const xMax = config.width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
   const boxWidth = xScale.bandwidth()
-  const constrainedWidth = Math.min(20, boxWidth)
+  console.log('bw', boxWidth)
+  const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
 
   // tooltips
@@ -39,13 +36,12 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   const handleTooltip = d => {
     return `
       <strong>${d.columnCategory}</strong></br>
-      Q1: ${d.columnFirstQuartile}<br/>
-      Q3: ${d.columnThirdQuartile}<br/>
+      ${config.boxplot.labels.q1}: ${d.columnFirstQuartile}<br/>
+      ${config.boxplot.labels.q3}: ${d.columnThirdQuartile}<br/>
       IQR: ${d.columnIqr}<br/>
       Median: ${d.columnMedian}
     `
   }
-  console.log('here', config.boxplot.plots)
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key='boxplot-wrapper'>
@@ -64,9 +60,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               fill={color_0}
               fillOpacity={0.5}
               stroke='black'
-              strokeWidth={1}
               valueScale={yScale}
-              outliers={config.boxplot.hideOutliers ? [] : d.columnOutliers}
+              outliers={config.boxplot.plotOutlierValues ? d.columnOutliers : []}
               outlierProps={{
                 style: {
                   fill: `${color_0}`,
@@ -80,7 +75,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
               }}
               boxProps={{
                 style: {
-                  stroke: 'black'
+                  stroke: 'black',
+                  strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
                 },
                 'data-tip': 'cool'
               }}
