@@ -792,7 +792,7 @@ const EditorPanel = () => {
                     }
                   />
 
-                  {config.visualizationSubType !== 'horizontal' && <TextField type='number' value={config.height} fieldName='height' label='Chart Height' updateField={updateField} />}
+                  {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1580,7 +1580,7 @@ const EditorPanel = () => {
 
                   {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
+                  <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
