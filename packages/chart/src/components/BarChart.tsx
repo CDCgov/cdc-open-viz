@@ -66,7 +66,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
 
     if (isHorizontal) {
-      config.height = totalHeight
+      config.heights.horizontal = totalHeight
     }
 
     // return new updated bars/groupes
@@ -366,8 +366,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <foreignObject
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                              x={config.runtime.horizontal ? 0 : (barWidth * bar.index) + offset}
-                              y={config.runtime.horizontal ? (barWidth * bar.index) : barY}
+                              x={config.runtime.horizontal ? 0 : barWidth * bar.index + offset}
+                              y={config.runtime.horizontal ? barWidth * bar.index : barY}
                               width={config.runtime.horizontal ? bar.y : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
                               style={{
