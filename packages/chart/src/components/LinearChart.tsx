@@ -502,7 +502,7 @@ export default function LinearChart() {
                       {!config.runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     </Group>
                     <Group>
-                      <Text transform={`translate(${xMax / 2}, ${yMax + 20}) rotate(-${0})`} verticalAnchor='start' textAnchor={'middle'} stroke='red'>
+                      <Text transform={`translate(${xMax / 2}, ${yMax + 20}) rotate(-${0})`} verticalAnchor='start' textAnchor={'middle'} stroke='#333'>
                         {config.runtime.xAxis.label}
                       </Text>
                     </Group>
