@@ -213,7 +213,7 @@ const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal',
 const EditorPanel = () => {
   const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, transformedData, isDashboard, setParentConfig, missingRequiredSections, setFilteredData } = useContext(Context)
 
-  const { minValue, maxValue, existPositiveValue ,isAllLine} = useReduceData(config, unfilteredData)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
     if (paletteName) updateConfig({ ...config, palette: paletteName })
@@ -620,10 +620,10 @@ const EditorPanel = () => {
   }
 
   const handleSeriesChange = (idx1, idx2) => {
-    let seriesOrder = config.series;
-    let [movedItem] = seriesOrder.splice(idx1, 1);
-    seriesOrder.splice(idx2, 0, movedItem);
-    updateConfig({ ...config, series: seriesOrder})
+    let seriesOrder = config.series
+    let [movedItem] = seriesOrder.splice(idx1, 1)
+    seriesOrder.splice(idx2, 0, movedItem)
+    updateConfig({ ...config, series: seriesOrder })
   }
 
   if (config.isLollipopChart && config?.series?.length > 1) {
@@ -665,8 +665,8 @@ const EditorPanel = () => {
       case (config.visualizationType === 'Line' || config.visualizationType === 'Spark Line') && enteredValue && parseFloat(enteredValue) > minVal:
         message = 'Value must be less than ' + minValue
         break
-      case (config.visualizationType === 'Combo'  && isAllLine) && enteredValue && parseFloat(enteredValue) > minVal:
-        message = 'Value must be less than ' + minValue;
+      case config.visualizationType === 'Combo' && isAllLine && enteredValue && parseFloat(enteredValue) > minVal:
+        message = 'Value must be less than ' + minValue
         break
       case (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && enteredValue && minVal > 0 && parseFloat(enteredValue) > 0:
         message = 'Value must be less than or equal to 0'
@@ -680,7 +680,7 @@ const EditorPanel = () => {
     setWarningMsg(function (prevMsg) {
       return { ...prevMsg, minMsg: message }
     })
-  };
+  }
   useEffect(() => {
     validateMinValue()
     validateMaxValue()
@@ -705,7 +705,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line']} />
+                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Box Plot']} />
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.isLollipopChart ? 'lollipop' : config.barStyle || 'flat'} fieldName='barStyle' label='bar style' updateField={updateField} options={showBarStyleOptions()} />}
@@ -718,8 +718,8 @@ const EditorPanel = () => {
                     config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
 
+                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
@@ -872,22 +872,29 @@ const EditorPanel = () => {
                                           </li>
                                         )}
                                       </Draggable>
-                                    ) 
+                                    )
                                   }
-                                  
+
                                   return (
                                     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                       {(provided, snapshot) => (
-                                        <li key={series.dataKey} className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                        <li
+                                          key={series.dataKey}
+                                          className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                        >
                                           {/*<div  className={snapshot.isDragging ? 'currently-dragging' : ''} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>*/}
-                                            <div className='series-list__name' data-title={series.dataKey}>
-                                              <div className='series-list__name--text'>{series.dataKey}</div>
-                                            </div>
-                                            {config.series && config.series.length > 1 && (
-                                              <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                &#215;
-                                              </button>
-                                            )}
+                                          <div className='series-list__name' data-title={series.dataKey}>
+                                            <div className='series-list__name--text'>{series.dataKey}</div>
+                                          </div>
+                                          {config.series && config.series.length > 1 && (
+                                            <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                              &#215;
+                                            </button>
+                                          )}
                                           {/*</div>*/}
                                         </li>
                                       )}
@@ -994,7 +1001,7 @@ const EditorPanel = () => {
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {config.visualizationType !== 'Pie' ? (( config.orientation !=='horizontal' ) ? 'Left Value Axis' : 'Value Axis') : 'Data Format'}
+                    {config.visualizationType !== 'Pie' ? (config.orientation !== 'horizontal' ? 'Left Value Axis' : 'Value Axis') : 'Data Format'}
                     {config.visualizationType === 'Pie' && !config.yAxis.dataKey && <WarningImage width='25' className='warning-icon' />}
                   </AccordionItemButton>
                 </AccordionItemHeading>
@@ -1024,7 +1031,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
+                      {config.series.length === 1 && <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
@@ -1050,7 +1057,23 @@ const EditorPanel = () => {
                   )}
                   <span className='divider-heading'>Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
-                  <CheckBox value={config.dataFormat.useFormat} section='dataFormat' fieldName='useFormat' label='Use Formatted Number' updateField={updateField} />
+                  <CheckBox
+                    value={config.dataFormat.abbreviated}
+                    section='dataFormat'
+                    fieldName='abbreviated'
+                    label='Abbreviate Axis Values'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
@@ -1557,7 +1580,7 @@ const EditorPanel = () => {
 
                   {config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
+                  <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} />
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
@@ -1673,7 +1696,7 @@ const EditorPanel = () => {
                       />
                     </>
                   )}
-                  {config.orientation === 'horizontal' && !config.isLollipopChart &&  config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
+                  {config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
                   {config.orientation === 'horizontal' && config.yAxis.labelPlacement === 'On Date/Category Axis' && <TextField type='number' value={config.barSpace || '20'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}

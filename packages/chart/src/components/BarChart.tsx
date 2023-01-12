@@ -44,14 +44,72 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return style
   }
 
+  // Declare a function to calculate the tooltips
+  function calcTooltips(bar, yAxisValue, xAxisValue) {
+    const { xAxis, yAxis, seriesLabels } = config.runtime
+    // check if  hasMultipleSeries
+    const hasMultipleSeries = Object.keys(seriesLabels).length > 1
+
+    // Use a hash table to store the tooltips for each axis
+    const tooltips = { y: '', x: '' }
+
+    // Calculate the y-axis tooltip
+    switch (true) {
+      case hasMultipleSeries:
+        tooltips.y = yAxis.label ? `${yAxis.label}: ${yAxisValue}` : yAxisValue
+        break
+      default:
+        tooltips.y = yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : yAxis.label ? `${yAxis.label}: ${yAxisValue}` : yAxisValue
+    }
+
+    // Calculate the x-axis tooltip
+    switch (true) {
+      case hasMultipleSeries:
+        tooltips.x = xAxis.label ? `${xAxis.label}: ${xAxisValue}` : xAxisValue
+        break
+      default:
+        tooltips.x = xAxis.isLegendValue ? `${bar.key}: ${xAxisValue}` : xAxis.label ? `${xAxis.label}: ${xAxisValue}` : ''
+    }
+
+    return {
+      xAxisTooltip: tooltips.x,
+      yAxisTooltip: tooltips.y
+    }
+  }
+
+  function createTooltip(bar, yAxisTooltip, xAxisTooltip) {
+    // Check if there are multiple series in the chart
+    const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+
+    // If there are multiple series, get the label for the current bar's series. Otherwise, set the label to an empty string.
+    const seriesLabel = hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key]}<br/>` : ''
+
+    // Create the tooltip string, including the series label if it exists
+    const tooltip = `<div>
+      ${seriesLabel}
+      ${yAxisTooltip}<br />
+      ${xAxisTooltip}
+      </div>
+     `
+    return tooltip
+  }
+
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
     if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
 
     const barsArr = [...defaultBars]
-    let barHeight = !isStacked ? config.barHeight * stackCount : config.barHeight
-    if (!isStacked && config.isLollipopChart) {
-      barHeight = lollipopBarWidth
+    let barHeight
+
+    const heights = {
+      stacked: config.barHeight,
+      lollipop: lollipopBarWidth
+    }
+
+    if (!isStacked) {
+      barHeight = heights[config.isLollipopChart ? 'lollipop' : 'stacked'] * stackCount
+    } else {
+      barHeight = heights.stacked
     }
 
     const labelHeight = isLabelBelowBar ? fontSize[config.fontSize || 'medium'] : 0
@@ -137,13 +195,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 barStack.bars.map(bar => {
                   const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
                   const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-                  let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-
-                  const tooltip = `<div>
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                  const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
+                  const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
 
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
@@ -195,15 +248,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
-                    const yAxisValue = formatNumber(data[bar.index][bar.key])
-                    const xAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
-                    let yAxisTooltip = config.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.yAxis.label ? `${config.yAxis.label}: ${yAxisValue}` : `${yAxisValue}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
-
-                    const tooltip = `<div>
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                    const xAxisValue = formatNumber(data[bar.index][bar.key])
+                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
+                    const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
+                    const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
@@ -239,7 +287,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor='start'
                             verticalAnchor='start'
                           >
-                            {isHorizontal ? xAxisValue : formatNumber(xAxisValue)}
+                            {yAxisValue}
                           </Text>
                         )}
 
@@ -328,9 +376,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         xAxisValue = tempValue
                         barWidth = config.barHeight
                       }
-
-                      let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${bar.key} : ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                      let xAxisTooltip = config.runtime.xAxis.isLegendValue ? ` ${bar.key} :${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                       let labelColor = '#000000'
 
                       // Set label color
@@ -338,10 +383,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         labelColor = '#FFFFFF'
                       }
 
-                      const tooltip = `<div>
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
+                      const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
+                      const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
                       const style = applyRadius(index)
 
                       // check if bar text/value string fits into  each bars.
