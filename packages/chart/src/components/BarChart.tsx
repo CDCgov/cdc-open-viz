@@ -5,11 +5,10 @@ import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Context from '../context'
-import ReactTooltip from 'react-tooltip'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -17,9 +16,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
 
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
-  const isLabelOnYAxis = config.yAxis.labelPlacement === 'On Date/Category Axis'
-  const isLabelOnBar = config.yAxis.labelPlacement === 'On Bar'
-  const isLabelMissing = !config.yAxis.labelPlacement
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
@@ -54,7 +50,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
     const barsArr = [...defaultBars]
     let barHeight = !isStacked ? config.barHeight * stackCount : config.barHeight
-    !isStacked && config.isLollipopChart ? (barHeight = lollipopBarWidth) : barHeight
+    if (!isStacked && config.isLollipopChart) {
+      barHeight = lollipopBarWidth
+    }
 
     const labelHeight = isLabelBelowBar ? fontSize[config.fontSize || 'medium'] : 0
     let barSpace = isLabelBelowBar ? barHeight / 2 : Number(config.barSpace)
@@ -90,7 +88,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }
 
   // Using State
-  const [horizBarHeight, setHorizBarHeight] = useState(null)
   const [textWidth, setTextWidth] = useState(null)
 
   useEffect(() => {
@@ -366,8 +363,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <foreignObject
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                              x={config.runtime.horizontal ? 0 : (barWidth * bar.index) + offset}
-                              y={config.runtime.horizontal ? (barWidth * bar.index) : barY}
+                              x={config.runtime.horizontal ? 0 : barWidth * bar.index + offset}
+                              y={config.runtime.horizontal ? barWidth * bar.index : barY}
                               width={config.runtime.horizontal ? bar.y : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
                               style={{
@@ -384,7 +381,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               <Text
                                 display={displayBar ? 'block' : 'none'}
                                 x={bar.y}
-                                y={config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
+                                y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
                                 dx={doesTextFit ? -5 : 5} // X padding
                                 verticalAnchor='middle'
@@ -418,7 +415,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )}
                             ;
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
                                 {bar.value}
                               </Text>
                             )}
