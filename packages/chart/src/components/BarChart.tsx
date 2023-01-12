@@ -424,7 +424,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               <Text
                                 display={displayBar ? 'block' : 'none'}
                                 x={bar.y}
-                                y={config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
+                                y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
                                 dx={doesTextFit ? -5 : 5} // X padding
                                 verticalAnchor='middle'
@@ -458,7 +458,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )}
                             ;
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
                                 {bar.value}
                               </Text>
                             )}
