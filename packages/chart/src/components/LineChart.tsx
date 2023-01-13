@@ -123,6 +123,23 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
                 }}
               />
+              {config.animate && (
+                <LinePath
+                  className='animation'
+                  curve={allCurves.curveLinear}
+                  data={data}
+                  x={d => xScale(getXAxisData(d))}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                  stroke='#fff'
+                  strokeWidth={3}
+                  strokeOpacity={1}
+                  shapeRendering='geometricPrecision'
+                  strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                  defined={(item, i) => {
+                    return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                  }}
+                />
+              )}
             </Group>
           )
         })}
