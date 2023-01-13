@@ -36,13 +36,13 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    isLegendValue: false,
     numTicks: ''
   },
   boxplot: [],
   topAxis: {
     hasLine: false
   },
+  isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
   barSpace: 20,
@@ -62,7 +62,6 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    isLegendValue: false,
     numTicks: ''
   },
   table: {

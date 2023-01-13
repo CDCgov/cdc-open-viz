@@ -26,6 +26,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const stackCount = config.runtime.seriesKeys.length
   const barBorderWidth = 1
   const fontSize = { small: 14, medium: 16, large: 18 }
+  const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   const applyRadius = (index: number) => {
     if (index === undefined || index === null || !isRounded) return
@@ -43,56 +44,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
     return style
   }
-
-  // Declare a function to calculate the tooltips
-  function calcTooltips(bar, yAxisValue, xAxisValue) {
-    const { xAxis, yAxis, seriesLabels } = config.runtime
-    // check if  hasMultipleSeries
-    const hasMultipleSeries = Object.keys(seriesLabels).length > 1
-
-    // Use a hash table to store the tooltips for each axis
-    const tooltips = { y: '', x: '' }
-
-    // Calculate the y-axis tooltip
-    switch (true) {
-      case hasMultipleSeries:
-        tooltips.y = yAxis.label ? `${yAxis.label}: ${yAxisValue}` : yAxisValue
-        break
-      default:
-        tooltips.y = yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : yAxis.label ? `${yAxis.label}: ${yAxisValue}` : yAxisValue
-    }
-
-    // Calculate the x-axis tooltip
-    switch (true) {
-      case hasMultipleSeries:
-        tooltips.x = xAxis.label ? `${xAxis.label}: ${xAxisValue}` : xAxisValue
-        break
-      default:
-        tooltips.x = xAxis.isLegendValue ? `${bar.key}: ${xAxisValue}` : xAxis.label ? `${xAxis.label}: ${xAxisValue}` : ''
-    }
-
-    return {
-      xAxisTooltip: tooltips.x,
-      yAxisTooltip: tooltips.y
-    }
-  }
-
-  function createTooltip(bar, yAxisTooltip, xAxisTooltip) {
-    // Check if there are multiple series in the chart
-    const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-
-    // If there are multiple series, get the label for the current bar's series. Otherwise, set the label to an empty string.
-    const seriesLabel = hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key]}<br/>` : ''
-
-    // Create the tooltip string, including the series label if it exists
-    const tooltip = `<div>
-      ${seriesLabel}
-      ${yAxisTooltip}<br />
-      ${xAxisTooltip}
-      </div>
-     `
-    return tooltip
-  }
+  // }
 
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
@@ -193,17 +145,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
-                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-                  const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
-                  const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barThickness = xMax / barStack.bars.length
                   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
                   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                   const style = applyRadius(barStack.index)
+                  // tooltips
+                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
+                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                  if (!hasMultipleSeries) {
+                    yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  }
+
+                  const tooltip = `<div>
+                  ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  ${yAxisTooltip}<br />
+                  ${xAxisTooltip}
+                    </div>`
 
                   return (
                     <>
@@ -248,16 +209,24 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
-                    const xAxisValue = formatNumber(data[bar.index][bar.key])
-                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
-                    const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
-                    const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index)
-
                     let labelColor = '#000000'
+                    // tooltips
+                    const xAxisValue = formatNumber(data[bar.index][bar.key])
+                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                    if (!hasMultipleSeries) {
+                      xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
+                    }
+                    const tooltip = `<div>
+                    ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}
+                      </div>`
 
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF'
@@ -383,13 +352,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         labelColor = '#FFFFFF'
                       }
 
-                      const { xAxisTooltip, yAxisTooltip } = calcTooltips(bar, yAxisValue, xAxisValue)
-                      const tooltip = createTooltip(bar, yAxisTooltip, xAxisTooltip)
                       const style = applyRadius(index)
 
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, config.fontSize)
                       let doesTextFit = (textWidth / bar.y) * 100 < 48
+
+                      let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                      let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                      if (!hasMultipleSeries && config.runtime.horizontal) {
+                        xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                      }
+                      if (!hasMultipleSeries && !config.runtime.horizontal) {
+                        yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                      }
+
+                      const tooltip = `<div>
+                      ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                      ${yAxisTooltip}<br />
+                      ${xAxisTooltip}
+                        </div>`
 
                       return (
                         <>
