@@ -4,6 +4,7 @@
   "theme": "theme-purple",
   "fontSize": "medium",
   "height": "332",
+  "animate": true,
   "padding": {
     "left": 5,
     "right": 5
@@ -131,7 +132,8 @@
     },
     {
       "dataKey": "Monthly-Goal",
-      "type": "Line"
+      "type": "dashed-md",
+      "axis": "Left"
     }
   ]
 }
