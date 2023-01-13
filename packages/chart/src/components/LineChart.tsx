@@ -57,11 +57,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 const yAxisValue = getYAxisData(d, seriesKey)
 
                 const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-                const isLegendValue = config.runtime.yAxis.isLegendValue
                 const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
                 let label = config.runtime.yAxis[labeltype]
                 // if has muiltiple series dont show legend value on tooltip
-                if (!hasMultipleSeries) label = isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
+                if (!hasMultipleSeries) label = config.isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
 
                 let yAxisTooltip = handleAxisFormating(axis, label, yAxisValue)
                 let xAxisTooltip = handleAxisFormating(axis, config.runtime.xAxis.label, xAxisValue)
