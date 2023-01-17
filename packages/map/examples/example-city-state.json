@@ -115,6 +115,7 @@
     ],
     "zoom": 1
   },
+  "dataUrl": "http://localhost:8080/examples/city-state.json",
   "sharing": {
     "enabled": false,
     "dataHost": "wcms-wp.cdc.gov",
@@ -578,7 +579,7 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
-      {
+    {
       "STATE": "Great Plains Tribal Chairmen's Health Board",
       "Rate": 18,
       "Location": "Vehicle",
@@ -590,7 +591,7 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
-        {
+    {
       "STATE": "Inter-Tribal Council of Michigan, Inc.",
       "Rate": 14,
       "Location": "Vehicle",
@@ -632,7 +633,7 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
-        {
+    {
       "STATE": "Lakeview",
       "Rate": 5,
       "Location": "Vehicle",
@@ -668,6 +669,5 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     }
-    
   ]
 }

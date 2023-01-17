@@ -6,7 +6,6 @@ import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
-import * as d3 from 'd3-array'
 
 import BarChart from './BarChart'
 import LineChart from './LineChart'
@@ -16,7 +15,6 @@ import useIntersectionObserver from './useIntersectionObserver'
 import CoveBoxPlot from './BoxPlot'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import numberFromString from '@cdc/core/helpers/numberFromString'
 import '../scss/LinearChart.scss'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
@@ -28,7 +26,6 @@ export default function LinearChart() {
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState<boolean>(false)
-  const [animatedChartPlayed, setAnimatedChartPlayed] = useState<boolean>(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -55,10 +52,10 @@ export default function LinearChart() {
   if (config && config.legend && !config.legend.hide && config.legend.position !== 'bottom' && (currentViewport === 'lg' || currentViewport === 'md')) {
     width = width * 0.73
   }
-
-  const height = config.aspectRatio ? width * config.aspectRatio : config.height
+  const { horizontal: heightHorizontal } = config.heights
+  const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
   const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
-  const yMax = height - config.runtime.xAxis.size
+  const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
@@ -142,7 +139,7 @@ export default function LinearChart() {
         range: [0, yMax]
       })
 
-      yScale.rangeRound([0, height])
+      yScale.rangeRound([0, yMax])
     } else {
       min = min < 0 ? min * 1.11 : min
 
@@ -347,7 +344,7 @@ export default function LinearChart() {
                       </Group>
                     )
                   })}
-                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={config.runtime.horizontal ? { x: 0, y: Number(config.height) } : props.axisToPoint} stroke='#000' />}
+                  {!config.yAxis.hideAxis && <Line from={props.axisFromPoint} to={config.runtime.horizontal ? { x: 0, y: Number(heightHorizontal) } : props.axisToPoint} stroke='#000' />}
                   {yScale.domain()[0] < 0 && <Line from={{ x: props.axisFromPoint.x, y: yScale(0) }} to={{ x: xMax, y: yScale(0) }} stroke='#333' />}
                   <Text className='y-label' textAnchor='middle' verticalAnchor='start' transform={`translate(${-1 * config.runtime.yAxis.size}, ${axisCenter}) rotate(-90)`} fontWeight='bold' fill={config.yAxis.labelColor}>
                     {props.label}
@@ -407,7 +404,7 @@ export default function LinearChart() {
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={config.runtime.horizontal ? Number(config.height) : yMax}
+            top={yMax}
             left={Number(config.runtime.yAxis.size)}
             label={config.runtime.xAxis.label}
             tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
@@ -505,7 +502,7 @@ export default function LinearChart() {
                       {!config.runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     </Group>
                     <Group>
-                      <Text transform={`translate(${xMax / 2}, ${config.height - yMax + 20}) rotate(-${0})`} verticalAnchor='start' textAnchor={'middle'} stroke='#333'>
+                      <Text transform={`translate(${xMax / 2}, ${yMax + 20}) rotate(-${0})`} verticalAnchor='start' textAnchor={'middle'} stroke='#333'>
                         {config.runtime.xAxis.label}
                       </Text>
                     </Group>
