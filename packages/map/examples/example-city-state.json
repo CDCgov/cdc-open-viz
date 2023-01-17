@@ -115,7 +115,6 @@
     ],
     "zoom": 1
   },
-  "dataUrl": "http://localhost:8080/examples/city-state.json",
   "sharing": {
     "enabled": false,
     "dataHost": "wcms-wp.cdc.gov",
