@@ -651,7 +651,31 @@
       "URL": "https://www.cdc.gov/"
     },
     {
-      "STATE": "Salem",
+      "STATE": "Salem, Oregon",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+        {
+      "STATE": "Salem, Connecticut",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Alabama",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Florida",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem, Massachusetts",
       "Rate": 5,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
