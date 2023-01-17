@@ -956,22 +956,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
-
     // if hyphen found, then split, uppercase each word, and put back together
-    if (string.includes('-') && string.includes('-')) {
-      
-        let dashSplit = string
-          .split('-')
-        let frontSplit = dashSplit[0]
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-          .join(' ')
-        let backSplit = dashSplit[1]
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-          .join(' ')
-
-        return frontSplit + "-" + backSplit;
+    if (string.includes('–') || string.includes('-')) {
+      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
+      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
+      let frontSplit = dashSplit[0]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      let backSplit = dashSplit[1]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      return frontSplit + splitCharacter + backSplit
     } else {
       // just return with each word upper cased
       return string
