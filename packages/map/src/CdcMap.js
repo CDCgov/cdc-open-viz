@@ -544,7 +544,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         breaks.map((item, index) => {
           const setMin = index => {
-            //debugger;
             let min = breaks[index]
 
             // if first break is a seperated zero, min is zero
@@ -958,13 +957,34 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const titleCase = string => {
     // If city/country name includes a hyphen return the original.
-    if (!string.includes('–') && !string.includes('-')) {
+/*     if (!string.includes('–') && !string.includes('-')) {
+      return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+    } */
+
+    if (string.includes('-') && string.includes('-')) {
+      
+        let dashSplit = string
+          .split('-')
+        let frontSplit = dashSplit[0]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+        let backSplit = dashSplit[1]
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+          .join(' ')
+
+      return frontSplit + "-" + backSplit;
+    } else {
       return string
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
         .join(' ')
     }
-    return string
+    //return string
   }
 
   // This resets all active legend toggles.
