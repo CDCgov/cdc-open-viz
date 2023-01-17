@@ -543,7 +543,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         breaks.map((item, index) => {
           const setMin = index => {
-            //debugger;
             let min = breaks[index]
 
             // if first break is a seperated zero, min is zero
@@ -956,14 +955,26 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
-    // If city/country name includes a hyphen return the original.
-    if (!string.includes('–') && !string.includes('-')) {
+    // if hyphen found, then split, uppercase each word, and put back together
+    if (string.includes('–') || string.includes('-')) {
+      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
+      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
+      let frontSplit = dashSplit[0]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      let backSplit = dashSplit[1]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      return frontSplit + splitCharacter + backSplit
+    } else {
+      // just return with each word upper cased
       return string
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
         .join(' ')
     }
-    return string
   }
 
   // This resets all active legend toggles.

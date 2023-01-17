@@ -115,7 +115,6 @@
     ],
     "zoom": 1
   },
-  "dataUrl": "http://localhost:8080/examples/city-state.json",
   "sharing": {
     "enabled": false,
     "dataHost": "wcms-wp.cdc.gov",
@@ -552,6 +551,120 @@
     {
       "STATE": "Philadelphia",
       "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Arctic Slope Native Association Limited",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Cherokee Nation",
+      "Rate": 12,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Cheyenne River Sioux Tribe",
+      "Rate": 11,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Fond du Lac Reservation",
+      "Rate": 22,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Great Plains Tribal Chairmen's Health Board",
+      "Rate": 18,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Hopi Tribe",
+      "Rate": 19,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Inter-Tribal Council of Michigan, Inc.",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Kaw Nation of Oklahoma",
+      "Rate": 16,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Navajo Nation",
+      "Rate": 24,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "South Puget Intertribal Planning Agency",
+      "Rate": 9,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Southeast Alaska Regional Health Consortium",
+      "Rate": 8,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Yukon-Kuskokwim Health Corporation",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Modesto",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Lakeview",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Lockport",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Warren",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Salem",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Benito",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Alexandria",
+      "Rate": 5,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     }
