@@ -973,7 +973,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         return frontSplit + "-" + backSplit;
     } else {
-      // just return with each word upoper cased
+      // just return with each word upper cased
       return string
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
