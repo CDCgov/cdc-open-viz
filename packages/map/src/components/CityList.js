@@ -42,7 +42,6 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
   // Cities output
   const cities = cityList.map((city, i) => {
     const geoData = isGeoCodeMap ? state.data.filter(item => city === item[state.columns.geo.name])[0] : data[city]
-
     const cityDisplayName = isGeoCodeMap ? city : titleCase(displayGeoName(city))
 
     const legendColors = isGeoCodeMap && geoData ? applyLegendToRow(geoData) : data[city] ? applyLegendToRow(data[city]) : false
