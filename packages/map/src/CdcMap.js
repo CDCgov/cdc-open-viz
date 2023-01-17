@@ -956,14 +956,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
-    // If city/country name includes a hyphen return the original.
-/*     if (!string.includes('–') && !string.includes('-')) {
-      return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-        .join(' ')
-    } */
 
+    // if hyphen found, then split, uppercase each word, and put back together
     if (string.includes('-') && string.includes('-')) {
       
         let dashSplit = string
@@ -977,14 +971,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
           .join(' ')
 
-      return frontSplit + "-" + backSplit;
+        return frontSplit + "-" + backSplit;
     } else {
+      // just return with each word upoper cased
       return string
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
         .join(' ')
     }
-    //return string
   }
 
   // This resets all active legend toggles.
