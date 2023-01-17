@@ -29,7 +29,6 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
 // Child Components
 import Sidebar from './components/Sidebar'
@@ -1134,7 +1133,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       // handle urls with spaces in the name.
-      if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
+      if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}`)
       let newData = await fetchRemoteData(newState.dataUrl)
 
       if (newData && newState.dataDescription) {
