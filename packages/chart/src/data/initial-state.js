@@ -62,7 +62,8 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    numTicks: ''
+    numTicks: '',
+    labelOffset: 65
   },
   table: {
     label: 'Data Table',
