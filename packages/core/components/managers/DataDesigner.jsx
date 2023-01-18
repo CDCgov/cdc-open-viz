@@ -193,6 +193,35 @@ const DataDesigner = props => {
                       ))}
                     </select>
                   </div>
+                  <div className='mb-2'>
+                    <div className='mb-1'>(Optional) Which properties in the dataset should be ignored?  (will not be used or treated as filters)</div>
+                    {configureData.dataDescription.ignoredKeys && configureData.dataDescription.ignoredKeys.length > 0 && (
+                      <ul className="value-list">
+                        {configureData.dataDescription.ignoredKeys.map((ignoredKey, index) => (
+                          <li key={`value-keys-list-${index}`}>{ignoredKey}<button onClick={() => {
+                            let newIgnoredKeys = configureData.dataDescription.ignoredKeys;
+                            newIgnoredKeys.splice(index, 1);
+                            updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', newIgnoredKeys)
+                          }}>X</button></li>
+                        ))}
+                      </ul>
+                    )}
+                    <select
+                      onChange={e => {
+                        if(e.target.value){
+                          updateDescriptionProp(visualizationKey, dataKey, 'ignoredKeys', [...(configureData.dataDescription.ignoredKeys || []), e.target.value])
+                        }
+                        e.target.value = '';
+                      }}
+                    >
+                      <option value=''>Choose an option</option>
+                      {Object.keys(configureData.data[0]).filter(value => !configureData.dataDescription.ignoredKeys || configureData.dataDescription.ignoredKeys.indexOf(value) === -1).map((value, index) => (
+                        <option value={value} key={`ignored-keys-option-${index}`}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </>
               )}
             </>
