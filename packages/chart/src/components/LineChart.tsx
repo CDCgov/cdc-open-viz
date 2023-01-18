@@ -30,8 +30,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
   const handleAxisFormating = (axis = 'left', label, value) => {
     axis = String(axis).toLocaleLowerCase()
-    label = label ? label : ''
-    return `${label}: ${formatNumber(value, axis)}`
+    if (label) {
+      return `${label}: ${formatNumber(value, axis)}`
+    }
+    return `${formatNumber(value, axis)}`
   }
 
   return (
