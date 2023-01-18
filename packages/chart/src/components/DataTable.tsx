@@ -71,6 +71,8 @@ export default function DataTable() {
                     columnThirdQuartile: labels.q3,
                     columnOutliers: 'Outliers',
                     values: 'Values',
+                    columnCount: 'Count',
+                    columnSd: 'Standard Deviation',
                     nonOutlierValues: 'Non Outliers'
                   }
 
@@ -137,14 +139,16 @@ export default function DataTable() {
           Cell: props => {
             let resolveCell = () => {
               if (Number(props.row.id) === 0) return true
-              if (Number(props.row.id) === 1) return plot.columnMean
-              if (Number(props.row.id) === 2) return plot.columnMedian
-              if (Number(props.row.id) === 3) return plot.columnFirstQuartile
-              if (Number(props.row.id) === 4) return plot.columnThirdQuartile
+              if (Number(props.row.id) === 1) return plot.columnMax
+              if (Number(props.row.id) === 2) return plot.columnThirdQuartile
+              if (Number(props.row.id) === 3) return plot.columnMedian
+              if (Number(props.row.id) === 4) return plot.columnFirstQuartile
               if (Number(props.row.id) === 5) return plot.columnMin
-              if (Number(props.row.id) === 6) return plot.columnMax
-              if (Number(props.row.id) === 7) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
-              if (Number(props.row.id) === 8) return plot.values.length > 0 ? plot.values.toString() : '-'
+              if (Number(props.row.id) === 6) return plot.columnCount
+              if (Number(props.row.id) === 7) return plot.columnSd
+              if (Number(props.row.id) === 8) return plot.columnMean
+              if (Number(props.row.id) === 9) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+              if (Number(props.row.id) === 10) return plot.values.length > 0 ? plot.values.toString() : '-'
               return <p>-</p>
             }
             return resolveCell()
