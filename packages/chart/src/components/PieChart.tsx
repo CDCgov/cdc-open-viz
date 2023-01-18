@@ -31,6 +31,17 @@ export default function PieChart() {
     freezeOnceVisible: false
   })
 
+  // Make sure the chart is visible if in the editor
+  useEffect(() => {
+    const element = document.querySelector('.isEditor')
+    console.log('element', element)
+    if (element) {
+      // parent element is visible
+      console.log('setAnimation')
+      setAnimatePie(prevState => true)
+    }
+  })
+
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
       setTimeout(() => {
@@ -117,7 +128,9 @@ export default function PieChart() {
     width = width * 0.73
   }
 
-  const height = config.aspectRatio ? width * config.aspectRatio : config.height
+  // Set a default height in case to make sure we have at least this or an aspect ratio set
+  const configHeight = config.height ? config.height : width
+  const height = config.aspectRatio ? width * config.aspectRatio : configHeight
 
   const radius = Math.min(width, height) / 2
   const centerY = height / 2
