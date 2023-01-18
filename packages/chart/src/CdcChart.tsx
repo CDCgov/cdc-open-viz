@@ -251,11 +251,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
         plots.push({
           columnCategory: g,
-          columnMax: q3 + 1.5 * iqr,
+          columnMax: Number(q3 + 1.5 * iqr).toFixed(2),
           columnThirdQuartile: q3,
           columnMedian: d3.median(filteredDataValues),
           columnFirstQuartile: q1,
-          columnMin: q1 - 1.5 * iqr,
+          columnMin: Number(q1 - 1.5 * iqr).toFixed(2),
           columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
           columnSd: d3.deviation(filteredDataValues).toFixed(2),
           columnMean: d3.mean(filteredDataValues),
