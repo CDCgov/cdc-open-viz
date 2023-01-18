@@ -142,6 +142,26 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   }}
                 />
               )}
+
+              {/* Render series labels at end if each line if selected in the editor */}
+              {config.showLineSeriesLabels &&
+                (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
+                  let lastDatum
+                  for (let i = data.length - 1; i >= 0; i--) {
+                    if (data[i][seriesKey]) {
+                      lastDatum = data[i]
+                      break
+                    }
+                  }
+                  if (!lastDatum) {
+                    lastDatum = data[data.length - 1]
+                  }
+                  return (
+                    <text x={xScale(getXAxisData(lastDatum)) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
+                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                    </text>
+                  )
+                })}
             </Group>
           )
         })}

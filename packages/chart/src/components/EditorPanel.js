@@ -3,19 +3,15 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-import { timeParse, timeFormat } from 'd3-time-format'
-import { useDebounce, useDebouncedCallback } from 'use-debounce'
+import { useDebounce } from 'use-debounce'
 
 import Context from '../context'
 import WarningImage from '../images/warning.svg'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Waiting from '@cdc/core/components/Waiting'
-import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg' //TODO: Update with Icon component
 import { useColorPalette } from '../hooks/useColorPalette'
 
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -24,6 +20,8 @@ import useRightAxis from '../hooks/useRightAxis'
 
 // TODO: Remove unused imports
 // TDOO: Move inline styles to a scss file
+
+/* eslint-disable react-hooks/rules-of-hooks */
 
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -34,7 +32,7 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
-  }, [debouncedValue])
+  }, [debouncedValue]) // eslint-disable-line
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
@@ -211,17 +209,17 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, transformedData, isDashboard, setParentConfig, missingRequiredSections, setFilteredData } = useContext(Context)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(Context)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
     if (paletteName) updateConfig({ ...config, palette: paletteName })
-  }, [paletteName])
+  }, [paletteName]) // eslint-disable-line
 
   useEffect(() => {
     dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [dispatch, config.palette])
+  }, [dispatch, config.palette]) // eslint-disable-line
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -243,7 +241,7 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
-  }, [config.visualizationType])
+  }, [config.visualizationType]) // eslint-disable-line
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
@@ -325,7 +323,6 @@ const EditorPanel = () => {
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [lollipopColorStyle, setLollipopColorStyle] = useState('two-tone')
 
   if (loading) {
     return null
@@ -442,14 +439,11 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    unfilteredData.map(row => {
+    unfilteredData.forEach(row => {
       Object.keys(row).forEach(columnName => (columns[columnName] = true))
     })
 
     if (filter) {
-      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== '' // TODO: remove?
-      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== '' // TODO: remove?
-
       Object.keys(columns).forEach(key => {
         if (
           (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
@@ -471,7 +465,7 @@ const EditorPanel = () => {
     if (!data) return []
     const set = new Set()
     for (let i = 0; i < data.length; i++) {
-      for (const [key, value] of Object.entries(data[i])) {
+      for (const [key] of Object.entries(data[i])) {
         set.add(key)
       }
     }
@@ -480,7 +474,7 @@ const EditorPanel = () => {
 
   const getDataValues = (dataKey, unique = false) => {
     let values = []
-    excludedData.map(e => {
+    excludedData.forEach(e => {
       values.push(e[dataKey])
     })
     return unique ? [...new Set(values)] : values
@@ -560,7 +554,7 @@ const EditorPanel = () => {
         orientation: 'horizontal'
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
@@ -569,7 +563,7 @@ const EditorPanel = () => {
         lollipopShape: config.lollipopShape
       })
     }
-  }, [config.isLollipopChart, config.lollipopShape])
+  }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -589,18 +583,7 @@ const EditorPanel = () => {
         })}
       </ul>
     )
-  }, [config])
-
-  const ErrorWithLolliopChart = ({ message }) => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{message}</p>
-        </section>
-      </section>
-    )
-  }
+  }, [config]) // eslint-disable-line
 
   const checkIsLine = type => {
     return type === ('Line' || 'dashed-sm')
@@ -684,7 +667,7 @@ const EditorPanel = () => {
   useEffect(() => {
     validateMinValue()
     validateMaxValue()
-  }, [minValue, maxValue, config])
+  }, [minValue, maxValue, config]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -1589,6 +1572,7 @@ const EditorPanel = () => {
                     <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
                   )}
 
+                  {/* eslint-disable */}
                   <label className='header'>
                     <span className='edit-label'>Header Theme</span>
                     <ul className='color-palette'>
@@ -1608,6 +1592,7 @@ const EditorPanel = () => {
                   <label>
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
+                  {/* eslint-enable */}
                   {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
                   <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
                   <span>Sequential</span>
@@ -1710,6 +1695,11 @@ const EditorPanel = () => {
                       <CheckBox value={config.visual?.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
                       <CheckBox value={config.visual?.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
                     </div>
+                  )}
+
+                  {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.showLineSeriesLabels} fieldName='showLineSeriesLabels' label='Append Series Name to End of Line Charts' updateField={updateField} />}
+                  {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && config.showLineSeriesLabels && (
+                    <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
