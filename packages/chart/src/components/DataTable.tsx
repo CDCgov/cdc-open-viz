@@ -9,49 +9,9 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import Context from '../context'
 
 import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
-import { BoxPlot } from '@visx/stats'
-
-const mockData = [
-  {
-    group: 'a',
-    min: 1,
-    max: 2,
-    q3: 'q3',
-    q1: 'q1',
-    title: 'this is a title'
-  },
-  {
-    group: 'b',
-    min: 1,
-    max: 2,
-    q3: 'q3',
-    q1: 'q1',
-    title: 'this is a title'
-  },
-  {
-    group: 'c',
-    min: 1,
-    max: 2,
-    q3: 'q3',
-    q1: 'q1',
-    title: 'this is a title'
-  },
-  {
-    group: 'd',
-    min: 1,
-    max: 2,
-    q3: 'q3',
-    q1: 'q1',
-    title: 'this is a title'
-  }
-]
 
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
-
-  // Debugging.
-  // if (config.visualizationType === 'Box Plot') return null
-
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -88,7 +48,6 @@ export default function DataTable() {
 
   // Creates columns structure for the table
   const tableColumns = useMemo(() => {
-    const resolveTableHeaders = () => {}
     const newTableColumns =
       config.visualizationType === 'Pie'
         ? []
@@ -98,15 +57,18 @@ export default function DataTable() {
               Header: 'Measures',
               Cell: props => {
                 const resolveName = () => {
+                  let {
+                    boxplot: { labels }
+                  } = config
                   const columnLookup = {
-                    columnMean: 'Mean',
-                    columnMax: 'Max',
-                    columnMin: 'Min',
-                    columnIqr: 'IQR',
+                    columnMean: labels.mean,
+                    columnMax: labels.maximum,
+                    columnMin: labels.minimum,
+                    columnIqr: labels,
                     columnCategory: 'Category',
-                    columnMedian: 'Median',
-                    columnFirstQuartile: 'First Quartile',
-                    columnThirdQuartile: 'Third Quartile',
+                    columnMedian: labels.median,
+                    columnFirstQuartile: labels.q1,
+                    columnThirdQuartile: labels.q3,
                     columnOutliers: 'Outliers',
                     values: 'Values',
                     nonOutlierValues: 'Non Outliers'
@@ -169,19 +131,22 @@ export default function DataTable() {
     }
 
     if (config.visualizationType === 'Box Plot') {
-      config.boxplot.plots.map((plot, index) => {
+      config.boxplot.tableData.map((plot, index) => {
         const newCol = {
           Header: plot.columnCategory,
           Cell: props => {
             let resolveCell = () => {
-              // console.log('props', props)
+              if (Number(props.row.id) === 0) return true
               if (Number(props.row.id) === 1) return plot.columnMean
               if (Number(props.row.id) === 2) return plot.columnMedian
               if (Number(props.row.id) === 3) return plot.columnFirstQuartile
               if (Number(props.row.id) === 4) return plot.columnThirdQuartile
+              if (Number(props.row.id) === 5) return plot.columnMin
+              if (Number(props.row.id) === 6) return plot.columnMax
+              if (Number(props.row.id) === 7) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+              if (Number(props.row.id) === 8) return plot.values.length > 0 ? plot.values.toString() : '-'
               return <p>-</p>
             }
-            console.log('p', props)
             return resolveCell()
           },
           id: `${index}`,
@@ -200,7 +165,7 @@ export default function DataTable() {
     config.visualizationType === 'Pie'
     ? [config.yAxis.dataKey]
     : config.visualizationType === 'Box Plot'
-    ? Object.entries(config.boxplot.plots[0])
+    ? Object.entries(config.boxplot.tableData[0])
     : config.runtime.seriesKeys),
     [config.runtime.seriesKeys])
 
@@ -284,7 +249,7 @@ export default function DataTable() {
               {rows.map((row, index) => {
                 prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
+                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
                     {row.cells.map((cell, index) => {
                       return (
                         <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
