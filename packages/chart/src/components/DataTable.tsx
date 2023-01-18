@@ -9,6 +9,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import Context from '../context'
 
 import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import { BoxPlot } from '@visx/stats'
 
 const mockData = [
   {
@@ -96,12 +97,27 @@ export default function DataTable() {
             {
               Header: 'Measures',
               Cell: props => {
-                let resolveMeasures = () => {
-                  console.log('Measures Row: ', props)
-                  if (Number(props.row.id) === 0) return <p>{props.row.original}</p>
-                  return <p>-</p>
+                const resolveName = () => {
+                  const columnLookup = {
+                    columnMean: 'Mean',
+                    columnMax: 'Max',
+                    columnMin: 'Min',
+                    columnIqr: 'IQR',
+                    columnCategory: 'Category',
+                    columnMedian: 'Median',
+                    columnFirstQuartile: 'First Quartile',
+                    columnThirdQuartile: 'Third Quartile',
+                    columnOutliers: 'Outliers',
+                    values: 'Values',
+                    nonOutlierValues: 'Non Outliers'
+                  }
+
+                  let resolvedName = columnLookup[props.row.original[0]]
+
+                  return resolvedName
                 }
-                return resolveMeasures()
+
+                return resolveName()
               }
             }
           ]
@@ -153,21 +169,20 @@ export default function DataTable() {
     }
 
     if (config.visualizationType === 'Box Plot') {
-      mockData.map((plot, index) => {
+      config.boxplot.plots.map((plot, index) => {
         const newCol = {
-          Header: plot.group,
+          Header: plot.columnCategory,
           Cell: props => {
             let resolveCell = () => {
               // console.log('props', props)
-              // if (Number(props.row.id) === 0) return props.rows[index].original.columnMax
-              // if (Number(props.row.id) === 1) return props.rows[index].original.columnThirdQuartile
-              // if (Number(props.row.id) === 2) return props.rows[index].original.columnMedian
-              // if (Number(props.row.id) === 3) return props.rows[index].original.columnFirstQuartile
-              // if (Number(props.row.id) === 4) return props.rows[index].original.columnFirstQuartile
+              if (Number(props.row.id) === 1) return plot.columnMean
+              if (Number(props.row.id) === 2) return plot.columnMedian
+              if (Number(props.row.id) === 3) return plot.columnFirstQuartile
+              if (Number(props.row.id) === 4) return plot.columnThirdQuartile
               return <p>-</p>
             }
-            console.log('p', props.row)
-            return <p>Group Row</p>
+            console.log('p', props)
+            return resolveCell()
           },
           id: `${index}`,
           canSort: true

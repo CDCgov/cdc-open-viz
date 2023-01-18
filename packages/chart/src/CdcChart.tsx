@@ -228,6 +228,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       const groups = uniqueArray(allKeys)
+      let tableData = []
       const plots = []
 
       // group specific statistics
@@ -262,6 +263,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           nonOutlierValues: nonOutliers
         })
       })
+
+      // tableData = plots
+      // tableData.forEach(table => {
+      //   delete table.columnCategory
+      // })
 
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
