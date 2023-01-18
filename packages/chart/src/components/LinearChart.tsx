@@ -437,7 +437,7 @@ export default function LinearChart() {
                     )
                   })}
                   {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                  <Text x={axisCenter} y={config.runtime.xAxis.size} textAnchor='middle' verticalAnchor='end' fontWeight='bold' fill={config.xAxis.labelColor}>
+                  <Text x={axisCenter} y={config.xAxis.labelOffset} textAnchor='middle' fontWeight='bold' fill={config.xAxis.labelColor}>
                     {props.label}
                   </Text>
                 </Group>

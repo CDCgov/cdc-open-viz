@@ -250,7 +250,6 @@
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 1em;
 
     &.bottom {
       flex-wrap: nowrap;
@@ -258,10 +257,6 @@
     }
     &.legend-hidden > svg {
       width: 100% !important;
-    }
-
-    .legend-container {
-      margin-top: 1rem;
     }
 
     > svg {
