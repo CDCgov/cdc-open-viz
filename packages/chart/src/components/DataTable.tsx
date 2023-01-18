@@ -9,7 +9,41 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import Context from '../context'
 
 import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
-import { CONSTANTS as boxPlotConstants } from './BoxPlot'
+
+const mockData = [
+  {
+    group: 'a',
+    min: 1,
+    max: 2,
+    q3: 'q3',
+    q1: 'q1',
+    title: 'this is a title'
+  },
+  {
+    group: 'b',
+    min: 1,
+    max: 2,
+    q3: 'q3',
+    q1: 'q1',
+    title: 'this is a title'
+  },
+  {
+    group: 'c',
+    min: 1,
+    max: 2,
+    q3: 'q3',
+    q1: 'q1',
+    title: 'this is a title'
+  },
+  {
+    group: 'd',
+    min: 1,
+    max: 2,
+    q3: 'q3',
+    q1: 'q1',
+    title: 'this is a title'
+  }
+]
 
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
@@ -60,7 +94,15 @@ export default function DataTable() {
         : config.visualizationType === 'Box Plot'
         ? [
             {
-              Header: boxPlotConstants.groupName
+              Header: 'Measures',
+              Cell: props => {
+                let resolveMeasures = () => {
+                  console.log('Measures Row: ', props)
+                  if (Number(props.row.id) === 0) return <p>{props.row.original}</p>
+                  return <p>-</p>
+                }
+                return resolveMeasures()
+              }
             }
           ]
         : [
@@ -111,11 +153,21 @@ export default function DataTable() {
     }
 
     if (config.visualizationType === 'Box Plot') {
-      config.boxplot.plots.map((plot, index) => {
+      mockData.map((plot, index) => {
         const newCol = {
-          Header: plot.columnCategory,
-          Cell: ({ row }) => {
-            return <>42</>
+          Header: plot.group,
+          Cell: props => {
+            let resolveCell = () => {
+              // console.log('props', props)
+              // if (Number(props.row.id) === 0) return props.rows[index].original.columnMax
+              // if (Number(props.row.id) === 1) return props.rows[index].original.columnThirdQuartile
+              // if (Number(props.row.id) === 2) return props.rows[index].original.columnMedian
+              // if (Number(props.row.id) === 3) return props.rows[index].original.columnFirstQuartile
+              // if (Number(props.row.id) === 4) return props.rows[index].original.columnFirstQuartile
+              return <p>-</p>
+            }
+            console.log('p', props.row)
+            return <p>Group Row</p>
           },
           id: `${index}`,
           canSort: true
@@ -128,7 +180,14 @@ export default function DataTable() {
     return newTableColumns
   }, [config, colorScale])
 
-  const tableData = useMemo(() => (config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys), [config.runtime.seriesKeys])
+  // prettier-ignore
+  const tableData = useMemo(() => (
+    config.visualizationType === 'Pie'
+    ? [config.yAxis.dataKey]
+    : config.visualizationType === 'Box Plot'
+    ? Object.entries(config.boxplot.plots[0])
+    : config.runtime.seriesKeys),
+    [config.runtime.seriesKeys])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
