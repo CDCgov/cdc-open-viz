@@ -102,20 +102,4 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   )
 }
 
-export const CONSTANTS = {
-  firstQuartile: 'First Quartile',
-  thirdQuartile: 'Third Quartile',
-  q1: 'Q1',
-  q3: 'Q3',
-  median: 'Median',
-  mode: 'Mode',
-  mean: 'Mean',
-  groupName: 'Measures',
-  maximum: 'Maximum',
-  minimum: 'Minimum',
-  standardDeviation: 'Standard Deviation',
-  count: 'Count',
-  outlierValues: 'Outlier Values'
-}
-
 export default CoveBoxPlot
