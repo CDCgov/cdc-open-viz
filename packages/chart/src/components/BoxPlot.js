@@ -7,27 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { transformedData: data, config, setConfig } = useContext(Context)
-
-  useEffect(() => {
-    if (config.visualizationType === 'Box Plot') {
-      setConfig({
-        ...config,
-        legend: {
-          ...config.legend,
-          hide: true
-        }
-      })
-    }
-  }, [])
-
-  const {
-    boxplot: { columnFirstQuartile, columnThirdQuartile, columnMax, columnMin, columnMedian, columnOutliers },
-    width,
-    height
-  } = config
-
   const boxWidth = xScale.bandwidth()
-  console.log('bw', boxWidth)
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
 
@@ -44,14 +24,15 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
   }
   return (
     <ErrorBoundary component='BoxPlot'>
-      <Group className='boxplot' key='boxplot-wrapper'>
+      <Group className='boxplot' key={`boxplot-group`}>
         {config.boxplot.plots.map((d, i) => {
           const offset = boxWidth - constrainedWidth
           const radius = 4
           return (
             <>
-              {config.boxplot.plotNonOutlierValues && d.nonOutlierValues.map(value => <circle cx={xScale(d.columnCategory) + offset + config.yAxis.size - radius - 0.5} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} />)}
+              {config.boxplot.plotNonOutlierValues && d.nonOutlierValues.map(value => <circle cx={xScale(d.columnCategory) + config.yAxis.size + boxWidth / 2} cy={yScale(value)} r={radius} fill={'#ccc'} style={{ opacity: 1, fillOpacity: 1, stroke: 'black' }} />)}
               <BoxPlot
+                data-left={xScale(d.columnCategory) + config.yAxis.size + offset / 2 + 0.5}
                 key={`box-plot-${i}`}
                 min={d.columnMin}
                 max={d.columnMax}

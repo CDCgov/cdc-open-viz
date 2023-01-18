@@ -5,6 +5,19 @@
 }
 
 .data-table-container {
+  // Hides Category Column
+  .row-Box-Plot--0 {
+    display: none !important;
+  }
+
+  // Highlight Boxplot cells
+  // .row-Box-Plot--1 > td:first-child,
+  // .row-Box-Plot--2 > td:first-child,
+  // .row-Box-Plot--3 > td:first-child,
+  // .row-Box-Plot--4 > td:first-child,
+  // .row-Box-Plot--5 > td:first-child {
+  //   background-color: #ffe699;
+  // }
   .region-table {
     display: table;
 

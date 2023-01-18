@@ -10,7 +10,6 @@ const Legend = () => {
   const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, setFilteredData, colorPalettes, rawData, setConfig } = useContext(Context)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
-  console.log(config.visualizationType)
 
   useEffect(() => {
     if (dynamicLegendItems.length === 0) return

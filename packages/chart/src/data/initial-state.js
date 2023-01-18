@@ -41,11 +41,11 @@ export default {
   boxplot: {
     plots: [],
     borders: 'true',
-    plotNonOutlierValues: false,
-    plotOutlierValues: false,
     firstQuartilePercentage: 25,
     thirdQuartilePercentage: 75,
     boxWidthPercentage: 40,
+    plotOutlierValues: false,
+    plotNonOutlierValues: true,
     legend: {
       showHowToReadText: false,
       howToReadText: 'How to read a boxplot...',

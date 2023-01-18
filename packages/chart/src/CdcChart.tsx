@@ -264,15 +264,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         })
       })
 
-      // tableData = plots
-      // tableData.forEach(table => {
-      //   delete table.columnCategory
-      // })
+      // make deep copy so we can remove some fields for data
+      // this appears to be the easiest option instead of running logic against the datatable cell...
+      tableData = JSON.parse(JSON.stringify(plots))
+      tableData.map(table => {
+        delete table.columnIqr
+        delete table.nonOutlierValues
+      })
 
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
       newConfig.boxplot.plots = plots
+      newConfig.boxplot.tableData = tableData
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
