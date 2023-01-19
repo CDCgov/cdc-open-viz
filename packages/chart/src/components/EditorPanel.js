@@ -990,7 +990,7 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                            <p>Highest value, excluding outliers</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -1012,14 +1012,14 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                            <p>Represented by top line of box. 25% of data are higher.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
 
                     {/* prettier-ignore */}
-                    {/* Q3 */}
+                    {/* median */}
                     <TextField
                       type='text'
                       value={config.boxplot.labels.median}
@@ -1034,7 +1034,7 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                            <p>Middle data point. Half of data are higher value.</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
@@ -1063,11 +1063,11 @@ const EditorPanel = () => {
                     />
 
                     {/* prettier-ignore */}
-                    {/* min */}
+                    {/* minimum */}
                     <TextField
                       type='text'
                       value={config.boxplot.labels.minimum}
-                      fieldName='q1'
+                      fieldName='minimum'
                       section='boxplot'
                       subsection='labels'
                       label='Minimum'
@@ -1078,34 +1078,24 @@ const EditorPanel = () => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Represented by bottom line of box. 25% of data are lower.</p>
+                            <p>Lowest value, excluding outliers</p>
                           </Tooltip.Content>
                         </Tooltip>
                       }
                     />
 
-                    {/* prettier-ignore */}
                     {/* iqr */}
-                    <TextField
-                      type='text'
-                      value={config.boxplot.labels.iqr}
-                      fieldName='iqr'
-                      section='boxplot'
-                      subsection='labels'
-                      label='Interquartile Range'
-                      updateField={updateField}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Represented by bottom line of box. 25% of data are lower.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
+                    <TextField type='text' value={config.boxplot.labels.iqr} fieldName='iqr' section='boxplot' subsection='labels' label='Interquartile Range' updateField={updateField} />
 
+                    {/* count */}
+                    <TextField type='text' value={config.boxplot.labels.count} fieldName='count' section='boxplot' subsection='labels' label='Count' updateField={updateField} />
+
+                    {/* mean */}
+                    <TextField type='text' value={config.boxplot.labels.mean} fieldName='mean' section='boxplot' subsection='labels' label='Mean' updateField={updateField} />
+                    {/* outliers */}
+                    <TextField type='text' value={config.boxplot.labels.outliers} fieldName='outliers' section='boxplot' subsection='labels' label='Outliers' updateField={updateField} />
+                    {/* values */}
+                    <TextField type='text' value={config.boxplot.labels.values} fieldName='values' section='boxplot' subsection='labels' label='Values' updateField={updateField} />
                     <br />
                     <h4>Percentages for Quartiles</h4>
                     <TextField

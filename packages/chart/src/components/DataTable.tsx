@@ -64,14 +64,14 @@ export default function DataTable() {
                     columnMean: labels.mean,
                     columnMax: labels.maximum,
                     columnMin: labels.minimum,
-                    columnIqr: labels,
+                    columnIqr: labels.iqr,
                     columnCategory: 'Category',
                     columnMedian: labels.median,
                     columnFirstQuartile: labels.q1,
                     columnThirdQuartile: labels.q3,
-                    columnOutliers: 'Outliers',
-                    values: 'Values',
-                    columnCount: 'Count',
+                    columnOutliers: labels.outliers,
+                    values: labels.values,
+                    columnCount: labels.count,
                     columnSd: 'Standard Deviation',
                     nonOutlierValues: 'Non Outliers'
                   }
@@ -154,7 +154,7 @@ export default function DataTable() {
             return resolveCell()
           },
           id: `${index}`,
-          canSort: true
+          canSort: false
         }
 
         newTableColumns.push(newCol)
