@@ -487,6 +487,7 @@
   // ANIMATIONS
   // Pie Chart Animations
   .animated-pie {
+    margin: auto !important;
     transition: all 0.4s ease-in-out;
     opacity: 0;
     transform-origin: center;
