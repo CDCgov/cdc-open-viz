@@ -45,7 +45,7 @@ export default {
   isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
-  barSpace: 20,
+  barSpace: 15,
   heights: {
     vertical: 300,
     horizontal: 750
