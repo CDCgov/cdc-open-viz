@@ -48,8 +48,7 @@ export default {
     plotNonOutlierValues: true,
     legend: {
       showHowToReadText: false,
-      howToReadText: 'How to read a boxplot...',
-      position: 'top'
+      howToReadText: ''
     },
     labels: {
       q1: 'Lower Quartile',
@@ -61,7 +60,10 @@ export default {
       mean: 'Mean',
       median: 'Median',
       sd: 'Standard Deviation',
-      iqr: 'Interquartile Range'
+      iqr: 'Interquartile Range',
+      count: 'Count',
+      outliers: 'Outliers',
+      values: 'Values'
     }
   },
   topAxis: {
