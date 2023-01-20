@@ -1145,7 +1145,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       // handle urls with spaces in the name.
       if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}`)
-      let newData = await fetchRemoteData(newState.dataUrl)
+      let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
