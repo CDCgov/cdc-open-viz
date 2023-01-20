@@ -121,7 +121,7 @@ export class DataTransform {
         return standardized
       }
     } else if (description.series === true && description.singleRow === false) {
-      if (description.seriesKey !== undefined && description.xKey !== undefined && description.valueKeys !== undefined && description.valueKeys.length > 0) {
+      if (description.seriesKey !== undefined && description.xKey !== undefined && description.valueKey !== undefined) {
         let standardizedMapped = {}
         let standardized = []
 
@@ -129,22 +129,20 @@ export class DataTransform {
           let extraKeys = []
           let uniqueKey = row[description.xKey]
           Object.keys(row).forEach(key => {
-            if (key !== description.xKey && key !== description.seriesKey && description.valueKeys.indexOf(key) === -1) {
+            if (key !== description.xKey && key !== description.seriesKey && key !== description.valueKey) {
               uniqueKey += '|' + key + '=' + row[key]
               extraKeys.push(key)
             }
           })
 
-          if(!standardizedMapped[uniqueKey]){ 
-            standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey] };
+          if (standardizedMapped[uniqueKey]) {
+            standardizedMapped[uniqueKey][row[description.seriesKey]] = row[description.valueKey]
+          } else {
+            standardizedMapped[uniqueKey] = { [description.xKey]: row[description.xKey], [row[description.seriesKey]]: row[description.valueKey] }
             extraKeys.forEach(key => {
               standardizedMapped[uniqueKey][key] = row[key]
             })
           }
-
-          description.valueKeys.forEach(valueKey => {
-            standardizedMapped[uniqueKey][row[description.seriesKey] + ' - ' + valueKey] = row[valueKey]
-          });
         })
 
         Object.keys(standardizedMapped).forEach(key => {

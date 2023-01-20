@@ -103,31 +103,6 @@
     cursor: pointer;
     font-size: 12px;
   }
-
-  .value-list {
-    list-style: none;
-    border: #c7c7c7 1px solid;
-    margin-bottom: 2em;
-
-    li {
-      padding: 0.3em 0.5em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: .9em;
-
-      button {
-        padding: 0 4px;
-        font-size: 1.125rem;
-        color: red;
-        cursor: pointer;
-      }
-    }
-
-    li+li {
-      border-top: #c7c7c7 1px solid;
-    }
-  }
 }
 
 // Modal

@@ -71,7 +71,7 @@ export default {
     limitHeight: false,
     height: '',
     caption: '',
-    showDownloadUrl: true
+    showDownloadUrl: false
   },
   orientation: 'vertical',
   legend: {
