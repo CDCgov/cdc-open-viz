@@ -64,12 +64,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       barHeight = heights.stacked
     }
 
-    const labelHeight = isLabelBelowBar ? fontSize[config.fontSize || 'medium'] : 0
-    let barSpace = isLabelBelowBar ? barHeight / 2 : Number(config.barSpace)
+    const labelHeight = isLabelBelowBar ? fontSize[config.fontSize] * 1.2 : 0
+    let barSpace = Number(config.barSpace)
 
-    if (config.isLollipopChart && isLabelBelowBar && !isStacked) {
-      barSpace = 20 // 20 is hard coded space.
-    }
     // calculate height of container based height, space and fontSize of labels
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
 
@@ -161,7 +158,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   }
 
                   const tooltip = `<div>
-                  ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   ${yAxisTooltip}<br />
                   ${xAxisTooltip}
                     </div>`
@@ -223,7 +220,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
                     }
                     const tooltip = `<div>
-                    ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
                       </div>`
@@ -368,7 +365,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const tooltip = `<div>
-                      ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                      ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                       ${yAxisTooltip}<br />
                       ${xAxisTooltip}
                         </div>`

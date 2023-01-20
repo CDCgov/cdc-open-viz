@@ -31,7 +31,7 @@ export default {
     tickColor: '#333',
     rightHideAxis: true,
     rightAxisSize: 50,
-    rightLabel: 'right label',
+    rightLabel: '',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
@@ -45,7 +45,7 @@ export default {
   isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
-  barSpace: 20,
+  barSpace: 15,
   heights: {
     vertical: 300,
     horizontal: 750
@@ -71,7 +71,7 @@ export default {
     limitHeight: false,
     height: '',
     caption: '',
-    showDownloadUrl: true
+    showDownloadUrl: false
   },
   orientation: 'vertical',
   legend: {
