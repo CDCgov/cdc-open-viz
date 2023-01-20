@@ -2224,7 +2224,7 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Enable Download CSV Button</span>
                     </label>
-                    <label className='checkbox'>
+                    {/* <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.general.showDownloadImgButton}
@@ -2233,8 +2233,8 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Enable Image Download</span>
-                    </label>
-                    <label className='checkbox'>
+                    </label> */}
+                    {/* <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.general.showDownloadPdfButton}
@@ -2243,7 +2243,7 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>Enable Pdf Download</span>
-                    </label>
+                    </label> */}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
