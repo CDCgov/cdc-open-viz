@@ -110,7 +110,7 @@ const Legend = () => {
   if (!legend) return
 
   if (!legend.dynamicLegend)
-    return (
+    return config.visualizationType !== 'Box Plot' ? (
       <aside
         style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
         id='legend'
