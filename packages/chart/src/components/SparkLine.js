@@ -90,9 +90,18 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
 
   const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]]
 
+  const isNumber = value => {
+    return value !== null && value !== '' && typeof value === 'number'
+  }
+
   useEffect(() => {
     ReactTooltip.rebuild()
   })
+
+  const getYscaleLog = value => {
+    console.log(' SparkLine YscaleValue', value)
+    return value
+  }
 
   return (
     <ErrorBoundary component='SparkLine'>
@@ -130,11 +139,14 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
                         cx={xScale(getXAxisData(d))}
-                        cy={yScale(getYAxisData(d, seriesKey))}
+                        cy={getYscaleLog(yScale(getYAxisData(d, seriesKey)))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        defined={(item, i) => {
+                          return isNumber(getYAxisData(d, seriesKey))
+                        }}
                       />
                     )}
                   </Group>

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useDebugValue } from 'react'
 import { Group } from '@visx/group'
 import { BarGroup, BarStack } from '@visx/shape'
 import { Text } from '@visx/text'
@@ -9,6 +9,9 @@ import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
+
+  //debugger;
+
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -94,6 +97,32 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return Math.ceil(context.measureText(text).width)
   }
 
+  function cleanData(data) {
+    let cleanedup = []
+    console.log('## Data to clean=', data)
+    data.forEach(function (d, i) {
+      //console.log("clean", i, " d", d);
+      let cleanedBar = {}
+      Object.keys(d).forEach(function (key) {
+        if (key === 'Date') {
+          // pass thru
+          cleanedBar[key] = d[key]
+        } else {
+          if (!isNaN(d[key])) {
+            cleanedBar[key] = d[key]
+          } else {
+            // return a 0 for non-numerics
+            cleanedBar[key] = '0'
+          }
+        }
+      })
+      //console.log("cleanedBar=", cleanedBar);
+      cleanedup.push(cleanedBar)
+    })
+    console.log('## cleanedData =', cleanedup)
+    return cleanedup
+  }
+
   // Using State
   const [textWidth, setTextWidth] = useState(null)
 
@@ -135,13 +164,16 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
   return (
     <ErrorBoundary component='BarChart'>
-      <Group left={config.runtime.yAxis.size}>
+      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+        {/* left - expects a number not a string */}
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
           <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
+                  //console.log("1 stacked not horiz size",config.runtime.yAxis.size);
+
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barThickness = xMax / barStack.bars.length
@@ -150,7 +182,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   const style = applyRadius(barStack.index)
                   // tooltips
                   const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  console.log('bar.bar.data', bar.bar.data[bar.key])
+                  console.log('bar.bar.data isNantest', /[\d]/.test(bar.bar.data[bar.key]))
+                  const yAxisValue = typeof bar.bar.data[bar.key] !== 'number' ? formatNumber(bar.bar.data[bar.key]) : formatNumber(0)
+                  console.log('xAxisValue, yAxisValue', xAxisValue, yAxisValue)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   if (!hasMultipleSeries) {
@@ -162,7 +197,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   ${yAxisTooltip}<br />
                   ${xAxisTooltip}
                     </div>`
-
+                  //console.log("1 stacked after tooltip bar", bar);
                   return (
                     <>
                       <style>
@@ -206,6 +241,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
+                    console.log('2 stacked horiz')
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
