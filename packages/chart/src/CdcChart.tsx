@@ -258,8 +258,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           columnMin: Number(q1 - 1.5 * iqr).toFixed(2),
           columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
           columnSd: d3.deviation(filteredDataValues).toFixed(2),
-          columnMean: d3.mean(filteredDataValues),
-          columnIqr: iqr,
+          columnMean: d3.mean(filteredDataValues).toFixed(2),
+          columnIqr: iqr.toFixed(2),
           columnOutliers: outliers,
           values: filteredDataValues,
           nonOutlierValues: nonOutliers
