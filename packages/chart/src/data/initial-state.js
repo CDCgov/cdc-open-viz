@@ -36,7 +36,8 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    numTicks: ''
+    numTicks: '',
+    axisPadding: 0
   },
   boxplot: [],
   topAxis: {
@@ -63,7 +64,8 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     numTicks: '',
-    labelOffset: 65
+    labelOffset: 65,
+    axisPadding: 0
   },
   table: {
     label: 'Data Table',
