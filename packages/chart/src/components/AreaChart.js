@@ -30,11 +30,16 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
     scroll: true
   })
 
+  let barThickness = xMax / config.data.length
+  let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
+  let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
+
   const getXValueFromCoordinate = x => {
-    const eachBand = xScale.step()
-    console.log('eachBand', eachBand)
-    const index = Math.round(x / (eachBand * 4))
-    return xScale.domain()[index]
+    let eachBand = xScale.step()
+    let numerator = x
+    let denominator = eachBand
+    const index = Math.round(Number(numerator) / denominator)
+    return xScale.domain()[index - 1] // fixes off by 1 error
   }
 
   const handleMouseOver = useCallback(
@@ -94,10 +99,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   fillOpacity={0.5}
                   data={data}
                   x={d => xScale(d[config.xAxis.dataKey])}
-                  y={d => yScale(d[config.series[index].dataKey])} yScale={yScale}
+                  y={d => yScale(d[config.series[index].dataKey])}
+                  yScale={yScale}
                   />
 
-                {/* bars to handle tooltips */}
                 <Bar
                   x={d => xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
@@ -107,13 +112,37 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   fill='red'
                   fillOpacity={0.05}
                   style={{ stroke: 'black', strokeWidth: 2 }}
-                  onMouseMove={e => handleMouseOver(e, data)}
+                  //onMouseMove={e => handleMouseOver(e, data)}
 
                   // onTouchStart={handleTooltip}
                   // onTouchMove={handleTooltip}
                   // onMouseMove={handleTooltip}
                   // onMouseLeave={() => hideTooltip()}
                 />
+
+                {/* bars to handle tooltips */}
+
+                {config.data.map((item, index) => {
+                  return (
+                    <Bar
+                      className='bar-here'
+                      x={barThickness * index + offset}
+                      y={d => yScale(d[config.series[index].dataKey])}
+                      yScale={yScale}
+                      width={barThicknessAdjusted}
+                      height={yMax}
+                      fill='green'
+                      fillOpacity={1}
+                      style={{ stroke: 'black', strokeWidth: 2 }}
+                      onMouseMove={e => handleMouseOver(e, data)}
+
+                      // onTouchStart={handleTooltip}
+                      // onTouchMove={handleTooltip}
+                      // onMouseMove={handleTooltip}
+                      // onMouseLeave={() => hideTooltip()}
+                    />
+                  )
+                })}
 
                 {tooltipData && (
                   <TooltipInPortal key={Math.random()} top={100} left={200} style={tooltipStyles}>
