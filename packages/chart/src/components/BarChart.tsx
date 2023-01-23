@@ -5,11 +5,10 @@ import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Context from '../context'
-import ReactTooltip from 'react-tooltip'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -17,9 +16,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
 
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
-  const isLabelOnYAxis = config.yAxis.labelPlacement === 'On Date/Category Axis'
-  const isLabelOnBar = config.yAxis.labelPlacement === 'On Bar'
-  const isLabelMissing = !config.yAxis.labelPlacement
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
@@ -30,6 +26,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const stackCount = config.runtime.seriesKeys.length
   const barBorderWidth = 1
   const fontSize = { small: 14, medium: 16, large: 18 }
+  const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   const applyRadius = (index: number) => {
     if (index === undefined || index === null || !isRounded) return
@@ -47,26 +44,34 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
     return style
   }
+  // }
 
   const updateBars = defaultBars => {
     // function updates  stacked && regular && lollipop horizontal bars
     if (config.visualizationType !== 'Bar' && !isHorizontal) return defaultBars
 
     const barsArr = [...defaultBars]
-    let barHeight = !isStacked ? config.barHeight * stackCount : config.barHeight
-    !isStacked && config.isLollipopChart ? (barHeight = lollipopBarWidth) : barHeight
+    let barHeight
 
-    const labelHeight = isLabelBelowBar ? fontSize[config.fontSize || 'medium'] : 0
-    let barSpace = isLabelBelowBar ? barHeight / 2 : Number(config.barSpace)
-
-    if (config.isLollipopChart && isLabelBelowBar && !isStacked) {
-      barSpace = 20 // 20 is hard coded space.
+    const heights = {
+      stacked: config.barHeight,
+      lollipop: lollipopBarWidth
     }
+
+    if (!isStacked) {
+      barHeight = heights[config.isLollipopChart ? 'lollipop' : 'stacked'] * stackCount
+    } else {
+      barHeight = heights.stacked
+    }
+
+    const labelHeight = isLabelBelowBar ? fontSize[config.fontSize] * 1.2 : 0
+    let barSpace = Number(config.barSpace)
+
     // calculate height of container based height, space and fontSize of labels
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
 
     if (isHorizontal) {
-      config.height = totalHeight
+      config.heights.horizontal = totalHeight
     }
 
     // return new updated bars/groupes
@@ -90,7 +95,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   }
 
   // Using State
-  const [horizBarHeight, setHorizBarHeight] = useState(null)
   const [textWidth, setTextWidth] = useState(null)
 
   useEffect(() => {
@@ -138,22 +142,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
-                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
-                  let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                  let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-
-                  const tooltip = `<div>
-                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}`
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barThickness = xMax / barStack.bars.length
                   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
                   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
                   const style = applyRadius(barStack.index)
+                  // tooltips
+                  const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
+                  const yAxisValue = formatNumber(bar.bar ? bar.bar.data[bar.key] : 0)
+                  let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                  if (!hasMultipleSeries) {
+                    yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                  }
+
+                  const tooltip = `<div>
+                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  ${yAxisTooltip}<br />
+                  ${xAxisTooltip}
+                    </div>`
 
                   return (
                     <>
@@ -198,21 +206,24 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
-                    const yAxisValue = formatNumber(data[bar.index][bar.key])
-                    const xAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
-                    let yAxisTooltip = config.yAxis.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.yAxis.label ? `${config.yAxis.label}: ${yAxisValue}` : `${yAxisValue}`
-                    let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
-
-                    const tooltip = `<div>
-                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}`
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index)
-
                     let labelColor = '#000000'
+                    // tooltips
+                    const xAxisValue = formatNumber(data[bar.index][bar.key])
+                    const yAxisValue = config.runtime.yAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
+                    let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                    let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                    if (!hasMultipleSeries) {
+                      xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
+                    }
+                    const tooltip = `<div>
+                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                    ${yAxisTooltip}<br />
+                    ${xAxisTooltip}
+                      </div>`
 
                     if (chroma.contrast(labelColor, bar.color) < 4.9) {
                       labelColor = '#FFFFFF'
@@ -242,7 +253,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             textAnchor='start'
                             verticalAnchor='start'
                           >
-                            {isHorizontal ? xAxisValue : formatNumber(xAxisValue)}
+                            {yAxisValue}
                           </Text>
                         )}
 
@@ -331,9 +342,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         xAxisValue = tempValue
                         barWidth = config.barHeight
                       }
-
-                      let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${bar.key} : ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
-                      let xAxisTooltip = config.runtime.xAxis.isLegendValue ? ` ${bar.key} :${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                       let labelColor = '#000000'
 
                       // Set label color
@@ -341,15 +349,26 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         labelColor = '#FFFFFF'
                       }
 
-                      const tooltip = `<div>
-                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
-                    ${yAxisTooltip}<br />
-                    ${xAxisTooltip}`
                       const style = applyRadius(index)
 
                       // check if bar text/value string fits into  each bars.
                       let textWidth = getTextWidth(xAxisValue, config.fontSize)
                       let doesTextFit = (textWidth / bar.y) * 100 < 48
+
+                      let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                      let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                      if (!hasMultipleSeries && config.runtime.horizontal) {
+                        xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
+                      }
+                      if (!hasMultipleSeries && !config.runtime.horizontal) {
+                        yAxisTooltip = config.isLegendValue ? `${bar.key}: ${yAxisValue}` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
+                      }
+
+                      const tooltip = `<div>
+                      ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                      ${yAxisTooltip}<br />
+                      ${xAxisTooltip}
+                        </div>`
 
                       return (
                         <>
@@ -366,8 +385,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             <foreignObject
                               id={`barGroup${barGroup.index}`}
                               key={`bar-group-bar-${barGroup.index}-${bar.index}-${bar.value}-${bar.key}`}
-                              x={config.runtime.horizontal ? 0 : (barWidth * bar.index) + offset}
-                              y={config.runtime.horizontal ? (barWidth * bar.index) : barY}
+                              x={config.runtime.horizontal ? 0 : barWidth * bar.index + offset}
+                              y={config.runtime.horizontal ? barWidth * bar.index : barY}
                               width={config.runtime.horizontal ? bar.y : barWidth}
                               height={isHorizontal && !config.isLollipopChart ? barWidth : isHorizontal && config.isLollipopChart ? lollipopBarWidth : barHeight}
                               style={{
@@ -384,7 +403,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               <Text
                                 display={displayBar ? 'block' : 'none'}
                                 x={bar.y}
-                                y={config.barHeight / 2 + config.barHeight * (barGroup.bars.length - bar.index - 1)}
+                                y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
                                 dx={doesTextFit ? -5 : 5} // X padding
                                 verticalAnchor='middle'
@@ -418,7 +437,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             )}
                             ;
                             {orientation === 'vertical' && (
-                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (barGroup.bars.length - bar.index - 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
+                              <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
                                 {bar.value}
                               </Text>
                             )}

@@ -3,19 +3,15 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
-import { timeParse, timeFormat } from 'd3-time-format'
-import { useDebounce, useDebouncedCallback } from 'use-debounce'
+import { useDebounce } from 'use-debounce'
 
 import Context from '../context'
 import WarningImage from '../images/warning.svg'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Waiting from '@cdc/core/components/Waiting'
-import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg' //TODO: Update with Icon component
 import { useColorPalette } from '../hooks/useColorPalette'
 
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -24,6 +20,8 @@ import useRightAxis from '../hooks/useRightAxis'
 
 // TODO: Remove unused imports
 // TDOO: Move inline styles to a scss file
+
+/* eslint-disable react-hooks/rules-of-hooks */
 
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -34,7 +32,7 @@ const TextField = memo(({ label, tooltip, section = null, subsection = null, fie
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
     }
-  }, [debouncedValue])
+  }, [debouncedValue]) // eslint-disable-line
 
   let name = subsection ? `${section}-${subsection}-${fieldName}` : `${section}-${subsection}-${fieldName}`
 
@@ -211,17 +209,17 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, transformedData, isDashboard, setParentConfig, missingRequiredSections, setFilteredData } = useContext(Context)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(Context)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)
   useEffect(() => {
     if (paletteName) updateConfig({ ...config, palette: paletteName })
-  }, [paletteName])
+  }, [paletteName]) // eslint-disable-line
 
   useEffect(() => {
     dispatch({ type: 'GET_PALETTE', payload: colorPalettes, paletteName: config.palette })
-  }, [dispatch, config.palette])
+  }, [dispatch, config.palette]) // eslint-disable-line
 
   // when the visualization type changes we
   // have to update the individual series type & axis details
@@ -243,7 +241,7 @@ const EditorPanel = () => {
       ...config,
       series: newSeries
     })
-  }, [config.visualizationType])
+  }, [config.visualizationType]) // eslint-disable-line
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
 
@@ -356,7 +354,6 @@ const EditorPanel = () => {
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
-  const [lollipopColorStyle, setLollipopColorStyle] = useState('two-tone')
 
   if (loading) {
     return null
@@ -473,14 +470,11 @@ const EditorPanel = () => {
   const getColumns = (filter = true) => {
     let columns = {}
 
-    unfilteredData.map(row => {
+    unfilteredData.forEach(row => {
       Object.keys(row).forEach(columnName => (columns[columnName] = true))
     })
 
     if (filter) {
-      let confidenceUpper = config.confidenceKeys?.upper && config.confidenceKeys?.upper !== '' // TODO: remove?
-      let confidenceLower = config.confidenceKeys?.lower && config.confidenceKeys?.lower !== '' // TODO: remove?
-
       Object.keys(columns).forEach(key => {
         if (
           (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
@@ -502,7 +496,7 @@ const EditorPanel = () => {
     if (!data) return []
     const set = new Set()
     for (let i = 0; i < data.length; i++) {
-      for (const [key, value] of Object.entries(data[i])) {
+      for (const [key] of Object.entries(data[i])) {
         set.add(key)
       }
     }
@@ -511,7 +505,7 @@ const EditorPanel = () => {
 
   const getDataValues = (dataKey, unique = false) => {
     let values = []
-    excludedData.map(e => {
+    excludedData.forEach(e => {
       values.push(e[dataKey])
     })
     return unique ? [...new Set(values)] : values
@@ -591,7 +585,7 @@ const EditorPanel = () => {
         orientation: 'horizontal'
       })
     }
-  }, [])
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     if (config.orientation === 'horizontal') {
@@ -600,7 +594,7 @@ const EditorPanel = () => {
         lollipopShape: config.lollipopShape
       })
     }
-  }, [config.isLollipopChart, config.lollipopShape])
+  }, [config.isLollipopChart, config.lollipopShape]) // eslint-disable-line
 
   const ExclusionsList = useCallback(() => {
     const exclusions = [...config.exclusions.keys]
@@ -620,18 +614,7 @@ const EditorPanel = () => {
         })}
       </ul>
     )
-  }, [config])
-
-  const ErrorWithLolliopChart = ({ message }) => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{message}</p>
-        </section>
-      </section>
-    )
-  }
+  }, [config]) // eslint-disable-line
 
   const checkIsLine = type => {
     return type === ('Line' || 'dashed-sm')
@@ -715,7 +698,7 @@ const EditorPanel = () => {
   useEffect(() => {
     validateMinValue()
     validateMaxValue()
-  }, [minValue, maxValue, config])
+  }, [minValue, maxValue, config]) // eslint-disable-line
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -824,7 +807,7 @@ const EditorPanel = () => {
                     }
                   />
 
-                  {config.visualizationSubType !== 'horizontal' && <TextField type='number' value={config.height} fieldName='height' label='Chart Height' updateField={updateField} />}
+                  {config.orientation === 'vertical' && <TextField type='number' value={config.heights.vertical} section='heights' fieldName='vertical' label='Chart Height' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -1238,7 +1221,7 @@ const EditorPanel = () => {
                   {config.visualizationType !== 'Pie' && (
                     <>
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
-                      <CheckBox value={config.yAxis.isLegendValue} section='yAxis' fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />
+                      {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
                       <TextField
                         value={config.yAxis.size}
@@ -1259,12 +1242,31 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
+
+                      <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
+                      {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
                     </>
                   )}
                   <span className='divider-heading'>Number Formatting</span>
                   <CheckBox value={config.dataFormat.commas} section='dataFormat' fieldName='commas' label='Add commas' updateField={updateField} />
-                  <CheckBox value={config.dataFormat.useFormat} section='dataFormat' fieldName='useFormat' label='Use Formatted Number' updateField={updateField} />
+                  <CheckBox
+                    value={config.dataFormat.abbreviated}
+                    section='dataFormat'
+                    fieldName='abbreviated'
+                    label='Abbreviate Axis Values'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <TextField value={config.dataFormat.roundTo} type='number' section='dataFormat' fieldName='roundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
                   <div className='two-col-inputs'>
                     <TextField
@@ -1522,6 +1524,7 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
 
                       <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />
+                      <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
 
                       {config.yAxis.labelPlacement !== 'Below Bar' && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.orientation === 'horizontal' ? (
@@ -1633,6 +1636,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
+                  <CheckBox value={config.legend.showLegendValuesTooltip} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                     <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />
@@ -1779,7 +1783,7 @@ const EditorPanel = () => {
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
 
-                  {/* <CheckBox value={config.animate} fieldName="animate" label="Animate Visualization" updateField={updateField} /> */}
+                  <CheckBox value={config.animate} fieldName='animate' label='Animate Visualization' updateField={updateField} />
 
                   {/*<CheckBox value={config.animateReplay} fieldName="animateReplay" label="Replay Animation When Filters Are Changed" updateField={updateField} />*/}
 
@@ -1787,6 +1791,7 @@ const EditorPanel = () => {
                     <Select value={config.lineDatapointStyle} fieldName='lineDatapointStyle' label='Line Datapoint Style' updateField={updateField} options={['hidden', 'hover', 'always show']} />
                   )}
 
+                  {/* eslint-disable */}
                   <label className='header'>
                     <span className='edit-label'>Header Theme</span>
                     <ul className='color-palette'>
@@ -1806,6 +1811,7 @@ const EditorPanel = () => {
                   <label>
                     <span className='edit-label'>Chart Color Palette</span>
                   </label>
+                  {/* eslint-enable */}
                   {/* <InputCheckbox fieldName='isPaletteReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
                   <InputToggle fieldName='isPaletteReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
                   <span>Sequential</span>
@@ -1897,7 +1903,7 @@ const EditorPanel = () => {
                   )}
                   {config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-                  {config.orientation === 'horizontal' && config.yAxis.labelPlacement === 'On Date/Category Axis' && <TextField type='number' value={config.barSpace || '20'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
+                  {config.orientation === 'horizontal' && <TextField type='number' value={config.barSpace || '20'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                   {config.visualizationType === 'Spark Line' && (
@@ -1908,6 +1914,11 @@ const EditorPanel = () => {
                       <CheckBox value={config.visual?.background} section='visual' fieldName='background' label='Use Theme Background Color' updateField={updateField} />
                       <CheckBox value={config.visual?.hideBackgroundColor} section='visual' fieldName='hideBackgroundColor' label='Hide Background Color' updateField={updateField} />
                     </div>
+                  )}
+
+                  {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.showLineSeriesLabels} fieldName='showLineSeriesLabels' label='Append Series Name to End of Line Charts' updateField={updateField} />}
+                  {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && config.showLineSeriesLabels && (
+                    <CheckBox value={config.colorMatchLineSeriesLabels} fieldName='colorMatchLineSeriesLabels' label='Match Series Color to Name at End of Line Charts' updateField={updateField} />
                   )}
                 </AccordionItemPanel>
               </AccordionItem>
@@ -1958,8 +1969,8 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
                   <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
                   <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
-                  <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} />
-                  <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} />
+                  {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
+                  {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                   <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>

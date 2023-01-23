@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 
 // IE11
@@ -29,7 +29,6 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
 // Child Components
 import Sidebar from './components/Sidebar'
@@ -101,7 +100,6 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
-  const [showLoadingMessage, setShowLoadingMessage] = useState(false)
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
@@ -115,7 +113,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [position, setPosition] = useState(state.mapPosition)
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -123,7 +121,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   useEffect(() => {
     try {
       if (filteredCountryCode) {
-        const filteredCountryObj = runtimeData[filteredCountryCode]
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
@@ -156,13 +153,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setPosition(state.mapPosition)
     }
   }, [state.mapPosition, setPosition])
-
-  const setZoom = reversedCoordinates => {
-    setState({
-      ...state,
-      mapPosition: { coordinates: reversedCoordinates, zoom: 3 }
-    })
-  }
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -248,7 +238,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
     const primaryCol = obj.columns.primary.name,
-      isData = obj.general.type === 'data',
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -554,7 +543,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         breaks.map((item, index) => {
           const setMin = index => {
-            //debugger;
             let min = breaks[index]
 
             // if first break is a seperated zero, min is zero
@@ -967,10 +955,26 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const titleCase = string => {
-    return string
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
-      .join(' ')
+    // if hyphen found, then split, uppercase each word, and put back together
+    if (string.includes('–') || string.includes('-')) {
+      let dashSplit = string.includes('–') ? string.split('–') : string.split('-') // determine hyphen or en dash to split on
+      let splitCharacter = string.includes('–') ? '–' : '-' // print hyphen or en dash later on.
+      let frontSplit = dashSplit[0]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      let backSplit = dashSplit[1]
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+      return frontSplit + splitCharacter + backSplit
+    } else {
+      // just return with each word upper cased
+      return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+        .join(' ')
+    }
   }
 
   // This resets all active legend toggles.
@@ -1003,7 +1007,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     let value = key
-
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
       value = titleCase(supportedStates[key][0])
@@ -1141,8 +1144,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
 
       // handle urls with spaces in the name.
-      if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}?v=${cacheBustingString()}`)
-      let newData = await fetchRemoteData(newState.dataUrl)
+      if (newState.dataUrl) newState.dataUrl = encodeURI(`${newState.dataUrl}`)
+      let newData = await fetchRemoteData(newState.dataUrl, 'map')
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
