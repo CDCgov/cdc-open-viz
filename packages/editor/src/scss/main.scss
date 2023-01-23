@@ -91,6 +91,18 @@
     border: #b8daff 1px solid;
     border-radius: 0.4em;
   }
+
+  .link.link-upload {
+    display: block;
+    color: #005eaa;
+    background: unset;
+    padding-left: unset;
+    margin-top: 0.3rem;
+    color: #005eaa;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+  }
 }
 
 // Modal

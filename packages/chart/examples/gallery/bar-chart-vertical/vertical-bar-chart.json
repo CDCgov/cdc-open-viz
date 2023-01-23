@@ -96,8 +96,7 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " units",
-    "useFormat": true
+    "suffix": " units"
   },
   "confidenceKeys": {},
   "visual": {
@@ -108,7 +107,7 @@
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "9000",
+      "Data 1": "900",
       "Data 2": "135",
       "Data 3": "300",
       "Data 4": "95",

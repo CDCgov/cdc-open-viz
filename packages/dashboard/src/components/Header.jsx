@@ -329,7 +329,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                   </label><br />
                 </div>
 
-                <div className="wrap">
+                {/* <div className="wrap">
                   <label>
                     <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
                     Show PDF Button
@@ -338,7 +338,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                     <input type='checkbox' defaultChecked={config.table.downloadImageButton} onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)} />
                     Show Image Button
                   </label>
-                </div>
+                </div> */}
 
                 <div className="wrap">
                   <label>

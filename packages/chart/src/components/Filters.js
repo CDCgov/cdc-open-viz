@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Context from './../context'
 import Button from '@cdc/core/components/elements/Button'
 
@@ -17,7 +17,7 @@ const useFilters = () => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters =  config.filters
+    let newFilters = config.filters
     newFilters[index].active = value
     setConfig({
       ...config,
@@ -26,7 +26,7 @@ const useFilters = () => {
     setShowApplyButton(true)
   }
 
-  const handleApplyButton = (newFilters) => {
+  const handleApplyButton = newFilters => {
     setConfig({ ...config, filters: newFilters })
     setFilteredData(filterData(newFilters, excludedData))
     setShowApplyButton(false)
@@ -36,33 +36,29 @@ const useFilters = () => {
     let newFilters = config.filters
 
     // reset to first item in values array.
-    newFilters.map( filter => {
+    newFilters.map(filter => {
       filter.active = filter.values[0]
     })
 
     setFilteredData(filterData(newFilters, excludedData))
-    setConfig({...config, filters: newFilters })
+    setConfig({ ...config, filters: newFilters })
   }
 
   return { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset }
 }
 
 const Filters = () => {
-
   const { config } = useContext(Context)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
-  const { filters  } = config
+  const { filters } = config
   const buttonText = 'Apply Filters'
   const resetText = 'Reset All'
 
   // A List of Dropdowns
   const FilterList = () => {
-
     if (config.filters) {
       return config.filters.map((singleFilter, index) => {
-
         const values = []
-
 
         if (!singleFilter.order || singleFilter.order === '') {
           singleFilter.order = 'asc'
@@ -103,30 +99,33 @@ const Filters = () => {
         )
       })
     } else {
-      return null;
+      return null
     }
-
   }
 
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      {config.filters.length > 0 &&
-      <>
-        <h3 className="filters-section__title">Filters</h3>
-        <hr />
-      </>
-      }
-      <div className="filters-section__wrapper" style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px'}}>
+      {config.filters.length > 0 && (
+        <>
+          <h3 className='filters-section__title'>Filters</h3>
+          <hr />
+        </>
+      )}
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px' }}>
         <FilterList />
-        {config.filters.length > 0 &&
-          <div className="filter-section__buttons" style={{ width: '100%' }}>
-            <Button onClick={ () => handleApplyButton(filters) } disabled={!showApplyButton} style={{ marginRight: '10px' }}>{buttonText}</Button>
-            <a href="#!" role="button" onClick={handleReset}>{resetText}</a>
+        {config.filters.length > 0 && (
+          <div className='filter-section__buttons' style={{ width: '100%' }}>
+            <Button onClick={() => handleApplyButton(filters)} disabled={!showApplyButton} style={{ marginRight: '10px' }}>
+              {buttonText}
+            </Button>
+            <a href='#!' role='button' onClick={handleReset}>
+              {resetText}
+            </a>
           </div>
-        }
+        )}
       </div>
     </section>
   )
 }
 
-export default Filters;
+export default Filters

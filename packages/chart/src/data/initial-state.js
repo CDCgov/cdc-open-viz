@@ -31,12 +31,13 @@ export default {
     tickColor: '#333',
     rightHideAxis: true,
     rightAxisSize: 50,
+    rightLabel: '',
     rightLabelOffsetSize: 0,
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    isLegendValue: false,
-    numTicks: ''
+    numTicks: '',
+    axisPadding: 0
   },
   boxplot: {
     plots: [],
@@ -69,10 +70,14 @@ export default {
   topAxis: {
     hasLine: false
   },
+  isLegendValue: false,
   barThickness: 0.35,
   barHeight: 25,
-  barSpace: 20,
-  height: 300,
+  barSpace: 15,
+  heights: {
+    vertical: 300,
+    horizontal: 750
+  },
   xAxis: {
     type: 'categorical',
     hideAxis: false,
@@ -85,8 +90,9 @@ export default {
     labelColor: '#333',
     tickLabelColor: '#333',
     tickColor: '#333',
-    isLegendValue: false,
-    numTicks: ''
+    numTicks: '',
+    labelOffset: 65,
+    axisPadding: 0
   },
   table: {
     label: 'Data Table',
@@ -94,7 +100,7 @@ export default {
     limitHeight: false,
     height: '',
     caption: '',
-    showDownloadUrl: true
+    showDownloadUrl: false
   },
   orientation: 'vertical',
   legend: {
@@ -117,7 +123,7 @@ export default {
   palette: 'qualitative-bold',
   isPaletteReversed: false,
   labels: false,
-  dataFormat: { commas: false, prefix: '', suffix: '', useFormat: false },
+  dataFormat: { commas: false, prefix: '', suffix: '', abbreviated: false },
   confidenceKeys: {},
   visual: {
     border: true,
