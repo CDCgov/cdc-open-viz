@@ -23,6 +23,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": "150",
+    "gridLines": false,
     "min": "",
     "max": "",
     "labelColor": "#333",
@@ -38,18 +39,20 @@
     "numTicks": "",
     "label": "Y Axis Example Label"
   },
+  "boxplot": [],
   "topAxis": {
     "hasLine": false
   },
   "barThickness": "0.6",
   "barHeight": 25,
+  "barSpace": 20,
   "height": 300,
   "xAxis": {
     "type": "categorical",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "59",
+    "size": "0",
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -57,9 +60,11 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "isLegendValue": false,
-    "numTicks": "",
+    "numTicks": "9",
     "dataKey": "Date",
-    "label": "X Axis Example Label"
+    "label": "X Axis Example Label",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y"
   },
   "table": {
     "label": "Data Type by Date",
@@ -67,6 +72,7 @@
     "limitHeight": false,
     "height": "",
     "caption": "",
+    "showDownloadUrl": true,
     "show": true,
     "download": true
   },
@@ -86,7 +92,7 @@
     "label": "Type of Data"
   },
   "exclusions": {
-    "active": false,
+    "active": true,
     "keys": []
   },
   "palette": "qualitative-bold",
