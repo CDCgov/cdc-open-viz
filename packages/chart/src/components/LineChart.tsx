@@ -36,9 +36,48 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return `${formatNumber(value, axis)}`
   }
 
+  const isNumberLog = value => {
+    //console.log("entering isNumber valuetype is:",typeof value);
+    var test = value != null && value !== '' && /[\d]/.test(value) && !Number.isNaN(value)
+    // Note: value is still a string here
+    // so typeof value === 'number' does not work
+    if (test === false) {
+      console.log('# isNUmber FALSE on value, result', value, test)
+    } else {
+      console.log('# isNUmber TRUE on value, result', value, test)
+    }
+    return value != null && value !== '' && /[\d]/.test(value) && !Number.isNaN(value)
+  }
+
+  const isNumber = value => {
+    if (typeof value === 'number') {
+      return !Number.isNaN(value)
+    }
+    if (typeof value === 'string') {
+      return value !== null && value !== '' && /[\d]/.test(value)
+    }
+
+    // Note: value is still a string here
+    // so typeof value === 'number' does not work (TT)
+  }
+
+  const checkCy = cy => {
+    //console.log("cy, type ", cy, typeof cy);
+    if (isNaN(cy) || Number.isNaN(cy)) {
+      return null
+    }
+    return cy
+  }
+  const logit = val => {
+    //console.log("val,type ", val, typeof val);
+    return val
+  }
+
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size}>
+      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+        {' '}
+        {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
@@ -73,11 +112,20 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ${xAxisTooltip}
                   </div>`
                 let circleRadii = 4.5
+                //console.log("d[seriesKey]", d[seriesKey]);
+                //console.log("getYAxisData(d, seriesKey)", getYAxisData(d, seriesKey));
+                //console.log("getXAxisData(d))",getXAxisData(d));
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
-                  d[seriesKey] !== null && (
+                  d[seriesKey] !== null &&
+                  isNumber(d[seriesKey]) &&
+                  isNumber(getYAxisData(d, seriesKey)) &&
+                  isNumber(getXAxisData(d)) &&
+                  isNumber(yScaleRight(getXAxisData(d))) &&
+                  isNumber(yScale(getXAxisData(d))) && (
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                      {/* Render legend */}
                       <Text
                         display={config.labels ? 'block' : 'none'}
                         x={xScale(getXAxisData(d))}
@@ -91,8 +139,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
-                        cx={xScale(getXAxisData(d))}
-                        cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
+                        cx={Number(xScale(getXAxisData(d)))}
+                        //cy={4}
+                        cy={seriesAxis === 'Right' ? checkCy(yScaleRight(getYAxisData(d, seriesKey))) : checkCy(yScale(getYAxisData(d, seriesKey)))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
                         data-tip={tooltip}
@@ -107,7 +156,18 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 curve={allCurves.curveLinear}
                 data={data}
                 x={d => xScale(getXAxisData(d))}
-                y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                //y={1}
+                //y={d => (seriesAxis === 'Right' ? logit(yScaleRight(getYAxisData(d, seriesKey))) : logit(yScale(getYAxisData(d, seriesKey))))}
+                //y={d => (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey))) && isNumber(yScale(getYAxisData(d, seriesKey))) ? logit(yScaleRight(getYAxisData(d, seriesKey))) : logit(yScale(getYAxisData(d, seriesKey))))}
+                y={d => {
+                  if (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey)))) {
+                    return logit(yScaleRight(getYAxisData(d, seriesKey)))
+                  } else if (seriesAxis !== 'Right' && isNumber(yScale(getYAxisData(d, seriesKey)))) {
+                    return logit(yScale(getYAxisData(d, seriesKey)))
+                  } else {
+                    return null
+                  }
+                }}
                 stroke={
                   colorScale && !config.legend.dynamicLegend
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
@@ -121,8 +181,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                defined={item => {
+                  //return isNumberLog(getYAxisData(d, seriesKey))
+                  return isNumberLog(item[config.runtime.seriesLabels[seriesKey]])
                 }}
               />
               {config.animate && (
@@ -131,14 +192,23 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   curve={allCurves.curveLinear}
                   data={data}
                   x={d => xScale(getXAxisData(d))}
-                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                  //y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                  y={d => {
+                    if (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey)))) {
+                      return yScaleRight(getYAxisData(d, seriesKey))
+                    } else if (seriesAxis !== 'Right' && isNumber(yScale(getYAxisData(d, seriesKey)))) {
+                      return logit(yScale(getYAxisData(d, seriesKey)))
+                    } else {
+                      return null
+                    }
+                  }}
                   stroke='#fff'
                   strokeWidth={3}
                   strokeOpacity={1}
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                    return isNumber(item[config.runtime.seriesLabels[seriesKey]])
                   }}
                 />
               )}
@@ -165,7 +235,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
             </Group>
           )
         })}
-
         {/* Message when dynamic legend and nothing has been picked */}
         {config.legend.dynamicLegend && seriesHighlight.length === 0 && (
           <Text x={xMax / 2} y={yMax / 2} fill='black' textAnchor='middle' color='black'>
