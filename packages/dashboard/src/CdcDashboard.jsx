@@ -34,7 +34,6 @@ import Widget from './components/Widget'
 import DataTable from './components/DataTable'
 import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
-
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
 
@@ -334,7 +333,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => { }
+    const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return
@@ -397,10 +396,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-      visualizationConfig.data = filteredData && filteredData[visualizationKey] ? filteredData[visualizationKey] : data[dataKey]
-      if (visualizationConfig.formattedData) {
-        visualizationConfig.originalFormattedData = visualizationConfig.formattedData
-        visualizationConfig.formattedData = visualizationConfig.data
+      if (filteredData && filteredData[visualizationKey]) {
+        visualizationConfig.data = filteredData[visualizationKey]
+        if (visualizationConfig.formattedData) {
+          visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+          visualizationConfig.formattedData = visualizationConfig.data
+        }
+      } else {
+        visualizationConfig.data = data[dataKey]
+        if (visualizationConfig.formattedData) {
+          visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+          visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+        }
       }
 
       const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
@@ -526,9 +533,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                         const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-                        visualizationConfig.data = filteredData && filteredData[col.widget] ? filteredData[col.widget] : data[dataKey]
-                        if (visualizationConfig.formattedData) {
-                          visualizationConfig.formattedData = visualizationConfig.data
+                        if (filteredData && filteredData[col.widget]) {
+                          visualizationConfig.data = filteredData[col.widget]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = visualizationConfig.data
+                          }
+                        } else {
+                          visualizationConfig.data = data[dataKey]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+                          }
                         }
 
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
@@ -663,7 +679,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 }
               }
 
-
               let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
 
               return (
@@ -690,17 +705,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     outerContainerRef
   }
 
-
-  const dashboardContainerClasses = [
-    'cdc-open-viz-module',
-    'type-dashboard',
-    `${currentViewport}`
-  ]
+  const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId} >
+        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
           {body}
         </div>
         <OverlayFrame />
