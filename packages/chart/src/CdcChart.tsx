@@ -702,7 +702,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Visualization */}
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              style={{ marginBottom: config.legend.position !== 'bottom' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
               className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
