@@ -183,6 +183,13 @@ export default function LinearChart() {
         range: [xMax / 2, xMax]
       })
     }
+
+    if (config.visualizationType === 'Scatter Plot') {
+      xScale = scaleLinear({
+        domain: [0, max],
+        range: [0, xMax]
+      })
+    }
   }
 
   const handleLeftTickFormatting = tick => {
@@ -249,6 +256,10 @@ export default function LinearChart() {
   useEffect(() => {
     ReactTooltip.rebuild()
   })
+
+  const handleTick = tick => {
+    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
+  }
 
   return isNaN(width) ? (
     <></>
@@ -404,16 +415,7 @@ export default function LinearChart() {
 
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
-          <AxisBottom
-            top={yMax}
-            left={Number(config.runtime.yAxis.size)}
-            label={config.runtime.xAxis.label}
-            tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
-            scale={xScale}
-            stroke='#333'
-            tickStroke='#333'
-            numTicks={countNumOfTicks('xAxis')}
-          >
+          <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={handleTick} scale={xScale} stroke='#333' tickStroke='#333' numTicks={countNumOfTicks('xAxis')}>
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
               return (
