@@ -122,6 +122,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
+                  console.log('item', item[config.runtime.seriesLabels[seriesKey]])
                   return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
                 }}
               />
