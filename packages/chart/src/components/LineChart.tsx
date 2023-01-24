@@ -107,7 +107,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 let xAxisTooltip = handleAxisFormating(axis, config.runtime.xAxis.label, xAxisValue)
 
                 const tooltip = `<div>
-                    ${config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[seriesKey] || ''}<br/>` : ''}
+                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[seriesKey] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
                   </div>`

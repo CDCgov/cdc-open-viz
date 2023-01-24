@@ -193,7 +193,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   }
 
                   const tooltip = `<div>
-                  ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                  ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                   ${yAxisTooltip}<br />
                   ${xAxisTooltip}
                     </div>`
@@ -256,7 +256,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       xAxisTooltip = config.isLegendValue ? `${bar.key}: ${xAxisValue}` : config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisTooltip
                     }
                     const tooltip = `<div>
-                    ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
                     ${xAxisTooltip}
                       </div>`
@@ -401,7 +401,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       }
 
                       const tooltip = `<div>
-                      ${config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
+                      ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries ? `${config.runtime.seriesLabels[bar.key] || ''}<br/>` : ''}
                       ${yAxisTooltip}<br />
                       ${xAxisTooltip}
                         </div>`
