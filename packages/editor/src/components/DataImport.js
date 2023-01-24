@@ -11,14 +11,11 @@ import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
 import LinkIcon from '../assets/icons/link.svg'
+import SampleDataContext from './../samples/SampleDataContext'
+import SampleData from './SampleData'
 
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-
-import validMapData from '../../example/valid-data-map.csv'
-import validChartData from '../../example/valid-data-chart.csv'
-import validCountyMapData from '../../example/valid-county-data.csv'
-import sampleGeoPoints from '../../example/supported-cities.csv'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -607,34 +604,11 @@ export default function DataImport() {
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
             </p>
-            {/* TODO: Add more sample data in, but this will do for now. */}
-            <span className='heading-3'>Load Sample Data:</span>
-            <ul className='sample-data-list'>
-              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
-                United States Sample Data #1
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
-              >
-                Chart Sample Data
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
-              >
-                United States Counties Sample Data
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
-              >
-                Sample Geo Points
-              </button>
-            </ul>
+
+            {/* prettier-ignore */}
+            <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
+              <SampleData.Buttons />
+            </SampleDataContext.Provider>
           </div>
         )}
 
