@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "title": "Example Bar Chart",
+  "title": "Example Area Chart",
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -52,7 +52,7 @@
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "0",
+    "size": "50",
     "tickRotation": 0,
     "min": "",
     "max": "",
