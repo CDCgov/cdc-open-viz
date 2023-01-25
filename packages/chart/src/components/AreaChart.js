@@ -21,15 +21,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   const tooltipStyles = {
     ...defaultStyles,
-    fontSize: '11px',
+    fontSize: '13px',
     borderRadius: '4px',
-    padding: '7px',
     minWidth: '100px',
-    textAlign: 'left',
-    paddingTop: '7px',
-    paddingBottom: '7px',
-    marginTop: '0',
-    marginBottom: '0'
+    textAlign: 'left'
   }
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     detectBounds: false,
