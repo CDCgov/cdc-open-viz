@@ -185,10 +185,12 @@ export default function LinearChart() {
     }
 
     if (config.visualizationType === 'Scatter Plot') {
-      xScale = scaleLinear({
-        domain: [0, max],
-        range: [0, xMax]
-      })
+      if (config.xAxis.type === 'continuous') {
+        xScale = scaleLinear({
+          domain: [0, Math.max.apply(null, xScale.domain())],
+          range: [0, xMax]
+        })
+      }
     }
   }
 

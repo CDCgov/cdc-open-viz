@@ -15,10 +15,9 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
     stroke: 'black'
   }
 
-  const handleTooltip = item => `<div>
- ${JSON.stringify(item)}<br/>
+  const handleTooltip = (item, s) => `<div>
  ${config.xAxis.label}: ${item[config.xAxis.dataKey]} <br/>
- ${config.yAxis.label}: ${item[config.yAxis.dataKey]}
+ ${config.yAxis.label}: ${item[s]}
 </div>`
 
   return (
@@ -26,17 +25,20 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
       {data.map((item, dataIndex) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map( s => {
+
+          console.log('ITEM', item)
+          console.log('series', s)
             return (
               <circle
                 key={`${dataIndex}`}
                 r={circleRadii}
                 cx={xScale(item[config.xAxis.dataKey])}
-                cy={yScale(item[config.yAxis.dataKey])}
+                cy={yScale(item[s])}
                 fillOpacity={1}
                 opacity={1}
                 style={pointStyles}
                 fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s] : s) : '#000'}
-                data-tip={handleTooltip(item)}
+                data-tip={handleTooltip(item, s)}
                 data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               />
             )
