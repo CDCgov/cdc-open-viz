@@ -38,7 +38,7 @@
     "rightAxisTickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "label": "Observations"
+    "label": "Y Axis"
   },
   "boxplot": [],
   "topAxis": {
@@ -48,7 +48,7 @@
   "barHeight": 25,
   "height": 300,
   "xAxis": {
-    "type": "categorical",
+    "type": "continuous",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -62,7 +62,7 @@
     "isLegendValue": false,
     "numTicks": "",
     "dataKey": "x",
-    "label": "Groups"
+    "label": "X Axis"
   },
   "table": {
     "label": "Data Table",
@@ -117,7 +117,19 @@
   },
   "series": [
     {
-      "dataKey": "y",
+      "dataKey": "y1",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y2",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y3",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y4",
       "type": "Bar"
     }
   ]

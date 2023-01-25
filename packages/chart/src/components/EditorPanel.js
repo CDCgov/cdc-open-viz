@@ -1193,7 +1193,7 @@ const EditorPanel = () => {
                 <AccordionItemPanel>
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={['categorical', 'date']} />
+                      <Select value={config.xAxis.type} section='xAxis' fieldName='type' label='Data Type' updateField={updateField} options={config.visualizationType !== 'Scatter Plot' ? ['categorical', 'date'] : ['categorical', 'date', 'continuous']} />
                       <Select
                         value={config.xAxis.dataKey || ''}
                         section='xAxis'
