@@ -108,11 +108,13 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           // pass thru
           cleanedBar[key] = d[key]
         } else {
-          if (!isNaN(d[key])) {
-            cleanedBar[key] = d[key]
+          // remove comma and dollar signs
+          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
+          //console.log("tmp no comma or $", tmp)
+          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+            cleanedBar[key] = tmp
           } else {
-            // return a 0 for non-numerics
-            cleanedBar[key] = '0'
+            // return nothing to skip bad data point
           }
         }
       })
@@ -121,6 +123,21 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     })
     console.log('## cleanedData =', cleanedup)
     return cleanedup
+  }
+  const isNumber = value => {
+    // in debugging I saw cases where inbound was a 'number'
+    // and other times a 'string' so might as well take care of both here
+    if (typeof value === 'number') {
+      return !Number.isNaN(value)
+    }
+    if (typeof value === 'string') {
+      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
+    }
+    return false // if we get here something is wrong so return false
+  }
+  const logit = val => {
+    console.log('BarChart val,type ', val, typeof val)
+    return val
   }
 
   // Using State
@@ -168,7 +185,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* left - expects a number not a string */}
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={cleanData(data)} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -237,7 +254,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={cleanData(data)} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -325,7 +342,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {config.visualizationSubType !== 'stacked' && (
           <Group>
             <BarGroup
-              data={data}
+              data={cleanData(data)}
               keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
               height={yMax}
               x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
@@ -347,10 +364,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     {barGroup.bars.map((bar, index) => {
                       let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                       let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
-                      let barHeight = orientation === 'horizontal' ? config.barHeight : Math.abs(yScale(bar.value) - yScale(0))
-                      let barY = bar.value >= 0 ? bar.y : yScale(0)
+                      let barHeight = orientation === 'horizontal' ? config.barHeight : isNumber(Math.abs(yScale(bar.value) - yScale(0))) ? Math.abs(yScale(bar.value) - yScale(0)) : 0
+                      let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
+
+                      console.log('barHeight, barY', barHeight, barY)
 
                       // ! Unsure if this should go back.
                       if (config.isLollipopChart) {
