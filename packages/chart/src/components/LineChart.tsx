@@ -38,7 +38,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
   const isNumberLog = value => {
     //console.log("entering isNumber valuetype is:",typeof value);
-    var test = value != null && value !== '' && /[\d]/.test(value) && !Number.isNaN(value)
+    var test = value != null && value !== '' && /\d+\.?\d*/.test(value) && !Number.isNaN(value)
     // Note: value is still a string here
     // so typeof value === 'number' does not work
     if (test === false) {
@@ -46,7 +46,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     } else {
       console.log('# isNUmber TRUE on value, result', value, test)
     }
-    return value != null && value !== '' && /[\d]/.test(value) && !Number.isNaN(value)
+    return value != null && value !== '' && /\d+\.?\d*/.test(value) && !Number.isNaN(value)
   }
 
   const isNumber = value => {
@@ -56,7 +56,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
       return !Number.isNaN(value)
     }
     if (typeof value === 'string') {
-      return value !== null && value !== '' && /[\d]/.test(value)
+      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
     }
     return false // if we get here something is wrong so return false
   }
@@ -69,7 +69,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return cy
   }
   const logit = val => {
-    console.log('val,type ', val, typeof val)
+    console.log('LineChart val,type ', val, typeof val)
     return val
   }
 
@@ -89,12 +89,13 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
           // pass thru the dates
           cleanedSeries[key] = d[key]
         } else {
-          // now check to see if it's a valid number
-          if ((d[key] !== '' && d[key] !== null && !isNaN(d[key])) || /[\d]/.test(d[key])) {
-            cleanedSeries[key] = d[key]
+          // remove comma and dollar signs
+          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
+          //console.log("tmp no comma or $", tmp)
+          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+            cleanedSeries[key] = tmp
           } else {
-            // leave that point out entirely
-            // return nothing to omit the point
+            // return nothing to skip bad data point
           }
         }
       })
