@@ -6,6 +6,7 @@ export default {
   visualizations: {},
   table: {
     label: 'Data Table',
-    show: true
+    show: true,
+    showDownloadUrl: false
   }
 }

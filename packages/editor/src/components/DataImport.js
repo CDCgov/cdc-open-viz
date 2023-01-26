@@ -4,7 +4,6 @@ import { csvParse } from 'd3'
 import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 
 import GlobalState from '../context'
 
@@ -30,8 +29,6 @@ import '@cdc/core/styles/v2/components/data-designer.scss'
 export default function DataImport() {
   const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(GlobalState)
 
-  const { overlay } = useGlobalContext()
-
   const transform = new DataTransform()
 
   const [externalURL, setExternalURL] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || '')
@@ -45,11 +42,6 @@ export default function DataImport() {
   const supportedDataTypes = {
     '.csv': 'text/csv',
     '.json': 'application/json'
-  }
-
-  const displayFileName = name => {
-    const nameParts = name.split('/')
-    return nameParts[nameParts.length - 1]
   }
 
   const displaySize = size => {
@@ -71,6 +63,9 @@ export default function DataImport() {
    */
   const dataExists = (newData, oldSeries, oldAxisX) => {
     // Loop through old series to make sure each exists in the new data
+
+    // TODO: move to forEach?
+    // eslint-disable-next-line array-callback-return
     oldSeries.map(function (currentValue, index, newData) {
       if (!newData.find(element => element.dataKey === currentValue.dataKey)) return false
     })
@@ -94,6 +89,7 @@ export default function DataImport() {
     const fileExtension = Object.keys(supportedDataTypes).find(extension => dataURL.pathname.endsWith(extension))
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await get(dataURL, {
         responseType: 'blob'
       }).then(response => {
@@ -133,14 +129,6 @@ export default function DataImport() {
 
     // Get the raw data as text from the file
     if (null === fileData) {
-      // const round = 1000 * 60 * 15;
-      // const date = new Date();
-      // const rounded = new Date(date.getTime() - (date.getTime() % round));
-      // const trimmedDate = rounded.toString().replace(/\s+/g, "");
-
-      const newUrl = new URL(fileName)
-      // newUrl.searchParams.append("v", trimmedDate);
-
       fileSourceType = 'url'
       try {
         fileData = await loadExternal()
@@ -165,9 +153,9 @@ export default function DataImport() {
     // For example, query parameters in API's and cache busting strings
     // file matching can handle .csv and .json, but doesn't handle
     // .csv?version=1 or .json?version=1
-    const handleFileExtension = (fileSourceType) => {
-      let fileExtension;
-      if(fileSourceType === "file") {
+    const handleFileExtension = fileSourceType => {
+      let fileExtension
+      if (fileSourceType === 'file') {
         fileExtension = path.match(/(?:\.([^.]+))?$/g)
 
         if (fileExtension.length === 0) {
@@ -177,12 +165,12 @@ export default function DataImport() {
         }
       }
 
-      if(fileSourceType === "url") {
+      if (fileSourceType === 'url') {
         let urlData = new URL(path)
         fileExtension = Object.keys(supportedDataTypes).find(extension => urlData.pathname.endsWith(extension))
       }
 
-      return fileExtension;
+      return fileExtension
     }
 
     let fileExtension = handleFileExtension(fileSourceType)
@@ -193,7 +181,7 @@ export default function DataImport() {
     let filereader = new FileReader()
 
     // Set encoding for CSV files - needed to render special characters properly
-    let encoding = mimeType === 'text/csv' ? 'ISO-8859-1' : ''
+    let encoding = mimeType === 'text/csv' ? 'utf-8' : ''
 
     filereader.onload = function () {
       let text = this.result
@@ -622,10 +610,30 @@ export default function DataImport() {
             {/* TODO: Add more sample data in, but this will do for now. */}
             <span className='heading-3'>Load Sample Data:</span>
             <ul className='sample-data-list'>
-              <li onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>United States Sample Data #1</li>
-              <li onClick={() => loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}>Chart Sample Data</li>
-              <li onClick={() => loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}>United States Counties Sample Data</li>
-              <li onClick={() => loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}>Sample Geo Points</li>
+              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
+                United States Sample Data #1
+              </button>
+              <button
+                className='link link-upload'
+                onClick={() => loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
+              >
+                Chart Sample Data
+              </button>
+              <button
+                className='link link-upload'
+                onClick={() => loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
+              >
+                United States Counties Sample Data
+              </button>
+              <button
+                className='link link-upload'
+                onClick={() => loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
+              >
+                Sample Geo Points
+              </button>
             </ul>
           </div>
         )}

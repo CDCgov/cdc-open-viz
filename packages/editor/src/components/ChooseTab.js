@@ -16,6 +16,7 @@ import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
+import GenericIcon from '@cdc/core/assets/icon-info.svg'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(GlobalState)
@@ -183,6 +184,14 @@ export default function ChooseTab() {
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
         </li>
+        {/* <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<GenericIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a box plot</Tooltip.Content>
+          </Tooltip>
+        </li> */}
       </ul>
 
       <div className='heading-2'>Maps</div>

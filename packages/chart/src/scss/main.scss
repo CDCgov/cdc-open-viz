@@ -120,30 +120,30 @@
     order: 1;
     position: relative;
 
-    &__inner{
-      &.bottom{
+    &__inner {
+      &.bottom {
         display: grid;
         grid-template-columns: auto auto;
       }
 
-      &.single-row{
+      &.single-row {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: flex-start;
 
-         & >div{
-          padding:0 1.2em 1em 0;
+        & > div {
+          padding: 0 1.2em 1em 0;
         }
 
-        & div>span {
-         margin-right: 0!important;
+        & div > span {
+          margin-right: 0 !important;
         }
 
-        & >div.legend-item{
+        & > div.legend-item {
           margin: 0 !important;
         }
-       }
+      }
     }
 
     .legend-reset {
@@ -186,14 +186,15 @@
       font-size: 1.3em;
     }
 
-    h2,p{
+    h2,
+    p {
       margin-bottom: 0.8em;
     }
-    & div.legend-item{
+    & div.legend-item {
       margin-bottom: 0.5em !important;
 
-      &:last-child{
-       margin: 0 !important;
+      &:last-child {
+        margin: 0 !important;
       }
     }
 
@@ -249,18 +250,13 @@
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
-    margin-bottom: 1em;
 
-    &.bottom{
+    &.bottom {
       flex-wrap: nowrap;
       flex-direction: column;
     }
     &.legend-hidden > svg {
       width: 100% !important;
-    }
-
-    .legend-container {
-      margin-top: 1rem;
     }
 
     > svg {
@@ -345,7 +341,7 @@
         display: inherit;
         margin-bottom: 5px;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 16px;
       }
     }
 
@@ -360,6 +356,7 @@
 
     select {
       font-size: 1em;
+      padding-right: 5px;
     }
 
     .single-filter {
@@ -403,7 +400,9 @@
     .chart-container {
       flex-wrap: nowrap;
 
-      .no-wrap { flex-wrap: nowrap; }
+      .no-wrap {
+        flex-wrap: nowrap;
+      }
 
       .legend-container {
         width: 25%;
@@ -415,7 +414,7 @@
           margin-right: 1em;
           order: 0;
         }
-        &.bottom{
+        &.bottom {
           width: 100%;
           margin-left: 0;
         }
@@ -450,8 +449,6 @@
     }
   }
 
-
-
   @include breakpointClass(lg) {
     &.font-small {
       font-size: 1em;
@@ -485,6 +482,7 @@
   // ANIMATIONS
   // Pie Chart Animations
   .animated-pie {
+    margin: auto !important;
     transition: all 0.4s ease-in-out;
     opacity: 0;
     transform-origin: center;
@@ -522,19 +520,20 @@
   .linear,
   .Line,
   .Combo {
-    &.animated path {
+    &.animated path.animation {
       opacity: 0;
     }
     &.animate {
-      path {
+      path.animation {
         opacity: 1;
         stroke-dasharray: 2000;
-        stroke-dashoffset: 2000;
+        stroke-dashoffset: 4000;
         animation: dash 2s ease-in-out forwards;
       }
       @keyframes dash {
         to {
           stroke-dashoffset: 0;
+          opacity: 0;
         }
       }
     }
@@ -572,6 +571,10 @@
       .group-1,
       .group-2 {
         transform-origin: center;
+      }
+
+      .visx-linepath .animation {
+        opacity: 0;
       }
     }
   }
