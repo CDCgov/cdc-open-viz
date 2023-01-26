@@ -258,3 +258,10 @@ table.data-table {
     transition: 0.3s all;
   }
 }
+.cove,
+.cdc-open-viz-module {
+  .download-links a:not(:last-child) {
+    margin-right: 10px;
+    display: inline-block;
+  }
+}

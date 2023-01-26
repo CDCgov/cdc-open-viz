@@ -31,6 +31,16 @@ export default function PieChart() {
     freezeOnceVisible: false
   })
 
+  // Make sure the chart is visible if in the editor
+  useEffect(() => {
+    const element = document.querySelector('.isEditor')
+    if (element) {
+      // parent element is visible
+      console.log('setAnimation')
+      setAnimatePie(prevState => true)
+    }
+  })
+
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
       setTimeout(() => {
@@ -117,7 +127,7 @@ export default function PieChart() {
     width = width * 0.73
   }
 
-  const height = config.aspectRatio ? width * config.aspectRatio : config.height
+  const height = config.heights.vertical
 
   const radius = Math.min(width, height) / 2
   const centerY = height / 2
@@ -146,7 +156,7 @@ export default function PieChart() {
 
   return (
     <ErrorBoundary component='PieChart'>
-      <svg width={width} height={height} className={`animated-pie group ${animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
             {pie => <AnimatedPie<any> {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}

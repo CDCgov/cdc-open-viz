@@ -28,6 +28,14 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     }
   }
 
+  const handleAxisFormating = (axis = 'left', label, value) => {
+    axis = String(axis).toLocaleLowerCase()
+    if (label) {
+      return `${label}: ${formatNumber(value, axis)}`
+    }
+    return `${formatNumber(value, axis)}`
+  }
+
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size}>
@@ -43,20 +51,26 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
               {data.map((d, dataIndex) => {
-                let seriesAxis = config.series.filter(s => s.dataKey === seriesKey)[0].axis
+                // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
+                const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
+                const { axis } = series
+
                 const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(d[config.runtime.xAxis.dataKey])) : d[config.runtime.xAxis.dataKey]
-                const yAxisValue = formatNumber(getYAxisData(d, seriesKey));
-                let yAxisTooltip = config.runtime.yAxis.isLegendValue ? `${seriesKey}: ${yAxisValue} ` : config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue;
-                let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
-                if (seriesAxis === 'Left') {
-                  yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
-                } else {
-                  yAxisTooltip = config.runtime.yAxis.rightLabel ? `${config.runtime.yAxis.rightLabel}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
-                }
+                const yAxisValue = getYAxisData(d, seriesKey)
+
+                const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+                const labeltype = axis === 'Right' ? 'rightLabel' : 'label'
+                let label = config.runtime.yAxis[labeltype]
+                // if has muiltiple series dont show legend value on tooltip
+                if (!hasMultipleSeries) label = config.isLegendValue ? config.runtime.seriesLabels[seriesKey] : label
+
+                let yAxisTooltip = handleAxisFormating(axis, label, yAxisValue)
+                let xAxisTooltip = handleAxisFormating(axis, config.runtime.xAxis.label, xAxisValue)
+
                 const tooltip = `<div>
+                    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && Object.keys(config.runtime.seriesLabels).length > 1 ? `${config.runtime.seriesLabels[seriesKey] || ''}<br/>` : ''}
                     ${yAxisTooltip}<br />
-                    ${xAxisTooltip}<br />
-                    ${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
+                    ${xAxisTooltip}
                   </div>`
                 let circleRadii = 4.5
                 return (
@@ -107,10 +121,47 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                defined={(item,i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== "" && item[config.runtime.seriesLabels[seriesKey]] !== null;
+                defined={(item, i) => {
+                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
                 }}
               />
+              {config.animate && (
+                <LinePath
+                  className='animation'
+                  curve={allCurves.curveLinear}
+                  data={data}
+                  x={d => xScale(getXAxisData(d))}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
+                  stroke='#fff'
+                  strokeWidth={3}
+                  strokeOpacity={1}
+                  shapeRendering='geometricPrecision'
+                  strokeDasharray={lineType ? handleLineType(lineType) : 0}
+                  defined={(item, i) => {
+                    return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                  }}
+                />
+              )}
+
+              {/* Render series labels at end if each line if selected in the editor */}
+              {config.showLineSeriesLabels &&
+                (config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map(seriesKey => {
+                  let lastDatum
+                  for (let i = data.length - 1; i >= 0; i--) {
+                    if (data[i][seriesKey]) {
+                      lastDatum = data[i]
+                      break
+                    }
+                  }
+                  if (!lastDatum) {
+                    return <></>
+                  }
+                  return (
+                    <text x={xScale(getXAxisData(lastDatum)) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
+                      {config.runtime.seriesLabels[seriesKey] || seriesKey}
+                    </text>
+                  )
+                })}
             </Group>
           )
         })}

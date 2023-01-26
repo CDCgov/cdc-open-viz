@@ -257,7 +257,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
         </div>
       )}
       {!subEditor && (
-        <div>
+        <div className="toggle-bar__wrapper">
           <ul className='toggle-bar'>
             <li
               className={tabSelected === 0 ? 'active' : 'inactive'}
@@ -316,21 +316,55 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
             )}
             {tabSelected === 2 && (
               <>
-                <label>Show Table</label>
-                <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
-                <label>Expanded by Default</label>
-                <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
-                <label>Display Download Button</label>
-                <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
-                <label>Limit Table Height</label>
-                <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
-                {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
+
+                <div className="wrap">
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
+                    Show Table
+                  </label><br />
+
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
+                    Expanded by Default
+                  </label><br />
+                </div>
+
+                {/* <div className="wrap">
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.downloadPdfButton} onChange={e => changeConfigValue('table', 'downloadPdfButton', e.target.checked)} />
+                    Show PDF Button
+                  </label>
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.downloadImageButton} onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)} />
+                    Show Image Button
+                  </label>
+                </div> */}
+
+                <div className="wrap">
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
+                    Limit Table Height
+                  </label>
+                  {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
+                </div>
+
+                <div className="wrap">
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
+                    Show CSV Button
+                  </label>
+                  <label>
+                    <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
+                    Show Link to Dataset
+                  </label>
+                </div>
               </>
             )}
           </div>
-        </div>
-      )}
-    </div>
+        </div >
+      )
+      }
+    </div >
   )
 }
 

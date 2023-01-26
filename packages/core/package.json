@@ -1,6 +1,6 @@
 {
   "name": "@cdc/core",
-  "version": "4.22.11",
+  "version": "4.23.1",
   "description": "Core elements of the CDC Open Visualization project",
   "author": "Daniel Immke <npm@daniel.do>",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
@@ -20,6 +20,8 @@
     "react-dom": ">=16"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.1",
     "papaparse": "^5.3.0",
     "prop-types": "^15.8.1",
     "react-accessible-accordion": "^3.3.4",

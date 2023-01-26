@@ -11,7 +11,6 @@ module.exports = {
         ecmaVersion: 12,
         sourceType: 'module',
     },
-    plugins: ['prettier'],
     rules: {
         'import/no-named-as-default': 0,
         'no-labels': 0,

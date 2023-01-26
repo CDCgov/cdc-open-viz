@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
+import * as d3 from 'd3-array'
 
 // External Libraries
 import { scaleOrdinal } from '@visx/scale'
@@ -12,6 +13,7 @@ import { timeParse, timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
+import { Base64 } from 'js-base64'
 
 // Primary Components
 import Context from './context'
@@ -31,6 +33,7 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from './components/Filters'
+import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
 
 // helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
@@ -42,7 +45,6 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }: { configUrl?: string; config?: any; isEditor?: boolean; isDashboard?: boolean; setConfig?; setEditing?; hostname?; link?: any }) {
   const transform = new DataTransform()
-
   interface keyable {
     [key: string]: any
   }
@@ -60,10 +62,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
+  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
 
+  // Destructure items from config for more readable JSX
+  const { legend, title, description, visualizationType } = config
   const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
@@ -211,6 +216,66 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             return series.dataKey
           })
         : []
+    }
+
+    if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
+      console.log('hit', newConfig)
+
+      // stats
+      let allKeys = data.map(d => d[newConfig.xAxis.dataKey])
+      let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
+
+      const uniqueArray = function (arrArg) {
+        return arrArg.filter(function (elem, pos, arr) {
+          return arr.indexOf(elem) === pos
+        })
+      }
+
+      const groups = uniqueArray(allKeys)
+      const plots = []
+
+      console.log('d', data)
+      console.log('newConfig', newConfig)
+      console.log('groups', groups)
+      console.log('allKeys', allKeys)
+      console.log('allValues', allValues)
+
+      // group specific statistics
+      // prevent re-renders
+      groups.map((g, index) => {
+        if (!g) return
+        // filter data by group
+        let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
+        let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
+        console.log('g', g)
+        console.log('item', filteredData)
+        console.log('item', newConfig)
+        // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
+
+        const q1 = d3.quantile(filteredDataValues, 0.25)
+        const q3 = d3.quantile(filteredDataValues, 0.75)
+        const iqr = q3 - q1
+        const lowerBounds = q1 - (q3 - q1) * 1.5
+        const upperBounds = q3 + (q3 - q1) * 1.5
+        const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+        plots.push({
+          columnCategory: g,
+          columnMean: d3.mean(filteredDataValues),
+          columnMedian: d3.median(filteredDataValues),
+          columnFirstQuartile: q1,
+          columnThirdQuartile: q3,
+          columnMin: q1 - 1.5 * iqr,
+          columnMax: q3 + 1.5 * iqr,
+          columnIqr: iqr,
+          columnOutliers: outliers,
+          values: filteredDataValues
+        })
+      })
+
+      // any other data we can add to boxplots
+      newConfig.boxplot['allValues'] = allValues
+      newConfig.boxplot['categories'] = groups
+      newConfig.boxplot.push(...plots)
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {
@@ -472,29 +537,63 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
+  const DownloadButton = ({ data }: any, type = 'link') => {
+    const fileName = `${config.title.substring(0, 50)}.csv`
+
+    const csvData = Papa.unparse(data)
+
+    const saveBlob = () => {
+      //@ts-ignore
+      if (typeof window.navigator.msSaveBlob === 'function') {
+        const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        //@ts-ignore
+        window.navigator.msSaveBlob(dataBlob, fileName)
+      }
+    }
+
+    if (type === 'download') {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn btn-download no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    } else {
+      return (
+        <a download={fileName} onClick={saveBlob} href={`data:text/csv;base64,${Base64.encode(csvData)}`} aria-label='Download this data in a CSV file format.' className={`btn no-border`}>
+          Download Data (CSV)
+        </a>
+      )
+    }
+  }
+
   // Format numeric data based on settings in config
   const formatNumber = (num, axis) => {
-    // check if value contains comma and remove it. later will add comma below.
-    if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
     // if num is NaN return num
     if (isNaN(num) || !num) return num
 
-    let original = num
-    let prefix = config.dataFormat.prefix
-    let stringFormattingOptions
+    // destructure dataFormat values
+    let {
+      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, rightPrefix, rightSuffix }
+    } = config
     let formatSuffix = format('.2s')
+
+    // check if value contains comma and remove it. later will add comma below.
+    if (String(num).indexOf(',') !== -1) num = num.replaceAll(',', '')
+
+    let original = num
+    let stringFormattingOptions
 
     if (axis !== 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
-        minimumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0,
-        maximumFractionDigits: config.dataFormat.roundTo ? Number(config.dataFormat.roundTo) : 0
+        minimumFractionDigits: roundTo ? Number(roundTo) : 0,
+        maximumFractionDigits: roundTo ? Number(roundTo) : 0
       }
     } else {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0,
-        maximumFractionDigits: config.dataFormat.rightRoundTo ? Number(config.dataFormat.rightRoundTo) : 0
+        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
+        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
       }
     }
 
@@ -513,38 +612,46 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         num = cutoff
       }
     }
-    num = num.toLocaleString('en-US', stringFormattingOptions)
 
+    // When we're formatting the left axis
+    // Use commas also updates bars and the data table
+    // We can't use commas when we're formatting the dataFormatted number
+    // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
+    if (axis === 'left' && commas && abbreviated) {
+      num = num
+    } else {
+      num = num.toLocaleString('en-US', stringFormattingOptions)
+    }
     let result = ''
 
-    if (config.dataFormat.useFormat) {
-      console.log('num', num)
-      num = formatSuffix(num)
+    if (abbreviated && axis === 'left') {
+      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    }
+
+    if (abbreviated && axis === 'bottom') {
+      num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
 
     if (prefix && axis !== 'right') {
       result += prefix
     }
 
-    if (config.dataFormat.rightPrefix && axis === 'right') {
-      result += config.dataFormat.rightPrefix
+    if (rightPrefix && axis === 'right') {
+      result += rightPrefix
     }
 
     result += num
 
-    if (config.dataFormat.suffix && axis !== 'right') {
-      result += config.dataFormat.suffix
+    if (suffix && axis !== 'right') {
+      result += suffix
     }
 
-    if (config.dataFormat.rightSuffix && axis === 'right') {
-      result += config.dataFormat.rightSuffix
+    if (rightSuffix && axis === 'right') {
+      result += rightSuffix
     }
 
     return String(result)
   }
-
-  // Destructure items from config for more readable JSX
-  const { legend, title, description, visualizationType } = config
 
   // Select appropriate chart type
   const chartComponents = {
@@ -552,7 +659,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
-    Pie: <PieChart />
+    Pie: <PieChart />,
+    'Box Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
@@ -596,11 +704,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {/* Filters */}
             {config.filters && !externalFilters && <Filters />}
             {/* Visualization */}
-            {config?.introText && <section className="introText">{parse(config.introText)}</section>}
+            {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
-              className={`chart-container ${config.legend.position==='bottom'? "bottom":""
-              }${config.legend.hide ? " legend-hidden" : ""
-              }${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+              style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
+              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
@@ -626,10 +733,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {link && link}
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
-            {/* Data Table */}
 
+            {/* buttons */}
+            <CoveMediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </CoveMediaControls.Section>
+
+            {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}
             {config?.footnotes && <section className='footnotes'>{parse(config.footnotes)}</section>}
+            {/* show pdf or image button */}
           </div>
         )}
       </>
@@ -670,7 +784,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setSeriesHighlight,
     dynamicLegendItems,
     setDynamicLegendItems,
-    filterData
+    filterData,
+    imageId
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
@@ -681,7 +796,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   return (
     <Context.Provider value={contextValues}>
-      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart}>
+      <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
         {body}
       </div>
     </Context.Provider>

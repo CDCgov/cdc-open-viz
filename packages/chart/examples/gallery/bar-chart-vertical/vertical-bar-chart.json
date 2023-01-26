@@ -35,6 +35,8 @@
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
+    "isLegendValue": false,
+    "numTicks": "",
     "label": "Y Axis Example Label"
   },
   "topAxis": {
@@ -55,21 +57,25 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
+    "isLegendValue": false,
+    "numTicks": "",
     "dataKey": "Date",
     "label": "X Axis Example Label"
   },
   "table": {
     "label": "Data Type by Date",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "",
     "caption": "",
-    "show": true
+    "show": true,
+    "download": true
   },
   "orientation": "vertical",
   "legend": {
     "behavior": "isolate",
     "position": "right",
+    "singleRow": false,
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
@@ -90,8 +96,7 @@
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " units",
-    "useFormat": true
+    "suffix": " units"
   },
   "confidenceKeys": {},
   "visual": {
@@ -102,7 +107,7 @@
   "data": [
     {
       "Date": "1/15/2016",
-      "Data 1": "9000",
+      "Data 1": "900",
       "Data 2": "135",
       "Data 3": "300",
       "Data 4": "95",

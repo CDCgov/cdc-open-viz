@@ -168,6 +168,16 @@ const EditorPanel = props => {
         })
         break
 
+      case 'toggleDataUrl':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDownloadUrl: value
+          }
+        })
+        break
+
       case 'toggleExtraBubbleBorder':
         setState({
           ...state,
@@ -367,12 +377,21 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'toggleDownloadMediaButton':
+      case 'toggleDownloadImgButton':
         setState({
           ...state,
           general: {
             ...state.general,
-            showDownloadMediaButton: !state.general.showDownloadMediaButton
+            showDownloadImgButton: !state.general.showDownloadImgButton
+          }
+        })
+        break
+      case 'toggleDownloadPdfButton':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            showDownloadPdfButton: !state.general.showDownloadPdfButton
           }
         })
         break
@@ -2188,6 +2207,16 @@ const EditorPanel = props => {
                     <label className='checkbox'>
                       <input
                         type='checkbox'
+                        checked={state.table.showDownloadUrl}
+                        onChange={event => {
+                          handleEditorChanges('toggleDataUrl', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Link to Dataset</span>
+                    </label>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
                         checked={state.general.showDownloadButton}
                         onChange={event => {
                           handleEditorChanges('toggleDownloadButton', event.target.checked)
@@ -2195,6 +2224,26 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Enable Download CSV Button</span>
                     </label>
+                    {/* <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showDownloadImgButton}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Image Download</span>
+                    </label> */}
+                    {/* <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.showDownloadPdfButton}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadPdfButton', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Enable Pdf Download</span>
+                    </label> */}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
@@ -2391,6 +2440,13 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
+                  {'us-geocode' === state.general.type && (
+                    <label>
+                      Geocode Settings
+                      <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
+                    </label>
+                  )}
+
                   {state.general.type === 'bubble' && (
                     <>
                       <TextField type='number' value={state.visual.minBubbleSize} section='visual' fieldName='minBubbleSize' label='Minimum Bubble Size' updateField={updateField} />
@@ -2433,20 +2489,21 @@ const EditorPanel = props => {
                       <span className='edit-label'>Bubble Map has extra border</span>
                     </label>
                   )}
-                  {state.general.geoType === 'us' && (
-                    <label>
-                      <span className='edit-label'>City Style</span>
-                      <select
-                        value={state.visual.cityStyle || false}
-                        onChange={event => {
-                          handleEditorChanges('handleCityStyle', event.target.value)
-                        }}
-                      >
-                        <option value='circle'>Circle</option>
-                        <option value='pin'>Pin</option>
-                      </select>
-                    </label>
-                  )}
+                  {state.general.geoType === 'us' ||
+                    (state.general.geoType === 'us-county' && (
+                      <label>
+                        <span className='edit-label'>City Style</span>
+                        <select
+                          value={state.visual.cityStyle || false}
+                          onChange={event => {
+                            handleEditorChanges('handleCityStyle', event.target.value)
+                          }}
+                        >
+                          <option value='circle'>Circle</option>
+                          <option value='pin'>Pin</option>
+                        </select>
+                      </label>
+                    ))}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
