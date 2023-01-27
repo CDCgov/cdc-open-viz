@@ -384,7 +384,6 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   if (configObj) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      console.log('changing')
       if (!configObj.dataUrl) {
         updateConfig({ ...defaults, ...configObj })
       }

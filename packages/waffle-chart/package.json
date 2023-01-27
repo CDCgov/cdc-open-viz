@@ -2,12 +2,12 @@
   "name": "@cdc/waffle-chart",
   "version": "4.22.11",
   "description": "React component for displaying a single piece of data in a card module",
-  "type": "module",
-  "main": "dist/cdcwafflechart",
   "moduleName": "CdcWaffleChart",
+  "main": "dist/cdcwafflechart",
+  "type": "module",
   "scripts": {
     "start": "vite --open",
-    "build": "vite build --force",
+    "build": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/waffle-chart build"
   },

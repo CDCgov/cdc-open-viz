@@ -1,38 +1,9 @@
-import { defineConfig } from 'vite'
+import GenerateViteConfig from '../../generateViteConfig.js'
+import { moduleName } from './package.json'
 
-import react from '@vitejs/plugin-react'
-import svgr from 'vite-plugin-svgr'
-
-import { name, moduleName } from './package.json'
-
-export default defineConfig({
-  server: { port: 8080 },
-  build: {
-    sourcemap: false,
-    lib: {
-      name: name,
-      entry: `src/${moduleName}.jsx`,
-      fileName: (format) => `${moduleName.toLowerCase()}.${format}.js`,
-    },
-    rollupOptions: {
-      external: [ 'react', 'reactDOM' ],
-      output: {
-        globals: {
-          react: 'React',
-          reactDOM: 'ReactDOM'
-        },
-      },
-    },
+export default GenerateViteConfig(moduleName,null,{
+  jsxImportSource: '@emotion/react',
+  babel: {
+    plugins: [ '@emotion/babel-plugin' ],
   },
-  plugins: [
-    react({
-      jsxImportSource: '@emotion/react',
-      babel: {
-        plugins: [ '@emotion/babel-plugin' ],
-      },
-    }),
-    svgr({
-      exportAsDefault: true
-    })
-  ]
 })
