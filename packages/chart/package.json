@@ -22,7 +22,6 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "4.22.11",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
@@ -56,7 +55,6 @@
   },
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa",
   "devDependencies": {
-    "resize-observer-polyfill": "^1.5.1",
-    "typescript": "^4.9.3"
+    "resize-observer-polyfill": "^1.5.1"
   }
 }

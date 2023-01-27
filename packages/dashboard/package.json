@@ -4,6 +4,7 @@
   "description": "React component for combining multiple visualizations into a single dashboard",
   "moduleName": "CdcDashboard",
   "main": "dist/cdcdashboard",
+  "type": "module",
   "scripts": {
     "start": "vite --open",
     "build": "vite build",

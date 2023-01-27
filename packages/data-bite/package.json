@@ -4,6 +4,7 @@
   "description": "React component for displaying a single piece of data in a card module",
   "moduleName": "CdcDataBite",
   "main": "dist/cdcdatabite",
+  "type": "module",
   "scripts": {
     "start": "vite --open",
     "build": "vite build",

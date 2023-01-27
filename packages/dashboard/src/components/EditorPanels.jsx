@@ -4,12 +4,11 @@ import ReactTooltip from 'react-tooltip'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { useDebounce } from 'use-debounce'
 
-import Context from '../context'
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import QuestionIcon from '@cdc/core/assets/question-circle.svg'
+import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import ConfigContext from '../ConfigContext'
 
 const Helper = ({ text }) => {
   return (
@@ -128,8 +127,8 @@ const Select = memo(({ label, value, options, fieldName, section = null, subsect
   )
 })
 
-const EditorPanel = memo(() => {
-  const { config, updateConfig, loading, rawData, setParentConfig, setEditing } = useContext(Context)
+const EditorPanels = memo(() => {
+  const { config, updateConfig, loading, rawData, setParentConfig, setEditing } = useContext(ConfigContext)
 
   const enforceRestrictions = updatedConfig => {
     // TODO
@@ -445,4 +444,4 @@ const EditorPanel = memo(() => {
   )
 })
 
-export default EditorPanel
+export default EditorPanels

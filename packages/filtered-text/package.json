@@ -2,31 +2,25 @@
   "name": "@cdc/filtered-text",
   "version": "4.22.11",
   "description": "React component for adding filtered text on dashboards.",
-  "author": "Adam Doe <rsq2@cdc.gov>",
-  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
-  "license": "Apache-2.0",
   "moduleName": "CdcFilteredText",
   "main": "dist/cdcfilteredtext",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
-  "files": [
-    "lib"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CDCgov/cdc-open-viz.git"
-  },
+  "type": "module",
   "scripts": {
     "start": "vite --open",
     "build": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/filtered-text build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz.git"
+  },
+  "author": "Adam Doe <rsq2@cdc.gov>",
   "bugs": {
     "url": "https://github.com/CDCgov/cdc-open-viz/issues"
   },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

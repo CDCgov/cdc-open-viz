@@ -4,6 +4,7 @@
   "description": "React component for displaying HTML content from an outside link",
   "moduleName": "CdcMarkupInclude",
   "main": "dist/cdcmarkupinclude",
+  "type": "module",
   "scripts": {
     "start": "vite --open",
     "build": "vite build",
