@@ -83,6 +83,7 @@ const CdcDataBite: FC<Props> = props => {
     setConfig(newConfig)
   }
 
+  //@ts-ignore
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo, memo, Fragment } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
@@ -8,19 +8,19 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 
 import Context from '../context'
 
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext<any>(Context)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(Context)
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
-  const [tableExpanded, setTableExpanded] = useState<boolean>(config.table.expanded)
+  const [tableExpanded, setTableExpanded] = useState(config.table.expanded)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
-  const DownloadButton = ({ data }: any, type) => {
+  const DownloadButton = ({ data }, type) => {
     const fileName = `${config.title.substring(0, 50)}.csv`
 
     const csvData = Papa.unparse(data)
@@ -61,11 +61,11 @@ export default function DataTable() {
               Cell: ({ row }) => {
                 const seriesLabel = config.runtime.seriesLabels ? config.runtime.seriesLabels[row.original] : row.original
                 return (
-                  <Fragment>
+                  <>
                     {config.visualizationType !== 'Pie' && (
                       <LegendCircle
                         fill={
-                          // non dynamic leged
+                          // non-dynamic leged
                           !config.legend.dynamicLegend
                             ? colorScale(seriesLabel)
                             : // dynamic legend
@@ -77,7 +77,7 @@ export default function DataTable() {
                       />
                     )}
                     <span>{seriesLabel}</span>
-                  </Fragment>
+                  </>
                 )
               },
               id: 'series-label'

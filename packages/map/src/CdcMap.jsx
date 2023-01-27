@@ -17,7 +17,7 @@ import ExternalIcon from './images/external-link.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 // Sass
 import './scss/main.scss'

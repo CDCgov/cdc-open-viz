@@ -11,19 +11,9 @@ import './scss/main.scss'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-interface Props {
-  configUrl: string
-  config?: object
-  isDashboard?: boolean
-  isEditor?: boolean
-  setConfig?: Function
-}
-
 type Defaults = typeof defaults
 
-const CdcFilteredText: FC<Props> = props => {
-  const { configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig } = props
-  const configObj: any = props.config
+const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
 
   const transform = new DataTransform()
   // Default States
@@ -38,6 +28,7 @@ const CdcFilteredText: FC<Props> = props => {
 
   // Default Functions
 
+  //@ts-ignore
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
     // If data is included through a URL, fetch that and store
@@ -106,12 +97,12 @@ const CdcFilteredText: FC<Props> = props => {
   }, []) // eslint-disable-line
 
   useEffect(() => {
-    if (!configObj.dataUrl) {
+    if (configObj && !configObj.dataUrl) {
       updateConfig({ ...defaults, ...configObj })
       setStateData(configObj.data)
       setExcludedData(configObj.data)
     }
-  }, [configObj.data]) // eslint-disable-line
+  }, [configObj?.data]) // eslint-disable-line
 
   let content = <Loading />
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 
 // IE11
-import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 import * as d3 from 'd3-array'
@@ -33,9 +32,9 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Filters from './components/Filters'
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
-// helpers
+// Helpers
 import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -43,21 +42,18 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
 import './scss/main.scss'
 
-export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }: { configUrl?: string; config?: any; isEditor?: boolean; isDashboard?: boolean; setConfig?; setEditing?; hostname?; link?: any }) {
+export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
-  interface keyable {
-    [key: string]: any
-  }
 
   const [loading, setLoading] = useState<Boolean>(true)
-  const [colorScale, setColorScale] = useState<any>(null)
-  const [config, setConfig] = useState<keyable>({})
-  const [stateData, setStateData] = useState<Array<Object>>(config.data || [])
-  const [excludedData, setExcludedData] = useState<Array<Object>>()
-  const [filteredData, setFilteredData] = useState<Array<Object>>()
-  const [seriesHighlight, setSeriesHighlight] = useState<Array<String>>([])
-  const [currentViewport, setCurrentViewport] = useState<String>('lg')
-  const [dimensions, setDimensions] = useState<Array<Number>>([])
+  const [colorScale, setColorScale] = useState(null)
+  const [config, setConfig] = useState({})
+  const [stateData, setStateData] = useState(config.data || [])
+  const [excludedData, setExcludedData] = useState()
+  const [filteredData, setFilteredData] = useState()
+  const [seriesHighlight, setSeriesHighlight] = useState([])
+  const [currentViewport, setCurrentViewport] = useState('lg')
+  const [dimensions, setDimensions] = useState([])
   const [externalFilters, setExternalFilters] = useState(null)
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
@@ -328,6 +324,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     data.forEach(row => {
       const value = row[columnName]
+      //@ts-ignore
       if (value && false === values.includes(value)) {
         values.push(value)
       }
@@ -352,7 +349,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   // Observes changes to outermost container and changes viewport size in state
-  const resizeObserver: ResizeObserver = new ResizeObserver(entries => {
+  const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
       let newViewport = getViewport(width)
@@ -408,13 +405,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
    * Another useEffect listens to externalFilterChanges and updates the config.
    */
   useEffect(() => {
-    const handleFilterData = (e: CustomEvent) => {
+    const handleFilterData = (e) => {
       let tmp = []
       tmp.push(e.detail)
       setExternalFilters(tmp)
     }
 
-    subscribe('cove_filterData', (e: CustomEvent) => handleFilterData(e))
+    subscribe('cove_filterData', (e) => handleFilterData(e))
 
     return () => {
       unsubscribe('cove_filterData', handleFilterData)
@@ -447,6 +444,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Load data when configObj data changes
   if (configObj) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig()
     }, [configObj.data])
@@ -523,7 +521,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = (dateString: string) => {
+  const parseDate = (dateString) => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
@@ -533,20 +531,18 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
-  const DownloadButton = ({ data }: any, type = 'link') => {
+  const DownloadButton = ({ data }, type = 'link') => {
     const fileName = `${config.title.substring(0, 50)}.csv`
 
     const csvData = Papa.unparse(data)
 
     const saveBlob = () => {
-      //@ts-ignore
       if (typeof window.navigator.msSaveBlob === 'function') {
         const dataBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
-        //@ts-ignore
         window.navigator.msSaveBlob(dataBlob, fileName)
       }
     }
@@ -750,8 +746,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = (d: any) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey]
+  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const contextValues = {
     getXAxisData,

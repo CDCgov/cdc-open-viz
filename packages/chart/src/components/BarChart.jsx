@@ -4,11 +4,11 @@ import { BarGroup, BarStack } from '@visx/shape'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext(ConfigContext)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -28,7 +28,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const fontSize = { small: 14, medium: 16, large: 18 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
-  const applyRadius = (index: number) => {
+  const applyRadius = (index) => {
     if (index === undefined || index === null || !isRounded) return
     let style = {}
 
@@ -138,7 +138,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={config.runtime.yAxis.size}>
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -202,7 +202,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -292,7 +292,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
               height={yMax}
-              x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}
+              x0={(d) => d[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.runtime.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
               yScale={config.runtime.horizontal ? xScale : yScale}
@@ -351,7 +351,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
                       const style = applyRadius(index)
 
-                      // check if bar text/value string fits into  each bars.
+                      // check if bar text/value string fits into each bar
                       let textWidth = getTextWidth(xAxisValue, config.fontSize)
                       let doesTextFit = (textWidth / bar.y) * 100 < 48
 

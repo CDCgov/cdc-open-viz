@@ -2,10 +2,12 @@
   "name": "@cdc/chart",
   "version": "4.22.11",
   "description": "React component for visualizing tabular data in various types of charts",
-  "main": "dist/cdcchart",
+  "main": "CdcChart",
+  "type": "module",
   "scripts": {
-    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcChart --env folderName=chart -c ../../webpack.config.js",
+    "start": "vite --open",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/chart build"
   },
   "repository": {
@@ -19,7 +21,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/core": "^1.1.4",
+    "@cdc/core": "4.22.11",
     "@visx/axis": "^1.0.0",
     "@visx/curve": "^1.0.0",
     "@visx/gradient": "^1.0.0",
@@ -30,14 +32,17 @@
     "@visx/scale": "^1.0.0",
     "@visx/shape": "^1.0.0",
     "@visx/stats": "^2.17.0",
+    "@visx/text": "^3.0.0",
     "@visx/tooltip": "^1.1.0",
     "chroma-js": "^2.1.2",
     "d3-array": "^2.8.0",
+    "d3-format": "^3.1.0",
     "d3-time-format": "^3.0.0",
-    "html-react-parser": "1.4.9",
+    "html-react-parser": "^3.0.8",
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
+    "react-beautiful-dnd": "^13.1.1",
     "react-spring": "^8.0.27",
     "react-table": "^7.5.0",
     "react-tooltip": "4.2.8",
@@ -45,11 +50,12 @@
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
-    "react": ">=16.8",
-    "react-dom": ">=16"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
-  "resolutions": {
-    "@types/react": "17.x"
-  },
-  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
+  "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa",
+  "devDependencies": {
+    "resize-observer-polyfill": "^1.5.1",
+    "typescript": "^4.9.3"
+  }
 }
