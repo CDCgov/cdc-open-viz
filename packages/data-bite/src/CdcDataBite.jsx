@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, FC, memo } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import Loading from '@cdc/core/components/Loading'
@@ -18,21 +18,11 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
-type DefaultsType = typeof defaults
-interface Props {
-  configUrl?: string
-  config?: any
-  isDashboard?: boolean
-  isEditor?: boolean
-  setConfig?: any
-  link?: any
-}
-
-const CdcDataBite: FC<Props> = props => {
+const CdcDataBite = props => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig, link } = props
 
-  const [config, setConfig] = useState<DefaultsType>({ ...defaults })
-  const [loading, setLoading] = useState<Boolean>(true)
+  const [config, setConfig] = useState({ ...defaults })
+  const [loading, setLoading] = useState(true)
 
   const {
     title,
@@ -52,7 +42,7 @@ const CdcDataBite: FC<Props> = props => {
 
   const transform = new DataTransform()
 
-  const [currentViewport, setCurrentViewport] = useState<String>('lg')
+  const [currentViewport, setCurrentViewport] = useState('lg')
 
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
 
@@ -111,13 +101,13 @@ const CdcDataBite: FC<Props> = props => {
     setLoading(false)
   }
 
-  const calculateDataBite = (includePrefixSuffix: boolean = true): string | number => {
+  const calculateDataBite = (includePrefixSuffix= true) => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
       return ''
     }
 
-    const applyPrecision = (value: number | string): string => {
+    const applyPrecision = (value) => {
       // first validation
       if (value === undefined || value === null) {
         console.error('Enter correct value to "applyPrecision()" function ')
@@ -128,7 +118,7 @@ const CdcDataBite: FC<Props> = props => {
         console.error(' Argunment isNaN, "applyPrecision()" function ')
         return
       }
-      let result: number | string = value
+      let result = value
       let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
       //  ROUND FIELD  going -1,-2,-3 numbers
       if (roundToPlace < 0) {
@@ -142,7 +132,7 @@ const CdcDataBite: FC<Props> = props => {
     }
 
     // filter null and 0 out from count data
-    const getColumnCount = (arr: (string | number)[]) => {
+    const getColumnCount = (arr) => {
       if (config.dataFormat.ignoreZeros) {
         numericalData = numericalData.filter(item => item && item)
         return numericalData.length
@@ -151,7 +141,7 @@ const CdcDataBite: FC<Props> = props => {
       }
     }
 
-    const getColumnSum = (arr: (string | number)[]) => {
+    const getColumnSum = (arr) => {
       // first validation
       if (arr === undefined || arr === null) {
         console.error('Enter valid value for getColumnSum function ')
@@ -163,17 +153,17 @@ const CdcDataBite: FC<Props> = props => {
         console.error('Arguments are not valid getColumnSum function ')
         return
       }
-      let sum: number = 0
+      let sum = 0
       if (arr.length > 1) {
         /// first convert each element to number then add using reduce method to escape string concatination.
-        sum = arr.map(el => Number(el)).reduce((sum: number, x: number) => sum + x)
+        sum = arr.map(el => Number(el)).reduce((sum, x) => sum + x)
       } else {
         sum = Number(arr[0])
       }
       return applyPrecision(sum)
     }
 
-    const getColumnMean = (arr: (string | number)[]) => {
+    const getColumnMean = (arr) => {
       // add default params to escape errors on runtime
       // first validation
       if (arr === undefined || arr === null || !Array.isArray(arr)) {
@@ -185,7 +175,7 @@ const CdcDataBite: FC<Props> = props => {
         arr = arr.filter(num => num !== 0)
       }
 
-      let mean: number = 0
+      let mean = 0
       if (arr.length > 1) {
         /// first convert each element to number then add using reduce method to escape string concatination.
         mean = arr.map(el => Number(el)).reduce((a, b) => a + b) / arr.length
@@ -195,7 +185,7 @@ const CdcDataBite: FC<Props> = props => {
       return applyPrecision(mean)
     }
 
-    const getMode = (arr: any[] = []): string[] => {
+    const getMode = (arr = []) => {
       // add default params to escape errors on runtime
       // this function accepts any array and returns array of strings
       let freq = {}
@@ -230,7 +220,7 @@ const CdcDataBite: FC<Props> = props => {
       return applyPrecision(value)
     }
 
-    const applyLocaleString = (value: string): string => {
+    const applyLocaleString = (value) => {
       if (value === undefined || value === null) return
       if (Number.isNaN(value) || typeof value === 'number') {
         value = String(value)
@@ -249,7 +239,7 @@ const CdcDataBite: FC<Props> = props => {
       return formattedValue
     }
 
-    let dataBite: string | number = ''
+    let dataBite = ''
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data
@@ -264,7 +254,7 @@ const CdcDataBite: FC<Props> = props => {
       }
     })
 
-    let numericalData: any[] = []
+    let numericalData = []
     // Get the column's data
     if (filteredData.length) {
       filteredData.forEach(row => {
@@ -298,8 +288,8 @@ const CdcDataBite: FC<Props> = props => {
         dataBite = getMode(numericalData).join('')
         break
       case DATA_FUNCTION_RANGE:
-        let rangeMin: number | string = Math.min(...numericalData)
-        let rangeMax: number | string = Math.max(...numericalData)
+        let rangeMin = Math.min(...numericalData)
+        let rangeMax = Math.max(...numericalData)
         rangeMin = applyPrecision(rangeMin)
         rangeMax = applyPrecision(rangeMax)
         if (config.dataFormat.commas) {

@@ -2,10 +2,12 @@
   "name": "@cdc/data-bite",
   "version": "4.22.11",
   "description": "React component for displaying a single piece of data in a card module",
+  "moduleName": "CdcDataBite",
   "main": "dist/cdcdatabite",
   "scripts": {
-    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcDataBite --env folderName=data-bite -c ../../webpack.config.js",
+    "start": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/data-bite build"
   },
   "repository": {
@@ -23,7 +25,7 @@
     "@cdc/core": "^4.22.11",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
-    "html-react-parser": "1.4.9",
+    "html-react-parser": "^3.0.8",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
     "react-beautiful-dnd": "^13.0.0",
@@ -33,11 +35,8 @@
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": ">=16"
-  },
-  "resolutions": {
-    "@types/react": "17.x"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
 }

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import '../scss/choose-vis-tab.scss'
 
-import GlobalState from '../context'
+import ConfigContext from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
@@ -19,7 +19,7 @@ import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import GenericIcon from '@cdc/core/assets/icon-info.svg'
 
 export default function ChooseTab() {
-  const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(GlobalState)
+  const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)
 
   useEffect(() => {
     if (tempConfig !== null) {

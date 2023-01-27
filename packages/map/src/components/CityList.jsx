@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react'
-/** @jsx jsx */
+import { useState, useEffect } from 'react'
+
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
 import { useTable, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination } from 'react-table'
-import GlobalState from '../context'
+import ConfigContext from '../ConfigContext'
 import { useDebounce } from 'use-debounce'
 
 // Core
@@ -49,7 +49,7 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
 
 const PreviewDataTable = ({ data }) => {
   const [tableData, setTableData] = useState(data ?? [])
-  const { setErrors, errorMessages, config } = useContext(GlobalState)
+  const { setErrors, errorMessages, config } = useContext(ConfigContext)
 
   const tableColumns = useMemo(() => {
     const columns = tableData.columns ?? []

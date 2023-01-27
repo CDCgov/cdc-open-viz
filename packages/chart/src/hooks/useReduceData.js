@@ -7,6 +7,7 @@ function useReduceData(config, data) {
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
+
       const yTotals = data.reduce((allTotals, xValue) => {
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
           yTotal += Number(xValue[k])
@@ -18,7 +19,7 @@ function useReduceData(config, data) {
           max = totalYValues
         }
         return allTotals
-      }, [] as number[])
+      }, [])
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
@@ -57,7 +58,7 @@ function useReduceData(config, data) {
     return min
   }
 
-  const findPositiveNum = (): boolean => {
+  const findPositiveNum = () => {
     // loop throught provided data to find positve number in arr based on series keys.
     let existPositiveValue = false
     if (config.runtime.seriesKeys) {

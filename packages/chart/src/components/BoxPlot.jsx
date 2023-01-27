@@ -1,14 +1,13 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
 import { scaleBand, scaleLinear } from '@visx/scale'
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
-import ReactTooltip from 'react-tooltip'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
-  const { transformedData: data, config } = useContext(Context)
+  const { transformedData: data, config } = useContext(ConfigContext)
 
   const {
     boxplot: { columnFirstQuartile, columnThirdQuartile, columnMax, columnMin, columnMedian, columnOutliers },

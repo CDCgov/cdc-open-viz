@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react'
-import Context from './../context'
+import React, { useState, useContext } from 'react'
+import ConfigContext from './../ConfigContext'
 import Button from '@cdc/core/components/elements/Button'
 
 const useFilters = () => {
-  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(Context)
+  const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)
   const [showApplyButton, setShowApplyButton] = useState(false)
 
   const sortAsc = (a, b) => {

@@ -7,7 +7,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-import GlobalState from './context'
+import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 
@@ -163,7 +163,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
 
   return (
     <GlobalContextProvider>
-      <GlobalState.Provider value={state}>
+      <ConfigContext.Provider value={state}>
         <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
           <Tabs className='top-level' startingTab={globalActive}>
             <TabPane title='1. Choose Visualization Type' className='choose-type'>
@@ -178,7 +178,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
             </TabPane>
           </Tabs>
         </div>
-      </GlobalState.Provider>
+      </ConfigContext.Provider>
       <OverlayFrame />
     </GlobalContextProvider>
   )

@@ -2,10 +2,13 @@
   "name": "@cdc/waffle-chart",
   "version": "4.22.11",
   "description": "React component for displaying a single piece of data in a card module",
+  "type": "module",
   "main": "dist/cdcwafflechart",
+  "moduleName": "CdcWaffleChart",
   "scripts": {
-    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcWaffleChart --env folderName=waffle-chart -c ../../webpack.config.js",
+    "start": "vite --open",
+    "build": "vite build --force",
+    "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/waffle-chart build"
   },
   "repository": {
@@ -24,18 +27,15 @@
     "@visx/shape": "^2.1.1",
     "chroma": "0.0.1",
     "chroma-js": "^2.1.0",
-    "html-react-parser": "1.4.9",
+    "html-react-parser": "^3.0.8",
     "react-accessible-accordion": "^3.3.4",
     "react-tooltip": "4.2.8",
     "use-debounce": "^6.0.1",
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": ">=16"
-  },
-  "resolutions": {
-    "@types/react": "17.x"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
 }

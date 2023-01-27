@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Tabs = ({ children, startingTab = 0, className, changeTab = null }) => {
   const [active, setActive] = useState(startingTab)

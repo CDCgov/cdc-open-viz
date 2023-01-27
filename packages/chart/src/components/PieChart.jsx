@@ -8,23 +8,20 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import useIntersectionObserver from './useIntersectionObserver'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-// react-spring transition definitions
-type PieStyles = { startAngle: number; endAngle: number }
-
-const enterUpdateTransition = ({ startAngle, endAngle }: PieArcDatum<any>) => ({
+const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,
   endAngle
 })
 
 export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext<any>(Context)
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
 
-  const [filteredData, setFilteredData] = useState<any>(undefined)
-  const [animatedPie, setAnimatePie] = useState<boolean>(false)
+  const [filteredData, setFilteredData] = useState(undefined)
+  const [animatedPie, setAnimatePie] = useState(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -49,17 +46,9 @@ export default function PieChart() {
     }
   }, [dataRef?.isIntersecting, config.animate])
 
-  type AnimatedPieProps<Datum> = ProvidedProps<Datum> & {
-    animate?: boolean
-    getKey: (d: PieArcDatum<Datum>) => string
-    delay?: number
-  }
 
-  function AnimatedPie<Datum>({ arcs, path, getKey }: AnimatedPieProps<Datum>) {
-    const transitions = useTransition<PieArcDatum<Datum>, PieStyles>(
-      arcs,
-      getKey,
-      // @ts-ignore react-spring doesn't like this overload
+  function AnimatedPie({ arcs, path, getKey }) {
+    const transitions = useTransition( arcs, getKey,
       {
         from: enterUpdateTransition,
         enter: enterUpdateTransition,
@@ -70,7 +59,7 @@ export default function PieChart() {
 
     return (
       <>
-        {transitions.map(({ item: arc, props, key }: { item: PieArcDatum<Datum>; props: PieStyles; key: string }) => {
+        {transitions.map(({ item: arc, props, key }) => {
           let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(arc.data[config.runtime.yAxis.dataKey])}` : formatNumber(arc.data[config.runtime.yAxis.dataKey])
           let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${arc.data[config.runtime.xAxis.dataKey]}` : arc.data[config.runtime.xAxis.dataKey]
 
@@ -79,11 +68,9 @@ export default function PieChart() {
             ${xAxisTooltip}<br />
             Percent: ${Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
             `
-
           return (
             <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               <animated.path
-                // compute interpolated path d attribute from intermediate angle values
                 d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
                   path({
                     ...arc,
@@ -98,7 +85,7 @@ export default function PieChart() {
             </Group>
           )
         })}
-        {transitions.map(({ item: arc, key }: { item: PieArcDatum<Datum>; props: PieStyles; key: string }) => {
+        {transitions.map(({ item: arc, key }) => {
           const [centroidX, centroidY] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
@@ -159,7 +146,7 @@ export default function PieChart() {
       <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
-            {pie => <AnimatedPie<any> {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
+            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
           </Pie>
         </Group>
       </svg>

@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 
-const GlobalState = createContext()
+const ConfigContext = createContext()
 
-GlobalState.displayName = 'GlobalState'
+ConfigContext.displayName = 'ConfigContext'
 
-export default GlobalState
+export default ConfigContext

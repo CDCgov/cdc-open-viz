@@ -5,7 +5,7 @@ import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, Acc
 
 import { useDebounce } from 'use-debounce'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
@@ -17,9 +17,6 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-
-// TODO: Remove unused imports
-// TDOO: Move inline styles to a scss file
 
 /* eslint-disable react-hooks/rules-of-hooks */
 
@@ -209,7 +206,7 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(Context)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
   const { paletteName, isPaletteReversed, filteredPallets, filteredQualitative, dispatch } = useColorPalette(colorPalettes, config)

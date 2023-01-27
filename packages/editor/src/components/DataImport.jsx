@@ -5,7 +5,7 @@ import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
-import GlobalState from '../context'
+import ConfigContext from '../ConfigContext'
 
 import TabPane from './TabPane'
 import Tabs from './Tabs'
@@ -27,7 +27,7 @@ import '../scss/data-import.scss'
 import '@cdc/core/styles/v2/components/data-designer.scss'
 
 export default function DataImport() {
-  const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(GlobalState)
+  const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
 
   const transform = new DataTransform()
 

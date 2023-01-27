@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, FC } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
@@ -32,13 +32,8 @@ const themeColor = {
   'theme-green': '#4b830d',
   'theme-amber': '#fbab18'
 }
-interface Props {
-  config?: any
-  isEditor?: any
-  link?: any
-}
 
-const WaffleChart: FC<Props> = ({ config, isEditor, link }) => {
+const WaffleChart = ({ config, isEditor, link }) => {
   let { title, theme, shape, nodeWidth, nodeSpacer, prefix, suffix, subtext, content, orientation, filters, dataColumn, dataFunction, dataConditionalColumn, dataConditionalOperator, dataConditionalComparate, customDenom, dataDenom, dataDenomColumn, dataDenomFunction, roundToPlace } = config
 
   const calculateData = useCallback(() => {
@@ -316,7 +311,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
   const [config, setConfig] = useState({ ...defaults })
   const [loading, setLoading] = useState(true)
 
-  const [currentViewport, setCurrentViewport] = useState<String>('lg')
+  const [currentViewport, setCurrentViewport] = useState('lg')
   const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
   const [container, setContainer] = useState()
 
@@ -387,6 +382,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
 
   //Reload config if parent passes different config
   if (configObj) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       console.log('changing')
       if (!configObj.dataUrl) {

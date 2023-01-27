@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite'
 import commonViteConfig from '../../vite.config'
 
-import { moduleName } from './package.json'
+import { name, moduleName } from './package.json'
 
 let customBuild = {
   ...commonViteConfig,
   build: {
     ...commonViteConfig.build,
     lib: {
-      name: moduleName,
+      name: name,
       entry: `src/${moduleName}.jsx`,
       fileName: (format) => `${moduleName.toLowerCase()}.${format}.js`,
     }

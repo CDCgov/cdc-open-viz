@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import DataTransform from '@cdc/core/helpers/DataTransform'
@@ -11,16 +11,14 @@ import './scss/main.scss'
 
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-type Defaults = typeof defaults
-
 const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
 
   const transform = new DataTransform()
   // Default States
-  const [config, setConfig] = useState<Defaults>(defaults)
+  const [config, setConfig] = useState(defaults)
   const [loading, setLoading] = useState(true)
-  const [stateData, setStateData] = useState<Array<any>>(config.data || [])
-  const [excludedData, setExcludedData] = useState<Array<Object>>() // eslint-disable-line
+  const [stateData, setStateData] = useState(config.data || [])
+  const [excludedData, setExcludedData] = useState()
   let { title, filters } = config
   const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
 
@@ -28,7 +26,6 @@ const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor =
 
   // Default Functions
 
-  //@ts-ignore
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
     // If data is included through a URL, fetch that and store
