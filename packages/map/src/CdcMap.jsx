@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 
 // IE11
-import 'core-js/stable'
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
@@ -943,6 +942,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
           <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
             {state.tooltips.linkLabel}
             <ExternalIcon className='inline-icon ml-1' />
@@ -969,7 +969,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         .join(' ')
       return frontSplit + splitCharacter + backSplit
     } else {
-      // just return with each word upper cased
+      // just return with each word uppercase
       return string
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
@@ -1311,6 +1311,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [runtimeData])
 
   if (config) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
     }, [config.data])
@@ -1384,7 +1385,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       tabbingID = `#dataTableSection__${Date.now()}`
     }
 
-    // 3) if its a navigation map skip to the dropdown.
+    // 3) if it's a navigation map skip to the dropdown.
     if (state.general.type === 'navigation') {
       tabbingID = `#dropdown-${Date.now()}`
     }
@@ -1404,6 +1405,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
                   <sup>{general.superTitle}</sup>
                   <div>{parse(title)}</div>
@@ -1430,6 +1432,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 Skip Over Map Container
               </a>
 
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
               <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
                 {currentViewport && (
                   <section className='geography-container' ref={mapSvg}>

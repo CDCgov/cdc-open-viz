@@ -1,5 +1,5 @@
-import React, { useState, useEffect, memo } from 'react'
-/** @jsx jsx */
+import { useState, useEffect, memo } from 'react'
+
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoCentroid } from 'd3-geo'

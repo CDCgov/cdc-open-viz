@@ -15,7 +15,7 @@ import parse from 'html-react-parser'
 import { Base64 } from 'js-base64'
 
 // Primary Components
-import Context from './context'
+import ConfigContext from './ConfigContext'
 import PieChart from './components/PieChart'
 import LinearChart from './components/LinearChart'
 
@@ -45,7 +45,7 @@ import './scss/main.scss'
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
 
-  const [loading, setLoading] = useState<Boolean>(true)
+  const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
   const [stateData, setStateData] = useState(config.data || [])
@@ -791,10 +791,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   isEditor && classes.push('isEditor')
 
   return (
-    <Context.Provider value={contextValues}>
+    <ConfigContext.Provider value={contextValues}>
       <div className={`${classes.join(' ')}`} ref={outerContainerRef} data-lollipop={config.isLollipopChart} data-download-id={imageId}>
         {body}
       </div>
-    </Context.Provider>
+    </ConfigContext.Provider>
   )
 }

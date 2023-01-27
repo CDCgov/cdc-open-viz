@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import ReactTooltip from 'react-tooltip'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -25,7 +25,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 
-const ReactTags = require('react-tag-autocomplete') // Future: Lazy
+// import ReactTags from 'react-tag-autocomplete'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)

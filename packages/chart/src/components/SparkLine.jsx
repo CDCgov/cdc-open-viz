@@ -14,10 +14,10 @@ import ReactTooltip from 'react-tooltip'
 
 import useReduceData from '../hooks/useReduceData'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(Context)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
   const { minValue, maxValue } = useReduceData(config, data)
 
@@ -115,7 +115,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                 const tooltip = `<div>
 									${yAxisTooltip}<br />
 									${xAxisTooltip}<br />
-									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''} 
+									${config.seriesLabel ? `${config.seriesLabel}: ${seriesKey}` : ''}
 									</div>`
 
                 let circleRadii = 4.5

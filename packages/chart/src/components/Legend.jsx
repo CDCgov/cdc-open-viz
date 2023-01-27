@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -7,7 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, setFilteredData, colorPalettes, rawData, setConfig } = useContext(Context)
+  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, setFilteredData, colorPalettes, rawData, setConfig } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 

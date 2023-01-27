@@ -2,11 +2,12 @@
   "name": "@cdc/chart",
   "version": "4.22.11",
   "description": "React component for visualizing tabular data in various types of charts",
-  "main": "CdcChart",
+  "moduleName": "CdcChart",
+  "main": "dist/cdcchart",
   "type": "module",
   "scripts": {
     "start": "vite --open",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/chart build"
   },

@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'

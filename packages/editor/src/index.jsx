@@ -9,7 +9,6 @@ let activeTab = Number.parseInt(standaloneParams.get('active')) - 1 || null
 
 let domContainer = document.getElementsByClassName('react-container')[0]
 
-
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <CdcEditor startingTab={activeTab} containerEl={domContainer} />

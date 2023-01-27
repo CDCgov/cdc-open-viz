@@ -10,10 +10,10 @@ import CdcMarkupInclude from '@cdc/markup-include'
 import '../scss/configure-tab.scss'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import GlobalState from '../context'
+import ConfigContext from '../ConfigContext'
 
 export default function ConfigureTab({ containerEl }) {
-  const { config, setTempConfig, hostname } = useContext(GlobalState)
+  const { config, setTempConfig, hostname } = useContext(ConfigContext)
 
   let { type } = config
 

@@ -2,10 +2,12 @@
   "name": "@cdc/dashboard",
   "version": "4.22.11",
   "description": "React component for combining multiple visualizations into a single dashboard",
+  "moduleName": "CdcDashboard",
   "main": "dist/cdcdashboard",
   "scripts": {
-    "start": "npx webpack serve --mode development -c ../../webpack.config.js",
-    "build": "npx webpack --mode production --env packageName=CdcDashboard --env folderName=dashboard -c ../../webpack.config.js",
+    "start": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
     "prepublishOnly": "lerna run --scope @cdc/dashboard build"
   },
   "repository": {
@@ -19,14 +21,14 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/chart": "^9.22.9",
+    "@cdc/chart": "4.22.11",
     "@cdc/core": "^4.22.11",
     "@cdc/data-bite": "^4.22.11",
-    "@cdc/filtered-text": "^0.0.1",
+    "@cdc/filtered-text": "^4.22.11",
     "@cdc/map": "^4.22.11",
     "@cdc/markup-include": "^4.22.11",
     "@cdc/waffle-chart": "^4.22.11",
-    "html-react-parser": "1.4.9",
+    "html-react-parser": "^3.0.8",
     "js-base64": "^2.5.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.3.4",
@@ -38,11 +40,8 @@
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {
-    "react": ">=16.8",
-    "react-dom": ">=16"
-  },
-  "resolutions": {
-    "@types/react": "17.x"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "gitHead": "ff89a7aea74c533413c62ef8859cc011e6b3cbfa"
 }

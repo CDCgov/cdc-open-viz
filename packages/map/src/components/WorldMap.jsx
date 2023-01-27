@@ -1,5 +1,5 @@
-import React, { useEffect, memo } from 'react'
-/** @jsx jsx */
+import { useEffect, memo } from 'react'
+
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoMercator } from 'd3-geo'

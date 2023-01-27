@@ -6,12 +6,12 @@ import { Base64 } from 'js-base64'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 export default function DataTable() {
-  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(Context)
+  const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
 
   // Debugging.
   // if (config.visualizationType === 'Box Plot') return null

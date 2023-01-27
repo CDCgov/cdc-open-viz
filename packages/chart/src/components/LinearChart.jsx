@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 
 import { Group } from '@visx/group'
@@ -9,7 +9,7 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import BarChart from './BarChart'
 import LineChart from './LineChart'
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from './useIntersectionObserver'
 import CoveBoxPlot from './BoxPlot'
@@ -22,10 +22,10 @@ import useTopAxis from '../hooks/useTopAxis'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext<any>(Context)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
   let [width] = dimensions
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
-  const [animatedChart, setAnimatedChart] = useState<boolean>(false)
+  const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -40,7 +40,7 @@ export default function LinearChart() {
     }
   })
 
-  // If the chart is in view and set to animate and it has not already played
+  // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
       setTimeout(() => {
@@ -60,8 +60,8 @@ export default function LinearChart() {
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
-  const getXAxisData = (d: any) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  const getYAxisData = (d: any, seriesKey: string) => d[seriesKey]
+  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   let xScale
   let yScale
@@ -122,19 +122,19 @@ export default function LinearChart() {
     }
 
     if (config.runtime.horizontal) {
-      xScale = scaleLinear<number>({
+      xScale = scaleLinear({
         domain: [min, max],
         range: [0, xMax]
       })
 
       yScale =
         config.runtime.xAxis.type === 'date'
-          ? scaleLinear<number>({
+          ? scaleLinear({
               domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
             })
-          : scalePoint<string>({ domain: xAxisDataMapped, padding: 0.5 })
+          : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
-      seriesScale = scalePoint<string>({
+      seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, yMax]
       })
@@ -143,18 +143,18 @@ export default function LinearChart() {
     } else {
       min = min < 0 ? min * 1.11 : min
 
-      yScale = scaleLinear<number>({
+      yScale = scaleLinear({
         domain: [min, max],
         range: [yMax, 0]
       })
 
-      xScale = scalePoint<string>({
+      xScale = scalePoint({
         domain: xAxisDataMapped,
         range: [0, xMax],
         padding: 0.5
       })
 
-      seriesScale = scalePoint<string>({
+      seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, xMax]
       })
@@ -171,13 +171,13 @@ export default function LinearChart() {
       )
 
       // group one
-      var g1xScale = scaleLinear<number>({
+      var g1xScale = scaleLinear({
         domain: [0, Math.max(groupOneMax, groupTwoMax)],
         range: [xMax / 2, 0]
       })
 
       // group 2
-      var g2xScale = scaleLinear<number>({
+      var g2xScale = scaleLinear({
         domain: g1xScale.domain(),
         range: [xMax / 2, xMax]
       })
