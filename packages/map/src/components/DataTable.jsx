@@ -5,7 +5,7 @@ import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon com
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import Loading from '@cdc/core/components/Loading'
 

@@ -1,15 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import CdcChart from './CdcChart'
+import CdcMap from './CdcMap';
 
-//@ts-ignore
 let isEditor = window.location.href.includes('editor=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcChart configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+    <CdcMap
+      isEditor={isEditor}
+      configUrl={domContainer.attributes['data-config'].value}
+      containerEl={domContainer}
+    />
   </React.StrictMode>,
 )
