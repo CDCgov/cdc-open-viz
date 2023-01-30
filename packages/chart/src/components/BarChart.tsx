@@ -99,7 +99,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
   function cleanData(data) {
     let cleanedup = []
-    console.log('## Data to clean=', data)
+    //console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
       //console.log("clean", i, " d", d);
       let cleanedBar = {}
@@ -110,7 +110,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         } else {
           // remove comma and dollar signs
           let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          //console.log("tmp no comma or $", tmp)
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedBar[key] = tmp
           } else {
@@ -121,7 +120,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       //console.log("cleanedBar=", cleanedBar);
       cleanedup.push(cleanedBar)
     })
-    console.log('## cleanedData =', cleanedup)
+    //console.log('## cleanedData =', cleanedup)
     return cleanedup
   }
   const isNumber = value => {
@@ -134,10 +133,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       return value !== null && value !== '' && /\d+\.?\d*/.test(value)
     }
     return false // if we get here something is wrong so return false
-  }
-  const logit = val => {
-    console.log('BarChart val,type ', val, typeof val)
-    return val
   }
 
   // Using State
@@ -189,8 +184,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
-                  //console.log("1 stacked not horiz size",config.runtime.yAxis.size);
-
                   let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                   let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                   let barThickness = xMax / barStack.bars.length
@@ -199,10 +192,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   const style = applyRadius(barStack.index)
                   // tooltips
                   const xAxisValue = config.runtime.xAxis.type === 'date' ? formatDate(parseDate(data[bar.index][config.runtime.xAxis.dataKey])) : data[bar.index][config.runtime.xAxis.dataKey]
-                  console.log('bar.bar.data', bar.bar.data[bar.key])
-                  console.log('bar.bar.data isNantest', /[\d]/.test(bar.bar.data[bar.key]))
                   const yAxisValue = typeof bar.bar.data[bar.key] !== 'number' ? formatNumber(bar.bar.data[bar.key]) : formatNumber(0)
-                  console.log('xAxisValue, yAxisValue', xAxisValue, yAxisValue)
                   let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                   const xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
                   if (!hasMultipleSeries) {
@@ -214,7 +204,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   ${yAxisTooltip}<br />
                   ${xAxisTooltip}
                     </div>`
-                  //console.log("1 stacked after tooltip bar", bar);
                   return (
                     <>
                       <style>
@@ -258,7 +247,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
-                    console.log('2 stacked horiz')
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1
                     let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1
                     config.barHeight = Number(config.barHeight)
@@ -368,8 +356,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(0)
                       let barGroupWidth = ((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (config.barThickness || 0.8)
                       let offset = (((config.runtime.horizontal ? yMax : xMax) / barGroups.length) * (1 - (config.barThickness || 0.8))) / 2
-
-                      console.log('barHeight, barY', barHeight, barY)
 
                       // ! Unsure if this should go back.
                       if (config.isLollipopChart) {
