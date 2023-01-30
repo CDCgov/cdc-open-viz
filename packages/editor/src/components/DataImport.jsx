@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import { get } from 'axios'
+import get from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -15,10 +15,11 @@ import LinkIcon from '../assets/icons/link.svg'
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
-import validMapData from '../../example/valid-data-map.csv'
-import validChartData from '../../example/valid-data-chart.csv'
-import validCountyMapData from '../../example/valid-county-data.csv'
-import sampleGeoPoints from '../../example/supported-cities.csv'
+// Vite specific syntax, use ?raw following url to parse direct reference
+import validMapData from '../../example/valid-data-map.csv?raw'
+import validChartData from '../../example/valid-data-chart.csv?raw'
+import validCountyMapData from '../../example/valid-county-data.csv?raw'
+import sampleGeoPoints from '../../example/supported-cities.csv?raw'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -610,7 +611,10 @@ export default function DataImport() {
             {/* TODO: Add more sample data in, but this will do for now. */}
             <span className='heading-3'>Load Sample Data:</span>
             <ul className='sample-data-list'>
-              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
+              <button className='link link-upload'
+                      onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+                      onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+              >
                 United States Sample Data #1
               </button>
               <button
