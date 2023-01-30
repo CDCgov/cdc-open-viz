@@ -1,3 +1,4 @@
+//TODO: COVE Refactor This is LEGEND-ary
 import React from 'react'
 import parse from 'html-react-parser'
 
