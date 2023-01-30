@@ -36,19 +36,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return `${formatNumber(value, axis)}`
   }
 
-  const isNumberLog = value => {
-    //console.log("entering isNumber valuetype is:",typeof value);
-    var test = value != null && value !== '' && /\d+\.?\d*/.test(value) && !Number.isNaN(value)
-    // Note: value is still a string here
-    // so typeof value === 'number' does not work
-    if (test === false) {
-      console.log('# isNUmber FALSE on value, result', value, test)
-    } else {
-      console.log('# isNUmber TRUE on value, result', value, test)
-    }
-    return value != null && value !== '' && /\d+\.?\d*/.test(value) && !Number.isNaN(value)
-  }
-
   const isNumber = value => {
     // in debugging I saw cases where inbound was a 'number'
     // and other times a 'string' so might as well take care of both here
@@ -68,10 +55,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     }
     return cy
   }
-  const logit = val => {
-    console.log('LineChart val,type ', val, typeof val)
-    return val
-  }
 
   // REMOVE bad data points from the data set
   // Examples: NA, N/A, "1,234", "anystring"
@@ -80,7 +63,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   // i.e. if a series has any bad data points the entire series wont plot
   function cleanData(data) {
     let cleanedup = []
-    console.log('## Data to clean=', data)
+    //console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
       //console.log("clean", i, " d", d);
       let cleanedSeries = {}
@@ -99,10 +82,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
           }
         }
       })
-      //console.log("cleanedSeries=", cleanedSeries);
       cleanedup.push(cleanedSeries)
     })
-    console.log('## cleanedData =', cleanedup)
+    //console.log('## cleanedData =', cleanedup)
     return cleanedup
   }
 
@@ -145,9 +127,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ${xAxisTooltip}
                   </div>`
                 let circleRadii = 4.5
-                //console.log("d[seriesKey]", d[seriesKey]);
-                //console.log("getYAxisData(d, seriesKey)", getYAxisData(d, seriesKey));
-                //console.log("getXAxisData(d))",getXAxisData(d));
+
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
@@ -189,19 +169,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 curve={allCurves.curveLinear}
                 data={cleanData(data)}
                 x={d => xScale(getXAxisData(d))}
-                //y={1}
-                //y={d => (seriesAxis === 'Right' ? logit(yScaleRight(getYAxisData(d, seriesKey))) : logit(yScale(getYAxisData(d, seriesKey))))}
-                //y={d => (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey))) && isNumber(yScale(getYAxisData(d, seriesKey))) ? logit(yScaleRight(getYAxisData(d, seriesKey))) : logit(yScale(getYAxisData(d, seriesKey))))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
-                /*                 y={d => {
-                  if (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey)))) {
-                    return logit(yScaleRight(getYAxisData(d, seriesKey)))
-                  } else if (seriesAxis !== 'Right' && isNumber(yScale(getYAxisData(d, seriesKey)))) {
-                    return logit(yScale(getYAxisData(d, seriesKey)))
-                  } else {
-                    return null
-                  }
-                }} */
                 stroke={
                   colorScale && !config.legend.dynamicLegend
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
@@ -219,7 +187,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 // - but if you add isNumber here and remove cleanedData above
                 // it will fail
                 defined={(item, i) => {
-                  return logit(item[config.runtime.seriesLabels[seriesKey]]) !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
+                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
                 }}
               />
               {config.animate && (
@@ -228,12 +196,11 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   curve={allCurves.curveLinear}
                   data={cleanData(data)}
                   x={d => xScale(getXAxisData(d))}
-                  //y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   y={d => {
                     if (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey)))) {
                       return yScaleRight(getYAxisData(d, seriesKey))
                     } else if (seriesAxis !== 'Right' && isNumber(yScale(getYAxisData(d, seriesKey)))) {
-                      return logit(yScale(getYAxisData(d, seriesKey)))
+                      return yScale(getYAxisData(d, seriesKey))
                     } else {
                       return null
                     }

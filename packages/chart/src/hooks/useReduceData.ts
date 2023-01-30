@@ -4,7 +4,6 @@ function useReduceData(config, data) {
   // for combo charts check if all Data series selected Line or dashed-md/sm/lg.
   const isAllLine = config?.series?.every(el => el.type === 'Line' || el.type === 'dashed-sm' || el.type === 'dashed-md' || el.type === 'dashed-lg')
   const isNumber = value => {
-    //console.log("useReduce isNumber val,type ", value, typeof value);
     value = cleanChars(value) // clean first
     if (typeof value === 'string') {
       return value !== null && value !== '' && /\d+\.?\d*/.test(value)
@@ -19,13 +18,6 @@ function useReduceData(config, data) {
     //console.log("entering isNumberLog valuetype is:",typeof value);
     value = cleanChars(value) // clean first
     // last test checks for 1 or more digits, optional decimal, 0 or more optional digits
-    var test = value != null && value !== '' && /\d+\.?\d*/.test(value)
-    // so typeof value === 'number' does not work
-    if (test === false) {
-      console.log('# isNUmberLog FALSE on value, result', value, test)
-    } else {
-      console.log('# isNUmberLog TRUE on value, result', value, test)
-    }
     if (typeof value === 'string') {
       return value !== null && value !== '' && /\d+\.?\d*/.test(value)
     }
@@ -34,7 +26,6 @@ function useReduceData(config, data) {
       return !Number.isNaN(value)
     }
     return false // if we get here its not a string or a number so something else
-    //value != null && value !== '' && /[\d]/.test(value) && !Number.isNaN(value)
   }
   const cleanChars = value => {
     // remove comma and $ signs
@@ -58,6 +49,7 @@ function useReduceData(config, data) {
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
+      console.log('max=', max)
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
@@ -80,10 +72,9 @@ function useReduceData(config, data) {
         max = Number(barMax) > Number(lineMax) ? barMax : lineMax
       }
     } else {
-      //console.log("###useReduceData ELSE case")
       max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
-    console.log('MAX=', max)
+    //console.log("max=",max)
     return max
   }
 
@@ -91,7 +82,7 @@ function useReduceData(config, data) {
     let min
     const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
-    console.log('MIN=', min)
+    //console.log("min=",min)
     return min
   }
 
