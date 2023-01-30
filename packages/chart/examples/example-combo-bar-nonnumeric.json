@@ -83,13 +83,13 @@
   "confidenceKeys": {},
   "visual": { "border": true, "accent": true, "background": true },
   "data": [
-    { "Date": "1/15/2016", "Data 1": "NA", "Data 2": "110", "Data 3": "100", "Data 4": "90", "Monthly-Goal": "100" },
-    { "Date": "2/15/2016", "Data 1": "100", "Data 2": "110", "Data 3": "100", "Data 4": "100", "Monthly-Goal": "100" },
-    { "Date": "3/15/2016", "Data 1": "80", "Data 2": "90", "Data 3": "100", "Data 4": "120", "Monthly-Goal": "110" },
-    { "Date": "4/15/2016", "Data 1": "80", "Data 2": "90", "Data 3": "110", "Data 4": "120", "Monthly-Goal": "110" },
+    { "Date": "1/15/2016", "Data 1": "N/A", "Data 2": "110", "Data 3": "100", "Data 4": "90", "Monthly-Goal": "100" },
+    { "Date": "2/15/2016", "Data 1": "100", "Data 2": "goop", "Data 3": "100", "Data 4": "100", "Monthly-Goal": "100" },
+    { "Date": "3/15/2016", "Data 1": "", "Data 2": "90", "Data 3": "100.5", "Data 4": "120", "Monthly-Goal": "110" },
+    { "Date": "4/15/2016", "Data 1": "80", "Data 2": "2,00", "Data 3": "110", "Data 4": "120", "Monthly-Goal": "110" },
     { "Date": "5/15/2016", "Data 1": "70", "Data 2": "90", "Data 3": "110", "Data 4": "130", "Monthly-Goal": "120" },
     { "Date": "6/15/2016", "Data 1": "100", "Data 2": "120", "Data 3": "120", "Data 4": "130", "Monthly-Goal": "120" },
-    { "Date": "7/15/2016", "Data 1": "110", "Data 2": "140", "Data 3": "120", "Data 4": "130", "Monthly-Goal": "130" },
+    { "Date": "7/15/2016", "Data 1": "zip", "Data 2": null, "Data 3": "120", "Data 4": "130", "Monthly-Goal": "130" },
     { "Date": "8/15/2016", "Data 1": "110", "Data 2": "130", "Data 3": "120", "Data 4": "140", "Monthly-Goal": "130" },
     { "Date": "9/15/2016", "Data 1": "120", "Data 2": "130", "Data 3": "120", "Data 4": "150", "Monthly-Goal": "140" }
   ],
