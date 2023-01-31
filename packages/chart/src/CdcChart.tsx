@@ -62,7 +62,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -242,14 +242,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       // group specific statistics
       // prevent re-renders
-      groups.map((g, index) => {
+      groups.forEach((g, index) => {
         if (!g) return
         // filter data by group
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
-        console.log('g', g)
-        console.log('item', filteredData)
-        console.log('item', newConfig)
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
 
         const q1 = d3.quantile(filteredDataValues, 0.25)
@@ -566,6 +563,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  // function calculates the width of given text and its font-size
+  function getTextWidth(text: string, font: string) {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    context.font = font || getComputedStyle(document.body).font
+
+    return Math.ceil(context.measureText(text).width)
+  }
+
   // Format numeric data based on settings in config
   const formatNumber = (num, axis) => {
     // if num is NaN return num
@@ -781,7 +788,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
-    imageId
+    imageId,
+    getTextWidth
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
