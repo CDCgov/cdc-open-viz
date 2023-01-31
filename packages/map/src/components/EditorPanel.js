@@ -683,7 +683,7 @@ const EditorPanel = props => {
   }
 
   const columnsRequiredChecker = useCallback(() => {
-    console.info('Running columns required check.')
+    console.info('Running columns required check.',state.columns)
     let columnList = []
 
     // Geo is always required
@@ -2125,7 +2125,24 @@ const EditorPanel = props => {
                     <AccordionItemButton>Data Table</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <TextField value={dataTable.title} updateField={updateField} section='dataTable' fieldName='title' label='Data Table Title' placeholder='Data Table' />
+                    <TextField
+                      value={dataTable.title}
+                      updateField={updateField}
+                      section='dataTable'
+                      fieldName='title'
+                      label='Data Table Title'
+                      placeholder='Data Table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Label is required for Data Table for 508 Compliance</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}
