@@ -9,6 +9,7 @@
     "start": "vite --open",
     "build": "vite build",
     "preview": "vite preview",
+    "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/map build"
   },
   "repository": {
