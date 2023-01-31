@@ -2,9 +2,6 @@ import Papa from 'papaparse'
 
 export default async function (url, visualizationType = '') {
   try {
-    // Using URL Object to get pathname without URL paramaters on regex.
-    if (visualizationType === 'map') url = decodeURI(url)
-
     url = new URL(url)
 
     const path = url.pathname
