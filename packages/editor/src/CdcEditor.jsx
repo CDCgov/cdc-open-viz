@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 
-import getViewport from '@cdc/core/helpers/getViewport'
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'

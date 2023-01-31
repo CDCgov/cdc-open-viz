@@ -1,0 +1,22 @@
+@import "../../themes/theme-colors";
+
+.cove-file-selector {
+  padding: 1rem 3rem;
+  font-size: 0.875rem;
+  text-align: center;
+  color: $mediumGray;
+  border: $lightGray 2px dashed;
+  border-radius: .2rem;
+  transition: .1s all;
+  cursor: pointer;
+
+  &.drag-active {
+    background-color: $lightestGray;
+  }
+
+  span {
+    text-decoration: underline;
+    white-space: pre;
+    color: $blue;
+  }
+}

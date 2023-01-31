@@ -1,14 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
+// Components
 import CdcWaffleChart from './CdcWaffleChart'
-
-let isEditor = window.location.href.includes('editor=true')
+import View from '@cdc/core/components/View.jsx'
 
 let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcWaffleChart configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+    <View>
+      <CdcWaffleChart configUrl={domContainer.attributes['data-config'].value} />
+    </View>
   </React.StrictMode>,
 )

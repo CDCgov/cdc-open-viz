@@ -1,23 +1,32 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import EditorPanel from './components/EditorPanel'
-import defaults from './data/initial-state'
-import Loading from '@cdc/core/components/Loading'
-import getViewport from '@cdc/core/helpers/getViewport'
+
+// Third Party
 import ResizeObserver from 'resize-observer-polyfill'
 import parse from 'html-react-parser'
 
-import Context from './context'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import CircleCallout from './components/CircleCallout'
-import './scss/main.scss'
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { Fragment } from 'react'
+// Store
 
+// Data
+import defaults from './data/initial-state'
+
+// Helpers
+import { getViewport, cacheBustingString, numberFromString } from '@cdc/core/helpers/coveHelpers'
 import { publish } from '@cdc/core/helpers/events'
+import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 
+// Components - Core
+import CircleCallout from './components/CircleCallout'
+import Loading from '@cdc/core/components/loader/Loading'
+
+// Components - Local
+import EditorPanel from './components/EditorPanel'
+
+// Styles
+import './scss/main.scss'
+
+// Visualization
 const CdcDataBite = props => {
   const { configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig, link } = props
 

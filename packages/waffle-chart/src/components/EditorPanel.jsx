@@ -2,15 +2,13 @@ import React, { useState, useEffect, memo, useContext } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import ConfigContext from '../ConfigContext'
-
 import Accordion from '@cdc/core/components/ui/Accordion'
-import Button from '@cdc/core/components/elements/Button'
+import Button from '@cdc/core/components/element/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import InputText from '@cdc/core/components/inputs/InputText'
-import InputSelect from '@cdc/core/components/inputs/InputSelect'
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import InputText from '@cdc/core/components/input/InputText'
+import InputSelect from '@cdc/core/components/input/InputSelect'
+import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 

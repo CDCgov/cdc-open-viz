@@ -1,0 +1,153 @@
+@import "../../utils/variables";
+@import "../../themes/theme-colors";
+
+.sbdocs .cove-button {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+
+  &.fluid {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+.cove-button {
+  display: inline-block;
+  position: relative;
+  min-height: 2.125rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  color: #fff;
+  background-color: $primary;
+  border: 0;
+  border-radius: 0.1875rem;
+  outline: none;
+  transition: all 500ms $transition-expo-out;
+  user-select: none;
+
+  * {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &:disabled {
+    background-color: #adadad !important;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:hover,
+  &:active,
+  &:focus,
+  &.active {
+    background-color: lighten($primary, 5%);
+  }
+
+  &:not(.loading) {
+    &:focus,
+    &:active {
+      &::after {
+        content: '';
+        position: absolute;
+        margin: -2px;
+        border-radius: .3125em;
+        outline: 2px solid rgba(161, 161, 161, 0.6);
+        pointer-events: none;
+        inset: 0;
+      }
+    }
+  }
+
+  &.loading:disabled {
+    cursor: default;
+  }
+
+  &.fluid {
+    width: 100%;
+  }
+
+  &.success {
+    background-color: #44aa41;
+
+    &:hover {
+      background-color: lighten(#44aa41, 5%);
+    }
+  }
+
+  &.warn {
+    background-color: #d73636;
+
+    &:hover {
+      background-color: darken(#d73636, 5%);
+    }
+  }
+
+  &.muted {
+    background-color: #a0a0a0;
+
+    &:hover {
+      background-color: darken(#a0a0a0, 5%);
+    }
+  }
+
+  &.cove-button--remove {
+    float: right;
+    min-height: unset;
+    padding: 0;
+    font-size: .7em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-transform: uppercase;
+    color: #C32B2B;
+    background-color: transparent;
+    border-radius: 5px;
+  }
+
+  &.cove-button--flex-center {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.cove-button__text {
+  align-self: stretch;
+  position: relative;
+  transition: width 500ms $transition-expo-out;
+
+  .cove-button__text--loading {
+    opacity: 0;
+  }
+
+  .cove-button__text--children {
+    opacity: 1;
+  }
+
+  .cove-button__text--loading,
+  .cove-button__text--children {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    transition: all 500ms $transition-expo-out;
+  }
+}
+
+.cove-button__load-spin {
+  display: flex;
+  width: 0;
+  overflow: hidden;
+}
+
+.cove-button__text--loading,
+.cove-button__load-spin {
+  white-space: nowrap;
+  transition: all 500ms $transition-expo-out;
+  opacity: 0;
+}

@@ -1,0 +1,75 @@
+@import "../../utils/variables";
+@import "../../themes/theme-colors";
+
+.cove-accordion__item {
+  select {
+    text-transform: capitalize;
+  }
+
+  .number-narrow {
+    width: 75px;
+    min-width: auto;
+  }
+}
+
+.cove-accordion__heading {
+  background: $lightestGray;
+}
+
+.cove-accordion__button {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  padding: .3em 1em;
+  font-size: 1em;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  user-select: none;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 7px;
+    height: 7px;
+    margin-right: 1em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transition: .1s all;
+    transform: rotate(-45deg) translateX(0) translateY(-50%);
+  }
+
+  &[aria-expanded='true']::before,
+  &[aria-selected='true']::before {
+    margin-right: 1.3em;
+    transition: .1s all;
+    transform: rotate(45deg) translateX(-2px) translateY(-70%);
+  }
+}
+
+.cove-accordion__button--text {
+  display: inherit;
+
+  //Accordion Warning Icon
+  .cove-icon--warning {
+    margin-left: 0.5rem;
+  }
+}
+
+.cove-accordion__panel {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.2s ease-in;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  h5 {
+    font-size: .8em;
+  }
+}

@@ -1,12 +1,15 @@
-import React from 'react'
-
-import { useGlobalContext } from '../GlobalContext'
+// Store
+import { useGlobalStore } from '../../stores/globalStore'
 
 import Overlay from './Overlay'
 
 const OverlayFrame = () => {
-  const { overlay } = useGlobalContext()
-  return <Overlay disableBgClose={overlay.disableBgClose}>{overlay.object}</Overlay>
+  const { overlay } = useGlobalStore()
+  return (
+    <Overlay disableBgClose={overlay?.disableBgClose}>
+      { overlay?.object }
+    </Overlay>
+  )
 }
 
 export default OverlayFrame

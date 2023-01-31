@@ -27,20 +27,20 @@ html:focus-within {
 }
 
 body {
-  // TODO: Uncomment after cove refactor - conflicts with flex display on current <body>. Why the $#@&%! 'that' was done in the first place, I have no clue.
-  //min-height: 100vh;
-  text-rendering: optimizeSpeed;
+  min-height: 100vh;
   line-height: 1.5;
+  text-rendering: optimizeSpeed;
 }
 
 a:not([class]) {
   text-decoration-skip-ink: auto;
 }
 
+
 img,
 picture {
-  max-width: 100%;
   display: block;
+  max-width: 100%;
 }
 
 input,
@@ -50,11 +50,10 @@ select {
   font: inherit;
 }
 
-sub,
-sup {
+sub, sup {
+  position: relative;
   font-size: 75%;
   line-height: 0;
-  position: relative;
   vertical-align: baseline;
 }
 
@@ -74,9 +73,9 @@ sub {
   *,
   *::before,
   *::after {
+    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }

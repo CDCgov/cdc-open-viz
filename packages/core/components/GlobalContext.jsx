@@ -1,3 +1,4 @@
+//TODO: COVE Refactor - This needs to be deleted en lieu of Zustand implementation, transition Charts/Maps/Editor(Wizard)/Dashboard
 import React, { createContext, useContext, useState } from 'react'
 
 export const GlobalContext = createContext({})

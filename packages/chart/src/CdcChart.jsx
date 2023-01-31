@@ -30,15 +30,15 @@ import Legend from './components/Legend'
 import DataTable from './components/DataTable'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
-import Loading from '@cdc/core/components/Loading'
+import Loading from '@cdc/core/components/loader/Loading'
 import Filters from './components/Filters'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 // Helpers
-import numberFromString from '@cdc/core/helpers/numberFromString'
-import getViewport from '@cdc/core/helpers/getViewport'
+import { numberFromString } from '@cdc/core/helpers/coveHelpers'
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 
 import './scss/main.scss'
 

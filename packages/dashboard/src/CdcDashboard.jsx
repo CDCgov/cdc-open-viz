@@ -11,14 +11,14 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
-import Loading from '@cdc/core/components/Loading'
+import Loading from '@cdc/core/components/loader/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import getViewport from '@cdc/core/helpers/getViewport'
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
 
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'

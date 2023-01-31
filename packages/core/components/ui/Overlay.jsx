@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useGlobalContext } from '../GlobalContext'
+// Store
+import { useGlobalStore } from '../../stores/globalStore'
 
-import '../../styles/v2/components/overlay.scss'
+// Styles
+import '../../styles/components/ui/overlay.scss'
 
 const Overlay = ({ disableBgClose, children, override = null }) => {
   //Access global modal state
-  let { overlay } = useGlobalContext()
+  let { overlay, toggleOverlay } = useGlobalStore()
 
   //Set local states
-  const [displayOverlay, setDisplayOverlay] = useState(false)
-  const [overlayAnimationState, setOverlayAnimationState] = useState(null)
-  const [overlayErrorState, setOverlayErrorState] = useState(false)
+  const [ displayOverlay, setDisplayOverlay ] = useState(false)
+  const [ overlayAnimationState, setOverlayAnimationState ] = useState(null)
+  const [ overlayErrorState, setOverlayErrorState ] = useState(false)
 
   const overlayDisplay = override ? override?.show : overlay?.show
 
@@ -29,7 +31,7 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     }, 750)
 
     return () => clearTimeout(timeoutShow)
-  }, [overlayDisplay])
+  }, [ overlayDisplay ])
 
   //Animate Out effect
   useEffect(() => {
@@ -45,7 +47,7 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     }, 400)
 
     return () => clearTimeout(timeoutHide)
-  }, [overlayDisplay])
+  }, [ overlayDisplay ])
 
   //Error animate effect
   useEffect(() => {
@@ -56,19 +58,30 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     }, 400)
 
     return () => clearTimeout(timeoutHide)
-  }, [overlayErrorState])
+  }, [ overlayErrorState ])
 
   //Render output
   return (
     <>
-      {displayOverlay && (
-        <div className={`cove-overlay${overlayAnimationState ? ' ' + overlayAnimationState : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
-          <div className='cove-overlay__bg' style={{ cursor: disableBgClose ? 'default' : null }} onClick={e => (disableBgClose ? setOverlayErrorState(true) : overlay ? overlay.actions.toggleOverlay(false) : override ? override.actions.toggleOverlay(false) : e.preventDefault())} role='alert' />
-          <div className='cove-overlay__wrapper'>
-            <div className='cove-overlay__container'>{children}</div>
+      {displayOverlay &&
+        <div
+          className={`cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
+          <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
+               onClick={(e) =>
+                 disableBgClose ? setOverlayErrorState(true) :
+                   overlay ? toggleOverlay(false) :
+                     override ? toggleOverlay(false) :
+                       e.preventDefault()
+               }
+               role="alert"
+          />
+          <div className="cove-overlay__wrapper">
+            <div className="cove-overlay__container">
+              {children}
+            </div>
           </div>
         </div>
-      )}
+      }
     </>
   )
 }

@@ -23,10 +23,10 @@ import './scss/main.scss'
 import './scss/btn.scss'
 
 // Core
-import Loading from '@cdc/core/components/Loading'
+import Loading from '@cdc/core/components/loader/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import getViewport from '@cdc/core/helpers/getViewport'
-import numberFromString from '@cdc/core/helpers/numberFromString'
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
+import { numberFromString } from '@cdc/core/helpers/coveHelpers'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Child Components
