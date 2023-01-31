@@ -8,7 +8,7 @@ import Context from '../context'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate, getTextWidth } = useContext<any>(Context)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -25,7 +25,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
   const stackCount = config.runtime.seriesKeys.length
   const barBorderWidth = 1
-  const fontSize = { small: 14, medium: 16, large: 18 }
+  const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
   const applyRadius = (index: number) => {
@@ -82,16 +82,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
       return { ...bar, y: y, height: barHeight }
     })
-  }
-
-  function getTextWidth(text, font) {
-    // function calculates the width of given text and its font-size
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-
-    context.font = font || getComputedStyle(document.body).font
-
-    return Math.ceil(context.measureText(text).width)
   }
 
   // Using State
@@ -352,8 +342,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                       const style = applyRadius(index)
 
                       // check if bar text/value string fits into  each bars.
-                      let textWidth = getTextWidth(xAxisValue, config.fontSize)
-                      let doesTextFit = (textWidth / bar.y) * 100 < 48
+                      let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                      let isTextFits = textWidth < bar.y - 5 // minus padding 5
 
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -400,15 +390,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
-                              <Text
-                                display={displayBar ? 'block' : 'none'}
-                                x={bar.y}
-                                y={config.barHeight / 2 + config.barHeight * bar.index}
-                                fill={labelColor}
-                                dx={doesTextFit ? -5 : 5} // X padding
-                                verticalAnchor='middle'
-                                textAnchor={doesTextFit ? 'end' : 'start'}
-                              >
+                              <Text display={displayBar ? 'block' : 'none'} x={bar.y} y={config.barHeight / 2 + config.barHeight * bar.index} fill={isTextFits ? labelColor : '#000000'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' textAnchor={isTextFits ? 'end' : 'start'}>
                                 {xAxisValue}
                               </Text>
                             )}
