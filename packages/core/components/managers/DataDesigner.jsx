@@ -9,6 +9,7 @@ import '../../styles/v2/components/data-designer.scss'
 const DataDesigner = props => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props
 
+
   return (
     <div className='cove-data-designer__container'>
       <div className='mb-2'>

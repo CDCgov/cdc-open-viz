@@ -478,6 +478,14 @@ export default function DataImport() {
     readyToConfigure = !!config.formattedData
   }
 
+  // Box plots skip the data description steps.
+  // If we have data and the visualizations is a box plot proceed...
+  if (config.visualizationType === 'Box Plot' && config.data) {
+    readyToConfigure = true
+  }
+
+  const showDataDesigner = config.visualizationType !== 'Box Plot'
+
   return (
     <>
       <div className='left-col'>
@@ -571,7 +579,7 @@ export default function DataImport() {
               </>
             )}
 
-            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />}
           </>
         )}
 
