@@ -635,6 +635,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       num = formatSuffix(parseFloat(num)).replace('G', 'B')
     }
 
+    if (abbreviated && axis === 'bottom') {
+      num = formatSuffix(parseFloat(num)).replace('G', 'B')
+    }
+
     if (prefix && axis !== 'right') {
       result += prefix
     }
