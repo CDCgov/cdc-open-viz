@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 // Third Party
 import PropTypes from 'prop-types'
 
-import '../../styles/components/input/index.scss'
+import '../../styles/v2/components/input/index.scss'
 
 const InputToggle = ({
   label,

@@ -16,7 +16,7 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, rebuildTooltips, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
@@ -67,8 +67,6 @@ const WorldMap = props => {
     let newRuntimeData = state.data.filter(item => item[state.columns.geo.name] === country[state.columns.geo.name])
     setFilteredCountryCode(newRuntimeData[0].uid)
   }
-
-  useEffect(() => rebuildTooltips())
 
   const handleMoveEnd = position => {
     setPosition(position)

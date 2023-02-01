@@ -7,7 +7,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
-import Loading from '@cdc/core/components/Loading'
+import Loading from '@cdc/core/components/loader/Loading'
 
 const DataTable = props => {
   const {

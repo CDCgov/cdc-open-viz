@@ -2,7 +2,7 @@
 import Label from '../element/Label'
 
 // Styles
-import '../../styles/components/ui/section-wrapper.scss'
+import '../../styles/v2/components/ui/section-wrapper.scss'
 
 const SectionWrapper = ({ label, tooltip, children }) => {
   return (

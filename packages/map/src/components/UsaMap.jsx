@@ -69,7 +69,7 @@ const nudges = {
 }
 
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
 
   let isFilterValueSupported = false
 
@@ -114,8 +114,6 @@ const UsaMap = props => {
 
     setTerritoriesData(territoriesList)
   }, [data])
-
-  useEffect(() => rebuildTooltips())
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 

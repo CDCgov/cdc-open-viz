@@ -6,7 +6,7 @@ import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
 // Third party
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 
@@ -1343,7 +1343,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const mapProps = {
     state,
     data: runtimeData,
-    rebuildTooltips: ReactTooltip.rebuild,
     applyTooltipsToGeo,
     closeModal,
     navigationHandler,

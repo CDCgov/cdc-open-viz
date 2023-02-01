@@ -50,7 +50,7 @@ import iconWarningCircle from '../../assets/icon-warning-circle.svg'
 import iconWarningTriangle from '../../assets/icon-warning-triangle.svg'
 
 // Styles
-import '../../styles/components/ui/icon.scss'
+import '../../styles/v2/components/ui/icon.scss'
 
 //TODO: COVE Refactor - Convert this from hash to map
 const iconHash = {

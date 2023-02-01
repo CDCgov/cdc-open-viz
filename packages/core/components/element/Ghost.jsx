@@ -1,5 +1,5 @@
 // Styles
-import '../../styles/components/element/ghost.scss'
+import '../../styles/v2/components/element/ghost.scss'
 
 const GhostEditor = () => (
   <div className="cove-ghost__editor">

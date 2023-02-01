@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-// import MapIcon from '../assets/map-folded.svg'
-import ChartIcon from '../../assets/icon-chart-bar.svg'
-import MarkupIncludeIcon from '../../assets/icon-code.svg'
 
-export const EditorAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
+import Icon from '../ui/Icon'
+
+export const EditorPanelAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
   const [ configTextboxValue, setConfigTextbox ] = useState({})
 
@@ -15,9 +14,9 @@ export const EditorAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
   }, [ state ])
 
   const typeLookup = {
-    chart: [ 'Charts', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <ChartIcon/> ],
-    map: [ 'Maps', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html', <MapIcon/> ],
-    'markup-include': [ 'Markup Include', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/Markup-Include.html', <MarkupIncludeIcon/> ]
+    chart: [ 'Charts', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/bar-chart.html', <Icon display="chartBar"/> ],
+    map: [ 'Maps', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html', <Icon display="mapFolded" base/> ],
+    'markup-include': [ 'Markup Include', 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/Markup-Include.html', <Icon display="code"/> ]
   }
 
   if (!state.type) return
@@ -57,4 +56,4 @@ export const EditorAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
   )
 }
 
-export default EditorAdvanced
+export default EditorPanelAdvanced

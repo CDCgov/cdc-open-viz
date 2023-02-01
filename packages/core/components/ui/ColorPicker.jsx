@@ -16,7 +16,7 @@ import THEME_COLORS from '../../data/componentThemes'
 import { capitalizeFirstLetter } from '../../helpers/coveHelpers'
 
 // Styles
-import '../../styles/components/ui/color-picker.scss'
+import '../../styles/v2/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
   const { config, updateConfig } = useConfigStore()

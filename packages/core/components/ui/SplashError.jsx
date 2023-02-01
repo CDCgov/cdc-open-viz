@@ -2,7 +2,7 @@
 import Icon from './Icon'
 
 // Styles
-import '../../styles/components/ui/progression.scss'
+import '../../styles/v2/components/ui/progression.scss'
 
 const SplashError = ({ title = 'Error', message }) => {
   return (

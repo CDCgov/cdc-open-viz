@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types'
 
 // Styles
-import '../../styles/components/ui/alert.scss'
+import '../../styles/v2/components/ui/alert.scss'
 
 const AlertBox = ({type = 'primary', inline = false, children}) => {
   return (

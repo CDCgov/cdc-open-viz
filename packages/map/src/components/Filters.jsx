@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import Context from './../context'
-import Button from '@cdc/core/components/elements/Button'
+import Button from '@cdc/core/components/element/Button'
 
 // TODO: Combine Charts/Maps Filters.js files
 const useFilters = () => {

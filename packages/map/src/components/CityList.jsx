@@ -3,14 +3,10 @@ import { useState, useEffect } from 'react'
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, isGeoCodeMap }) => {
   const [citiesData, setCitiesData] = useState({})
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   useEffect(() => {
     if (!isGeoCodeMap) {

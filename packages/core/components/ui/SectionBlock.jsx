@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types'
 
 // Styles
-import '../../styles/components/ui/section-block.scss'
+import '../../styles/v2/components/ui/section-block.scss'
 
 const SectionBlock = ({ children, ...attributes }) => {
   return (

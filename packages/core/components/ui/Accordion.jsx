@@ -15,7 +15,7 @@ import Icon from './Icon'
 import Tooltip from './Tooltip'
 
 // Styles
-import '../../styles/components/ui/accordion.scss'
+import '../../styles/v2/components/ui/accordion.scss'
 
 //Define the "slots" to be populated by subcomponents
 const AccordionSection = () => null

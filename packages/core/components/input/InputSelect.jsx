@@ -11,7 +11,7 @@ import { getConfigKeyValue } from '../../helpers/configHelpers'
 import Label from '../element/Label'
 
 // Styles
-import '../../styles/components/input/index.scss'
+import '../../styles/v2/components/input/index.scss'
 
 const InputSelect = (
   {

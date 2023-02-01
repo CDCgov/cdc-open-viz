@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import LoadSpin from '../ui/LoadSpin'
 
 // Styles
-import '../../styles/components/ui/render.scss'
+import '../../styles/v2/components/ui/render.scss'
 
 const RenderFallback = ({
                           fadeEffect = true,

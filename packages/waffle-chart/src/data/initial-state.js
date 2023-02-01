@@ -22,7 +22,7 @@ export default {
   shape: 'circle',
   nodeWidth: '10',
   nodeSpacer: '2',
-  theme: 'theme-blue',
+  theme: 'blue',
   type: 'waffle-chart',
   visual: {
     border: true,

@@ -1,7 +1,7 @@
 @use 'sass:string';
 
 @import "../utils/_variables.scss";
-@import "../../styles/themes";
+@import "../themes";
 
 $componentBorderRadius: 3px;
 

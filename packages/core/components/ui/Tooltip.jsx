@@ -4,7 +4,7 @@ import { useId } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // Styles
-import '../../styles/components/ui/tooltip.scss'
+import '../../styles/v2/components/ui/tooltip.scss'
 
 const TooltipTarget = () => null
 const TooltipContent = () => null

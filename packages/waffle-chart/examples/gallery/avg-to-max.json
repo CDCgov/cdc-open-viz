@@ -3155,7 +3155,7 @@
   "shape": "circle",
   "nodeWidth": "11",
   "nodeSpacer": "4",
-  "theme": "theme-purple",
+  "theme": "purple",
   "type": "waffle-chart",
   "dataFileName": "dashboard_aggregate_example_state_type.csv",
   "dataFileSourceType": "file"

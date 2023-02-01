@@ -40,7 +40,7 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-table": "^7.5.0",
     "react-tag-autocomplete": "^6.0.0",
-    "react-tooltip": "4.2.8",
+    "react-tooltip": "^5.7.2",
     "topojson-client": "^3.1.0",
     "use-debounce": "^5.2.0",
     "whatwg-fetch": "^3.6.2"

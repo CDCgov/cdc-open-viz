@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
   useEffect(() => {

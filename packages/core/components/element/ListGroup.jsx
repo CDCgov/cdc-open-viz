@@ -8,7 +8,7 @@ import Label from './Label'
 import Tooltip from '../ui/Tooltip'
 
 // Styles
-import '../../styles/components/element/list-group.scss'
+import '../../styles/v2/components/element/list-group.scss'
 
 const MAX_TEXT_WIDTH = 250
 const MAX_TEXT_SELECT_WIDTH = 150

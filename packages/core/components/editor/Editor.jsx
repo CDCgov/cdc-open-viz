@@ -14,8 +14,8 @@ import Icon from '../ui/Icon'
 import SplashError from '../ui/SplashError'
 
 // Styles
-import '../../styles/components/editor.scss'
-import '../../styles/components/element/editor-utils.scss'
+import '../../styles/v2/components/editor.scss'
+import '../../styles/v2/components/element/editor-utils.scss'
 
 const Editor = ({ EditorPanels, children, setParentConfig }) => {
   const { os } = useGlobalStore()

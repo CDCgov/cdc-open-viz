@@ -1,5 +1,5 @@
 // Styles
-import '../../styles/components/ui/loadspin.scss'
+import '../../styles/v2/components/ui/loadspin.scss'
 
 const LoadSpin = ({ color = '#fff', opacity = 100, size = 100, className }) => {
   const n = 8

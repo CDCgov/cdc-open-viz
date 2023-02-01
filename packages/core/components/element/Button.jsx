@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import LoadSpin from '../ui/LoadSpin'
 
 // Styles
-import '../../styles/components/element/button.scss'
+import '../../styles/v2/components/element/button.scss'
 
 const Button = ({
                   style,

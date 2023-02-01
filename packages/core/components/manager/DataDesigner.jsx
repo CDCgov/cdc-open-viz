@@ -3,7 +3,7 @@ import Card from '../element/Card'
 
 import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../data/dataDesignerTables'
 
-import '../../styles/components/manager/data-designer.scss'
+import '../../styles/v2/components/manager/data-designer.scss'
 
 const DataDesigner = props => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props

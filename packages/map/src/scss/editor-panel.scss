@@ -114,7 +114,6 @@
   .editor-panel {
     background: #fff;
     width: $editorWidth;
-    overflow-y: overlay;
     position: fixed;
     z-index: 7;
     display: flex;
@@ -125,7 +124,7 @@
 
     //TODO: Remove after COVE refactor
     &.cove {
-      @import "@cdc/core/styles/v2/layout/tooltip.scss";
+      @import "@cdc/core/styles/v2/components/ui/tooltip.scss";
     }
 
     .remove-column {

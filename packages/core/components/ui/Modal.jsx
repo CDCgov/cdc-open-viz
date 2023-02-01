@@ -10,7 +10,7 @@ import { useGlobalStore } from '../../stores/globalStore'
 import Icon from './Icon'
 
 // Styles
-import '../../styles/components/ui/modal.scss'
+import '../../styles/v2/components/ui/modal.scss'
 
 //Define the "slots" to be populated by subcomponents
 const ModalHeader = () => null

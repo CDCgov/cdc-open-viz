@@ -7,7 +7,7 @@ import { useConfigStore } from '../stores/configStore'
 // Helpers
 import DataTransform from '../helpers/DataTransform'
 
-const useLoadConfig = (configObj, configUrl, defaults = null, runtime = null) => {
+const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
   const { setConfigDefaults, updateConfig } = useConfigStore((state) => state)
 
@@ -89,7 +89,7 @@ const useLoadConfig = (configObj, configUrl, defaults = null, runtime = null) =>
     }
   }, [ cycle, configObj, configUrl ])
 
-  return [ loadingConfig, reloadConfig ]
+  return (loadingConfig ? <></> : children)
 }
 
-export default useLoadConfig
+export default ConfigProxy

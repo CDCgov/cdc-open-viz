@@ -5,7 +5,7 @@ import Icon from '../ui/Icon'
 import Tooltip from '../ui/Tooltip'
 
 // Styles
-import '../../styles/components/element/label.scss'
+import '../../styles/v2/components/element/label.scss'
 
 const Label = ({name, tooltip, style, children, className, ...attributes}) => {
 
