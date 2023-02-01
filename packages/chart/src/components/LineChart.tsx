@@ -155,7 +155,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     }
                   }
                   if (!lastDatum) {
-                    lastDatum = data[data.length - 1]
+                    return <></>
                   }
                   return (
                     <text x={xScale(getXAxisData(lastDatum)) + 5} y={yScale(getYAxisData(lastDatum, seriesKey))} alignmentBaseline='middle' fill={config.colorMatchLineSeriesLabels && colorScale ? colorScale(config.runtime.seriesLabels[seriesKey] || seriesKey) : 'black'}>
