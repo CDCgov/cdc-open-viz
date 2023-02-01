@@ -18,7 +18,7 @@ const useFilters = () => {
   const announceChange = text => {}
 
   const changeFilterActive = (index, value) => {
-    let newFilters = runtimeFilters
+    let newFilters = config.filters
     newFilters[index].active = value
     setRuntimeFilters(newFilters)
     setShowApplyButton(true)

@@ -200,6 +200,12 @@ export default function LinearChart() {
     return tick
   }
 
+  const handleBottomTickFormatting = tick => {
+    if (config.runtime.xAxis.type === 'date') return formatDate(tick)
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'bottom')
+    return tick
+  }
+
   const countNumOfTicks = axis => {
     // function get number of ticks based on bar type & users value
     const isHorizontal = config.orientation === 'horizontal'
@@ -417,7 +423,7 @@ export default function LinearChart() {
 
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
-          <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={handleTick} scale={xScale} stroke='#333' tickStroke='#333' numTicks={countNumOfTicks('xAxis')}>
+          <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={handleBottomTickFormatting} scale={xScale} stroke='#333' tickStroke='#333' numTicks={countNumOfTicks('xAxis')}>
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
               return (

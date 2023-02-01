@@ -555,9 +555,27 @@
       "URL": "https://www.cdc.gov/"
     },
     {
+      "STATE": "Alaska Native Tribal Health Consortium",
+      "Rate": 24,
+      "Location": "Work",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "American Indian Cancer Foundation",
+      "Rate": 14,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
       "STATE": "Arctic Slope Native Association Limited",
       "Rate": 14,
       "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "California Rural Indian Health Board Inc.",
+      "Rate": 19,
+      "Location": "Work",
       "URL": "https://www.cdc.gov/"
     },
     {
@@ -603,7 +621,19 @@
       "URL": "https://www.cdc.gov/"
     },
     {
+      "STATE": "Native American Rehabilitation Association of the Northwest, Inc.",
+      "Rate": 22,
+      "Location": "School",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
       "STATE": "Navajo Nation",
+      "Rate": 24,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Northwest Portland Area Indian Health Board",
       "Rate": 24,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
@@ -611,6 +641,12 @@
     {
       "STATE": "South Puget Intertribal Planning Agency",
       "Rate": 9,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "Southcentral Foundation",
+      "Rate": 29,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
@@ -656,7 +692,7 @@
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
     },
-        {
+    {
       "STATE": "Salem, Connecticut",
       "Rate": 5,
       "Location": "Vehicle",
@@ -688,6 +724,12 @@
     },
     {
       "STATE": "Alexandria",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Juan",
       "Rate": 5,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
