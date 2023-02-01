@@ -190,6 +190,12 @@ export default function LinearChart() {
     return tick
   }
 
+  const handleBottomTickFormatting = tick => {
+    if (config.runtime.xAxis.type === 'date') return formatDate(tick)
+    if (config.orientation === 'horizontal') return formatNumber(tick, 'bottom')
+    return tick
+  }
+
   const countNumOfTicks = axis => {
     // function get number of ticks based on bar type & users value
     const isHorizontal = config.orientation === 'horizontal'
