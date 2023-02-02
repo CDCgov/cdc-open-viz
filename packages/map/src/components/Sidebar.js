@@ -83,7 +83,7 @@ const Sidebar = props => {
 
     return (
       <section className='filter-col' key={idx}>
-        {singleFilter.label.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
+        {singleFilter.label?.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
         <select
           id={`filter-${idx}`}
           className='filter-select'
