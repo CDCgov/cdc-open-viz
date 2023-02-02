@@ -98,11 +98,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
     ReactTooltip.rebuild()
   })
 
-  const getYscaleLog = value => {
-    console.log(' SparkLine YscaleValue', value)
-    return value
-  }
-
   return (
     <ErrorBoundary component='SparkLine'>
       <svg role='img' aria-label={handleChartAriaLabels(config)} width={width} height={height} className={'sparkline'} tabIndex={0}>
@@ -139,7 +134,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
                         cx={xScale(getXAxisData(d))}
-                        cy={getYscaleLog(yScale(getYAxisData(d, seriesKey)))}
+                        cy={yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
                         data-tip={tooltip}

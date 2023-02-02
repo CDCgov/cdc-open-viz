@@ -173,7 +173,6 @@ export default function PieChart() {
           newFilteredData.push(d)
         }
       })
-      debugger
 
       setFilteredData(newFilteredData)
     } else {

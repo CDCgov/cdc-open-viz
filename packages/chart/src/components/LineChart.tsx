@@ -12,7 +12,7 @@ import Context from '../context'
 import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, updateConfig } = useContext<any>(Context)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig } = useContext<any>(Context)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleLineType = lineType => {
@@ -34,26 +34,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
       return `${label}: ${formatNumber(value, axis)}`
     }
     return `${formatNumber(value, axis)}`
-  }
-
-  const isNumber = value => {
-    // in debugging I saw cases where inbound was a 'number'
-    // and other times a 'string' so might as well take care of both here
-    if (typeof value === 'number') {
-      return !Number.isNaN(value)
-    }
-    if (typeof value === 'string') {
-      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
-    }
-    return false // if we get here something is wrong so return false
-  }
-
-  const checkCy = cy => {
-    //console.log("cy, type ", cy, typeof cy);
-    if (isNaN(cy) || Number.isNaN(cy)) {
-      return null
-    }
-    return cy
   }
 
   // REMOVE bad data points from the data set
@@ -153,8 +133,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
                         cx={Number(xScale(getXAxisData(d)))}
-                        //cy={4}
-                        cy={seriesAxis === 'Right' ? checkCy(yScaleRight(getYAxisData(d, seriesKey))) : checkCy(yScale(getYAxisData(d, seriesKey)))}
+                        cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
                         data-tip={tooltip}
@@ -196,15 +175,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   curve={allCurves.curveLinear}
                   data={cleanData(data)}
                   x={d => xScale(getXAxisData(d))}
-                  y={d => {
-                    if (seriesAxis === 'Right' && isNumber(yScaleRight(getYAxisData(d, seriesKey)))) {
-                      return yScaleRight(getYAxisData(d, seriesKey))
-                    } else if (seriesAxis !== 'Right' && isNumber(yScale(getYAxisData(d, seriesKey)))) {
-                      return yScale(getYAxisData(d, seriesKey))
-                    } else {
-                      return null
-                    }
-                  }}
+                  y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
                   strokeWidth={3}
                   strokeOpacity={1}
