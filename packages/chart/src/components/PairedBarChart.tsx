@@ -13,12 +13,11 @@ interface PairedBarChartProps {
 }
 
 const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
-  const { config, colorScale, transformedData, formatNumber, seriesHighlight, getTextWidth } = useContext<any>(Context)
+  const { config, colorScale, transformedData: data, formatNumber, seriesHighlight, getTextWidth } = useContext<any>(Context)
 
   if (!config || config?.series?.length < 2) return
 
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
-  const data = transformedData
   const halfWidth = width / 2
   const fontSize = { small: 16, medium: 18, large: 20 }
 
