@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useDebugValue } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Group } from '@visx/group'
 import { BarGroup, BarStack } from '@visx/shape'
 import { Text } from '@visx/text'
@@ -8,9 +8,7 @@ import Context from '../context'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context)
-
-  //debugger;
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, parseDate } = useContext<any>(Context)
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -97,11 +95,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return Math.ceil(context.measureText(text).width)
   }
 
-  function cleanData(data) {
-    let cleanedup = []
-    //console.log('## Data to clean=', data)
+  // This cleans a data set by:
+  // - removing commas and $ signs from any numbers to try to plot the point
+  // - removing any data points that are NOT composed of of all digits (but allow a decimal point)
+  // Without this the charts "break" and do not render
+  const cleanData = (data, testing = false) => {
+    let cleanedupData = []
+    if (testing) console.log('## Data to clean=', data)
     data.forEach(function (d, i) {
-      //console.log("clean", i, " d", d);
+      if (testing) console.log("clean", i, " d", d);
       let cleanedBar = {}
       Object.keys(d).forEach(function (key) {
         if (key === 'Date') {
@@ -112,27 +114,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
           let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
           if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
             cleanedBar[key] = tmp
-          } else {
-            // return nothing to skip bad data point
           }
+          // if you get here, then return nothing to skip bad data point
         }
       })
-      //console.log("cleanedBar=", cleanedBar);
-      cleanedup.push(cleanedBar)
+      if (testing) console.log("cleanedBar=", cleanedBar);
+      cleanedupData.push(cleanedBar)
     })
-    //console.log('## cleanedData =', cleanedup)
-    return cleanedup
-  }
-  const isNumber = value => {
-    // in debugging I saw cases where inbound was a 'number'
-    // and other times a 'string' so might as well take care of both here
-    if (typeof value === 'number') {
-      return !Number.isNaN(value)
-    }
-    if (typeof value === 'string') {
-      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
-    }
-    return false // if we get here something is wrong so return false
+    if (testing) console.log('## cleanedData =', cleanedupData)
+    return cleanedupData
   }
 
   // Using State
@@ -176,7 +166,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
   return (
     <ErrorBoundary component='BarChart'>
-      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+      <Group left={parseFloat(config.runtime.yAxis.size)}>
         {/* left - expects a number not a string */}
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (

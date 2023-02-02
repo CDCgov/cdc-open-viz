@@ -748,7 +748,17 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const getXAxisData = (d: any) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey]
-
+  const isNumber = value => {
+    // in debugging I saw cases where inbound was a 'number'
+    // and other times a 'string' so might as well take care of both here
+    if (typeof value === 'number') {
+      return !Number.isNaN(value)
+    }
+    if (typeof value === 'string') {
+      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
+    }
+    return false // if we get here something is wrong so return false
+  }
   const contextValues = {
     getXAxisData,
     getYAxisData,
@@ -781,6 +791,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
+    isNumber,
     imageId
   }
 

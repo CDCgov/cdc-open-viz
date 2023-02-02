@@ -14,19 +14,6 @@ function useReduceData(config, data) {
     }
     return false // because if it gets here something is wrong
   }
-  const isNumberLog = value => {
-    //console.log("entering isNumberLog valuetype is:",typeof value);
-    value = cleanChars(value) // clean first
-    // last test checks for 1 or more digits, optional decimal, 0 or more optional digits
-    if (typeof value === 'string') {
-      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
-    }
-    // just in case data has type number we need this
-    if (typeof value === 'number') {
-      return !Number.isNaN(value)
-    }
-    return false // if we get here its not a string or a number so something else
-  }
   const cleanChars = value => {
     // remove comma and $ signs
     return value != null && value != '' ? value.replace(/[,\$]/g, '') : ''
