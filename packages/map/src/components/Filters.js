@@ -71,7 +71,7 @@ export const Filters = () => {
 
         return (
           <section className='filter-col single-filter' key={idx}>
-            {singleFilter.label.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
+            {singleFilter.label?.length > 0 && <label htmlFor={`filter-${idx}`}>{singleFilter.label}</label>}
             <select
               id={`filter-${idx}`}
               className='filter-select'
