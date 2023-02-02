@@ -19,6 +19,7 @@ import validMapData from '../../example/valid-data-map.csv'
 import validChartData from '../../example/valid-data-chart.csv'
 import validCountyMapData from '../../example/valid-county-data.csv'
 import sampleGeoPoints from '../../example/supported-cities.csv'
+import validBoxPlotData from '../../example/valid-boxplot.csv'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -641,6 +642,9 @@ export default function DataImport() {
                 onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
               >
                 Sample Geo Points
+              </button>
+              <button className='link link-upload' onClick={() => loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)}>
+                Sample Box Plot Data
               </button>
             </ul>
           </div>
