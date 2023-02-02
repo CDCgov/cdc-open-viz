@@ -894,12 +894,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
+    // check the override
+    stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
 
     if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
       let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
 
-      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
+      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
@@ -1231,6 +1233,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
+
+    // When geo label override changes
+  useEffect(() => {
+    // redo the tooltips
+    applyTooltipsToGeo();
+  }, [state.general.geoLabelOverride])
+  
 
   useEffect(() => {
     // UID
