@@ -1504,7 +1504,8 @@ const EditorPanel = props => {
                   <AccordionItemButton>Columns</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <label className='edit-block geo'>
+                  <fieldset className='primary-fieldset edit-block'>
+                    <label>
                     <span className='edit-label column-heading'>
                       Geography
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -1524,6 +1525,7 @@ const EditorPanel = props => {
                     >
                       {columnsOptions}
                     </select>
+                  </label>
                   <label className='checkbox'>
                     <input
                       type='checkbox'
@@ -1533,7 +1535,7 @@ const EditorPanel = props => {
                       }}
                     />
                     <span className='edit-label'>Hide Geography Column Name in Tooltip</span>
-                      </label>
+                    </label>
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -1542,15 +1544,14 @@ const EditorPanel = props => {
                           handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
                         }}
                       />
-                      <span className='edit-label column-heading'>Hide Primary Column Name in Tooltip</span>
+                      <span className='edit-label'>Hide Primary Column Name in Tooltip</span>
                         </label>
-                        <span className='edit-label column-heading'>
                       <TextField
                         value={state.general.geoLabelOverride}
                         section='general'
                         fieldName='geoLabelOverride'
                         label='Geography Label'
-                        className='edit-label column-heading'
+                        className='edit-label'
                         updateField={updateField}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -1562,8 +1563,8 @@ const EditorPanel = props => {
                             </Tooltip.Content>
                           </Tooltip>
                         }
-                      /></span>
-                  </label>
+                  /> 
+                  </fieldset>
                   {'navigation' !== state.general.type && (
                     <fieldset className='primary-fieldset edit-block'>
                       <label>
