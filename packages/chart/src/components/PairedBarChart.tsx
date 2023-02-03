@@ -48,11 +48,6 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
     range: [0, halfWidth]
   })
 
-  // const yScale = scaleBand({
-  //   range: [0, adjustedHeight],
-  //   domain: data.map(d => d[config.dataDescription.xKey])
-  // })
-
   // Set label color
   let labelColor = '#000000'
 
@@ -107,7 +102,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
                 const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey]), `normal ${fontSize[config.fontSize]}px sans-serif`)
-                const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
+                const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
                   <>
@@ -129,7 +124,7 @@ const PairedBarChart: React.FC<PairedBarChartProps> = ({ width, height }) => {
                         display={displayBar ? 'block' : 'none'}
                       />
                       {config.yAxis.displayNumbersOnBar && displayBar && (
-                        <Text textAnchor={isTextFits ? 'start' : 'end'} dx={isTextFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={isTextFits ? groupOne.labelColor : '#000'}>
+                        <Text textAnchor={textFits ? 'start' : 'end'} dx={textFits ? 5 : -5} verticalAnchor='middle' x={halfWidth - barWidth} y={y + config.barHeight / 2} fill={textFits ? groupOne.labelColor : '#000'}>
                           {formatNumber(d[groupOne.dataKey])}
                         </Text>
                       )}
