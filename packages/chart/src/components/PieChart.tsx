@@ -40,6 +40,7 @@ function cleanData(data) {
           cleanedSeries[key] = tmp
         } else {
           // return nothing to skip bad data point
+          cleanedSeries[key] = ''
         }
       }
     })

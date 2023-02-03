@@ -8,7 +8,10 @@ import Context from '../context'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, parseDate } = useContext<any>(Context)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, parseDate } = useContext<any>(Context)
+  // Just do this once up front otherwise we end up 
+  // calling clean several times on same set of data (TT)
+  const cdata = cleanData(data);
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -95,36 +98,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     return Math.ceil(context.measureText(text).width)
   }
 
-  // This cleans a data set by:
-  // - removing commas and $ signs from any numbers to try to plot the point
-  // - removing any data points that are NOT composed of of all digits (but allow a decimal point)
-  // Without this the charts "break" and do not render
-  const cleanData = (data, testing = false) => {
-    let cleanedupData = []
-    if (testing) console.log('## Data to clean=', data)
-    data.forEach(function (d, i) {
-      if (testing) console.log("clean", i, " d", d);
-      let cleanedBar = {}
-      Object.keys(d).forEach(function (key) {
-        if (key === 'Date') {
-          // pass thru
-          cleanedBar[key] = d[key]
-        } else {
-          // remove comma and dollar signs
-          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
-            cleanedBar[key] = tmp
-          }
-          // if you get here, then return nothing to skip bad data point
-        }
-      })
-      if (testing) console.log("cleanedBar=", cleanedBar);
-      cleanedupData.push(cleanedBar)
-    })
-    if (testing) console.log('## cleanedData =', cleanedupData)
-    return cleanedupData
-  }
-
   // Using State
   const [textWidth, setTextWidth] = useState(null)
 
@@ -167,10 +140,9 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   return (
     <ErrorBoundary component='BarChart'>
       <Group left={parseFloat(config.runtime.yAxis.size)}>
-        {/* left - expects a number not a string */}
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={cleanData(data)} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={cdata} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d: any) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -233,7 +205,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={cleanData(data)} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={cdata} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d: any) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -320,7 +292,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {config.visualizationSubType !== 'stacked' && (
           <Group>
             <BarGroup
-              data={cleanData(data)}
+              data={cdata}
               keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
               height={yMax}
               x0={(d: any) => d[config.runtime.originalXAxis.dataKey]}

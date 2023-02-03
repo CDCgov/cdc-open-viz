@@ -12,7 +12,10 @@ import Context from '../context'
 import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, updateConfig } = useContext<any>(Context)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext<any>(Context)
+  // Just do this once up front otherwise we end up 
+  // calling clean several times on same set of data (TT)
+  const cdata = cleanData(data);
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleLineType = lineType => {
@@ -36,38 +39,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
     return `${formatNumber(value, axis)}`
   }
 
-  // REMOVE bad data points from the data set
-  // Examples: NA, N/A, "1,234", "anystring"
-  // - if you dont call this on data into LineGroup below, for example
-  // then entire data series are removed because of the defined statement
-  // i.e. if a series has any bad data points the entire series wont plot
-  function cleanData(data) {
-    let cleanedup = []
-    //console.log('## Data to clean=', data)
-    data.forEach(function (d, i) {
-      //console.log("clean", i, " d", d);
-      let cleanedSeries = {}
-      Object.keys(d).forEach(function (key) {
-        if (key === 'Date') {
-          // pass thru the dates
-          cleanedSeries[key] = d[key]
-        } else {
-          // remove comma and dollar signs
-          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-          //console.log("tmp no comma or $", tmp)
-          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
-            cleanedSeries[key] = tmp
-          } else {
-            // return nothing to skip bad data point
-          }
-        }
-      })
-      cleanedup.push(cleanedSeries)
-    })
-    //console.log('## cleanedData =', cleanedup)
-    return cleanedup
-  }
-
   return (
     <ErrorBoundary component='LineChart'>
       <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
@@ -84,7 +55,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {cleanData(data).map((d, dataIndex) => {
+              {cdata.map((d, dataIndex) => {
                 // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
                 const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
@@ -146,7 +117,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
               <LinePath
                 curve={allCurves.curveLinear}
-                data={cleanData(data)}
+                data={cdata}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
@@ -162,9 +133,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
-                // this is needed to get the non-numerics to not break the chart
-                // - but if you add isNumber here and remove cleanedData above
-                // it will fail
                 defined={(item, i) => {
                   return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
                 }}
@@ -173,7 +141,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 <LinePath
                   className='animation'
                   curve={allCurves.curveLinear}
-                  data={cleanData(data)}
+                  data={cdata}
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
