@@ -332,18 +332,18 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         xAxisValue = tempValue
                         barWidth = config.barHeight
                       }
+                      // check if bar text/value string fits into  each bars.
+                      let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                      let textFits = textWidth < bar.y - 5 // minus padding 5
+
                       let labelColor = '#000000'
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        labelColor = '#FFFFFF'
+                        if (textFits) labelColor = '#FFFFFF'
                       }
 
                       const style = applyRadius(index)
-
-                      // check if bar text/value string fits into  each bars.
-                      let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
-                      let isTextFits = textWidth < bar.y - 5 // minus padding 5
 
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -390,7 +390,15 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
-                              <Text display={displayBar ? 'block' : 'none'} x={bar.y} y={config.barHeight / 2 + config.barHeight * bar.index} fill={isTextFits ? labelColor : '#000000'} dx={isTextFits ? -5 : 5} verticalAnchor='middle' textAnchor={isTextFits ? 'end' : 'start'}>
+                              <Text // prettier-ignore
+                                display={displayBar ? 'block' : 'none'}
+                                x={bar.y}
+                                y={config.barHeight / 2 + config.barHeight * bar.index}
+                                fill={labelColor}
+                                dx={textFits ? -5 : 5}
+                                verticalAnchor='middle'
+                                textAnchor={textFits ? 'end' : 'start'}
+                              >
                                 {xAxisValue}
                               </Text>
                             )}
