@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import get from 'axios'
+import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -611,10 +611,7 @@ export default function DataImport() {
             {/* TODO: Add more sample data in, but this will do for now. */}
             <span className='heading-3'>Load Sample Data:</span>
             <ul className='sample-data-list'>
-              <button className='link link-upload'
-                      onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
-                      onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
-              >
+              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
                 United States Sample Data #1
               </button>
               <button
