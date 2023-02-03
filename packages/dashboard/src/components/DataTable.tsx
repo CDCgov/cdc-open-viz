@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 

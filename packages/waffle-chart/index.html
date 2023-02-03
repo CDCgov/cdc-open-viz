@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+      body {
+        /* max-width: 1000px; */
+        margin: 0 auto !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .react-container + .react-container {
+        margin-top: 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Original -->
+    <div class="react-container" data-config="/examples/example-config.json"></div>
+
+    <!-- DATA PRESENTATION GALLERY: https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/waffle-chart.html#examples -->
+    <!-- <div class="react-container" data-config="/examples/gallery/avg-to-max.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/count.json"></div> -->
+
+    <script type="module" src="./src/index.jsx"></script>
+  </body>
+</html>
