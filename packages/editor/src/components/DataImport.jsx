@@ -20,6 +20,8 @@ import validMapData from '../../example/valid-data-map.csv?raw'
 import validChartData from '../../example/valid-data-chart.csv?raw'
 import validCountyMapData from '../../example/valid-county-data.csv?raw'
 import sampleGeoPoints from '../../example/supported-cities.csv?raw'
+import validScatterPlot from '../../example/valid-scatterplot.csv?raw'
+
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -322,7 +324,7 @@ export default function DataImport() {
     if (tempConfig !== null) setTempConfig(null)
 
     setConfig(newConfig)
-  }, [])
+  }, []) // eslint-disable-line
 
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
