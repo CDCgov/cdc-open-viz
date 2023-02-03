@@ -40,6 +40,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import isNumber from '@cdc/core/helpers/isNumber'
 
 import './scss/main.scss'
 
@@ -748,16 +749,35 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const getXAxisData = (d: any) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d: any, seriesKey: string) => d[seriesKey]
-  const isNumber = value => {
-    // in debugging I saw cases where inbound was a 'number'
-    // and other times a 'string' so might as well take care of both here
-    if (typeof value === 'number') {
-      return !Number.isNaN(value)
-    }
-    if (typeof value === 'string') {
-      return value !== null && value !== '' && /\d+\.?\d*/.test(value)
-    }
-    return false // if we get here something is wrong so return false
+
+  // This cleans a data set by:
+  // - removing commas and $ signs from any numbers to try to plot the point
+  // - removing any data points that are NOT composed of of all digits (but allow a decimal point)
+  // Without this the charts "break" and do not render
+  const cleanData = (data, testing = false) => {
+    let cleanedupData = []
+    if (testing) console.log('## Data to clean=', data)
+    data.forEach(function (d, i) {
+      if (testing) console.log("clean", i, " d", d);
+      let cleanedBar = {}
+      Object.keys(d).forEach(function (key) {
+        if (key === 'Date') {
+          // pass thru
+          cleanedBar[key] = d[key]
+        } else {
+          // remove comma and dollar signs
+          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
+          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+            cleanedBar[key] = tmp
+          } else { cleanedBar[key] = '' }
+          // if you get here, then return nothing to skip bad data point
+        }
+      })
+      if (testing) console.log("cleanedBar=", cleanedBar);
+      cleanedupData.push(cleanedBar)
+    })
+    if (testing) console.log('## cleanedData =', cleanedupData)
+    return cleanedupData
   }
   const contextValues = {
     getXAxisData,
@@ -792,6 +812,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setDynamicLegendItems,
     filterData,
     isNumber,
+    cleanData,
     imageId
   }
 
