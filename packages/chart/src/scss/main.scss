@@ -1,8 +1,8 @@
-@import '~@cdc/core/styles/base';
-@import '~@cdc/core/styles/heading-colors';
+@import '@cdc/core/styles/base';
+@import '@cdc/core/styles/heading-colors';
 @import 'mixins';
 @import 'variables';
-@import '~@cdc/core/styles/v2/themes/color-definitions';
+@import '@cdc/core/styles/v2/themes/color-definitions';
 
 .form-container {
   overflow-y: auto;
