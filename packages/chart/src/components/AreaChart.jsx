@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, useRef } from 'react'
 
 // cdc
-import Context from '../context'
+import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
@@ -15,7 +15,7 @@ import { GlyphCircle } from '@visx/glyph'
 
 const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   const DEBUG = false
-  const { transformedData: data, config, height, width } = useContext(Context)
+  const { transformedData: data, config, height, width } = useContext(ConfigContext)
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } = useTooltip()
   let isEditor = window.location.href.includes('editor=true')
 
@@ -116,7 +116,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   x={d => xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
                   yScale={yScale}
-                  />
+                />
 
                 <Bar
                   x={d => xScale(d[config.xAxis.dataKey])}
@@ -129,10 +129,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
 
-                  // onTouchStart={handleTooltip}
-                  // onTouchMove={handleTooltip}
-                  // onMouseMove={handleTooltip}
-                  // onMouseLeave={() => hideTooltip()}
+                // onTouchStart={handleTooltip}
+                // onTouchMove={handleTooltip}
+                // onMouseMove={handleTooltip}
+                // onMouseLeave={() => hideTooltip()}
                 />
 
                 {/* bars to handle tooltips */}
