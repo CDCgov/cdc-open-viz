@@ -215,8 +215,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      console.log('hit', newConfig)
-
       // stats
       let allKeys = data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
@@ -228,13 +226,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       const groups = uniqueArray(allKeys)
+      let tableData = []
       const plots = []
-
-      console.log('d', data)
-      console.log('newConfig', newConfig)
-      console.log('groups', groups)
-      console.log('allKeys', allKeys)
-      console.log('allValues', allValues)
 
       // group specific statistics
       // prevent re-renders
@@ -244,31 +237,46 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
         // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
-
-        const q1 = d3.quantile(filteredDataValues, 0.25)
-        const q3 = d3.quantile(filteredDataValues, 0.75)
+        const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+        const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
         const iqr = q3 - q1
         const lowerBounds = q1 - (q3 - q1) * 1.5
         const upperBounds = q3 + (q3 - q1) * 1.5
         const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+        let nonOutliers = filteredDataValues
+
+        nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
+
         plots.push({
           columnCategory: g,
-          columnMean: d3.mean(filteredDataValues),
+          columnMax: Number(q3 + 1.5 * iqr).toFixed(2),
+          columnThirdQuartile: q3.toFixed(2),
           columnMedian: d3.median(filteredDataValues),
-          columnFirstQuartile: q1,
-          columnThirdQuartile: q3,
-          columnMin: q1 - 1.5 * iqr,
-          columnMax: q3 + 1.5 * iqr,
-          columnIqr: iqr,
+          columnFirstQuartile: q1.toFixed(2),
+          columnMin: Number(q1 - 1.5 * iqr).toFixed(2),
+          columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+          columnSd: d3.deviation(filteredDataValues).toFixed(2),
+          columnMean: d3.mean(filteredDataValues).toFixed(2),
+          columnIqr: iqr.toFixed(2),
           columnOutliers: outliers,
-          values: filteredDataValues
+          values: filteredDataValues,
+          nonOutlierValues: nonOutliers
         })
+      })
+
+      // make deep copy so we can remove some fields for data
+      // this appears to be the easiest option instead of running logic against the datatable cell...
+      tableData = JSON.parse(JSON.stringify(plots))
+      tableData.map(table => {
+        delete table.columnIqr
+        delete table.nonOutlierValues
       })
 
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
-      newConfig.boxplot.push(...plots)
+      newConfig.boxplot.plots = plots
+      newConfig.boxplot.tableData = tableData
     }
 
     if (newConfig.visualizationType === 'Combo' && newConfig.series) {

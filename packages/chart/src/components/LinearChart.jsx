@@ -217,13 +217,13 @@ export default function LinearChart() {
     let minYValue
     let maxYValue
     let allOutliers = []
-    let allLowerBounds = config.boxplot.map(plot => plot.columnMin)
-    let allUpperBounds = config.boxplot.map(plot => plot.columnMax)
+    let allLowerBounds = config.boxplot.plots.map(plot => plot.columnMin)
+    let allUpperBounds = config.boxplot.plots.map(plot => plot.columnMax)
 
     minYValue = Math.min(...allLowerBounds)
     maxYValue = Math.max(...allUpperBounds)
 
-    const hasOutliers = config.boxplot.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier)))
+    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
 
     if (hasOutliers) {
       let outlierMin = Math.min(...allOutliers)
@@ -291,7 +291,7 @@ export default function LinearChart() {
 
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
-          <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size)} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
+          <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -402,7 +402,16 @@ export default function LinearChart() {
 
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
-          <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={handleBottomTickFormatting} scale={xScale} stroke='#333' tickStroke='#333' numTicks={countNumOfTicks('xAxis')}>
+          <AxisBottom
+            top={config.runtime.horizontal ? Number(config.height) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            left={Number(config.runtime.yAxis.size)}
+            label={config.runtime.xAxis.label}
+            tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
+            scale={xScale}
+            stroke='#333'
+            tickStroke='#333'
+            numTicks={countNumOfTicks('xAxis')}
+          >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
               return (

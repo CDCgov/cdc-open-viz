@@ -15,11 +15,11 @@ import LinkIcon from '../assets/icons/link.svg'
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
-// Vite specific syntax, use ?raw following url to parse direct reference
-import validMapData from '../../example/valid-data-map.csv?raw'
-import validChartData from '../../example/valid-data-chart.csv?raw'
-import validCountyMapData from '../../example/valid-county-data.csv?raw'
-import sampleGeoPoints from '../../example/supported-cities.csv?raw'
+import validMapData from '../../example/valid-data-map.csv'
+import validChartData from '../../example/valid-data-chart.csv'
+import validCountyMapData from '../../example/valid-county-data.csv'
+import sampleGeoPoints from '../../example/supported-cities.csv'
+import validBoxPlotData from '../../example/valid-boxplot.csv'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -479,6 +479,14 @@ export default function DataImport() {
     readyToConfigure = !!config.formattedData
   }
 
+  // Box plots skip the data description steps.
+  // If we have data and the visualizations is a box plot proceed...
+  if (config.visualizationType === 'Box Plot' && config.data) {
+    readyToConfigure = true
+  }
+
+  const showDataDesigner = config.visualizationType !== 'Box Plot'
+
   return (
     <>
       <div className='left-col'>
@@ -572,7 +580,7 @@ export default function DataImport() {
               </>
             )}
 
-            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />}
           </>
         )}
 
@@ -600,10 +608,10 @@ export default function DataImport() {
             {errors &&
               (errors.map
                 ? errors.map((message, index) => (
-                    <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
-                    </div>
-                  ))
+                  <div className='error-box slim mt-2' key={`error-${message}`}>
+                    <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                  </div>
+                ))
                 : errors.message)}
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
@@ -611,7 +619,10 @@ export default function DataImport() {
             {/* TODO: Add more sample data in, but this will do for now. */}
             <span className='heading-3'>Load Sample Data:</span>
             <ul className='sample-data-list'>
-              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
+              <button className='link link-upload'
+                onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+              >
                 United States Sample Data #1
               </button>
               <button
@@ -634,6 +645,9 @@ export default function DataImport() {
                 onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
               >
                 Sample Geo Points
+              </button>
+              <button className='link link-upload' onClick={() => loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)}>
+                Sample Box Plot Data
               </button>
             </ul>
           </div>
