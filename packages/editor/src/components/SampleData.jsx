@@ -2,10 +2,12 @@ import React, { useContext } from 'react'
 import SampleDataContext from '../samples/SampleDataContext'
 
 // Data Samples
-import validChartData from './../samples/valid-data-chart.csv'
-import validMapData from './../samples/valid-data-map.csv'
-import validCountyMapData from './../samples/valid-county-data.csv'
-import sampleGeoPoints from './../samples/valid-geo-point.csv'
+import validMapData from './../samples/valid-data-map.csv?raw'
+import validChartData from './../samples/valid-data-chart.csv?raw'
+import validCountyMapData from './../samples/valid-county-data.csv?raw'
+import validGeoPoint from './../samples/valid-geo-point.csv?raw'
+import validScatterPlot from './../samples/valid-scatterplot.csv?raw'
+import validBoxPlotData from './../samples/valid-boxplot.csv?raw'
 
 // Add additional data to samples
 const sampleData = {
@@ -14,6 +16,16 @@ const sampleData = {
       text: 'Chart Sample Data',
       fileName: 'valid-data-chart.csv',
       data: validChartData
+    },
+    {
+      text: 'Box Plot Sample Data',
+      fileName: 'valid-boxplot.csv',
+      data: validBoxPlotData
+    },
+    {
+      text: 'Scatter Plot Sample Data',
+      fileName: 'valid-scatterplot.csv',
+      data: validScatterPlot
     }
   ],
   maps: [
@@ -30,7 +42,7 @@ const sampleData = {
     {
       text: 'United States: Geo Point Sample Data',
       fileName: 'supported-cities.csv',
-      data: sampleGeoPoints
+      data: validGeoPoint
     }
   ]
 }
