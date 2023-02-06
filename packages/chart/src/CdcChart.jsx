@@ -207,10 +207,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -613,7 +613,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
-    if (axis === 'left' && commas && abbreviated) {
+    if (axis === 'left' && commas && abbreviated || axis === 'bottom' && commas && abbreviated) {
       num = num
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
