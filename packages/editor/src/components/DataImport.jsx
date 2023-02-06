@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import get from 'axios'
+import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
