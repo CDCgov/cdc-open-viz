@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import get from 'axios'
+import { get } from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -21,7 +21,7 @@ import validChartData from '../../example/valid-data-chart.csv?raw'
 import validCountyMapData from '../../example/valid-county-data.csv?raw'
 import sampleGeoPoints from '../../example/supported-cities.csv?raw'
 import validScatterPlot from '../../example/valid-scatterplot.csv?raw'
-
+import validBoxPlotData from '../../example/valid-boxplot.csv?raw'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -655,25 +655,33 @@ export default function DataImport() {
               >
                 Sample Scatter Plot
               </button>
+              <button className='link link-upload' onClick={() => loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)}>
+                Sample Box Plot Data
+              </button>
             </ul>
-          </div>
-        )}
+          </div >
+        )
+        }
 
-        {config.type === 'dashboard' && !addingDataset && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
-              + Add More Files
-            </button>
-          </p>
-        )}
+        {
+          config.type === 'dashboard' && !addingDataset && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+                + Add More Files
+              </button>
+            </p>
+          )
+        }
 
-        {readyToConfigure && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
-              Configure your visualization
-            </button>
-          </p>
-        )}
+        {
+          readyToConfigure && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+                Configure your visualization
+              </button>
+            </p>
+          )
+        }
 
         <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
           <div>
@@ -681,7 +689,7 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-      </div>
+      </div >
       <div className='right-col'>
         <PreviewDataTable data={previewData} />
       </div>
