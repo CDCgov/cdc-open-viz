@@ -58,7 +58,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -231,7 +231,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
       // group specific statistics
       // prevent re-renders
-      groups.map((g, index) => {
+      groups.forEach((g, index) => {
         if (!g) return
         // filter data by group
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
@@ -410,13 +410,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
    * Another useEffect listens to externalFilterChanges and updates the config.
    */
   useEffect(() => {
-    const handleFilterData = (e) => {
+    const handleFilterData = e => {
       let tmp = []
       tmp.push(e.detail)
       setExternalFilters(tmp)
     }
 
-    subscribe('cove_filterData', (e) => handleFilterData(e))
+    subscribe('cove_filterData', e => handleFilterData(e))
 
     return () => {
       unsubscribe('cove_filterData', handleFilterData)
@@ -526,7 +526,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = (dateString) => {
+  const parseDate = dateString => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
@@ -536,7 +536,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
@@ -565,6 +565,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         </a>
       )
     }
+  }
+
+  // function calculates the width of given text and its font-size
+  function getTextWidth(text, font) {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    context.font = font || getComputedStyle(document.body).font
+
+    return Math.ceil(context.measureText(text).width)
   }
 
   // Format numeric data based on settings in config
@@ -618,7 +628,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
-    if (axis === 'left' && commas && abbreviated) {
+    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -751,7 +761,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const contextValues = {
@@ -786,7 +796,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
-    imageId
+    imageId,
+    getTextWidth
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
