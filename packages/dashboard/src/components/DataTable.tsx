@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
+import { useContext, useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
-import MediaControls from '@cdc/core/components/MediaControls'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 

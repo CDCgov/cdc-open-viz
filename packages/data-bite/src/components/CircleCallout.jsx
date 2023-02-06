@@ -1,5 +1,5 @@
 import React from 'react'
-import themes from '@cdc/core/data/componentThemes.js'
+import themes from '@cdc/core/data/componentThemes'
 import chroma from 'chroma-js'
 
 const CircleCallout = ({ text, theme = 'theme-blue', dataFormat, biteFontSize }) => {

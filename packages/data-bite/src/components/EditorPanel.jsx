@@ -1,5 +1,6 @@
-import React, { memo, useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 
+// Third Party
 import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
 
 import { useDebounce } from 'use-debounce'

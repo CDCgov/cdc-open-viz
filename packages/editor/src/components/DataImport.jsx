@@ -20,10 +20,13 @@ import validMapData from '../../example/valid-data-map.csv?raw'
 import validChartData from '../../example/valid-data-chart.csv?raw'
 import validCountyMapData from '../../example/valid-county-data.csv?raw'
 import sampleGeoPoints from '../../example/supported-cities.csv?raw'
+import validBoxPlotData from '../../example/valid-boxplot.csv?raw'
 
 import DataDesigner from '@cdc/core/components/manager/DataDesigner'
 
 import '../scss/data-import.scss'
+
+import '@cdc/core/styles/v2/components/data-designer.scss'
 
 export default function DataImport() {
   const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
@@ -477,6 +480,14 @@ export default function DataImport() {
     readyToConfigure = !!config.formattedData
   }
 
+  // Box plots skip the data description steps.
+  // If we have data and the visualizations is a box plot proceed...
+  if (config.visualizationType === 'Box Plot' && config.data) {
+    readyToConfigure = true
+  }
+
+  const showDataDesigner = config.visualizationType !== 'Box Plot'
+
   return (
     <>
       <div className='left-col'>
@@ -570,7 +581,7 @@ export default function DataImport() {
               </>
             )}
 
-            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />}
           </>
         )}
 
@@ -598,10 +609,10 @@ export default function DataImport() {
             {errors &&
               (errors.map
                 ? errors.map((message, index) => (
-                    <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
-                    </div>
-                  ))
+                  <div className='error-box slim mt-2' key={`error-${message}`}>
+                    <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                  </div>
+                ))
                 : errors.message)}
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
@@ -610,8 +621,8 @@ export default function DataImport() {
             <span className='heading-3'>Load Sample Data:</span>
             <ul className='sample-data-list'>
               <button className='link link-upload'
-                      onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
-                      onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+                onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}
               >
                 United States Sample Data #1
               </button>
@@ -635,6 +646,9 @@ export default function DataImport() {
                 onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
               >
                 Sample Geo Points
+              </button>
+              <button className='link link-upload' onClick={() => loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)}>
+                Sample Box Plot Data
               </button>
             </ul>
           </div>

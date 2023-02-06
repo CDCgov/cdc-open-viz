@@ -78,7 +78,10 @@
     "title": "Legend Title",
     "description": "Legend Text",
     "type": "equalnumber",
-    "specialClasses": ["*", "NA"],
+    "specialClasses": [
+      "*",
+      "NA"
+    ],
     "unified": false,
     "singleColumn": false,
     "dynamicDescription": false,
@@ -106,7 +109,10 @@
     "showBubbleZeros": false
   },
   "mapPosition": {
-    "coordinates": [0, 30],
+    "coordinates": [
+      0,
+      30
+    ],
     "zoom": 1
   },
   "sharing": {
@@ -718,6 +724,12 @@
     },
     {
       "STATE": "Alexandria",
+      "Rate": 5,
+      "Location": "Vehicle",
+      "URL": "https://www.cdc.gov/"
+    },
+    {
+      "STATE": "San Juan",
       "Rate": 5,
       "Location": "Vehicle",
       "URL": "https://www.cdc.gov/"
