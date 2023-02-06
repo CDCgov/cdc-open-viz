@@ -15,11 +15,13 @@ import LinkIcon from '../assets/icons/link.svg'
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
-import validMapData from '../../example/valid-data-map.csv'
-import validChartData from '../../example/valid-data-chart.csv'
-import validCountyMapData from '../../example/valid-county-data.csv'
-import sampleGeoPoints from '../../example/supported-cities.csv'
-import validBoxPlotData from '../../example/valid-boxplot.csv'
+// Vite specific syntax, use ?raw following url to parse direct reference
+import validMapData from '../../example/valid-data-map.csv?raw'
+import validChartData from '../../example/valid-data-chart.csv?raw'
+import validCountyMapData from '../../example/valid-county-data.csv?raw'
+import sampleGeoPoints from '../../example/supported-cities.csv?raw'
+import validScatterPlot from '../../example/valid-scatterplot.csv?raw'
+import validBoxPlotData from '../../example/valid-boxplot.csv?raw'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -322,7 +324,7 @@ export default function DataImport() {
     if (tempConfig !== null) setTempConfig(null)
 
     setConfig(newConfig)
-  }, [])
+  }, []) // eslint-disable-line
 
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
@@ -481,11 +483,11 @@ export default function DataImport() {
 
   // Box plots skip the data description steps.
   // If we have data and the visualizations is a box plot proceed...
-  if (config.visualizationType === 'Box Plot' && config.data) {
+  if ((config.visualizationType === 'Box Plot' && config.data) || config.visualizationType === 'Scatter Plot') {
     readyToConfigure = true
   }
 
-  const showDataDesigner = config.visualizationType !== 'Box Plot'
+  const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
 
   return (
     <>
@@ -646,28 +648,40 @@ export default function DataImport() {
               >
                 Sample Geo Points
               </button>
+              <button
+                className='link link-upload'
+                onClick={() => loadData(new Blob([validScatterPlot], { type: 'text/csv' }), 'valid-scatterplot.csv', editingDataset)}
+                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validScatterPlot], { type: 'text/csv' }), 'valid-scatterplot.csv', editingDataset)}
+              >
+                Sample Scatter Plot
+              </button>
               <button className='link link-upload' onClick={() => loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validBoxPlotData], { type: 'text/csv' }), 'valid-boxplot.csv', editingDataset)}>
                 Sample Box Plot Data
               </button>
             </ul>
-          </div>
-        )}
+          </div >
+        )
+        }
 
-        {config.type === 'dashboard' && !addingDataset && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
-              + Add More Files
-            </button>
-          </p>
-        )}
+        {
+          config.type === 'dashboard' && !addingDataset && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+                + Add More Files
+              </button>
+            </p>
+          )
+        }
 
-        {readyToConfigure && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
-              Configure your visualization
-            </button>
-          </p>
-        )}
+        {
+          readyToConfigure && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+                Configure your visualization
+              </button>
+            </p>
+          )
+        }
 
         <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
           <div>
@@ -675,7 +689,7 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-      </div>
+      </div >
       <div className='right-col'>
         <PreviewDataTable data={previewData} />
       </div>
