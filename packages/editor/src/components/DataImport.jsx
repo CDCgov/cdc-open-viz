@@ -318,7 +318,7 @@ export default function DataImport() {
     if (tempConfig !== null) setTempConfig(null)
 
     setConfig(newConfig)
-  }, [])
+  }, []) // eslint-disable-line
 
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
@@ -477,11 +477,11 @@ export default function DataImport() {
 
   // Box plots skip the data description steps.
   // If we have data and the visualizations is a box plot proceed...
-  if (config.visualizationType === 'Box Plot' && config.data) {
+  if ((config.visualizationType === 'Box Plot' && config.data) || config.visualizationType === 'Scatter Plot') {
     readyToConfigure = true
   }
 
-  const showDataDesigner = config.visualizationType !== 'Box Plot'
+  const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
 
   return (
     <>
