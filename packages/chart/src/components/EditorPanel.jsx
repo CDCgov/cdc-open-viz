@@ -1900,7 +1900,7 @@ const EditorPanel = () => {
                   )}
                   {config.orientation === 'horizontal' && !config.isLollipopChart && config.yAxis.labelPlacement !== 'On Bar' && <TextField type='number' value={config.barHeight || '25'} fieldName='barHeight' label=' Bar Thickness' updateField={updateField} min='15' />}
                   {((config.visualizationType === 'Bar' && config.orientation !== 'horizontal') || config.visualizationType === 'Combo') && <TextField value={config.barThickness} type='number' fieldName='barThickness' label='Bar Thickness' updateField={updateField} />}
-                  {config.orientation === 'horizontal' && <TextField type='number' value={config.barSpace || '20'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
+                  {(config.orientation === 'horizontal' || config.visualizationType === 'Paired Bar') && <TextField type='number' value={config.barSpace || '15'} fieldName='barSpace' label='Bar Space' updateField={updateField} min='0' />}
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <CheckBox value={config.topAxis.hasLine} section='topAxis' fieldName='hasLine' label='Add Top Axis Line' updateField={updateField} />}
 
                   {config.visualizationType === 'Spark Line' && (
