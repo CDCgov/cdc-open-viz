@@ -32,7 +32,7 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
-import CoveMediaControls from '@cdc/core/helpers/CoveMediaControls'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
 
 import './scss/main.scss'

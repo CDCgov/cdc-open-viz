@@ -3,11 +3,12 @@ import React from 'react'
 import Button from '../elements/Button'
 import Card from '../elements/Card'
 
-import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../data/dataDesignerTables'
+import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../templates/dataDesignerTables'
 import '../../styles/v2/components/data-designer.scss'
 
 const DataDesigner = props => {
   const { configureData, updateDescriptionProp, visualizationKey, dataKey } = props
+
 
   return (
     <div className='cove-data-designer__container'>
