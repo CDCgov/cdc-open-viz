@@ -1,8 +1,8 @@
-@import '~@cdc/core/styles/base';
-@import '~@cdc/core/styles/heading-colors';
+@import '@cdc/core/styles/base';
+@import '@cdc/core/styles/heading-colors';
 @import 'mixins';
 @import 'variables';
-@import '~@cdc/core/styles/v2/themes/color-definitions';
+@import '@cdc/core/styles/v2/themes/color-definitions';
 
 .form-container {
   overflow-y: auto;
@@ -598,6 +598,17 @@
 
     to {
       transform: scale(1);
+    }
+  }
+
+  .fieldset--boxplot {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 10px;
+
+    label {
+      margin: 5px 0;
     }
   }
 }

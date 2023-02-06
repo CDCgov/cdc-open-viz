@@ -14,7 +14,7 @@ div.data-table-heading {
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
-  background-image: url(~@cdc/core/assets/icon-minus.svg);
+  background-image: url(../assets/icon-minus.svg);
   background-size: 15px 15px; // Need to define both for IE11
   background-position: right 0.7em center;
   background-repeat: no-repeat;
@@ -23,7 +23,7 @@ div.data-table-heading {
     position: relative;
   }
   &.collapsed {
-    background-image: url(~@cdc/core/assets/icon-plus.svg);
+    background-image: url(../assets/icon-plus.svg);
     background-size: 15px 15px; // Need to define both for IE11
     background-position: right 0.7em center;
     background-repeat: no-repeat;
@@ -96,12 +96,12 @@ table.data-table {
 
     th.sort-asc,
     td.sort-asc {
-      background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
+      background-image: url(../assets/icon-caret-filled-up.svg);
     }
 
     th.sort-desc,
     td.sort-desc {
-      background-image: url(~@cdc/core/assets/icon-caret-filled-down.svg);
+      background-image: url(../assets/icon-caret-filled-down.svg);
     }
 
     th:last-child,
@@ -218,7 +218,7 @@ table.data-table {
     button.btn-next {
       &::before {
         content: ' ';
-        background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
+        background-image: url(../assets/icon-caret-filled-up.svg);
         background-size: 10px 5px;
         width: 10px;
         height: 5px;
@@ -229,7 +229,7 @@ table.data-table {
     button.btn-prev {
       &::before {
         content: ' ';
-        background-image: url(~@cdc/core/assets/icon-caret-filled-up.svg);
+        background-image: url(../assets/icon-caret-filled-up.svg);
         background-size: 10px 5px;
         width: 10px;
         height: 5px;
