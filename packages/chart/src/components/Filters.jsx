@@ -48,7 +48,7 @@ const useFilters = () => {
 }
 
 const Filters = () => {
-  const { config } = useContext(Context)
+  const { config } = useContext(ConfigContext)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
   const { filters } = config
   const buttonText = 'Apply Filters'
