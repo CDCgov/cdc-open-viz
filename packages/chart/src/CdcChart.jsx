@@ -671,7 +671,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Line: <LinearChart />,
     Combo: <LinearChart />,
     Pie: <PieChart />,
-    'Box Plot': <LinearChart />
+    'Box Plot': <LinearChart />,
+    'Scatter Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {

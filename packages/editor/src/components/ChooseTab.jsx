@@ -192,6 +192,14 @@ export default function ChooseTab() {
             <Tooltip.Content>Display a box plot</Tooltip.Content>
           </Tooltip>
         </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Scatter Plot' type='chart' subType='Scatter Plot' orientation='vertical' icon={<GenericIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a scatter plot</Tooltip.Content>
+          </Tooltip>
+        </li>
       </ul>
 
       <div className='heading-2'>Maps</div>
