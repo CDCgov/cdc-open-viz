@@ -5,6 +5,7 @@ import { Circle, Bar } from '@visx/shape'
 
 import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
@@ -335,8 +336,7 @@ const CdcWaffleChart = ({ configUrl, config: configObj, isDashboard = false, isE
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-      responseData = await dataString.json()
+      responseData = await fetchRemoteData(response.dataUrl)
     }
 
     response.data = responseData
