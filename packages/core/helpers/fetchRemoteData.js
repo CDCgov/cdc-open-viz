@@ -1,8 +1,7 @@
 import Papa from 'papaparse'
 
-export default async function (url) {
+export default async function (url, visualizationType = '') {
   try {
-    // Using URL Object to get pathname without URL paramaters on regex.
     url = new URL(url)
 
     const path = url.pathname
