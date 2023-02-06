@@ -1,0 +1,35 @@
+import { Meta, Story, ArgsTable, Canvas } from '@storybook/blocks';
+
+import InputCheckbox from '../InputCheckbox'
+
+<Meta
+  title="Components/Input/Checkbox"
+  component={InputCheckbox}
+  parameters={{ options: { isToolshown: true } }}
+  argTypes={{
+    label: {
+      control: {
+        type: 'text'
+      }
+    },
+    size: {
+      options: [ 'small', 'medium', 'large' ],
+      control: { type: 'radio' }
+    },
+    activeColor: { control: { type: 'color' } },
+    activeCheckColor: { control: { type: 'color' } }
+  }}
+/>
+
+# Checkbox
+
+<Canvas>
+  <Story name="Default">
+    <InputCheckbox value={false} size="small"/>
+    <InputCheckbox value={false}/>
+    <InputCheckbox value={false} size="large"/>
+    <InputCheckbox value={false} size="small" activeColor="#025eaa"/>
+    <InputCheckbox value={false} activeColor="#025eaa"/>
+    <InputCheckbox value={false} size="large" activeColor="#025eaa" activeCheckColor="#fff"/>
+  </Story>
+</Canvas>

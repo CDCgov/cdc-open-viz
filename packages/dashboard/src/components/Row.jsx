@@ -4,7 +4,7 @@ import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
 import Modal from '@cdc/core/components/ui/Modal'
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
+import InputToggle from '@cdc/core/components/input/InputToggle'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import Column from './Column'

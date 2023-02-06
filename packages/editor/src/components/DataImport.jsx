@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { csvParse } from 'd3'
-import get from 'axios'
+import axios from 'axios'
 
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import dataTransform from '@cdc/core/helpers/dataTransform'
 
 import ConfigContext from '../ConfigContext'
 
@@ -21,16 +21,14 @@ import validChartData from '../../example/valid-data-chart.csv?raw'
 import validCountyMapData from '../../example/valid-county-data.csv?raw'
 import sampleGeoPoints from '../../example/supported-cities.csv?raw'
 
-import DataDesigner from '@cdc/core/components/managers/DataDesigner'
+import DataDesigner from '@cdc/core/components/manager/DataDesigner'
 
 import '../scss/data-import.scss'
-
-import '@cdc/core/styles/v2/components/data-designer.scss'
 
 export default function DataImport() {
   const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [externalURL, setExternalURL] = useState(config.dataFileSourceType === 'url' ? config.dataFileName : config.dataUrl || '')
 
@@ -91,7 +89,7 @@ export default function DataImport() {
 
     try {
       // eslint-disable-next-line no-unused-vars
-      const response = await get(dataURL, {
+      const response = await axios.get(dataURL, {
         responseType: 'blob'
       }).then(response => {
         responseBlob = response.data

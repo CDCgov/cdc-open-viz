@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 
+// Third Party
+import PropTypes from 'prop-types'
+
 // Store
-import { useGlobalStore } from '../stores/globalStore'
-import { useConfigStore } from '../stores/configStore'
+import { useGlobalStore } from '../../stores/globalStore'
+import { useConfigStore } from '../../stores/configStore'
 
 // Helpers
-import DataTransform from '../helpers/DataTransform'
+import dataTransform from '../../helpers/dataTransform'
 
 const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
@@ -14,7 +17,7 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
   const [ cycle, setCycle ] = useState(false)
   const [ loadingConfig, setLoadingConfig ] = useState(true)
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const reloadConfig = () => {
     setLoadingConfig(true)
@@ -75,11 +78,10 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
       return newConfig
     }
 
-
     if (!cycle) {
       fetchConfig()
         .then((newConfig) => {
-          updateConfig(newConfig, runtime) // Set final config data in ConfigContext
+          updateConfig(newConfig, runtime) // Set final config data in ConfigContext, TODO: COVE Refactor - is this being parsed properly? Is runtime being attached?
           setLoadingConfig(false) // Tell subcomponents that the config is ready
         })
         .catch(console.error)
@@ -90,6 +92,17 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
   }, [ cycle, configObj, configUrl ])
 
   return (loadingConfig ? <></> : children)
+}
+
+ConfigProxy.propTypes = {
+  /** A *__json object__* containing values used for configuration of the dashboard or component */
+  configObj: PropTypes.object,
+  /** A *__url referral to a json object__* containing values used for configuration of the dashboard or component  */
+  configUrl: PropTypes.string,
+  /** A json object containing any default, baseline values for a visualization. */
+  defaults: PropTypes.object,
+  /** A visualization-specific function that is run against the resolved *configObj* or *configURL* object; returns a modified object based off those processed values */
+  runtime: PropTypes.func,
 }
 
 export default ConfigProxy

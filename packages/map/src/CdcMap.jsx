@@ -16,7 +16,7 @@ import ExternalIcon from './images/external-link.svg'
 import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Sass
 import './scss/main.scss'
@@ -24,7 +24,9 @@ import './scss/btn.scss'
 
 // Core
 import Loading from '@cdc/core/components/loader/Loading'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
+
+// Helpers
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import { getViewport } from '@cdc/core/helpers/coveHelpers'
 import { numberFromString } from '@cdc/core/helpers/coveHelpers'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -99,7 +101,7 @@ const getUniqueValues = (data, columnName) => {
 }
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
-  const transform = new DataTransform()
+  const transform = new dataTransform()
   const [state, setState] = useState({ ...initialState })
   const [loading, setLoading] = useState(true)
   const [currentViewport, setCurrentViewport] = useState()
@@ -1472,10 +1474,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
+              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
               <DataTable

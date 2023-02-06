@@ -3,12 +3,12 @@ import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-tab
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 import ConfigContext from '../ConfigContext'
 
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 export default function DataTable() {
   const { rawData, transformedData: data, config, colorScale, parseDate, formatDate, formatNumber: numberFormatter, colorPalettes, imageId } = useContext(ConfigContext)
@@ -129,10 +129,10 @@ export default function DataTable() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns: tableColumns, data: tableData, defaultColumn }, useSortBy, useBlockLayout, useResizeColumns)
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={config} />
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={config} />
         {config.table.download && <DownloadButton data={rawData} type='link' />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
 
       <section id={config?.title ? `dataTableSection__${config?.title.replace(/\s/g, '')}` : `dataTableSection`} className={`data-table-container`} aria-label={accessibilityLabel}>
         <div

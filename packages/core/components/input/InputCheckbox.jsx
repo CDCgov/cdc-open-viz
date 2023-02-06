@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 // Store
 import { useConfigStore } from '../../stores/configStore'
 
-//Helpers
+// Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
 
 // Components

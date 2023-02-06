@@ -1,0 +1,26 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import Ghost from '../Ghost'
+
+<Meta
+  title="Components/Element/Ghost"
+  component={Ghost}
+/>
+
+# Ghost Component
+The Ghost component serves as a central store for all ghost (skeleton) views.
+
+Ghosted sections serve up temporary, animated, visuals while asynchronous data is being loaded into the components.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Editor"
+         args={{
+           display: 'editor'
+         }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Editor"/>
+
+export const Template = ({ ...args }) => <Ghost {...args}/>

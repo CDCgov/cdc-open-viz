@@ -2,8 +2,8 @@
 import React from 'react'
 import parse from 'html-react-parser'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 const Sidebar = props => {
   const { legend, runtimeFilters, columns, setAccessibleStatus, changeFilterActive, resetLegendToggles, runtimeLegend, setRuntimeLegend, prefix, suffix, viewport, displayDataAsText } = props

@@ -3,7 +3,7 @@ import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import ConfigContext from '../ConfigContext'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {

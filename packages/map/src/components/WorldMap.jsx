@@ -1,7 +1,7 @@
 import { useEffect, memo } from 'react'
 
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'

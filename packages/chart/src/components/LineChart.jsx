@@ -5,7 +5,7 @@ import { Group } from '@visx/group'
 import { LinePath } from '@visx/shape'
 import { Text } from '@visx/text'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
 

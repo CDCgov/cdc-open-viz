@@ -1,6 +1,15 @@
 @import "../../utils/variables";
 @import "../../themes/theme-colors";
 
+.sbdocs {
+  .cove-ghost__editor {
+    max-height: 550px;
+  }
+  .cove-ghost__component__content {
+    min-height: 250px;
+  }
+}
+
 // Editor ---------------------------
 .cove-ghost__editor {
   display: flex;

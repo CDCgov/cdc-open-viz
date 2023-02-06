@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'

@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 // Styles
 import '../../styles/v2/components/element/ghost.scss'
 
@@ -40,6 +42,11 @@ const Ghost = ({ display }) => {
     default:
       return null
   }
+}
+
+Ghost.propTypes = {
+  /** Specifies the design to be used for component ghosting */
+  display: PropTypes.oneOf(['editor', 'component'])
 }
 
 export default Ghost

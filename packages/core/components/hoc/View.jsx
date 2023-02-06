@@ -1,13 +1,15 @@
 import React from 'react'
 
+import PropTypes from 'prop-types'
+
 // Store
-import { useGlobalStore } from '../stores/globalStore'
+import { useGlobalStore } from '../../stores/globalStore'
 
 // Components - Core
-import Editor from './editor/Editor'
+import Editor from '../editor/Editor'
 
 // Styles
-import '../styles/v2/main.scss'
+import '../../styles/v2/main.scss'
 
 const View = ({ EditorPanels, children }) => {
   const { viewMode } = useGlobalStore()
@@ -16,13 +18,10 @@ const View = ({ EditorPanels, children }) => {
 
   switch (viewMode) {
     case 'component':
-      view = (
-        <div className="cove">
-          {children}
-        </div>
-      )
+      view = children
       break
     case 'editor':
+    case 'wizard':
       view = (
         <Editor EditorPanels={EditorPanels}>
           {children}
@@ -33,11 +32,14 @@ const View = ({ EditorPanels, children }) => {
       break
   }
 
-  return (
-    <div className="cove">
-      {view}
-    </div>
-  )
+  return view
+}
+
+View.propTypes = {
+  /** **[External]** Retrieved from the `globalStore` - Defines the current view of the user, depending on the environment settings detected */
+  viewMode: PropTypes.oneOf(['component', 'editor', 'wizard']),
+  /** The React component export of the EditorPanels for the component */
+  EditorPanels: PropTypes.func
 }
 
 export default View

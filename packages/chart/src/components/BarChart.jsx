@@ -3,7 +3,7 @@ import { Group } from '@visx/group'
 import { BarGroup, BarStack } from '@visx/shape'
 import { Text } from '@visx/text'
 import chroma from 'chroma-js'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 

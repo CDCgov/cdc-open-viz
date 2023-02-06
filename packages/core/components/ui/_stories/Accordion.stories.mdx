@@ -1,0 +1,36 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/blocks';
+
+import Accordion from '../Accordion'
+
+<Meta
+  title="Components/UI/Accordion"
+  component={Accordion}
+/>
+
+# Accordion
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           label: 'Collapsed Section Content',
+           warnIf: 1 === 1,
+           tooltip: 'This section is an example.'
+         }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => (
+  <Accordion>
+    <Accordion.Section {...args}>
+      <p>An accordion is used to show (and hide) HTML content.</p>
+      <p>Both the element that is used to open the accordion and the accordion's content can be any HTML element.</p>
+    </Accordion.Section>
+    <Accordion.Section {...args}>
+      <p>An accordion is used to show (and hide) HTML content.</p>
+      <p>Both the element that is used to open the accordion and the accordion's content can be any HTML element.</p>
+    </Accordion.Section>
+  </Accordion>
+)

@@ -22,7 +22,7 @@ import calculateWaffleAnimation from './helpers/calculateWaffleAnimation'
 // Components - Core
 import Component from '@cdc/core/components/hoc/Component'
 import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import View from '@cdc/core/components/hoc/View'
 
 // Components - Local

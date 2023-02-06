@@ -2,15 +2,14 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
 }
 
 .cove {
-  height: 100vh;
-  max-height: 100%; //Is this needed?
   font: 1em/1.6 system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Droid Sans, Helvetica Neue, Fira Sans, sans-serif;
   font-weight: 400;
   font-style: normal;
-  line-height: 1.4;
+  line-height: 1.5;
   color: $baseColor;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

@@ -1,0 +1,25 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import Label from '../Label'
+
+<Meta
+  title="Components/Element/Label"
+  component={Label}
+/>
+
+# Label Component
+Labels are used to either define an input field, or to annotate a section of content.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example" args={{
+    tooltip: "Example tooltip text",
+    upperCase: true,
+    children: "Example Label"
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <Label {...args}/>

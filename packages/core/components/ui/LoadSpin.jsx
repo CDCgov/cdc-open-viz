@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 // Styles
 import '../../styles/v2/components/ui/loadspin.scss'
 
@@ -14,6 +16,15 @@ const LoadSpin = ({ color = '#fff', opacity = 100, size = 100, className }) => {
       </div>
     </>
   )
+}
+
+LoadSpin.propTypes = {
+  /** Set the spinner color */
+  color: PropTypes.string,
+  /** Set the spinner opacity `[0-100]` */
+  opacity: PropTypes.number,
+  /** Set the size of the displayed spinner in px */
+  size: PropTypes.number
 }
 
 export default LoadSpin

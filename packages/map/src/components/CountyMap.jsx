@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo, useRef } from 'react'
 import Loading from '@cdc/core/components/loader/Loading'
 
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid, geoPath } from 'd3-geo'
 import { feature, mesh } from 'topojson-client'
 import { CustomProjection } from '@visx/geo'

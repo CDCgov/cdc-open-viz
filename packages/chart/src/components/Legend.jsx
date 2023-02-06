@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import ConfigContext from '../ConfigContext'
 import parse from 'html-react-parser'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 import useLegendClasses from './../hooks/useLegendClasses'
 

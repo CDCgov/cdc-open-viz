@@ -1,0 +1,20 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import View from '../View'
+
+<Meta
+  title="Components/HOC/View"
+  component={View}
+/>
+
+# View Component
+A special component that renders a layout based on the current view for the user. The view is changed, depending on the consumption of the component, or the current URL of the user:
+- If a COVE component is loaded on its own, the view will be set to `component`. In this mode, the component displays as normal, and no interactive options are available. This is the default view.
+- If the URL contains `?editor=true`, the view will be set to `editor`. In this mode, the EditorPanels for an individual component will be accessible, and a special interactive screen is available for previewing the component with breakpoints.
+- When accessing a component through the Wizard, the view is set to `wizard`. In this mode, the EditorPanels and interactive breakpoint previews are available, regardless of the URL parameters.
+
+<Story name="Example"/>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <View {...args}/>

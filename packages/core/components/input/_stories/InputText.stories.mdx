@@ -1,0 +1,17 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import InputText from '../InputText'
+
+<Meta
+  title="Components/Input/Text"
+  component={InputText}
+  parameters={{ options: { isToolshown: true } }}
+/>
+
+# Text
+
+<Story name="Default">
+  <InputText label={'Test'}/>
+  <InputText label={'Test 2'} type="textarea"/>
+  <InputText label={'Test 2'} type="number"/>
+</Story>

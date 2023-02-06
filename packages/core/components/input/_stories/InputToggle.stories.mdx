@@ -1,0 +1,69 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+import InputToggle from '../InputToggle'
+
+<Meta
+  title="Components/Input/Toggle"
+  name="Usage"
+  component={InputToggle}
+  parameters={{ options: { isToolshown: true } }}
+/>
+
+export const Template = ({ ...args }) => (
+  <InputToggle {...args} />
+)
+
+# Toggle
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           label: 'Toggle Label',
+           labelPosition: 'top',
+           toggleType: 'flat',
+           tooltip: 'Example tooltip text...',
+           size: 'medium',
+           activeColor: '#39569b',
+           value: true
+         }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+## Flat
+`toggleType="flat"`
+<Canvas sourceState="none">
+  <InputToggle activeColor="#46c3d1" value={true}/>
+  <InputToggle size="medium" activeColor="#46c3d1" value={true}/>
+  <InputToggle size="large" activeColor="#46c3d1" value={true}/>
+</Canvas>
+
+<br/>
+
+## Block
+`toggleType="block"`
+<Canvas sourceState="none">
+  <InputToggle toggleType="block" activeColor="#025eaa" value={true}/>
+  <InputToggle size="medium" toggleType="block" activeColor="#025eaa" value={true}/>
+  <InputToggle size="large" toggleType="block" activeColor="#025eaa" value={true}/>
+</Canvas>
+
+<br/>
+
+## Pill
+`toggleType="pill"`
+<Canvas sourceState="none">
+  <InputToggle toggleType="pill" activeColor="#f22d70" value={true}/>
+  <InputToggle size="medium" toggleType="pill" activeColor="#f22d70" value={true}/>
+  <InputToggle size="large" toggleType="pill" activeColor="#f22d70" value={true}/>
+</Canvas>
+
+<br/>
+
+## 3D
+`toggleType="3d"`
+<Canvas sourceState="hidden">
+  <InputToggle toggleType="3d" value={true}/>
+  <InputToggle size="medium" toggleType="3d" value={true}/>
+  <InputToggle size="large" toggleType="3d" value={true}/>
+</Canvas>

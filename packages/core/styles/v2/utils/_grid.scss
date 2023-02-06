@@ -1,11 +1,13 @@
-$grid-gap-offset: 8;
-$grid-gap-max: 64;
-$grid-columns: 12;
+@import './variables';
+
+$cove-grid-gap-offset: 8;
+$cove-grid-gap-max: 64;
+$cove-grid-columns: 12;
 
 @mixin create-grid-selectors($breakpoint: null) {
   $infix: if($breakpoint == null, '-', '--#{$breakpoint}');
 
-  @for $i from 1 through $grid-columns {
+  @for $i from 1 through $cove-grid-columns {
     .cove-grid__col#{$infix}-#{$i} {
       grid-column-end: span $i;
     }
@@ -23,10 +25,10 @@ $grid-columns: 12;
 
 @mixin grid-gaps() {
   $i: 0;
-  @while ($i * $grid-gap-offset) <= $grid-gap-max {
+  @while ($i * $cove-grid-gap-offset) <= $cove-grid-gap-max {
     .cove-grid--gap--#{$i} {
-      grid-gap: #{($i * $grid-gap-offset) + 'px'};
-      gap: #{($i * $grid-gap-offset) + 'px'};
+      grid-gap: #{($i * $cove-grid-gap-offset) + 'px'};
+      gap: #{($i * $cove-grid-gap-offset) + 'px'};
     }
     $i: $i + 1;
   }
@@ -34,7 +36,7 @@ $grid-columns: 12;
 
 .cove-grid {
   display: grid;
-  grid-template-columns: repeat($grid-columns, 1fr);
+  grid-template-columns: repeat($cove-grid-columns, 1fr);
 }
 
 @include create-grid-selectors;

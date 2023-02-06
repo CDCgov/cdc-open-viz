@@ -1,0 +1,155 @@
+import { useState } from 'react';
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import Button from '../Button'
+
+<Meta
+  title="Components/Element/Button"
+  component={Button}
+/>
+
+# Button Component
+
+<p>Use the Button component to provide users with a method to interface with a major component, or trigger certain
+  actions.</p>
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+         args={{
+           children: "Button Text",
+           fluid: false,
+           disabled: false,
+           flexCenter: false
+         }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+<br/>
+<br/>
+
+## Loader Displays
+The Button component can also serve as a dynamic display for a variety of interactive event states:
+- Loading a file
+- After clicking "save"
+- Awaiting any asynchronous operation(s) to complete
+
+This display can be toggled on/off by passing a *boolean* value to the `disabled` property.
+
+<Canvas>
+  <Story name="Loader">
+    {() => {
+      const [ isLoading, setIsLoading ] = useState(false)
+      const loadingHandler = () => {
+        setIsLoading(true)
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 1000)
+        return
+      }
+      return <Button
+        role="loader"
+        disabled={isLoading}
+        loadingText="Saving your changes..."
+        onClick={() => loadingHandler()}
+      >
+        Click To Save
+      </Button>
+    }}
+  </Story>
+</Canvas>
+
+<br/>
+
+## Styling Options
+
+<br/>
+
+### Classes
+
+The Button component has several, basic color classes that can be applied out of the box.
+
+<Canvas sourceState="hidden">
+  <Story name="Classes">
+    {Classes.bind({})}
+  </Story>
+</Canvas>
+
+<br/>
+
+### Fluid (Fullwidth)
+
+The Button component can be made fullwidth inside it's containing parent, or a page by adding the `fluid` property.
+
+<Canvas sourceState="hidden">
+  <Story name="Fluid"
+         args={{
+           fluid: true,
+           children: "Fluid Button"
+         }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<br/>
+
+### Custom Styles
+
+Button component styles can be overwritten, just like any other element.
+
+<Canvas sourceState="hidden">
+  <Story name="Custom Styles">
+    {CustomClasses.bind({})}
+  </Story>
+</Canvas>
+
+<br/>
+
+### Custom Hover Styles
+
+You can also add custom hover styles to the button. The `hoverStyle` property will accept an object with style definitions. These will overwrite any styles defined previously through the `style` property when the element is hovered.
+
+<Canvas sourceState="hidden">
+  <Story name="Custom Hover Styles">
+    {CustomHover.bind({})}
+  </Story>
+</Canvas>
+
+export const Template = ({ ...args }) => (
+  <Button {...args}/>
+)
+
+export const Classes = ({ ...args }) => (
+  <>
+    <Button>Default</Button>
+    <Button className="cove-button--success">Success</Button>
+    <Button className="cove-button--warn">Warning</Button>
+    <Button className="cove-button--muted">Muted</Button>
+  </>
+)
+
+export const CustomClasses = ({ ...args }) => (
+  <Button style={{
+    padding: '14px 8px',
+    fontSize: '12px',
+    minWidth: 'unset',
+    borderTopLeftRadius: '20px',
+    borderBottomRightRadius: '10px'
+  }}>
+    Custom CSS Styles
+  </Button>
+)
+
+export const CustomHover = ({ ...args }) => (
+  <>
+    <Button hoverStyle={{ backgroundColor: 'yellow', color: 'blue' }}>
+      String Values
+    </Button>
+    <Button style={{ maxWidth: 'unset', padding: '1rem', backgroundColor: 'red', color: 'black' }}
+            hoverStyle={{ padding: '1rem 3rem', backgroundColor: 'purple', color: 'white' }}>
+      Array Values
+    </Button>
+  </>
+)

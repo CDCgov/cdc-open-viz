@@ -9,6 +9,7 @@ $editorAnimationTimer: 400ms;
   grid-template-columns: auto 1fr;
   position: relative;
   height: 100vh;
+  max-height: 100%;
   transform: scale(1); //Set baseline for fixed position
   overflow: hidden;
 

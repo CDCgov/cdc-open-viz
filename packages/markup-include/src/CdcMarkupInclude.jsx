@@ -3,7 +3,7 @@ import axios from 'axios'
 import parse from 'html-react-parser'
 import { Markup } from 'interweave'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
 
 import ConfigContext from './ConfigContext'

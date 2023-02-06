@@ -1,17 +1,26 @@
 import { useEffect, useRef } from 'react'
+
+// Third Party
 import parse from 'html-react-parser'
+import PropTypes from 'prop-types'
 
 // Store
-import { useGlobalStore } from '../stores/globalStore'
-import { useConfigStore } from '../stores/configStore'
+import { useGlobalStore } from '../../stores/globalStore'
+import { useConfigStore } from '../../stores/configStore'
 
 // Styles
-import '../styles/v2/components/component.scss'
+import '../../styles/v2/components/component.scss'
 
-const Component = (props) => {
+const Component = ({ className, children, exampleConfig, ...attributes }) => {
   const { setDimensions } = useGlobalStore()
-  const { config } = useConfigStore()
-  const { className, children, ...attributes } = props
+  const { config, updateConfig } = useConfigStore()
+
+  // Provide an example configObj for documentation purposes
+  useEffect(() => {
+    if (exampleConfig) updateConfig(exampleConfig)
+    return () => {
+    }
+  }, [ exampleConfig ])
 
   // Observe changes to component container sizes for use with SVG renders
   const outerContainerRef = useRef()
@@ -31,12 +40,12 @@ const Component = (props) => {
 
 
   // Component Attributes
-  const customBorderAttrs = config.visual.border !== 'default' && { 'data-border': config.visual.border }
-  const customShadowAttrs = !config.visual.shadow && { 'data-shadow': false }
+  const customBorderAttrs = config.visual?.border !== 'default' && { 'data-border': config.visual?.border }
+  const customShadowAttrs = !config.visual?.shadow && { 'data-no-shadow': true }
   // config.visual.accent !== 'default' && (config.visual.accent === 'top' && !title ) && { 'data-accent': config.visual.accent }
   const customAccentAttrs = () => {
-    if (config.visual.accent === 'default' || (config.visual.accent === 'top' && config.title)) return {}
-    return { 'data-accent': config.visual.accent }
+    if (config.visual?.accent === 'default' || (config.visual?.accent === 'top' && config.title)) return {}
+    return { 'data-accent': config.visual?.accent }
   }
 
   const customComponentAttrs = {
@@ -47,7 +56,7 @@ const Component = (props) => {
   }
 
   // Component Content Attributes
-  const customBgAttrs = config.visual.background !== 'default' && { 'data-bg': config.visual.background }
+  const customBgAttrs = config.visual?.background !== 'default' && { 'data-bg': config.visual?.background }
 
   const customContentAttrs = {
     ...customBgAttrs
@@ -74,6 +83,25 @@ const Component = (props) => {
       </div>
     </div>
   )
+}
+
+Component.propTypes = {
+  /** All content set between the \<Component\> tags */
+  children: PropTypes.any,
+  /** Additional classes to be appended to the component */
+  className: PropTypes.string,
+  config: PropTypes.shape({
+    theme: PropTypes.oneOf([ 'blue', 'purple', 'brown', 'teal', 'pink', 'orange', 'slate', 'indigo', 'cyan', 'green', 'amber']),
+    /** Set a custom title for the component; defaults to a `config.title` entry for the component config */
+    title: PropTypes.string,
+    description: PropTypes.string,
+    visual: PropTypes.shape({
+      border: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
+      background: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
+      shadow: PropTypes.bool,
+      accent: PropTypes.oneOf([ 'top', 'right', 'bottom', 'left' ])
+    })
+  })
 }
 
 export default Component

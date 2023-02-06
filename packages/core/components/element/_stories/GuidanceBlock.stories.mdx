@@ -1,0 +1,34 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import GuidanceBlock from '../GuidanceBlock'
+
+<Meta
+  title="Components/Element/GuidanceBlock"
+  component={GuidanceBlock}
+/>
+
+# GuidanceBlock Component
+The GuidanceBlock component is used for prominently highlighting either informative, or call-to-action, content.
+
+They primarily assist users by either providing context, or by directing them to related content links.
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example"
+  args={{
+    linkTo: "https://www.cdc.gov",
+    icon: "mapFolded"
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <GuidanceBlock {...args}>
+  <GuidanceBlock.Title>
+    Get Help
+  </GuidanceBlock.Title>
+  <GuidanceBlock.Content>
+    <p>Click here for more information and resources to assist you further.</p>
+  </GuidanceBlock.Content>
+</GuidanceBlock>

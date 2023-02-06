@@ -62,15 +62,15 @@ const Accordion = ({ children }) => {
 //Create subcomponents as "slots" within component namespace
 Accordion.Section = AccordionSection
 
-Accordion.Section.propTypes = {
-  /* Show warning if supplied statement or value is truthy */
+Accordion.propTypes = {
+  /** Show warning if supplied statement or value is truthy */
   warnIf: PropTypes.any,
-  /* Title for the accordion label*/
+  /** Title for the accordion label*/
   label: PropTypes.string,
-  /* Tooltip for the accordion label*/
+  /** Tooltip for the accordion label; JSX markup can also be supplied */
   tooltip: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string
+    PropTypes.string,
+    PropTypes.object
   ])
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import closeIcon from '../images/close.svg?inline'
-import LegendCircle from '@cdc/core/components/LegendCircle'
+import LegendCircle from '@cdc/core/components/element/LegendCircle'
 
 //TODO: Where is this being used? Transfer to new Modal component?
 const Modal = props => {

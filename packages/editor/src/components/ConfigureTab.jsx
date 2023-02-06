@@ -9,7 +9,7 @@ import CdcMarkupInclude from '@cdc/markup-include'
 
 import '../scss/configure-tab.scss'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 
 export default function ConfigureTab({ containerEl }) {

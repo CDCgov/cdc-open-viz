@@ -3,9 +3,9 @@ import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-tab
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import LegendCircle from '@cdc/core/components/LegendCircle'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import LegendCircle from '@cdc/core/components/element/LegendCircle'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 import Loading from '@cdc/core/components/loader/Loading'
 
@@ -280,10 +280,10 @@ const DataTable = props => {
   if (!state.data) return <Loading />
   return (
     <ErrorBoundary component='DataTable'>
-      <CoveMediaControls.Section classes={['download-links']}>
-        <CoveMediaControls.Link config={state} />
+      <MediaControls.Section classes={['download-links']}>
+        <MediaControls.Link config={state} />
         {state.general.showDownloadButton && <DownloadButton />}
-      </CoveMediaControls.Section>
+      </MediaControls.Section>
       <section id={tabbingId.replace('#', '')} className={`data-table-container ${viewport}`} aria-label={accessibilityLabel}>
         <a id='skip-nav' className='cdcdataviz-sr-only-focusable' href={`#${skipId}`}>
           Skip Navigation or Skip to Content

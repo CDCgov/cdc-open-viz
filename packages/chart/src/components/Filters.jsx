@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import ConfigContext from './../ConfigContext'
-import Button from '@cdc/core/components/elements/Button'
+import Button from '@cdc/core/components/element/Button'
 
 const useFilters = () => {
   const { config, setConfig, filteredData, setFilteredData, excludedData, filterData, runtimeFilters } = useContext(ConfigContext)

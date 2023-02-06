@@ -1,0 +1,22 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import OverlayFrame from '../OverlayFrame'
+
+<Meta
+  title="Components/HOC/OverlayFrame"
+  component={OverlayFrame}
+/>
+
+# OverlayFrame Component
+Documentation for this component is pending.
+
+## Subheader
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example">
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <OverlayFrame {...args}/>

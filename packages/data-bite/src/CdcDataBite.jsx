@@ -12,7 +12,7 @@ import defaults from './data/initial-state'
 // Helpers
 import { getViewport, cacheBustingString, numberFromString } from '@cdc/core/helpers/coveHelpers'
 import { publish } from '@cdc/core/helpers/events'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
@@ -49,7 +49,7 @@ const CdcDataBite = props => {
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [currentViewport, setCurrentViewport] = useState('lg')
 

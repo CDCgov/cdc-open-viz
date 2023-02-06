@@ -15,9 +15,9 @@ import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
-import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
+import OverlayFrame from '@cdc/core/components/hoc/OverlayFrame'
 import Loading from '@cdc/core/components/loader/Loading'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import { getViewport } from '@cdc/core/helpers/coveHelpers'
 
 import CdcMap from '@cdc/map'
@@ -32,7 +32,7 @@ import Header from './components/Header'
 import defaults from './data/initial-state'
 import Widget from './components/Widget'
 import DataTable from './components/DataTable'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 
 import './scss/main.scss'
@@ -112,7 +112,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
   const { title, description } = config.dashboard || config
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const processData = async config => {
     let dataset = config.formattedData || config.data
@@ -622,8 +622,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
           {/* Image or PDF Inserts */}
           <section className='download-buttons'>
-            {config.table.downloadImageButton && <CoveMediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <CoveMediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
+            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
           </section>
 
           {/* Data Table */}

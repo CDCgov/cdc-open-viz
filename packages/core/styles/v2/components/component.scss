@@ -9,7 +9,7 @@ $componentBorderRadius: 3px;
   border-radius: $componentBorderRadius;
   box-shadow: rgb(0 15 30 / 25%) 0 5px 15px -5px;
 
-  &[data-shadow="false"] {
+  &[data-no-shadow="true"] {
     box-shadow: none;
   }
 

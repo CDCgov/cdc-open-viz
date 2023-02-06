@@ -10,7 +10,7 @@ import useIntersectionObserver from './useIntersectionObserver'
 
 import ConfigContext from '../ConfigContext'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   startAngle,

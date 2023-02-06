@@ -52,16 +52,15 @@
       outline: 2px solid rgba(161, 161, 161, 0.6);
     }
   }
+}
 
-  svg {
-    width: 60px;
-    margin-right: 1rem;
-    color: $blue;
-
-    path {
-      fill: currentColor;
-    }
-  }
+.cove-guidance-block__icon {
+  display: block;
+  float: left;
+  height: 45px;
+  margin-right: 1rem;
+  color: #005eaa;
+  aspect-ratio: 1/1;
 }
 
 .cove-guidance-block__header {

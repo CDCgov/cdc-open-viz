@@ -1,11 +1,11 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
 
 import Accordion from '@cdc/core/components/ui/Accordion'
-import InputText from '@cdc/core/components/inputs/InputText'
+import InputText from '@cdc/core/components/input/InputText'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 

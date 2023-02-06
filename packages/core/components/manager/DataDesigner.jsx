@@ -1,7 +1,7 @@
 import Button from '../element/Button'
 import Card from '../element/Card'
 
-import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../data/dataDesignerTables'
+import { DATA_TABLE_VERTICAL, DATA_TABLE_HORIZONTAL, DATA_TABLE_SINGLE_ROW, DATA_TABLE_MULTI_ROW } from '../../templates/dataDesignerTables'
 
 import '../../styles/v2/components/manager/data-designer.scss'
 

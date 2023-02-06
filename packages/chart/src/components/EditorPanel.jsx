@@ -7,12 +7,12 @@ import { useDebounce } from 'use-debounce'
 
 import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
-import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
+import AdvancedEditor from '@cdc/core/components/editor/AdvancedEditor'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { useColorPalette } from '../hooks/useColorPalette'
 
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
+import InputToggle from '@cdc/core/components/input/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'

@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 
 import { jsx } from '@emotion/react'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { geoCentroid } from 'd3-geo'
 import { feature } from 'topojson-client'
 import topoJSON from '../data/us-topo.json'

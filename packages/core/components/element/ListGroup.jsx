@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
+// Store
+import { useConfigStore } from '../../stores/configStore'
+
 // Components
 import Icon from '../ui/Icon'
 import InputSelect from '../input/InputSelect'
@@ -22,28 +25,29 @@ const returnObjKeyValue = (key, obj) => {
   return value[0]
 }
 
-const ListGroupItem = (props) => {
-  const { textValueKey, listData, canClear, options, optionsSection, optionsSubsection, removeAction, updateField, index } = props
+const ListGroupItem = ({ textValueKey, listData, canClear, options, optionsSection, optionsSubsection, removeAction, index }) => {
+  const { updateConfigField } = useConfigStore()
+
   const [ textWidth, setTextWidth ] = useState(0)
 
   useEffect(() => {
-    //Create ghost object and text nodes for children
-    const ghostSpan = document.createElement('span')
-    ghostSpan.style.opacity = '0'
-    ghostSpan.style.visibility = 'hidden'
-    ghostSpan.style.position = 'absolute'
+    //Create shadow object and text nodes for children
+    const shadowSpan = document.createElement('span')
+    shadowSpan.style.opacity = '0'
+    shadowSpan.style.visibility = 'hidden'
+    shadowSpan.style.position = 'absolute'
 
-    //Append data to ghost objects
-    ghostSpan.appendChild(document.createTextNode(textValueKey))
+    //Append data to shadow objects
+    shadowSpan.appendChild(document.createTextNode(textValueKey))
 
     //Append objects to document
-    document.body.appendChild(ghostSpan)
+    document.body.appendChild(shadowSpan)
 
     //Register ghost width values in state
-    setTextWidth(ghostSpan.offsetWidth)
+    setTextWidth(shadowSpan.offsetWidth)
 
     //Remove ghost objects from document
-    document.body.removeChild(ghostSpan)
+    document.body.removeChild(shadowSpan)
   }, [])
 
   const isOverflow = () => options ? textWidth > MAX_TEXT_SELECT_WIDTH : textWidth > MAX_TEXT_WIDTH
@@ -51,7 +55,7 @@ const ListGroupItem = (props) => {
   const onChangeHandler = (e) => {
     let listArr = [ ...listData ]
     listArr[index][optionsSubsection] = e.target.value
-    updateField(optionsSection, optionsSubsection, { ...listArr })
+    updateConfigField([optionsSection, optionsSubsection], { ...listArr })
   }
 
   return (
@@ -83,8 +87,7 @@ const ListGroupItem = (props) => {
   )
 }
 
-const ListGroup = (props) => {
-  const { label, tooltip, items, textValueKey, canClear = true, options, optionsSection, optionsSubsection, removeAction, updateField } = props
+const ListGroup = ({ label, tooltip, items, textValueKey, canClear = true, options, optionsSection, optionsSubsection, removeAction }) => {
   const [ listData, setListData ] = useState(items)
 
   useEffect(() => {
@@ -107,7 +110,7 @@ const ListGroup = (props) => {
             itemsJsx.push(
               <ListGroupItem textValueKey={textValue} listData={listData} canClear={canClear}
                              options={options} optionsSection={optionsSection} optionsSubsection={optionsSubsection}
-                             removeAction={removeAction} updateField={updateField}
+                             removeAction={removeAction}
                              index={index} key={index}
               />
             )
@@ -137,12 +140,27 @@ const ListGroup = (props) => {
 }
 
 ListGroup.propTypes = {
-  /* Array of items to populate the list */
-  items: PropTypes.oneOfType([
-      PropTypes.array,
-      PropTypes.object
-    ]
-  )
+  /** Supply a label for the ListGroup */
+  label: PropTypes.string,
+  /** Allow all items from the list to be removed. Set `false` to force at least 1 to remain */
+  canClear: PropTypes.bool,
+  /** Supply the key name containing the value to be used when populating the text value */
+  textValueKey: PropTypes.string,
+  /** Array list of values for additional dropdown selections on each list item */
+  options: PropTypes.array,
+  /** First config key value to target when updating the option of the dropdown  */
+  optionsSection: PropTypes.string,
+  /** Second, nested config key value to target when updating the option of the dropdown  */
+  optionsSubsection: PropTypes.string,
+  /** Callback function to trigger when removing an item from the ListGroup */
+  removeAction: PropTypes.func,
+  /** Array of strings, or objects, used to populate the list. If objects are used, each entry's key is set to the text and the value is set to the value of  */
+  items: PropTypes.array,
+  /** Add a tooltip to describe the ListGroup's usage; JSX markup can also be supplied */
+  tooltip: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]),
 }
 
 export default ListGroup

@@ -4,10 +4,10 @@ import { useDrag } from 'react-dnd'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import ConfigContext from '../ConfigContext'
 
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
-import DataDesigner from '@cdc/core/components/managers/DataDesigner'
+import DataDesigner from '@cdc/core/components/manager/DataDesigner'
 import Icon from '@cdc/core/components/ui/Icon'
 import Modal from '@cdc/core/components/ui/Modal'
 
@@ -50,7 +50,7 @@ const Widget = ({ data = {}, addVisualization, type }) => {
   const dataRef = useRef()
   dataRef.current = data
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const handleWidgetMove = (item, monitor) => {
     let result = monitor.getDropResult()

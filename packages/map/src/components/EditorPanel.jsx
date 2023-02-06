@@ -8,7 +8,7 @@ import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { useColorPalette } from '../hooks/useColorPalette'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import Waiting from '@cdc/core/components/loader/Waiting'
 
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'

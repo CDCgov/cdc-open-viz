@@ -1,0 +1,27 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import InputGroup from '../InputGroup'
+import InputText from '../InputText'
+import Icon from '../../ui/Icon'
+
+<Meta
+  title="Components/Input/Group"
+  component={InputGroup}
+  parameters={{ options: { isToolshown: true } }}
+/>
+
+# Group
+
+<Story name="Default">
+  <InputGroup flow="left" label={<><Icon className="mr-1" display="upload"/> There is text here</>}
+              className="mb-2">
+    <InputText type="text" label="bob"/>
+  </InputGroup>
+  <InputGroup flow="right" label="Test label text" className="mb-2">
+    <InputText type="text"/>
+  </InputGroup>
+  <InputGroup flow="center" label="@" className="mb-2">
+  <InputText type="text" placeholder="User"/>
+  <InputText type="text" placeholder="Server"/>
+</InputGroup>
+</Story>

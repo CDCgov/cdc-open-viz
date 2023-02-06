@@ -32,18 +32,18 @@ import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/loader/Loading'
 import Filters from './components/Filters'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Helpers
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import { numberFromString } from '@cdc/core/helpers/coveHelpers'
 import { getViewport } from '@cdc/core/helpers/coveHelpers'
-import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 
 import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
-  const transform = new DataTransform()
+  const transform = new dataTransform()
 
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
@@ -731,10 +731,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
             {/* buttons */}
-            <CoveMediaControls.Section classes={['download-buttons']}>
-              {config.table.showDownloadImgButton && <CoveMediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
-              {config.table.showDownloadPdfButton && <CoveMediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
-            </CoveMediaControls.Section>
+            <MediaControls.Section classes={['download-buttons']}>
+              {config.table.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={config} elementToCapture={imageId} />}
+              {config.table.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={config} elementToCapture={imageId} />}
+            </MediaControls.Section>
 
             {/* Data Table */}
             {config.xAxis.dataKey && config.table.show && config.visualizationType !== 'Spark Line' && <DataTable />}

@@ -1,93 +1,112 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
 
+// Store
+import { useConfigStore } from '../../stores/configStore'
+
+// Helpers
+import { getConfigKeyValue } from '../../helpers/configHelpers'
+
+// Components
+import Label from '../element/Label'
+
+// Styles
 import '../../styles/v2/components/input/index.scss'
 
 const InputToggle = ({
-  label,
-  toggleType = 'flat',
-  size = 'medium',
-  activeColor = null,
-  section = null,
-  subsection = null,
-  fieldName,
-  updateField,
-  value: stateValue,
+                       label,
+                       labelPosition = 'left',
+                       tooltip,
+                       toggleType = 'flat',
+                       size = 'small',
+                       activeColor = null,
 
-  i = null,
-  min = null,
-  max = null,
-  ...attributes
-}) => {
-  const [value, setValue] = useState(stateValue)
+                       configField,
+                       value: inlineValue,
+                       className, ...attributes
+                     }) => {
 
-  let name = () => {
-    let str = ''
-    if (section) str += section + '-'
-    if (subsection) str += subsection + '-'
-    if (fieldName) str += fieldName
-    return str
-  }
+  const { config, updateConfigField } = useConfigStore()
+
+  const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
+  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || false)
+
+  //Set initial value
+  useEffect(() => {
+    if (configField) {
+      if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets value
+        if (inlineValue !== value) {
+          updateConfigField(configField, value)
+        }
+      }
+
+      // Initial value changed to configField value
+      // updateConfigField func is now accessible
+      setLoadedConfigValue(true)
+    }
+  }, [ value ])
 
   const toggleTypeClass = () => {
     const typeArr = {
-      flat: ' toggle--flat',
-      block: ' toggle--block',
-      pill: ' toggle--pill',
-      '3d': ' toggle--3d'
+      flat: ' cove-input__toggle--flat',
+      block: ' cove-input__toggle--block',
+      pill: ' cove-input__toggle--pill',
+      '3d': ' cove-input__toggle--3d'
     }
     return typeArr[toggleType] || ''
   }
 
-  useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value) {
-      setValue(stateValue)
-    }
-  }, [stateValue])
+  const onClickHandler = () => setValue(value => !value)
 
-  useEffect(() => {
-    if (stateValue !== undefined && stateValue !== value && updateField) {
-      updateField(section, subsection, fieldName, value, i)
-    }
-  }, [value])
+  const tooltipCheck = () => {
+    if (tooltip) return { 'data-has-tooltip': true }
+    return {}
+  }
+
+  const tooltipArgs = {...tooltipCheck()}
+
+  const TooltipLabel = () => (
+    <div className="cove-input__toggle-group__label" {...tooltipArgs}>
+      <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
+    </div>
+  )
 
   return (
-    <div className='input-group'>
-      {label && <label>{label}</label>}
-      <div className={'cove-input__toggle' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + toggleTypeClass() + (value ? ' active' : '')} onClick={() => setValue(!value)}>
-        <div className='cove-input__toggle-button' />
-        <div className='cove-input__toggle-track' style={value && activeColor ? { backgroundColor: activeColor } : null} />
-        <input className='cove-input--hidden' type='checkbox' name={name()} checked={value || false} readOnly />
+    <>
+      {label && labelPosition === 'top' && <TooltipLabel/>}
+      <div className={'cove-input__toggle-group' + (className ? ' ' + className : '')} flow={labelPosition}>
+        {label && labelPosition === 'left' && <TooltipLabel/>}
+        <div className={'cove-input__toggle' + (size === 'medium' ? '--medium' : size === 'large' ? '--large' : '') + toggleTypeClass() + (value ? ' cove-input__toggle--active' : '')} onClick={() => onClickHandler()}>
+          <div className="cove-input__toggle-button"/>
+          <div className="cove-input__toggle-track" style={value && activeColor ? { backgroundColor: activeColor } : null}/>
+          <input className="cove-input--hidden" type="checkbox" checked={value || false} readOnly/>
+        </div>
+        {label && labelPosition === 'right' && <TooltipLabel/>}
       </div>
-    </div>
+    </>
   )
 }
 
 InputToggle.propTypes = {
   /** Add label to the input field */
   label: PropTypes.string,
+  /** Position the label relative to the toggle */
+  labelPosition: PropTypes.oneOf([ 'left', 'right', 'top' ]),
+  /** Add a tooltip to describe the toggle's usage; JSX markup can also be supplied */
+  tooltip: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]),
   /** Select the preferred display style of the toggle */
-  toggleType: PropTypes.oneOf(['flat', 'block', 'pill', '3d']),
+  toggleType: PropTypes.oneOf([ 'flat', 'block', 'pill', '3d' ]),
   /** Select the preferred size of the toggle */
-  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  size: PropTypes.oneOf([ 'small', 'medium', 'large' ]),
   /** Select the preferred color for the toggle when active */
   activeColor: PropTypes.string,
-  /** Parent key value of nested target config option
-   *
-   * (optional)*/
-  section: PropTypes.string,
-  /** Child key value of nested target config option
-   *
-   * (optional, requires `section` value)*/
-  subsection: PropTypes.string,
-  /** Key value of targeted config option */
-  fieldName: PropTypes.string,
-  /** Prop drill down of the updateField function */
-  updateField: PropTypes.func,
   /** Current value of the input, usually the current config option value */
-  stateValue: PropTypes.object
+  stateValue: PropTypes.bool
 }
 
 export default InputToggle

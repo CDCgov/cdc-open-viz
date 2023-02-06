@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import DataTransform from '@cdc/core/helpers/DataTransform'
-import Loading from '@cdc/core/components/Loading'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import dataTransform from '@cdc/core/helpers/dataTransform'
+import Loading from '@cdc/core/components/loader/Loading'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state'
 import ConfigContext from './ConfigContext'
@@ -13,7 +13,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
 
-  const transform = new DataTransform()
+  const transform = new dataTransform()
   // Default States
   const [config, setConfig] = useState(defaults)
   const [loading, setLoading] = useState(true)

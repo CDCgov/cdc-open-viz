@@ -6,7 +6,11 @@ export const useGlobalStore = create(devtools((set) => ({
     // Global
     viewMode: window.location.href.includes('editor=true') ? 'editor' : 'component',
     os: navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null,
-    overlay: null,
+    overlay: {
+      object: null,
+      show: false,
+      disableBgClose: false
+    },
     dimensions: null,
 
     // Actions

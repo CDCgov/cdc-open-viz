@@ -1,0 +1,86 @@
+import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
+
+import Component from '../Component'
+
+<Meta
+  title="Components/HOC/Component"
+  component={Component}
+  args={{
+    exampleConfig: {
+      theme: "blue",
+      title: "Component Title",
+      description: "A small description of the component",
+      visual: {
+        background: "default",
+        border: "default",
+        shadow: true,
+        accent: "bottom"
+      }
+    }
+  }}
+  argTypes={{
+    exampleConfig: {
+      table: {
+        disable: true
+      }
+    },
+    className: {
+      control: 'text'
+    },
+    children: {
+      control: false
+    },
+    config: {
+      control: false
+    },
+    'config.theme': {
+      description: "[External] Sets a custom theme to be used by the Component for the header bar and borders <br/><br/> `'blue'` `'purple'` `'brown'` `'teal'` `'pink'` `'orange'` `'slate'` `'indigo'` `'cyan'` `'green'` `'amber'`"
+    },
+    'config.title': {
+      description: "[External] Set a custom title for the component header section"
+    },
+    'config.description': {
+      description: "[External] Supply a description or subtext for the component's content"
+    },
+    'config.visual': {
+      description: "[External] An object containing visual definitions for the component"
+    },
+    'config.visual.background': {
+      description: "[External] Set the background display style for the component <br/><br/> `'default'` `'template'` `'none'`"
+    },
+    'config.visual.border': {
+      description: "[External] Set the border display style for the component <br/><br/> `'default'` `'template'` `'none'`"
+    },
+    'config.visual.shadow': {
+      description: "[External] Enable/disable the display of the drop-shadow on the Component",
+    },
+    'config.visual.accent': {
+      description: "[External] Set the position of the accent border display on the Component <br/><br/> `'top'` `'right'` `'bottom'` `'left'`",
+    }
+  }}
+/>
+
+# Component Archetype
+Component is a top-level, archetype component. It acts as a stylized wrapper, containing a visualization and any of it's related components (tables, legends, etc.).
+
+It is displayed on a dashboard or page, collectively rendering the final output of what would be considered a COVE component.
+
+<br/>
+
+**[Documentation Note]:** *Due to the complexity of the state required for this component, and the limitations of Storybook's framework, interactive functionality testing for this component is currently unavailable in the documentation.
+Furthermore, the markup and arguments table does appear slightly different; be aware that documented argument references on the table also includes specifics for the Config Store's `config: {}` value.*
+
+<Canvas sourceState="shown" withSource="open">
+  <Story name="Example">
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <Component {...args}>
+  <h2>[Component Visualization]</h2>
+  <br/>
+  <p>This section is just an example of how the inner content of a component will be displayed. A visualization,
+    and any of it's required/related components will appear in this area.</p>
+</Component>

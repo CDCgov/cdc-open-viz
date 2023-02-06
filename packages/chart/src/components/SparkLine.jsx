@@ -8,7 +8,7 @@ import { scaleLinear, scalePoint } from '@visx/scale'
 import { AxisBottom } from '@visx/axis'
 import { MarkerArrow } from '@visx/marker'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 import ReactTooltip from 'react-tooltip'
 
