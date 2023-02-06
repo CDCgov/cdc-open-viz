@@ -8,7 +8,7 @@ import ConfigContext from '../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
-  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate } = useContext(ConfigContext)
+  const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, parseDate, getTextWidth } = useContext(ConfigContext)
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -25,10 +25,10 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const radius = config.roundingStyle === 'standard' ? '8px' : config.roundingStyle === 'shallow' ? '5px' : config.roundingStyle === 'finger' ? '15px' : '0px'
   const stackCount = config.runtime.seriesKeys.length
   const barBorderWidth = 1
-  const fontSize = { small: 14, medium: 16, large: 18 }
+  const fontSize = { small: 16, medium: 18, large: 20 }
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
 
-  const applyRadius = (index) => {
+  const applyRadius = index => {
     if (index === undefined || index === null || !isRounded) return
     let style = {}
 
@@ -84,16 +84,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     })
   }
 
-  function getTextWidth(text, font) {
-    // function calculates the width of given text and its font-size
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-
-    context.font = font || getComputedStyle(document.body).font
-
-    return Math.ceil(context.measureText(text).width)
-  }
-
   // Using State
   const [textWidth, setTextWidth] = useState(null)
 
@@ -138,7 +128,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={config.runtime.yAxis.size}>
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -202,7 +192,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={data} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -292,7 +282,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               data={data}
               keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
               height={yMax}
-              x0={(d) => d[config.runtime.originalXAxis.dataKey]}
+              x0={d => d[config.runtime.originalXAxis.dataKey]}
               x0Scale={config.runtime.horizontal ? yScale : xScale}
               x1Scale={seriesScale}
               yScale={config.runtime.horizontal ? xScale : yScale}
@@ -342,18 +332,18 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         xAxisValue = tempValue
                         barWidth = config.barHeight
                       }
+                      // check if bar text/value string fits into  each bars.
+                      let textWidth = getTextWidth(xAxisValue, `normal ${fontSize[config.fontSize]}px sans-serif`)
+                      let textFits = textWidth < bar.y - 5 // minus padding 5
+
                       let labelColor = '#000000'
 
                       // Set label color
                       if (chroma.contrast(labelColor, barColor) < 4.9) {
-                        labelColor = '#FFFFFF'
+                        if (textFits) labelColor = '#FFFFFF'
                       }
 
                       const style = applyRadius(index)
-
-                      // check if bar text/value string fits into each bar
-                      let textWidth = getTextWidth(xAxisValue, config.fontSize)
-                      let doesTextFit = (textWidth / bar.y) * 100 < 48
 
                       let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${yAxisValue}` : yAxisValue
                       let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${xAxisValue}` : xAxisValue
@@ -400,14 +390,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
-                              <Text
+                              <Text // prettier-ignore
                                 display={displayBar ? 'block' : 'none'}
                                 x={bar.y}
                                 y={config.barHeight / 2 + config.barHeight * bar.index}
                                 fill={labelColor}
-                                dx={doesTextFit ? -5 : 5} // X padding
+                                dx={textFits ? -5 : 5}
                                 verticalAnchor='middle'
-                                textAnchor={doesTextFit ? 'end' : 'start'}
+                                textAnchor={textFits ? 'end' : 'start'}
                               >
                                 {xAxisValue}
                               </Text>
