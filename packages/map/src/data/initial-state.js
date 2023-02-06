@@ -63,7 +63,7 @@ export default {
     title: 'Data Table'
   },
   table: {
-    showDownloadUrl: true
+    showDownloadUrl: false
   },
   tooltips: {
     appearanceType: 'hover',
