@@ -6,6 +6,7 @@ import { Text } from '@visx/text'
 import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
+import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
 import LineChart from './LineChart'
 import ConfigContext from '../ConfigContext'
@@ -181,6 +182,15 @@ export default function LinearChart() {
         range: [xMax / 2, xMax]
       })
     }
+
+    if (config.visualizationType === 'Scatter Plot') {
+      if (config.xAxis.type === 'continuous') {
+        xScale = scaleLinear({
+          domain: [0, Math.max.apply(null, xScale.domain())],
+          range: [0, xMax]
+        })
+      }
+    }
   }
 
   const handleLeftTickFormatting = tick => {
@@ -248,6 +258,10 @@ export default function LinearChart() {
       domain: config.boxplot.categories,
       padding: 0.4
     })
+  }
+
+  const handleTick = tick => {
+    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
   }
 
   return isNaN(width) ? (
@@ -509,18 +523,20 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
+
+        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
 
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>
