@@ -1,43 +1,80 @@
 {
   "type": "chart",
   "title": "Example Paired Bar Chart",
-  "theme": "theme-slate",
+  "theme": "theme-pink",
+  "animate": false,
   "fontSize": "small",
   "lineDatapointStyle": "hover",
-  "barHasBorder": "false",
+  "barHasBorder": "true",
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
   "visualizationSubType": null,
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
   "padding": {
     "left": 5,
     "right": 5
   },
   "yAxis": {
-    "hideAxis": true,
+    "hideAxis": false,
+    "displayNumbersOnBar": true,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "75",
+    "size": "86",
     "gridLines": false,
-    "label": "Value Axis",
-    "numTicks": "6"
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 50,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "4",
+    "label": "Value Axisd"
   },
+  "boxplot": [],
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
   "barThickness": 0.35,
-  "height": "400",
+  "barHeight": "25",
+  "barSpace": "15",
+  "heights": {
+    "vertical": 300,
+    "horizontal": 287
+  },
   "xAxis": {
     "type": "categorical",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "56",
+    "size": "79",
     "tickRotation": "0",
+    "min": "",
     "max": "15000",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": "87",
     "dataKey": "Age Group",
     "label": "Age Group"
   },
   "table": {
     "label": "Data Table",
     "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
     "show": true,
     "indexLabel": "Region"
   },
@@ -45,7 +82,15 @@
   "legend": {
     "behavior": "isolate",
     "position": "right",
+    "singleRow": false,
+    "colorCode": "",
     "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
     "hide": false,
     "label": "Region "
   },
@@ -53,14 +98,22 @@
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-soft",
+  "palette": "qualitative1",
   "isPaletteReversed": false,
   "labels": false,
   "dataFormat": {
     "commas": true,
-    "suffix": " per 100k"
+    "prefix": "",
+    "suffix": " per 100k",
+    "abbreviated": false
   },
   "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "height": "400",
   "data": [
     {
       "Region": "West Coast",
@@ -115,7 +168,7 @@
     {
       "Region": "East Coast",
       "Age Group": "35-44",
-      "Cases Per 100K": "7478"
+      "Cases Per 100K": "27478"
     },
     {
       "Region": "East Coast",
@@ -191,6 +244,5 @@
       "type": "Bar"
     }
   ],
-  "filters": [],
-  "barHeight": "23"
+  "filters": []
 }

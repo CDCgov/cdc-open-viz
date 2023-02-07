@@ -81,6 +81,15 @@ const hashObj = row => {
   }
 }
 
+const indexOfIgnoreType = (arr, item) => {
+  for(let i = 0; i < arr.length; i++){
+    if(item == arr[i]){
+      return i;
+    }
+  }
+  return -1;
+}
+
 // returns string[]
 const getUniqueValues = (data, columnName) => {
   let result = {}
@@ -392,12 +401,25 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       let sorted = [...uniqueValues.keys()]
 
+      if(obj.legend.additionalCategories){
+        obj.legend.additionalCategories.forEach(additionalCategory => {
+          if(additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1){
+            sorted.push(additionalCategory);
+          }
+        });
+      }
+
       // Apply custom sorting or regular sorting
       let configuredOrder = obj.legend.categoryValuesOrder ?? []
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
-          return configuredOrder.indexOf(a) - configuredOrder.indexOf(b)
+          let aVal = configuredOrder.indexOf(a);
+          let bVal = configuredOrder.indexOf(b);
+          if(aVal === bVal) return 0;
+          if(aVal === -1) return 1;
+          if(bVal === -1) return -1;
+          return aVal - bVal;
         })
       } else {
         sorted.sort((a, b) => a - b)

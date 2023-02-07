@@ -33,7 +33,7 @@
     "behavior": "isolate",
     "position": "right",
     "label": "Type of Data",
-    "dynamicLegend": true
+    "dynamicLegend": false
   },
   "palette": "qualitative-bold",
   "labels": false,
