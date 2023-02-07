@@ -1,0 +1,34 @@
+﻿[
+  {
+    "Category": "One",
+    "Values": 888
+  },
+  {
+    "Category": "Two",
+    "Values": 400
+  },
+  {
+    "Category": "Three",
+    "Values": -100
+  },
+  {
+    "Category": "Four",
+    "Values": 500
+  },
+  {
+    "Category": "Five",
+    "Values": 700
+  },
+  {
+    "Category": "Six",
+    "Values": -1000
+  },
+  {
+    "Category": "Seven",
+    "Values": 300
+  },
+  {
+    "Category": "Eight",
+    "Values": -500
+  }
+]
