@@ -61,7 +61,7 @@ export default function LinearChart() {
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
-  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   let xScale
@@ -417,7 +417,7 @@ export default function LinearChart() {
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
           <AxisBottom
-            top={config.runtime.horizontal ? Number(config.height) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            top={config.runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(config.runtime.yAxis.size)}
             label={config.runtime.xAxis.label}
             tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
