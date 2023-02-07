@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useRef } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
@@ -17,6 +17,8 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   const DEBUG = false
   const { transformedData: data, config, height, width } = useContext(ConfigContext)
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } = useTooltip()
+  const [xAxisCircleToDisplay, setXAxisCircleToDisplay] = useState(null)
+
   let isEditor = window.location.href.includes('editor=true')
 
   const tooltipStyles = {
@@ -54,14 +56,24 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
   const handleMouseOver = useCallback(
     (e, data) => {
+
+      // get the svg coordinates of the mouse
+      // and get the closest values
       const eventSvgCoords = localPoint(e)
-
       const { x } = eventSvgCoords
-
       let closestXScaleValue = getXValueFromCoordinate(x)
-
       const yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
+
+      console.log('cfg', config.runtime.seriesKeys)
+      config.runtime.seriesKeys.map(key => {
+        console.log('key', key)
+        console.log('yScaleValues', yScaleValues)
+        yScaleValues[0].filter(item => item === key)
+      })
       let yScaleMaxValues = []
+
+      // filter out the series that aren't added to the map.
+      config.series.map(series => console.log('series here', series))
       config.series.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series.dataKey])))
 
       let tooltipData = {}
@@ -69,6 +81,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       console.log('tooltip data', tooltipData)
       tooltipData.dataXPosition = 10
       tooltipData.dataYPosition = yMax + 10
+
 
       let tooltipInformation = {
         tooltipData: tooltipData,
@@ -128,15 +141,22 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   fillOpacity={0.05}
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
-
-                // onTouchStart={handleTooltip}
-                // onTouchMove={handleTooltip}
-                // onMouseMove={handleTooltip}
-                // onMouseLeave={() => hideTooltip()}
                 />
+                {console.log('toooltip', tooltipData)}
+                {tooltipData &&
+                  <circle
+                    cx={xScale(tooltipData.data[0][config.xAxis.dataKey])}
+                    cy={yScale(tooltipData.data[0][s.dataKey])}
+                    dataTestx={d => Number(xScale(d[config.xAxis.dataKey]))}
+                    r={4.5}
+                    opacity={1}
+                    fillOpacity={1}
+                    fill={seriesColor}
+                    style={{ filter: 'unset', opacity: 1 }}
+                  />
+                }
 
                 {/* bars to handle tooltips */}
-
                 {DEBUG &&
                   config.data.map((item, index) => {
                     return (
@@ -166,9 +186,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                         ))}
                       </ul>
                     </Group>
-                    <g>
-                      <GlyphCircle left={tooltipLeft} top={tooltipTop} size={110} fill={'white'} stroke={'white'} strokeWidth={2} />
-                    </g>
                   </TooltipInPortal>
                 )}
               </>
