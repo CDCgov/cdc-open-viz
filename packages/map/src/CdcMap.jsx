@@ -976,6 +976,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return toolTipText
   }
 
+  // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
+  // - this function is used to prevent that and instead give the formatting that is wanted
+  // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
     // if hyphen found, then split, uppercase each word, and put back together
     if (string.includes('–') || string.includes('-')) {
@@ -1246,13 +1249,26 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.general.statePicked])
 
-  // When geotype changes
+  
   useEffect(() => {
-    // UID
+    // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
+  
+  // DEV-769 make "Data Table" both a required field and default value
+  useEffect(() => {
+    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+      setState({
+          ...state,
+        dataTable: {
+            ...state.dataTable,
+            title: "Data Table"
+          }
+        })
+    }
+  }, [state.dataTable])
 
   useEffect(() => {
     // UID
