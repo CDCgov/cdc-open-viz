@@ -1,72 +1,48 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
+
+// Third Party
 import axios from 'axios'
-import parse from 'html-react-parser'
 import { Markup } from 'interweave'
 
-import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
-import Loading from '@cdc/core/components/Loading'
+// Store
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
-import ConfigContext from './ConfigContext'
-import EditorPanel from './components/EditorPanel'
+// Data
 import defaults from './data/initial-state'
 
-import './scss/main.scss'
-
+// Helpers
 import { publish } from '@cdc/core/helpers/events'
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+// Components - Core
+import AlertBox from '@cdc/core/components/ui/AlertBox'
+import Component from '@cdc/core/components/hoc/Component'
+import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
+import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
+import View from '@cdc/core/components/hoc/View'
 
-const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
-  // Default States
-  const [config, setConfig] = useState({ ...defaults })
-  const [loading, setLoading] = useState(true)
+// Components - Local
+import EditorPanels from './components/EditorPanels'
 
-  // Custom States
+// Styles
+import './scss/cove-markup-include.scss'
+
+// Visualization
+const CdcMarkupInclude = ({ configObj, configUrl }) => {
+  const { config } = useConfigStore()
+
   const [urlMarkup, setUrlMarkup] = useState('')
   const [markupError, setMarkupError] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // Broadcast Loaded State
   const container = useRef()
+  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
-
-  let { title } = config
-
-  // Default Functions
-  const updateConfig = newConfig => {
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
-
-    newConfig.runtime = {}
-    newConfig.runtime.uniqueId = Date.now()
-
-    newConfig.runtime.editorErrorMessage = ''
-    setConfig(newConfig)
-  }
-
-  const loadConfig = useCallback(async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
-    let responseData = response.data ?? {}
-
-    if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-      responseData = await dataString.json()
-    }
-
-    response.data = responseData
-
-    updateConfig({ ...defaults, ...response })
-    setLoading(false)
-  }, [])
-
-  // Custom Functions
+  // Error Checking & Logging
   useEffect(() => {
     if (markupError) {
       let errorCode = markupError
-      let message = 'There was a problem retrieving the content from ' + config.srcUrl + '. '
+      let message = `<p class="mb-1">There was a problem retrieving the content from <a href="${config.srcUrl}" target="_blank">${config.srcUrl}</a>.</p>`
       let protocolCheck = /https?:\/\//g
 
       if (errorCode === 404 && !config.srcUrl.match(protocolCheck)) {
@@ -74,39 +50,76 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
       }
 
       let errorList = {
-        200: 'This is likely due to a CORS restriction policy from the remote origin address.',
+        200: 'This is likely due to a <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing" target="_blank">CORS restriction policy</a> from the remote origin address.',
         404: 'The requested source URL cannot be found. Please verify the link address provided.',
-        proto: 'Provided source URL must include https:// or http:// before the address (depending on the source content type).'
+        'proto': 'Provided source URL must include <strong>https://</strong> or <strong>http://</strong> before the address.'
       }
 
-      message += errorList[errorCode]
+      message += '- <em>' + errorList[errorCode] + '</em>'
       setErrorMessage(message)
     } else {
-      setErrorMessage(null)
+      setErrorMessage('')
     }
-  }, [markupError])
+  }, [ markupError ])
+
+  // Used to populate the default markup data
+  const demoMarkup = `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Demo Markup</title>
+      </head>
+      <body>
+        <h1>Demo Markup</h1>
+        <br/>
+        <img style="float: right; overflow: hidden; border-radius: 5px; margin: 0 0 1.5rem 1.5rem" src="https://picsum.photos/250/150">
+        <p>
+          Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+          Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
+          A small river named Duden flows by their place and supplies it with the necessary regelialia.
+          It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+        </p>
+        <br/>
+        <p>
+          Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life.
+          One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.
+          The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and
+          devious Semikoli, but the Little Blind Text didn’t listen.
+        </p>
+        <br/>
+        <p>
+          She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills
+          of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village
+          and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.
+        </p>
+      </body>
+    </html>
+  `
 
   const loadConfigMarkupData = useCallback(async () => {
     setMarkupError(null)
 
     if (config.srcUrl) {
       if (config.srcUrl === '#example') {
-        setUrlMarkup(
-          '<!doctype html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"> <meta http-equiv="X-UA-Compatible" content="ie=edge"> <title>Document</title> </head> <body> <h1>Header</h1> <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p> <br> <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen. </p><br><p>She packed her seven versalia, put her initial into the belt and made herself on the way. When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek.</p></body></html>'
-        )
+        setUrlMarkup(demoMarkup)
       } else {
         try {
-          await axios.get(config.srcUrl).then(res => {
-            if (res.data) {
-              setUrlMarkup(res.data)
-            }
-          })
+          await axios
+            .get(config.srcUrl)
+            .then((res) => {
+              if (res.data) {
+                setUrlMarkup(res.data)
+              }
+            })
         } catch (err) {
           if (err.response) {
-            // Response with error
+            // Received a response with an error, so storing that error in state
             setMarkupError(err.response.status)
           } else if (err.request) {
-            // No response received
+            // No response received from the request, so likely a block from CORS - presumptuously set the error state to 200
             setMarkupError(200)
           }
 
@@ -116,28 +129,28 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
     } else {
       setUrlMarkup('')
     }
-  }, [config.srcUrl])
+  }, [ config.srcUrl ])
 
-  const parseBodyMarkup = markup => {
+  // Used to parse the markup either between the <body> tags
+  // Parses the entire supplied content if no <body> tags exist
+  const parseBodyMarkup = (markup) => {
     let parse
     let hasBody = false
     if (markup && markup !== '' && markup !== null) {
-      if (markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)) {
-        hasBody = true
+      // Check if html <body></body> tags exist in the markup
+      hasBody = markup.toString().match(/<body[^>]*>/i) && markup.toString().match(/<\/body\s*>/i)
+
+      if (hasBody) {
+        // If body tags exist, extract only the markup between the tags
         parse = markup.toString().match(/<body[^>]*>([^<]*(?:(?!<\/?body)<[^<]*)*)<\/body\s*>/i)
       } else {
+        // If there's no body tags, just grab everything
         parse = markup.toString()
       }
     }
 
     return hasBody ? parse[1] : parse
   }
-
-  //Load initial config
-  useEffect(() => {
-    loadConfig().catch(err => console.log(err))
-    publish('cove_loaded', { loadConfigHasRun: true })
-  }, [])
 
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
@@ -146,50 +159,28 @@ const CdcMarkupInclude = ({ configUrl, config: configObj, isDashboard = false, i
     }
   }, [config, container])
 
-  //Reload config if config object provided/updated
+  // Refetch the markup content whenever config is updated
   useEffect(() => {
-    loadConfig().catch(err => console.log(err))
-  }, [configObj?.data])
-
-  //Reload any functions when config is updated
-  useEffect(() => {
-    loadConfigMarkupData().catch(err => console.log(err))
-  }, [loadConfigMarkupData])
-
-  let content = <Loading />
-
-  let bodyClasses = ['markup-include']
-
-  if (loading === false) {
-    let body = (
-      <div className={bodyClasses.join(' ')} ref={container}>
-        {title && (
-          <header className={`cove-component__header ${config.theme}`} aria-hidden='true'>
-            {parse(title)} {isDashboard}
-          </header>
-        )}
-        <div className={`cove-component__content ${contentClasses.join(' ')}`}>
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            <div className='cove-component__content-wrap'>
-              {!markupError && urlMarkup && <Markup content={parseBodyMarkup(urlMarkup)} />}
-              {markupError && config.srcUrl && <div className='warning'>{errorMessage}</div>}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-
-    content = (
-      <div className={`cove markup-include ${config.theme}`}>
-        {isEditor && <EditorPanel>{body}</EditorPanel>}
-        {!isEditor && body}
-      </div>
-    )
-  }
+    loadConfigMarkupData().catch((err) => console.error(err))
+  }, [ loadConfigMarkupData ])
 
   return (
-    <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>{content}</ConfigContext.Provider>
+    <ErrorBoundary component="CdcMarkupInclude">
+      <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
+        <View EditorPanels={EditorPanels}>
+          <Component className="cove-markup-include">
+            {config.missingRequiredSections && <>Missing data in sections</>}
+            {!config.missingRequiredSections && !config.newViz && (<>
+              {!markupError && urlMarkup &&
+                <Markup content={parseBodyMarkup(urlMarkup)}/>
+              }
+              {markupError && config.srcUrl &&
+                <AlertBox type="error"><Markup content={errorMessage}/></AlertBox>
+              }
+            </>)}
+          </Component>
+        </View>
+      </ConfigProxy>
     </ErrorBoundary>
   )
 }

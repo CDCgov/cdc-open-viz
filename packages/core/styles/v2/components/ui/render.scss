@@ -27,6 +27,9 @@
   font-style: italic;
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
   white-space: nowrap;
-  animation: fadeOutIn 3000ms ease infinite;
   z-index: 1;
+
+  &.cove-render__text--animate {
+    animation: fadeOutIn 3000ms ease infinite;
+  }
 }

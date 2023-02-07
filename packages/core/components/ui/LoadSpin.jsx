@@ -23,7 +23,7 @@ LoadSpin.propTypes = {
   color: PropTypes.string,
   /** Set the spinner opacity `[0-100]` */
   opacity: PropTypes.number,
-  /** Set the size of the displayed spinner in px */
+
   size: PropTypes.number
 }
 

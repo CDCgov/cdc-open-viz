@@ -7,12 +7,17 @@ import MediaControls from '../MediaControls'
   component={MediaControls}
 />
 
-# Header
-Content Text
+# MediaControls Component
+Used to generate download buttons for saving COVE related visualizations and/or data in various formats.
 
-## Subheader
+Pending further documentation.
+
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <MediaControls/>
+  <Story name="Example">
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <MediaControls {...args}/>

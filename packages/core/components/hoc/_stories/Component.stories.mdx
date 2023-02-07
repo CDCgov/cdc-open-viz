@@ -10,6 +10,7 @@ import Component from '../Component'
       theme: "blue",
       title: "Component Title",
       description: "A small description of the component",
+      tooltip: "This is an <strong>example</strong> tooltip.",
       visual: {
         background: "default",
         border: "default",
@@ -37,13 +38,16 @@ import Component from '../Component'
       description: "[External] Sets a custom theme to be used by the Component for the header bar and borders <br/><br/> `'blue'` `'purple'` `'brown'` `'teal'` `'pink'` `'orange'` `'slate'` `'indigo'` `'cyan'` `'green'` `'amber'`"
     },
     'config.title': {
-      description: "[External] Set a custom title for the component header section"
+      description: "[External] Set a custom title for the component header section <br/><br/> `string`"
     },
     'config.description': {
-      description: "[External] Supply a description or subtext for the component's content"
+      description: "[External] Supply a description or subtext for the component's content <br/><br/> `string`"
+    },
+    'config.tooltip': {
+      description: "[External] Add a tooltip to describe the Component; JSX markup can also be supplied <br/><br/> `any`"
     },
     'config.visual': {
-      description: "[External] An object containing visual definitions for the component"
+      description: "[External] An object containing visual definitions for the component <br/><br/> `object`"
     },
     'config.visual.background': {
       description: "[External] Set the background display style for the component <br/><br/> `'default'` `'template'` `'none'`"
@@ -52,10 +56,10 @@ import Component from '../Component'
       description: "[External] Set the border display style for the component <br/><br/> `'default'` `'template'` `'none'`"
     },
     'config.visual.shadow': {
-      description: "[External] Enable/disable the display of the drop-shadow on the Component",
+      description: "[External] Enable/disable the display of the drop-shadow on the Component <br/><br/> `bool`",
     },
     'config.visual.accent': {
-      description: "[External] Set the position of the accent border display on the Component <br/><br/> `'top'` `'right'` `'bottom'` `'left'`",
+      description: "[External] Set the position of the accent border display on the Component <br/><br/> `'none'` `'top'` `'right'` `'bottom'` `'left'`",
     }
   }}
 />

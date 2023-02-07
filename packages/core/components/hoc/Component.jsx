@@ -8,6 +8,10 @@ import PropTypes from 'prop-types'
 import { useGlobalStore } from '../../stores/globalStore'
 import { useConfigStore } from '../../stores/configStore'
 
+// Components
+import Icon from '../ui/Icon'
+import Tooltip from '../ui/Tooltip'
+
 // Styles
 import '../../styles/v2/components/component.scss'
 
@@ -35,16 +39,15 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
       })
       outerContainerObserver.observe(outerContainerRef.current)
     }
-    // return () => {}
+    return () => {}
   })
-
 
   // Component Attributes
   const customBorderAttrs = config.visual?.border !== 'default' && { 'data-border': config.visual?.border }
   const customShadowAttrs = !config.visual?.shadow && { 'data-no-shadow': true }
   // config.visual.accent !== 'default' && (config.visual.accent === 'top' && !title ) && { 'data-accent': config.visual.accent }
   const customAccentAttrs = () => {
-    if (config.visual?.accent === 'default' || (config.visual?.accent === 'top' && config.title)) return {}
+    if (config.visual?.accent === 'none' || (config.visual?.accent === 'top' && config.title)) return {}
     return { 'data-accent': config.visual?.accent }
   }
 
@@ -69,6 +72,21 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
         {config.title &&
           <header className="cove-component__header" role="heading" aria-hidden="true" aria-level={2}>
             {parse(config.title)}
+            {config.tooltip && config.tooltip !== '' && <>
+              <Tooltip>
+                <Tooltip.Target>
+                  <Icon display="questionCircle"/>
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  {typeof config.tooltip === 'object'
+                    ? config.tooltip
+                    : typeof config.tooltip === 'string' && (
+                    <p>{parse(config.tooltip)}</p>
+                  )}
+                </Tooltip.Content>
+              </Tooltip>
+            </>
+            }
           </header>
         }
         <div className="cove-component__content" {...customContentAttrs}>
@@ -99,7 +117,7 @@ Component.propTypes = {
       border: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
       background: PropTypes.oneOf([ 'default', 'theme', 'none' ]),
       shadow: PropTypes.bool,
-      accent: PropTypes.oneOf([ 'top', 'right', 'bottom', 'left' ])
+      accent: PropTypes.oneOf([ 'none', 'top', 'right', 'bottom', 'left' ])
     })
   })
 }

@@ -10,9 +10,12 @@ import SectionWrapper from '../SectionWrapper'
 # Header
 Content Text
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <SectionWrapper></SectionWrapper>
+  <Story name="Example">
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <SectionWrapper {...args}/>

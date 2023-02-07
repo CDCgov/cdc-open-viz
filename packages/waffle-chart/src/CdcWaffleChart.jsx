@@ -11,6 +11,18 @@ import { useConfigStore } from '@cdc/core/stores/configStore'
 // Data
 import defaults from './data/initial-state'
 
+// Constants
+import THEME_COLORS from '@cdc/core/data/componentThemes'
+import {
+  DATA_FUNCTION_COUNT,
+  DATA_FUNCTION_SUM,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_MODE
+} from './data/consts'
+
 // Hooks
 import usePrevious from './hooks/usePrevious'
 
@@ -28,18 +40,6 @@ import View from '@cdc/core/components/hoc/View'
 // Components - Local
 import EditorPanels from './components/EditorPanels'
 
-// Constants
-import THEME_COLORS from '@cdc/core/data/componentThemes'
-import {
-  DATA_FUNCTION_COUNT,
-  DATA_FUNCTION_SUM,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MAX,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_MODE
-} from './data/consts'
-
 // Styles
 import './scss/cove-waffle-chart.scss'
 
@@ -47,7 +47,7 @@ import './scss/cove-waffle-chart.scss'
 const CdcWaffleChart = ({ configObj, configUrl }) => {
   const { config, missingRequiredSections } = useConfigStore()
 
-  const calculateData = useCallback(() => {
+  const calculateData = () => {
     //If either the column or function aren't set, do not calculate
     if (!config.dataColumn || !config.dataFunction) return ''
 
@@ -154,11 +154,11 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
     }
 
     return applyPrecision((waffleNumerator / waffleDenominator) * 100, config.roundToPlace)
-  }, [ config ])
+  }
 
-  const setRatio = useCallback(() => {
+  const setRatio = () => {
     return (config.nodeWidth * 10) + (config.nodeSpacer * 9)
-  }, [ config.nodeWidth, config.nodeSpacer ])
+  }
 
   const dataPercentage = calculateData()
 
@@ -168,7 +168,7 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
   let prevVal = usePrevious(dataPercentage)
   let newVal = dataPercentage
 
-  const WaffleRender = () => {
+  const waffleRender = useCallback(() => {
     let waffleData = []
 
     for (let i = 0; i < 100; i++) {
@@ -185,7 +185,7 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
     return waffleData.map((node, key) => (
       node.shape === 'square'
         ? <Bar className="cove-waffle-chart__node"
-               style={{ transitionDelay: calculateWaffleAnimation(key, prevVal, newVal), fillOpacity: node.opacity }}
+               style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
                x={node.x} y={node.y}
                width={nodeWidthNum} height={nodeWidthNum}
                fill={node.color}
@@ -193,7 +193,7 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
         />
         : node.shape === 'person' ?
           <path
-            style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})` }}
+            style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`, transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
             fill={node.color} fillOpacity={node.opacity} key={key}
             d="M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
                           0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,
@@ -201,13 +201,13 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
           </path>
           :
           <Circle className="cove-waffle-chart__node"
-                  style={{ transitionDelay: calculateWaffleAnimation(key, prevVal, newVal), fillOpacity: node.opacity }}
+                  style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
                   cx={node.x} cy={node.y} r={nodeWidthNum / 2}
                   fill={node.color}
                   data-step={key} key={key}
           />
     ))
-  }
+  }, [config.shape, config.theme, dataPercentage, prevVal, newVal, nodeSpacerNum, nodeWidthNum ])
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
@@ -222,7 +222,7 @@ const CdcWaffleChart = ({ configObj, configUrl }) => {
                 <div className="cove-waffle-chart__visualization" style={{ width: setRatio() }}>
                   <svg width={setRatio()} height={setRatio()}>
                     <Group>
-                      <WaffleRender/>
+                      {waffleRender()}
                     </Group>
                   </svg>
                 </div>

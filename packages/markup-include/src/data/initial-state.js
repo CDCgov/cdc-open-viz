@@ -3,12 +3,11 @@ export default {
   showHeader: false,
   type: 'markup-include',
   srcUrl: '#example',
-  theme: 'theme-blue',
+  theme: 'blue',
   visual: {
-    border: false,
-    accent: false,
-    background: false,
-    hideBackgroundColor: false,
-    borderColorTheme: false
+    border: 'default',
+    accent: 'none',
+    background: 'default',
+    shadow: true
   }
 }

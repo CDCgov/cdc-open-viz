@@ -1,3 +1,5 @@
+// Third Party
+import parse from 'html-react-parser'
 import PropTypes from 'prop-types'
 
 // Components
@@ -29,7 +31,7 @@ const Label = ({ name, upperCase = true, tooltip, style, children, className, ..
             {typeof tooltip === 'object'
               ? tooltip
               : typeof tooltip === 'string' && (
-              <p>{tooltip}</p>
+              <p>{parse(tooltip)}</p>
             )}
           </Tooltip.Content>
         </Tooltip>

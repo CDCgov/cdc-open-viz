@@ -7,12 +7,23 @@ import RenderFallback from '../RenderFallback'
   component={RenderFallback}
 />
 
-# Header
-Content Text
+# RenderFallback Component
+Used to provide an animated display while loading or processing any asynchronous data for components or visualizations.
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <RenderFallback/>
+  <Story name="Example"
+         args={{
+           fadeEffect: true,
+           text: 'Rendering visualization...',
+           loadSpinColor: '#005eaa',
+           loadSpinOpacity: 30,
+           loadSpinSize: 85
+         }}
+  >
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <RenderFallback {...args}/>

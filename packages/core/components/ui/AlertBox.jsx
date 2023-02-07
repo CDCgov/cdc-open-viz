@@ -4,17 +4,21 @@ import PropTypes from 'prop-types'
 // Styles
 import '../../styles/v2/components/ui/alert.scss'
 
-const AlertBox = ({type = 'primary', inline = false, children}) => {
+const AlertBox = ({ type = 'basic', inline = false, children }) => {
   return (
-    <div className={`cove-alert cove-alert--${type}`}>
+    <div className={`cove-alert cove-alert--${type}` + (inline ? ' cove-alert--inline' : '')}>
       {children}
     </div>
   )
 }
 
 AlertBox.propTypes = {
+  /** Set the visual color theme of the alert box */
   type: PropTypes.oneOf([ 'basic', 'info', 'success', 'error', 'caution' ]),
-  inline: PropTypes.bool
+  /** Displays the alert inline */
+  inline: PropTypes.bool,
+  /** All content set between the \<AlertBox\> tags */
+  children: PropTypes.any
 }
 
 export default AlertBox

@@ -2,6 +2,5 @@
   "type": "markup-include",
   "srcUrl": "#example",
   "title": "Markup Include",
-  "theme": "theme-blue",
-  "data": []
+  "theme": "theme-blue"
 }

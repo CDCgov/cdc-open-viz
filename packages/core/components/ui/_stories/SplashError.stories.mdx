@@ -10,9 +10,12 @@ import SplashError from '../SplashError'
 # Header
 Content Text
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <SplashError/>
+  <Story name="Example">
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <SplashError {...args}/>

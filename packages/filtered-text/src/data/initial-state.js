@@ -6,11 +6,9 @@ export default {
   shadow: false,
   filters: [],
   visual: {
-    hideBackgroundColor: false,
-    background: false,
-    roundedBorders: false,
-    accent: false,
-    border: false,
-    borderColorTheme: false
+    border: 'default',
+    accent: 'none',
+    background: 'default',
+    shadow: true
   }
 }

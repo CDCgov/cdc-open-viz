@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 // Store
 import { useGlobalStore } from '../../stores/globalStore'
@@ -6,21 +7,21 @@ import { useGlobalStore } from '../../stores/globalStore'
 // Styles
 import '../../styles/v2/components/ui/overlay.scss'
 
-const Overlay = ({ disableBgClose, children, override = null }) => {
-  //Access global modal state
+const Overlay = ({ anchor }) => {
+  // Access global modal state
   let { overlay, toggleOverlay } = useGlobalStore()
 
-  //Set local states
+  let overlayAnchor = anchor === true ? anchor.current : document.body
+
+  // Set local states
   const [ displayOverlay, setDisplayOverlay ] = useState(false)
   const [ overlayAnimationState, setOverlayAnimationState ] = useState(null)
   const [ overlayErrorState, setOverlayErrorState ] = useState(false)
 
-  const overlayDisplay = override ? override?.show : overlay?.show
-
-  //Animate In effect
+  // Animate In effect
   useEffect(() => {
-    if (overlayDisplay === undefined) return
-    if (overlayDisplay === false) return //Reject
+    if (overlay?.show === undefined) return
+    if (overlay?.show === false) return //Reject
 
     document.body.style.overflow = 'hidden'
     setDisplayOverlay(true)
@@ -31,12 +32,12 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     }, 750)
 
     return () => clearTimeout(timeoutShow)
-  }, [ overlayDisplay ])
+  }, [ overlay?.show ])
 
-  //Animate Out effect
+  // Animate Out effect
   useEffect(() => {
-    if (overlayDisplay === undefined) return
-    if (overlayDisplay === true) return //Reject
+    if (overlay?.show === undefined) return
+    if (overlay?.show === true) return //Reject
 
     setOverlayAnimationState('animate-out')
 
@@ -47,9 +48,9 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     }, 400)
 
     return () => clearTimeout(timeoutHide)
-  }, [ overlayDisplay ])
+  }, [ overlay?.show ])
 
-  //Error animate effect
+  // Animate Error effect
   useEffect(() => {
     if (overlayErrorState === false) return //Reject
 
@@ -60,29 +61,27 @@ const Overlay = ({ disableBgClose, children, override = null }) => {
     return () => clearTimeout(timeoutHide)
   }, [ overlayErrorState ])
 
-  //Render output
-  return (
-    <>
-      {displayOverlay &&
-        <div
-          className={`cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
-          <div className="cove-overlay__bg" style={{ cursor: disableBgClose ? 'default' : null }}
-               onClick={(e) =>
-                 disableBgClose ? setOverlayErrorState(true) :
-                   overlay ? toggleOverlay(false) :
-                     override ? toggleOverlay(false) :
-                       e.preventDefault()
-               }
-               role="alert"
-          />
-          <div className="cove-overlay__wrapper">
-            <div className="cove-overlay__container">
-              {children}
-            </div>
+  // Render Overlay
+  return createPortal(<>
+    {displayOverlay &&
+      <div
+        className={`cove cove-overlay${overlayAnimationState ? (' ' + overlayAnimationState) : ''}${overlayErrorState ? ' overlay-error' : ''}`}>
+        <div className="cove-overlay__bg" style={{ cursor: overlay?.disableBgClose ? 'default' : null }}
+             onClick={(e) => overlay?.disableBgClose
+               ? setOverlayErrorState(true)
+               : overlay
+                 ? toggleOverlay(false)
+                 : e.preventDefault()
+             }
+             role="alert"
+        />
+        <div className="cove-overlay__wrapper">
+          <div className="cove-overlay__container">
+            {overlay?.object}
           </div>
         </div>
-      }
-    </>
-  )
+      </div>
+    }
+  </>, overlayAnchor)
 }
 export default Overlay

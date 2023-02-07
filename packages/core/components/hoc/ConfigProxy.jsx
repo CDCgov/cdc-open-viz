@@ -9,10 +9,11 @@ import { useConfigStore } from '../../stores/configStore'
 
 // Helpers
 import dataTransform from '../../helpers/dataTransform'
+import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
 const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
-  const { setConfigDefaults, updateConfig } = useConfigStore((state) => state)
+  const { setConfigDefaults, updateConfig } = useConfigStore()
 
   const [ cycle, setCycle ] = useState(false)
   const [ loadingConfig, setLoadingConfig ] = useState(true)
@@ -69,6 +70,9 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
           }
         })
       }
+
+      // Validates config file and updates any previous entries into new format
+      newConfig = coveUpdateWorker(newConfig)
 
       newConfig.data = responseData // Attach data to newConfig
 

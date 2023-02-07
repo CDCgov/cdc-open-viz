@@ -9,9 +9,9 @@ import '../../styles/v2/components/ui/render.scss'
 const RenderFallback = ({
                           fadeEffect = true,
                           text = 'Rendering visualization...',
-                          loadSpinSize = 85,
                           loadSpinColor = '#005eaa',
                           loadSpinOpacity = 30,
+                          loadSpinSize = 85,
                           style
                         }) => {
   return (
@@ -27,12 +27,16 @@ const RenderFallback = ({
 }
 
 RenderFallback.propTypes = {
+  /** Enable a pulse fade effect for text in the fallback */
   fadeEffect: PropTypes.bool,
+  /** Set the text to display in the fallback */
   text: PropTypes.string,
-  loadSpinSize: PropTypes.number,
+  /** Set the spinner color */
   loadSpinColor: PropTypes.string,
-  /* Define the opacity of the loadspinner */
-  loadSpinOpacity: PropTypes.number
+  /** Set the spinner opacity `[0-100]` */
+  loadSpinOpacity: PropTypes.number,
+  /** Set the size of the displayed spinner in px */
+  loadSpinSize: PropTypes.number,
 }
 
 export default RenderFallback

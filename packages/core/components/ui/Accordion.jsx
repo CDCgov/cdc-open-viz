@@ -8,6 +8,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton,
 } from 'react-accessible-accordion'
+import parse from 'html-react-parser'
 import PropTypes from 'prop-types'
 
 // Components
@@ -42,7 +43,7 @@ const Accordion = ({ children }) => {
                       <Icon display="questionCircle" size={14}/>
                     </Tooltip.Target>
                     <Tooltip.Content>
-                      {section.props.tooltip}
+                      {parse(section.props.tooltip)}
                     </Tooltip.Content>
                   </Tooltip>
                 )

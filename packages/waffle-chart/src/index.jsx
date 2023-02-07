@@ -8,8 +8,6 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <div className="cove">
-      <CdcWaffleChart configUrl={domContainer.attributes['data-config'].value} />
-    </div>
+    <CdcWaffleChart configUrl={domContainer.attributes['data-config'].value} />
   </React.StrictMode>,
 )

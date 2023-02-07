@@ -71,9 +71,22 @@ const ColorPicker = ({ label, colors = THEME_COLORS, tooltip, colorTooltip }) =>
 }
 
 ColorPicker.propTypes = {
+  /** Add label for the ColorPicker component */
   label: PropTypes.string,
-  colors: PropTypes.array || PropTypes.object,
-  tooltip: PropTypes.any,
+  /** Define the color options to be generated:
+   * <br/>- `Array` will generate the list based off each entry
+   * <br/>- `Object` will generate the list based off a `key: value` = `colorName: colorValue` correlation
+   * <br/><br/> */
+  colors: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.object
+  ]),
+  /** Add a tooltip to describe the ColorPicker's usage; JSX markup can also be supplied */
+  tooltip: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]),
+  /** Display a tooltip defining the value of a focused color */
   colorTooltip: PropTypes.bool
 }
 

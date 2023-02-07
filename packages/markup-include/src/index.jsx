@@ -1,18 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-
+// Components - Local
 import CdcMarkupInclude from './CdcMarkupInclude'
-
-let isEditor = window.location.href.includes('editor=true')
 
 let domContainer = document.getElementsByClassName('react-container')[0]
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <GlobalContextProvider>
-      <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
-    </GlobalContextProvider>
+    <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value}/>
   </React.StrictMode>,
 )

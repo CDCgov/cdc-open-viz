@@ -1,4 +1,4 @@
-import React from 'react'
+// Third Party
 import html2pdf from 'html2pdf.js'
 import html2canvas from 'html2canvas'
 
@@ -10,27 +10,15 @@ const buttonText = {
 }
 
 const saveImageAs = (uri, filename) => {
-  const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
-  const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
-  const ieEdge = navigator.userAgent.match(/Edge/g)
-  const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
-
-  if (ieVer > -1) {
-    const fileAsBlob = new Blob([uri], {
-      type: 'image/png'
-    })
-    window.navigator.msSaveBlob(fileAsBlob, filename)
+  const link = document.createElement('a')
+  if (typeof link.download === 'string') {
+    link.href = uri
+    link.download = filename
+    link.onclick = e => document.body.removeChild(e.target)
+    document.body.appendChild(link)
+    link.click()
   } else {
-    const link = document.createElement('a')
-    if (typeof link.download === 'string') {
-      link.href = uri
-      link.download = filename
-      link.onclick = e => document.body.removeChild(e.target)
-      document.body.appendChild(link)
-      link.click()
-    } else {
-      window.open(uri)
-    }
+    window.open(uri)
   }
 }
 

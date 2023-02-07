@@ -27,13 +27,34 @@ $componentBorderRadius: 3px;
 }
 
 .cove-component__header {
+  position: relative;
   padding: 0.6rem 0.8rem;
   font-size: 1.1rem;
   color: #fff;
+  background-color: #b8b8b8;
   border-bottom-width: 3px;
   border-bottom-style: solid;
+  border-bottom-color: #d2d2d2;
   transition: background-color 200ms ease, border-color 200ms ease;
   //border-radius: $componentBorderRadius $componentBorderRadius 0 0;
+
+  .cove-tooltip {
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    font-size: 16px;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  .cove-tooltip--target {
+    transition: opacity 200ms $transition-expo-out;
+    opacity: 0.75;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 .cove-component__content {

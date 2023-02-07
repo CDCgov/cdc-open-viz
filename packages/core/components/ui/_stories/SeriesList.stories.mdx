@@ -10,9 +10,12 @@ import SeriesList from '../SeriesList'
 # Header
 Content Text
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <SeriesList></SeriesList>
+  <Story name="Example">
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <SeriesList {...args}/>

@@ -7,12 +7,18 @@ import ColorPicker from '../ColorPicker'
   component={ColorPicker}
 />
 
-# Header
+# ColorPicker Component
 Content Text
 
-## Subheader
 <Canvas sourceState="shown" withSource="open">
-  <Story name="Name">
-    <ColorPicker/>
+  <Story name="Example" args={{
+    label: "Example Theme Color",
+    tooltip: "This is an <strong>example</strong> tooltip"
+  }}>
+    {Template.bind({})}
   </Story>
 </Canvas>
+
+<ArgsTable story="Example"/>
+
+export const Template = ({ ...args }) => <ColorPicker {...args}/>

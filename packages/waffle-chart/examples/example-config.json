@@ -5,6 +5,8 @@
   "title": "Waffle Chart",
   "content": "of cases occurred in the home",
   "subtext": "Waffle chart subtext or citation",
+  "dataColumn": "Insured Rate",
+  "dataFunction": "Mean (Average)",
   "theme": "blue",
   "suffix": "%"
 }

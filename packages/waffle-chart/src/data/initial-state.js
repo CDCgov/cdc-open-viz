@@ -24,11 +24,11 @@ export default {
   nodeSpacer: '2',
   theme: 'blue',
   type: 'waffle-chart',
+  tooltip: '',
   visual: {
-    border: true,
-    accent: false,
-    background: false,
-    hideBackgroundColor: false,
-    borderColorTheme: false
+    border: 'default',
+    accent: 'none',
+    background: 'default',
+    shadow: true
   }
 }
