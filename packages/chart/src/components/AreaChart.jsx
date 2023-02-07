@@ -63,21 +63,23 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       const { x } = eventSvgCoords
       let closestXScaleValue = getXValueFromCoordinate(x)
       const yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
-
-      console.log('cfg', config.runtime.seriesKeys)
-      config.runtime.seriesKeys.map(key => {
-        console.log('key', key)
-        console.log('yScaleValues', yScaleValues)
-        yScaleValues[0].filter(item => item === key)
-      })
+      let seriesToInclude = []
       let yScaleMaxValues = []
+      let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
+
+      itemsToLoop.map(seriesKey => {
+        Object.entries(yScaleValues[0]).forEach((item) => item[0] === seriesKey && seriesToInclude.push(item))
+      })
 
       // filter out the series that aren't added to the map.
-      config.series.map(series => console.log('series here', series))
-      config.series.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series.dataKey])))
+      console.log('series to include', seriesToInclude)
+      seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
+
+      console.log('series', Object.fromEntries(seriesToInclude))
+      seriesToInclude = Object.fromEntries(seriesToInclude)
 
       let tooltipData = {}
-      tooltipData.data = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
+      tooltipData.data = seriesToInclude
       console.log('tooltip data', tooltipData)
       tooltipData.dataXPosition = 10
       tooltipData.dataYPosition = yMax + 10
@@ -142,11 +144,11 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
                 />
-                {console.log('toooltip', tooltipData)}
+                {console.log('tooo000000ltip', tooltipData?.data ? tooltipData?.data : null)}
                 {tooltipData &&
                   <circle
-                    cx={xScale(tooltipData.data[0][config.xAxis.dataKey])}
-                    cy={yScale(tooltipData.data[0][s.dataKey])}
+                    cx={xScale(tooltipData.data[config.xAxis.dataKey])}
+                    cy={yScale(tooltipData.data[s.dataKey])}
                     dataTestx={d => Number(xScale(d[config.xAxis.dataKey]))}
                     r={4.5}
                     opacity={1}
@@ -179,7 +181,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   <TooltipInPortal key={Math.random()} top={tooltipOffset.top} left={tooltipOffset.left} style={tooltipStyles}>
                     <Group x={config.yAxis.size + 10} y={0}>
                       <ul style={{ listStyle: 'none', paddingLeft: 'unset' }}>
-                        {Object.entries(tooltipData.data[0]).map(item => (
+                        {Object.entries(tooltipData.data).map(item => (
                           <li>
                             {item[0]} {item[1]}
                           </li>
