@@ -10,7 +10,7 @@ import { MarkerArrow } from '@visx/marker'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
-import ReactTooltip from 'react-tooltip'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 import useReduceData from '../hooks/useReduceData'
 
@@ -91,7 +91,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]]
 
   useEffect(() => {
-    ReactTooltip.rebuild()
+    Tooltip.rebuild()
   })
 
   return (

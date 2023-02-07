@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce'
 
 import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
-import AdvancedEditor from '@cdc/core/components/editor/AdvancedEditor'
+import EditorPanelAdvanced from '@cdc/core/components/editor/EditorPanelAdvanced'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { useColorPalette } from '../hooks/useColorPalette'
@@ -741,7 +741,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Super Title</p>
@@ -759,7 +759,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Intro Text</p>
@@ -777,7 +777,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Enter supporting text to display below the data visualization, if applicable. The following HTML tags are supported: strong, em, sup, and sub.</p>
@@ -795,7 +795,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Footnotes</p>
@@ -822,7 +822,7 @@ const EditorPanel = () => {
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>A data series is a set of related data points plotted in a chart and typically represented in the chart legend.</p>
@@ -967,7 +967,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Highest value, excluding outliers</p>
@@ -989,7 +989,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Represented by top line of box. 25% of data are higher.</p>
@@ -1011,7 +1011,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Middle data point. Half of data are higher value.</p>
@@ -1033,7 +1033,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Represented by bottom line of box. 25% of data are lower.</p>
@@ -1055,7 +1055,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Lowest value, excluding outliers</p>
@@ -1089,7 +1089,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Represented by bottom line of box. 25% of data are lower.</p>
@@ -1109,7 +1109,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Represented by top line of box. 25% of data are higher.</p>
@@ -1134,7 +1134,7 @@ const EditorPanel = () => {
                           <legend className='edit-label float-left'>Displaying</legend>
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Assign an axis for the series</p>
@@ -1206,7 +1206,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Select the source data to be visually represented.</p>
@@ -1231,7 +1231,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' />
+                              <Icon display='questionCircle' />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>
@@ -1256,7 +1256,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' />
+                          <Icon display='questionCircle' />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>{`This option abbreviates very large or very small numbers on the value axis`}</p>
@@ -1275,7 +1275,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
@@ -1293,7 +1293,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
@@ -1353,7 +1353,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               {config.visualizationType === 'Pie' && <p>Enter a data prefix to display in the data table and chart tooltips, if applicable.</p>}
@@ -1371,7 +1371,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               {config.visualizationType === 'Pie' && <p>Enter a data suffix to display in the data table and tooltips, if applicable.</p>}
@@ -1412,7 +1412,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Select the column or row containing the categories or dates for this axis. </p>
@@ -1436,7 +1436,7 @@ const EditorPanel = () => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Select the source row or column that contains the segment labels. Depending on the data structure, it may be listed as "Key."</p>
@@ -1472,7 +1472,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>When this option is checked, you can select source-file values for exclusion from the date/category axis. </p>
@@ -1550,7 +1550,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>When this option is checked, you can select values for exclusion from the pie segments.</p>
@@ -1625,7 +1625,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
@@ -1773,8 +1773,8 @@ const EditorPanel = () => {
                     {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
                     {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
                     {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
-                    <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend?.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
+                    <TextField type='textarea' value={config.boxplot.legend?.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                   </fieldset>
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
@@ -1888,7 +1888,7 @@ const EditorPanel = () => {
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>Any value below the cut-off value is included in a special "less than" category. This option supports special conditions like suppressed data.</p>
@@ -1934,7 +1934,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Hiding the data table may affect accessibility. An alternate form of accessing visualization data is a 508 requirement.</p>
@@ -1953,7 +1953,7 @@ const EditorPanel = () => {
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                         </Tooltip.Target>
                         <Tooltip.Content>
                           <p>Enter a description of the data table to be read by screen readers.</p>
@@ -1974,7 +1974,7 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
-          {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
+          {config.type !== 'Spark Line' && <EditorPanelAdvanced loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
     </ErrorBoundary>

@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
-import ReactTooltip from 'react-tooltip'
 
-import Pie, { ProvidedProps, PieArcDatum } from '@visx/shape/lib/shapes/Pie'
+import Pie from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -20,8 +19,8 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
 export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
 
-  const [filteredData, setFilteredData] = useState(undefined)
-  const [animatedPie, setAnimatePie] = useState(false)
+  const [ filteredData, setFilteredData ] = useState(undefined)
+  const [ animatedPie, setAnimatePie ] = useState(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -44,11 +43,11 @@ export default function PieChart() {
         setAnimatePie(true)
       }, 500)
     }
-  }, [dataRef?.isIntersecting, config.animate])
+  }, [ dataRef?.isIntersecting, config.animate ])
 
 
   function AnimatedPie({ arcs, path, getKey }) {
-    const transitions = useTransition( arcs, getKey,
+    const transitions = useTransition(arcs, getKey,
       {
         from: enterUpdateTransition,
         enter: enterUpdateTransition,
@@ -71,7 +70,7 @@ export default function PieChart() {
           return (
             <Group key={key} style={{ opacity: config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) === -1 ? 0.5 : 1 }}>
               <animated.path
-                d={interpolate([props.startAngle, props.endAngle], (startAngle, endAngle) =>
+                d={interpolate([ props.startAngle, props.endAngle ], (startAngle, endAngle) =>
                   path({
                     ...arc,
                     startAngle,
@@ -86,7 +85,7 @@ export default function PieChart() {
           )
         })}
         {transitions.map(({ item: arc, key }) => {
-          const [centroidX, centroidY] = path.centroid(arc)
+          const [ centroidX, centroidY ] = path.centroid(arc)
           const hasSpaceForLabel = arc.endAngle - arc.startAngle >= 0.1
 
           let textColor = '#FFF'
@@ -97,7 +96,7 @@ export default function PieChart() {
           return (
             <animated.g key={key}>
               {hasSpaceForLabel && (
-                <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy='.33em' textAnchor='middle' pointerEvents='none'>
+                <Text style={{ fill: textColor }} x={centroidX} y={centroidY} dy=".33em" textAnchor="middle" pointerEvents="none">
                   {Math.round((((arc.endAngle - arc.startAngle) * 180) / Math.PI / 360) * 100) + '%'}
                 </Text>
               )}
@@ -108,7 +107,7 @@ export default function PieChart() {
     )
   }
 
-  let [width] = dimensions
+  let [ width ] = dimensions
 
   if (config && config.legend && !config.legend.hide && currentViewport === 'lg') {
     width = width * 0.73
@@ -135,23 +134,22 @@ export default function PieChart() {
     } else {
       setFilteredData(undefined)
     }
-  }, [seriesHighlight])
+  }, [ seriesHighlight ])
 
   useEffect(() => {
     ReactTooltip.rebuild()
   })
 
   return (
-    <ErrorBoundary component='PieChart'>
-      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
+    <ErrorBoundary component="PieChart">
+      <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role="img" aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
           <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
-            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
+            {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]}/>}
           </Pie>
         </Group>
       </svg>
-      <div ref={triggerRef} />
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      <div ref={triggerRef}/>
     </ErrorBoundary>
   )
 }

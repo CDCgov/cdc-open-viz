@@ -23,8 +23,6 @@ import { colorPalettesChart as colorPalettes } from '../../core/data/colorPalett
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
-import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
-
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
 import DataTable from './components/DataTable'
@@ -65,7 +63,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
-  const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -718,7 +715,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
+              className={`chart-container`}
             >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
@@ -727,7 +724,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.visualizationType === 'Spark Line' && (
                 <>
                   {description && <div className='subtext'>{parse(description)}</div>}
-                  <div style={sparkLineStyles}>
+                  <div>
                     <ParentSize>
                       {parent => (
                         <>
