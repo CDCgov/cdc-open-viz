@@ -159,7 +159,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         {`
                          #barStack${barStack.index}-${bar.index} rect,
                          #barStack${barStack.index}-${bar.index} foreignObject{
-                          animation-delay: ${barStack.index}.2s;
+                          animation-delay: ${barStack.index * 0.5}s;
                           transform-origin: ${barThicknessAdjusted / 2}px ${bar.y + bar.height}px
                         }
                       `}
@@ -220,53 +220,64 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     }
 
                     return (
-                      <Group key={index}>
-                        <foreignObject
-                          key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
-                          className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
-                          x={bar.x}
-                          y={bar.y}
-                          width={bar.width}
-                          height={bar.height}
-                          style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
-                          opacity={transparentBar ? 0.5 : 1}
-                          display={displayBar ? 'block' : 'none'}
-                          data-tip={tooltip}
-                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                        ></foreignObject>
-
-                        {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
-                          <Text
-                            x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
-                            y={bar.y + bar.height * 1.2}
-                            fill={'#000000'}
-                            textAnchor='start'
-                            verticalAnchor='start'
-                          >
-                            {yAxisValue}
-                          </Text>
-                        )}
-
-                        {displayNumbersOnBar && textWidth + 50 < bar.width && (
-                          <Text
+                      <>
+                        <style>
+                          {`
+                         #barStack${barStack.index}-${bar.index} rect,
+                         #barStack${barStack.index}-${bar.index} foreignObject{
+                          animation-delay: ${barStack.index * 0.5}s;
+                          transform-origin: ${bar.x}px
+                        }
+                      `}
+                        </style>
+                        <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
+                          <foreignObject
+                            key={`barstack-horizontal-${barStack.index}-${bar.index}-${index}`}
+                            className={`animated-chart group ${animatedChart ? 'animated' : ''}`}
+                            x={bar.x}
+                            y={bar.y}
+                            width={bar.width}
+                            height={bar.height}
+                            style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
+                            opacity={transparentBar ? 0.5 : 1}
                             display={displayBar ? 'block' : 'none'}
-                            x={bar.x + barStack.bars[bar.index].width / 2} // padding
-                            y={bar.y + bar.height / 2}
-                            fill={labelColor}
-                            textAnchor='middle'
-                            verticalAnchor='middle'
-                            innerRef={e => {
-                              if (e) {
-                                // use font sizes and padding to set the bar height
-                                let elem = e.getBBox()
-                                setTextWidth(elem.width)
-                              }
-                            }}
-                          >
-                            {formatNumber(data[bar.index][bar.key])}
-                          </Text>
-                        )}
-                      </Group>
+                            data-tip={tooltip}
+                            data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          ></foreignObject>
+
+                          {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
+                            <Text
+                              x={`${bar.x + (config.isLollipopChart ? 15 : 5)}`} // padding
+                              y={bar.y + bar.height * 1.2}
+                              fill={'#000000'}
+                              textAnchor='start'
+                              verticalAnchor='start'
+                            >
+                              {yAxisValue}
+                            </Text>
+                          )}
+
+                          {displayNumbersOnBar && textWidth + 50 < bar.width && (
+                            <Text
+                              display={displayBar ? 'block' : 'none'}
+                              x={bar.x + barStack.bars[bar.index].width / 2} // padding
+                              y={bar.y + bar.height / 2}
+                              fill={labelColor}
+                              textAnchor='middle'
+                              verticalAnchor='middle'
+                              innerRef={e => {
+                                if (e) {
+                                  // use font sizes and padding to set the bar height
+                                  let elem = e.getBBox()
+                                  setTextWidth(elem.width)
+                                }
+                              }}
+                            >
+                              {formatNumber(data[bar.index][bar.key])}
+                            </Text>
+                          )}
+                        </Group>
+                      </>
                     )
                   })
                 )
