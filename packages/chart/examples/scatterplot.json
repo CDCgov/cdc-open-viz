@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "title": "Example Box Plot",
+  "title": "Scatter Plot",
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -18,7 +18,7 @@
     "right": 5
   },
   "yAxis": {
-    "dataKey": "Value",
+    "dataKey": "y",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
@@ -38,8 +38,9 @@
     "rightAxisTickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "label": "Observations"
+    "label": "Y Axis"
   },
+  "boxplot": [],
   "topAxis": {
     "hasLine": false
   },
@@ -47,7 +48,7 @@
   "barHeight": 25,
   "height": 300,
   "xAxis": {
-    "type": "categorical",
+    "type": "continuous",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -60,8 +61,8 @@
     "tickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "dataKey": "Group_Category",
-    "label": "Groups"
+    "dataKey": "x",
+    "label": "X Axis"
   },
   "table": {
     "label": "Data Table",
@@ -79,7 +80,6 @@
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
-    "hide": true,
     "dynamicLegend": false,
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
@@ -105,19 +105,31 @@
     "accent": true,
     "background": true
   },
-  "dataUrl": "/examples/newdata.json",
-  "visualizationType": "Box Plot",
+  "dataUrl": "/examples/scatterplot-continuous.csv",
+  "visualizationType": "Scatter Plot",
   "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",
   "dataDescription": {
     "horizontal": false,
     "series": false,
-    "singleRow": true,
+    "singleRow": false,
     "xKey": "Group_Category",
     "valueKey": "Value"
   },
   "series": [
     {
-      "dataKey": "Value",
+      "dataKey": "y1",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y2",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y3",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y4",
       "type": "Bar"
     }
   ]
