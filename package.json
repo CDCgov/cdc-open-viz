@@ -41,6 +41,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-storybook": "^0.6.10",
+    "gh-pages": "^5.0.0",
     "html-react-parser": "^3.0.8",
     "husky": "^4.3.0",
     "immer": "^9.0.19",
@@ -86,8 +87,8 @@
     "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
-    "predeploy": "build-storybook -o docs",
-    "deploy": "gh-pages -d docs"
+    "predeploy": "storybook build --docs --output-dir .storybook_static",
+    "deploy": "gh-pages -d .storybook_static"
   },
   "dependencies": {
     "@visx/legend": "^2.10.0",
