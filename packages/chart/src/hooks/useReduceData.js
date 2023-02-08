@@ -5,21 +5,9 @@ function useReduceData(config, data) {
   const isBar = config?.series?.every(element => element?.type === 'Bar')
   // for combo charts check if all Data series selected Line or dashed-md/sm/lg.
   const isAllLine = config?.series?.every(el => el.type === 'Line' || el.type === 'dashed-sm' || el.type === 'dashed-md' || el.type === 'dashed-lg')
-/*   const isNumber = value => {
-    value = cleanChars(value) 
-    if (typeof value === 'string') {
-      // return value !== null && value !== '' && /\d+\.?\d* /.test(value)
-    }
-    // just in case data has type number we need this
-    if (typeof value === 'number') {
-      return !Number.isNaN(value)
-    }
-    return false 
-  }
-*/
   const cleanChars = value => {
     // remove comma and $ signs
-    return value != null && value != '' ? value.replace(/[,\$]/g, '') : ''
+    return value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
   }
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
@@ -40,7 +28,6 @@ function useReduceData(config, data) {
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
-      console.log('max=', max)
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
@@ -65,7 +52,6 @@ function useReduceData(config, data) {
     } else {
       max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
-    //console.log("max=",max)
     return max
   }
 
@@ -73,7 +59,6 @@ function useReduceData(config, data) {
     let min
     const minNumberFromData = Math.min(...data.map(d => Math.min(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 1000000000)))))
     min = String(minNumberFromData)
-    //console.log("min=",min)
     return min
   }
 

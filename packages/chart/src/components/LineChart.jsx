@@ -15,7 +15,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data);
+  const cleanedData = cleanData(data,"Date");
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleLineType = lineType => {
