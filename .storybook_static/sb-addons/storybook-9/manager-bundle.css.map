@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../.storybook/storybook-styles.css"],
-  "sourcesContent": ["#storybook-explorer-tree .sidebar-subheading button,\n#storybook-explorer-tree .sidebar-subheading button:focus {\n  color: #3a569b;\n}\n\n#storybook-explorer-tree a[data-nodetype=\"document\"] > svg {\n  color: #49b0f8\n}\n\n#storybook-explorer-tree a[data-nodetype=\"document\"][data-selected=\"true\"] > svg {\n  color: #fff\n}\n"],
-  "mappings": "AAAA,8GAEE,cAGF,uDACE,cAGF,2EACE",
-  "names": []
-}

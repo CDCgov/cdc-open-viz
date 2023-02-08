@@ -1,2 +1,0 @@
-import{c as a,d as s}from"./middleware-8046ed8c.js";const i=a(s(o=>({viewMode:"component",os:navigator.userAgent.indexOf("Win")!==-1?"Win":navigator.userAgent.indexOf("Mac")!==-1?"MacOS":null,overlay:{object:null,show:!1,disableBgClose:!1},dimensions:null,setViewMode:e=>o(()=>({viewMode:e})),setDimensions:e=>o(()=>({dimensions:e})),openOverlay:(e,l=!1)=>o(()=>({overlay:{object:e,show:!0,disableBgClose:l}})),toggleOverlay:(e=!1)=>o(()=>({overlay:{show:e}}))}),{enabled:!0,name:"GlobalStore"}));export{i as u};
-//# sourceMappingURL=globalStore-3225bb68.js.map
