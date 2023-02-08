@@ -12,7 +12,7 @@ import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext<any>(Context)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
   const cdata = cleanData(data);

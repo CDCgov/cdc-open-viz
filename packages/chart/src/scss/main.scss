@@ -557,6 +557,7 @@
 
       .horizontal rect,
       .horizontal foreignObject {
+        opacity: 0;
         animation: growBarH 0.5s linear forwards;
         animation-play-state: paused;
       }
@@ -593,11 +594,24 @@
 
   @keyframes growBarH {
     from {
+      opacity: 1;
       transform: scale(0, 1);
     }
 
     to {
+      opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  .fieldset--boxplot {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 10px;
+
+    label {
+      margin: 5px 0;
     }
   }
 }

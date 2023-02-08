@@ -55,7 +55,41 @@ export default function DataTable() {
     const newTableColumns =
       config.visualizationType === 'Pie'
         ? []
-        : [
+        : config.visualizationType === 'Box Plot'
+          ? [
+            {
+              Header: 'Measures',
+              Cell: props => {
+                const resolveName = () => {
+                  let {
+                    boxplot: { labels }
+                  } = config
+                  const columnLookup = {
+                    columnMean: labels.mean,
+                    columnMax: labels.maximum,
+                    columnMin: labels.minimum,
+                    columnIqr: labels.iqr,
+                    columnCategory: 'Category',
+                    columnMedian: labels.median,
+                    columnFirstQuartile: labels.q1,
+                    columnThirdQuartile: labels.q3,
+                    columnOutliers: labels.outliers,
+                    values: labels.values,
+                    columnCount: labels.count,
+                    columnSd: 'Standard Deviation',
+                    nonOutlierValues: 'Non Outliers'
+                  }
+
+                  let resolvedName = columnLookup[props.row.original[0]]
+
+                  return resolvedName
+                }
+
+                return resolveName()
+              }
+            }
+          ]
+          : [
             {
               Header: '',
               Cell: ({ row }) => {
@@ -70,8 +104,8 @@ export default function DataTable() {
                             ? colorScale(seriesLabel)
                             : // dynamic legend
                             config.legend.dynamicLegend
-                            ? colorPalettes[config.palette][row.index]
-                            : // fallback
+                              ? colorPalettes[config.palette][row.index]
+                              : // fallback
                               '#000'
                         }
                       />
@@ -83,24 +117,65 @@ export default function DataTable() {
               id: 'series-label'
             }
           ]
+    if (config.visualizationType !== 'Box Plot') {
+      data.forEach((d, index) => {
+        const resolveTableHeader = () => {
+          if (config.runtime[section].type === 'date') return formatDate(parseDate(d[config.runtime.originalXAxis.dataKey]))
+          return d[config.runtime.originalXAxis.dataKey]
+        }
+        const newCol = {
+          Header: resolveTableHeader(),
+          Cell: ({ row }) => {
+            return <>{numberFormatter(d[row.original])}</>
+          },
+          id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
+          canSort: true
+        }
 
-    data.forEach((d, index) => {
-      const newCol = {
-        Header: config.runtime[section].type === 'date' ? formatDate(parseDate(d[config.runtime.originalXAxis.dataKey])) : d[config.runtime.originalXAxis.dataKey],
-        Cell: ({ row }) => {
-          return <>{numberFormatter(d[row.original])}</>
-        },
-        id: `${d[config.runtime.originalXAxis.dataKey]}--${index}`,
-        canSort: true
-      }
+        newTableColumns.push(newCol)
+      })
+    }
 
-      newTableColumns.push(newCol)
-    })
+    if (config.visualizationType === 'Box Plot') {
+      config.boxplot.tableData.map((plot, index) => {
+        const newCol = {
+          Header: plot.columnCategory,
+          Cell: props => {
+            let resolveCell = () => {
+              if (Number(props.row.id) === 0) return true
+              if (Number(props.row.id) === 1) return plot.columnMax
+              if (Number(props.row.id) === 2) return plot.columnThirdQuartile
+              if (Number(props.row.id) === 3) return plot.columnMedian
+              if (Number(props.row.id) === 4) return plot.columnFirstQuartile
+              if (Number(props.row.id) === 5) return plot.columnMin
+              if (Number(props.row.id) === 6) return plot.columnCount
+              if (Number(props.row.id) === 7) return plot.columnSd
+              if (Number(props.row.id) === 8) return plot.columnMean
+              if (Number(props.row.id) === 9) return plot.columnOutliers.length > 0 ? plot.columnOutliers.toString() : '-'
+              if (Number(props.row.id) === 10) return plot.values.length > 0 ? plot.values.toString() : '-'
+              return <p>-</p>
+            }
+            return resolveCell()
+          },
+          id: `${index}`,
+          canSort: false
+        }
+
+        newTableColumns.push(newCol)
+      })
+    }
 
     return newTableColumns
   }, [config, colorScale])
 
-  const tableData = useMemo(() => (config.visualizationType === 'Pie' ? [config.yAxis.dataKey] : config.runtime.seriesKeys), [config.runtime.seriesKeys])
+  // prettier-ignore
+  const tableData = useMemo(() => (
+    config.visualizationType === 'Pie'
+      ? [config.yAxis.dataKey]
+      : config.visualizationType === 'Box Plot'
+        ? Object.entries(config.boxplot.tableData[0])
+        : config.runtime.seriesKeys),
+    [config.runtime.seriesKeys])
 
   // Change accessibility label depending on expanded status
   useEffect(() => {
@@ -182,7 +257,7 @@ export default function DataTable() {
               {rows.map((row, index) => {
                 prepareRow(row)
                 return (
-                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`}>
+                  <tr {...row.getRowProps()} key={`tbody__tr-${index}`} className={`row-${String(config.visualizationType).replace(' ', '-')}--${index}`}>
                     {row.cells.map((cell, index) => {
                       return (
                         <td tabIndex='0' {...cell.getCellProps()} key={`tbody__tr__td-${index}`} role='gridcell'>
