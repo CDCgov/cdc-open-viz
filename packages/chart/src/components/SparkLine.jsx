@@ -72,9 +72,9 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cdata = cleanData(data);
+  const cleanedData = cleanData(data);
 
-  if (cdata) {
+  if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
@@ -89,7 +89,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
       max += paddingValue
     }
 
-    let xAxisDataMapped = cdata.map(d => getXAxisData(d))
+    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
 
     if (config.runtime.horizontal) {
       xScale = scaleLinear({
@@ -145,7 +145,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {cdata.map((d, dataIndex) => {
+              {cleanedData.map((d, dataIndex) => {
                 let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
                 let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
 
@@ -179,7 +179,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
               })}
               <LinePath
                 curve={allCurves.curveLinear}
-                data={cdata}
+                data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
                 y={d => yScale(getYAxisData(d, seriesKey))}
                 stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}

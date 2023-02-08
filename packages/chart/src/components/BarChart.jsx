@@ -11,7 +11,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cdata = cleanData(data);
+  const cleanedData = cleanData(data);
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -136,7 +136,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={parseFloat(config.runtime.yAxis.size)}>
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={cdata} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -199,7 +199,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={cdata} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -297,7 +297,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {config.visualizationSubType !== 'stacked' && (
           <Group>
             <BarGroup
-              data={cdata}
+              data={cleanedData}
               keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
               height={yMax}
               x0={d => d[config.runtime.originalXAxis.dataKey]}
