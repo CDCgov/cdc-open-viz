@@ -17,40 +17,11 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
   endAngle
 })
 
-// Would put this in helpers but it changes based on the structure of the data
-// - here the pie needs to omit 'name' but line and bar omit "Date"
-function cleanData(data) {
-  let cleanedup = []
-  //console.log('## Data to clean=', data)
-  data.forEach(function (d, i) {
-    //console.log("clean", i, " d", d);
-    let cleanedSeries = {}
-    Object.keys(d).forEach(function (key) {
-      if (key === 'name') {
-        // pass thru the dates
-        cleanedSeries[key] = d[key]
-      } else {
-        // remove comma and dollar signs
-        let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
-        //console.log("tmp no comma or $", tmp)
-        if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
-          cleanedSeries[key] = tmp
-        } else {
-          // return nothing to skip bad data point
-          cleanedSeries[key] = ''
-        }
-      }
-    })
-    //console.log("cleanedSeries=", cleanedSeries);
-    cleanedup.push(cleanedSeries)
-  })
-  //console.log('## cleanedData =', cleanedup)
-  return cleanedup
-}
-
 export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
 
+  const cleanedData = cleanData(data, "name");
+  
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
 
@@ -176,7 +147,7 @@ export default function PieChart() {
     <ErrorBoundary component='PieChart'>
       <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
-          <Pie data={filteredData || cleanData(data)} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
+          <Pie data={filteredData || cleanedData} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
             {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
           </Pie>
         </Group>

@@ -72,7 +72,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data);
+  const cleanedData = cleanData(data,"Date");
 
   if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
