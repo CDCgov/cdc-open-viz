@@ -1,0 +1,15 @@
+import{M as l,C as h,S as u,A}from"./index-676c21af.js";import{A as t}from"./Accordion-b2b36620.js";import{j as r,a as o,F as g}from"./jsx-runtime-68f49b4e.js";import{u as i}from"./index-9ec211f2.js";import"./preload-helper-41c905a7.js";import"./chunk-GWAJ4KRU-d69fdc61.js";import"./index-f1f749bf.js";import"./_commonjsHelpers-042e6b4d.js";import"./index-c4724429.js";import"./index-d475d2ea.js";import"./memoizerific-a8c4a000.js";import"./index-a253c635.js";import"./chunk-XHUUYXNA-19dd1a76.js";import"./chunk-FD4M6EBV-8d27da22.js";import"./chunk-NNAAFZ4U-67fa674f.js";import"./chunk-3EFM6HRY-4c51b38f.js";import"./_getTag-6acf5a83.js";import"./_baseIsEqual-0821e666.js";import"./index-8796c665.js";import"./index-356e4a49.js";import"./index-286867b9.js";import"./index-4d501b15.js";import"./Icon-36492f7a.js";import"./Tooltip-135fcab5.js";const d=({...n})=>{const e=Object.assign({p:"p"},i());return t||p("Accordion",!1),t.Section||p("Accordion.Section",!0),r(t,{children:[r(t.Section,{...n,children:[o(e.p,{children:"An accordion is used to show (and hide) HTML content."}),o(e.p,{children:"Both the element that is used to open the accordion and the accordion's content can be any HTML element."})]}),r(t.Section,{...n,children:[o(e.p,{children:"An accordion is used to show (and hide) HTML content."}),o(e.p,{children:"Both the element that is used to open the accordion and the accordion's content can be any HTML element."})]})]})};function f(n={}){const{wrapper:e}=Object.assign({},i(),n.components);return e?o(e,{...n,children:o(s,{})}):s();function s(){const m=Object.assign({h1:"h1"},i(),n.components);return r(g,{children:[o(l,{title:"Components/UI/Accordion",component:t}),`
+`,o(m.h1,{children:"Accordion"}),`
+`,o(h,{sourceState:"shown",withSource:"open",children:o(u,{name:"Example",args:{label:"Collapsed Section Content",warnIf:!0,tooltip:"This is an <strong>example</strong> tooltip."},children:d.bind({})})}),`
+`,o(A,{story:"Example"})]})}}function p(n,e){throw new Error("Expected "+(e?"component":"object")+" `"+n+"` to be defined: you likely forgot to import, pass, or provide it.")}const a=d.bind({});a.storyName="Example";a.args={label:"Collapsed Section Content",warnIf:!0,tooltip:"This is an <strong>example</strong> tooltip."};a.parameters={storySource:{source:`({ ...args
+}) => <Accordion>
+    <Accordion.Section {...args}>
+      <p>An accordion is used to show (and hide) HTML content.</p>
+      <p>Both the element that is used to open the accordion and the accordion's content can be any HTML element.</p>
+    </Accordion.Section>
+    <Accordion.Section {...args}>
+      <p>An accordion is used to show (and hide) HTML content.</p>
+      <p>Both the element that is used to open the accordion and the accordion's content can be any HTML element.</p>
+    </Accordion.Section>
+  </Accordion>`}};const c={title:"Components/UI/Accordion",component:t,tags:["stories-mdx"],includeStories:["example"]};c.parameters=c.parameters||{};c.parameters.docs={...c.parameters.docs||{},page:f};const q=["Template","example"];export{d as Template,q as __namedExportsOrder,c as default,a as example};
+//# sourceMappingURL=Accordion.stories-f2700462.js.map

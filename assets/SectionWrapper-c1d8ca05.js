@@ -1,0 +1,2 @@
+import{a as r,j as o}from"./jsx-runtime-68f49b4e.js";import{L as c}from"./Label-305d00b9.js";const n=({label:e,tooltip:s,children:a})=>r("div",{className:"cove-section-wrapper",style:e?{paddingTop:"0.75rem"}:null,children:o("div",{className:"cove-section-wrapper__container",style:e?{paddingTop:"1.25rem"}:null,children:[e&&r("div",{className:"cove-section-wrapper__label",children:r(c,{className:"mb-0",tooltip:s,children:e})}),a]})});n.__docgenInfo={description:"",methods:[],displayName:"SectionWrapper"};export{n as S};
+//# sourceMappingURL=SectionWrapper-c1d8ca05.js.map
