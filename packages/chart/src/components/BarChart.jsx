@@ -11,7 +11,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data,"Date");
+  const cleanedData = cleanData(data, config.xAxis.dataKey);
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'

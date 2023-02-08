@@ -20,7 +20,7 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
 export default function PieChart() {
   const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
 
-  const cleanedData = cleanData(data, "name");
+  const cleanedData = cleanData(data, config.xAxis.dataKey);
   
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
