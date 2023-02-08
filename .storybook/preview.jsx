@@ -1,4 +1,4 @@
-import pretty from 'pretty';
+import React from 'react'
 import { previewTheme } from './coveSbThemes'
 
 import  '../packages/core/styles/v2/main.scss'

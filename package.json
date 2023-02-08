@@ -87,8 +87,8 @@
     "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
-    "predeploy": "storybook build --docs --output-dir .storybook_static",
-    "deploy": "gh-pages -d .storybook_static"
+    "predeploy": "storybook build --docs --output-dir .storybook_build --no-manager-cache && touch .storybook_build/.nojekyll",
+    "deploy": "gh-pages -d .storybook_build -t true"
   },
   "dependencies": {
     "@visx/legend": "^2.10.0",

@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import svgr from 'vite-plugin-svgr' // SVG Support
 import dsv from '@rollup/plugin-dsv' // CSV Support
-import Markdown from 'vite-plugin-md' // Markdown Import Support
 import dns from 'dns' // nodeJS
 
 // Force load dev server on `localhost` vs 127.0.0.1
@@ -41,8 +40,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         exportAsDefault: true
       }),
       cssInjectedByJsPlugin(),
-      dsv(),
-      Markdown()
+      dsv()
     ],
     ...configOptions
   }

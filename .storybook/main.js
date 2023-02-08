@@ -10,8 +10,7 @@ export default {
     "@storybook/addon-interactions"
   ],
   "framework": {
-    "name": "@storybook/react-vite",
-    "options": {}
+    "name": "@storybook/react-vite"
   },
   "core": {
     disableTelemetry: true
