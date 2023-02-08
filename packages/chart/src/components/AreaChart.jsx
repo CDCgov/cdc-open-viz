@@ -6,18 +6,16 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 // visx
-import { AreaClosed, LinePath, Bar, Area } from '@visx/shape'
+import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
-import { curveMonotoneX } from '@visx/curve'
+import * as allCurves from '@visx/curve'
 import { useTooltip, useTooltipInPortal, defaultStyles } from '@visx/tooltip'
 import { localPoint } from '@visx/event'
-import { GlyphCircle } from '@visx/glyph'
 
 const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   const DEBUG = false
-  const { transformedData: data, config, height, width } = useContext(ConfigContext)
-  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } = useTooltip()
-  const [xAxisCircleToDisplay, setXAxisCircleToDisplay] = useState(null)
+  const { transformedData: data, config, handleLineType } = useContext(ConfigContext)
+  const { tooltipData, showTooltip } = useTooltip()
 
   let isEditor = window.location.href.includes('editor=true')
 
@@ -106,7 +104,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
         <Group className='area-chart' key='area-wrapper' left={config.yAxis.size}>
           {config.series.map((s, index) => {
             let seriesColor = colorPalettesChart[config.palette][index]
-            let curveType = curveMonotoneX
+            let curveType = allCurves[s.lineType]
+
+            console.log('s', s.type)
+            console.log('handled', handleLineType(s.type))
 
             return (
               <>
@@ -120,10 +121,11 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   strokeOpacity={1}
                   shapeRendering='geometricPrecision'
                   curve={curveType}
+                  strokeDasharray={s.type ? handleLineType(s.type) : 0}
+
                 />
                 {/* prettier-ignore */}
                 <AreaClosed
-                  curve={curveType}
                   key={'area-chart'}
                   fill={seriesColor}
                   fillOpacity={0.5}
@@ -131,6 +133,9 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   x={d => xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
                   yScale={yScale}
+                  curve={curveType}
+                  strokeDasharray={s.type ? handleLineType(s.typ) : 0}
+
                 />
 
                 <Bar
