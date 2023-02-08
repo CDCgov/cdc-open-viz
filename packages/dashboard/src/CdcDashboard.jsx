@@ -34,9 +34,10 @@ import Widget from './components/Widget'
 import DataTable from './components/DataTable'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 
-
 import './scss/main.scss'
 import '@cdc/core/styles/v2/main.scss'
+
+/* eslint-disable react-hooks/exhaustive-deps */
 
 const addVisualization = (type, subType) => {
   let modalWillOpen = type === 'markup-include' ? false : true
@@ -108,7 +109,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   const [preview, setPreview] = useState(false)
   const [tabSelected, setTabSelected] = useState(0)
   const [currentViewport, setCurrentViewport] = useState('lg')
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const { title, description } = config.dashboard || config
 
@@ -334,10 +335,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => { }
+    const announceChange = text => {}
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
-      if (!singleFilter.showDropdown) return
+      if (!singleFilter.showDropdown) return <></>
 
       const values = []
 
@@ -663,12 +664,11 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                 }
               }
 
-
               let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
 
               return (
                 <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
                 </div>
               )
             })}
@@ -690,17 +690,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     outerContainerRef
   }
 
-
-  const dashboardContainerClasses = [
-    'cdc-open-viz-module',
-    'type-dashboard',
-    `${currentViewport}`
-  ]
+  const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId} >
+        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
           {body}
         </div>
         <OverlayFrame />
