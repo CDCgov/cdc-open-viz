@@ -7,7 +7,13 @@ function useReduceData(config, data) {
   const isAllLine = config?.series?.every(el => el.type === 'Line' || el.type === 'dashed-sm' || el.type === 'dashed-md' || el.type === 'dashed-lg')
   const cleanChars = value => {
     // remove comma and $ signs
-    return value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
+    let tmp
+    if (typeof value === 'string') {
+      tmp = value !== null && value !== '' ? value.replace(/[,\$]/g, '') : ''
+    } else {
+      tmp = value !== null && value !== '' ? value : ''
+    }
+    return tmp
   }
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
