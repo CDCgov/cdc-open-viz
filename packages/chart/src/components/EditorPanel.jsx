@@ -803,13 +803,19 @@ const EditorPanel = () => {
                             {provided => (
                               <ul {...provided.droppableProps} className='series-list' ref={provided.innerRef} style={{ marginTop: '1em' }}>
                                 {config.series.map((series, i) => {
-                                  if (config.visualizationType === 'Combo') {
+                                  if (config.visualizationType === 'Combo' || 'Area Chart') {
                                     let changeType = (i, value) => {
                                       let series = [...config.series]
                                       series[i].type = value
 
                                       series[i].axis = 'Left'
 
+                                      updateConfig({ ...config, series })
+                                    }
+
+                                    let changeLineType = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].lineType = value
                                       updateConfig({ ...config, series })
                                     }
 
@@ -824,11 +830,32 @@ const EditorPanel = () => {
                                         <option value='' default>
                                           Select
                                         </option>
-                                        <option value='Bar'>Bar</option>
+                                        {config.visualizationType === 'Combo' &&
+                                          <option value='Bar'>Bar</option>
+                                        }
                                         <option value='Line'>Solid Line</option>
                                         <option value='dashed-sm'>Small Dashed</option>
                                         <option value='dashed-md'>Medium Dashed</option>
                                         <option value='dashed-lg'>Large Dashed</option>
+                                      </select>
+                                    )
+
+                                    const lineType = (
+                                      <select
+                                        value={series.lineStyle}
+                                        onChange={event => {
+                                          changeLineType(i, event.target.value)
+                                        }}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                      >
+                                        <option value='' default>
+                                          Select
+                                        </option>
+                                        <option value='curveMonotoneY'>Monotone Y</option>
+                                        <option value='curveMonotoneX'>Monotone X</option>
+                                        <option value='curveLinear'>Linear</option>
+                                        <option value='curveNatural'>Natural</option>
+                                        <option value='curveStep'>Step</option>
                                       </select>
                                     )
 
@@ -842,6 +869,7 @@ const EditorPanel = () => {
                                               </div>
                                               <span>
                                                 <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
                                                 {config.series && config.series.length > 1 && (
                                                   <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
                                                     &#215;

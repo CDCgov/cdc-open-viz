@@ -89,6 +89,19 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
+  const handleLineType = lineType => {
+    switch (lineType) {
+      case 'dashed-sm':
+        return '5 5'
+      case 'dashed-md':
+        return '10 5'
+      case 'dashed-lg':
+        return '15 5'
+      default:
+        return 0
+    }
+  }
+
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
 
@@ -207,10 +220,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-            return series.dataKey
-          })
+          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+          return series.dataKey
+        })
         : []
     }
 
@@ -264,7 +277,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.push(...plots)
     }
 
-    if (newConfig.visualizationType === 'Combo' && newConfig.series) {
+    if (newConfig.visualizationType === 'Combo' || 'Area Chart' && newConfig.series) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -772,7 +785,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
-    imageId
+    imageId,
+    handleLineType
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]
