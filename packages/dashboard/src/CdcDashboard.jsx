@@ -398,10 +398,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
       const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-      visualizationConfig.data = filteredData && filteredData[visualizationKey] ? filteredData[visualizationKey] : data[dataKey]
-      if (visualizationConfig.formattedData) {
-        visualizationConfig.originalFormattedData = visualizationConfig.formattedData
-        visualizationConfig.formattedData = visualizationConfig.data
+      if (filteredData && filteredData[visualizationKey]) {
+        visualizationConfig.data = filteredData[visualizationKey]
+        if (visualizationConfig.formattedData) {
+          visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+          visualizationConfig.formattedData = visualizationConfig.data
+        }
+      } else {
+        visualizationConfig.data = data[dataKey]
+        if (visualizationConfig.formattedData) {
+          visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+          visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+        }
       }
 
       const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === visualizationKey).length > 0
@@ -527,9 +535,18 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
                         const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
 
-                        visualizationConfig.data = filteredData && filteredData[col.widget] ? filteredData[col.widget] : data[dataKey]
-                        if (visualizationConfig.formattedData) {
-                          visualizationConfig.formattedData = visualizationConfig.data
+                        if (filteredData && filteredData[col.widget]) {
+                          visualizationConfig.data = filteredData[col.widget]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = visualizationConfig.data
+                          }
+                        } else {
+                          visualizationConfig.data = data[dataKey]
+                          if (visualizationConfig.formattedData) {
+                            visualizationConfig.originalFormattedData = visualizationConfig.formattedData
+                            visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
+                          }
                         }
 
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
