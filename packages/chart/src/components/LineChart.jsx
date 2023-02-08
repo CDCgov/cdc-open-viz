@@ -15,7 +15,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up 
   // calling clean several times on same set of data (TT)
-  const cdata = cleanData(data);
+  const cleanedData = cleanData(data);
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleLineType = lineType => {
@@ -55,7 +55,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {cdata.map((d, dataIndex) => {
+              {cleanedData.map((d, dataIndex) => {
                 // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
                 const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
@@ -117,7 +117,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
               <LinePath
                 curve={allCurves.curveLinear}
-                data={cdata}
+                data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
@@ -141,7 +141,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 <LinePath
                   className='animation'
                   curve={allCurves.curveLinear}
-                  data={cdata}
+                  data={cleanedData}
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
