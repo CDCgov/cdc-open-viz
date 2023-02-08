@@ -1,13 +1,19 @@
 export default {
+  title: '',
+  theme: 'blue',
+  subtext: '',
   type: 'data-bite',
-  data: [],
-  dataBite: '',
-  dataFunction: '',
-  dataColumn: '',
+  biteStyle: 'graphic',
   bitePosition: 'Left',
   biteFontSize: 24,
   fontSize: 'medium',
   biteBody: '',
+  tooltip: '',
+  data: [],
+  dataBite: '',
+  dataFunction: '',
+  dataColumn: '',
+  filters: [],
   imageData: {
     display: 'none',
     url: '',
@@ -20,18 +26,11 @@ export default {
     prefix: '',
     suffix: '%'
   },
-  biteStyle: 'graphic',
-  filters: [],
-  subtext: '',
-  title: '',
-  theme: 'theme-blue',
-  shadow: false,
   visual: {
-    border: false,
-    accent: false,
-    background: false,
-    hideBackgroundColor: false,
-    borderColorTheme: false
+    border: 'default',
+    accent: 'none',
+    background: 'default',
+    shadow: true
   },
   general: {
     isCompactStyle: false

@@ -1,15 +1,17 @@
 .data-table-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5em;
+
   h2 {
-    font-weight: 600;
     font-size: 1.3em;
+    font-weight: 600;
   }
+
   .filter {
     align-self: flex-end;
-    font-size: 1em;
     width: 30%;
+    font-size: 1em;
   }
 }

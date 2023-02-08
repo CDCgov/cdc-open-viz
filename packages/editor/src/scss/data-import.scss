@@ -3,52 +3,61 @@
 .cdc-editor .data-designer {
   display: flex;
   justify-content: flex-end;
+
   .left-col {
-    background: #fff;
-    padding: $gbl-padding;
-    width: 50%;
-    border-right: $lightGray 1px solid;
     position: fixed;
+    top: 0;
     bottom: 0;
     left: 0;
-    top: 0;
+    width: 50%;
+    padding: $gbl-padding;
     margin-top: 3rem;
-    z-index: 1;
+    background: #fff;
+    border-right: $lightGray 1px solid;
     overflow-y: auto;
+    z-index: 1;
+
     .dataset-name-input {
       width: 100%;
     }
+
     .heading-3 {
-      font-weight: 600;
-      margin-bottom: 0.5em;
-      margin-top: 1em;
-      border-top: 1px solid gray;
       padding-top: 0.5em;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+      border-top: 1px solid gray;
     }
+
     .tabs {
       margin-bottom: 2em;
+
       > ul.nav {
         display: flex;
       }
+
       .nav-item {
         display: flex;
-        justify-content: center;
-        list-style: none;
-        padding: 0.6rem 0;
         flex-grow: 1;
-        border-bottom: $lightGray 1px solid;
-        color: $mediumGray;
+        justify-content: center;
         align-items: center;
+        padding: 0.6rem 0;
+        list-style: none;
+        color: $mediumGray;
+        border-bottom: $lightGray 1px solid;
+
         svg {
           margin-right: 0.3em;
         }
+
         &:hover {
           border-bottom-color: $mediumGray;
         }
+
         &.active {
+          color: $darkGray;
           border-bottom-width: 5px;
           border-bottom-color: $mediumGray;
-          color: $darkGray;
         }
       }
 
@@ -57,75 +66,90 @@
         border-top: 1px solid $baseColor;
       }
     }
+
     table {
       width: 100%;
       border: 1px solid gray;
+
       thead {
         background-color: rgb(220, 220, 200);
         border-bottom: 1px solid gray;
       }
+
       td {
-        text-align: center;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
         max-width: 40px;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
 
         button {
           font-size: 11pt;
         }
       }
+
       td:last-child {
         max-width: 10px;
       }
     }
+
     .cdcdataviz-file-selector {
       padding: 1rem 3rem;
+      font-size: 1em;
       text-align: center;
+      color: $mediumGray;
       border: $lightGray 2px dashed;
       border-radius: 0.2rem;
-      cursor: pointer;
-      font-size: 1em;
-      color: $mediumGray;
       transition: 0.1s all;
+      cursor: pointer;
+
       svg {
         max-width: 35px;
         margin: 0 auto 0.5em;
         color: $baseColor;
         transition: 0.1s all;
+
         path {
           fill: currentColor;
         }
       }
+
       &.drag-active {
         background-color: $lightest-gray;
+
         svg {
-          transform: scale(0.8);
           transition: 0.1s all;
+          transform: scale(0.8);
         }
       }
+
       span {
+        text-decoration: underline;
         white-space: pre;
         color: $blue;
-        text-decoration: underline;
       }
     }
+
     .footnote {
+      margin: 1em 0 2em 0;
       font-size: 0.8rem;
       font-style: italic;
-      margin: 1em 0 2em 0;
       color: $mediumGray;
     }
+
     .btn {
       display: inline-block;
       margin: 1em 0;
     }
+
     .btn.active {
       background: darken($primary, 15%);
     }
+
     .input-group {
       display: flex;
       align-items: stretch;
+
       input[type='text'] {
         flex-grow: 1;
         border-right: 0;
@@ -138,12 +162,13 @@
     }
 
     .sample-data-list {
-      font-size: 0.8rem;
       list-style: none;
+      font-size: 0.8rem;
+
       li {
         margin-top: 0.3rem;
-        color: $blue;
         text-decoration: underline;
+        color: $blue;
         cursor: pointer;
       }
     }
@@ -164,8 +189,9 @@
       }
 
       .cdcdataviz-file-selector.loaded-file {
-        font-size: 0.9em;
         padding: 0.4rem 3rem;
+        font-size: 0.9em;
+
         svg {
           position: relative;
           top: 4px;
@@ -175,15 +201,17 @@
         }
       }
     }
+
     .data-source-options {
       align-items: center;
     }
   }
+
   .right-col {
     position: relative;
-    background-color: $lightest-gray;
-    padding: $gbl-padding;
     width: 50% !important;
+    padding: $gbl-padding;
+    background-color: $lightest-gray;
     @import 'data-table';
   }
 }

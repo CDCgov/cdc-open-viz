@@ -85,7 +85,9 @@
     "publish": "npx lerna publish",
     "storybook": "storybook dev -p 6006",
     "storybook-docs": "storybook dev --docs",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "predeploy": "build-storybook -o docs",
+    "deploy": "gh-pages -d docs"
   },
   "dependencies": {
     "@visx/legend": "^2.10.0",

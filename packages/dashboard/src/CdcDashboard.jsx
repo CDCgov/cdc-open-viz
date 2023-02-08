@@ -15,7 +15,7 @@ import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
-import OverlayFrame from '@cdc/core/components/hoc/OverlayFrame'
+import Overlay from '@cdc/core/components/ui/Overlay'
 import Loading from '@cdc/core/components/loader/Loading'
 import dataTransform from '@cdc/core/helpers/dataTransform'
 import { getViewport } from '@cdc/core/helpers/coveHelpers'
@@ -703,7 +703,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
         <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId} >
           {body}
         </div>
-        <OverlayFrame />
+        <Overlay />
       </ConfigContext.Provider>
     </GlobalContextProvider>
   )

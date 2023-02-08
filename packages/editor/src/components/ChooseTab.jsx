@@ -1,5 +1,4 @@
 import React, { useContext, useEffect } from 'react'
-import '../scss/choose-vis-tab.scss'
 
 import ConfigContext from '../ConfigContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -17,6 +16,8 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
 import GenericIcon from '@cdc/core/assets/icon-info.svg'
+
+import '../scss/choose-vis-tab.scss'
 
 export default function ChooseTab() {
   const { config, setConfig, setGlobalActive, tempConfig, setTempConfig } = useContext(ConfigContext)

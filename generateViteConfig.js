@@ -12,29 +12,28 @@ dns.setDefaultResultOrder('verbatim')
 
 // DEV NOTE: Modifications made to this file will not be hot-loaded through HMR for component.
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.
-const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}) => {
+const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}, rollupOptions = {} ) => {
+  let rollupOptionsDefault = {
+    external: [ 'react', 'reactDOM' ],
+    output: {
+      chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
+      globals: {
+        react: 'React',
+        reactDOM: 'ReactDOM'
+      },
+    },
+    ...rollupOptions
+  }
   let configOptionsDefault = {
     server: { port: 8080 },
     build: {
-      commonjsOptions: {
-        include: [/@cdc\/core/, /node_modules/],
-      },
       sourcemap: false,
       lib: {
         entry: `src/${componentName}.jsx`,
         formats: ['es'],
         fileName: (format) => `${componentName.toLowerCase()}.js`,
       },
-      rollupOptions: {
-        external: [ 'react', 'reactDOM' ],
-        output: {
-          chunkFileNames: `${componentName.toLowerCase()}-[hash].[format].js`,
-          globals: {
-            react: 'React',
-            reactDOM: 'ReactDOM'
-          },
-        },
-      },
+      rollupOptions: { ...rollupOptionsDefault },
     },
     plugins: [
       react(reactOptions),

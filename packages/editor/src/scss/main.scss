@@ -1,58 +1,69 @@
-@import '@cdc/core/styles/base';
+@import '../../../core/styles/base';
 @import 'variables';
 
 .cdc-open-viz-module.cdc-editor {
-  min-height: inherit;
   display: flex;
   flex-direction: column;
+  min-height: inherit;
+
   .tabs {
     nav {
       display: flex;
     }
+
     .nav-item {
       user-select: none;
       cursor: pointer;
+
       &.disabled {
         cursor: not-allowed;
       }
+
       &.active {
         cursor: default;
       }
     }
   }
+
   // Top level tabs
   .top-level {
     position: fixed;
     width: 100%;
     z-index: 10;
+
     ul {
       display: flex;
       list-style: none;
+
       li {
-        background: #f2f2f2;
-        line-height: 3rem;
-        border-bottom: 1px solid $lightGray;
-        color: #333;
         flex-grow: 1;
         flex-shrink: 0;
         width: 25%;
-        border-right: 1px solid $lightGray;
+        line-height: 3rem;
         text-align: center;
+        color: #333;
+        background: #f2f2f2;
+        border-right: 1px solid $lightGray;
+        border-bottom: 1px solid $lightGray;
+
         &:last-child {
           border-right: none;
         }
+
         &.active {
-          background-color: #565656;
           color: #fff;
+          background-color: #565656;
         }
       }
     }
   }
+
   > .tab-content {
     flex-grow: 1;
-    margin-top: 3rem;
     position: relative;
+    margin-top: 3rem;
   }
+
   .dropdown {
     display: block;
     width: 100%;
@@ -69,49 +80,51 @@
       display: block;
     }
   }
+
   .info-box {
-    border: $lightGray 1px solid;
     padding: 1rem;
     font-size: 0.9rem;
+    border: $lightGray 1px solid;
+
     h4 {
-      font-weight: 600;
       font-size: 1.2em;
+      font-weight: 600;
     }
+
     ul {
       padding: inherit;
     }
   }
 
   .alert--info {
-    color: #004085;
-    background-color: #cce5ff;
     padding: 0.75em 1em;
     margin: 1em 0;
     font-size: 0.8em;
+    color: #004085;
+    background-color: #cce5ff;
     border: #b8daff 1px solid;
     border-radius: 0.4em;
   }
 
   .link.link-upload {
     display: block;
-    color: #005eaa;
-    background: unset;
     padding-left: unset;
     margin-top: 0.3rem;
-    color: #005eaa;
-    text-decoration: underline;
-    cursor: pointer;
     font-size: 12px;
+    text-decoration: underline;
+    color: #005eaa;
+    background: unset;
+    cursor: pointer;
   }
 }
 
 // Modal
 .modal-backdrop {
   position: fixed;
-  width: 100%;
-  height: 100%;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(255, 255, 255, 0.75);
   z-index: 500;
   backdrop-filter: blur(2px);
@@ -121,23 +134,23 @@
   position: fixed;
   top: 50%;
   left: 50%;
+  width: inherit;
+  font-family: sans-serif;
+  outline: 0;
   transform: translate(-50%, -50%);
   z-index: 700;
-  width: inherit;
-  outline: 0;
-  font-family: sans-serif;
 
   .modal {
-    z-index: 100;
-    background: #fff;
     position: relative;
-    margin: auto;
-    border-radius: 8px;
-    border: rgba(0, 0, 0, 0.3) 1px solid;
-    box-shadow: rgb(0 0 0 / 20%) 3px 3px 7px;
-    line-height: 1.4em;
     padding: 16px 20px;
+    margin: auto;
+    line-height: 1.4em;
+    background: #fff;
+    border: rgba(0, 0, 0, 0.3) 1px solid;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: rgb(0 0 0 / 20%) 3px 3px 7px;
+    z-index: 100;
   }
 
   .modal-header {
@@ -147,10 +160,10 @@
 
   .modal-close {
     position: absolute;
-    right: 20px;
     top: 18px;
-    cursor: pointer;
+    right: 20px;
     width: 1em;
+    cursor: pointer;
   }
 
   .confirmation-buttons {
@@ -159,12 +172,12 @@
 
   // todo import global style
   .btn {
-    background: #005eaa;
-    color: #fff;
-    border: 0;
+    display: block;
     padding: 0.4em 0.8em;
     font-size: 1em;
-    display: block;
+    color: #fff;
+    background: #005eaa;
+    border: 0;
     border-radius: 5px;
     transition: 0.1s all;
     cursor: pointer;
@@ -178,7 +191,7 @@
 
 //TODO: Remove after refactor to wizard
 .cdc-open-viz-module .cove-temp {
-  @import '@cdc/core/styles/v2/layout/_tooltip.scss';
+  @import '@cdc/core/styles/v2/components/ui/tooltip.scss';
 }
 
 section.introText {
@@ -186,7 +199,7 @@ section.introText {
 }
 
 section.footnotes {
-  border-top: 1px solid #ddd;
-  margin-top: 70px;
   padding: 15px;
+  margin-top: 70px;
+  border-top: 1px solid #ddd;
 }

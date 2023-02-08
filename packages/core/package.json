@@ -4,6 +4,7 @@
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },

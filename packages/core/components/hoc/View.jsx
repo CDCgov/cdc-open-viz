@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -13,8 +13,16 @@ import Overlay from '../ui/Overlay'
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ EditorPanels, children }) => {
-  const { viewMode } = useGlobalStore()
+const View = ({ EditorPanels, isWizard, children }) => {
+  const { viewMode, setViewMode } = useGlobalStore()
+
+  useEffect(() => {
+    if (window.location.href.includes('editor=true')) {
+      if (isWizard) return setViewMode('wizard') //Supplied by Wizard (previously named Editor)
+      return setViewMode('editor')
+    }
+    return () => {}
+  }, [isWizard, setViewMode])
 
   // Define the anchor ref to attach the Overlay/Modals to
   const coveAnchor = useRef()
@@ -43,9 +51,12 @@ const View = ({ EditorPanels, children }) => {
       break
     case 'wizard':
       view = (
-        <Editor EditorPanels={EditorPanels}>
-          {children}
-        </Editor>
+        <div className="cove" ref={coveAnchor}>
+          <Editor EditorPanels={EditorPanels}>
+            {children}
+          </Editor>
+          <Overlay/>
+        </div>
       )
       break
     default:

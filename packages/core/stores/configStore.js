@@ -29,7 +29,6 @@ export const useConfigStore = create(devtools((set) => ({
     setMissingRequiredSections: (bool) => set(produce((state) => {
       state.config.missingRequiredSections = bool
     })),
-    setViewMode: (view) => set((state) => ({ view: view })),
     updateConfig: (config) => set((state) => ({ config: { ...state.config, ...config } })),
     updateConfigField: (fieldPayload, setValue) => {
       set(produce((state) => (merge(state, { config: setConfigKeyValue(fieldPayload, setValue) }))))

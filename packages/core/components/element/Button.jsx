@@ -72,17 +72,19 @@ const Button = ({
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }
+    return () => {}
   }, [role, buttonRef.current])
 
   useEffect(() => {
     //Adjust button styles depending on cursor, focus, and active, states
-    return buttonState === 'in'
-      ? setCustomStyles(stateStyles => ({ ...stateStyles, ...hoverStyle }))
-      : buttonState === 'out'
-        ? active //If button state is out, check if its 'active'; we want to keep hover styles applied to 'active' buttons
-          ? null //Button is active, so leave the 'hover' styles in place
-          : setCustomStyles({ ...style }) //Button is not 'active', so reset display styles back to default
-        : false //Button state is neither 'in' nor 'out' - do nothing
+    if (buttonState === 'in') {
+      return setCustomStyles(stateStyles => ({ ...stateStyles, ...hoverStyle }))
+    } else if (buttonState === 'out') {
+      if (!active) { //If button state is out, check if its 'active'; we want to keep hover styles applied to 'active' buttons
+        return setCustomStyles({ ...style }) //Button is not 'active', so reset display styles back to default
+      }
+    }
+    return () => {}
   }, [ buttonState, active ])
 
   return (

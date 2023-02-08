@@ -9,7 +9,7 @@ import { getViewport } from '@cdc/core/helpers/coveHelpers'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
-import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
+import Overlay from '@cdc/core/components/ui/Overlay'
 
 import DataImport from './components/DataImport'
 import ChooseTab from './components/ChooseTab'
@@ -179,7 +179,7 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
           </Tabs>
         </div>
       </ConfigContext.Provider>
-      <OverlayFrame />
+      <Overlay />
     </GlobalContextProvider>
   )
 }

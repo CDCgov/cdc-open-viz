@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
-// import FocusLock from "react-focus-lock";
 import ReactDOM from 'react-dom'
-import CloseIcon from '../../assets/icons/close.svg'
+import CloseIcon from '@cdc/core/assets/icon-close.svg'
 
 export const Modal = ({ isShown, hide, modalContent, headerText }) => {
   const onKeyDown = event => {

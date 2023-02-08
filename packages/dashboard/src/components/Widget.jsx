@@ -25,7 +25,7 @@ const iconHash = {
   'single-state': <Icon display='mapAl' base />,
   gear: <Icon display='gear' base />,
   tools: <Icon display='tools' base />,
-  'filtered-text': <Icon display='filtered-text' base />
+  'filtered-text': <Icon display='filteredText' base />
 }
 
 const labelHash = {

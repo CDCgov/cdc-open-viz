@@ -27,6 +27,7 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {
+      console.log(url)
       let urlObj = null
       try {
         const res = await fetch(url)

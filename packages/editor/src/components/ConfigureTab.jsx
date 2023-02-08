@@ -39,19 +39,19 @@ export default function ConfigureTab({ containerEl }) {
     case 'data-bite':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <CdcDataBite isEditor={true} config={config} setConfig={setTempConfig} />
+          <CdcDataBite isWizard={true} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'waffle-chart':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <CdcWaffleChart isEditor={true} config={config} setConfig={setTempConfig} />
+          <CdcWaffleChart isWizard={true} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     case 'markup-include':
       return (
         <ErrorBoundary component='CdcDashboard'>
-          <CdcMarkupInclude isEditor={true} config={config} setConfig={setTempConfig} />
+          <CdcMarkupInclude isWizard={true} config={config} setConfig={setTempConfig} />
         </ErrorBoundary>
       )
     default:

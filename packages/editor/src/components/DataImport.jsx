@@ -21,7 +21,7 @@ import DataDesigner from '@cdc/core/components/manager/DataDesigner'
 
 import '../scss/data-import.scss'
 
-import '@cdc/core/styles/v2/components/data-designer.scss'
+import '@cdc/core/styles/v2/components/manager/data-designer.scss'
 
 export default function DataImport() {
   const { config, setConfig, errors, setErrors, errorMessages, maxFileSize, setGlobalActive, tempConfig, setTempConfig, sharepath } = useContext(ConfigContext)
