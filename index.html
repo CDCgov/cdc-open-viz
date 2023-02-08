@@ -1,43 +1,17 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><title>Webpack App</title><meta name="viewport" content="width=device-width,initial-scale=1"/><style>html, body {
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
 
-  * {
-    box-sizing: border-box;
-  }</style><script>/* globals window */
-  /* eslint-disable no-underscore-dangle */
-  try {
-    if (window.top !== window) {
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.top.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('unable to connect to top frame for connecting dev tools');
-  }
+    <title>@storybook/cli - Storybook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  window.onerror = function onerror(message, source, line, column, err) {
-    if (window.CONFIG_TYPE !== 'DEVELOPMENT') return;
-    // eslint-disable-next-line no-var, vars-on-top
-    var xhr = new window.XMLHttpRequest();
-    xhr.open('POST', '/runtime-error');
-    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xhr.send(
-      JSON.stringify({
-        /* eslint-disable object-shorthand */
-        message: message,
-        source: source,
-        line: line,
-        column: column,
-        error: err && { message: err.message, name: err.name, stack: err.stack },
-        origin: 'manager',
-        /* eslint-enable object-shorthand */
-      })
-    );
-  };</script><style>.sidebar-header img {
+    
+      <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    
+
+     <style>
+.sidebar-header img {
     margin-left: auto;
     margin-right: auto;
 }
@@ -56,23 +30,96 @@ iframe#storybook-preview-iframe {
 
 #storybook-explorer-tree button.sidebar-item > svg {
     color: #3a569b;
-}</style><style>#root[hidden],
-      #docs-root[hidden] {
+}
+
+</style>
+ 
+
+    <style>
+      #storybook-root[hidden]{
         display: none !important;
-      }</style></head><body><div id="root"></div><div id="docs-root"></div><script>window['CONFIG_TYPE'] = "PRODUCTION";
-          
+      }
+    </style>
+
+    
+    <link href="./sb-addons/storybook-9/manager-bundle.css" rel="stylesheet" />
+    
+  </head>
+  <body>
+    <div id="root"></div>
+
+    
+    <script>
       
-          
-            window['LOGLEVEL'] = "info";
-          
+        
+          window['FEATURES'] = {
+  "warnOnLegacyHierarchySeparator": true,
+  "buildStoriesJson": false,
+  "storyStoreV7": true,
+  "breakingChangesV7": true,
+  "interactionsDebugger": false,
+  "argTypeTargetsV7": true
+};
+        
       
-          
-            window['FEATURES'] = {"postcss":true,"emotionAlias":true,"warnOnLegacyHierarchySeparator":true};
-          
+        
+          window['REFS'] = {};
+        
       
-          
+        
+          window['LOGLEVEL'] = "info";
+        
       
-          
+        
+          window['DOCS_OPTIONS'] = {
+  "docsMode": true,
+  "disable": false,
+  "defaultName": "Docs",
+  "autodocs": "tag"
+};
+        
       
-          
-            window['DOCS_MODE'] = false;</script><script src="runtime~main.aa7e33994461fb0cc051.manager.bundle.js"></script><script src="541.505cb0832d6603d345e4.manager.bundle.js"></script><script src="main.3d2a627ce8ebeb65af35.manager.bundle.js"></script></body></html>
+        
+          window['CONFIG_TYPE'] = "PRODUCTION";
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </script>
+    
+
+    <script type="module">
+      import './sb-manager/runtime.mjs';
+
+      
+      import './sb-addons/links-0/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-controls-1/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-actions-2/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-backgrounds-3/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-viewport-4/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-toolbars-5/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-measure-6/manager-bundle.mjs';
+      
+      import './sb-addons/essentials-outline-7/manager-bundle.mjs';
+      
+      import './sb-addons/interactions-8/manager-bundle.mjs';
+      
+      import './sb-addons/storybook-9/manager-bundle.mjs';
+           
+    </script>    
+
+    <link href="./sb-preview/runtime.mjs" rel="preload" as="script">
+  </body>
+</html>
