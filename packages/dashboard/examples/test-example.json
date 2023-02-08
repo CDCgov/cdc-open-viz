@@ -1,5 +1,5 @@
 {
-  "dashboard": { "theme": "theme-blue" },
+  "dashboard": { "theme": "blue" },
   "rows": [[{ "width": 12, "widget": "waffle-chart1661970401264" }, {}, {}]],
   "visualizations": {
     "waffle-chart1661970401264": {
@@ -85,7 +85,7 @@
       "shape": "circle",
       "nodeWidth": "10",
       "nodeSpacer": "2",
-      "theme": "theme-blue",
+      "theme": "blue",
       "type": "waffle-chart",
       "uid": "waffle-chart1661970401264",
       "visualizationType": "waffle-chart",

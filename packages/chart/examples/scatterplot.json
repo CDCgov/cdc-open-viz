@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Scatter Plot",
-  "theme": "theme-blue",
+  "theme": "blue",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",

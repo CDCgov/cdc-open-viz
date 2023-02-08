@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Lollipop Style Horizontal Bar Chart - Number of Spills Occurring in the Home",
-  "theme": "theme-blue",
+  "theme": "blue",
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -21,7 +21,7 @@
     "gridLines": false,
     "type": "chart",
     "title": "Lollipop Style Horizontal Bar Chart",
-    "theme": "theme-blue",
+    "theme": "blue",
     "fontSize": "medium",
     "lineDatapointStyle": "hover",
     "barHasBorder": "false",

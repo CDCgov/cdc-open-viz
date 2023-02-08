@@ -3160,7 +3160,7 @@
   ],
   "subtext": "Cite Source of Information",
   "title": "Average Amount Georgia 2019 - 2021",
-  "theme": "theme-cyan",
+  "theme": "cyan",
   "shadow": false,
   "dataFileName": "dashboard_aggregate_example_state_type.csv",
   "dataFileSourceType": "file"

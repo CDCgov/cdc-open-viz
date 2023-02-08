@@ -557,6 +557,7 @@
 
       .horizontal rect,
       .horizontal foreignObject {
+        opacity: 0;
         animation: growBarH 0.5s linear forwards;
         animation-play-state: paused;
       }
@@ -593,10 +594,12 @@
 
   @keyframes growBarH {
     from {
+      opacity: 1;
       transform: scale(0, 1);
     }
 
     to {
+      opacity: 1;
       transform: scale(1);
     }
   }

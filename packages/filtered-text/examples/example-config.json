@@ -1,7 +1,7 @@
 {
   "type": "filtered-text",
   "title": "Filtered Text",
-  "theme": "theme-blue",
+  "theme": "blue",
   "dataUrl": "examples/sex-ageGroup-with-values.json",
   "textColumn": "age-group"
 }

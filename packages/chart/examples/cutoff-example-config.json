@@ -1,6 +1,6 @@
 {
   "title": "Data Cutoff Example (< 0.1)",
-  "theme": "theme-blue",
+  "theme": "blue",
   "dataUrl": "/examples/cutoff-example-data.json",
   "animate": true,
   "animateReplay": true,

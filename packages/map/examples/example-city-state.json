@@ -4,7 +4,7 @@
     "subtext": "*: Lorem ipsum; NA: Lorem ipsum.",
     "type": "data",
     "geoType": "us",
-    "headerColor": "theme-cyan",
+    "headerColor": "cyan",
     "showSidebar": true,
     "showTitle": true,
     "showDownloadButton": true,

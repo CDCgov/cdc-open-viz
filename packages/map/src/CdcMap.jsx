@@ -84,12 +84,12 @@ const hashObj = row => {
 }
 
 const indexOfIgnoreType = (arr, item) => {
-  for(let i = 0; i < arr.length; i++){
-    if(item == arr[i]){
-      return i;
+  for (let i = 0; i < arr.length; i++) {
+    if (item == arr[i]) {
+      return i
     }
   }
-  return -1;
+  return -1
 }
 
 // returns string[]
@@ -302,7 +302,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let amt = Math.max(result.length - specialClasses, 1)
       let distributionArray = colorDistributions[amt]
 
-      const specificColor = distributionArray[colorIdx]
+      let specificColor
+      if (distributionArray) {
+        specificColor = distributionArray[colorIdx]
+      } else if (mapColorPalette[colorIdx]) {
+        specificColor = colorIdx
+      } else {
+        specificColor = mapColorPalette.length - 1
+      }
 
       return mapColorPalette[specificColor]
     }
@@ -403,12 +410,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       let sorted = [...uniqueValues.keys()]
 
-      if(obj.legend.additionalCategories){
+      if (obj.legend.additionalCategories) {
         obj.legend.additionalCategories.forEach(additionalCategory => {
-          if(additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1){
-            sorted.push(additionalCategory);
+          if (additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1) {
+            sorted.push(additionalCategory)
           }
-        });
+        })
       }
 
       // Apply custom sorting or regular sorting
@@ -416,12 +423,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a);
-          let bVal = configuredOrder.indexOf(b);
-          if(aVal === bVal) return 0;
-          if(aVal === -1) return 1;
-          if(bVal === -1) return -1;
-          return aVal - bVal;
+          let aVal = configuredOrder.indexOf(a)
+          let bVal = configuredOrder.indexOf(b)
+          if (aVal === bVal) return 0
+          if (aVal === -1) return 1
+          if (bVal === -1) return -1
+          return aVal - bVal
         })
       } else {
         sorted.sort((a, b) => a - b)
@@ -978,6 +985,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return toolTipText
   }
 
+  // if city has a hyphen then in tooltip it ends up UPPER CASE instead of just regular Upper Case
+  // - this function is used to prevent that and instead give the formatting that is wanted
+  // Example:  Desired city display in tooltip on map: "Inter-Tribal Indian Reservation"
   const titleCase = string => {
     // if hyphen found, then split, uppercase each word, and put back together
     if (string.includes('–') || string.includes('-')) {
@@ -1248,13 +1258,26 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.general.statePicked])
 
-  // When geotype changes
+  
   useEffect(() => {
-    // UID
+    // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
+  
+  // DEV-769 make "Data Table" both a required field and default value
+  useEffect(() => {
+    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+      setState({
+          ...state,
+        dataTable: {
+            ...state.dataTable,
+            title: "Data Table"
+          }
+        })
+    }
+  }, [state.dataTable])
 
   useEffect(() => {
     // UID

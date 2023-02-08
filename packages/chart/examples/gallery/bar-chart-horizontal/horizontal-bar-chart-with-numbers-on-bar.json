@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example of Horizontal Bar Chart with Numbers on Bar",
-  "theme": "theme-blue",
+  "theme": "blue",
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "true",
@@ -14,7 +14,7 @@
     "gridLines": false,
     "type": "chart",
     "title": "Example of Horizontal Bar Chart with Numbers on Bar",
-    "theme": "theme-blue",
+    "theme": "blue",
     "fontSize": "medium",
     "lineDatapointStyle": "hover",
     "barHasBorder": "true",

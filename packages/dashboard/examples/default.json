@@ -114,7 +114,7 @@
         "territoriesLabel": "Territories",
         "type": "data",
         "geoType": "us",
-        "headerColor": "theme-blue",
+        "headerColor": "blue",
         "showSidebar": true,
         "showTitle": true,
         "geoBorderColor": "darkGray",

@@ -2,7 +2,7 @@ import React from 'react'
 import themes from '@cdc/core/data/componentThemes'
 import chroma from 'chroma-js'
 
-const CircleCallout = ({ text, theme = 'theme-blue', biteFontSize }) => {
+const CircleCallout = ({ text, theme = 'blue', biteFontSize }) => {
   const styles = {
     outerRing: {
       fill: themes[theme].primary

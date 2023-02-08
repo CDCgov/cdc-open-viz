@@ -2,7 +2,7 @@
   "title": "",
   "dataUrl": "/examples/date-exclusions-data.json",
   "type": "chart",
-  "theme": "theme-blue",
+  "theme": "blue",
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",

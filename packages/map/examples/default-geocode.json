@@ -6,7 +6,7 @@
 		},
 		"geoType": "us-county",
 		"geoBorderColor": "darkGray",
-		"headerColor": "theme-blue",
+		"headerColor": "blue",
 		"showTitle": true,
 		"showSidebar": true,
 		"showDownloadButton": true,

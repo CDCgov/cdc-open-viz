@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example Stacked Horizontal Bar Chart",
-  "theme": "theme-blue",
+  "theme": "blue",
   "fontSize": "small",
   "lineDatapointStyle": "hover",
   "barHasBorder": "true",
@@ -21,7 +21,7 @@
     "gridLines": false,
     "type": "chart",
     "title": "",
-    "theme": "theme-blue",
+    "theme": "blue",
     "fontSize": "medium",
     "lineDatapointStyle": "hover",
     "barHasBorder": "false",

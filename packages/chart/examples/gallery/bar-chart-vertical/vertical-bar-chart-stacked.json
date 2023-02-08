@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example Stacked Bar Chart",
-  "theme": "theme-orange",
+  "theme": "orange",
   "fontSize": "medium",
   "height": "375",
   "padding": {

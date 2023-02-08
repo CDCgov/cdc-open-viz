@@ -1,0 +1,154 @@
+{
+  "title": "Example Stacked Vertical",
+  "visualizationType": "Bar",
+  "visualizationSubType": "stacked",
+  "orientation": "vertical",
+  "animate": true,
+  "animateReplay": true,
+  "yAxis": {
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": false
+  },
+  "barThickness": 0.35,
+  "height": 300,
+  "xAxis": {
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "dataKey": "Date"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "show": true
+  },
+  "legend": {
+    "behavior": "isolate",
+    "position": "right",
+    "reverseLabelOrder": false
+  },
+  "series": [
+    {
+      "dataKey": "Data 1",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "Data 2",
+      "type": "Bar"
+    }
+  ],
+  "data": [
+    {
+      "Date": "1/15/2016",
+      "Data 1": "90",
+      "Data 2": "NA",
+      "Data 3": "300",
+      "Data 4": "95",
+      "Data 5": "120",
+      "Data 6": "310",
+      "Data 7": "40",
+      "Data 8": "90",
+      "Data 9": "240",
+      "Data 10": "60",
+      "Data 11": "160",
+      "Data 12": "200"
+    },
+    {
+      "Date": "2/15/2016",
+      "Data 1": "40",
+      "Data 2": "90",
+      "Data 3": "240",
+      "Data 4": "60",
+      "Data 5": "160",
+      "Data 6": "200",
+      "Data 7": "40",
+      "Data 8": "90",
+      "Data 9": "240",
+      "Data 10": "60",
+      "Data 11": "160",
+      "Data 12": "200"
+    },
+    {
+      "Date": "3/15/2016",
+      "Data 1": "50",
+      "Data 2": "300",
+      "Data 3": "290",
+      "Data 4": "100",
+      "Data 5": "200",
+      "Data 6": "250",
+      "Data 7": "80",
+      "Data 8": "350",
+      "Data 9": "300",
+      "Data 10": "150",
+      "Data 11": "130",
+      "Data 12": "100"
+    },
+    {
+      "Date": "4/15/2016",
+      "Data 1": "120",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220",
+      "Data 7": "40",
+      "Data 8": "90",
+      "Data 9": "240",
+      "Data 10": "60",
+      "Data 11": "160",
+      "Data 12": "200"
+    },
+    {
+      "Date": "5/15/2016",
+      "Data 1": "80",
+      "Data 2": "350",
+      "Data 3": "300",
+      "Data 4": "150",
+      "Data 5": "130",
+      "Data 6": "100",
+      "Data 7": "120",
+      "Data 8": "160",
+      "Data 9": "230",
+      "Data 10": "180",
+      "Data 11": "160",
+      "Data 12": "220"
+    },
+    {
+      "Date": "6/15/2016",
+      "Data 1": "90",
+      "Data 2": "220",
+      "Data 3": "320",
+      "Data 4": "100",
+      "Data 5": "220",
+      "Data 6": "300",
+      "Data 7": "40",
+      "Data 8": "90",
+      "Data 9": "240",
+      "Data 10": "60",
+      "Data 11": "160",
+      "Data 12": "200"
+    },
+    {
+      "Date": "7/15/2016",
+      "Data 1": "120",
+      "Data 2": "160",
+      "Data 3": "230",
+      "Data 4": "180",
+      "Data 5": "160",
+      "Data 6": "220",
+      "Data 7": "80",
+      "Data 8": "350",
+      "Data 9": "300",
+      "Data 10": "150",
+      "Data 11": "130",
+      "Data 12": "100"
+    }
+    
+  ]
+}

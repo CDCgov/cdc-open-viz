@@ -34,9 +34,11 @@ import MediaControls from '@cdc/core/components/ui/MediaControls'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/dataTransform'
-import { numberFromString } from '@cdc/core/helpers/coveHelpers'
-import { getViewport } from '@cdc/core/helpers/coveHelpers'
-import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
+import { getViewport, numberFromString, cacheBustingString } from '@cdc/core/helpers/coveHelpers'
+
+// TODO: COVE Refactor - Move these into coveHelpers
+import isNumber from '@cdc/core/helpers/isNumber'
+import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
 
@@ -716,7 +718,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
             {config?.introText && <section className='introText'>{parse(config.introText)}</section>}
             <div
               style={{ marginBottom: config.legend.position !== 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px' }}
-              className={`chart-container`}
+              className={`chart-container  ${config.legend.position === 'bottom' ? 'bottom' : ''}${config.legend.hide ? ' legend-hidden' : ''}${lineDatapointClass}${barBorderClass} ${contentClasses.join(' ')}`}
             >
               {/* All charts except sparkline */}
               {config.visualizationType !== 'Spark Line' && chartComponents[visualizationType]}
@@ -794,6 +796,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     dynamicLegendItems,
     setDynamicLegendItems,
     filterData,
+    isNumber,
+    cleanData,
     imageId,
     getTextWidth
   }

@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example Horizontal Bar Chart",
-  "theme": "theme-teal",
+  "theme": "teal",
   "fontSize": "small",
   "lineDatapointStyle": "hover",
   "barHasBorder": "false",
@@ -14,7 +14,7 @@
     "gridLines": false,
     "type": "chart",
     "title": "Example Horizontal Bar Chart",
-    "theme": "theme-teal",
+    "theme": "teal",
     "fontSize": "small",
     "lineDatapointStyle": "hover",
     "barHasBorder": "false",

@@ -1,18 +1,18 @@
 {
   "type": "chart",
-  "title": "Example Line Chart",
-  "theme": "green",
+  "title": "Example Bar Chart",
+  "theme": "blue",
   "fontSize": "medium",
-  "height": "375",
+  "height": 300,
   "padding": { "left": 5, "right": 5 },
-  "yAxis": { "size": "75", "gridLines": false, "label": "Y-Axis Example Label", "numTicks": "9" },
-  "barThickness": 0.35,
-  "xAxis": { "size": "77", "tickRotation": "25", "dataKey": "Date", "label": "X-Axis Example Label", "type": "date", "dateParseFormat": "%d/%m/%Y", "dateDisplayFormat": "%d/%m/%Y" },
-  "table": { "label": "Data Table", "expanded": true, "download": true },
+  "yAxis": { "size": "76", "gridLines": false, "label": "Y Axis Example Label" },
+  "barThickness": "0.6",
+  "xAxis": { "size": "59", "tickRotation": 0, "dataKey": "Date", "label": "X Axis Example Label" },
+  "table": { "label": "Data Type by Date", "expanded": true },
   "legend": { "behavior": "isolate", "position": "right", "label": "Type of Data" },
   "palette": "qualitative-bold",
   "labels": false,
-  "dataFormat": {},
+  "dataFormat": { "suffix": " units" },
   "confidenceKeys": {},
   "data": [
     { "Date": "1/15/2016", "Data 1": "90", "Data 2": "135", "Data 3": "300", "Data 4": "95", "Data 5": "120", "Data 6": "310" },
@@ -22,13 +22,12 @@
     { "Date": "5/15/2016", "Data 1": "80", "Data 2": "350", "Data 3": "300", "Data 4": "150", "Data 5": "130", "Data 6": "100" },
     { "Date": "6/15/2016", "Data 1": "90", "Data 2": "220", "Data 3": "320", "Data 4": "100", "Data 5": "220", "Data 6": "300" }
   ],
-  "visualizationType": "Line",
+  "visualizationType": "Bar",
   "series": [
     { "dataKey": "Data 1", "type": "Bar" },
     { "dataKey": "Data 2", "type": "Bar" },
-    { "dataKey": "Data 3", "type": "Bar" },
-    { "dataKey": "Data 4", "type": "Bar" },
-    { "dataKey": "Data 5", "type": "Bar" },
-    { "dataKey": "Data 6", "type": "Bar" }
-  ]
+    { "dataKey": "Data 3", "type": "Bar" }
+  ],
+  "description": "This example shows a bar chart created in the visualization editor in WCMS",
+  "dataCutoff": "0"
 }

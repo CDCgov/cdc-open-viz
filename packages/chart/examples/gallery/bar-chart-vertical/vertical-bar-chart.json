@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example Bar Chart",
-  "theme": "theme-blue",
+  "theme": "blue",
   "animate": false,
   "fontSize": "medium",
   "lineDatapointStyle": "hover",
@@ -153,11 +153,11 @@
     {
       "Date": "6/15/2016",
       "Data 1": "9000",
-      "Data 2": "220",
+      "Data 2": "-2200",
       "Data 3": "320",
       "Data 4": "100",
       "Data 5": "220",
-      "Data 6": "3000"
+      "Data 6": "-3000"
     }
   ],
   "visualizationType": "Bar",

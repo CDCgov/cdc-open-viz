@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Bar Chart with Confidence Intervals",
-  "theme": "theme-green",
+  "theme": "green",
   "fontSize": "medium",
   "height": 300,
   "padding": {

@@ -6,7 +6,7 @@
 		"territoriesLabel": "Territories",
 		"type": "map",
 		"geoType": "single-state",
-		"headerColor": "theme-blue",
+		"headerColor": "blue",
 		"showSidebar": true,
 		"showTitle": true,
 		"geoBorderColor": "darkGray",

@@ -3,7 +3,7 @@
   "showHeader": false,
   "type": "markup-include",
   "srcUrl": "/wcms/4.0/cdc-wp/data-presentation/examples/SSI-Image-With-Text.html",
-  "theme": "theme-slate",
+  "theme": "slate",
   "data": [
     {
       "Race": "Hispanic or Latino",

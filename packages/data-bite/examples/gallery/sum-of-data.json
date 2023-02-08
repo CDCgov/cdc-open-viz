@@ -3154,7 +3154,7 @@
   "filters": [],
   "subtext": "Cite Source of Information",
   "title": "Sum Total 2019 - 2021",
-  "theme": "theme-orange",
+  "theme": "orange",
   "shadow": false,
   "dataFileName": "dashboard_aggregate_example_state_type.csv",
   "dataFileSourceType": "file"

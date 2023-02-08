@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Example Paired Bar Chart",
-  "theme": "theme-pink",
+  "theme": "pink",
   "animate": false,
   "fontSize": "small",
   "lineDatapointStyle": "hover",

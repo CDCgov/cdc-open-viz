@@ -3,7 +3,7 @@
   "showHeader": false,
   "type": "markup-include",
   "srcUrl": "https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Markup-Include-Button-and-Text.html",
-  "theme": "theme-blue",
+  "theme": "blue",
   "data": [
     {
       "Race": "Hispanic or Latino",

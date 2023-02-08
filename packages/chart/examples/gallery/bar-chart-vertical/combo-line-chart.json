@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Combo Bar-Line Chart",
-  "theme": "theme-purple",
+  "theme": "purple",
   "fontSize": "medium",
   "height": "332",
   "animate": true,

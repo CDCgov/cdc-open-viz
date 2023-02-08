@@ -1,7 +1,7 @@
 {
   "type": "chart",
   "title": "Categorical Bar Chart",
-  "theme": "theme-blue",
+  "theme": "blue",
   "fontSize": "medium",
   "height": 300,
   "padding": {
@@ -39,7 +39,7 @@
     {
       "Location": "Vehicle",
       "Group A": "100",
-      "Group B": "150",
+      "Group B": "-150",
       "Group C": "90"
     },
     {

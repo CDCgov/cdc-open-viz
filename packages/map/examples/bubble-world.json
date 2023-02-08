@@ -5,7 +5,7 @@
     "subtext": "",
     "type": "bubble",
     "geoType": "world",
-    "headerColor": "theme-blue",
+    "headerColor": "blue",
     "geoBorderColor": "darkGray",
     "showSidebar": true,
     "showTitle": true,
