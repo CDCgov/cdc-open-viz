@@ -934,6 +934,12 @@ const EditorPanel = props => {
             valid = false
           }
         })
+        let runtimeLegendKeys = runtimeLegend.map(item => item.value);
+        state.legend.categoryValuesOrder.forEach(category => {
+          if(runtimeLegendKeys.indexOf(category) === -1){
+            valid = false;
+          }
+        });
       } else {
         valid = false
       }
@@ -1848,6 +1854,57 @@ const EditorPanel = props => {
                       </button>
                     </fieldset>
                   )}
+                  {'category' === state.legend.type && (
+                    <fieldset className='primary-fieldset edit-block'>
+                      <label>
+                        <span className='edit-label'>
+                          Additional Category
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>You can provide additional categories to ensure they appear in the legend</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                      </label>
+                      {state.legend.additionalCategories && state.legend.additionalCategories.map((val, i) => (
+                        <fieldset className='edit-block' key={val}>
+                          <button
+                            className='remove-column'
+                            onClick={event => {
+                              event.preventDefault()
+                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
+                              updatedAdditionaCategories.splice(i, 1);
+                              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories);
+                            }}
+                          >
+                            Remove
+                          </button>
+                          <label>
+                            <span className='edit-label column-heading'>Category</span>
+                            <TextField value={val} section="legend" subsection={null} fieldName="additionalCategories" updateField={(section, subsection, fieldName, value) => {
+                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
+                              updatedAdditionaCategories[i] = value;
+                              updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                            }} />
+                          </label>
+                        </fieldset>
+                      ))}
+                      <button
+                        className={'btn full-width'}
+                        onClick={event => {
+                          event.preventDefault()
+                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])];
+                          updatedAdditionaCategories.push('');
+                          updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                        }}
+                      >
+                        Add Category
+                      </button>
+                    </fieldset>
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>{' '}
               {/* Columns */}
@@ -2125,7 +2182,24 @@ const EditorPanel = props => {
                     <AccordionItemButton>Data Table</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <TextField value={dataTable.title} updateField={updateField} section='dataTable' fieldName='title' label='Data Table Title' placeholder='Data Table' />
+                    <TextField
+                      value={dataTable.title}
+                      updateField={updateField}
+                      section='dataTable'
+                      fieldName='title'
+                      label='Data Table Title'
+                      placeholder='Data Table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Label is required for Data Table for 508 Compliance</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                     <TextField
                       value={dataTable.indexLabel || ''}
                       updateField={updateField}

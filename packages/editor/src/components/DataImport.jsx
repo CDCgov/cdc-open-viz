@@ -11,15 +11,11 @@ import TabPane from './TabPane'
 import Tabs from './Tabs'
 import PreviewDataTable from './PreviewDataTable'
 import LinkIcon from '../assets/icons/link.svg'
+import SampleDataContext from './../samples/SampleDataContext'
+import SampleData from './SampleData'
 
 import FileUploadIcon from '../assets/icons/file-upload-solid.svg'
 import CloseIcon from '@cdc/core/assets/icon-close.svg'
-
-// Vite specific syntax, use ?raw following url to parse direct reference
-import validMapData from '../../example/valid-data-map.csv?raw'
-import validChartData from '../../example/valid-data-chart.csv?raw'
-import validCountyMapData from '../../example/valid-county-data.csv?raw'
-import sampleGeoPoints from '../../example/supported-cities.csv?raw'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 
@@ -322,7 +318,7 @@ export default function DataImport() {
     if (tempConfig !== null) setTempConfig(null)
 
     setConfig(newConfig)
-  }, [])
+  }, []) // eslint-disable-line
 
   const updateDescriptionProp = (visualizationKey, datasetKey, key, value) => {
     if (config.type === 'dashboard') {
@@ -479,6 +475,14 @@ export default function DataImport() {
     readyToConfigure = !!config.formattedData
   }
 
+  // Box plots skip the data description steps.
+  // If we have data and the visualizations is a box plot proceed...
+  if ((config.visualizationType === 'Box Plot' && config.data) || config.visualizationType === 'Scatter Plot') {
+    readyToConfigure = true
+  }
+
+  const showDataDesigner = config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot'
+
   return (
     <>
       <div className='left-col'>
@@ -572,7 +576,7 @@ export default function DataImport() {
               </>
             )}
 
-            <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />
+            {showDataDesigner && <DataDesigner visuzliationKey={null} dataKey={configureData.dataFileName} configureData={configureData} updateDescriptionProp={updateDescriptionProp} />}
           </>
         )}
 
@@ -600,60 +604,42 @@ export default function DataImport() {
             {errors &&
               (errors.map
                 ? errors.map((message, index) => (
-                    <div className='error-box slim mt-2' key={`error-${message}`}>
-                      <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
-                    </div>
-                  ))
+                  <div className='error-box slim mt-2' key={`error-${message}`}>
+                    <span>{message}</span> <CloseIcon className='inline-icon dismiss-error' onClick={() => setErrors(errors.filter((val, i) => i !== index))} />
+                  </div>
+                ))
                 : errors.message)}
             <p className='footnote'>
               Supported file types: {Object.keys(supportedDataTypes).join(', ')}. Maximum file size {maxFileSize}MB.
             </p>
-            {/* TODO: Add more sample data in, but this will do for now. */}
-            <span className='heading-3'>Load Sample Data:</span>
-            <ul className='sample-data-list'>
-              <button className='link link-upload' onClick={() => loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)} onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validMapData], { type: 'text/csv' }), 'valid-data-map.csv', editingDataset)}>
-                United States Sample Data #1
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validChartData], { type: 'text/csv' }), 'valid-data-chart.csv', editingDataset)}
-              >
-                Chart Sample Data
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([validCountyMapData], { type: 'text/csv' }), 'valid-county-data.csv', editingDataset)}
-              >
-                United States Counties Sample Data
-              </button>
-              <button
-                className='link link-upload'
-                onClick={() => loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
-                onKeyDown={e => e.keyCode === 13 && loadData(new Blob([sampleGeoPoints], { type: 'text/csv' }), 'supported-cities.csv', editingDataset)}
-              >
-                Sample Geo Points
-              </button>
-            </ul>
-          </div>
-        )}
 
-        {config.type === 'dashboard' && !addingDataset && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
-              + Add More Files
-            </button>
-          </p>
-        )}
+            {/* prettier-ignore */}
+            <SampleDataContext.Provider value={{ loadData, editingDataset, config }}>
+              <SampleData.Buttons />
+            </SampleDataContext.Provider>
+          </div >
+        )
+        }
 
-        {readyToConfigure && (
-          <p>
-            <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
-              Configure your visualization
-            </button>
-          </p>
-        )}
+        {
+          config.type === 'dashboard' && !addingDataset && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+                + Add More Files
+              </button>
+            </p>
+          )
+        }
+
+        {
+          readyToConfigure && (
+            <p>
+              <button className='btn btn-primary' onClick={() => setGlobalActive(2)}>
+                Configure your visualization
+              </button>
+            </p>
+          )
+        }
 
         <a href='https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data-map.html' target='_blank' rel='noopener noreferrer' className='guidance-link'>
           <div>
@@ -661,7 +647,7 @@ export default function DataImport() {
             <p>Documentation and examples on formatting data and configuring visualizations.</p>
           </div>
         </a>
-      </div>
+      </div >
       <div className='right-col'>
         <PreviewDataTable data={previewData} />
       </div>
