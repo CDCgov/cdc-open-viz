@@ -17,16 +17,16 @@ const sampleData = {
       fileName: 'valid-data-chart.csv',
       data: validChartData
     },
-    {
-      text: 'Box Plot Sample Data',
-      fileName: 'valid-boxplot.csv',
-      data: validBoxPlotData
-    },
-    {
-      text: 'Scatter Plot Sample Data',
-      fileName: 'valid-scatterplot.csv',
-      data: validScatterPlot
-    }
+    // {
+    //   text: 'Box Plot Sample Data',
+    //   fileName: 'valid-boxplot.csv',
+    //   data: validBoxPlotData
+    // },
+    // {
+    //   text: 'Scatter Plot Sample Data',
+    //   fileName: 'valid-scatterplot.csv',
+    //   data: validScatterPlot
+    // }
   ],
   maps: [
     {
