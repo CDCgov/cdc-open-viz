@@ -82,12 +82,12 @@ const hashObj = row => {
 }
 
 const indexOfIgnoreType = (arr, item) => {
-  for(let i = 0; i < arr.length; i++){
-    if(item == arr[i]){
-      return i;
+  for (let i = 0; i < arr.length; i++) {
+    if (item == arr[i]) {
+      return i
     }
   }
-  return -1;
+  return -1
 }
 
 // returns string[]
@@ -300,7 +300,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let amt = Math.max(result.length - specialClasses, 1)
       let distributionArray = colorDistributions[amt]
 
-      const specificColor = distributionArray[colorIdx]
+      let specificColor
+      if (distributionArray) {
+        specificColor = distributionArray[colorIdx]
+      } else if (mapColorPalette[colorIdx]) {
+        specificColor = colorIdx
+      } else {
+        specificColor = mapColorPalette.length - 1
+      }
 
       return mapColorPalette[specificColor]
     }
@@ -401,12 +408,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       let sorted = [...uniqueValues.keys()]
 
-      if(obj.legend.additionalCategories){
+      if (obj.legend.additionalCategories) {
         obj.legend.additionalCategories.forEach(additionalCategory => {
-          if(additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1){
-            sorted.push(additionalCategory);
+          if (additionalCategory && indexOfIgnoreType(sorted, additionalCategory) === -1) {
+            sorted.push(additionalCategory)
           }
-        });
+        })
       }
 
       // Apply custom sorting or regular sorting
@@ -414,12 +421,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       if (configuredOrder.length) {
         sorted.sort((a, b) => {
-          let aVal = configuredOrder.indexOf(a);
-          let bVal = configuredOrder.indexOf(b);
-          if(aVal === bVal) return 0;
-          if(aVal === -1) return 1;
-          if(bVal === -1) return -1;
-          return aVal - bVal;
+          let aVal = configuredOrder.indexOf(a)
+          let bVal = configuredOrder.indexOf(b)
+          if (aVal === bVal) return 0
+          if (aVal === -1) return 1
+          if (bVal === -1) return -1
+          return aVal - bVal
         })
       } else {
         sorted.sort((a, b) => a - b)
