@@ -13,10 +13,10 @@ import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
 const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
-  const { setConfigDefaults, updateConfig } = useConfigStore()
+  const { setConfigDefaults, updateConfig, setUpdateWizardConfig, updateWizardConfig } = useConfigStore()
 
-  const [ cycle, setCycle ] = useState(false)
-  const [ loadingConfig, setLoadingConfig ] = useState(true)
+  const [cycle, setCycle] = useState(false)
+  const [loadingConfig, setLoadingConfig] = useState(true)
 
   const transform = new dataTransform()
 
@@ -24,6 +24,10 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
     setLoadingConfig(true)
     setCycle(false)
   }
+
+  useEffect(() => {
+    setUpdateWizardConfig(setWizardConfig)
+  }, [setWizardConfig]);
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {
@@ -87,7 +91,7 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
       fetchConfig()
         .then((newConfig) => {
           // Pass up to Editor if needed
-          if (setWizardConfig) setWizardConfig(newConfig)
+          // if (setUpdateWizardConfig) updateWizardConfig(newConfig)
           updateConfig(newConfig, runtime) // Set final config data in ConfigContext, TODO: COVE Refactor - is this being parsed properly? Is runtime being attached?
           setLoadingConfig(false) // Tell subcomponents that the config is ready
         })
@@ -96,7 +100,7 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
           setCycle(true) // Switch to end the useLoadConfig cycle
         })
     }
-  }, [ cycle, configObj, configUrl ])
+  }, [cycle, configObj, configUrl])
 
   return (loadingConfig ? <></> : children)
 }

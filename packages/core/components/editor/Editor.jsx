@@ -19,16 +19,16 @@ import '../../styles/v2/components/element/editor-utils.scss'
 
 const Editor = ({ EditorPanels, children, setParentConfig }) => {
   const { os } = useGlobalStore()
-  const { config, setConfig, updateConfig } = useConfigStore()
+  const { config, setConfig, updateConfig, updateWizardConfig } = useConfigStore()
   const { missingRequiredSections } = config
 
-  const [ displayPanel, setDisplayPanel ] = useState(true)
-  const [ displayGrid, setDisplayGrid ] = useState(false)
-  const [ viewportPreview, setViewportPreview ] = useState(null)
-  const [ rotateAnimation, setRotateAnimation ] = useState(false)
-  const [ showConfirm, setShowConfirm ] = useState(false)
+  const [displayPanel, setDisplayPanel] = useState(true)
+  const [displayGrid, setDisplayGrid] = useState(false)
+  const [viewportPreview, setViewportPreview] = useState(null)
+  const [rotateAnimation, setRotateAnimation] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
-  const [ previewDimensions, setPreviewDimensions ] = useState({})
+  const [previewDimensions, setPreviewDimensions] = useState({})
 
   const resetIcon = useRef(null)
   const editorPanelRef = useRef(null)
@@ -49,36 +49,36 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
   // Toggle the grid display with the viewport preview
   useEffect(() => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
-  }, [ viewportPreview ])
+  }, [viewportPreview])
 
   // Update the local config object, if the component config context changes
-/*
-  useEffect(() => {
-    setConfig({ ...contextConfig })
-  }, [ contextConfig ])
-*/
+  /*
+    useEffect(() => {
+      setConfig({ ...contextConfig })
+    }, [ contextConfig ])
+  */
 
   // If missing any required sections, enable the confirmation window,
   // and keep active until receiving confirmation.
   useEffect(() => {
     if (missingRequiredSections === true) setShowConfirm(true)
     if (missingRequiredSections === false && showConfirm === true) setShowConfirm(false)
-  }, [ missingRequiredSections, showConfirm ])
+  }, [missingRequiredSections, showConfirm])
 
   // If there is no longer a confirmation, update the component's config.
   useEffect(() => {
     if (showConfirm === false) updateConfig(convertStateToConfig())
-  }, [ showConfirm ])
+  }, [showConfirm])
 
   // If a subcomponent of Wizard or Dashboard, pass config
   // up to said parent, if the component's config is updated.
   useEffect(() => {
-    if (setParentConfig) setParentConfig(convertStateToConfig())
-  }, [ config ])
+    if (updateWizardConfig) updateWizardConfig(convertStateToConfig())
+  }, [config, updateWizardConfig])
 
   const viewportPreviewController = useCallback((breakpoint) => {
     return setViewportPreview(prevState => prevState !== breakpoint ? breakpoint : null)
-  }, [ viewportPreview ])
+  }, [viewportPreview])
 
   const onKeypress = (key) => {
     if (key.code === 'Escape') setDisplayPanel(display => !display)
@@ -154,12 +154,12 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
 
       return () => clearTimeout(timeoutShow)
     }
-  }, [ rotateAnimation ])
+  }, [rotateAnimation])
 
   return (
     <div className={`cove-editor${displayPanel ? ' panel-shown' : ''}`}>
       <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
-              title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
+        title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} />
       <section className="cove-editor__panel" tabIndex={0} ref={editorPanelRef}>
         <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
         <div className="cove-editor__panel-container">
@@ -171,7 +171,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
         </div>
       </section>
       <div className="cove-editor__content" data-grid={displayGrid || null}>
-        {showConfirm && <Confirm/>}
+        {showConfirm && <Confirm />}
         <div className="cove-editor__content-wrap--x" style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}>
           <div className="cove-editor__content-wrap--y">
             <div className="cove-editor-utils__breakpoints--px">
@@ -182,7 +182,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
             <div className="cove-editor__grid-caret--top" ref={componentContainerRef}>
               <div className="cove-editor__grid-caret--bottom">
                 {undefined === config?.newViz && config?.runtime && config?.runtime?.editorErrorMessage &&
-                  <SplashError title="Error With Configuration" message={config.runtime.editorErrorMessage}/>
+                  <SplashError title="Error With Configuration" message={config.runtime.editorErrorMessage} />
                 }
                 {children}
               </div>
@@ -201,7 +201,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
             <p className={displayGrid ? 'hotkey--active' : null}>G</p>
             <p className={rotateAnimation ? 'hotkey--active' : null}>R</p>
             <p className={viewportPreview ? 'hotkey--active' : null}>
-              {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display="command" size={12}/> : 'Alt'} + {viewportPreview ? (breakpoints.indexOf(viewportPreview) + 1) : `[1 - ${breakpoints.length}]`}
+              {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display="command" size={12} /> : 'Alt'} + {viewportPreview ? (breakpoints.indexOf(viewportPreview) + 1) : `[1 - ${breakpoints.length}]`}
             </p>
           </div>
         </div>
@@ -211,7 +211,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
               setDisplayGrid(display => !display)
             }}>
               <div className="cove-editor-utils__breakpoints-grid">
-                <Icon display="squareGrid"/>
+                <Icon display="squareGrid" />
               </div>
             </li>
             {breakpoints.map((breakpoint, index) => (
@@ -221,7 +221,7 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
               resetPreview()
             }}>
               <div className="cove-editor-utils__breakpoints-reset" ref={resetIcon}>
-                <Icon display="rotateLeft"/>
+                <Icon display="rotateLeft" />
               </div>
             </li>
           </ul>
