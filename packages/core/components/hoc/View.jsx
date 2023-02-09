@@ -16,13 +16,13 @@ import '../../styles/v2/main.scss'
 const View = ({ EditorPanels, isWizard, children }) => {
   const { viewMode, setViewMode } = useGlobalStore()
 
+  const winLocation = window.location.href
+
   useEffect(() => {
-    if (window.location.href.includes('editor=true')) {
-      if (isWizard) return setViewMode('wizard') //Supplied by Wizard (previously named Editor)
-      return setViewMode('editor')
-    }
+    if (winLocation.includes('editor=true')) return setViewMode('editor')
+    if (isWizard) return setViewMode('wizard') //Supplied by Wizard (previously named Editor)
     return () => {}
-  }, [isWizard, setViewMode])
+  }, [winLocation, isWizard, setViewMode])
 
   // Define the anchor ref to attach the Overlay/Modals to
   const coveAnchor = useRef()

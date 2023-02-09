@@ -86,7 +86,9 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
 
     if (viewportCommandKey) {
-      key.preventDefault()
+      // Ignore non-numeric keys
+      if (!!key.code.match(/^\d+$/)) key.preventDefault()
+
       const keyIndex = key.key - 1
       if (keyIndex <= breakpoints.length)
         viewportPreviewController(breakpoints[keyIndex])

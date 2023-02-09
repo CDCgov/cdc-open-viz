@@ -33,13 +33,19 @@ const FilteredText = ({ configObj, configUrl }) => {
     return filteredData
   }
 
-  return (<>{
-    filteredText().slice(0, 1).map((entry, i) => (
-      <p key={i}>
-        {parse(entry[config.textColumn] || '')}
-      </p>
-    ))
-  }</>)
+  return (<>
+    {config.missingRequiredSections && <>Missing data in sections</>}
+    {!config.missingRequiredSections && <>
+      {
+        filteredText().slice(0, 1).map((entry, i) => (
+          <p key={i}>
+            {parse(entry[config.textColumn] || '')}
+          </p>
+        ))
+      }
+    </>
+    }
+  </>)
 }
 
 export default FilteredText

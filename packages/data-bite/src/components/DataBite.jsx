@@ -310,7 +310,8 @@ const DataBite = () => {
   const showBite = undefined !== config.dataColumn && undefined !== config.dataFunction
 
   return <>
-    {!config.missingRequiredSections && !config.newViz && (<>
+    {config.missingRequiredSections && <>Missing data in sections</>}
+    {!config.missingRequiredSections && (<>
       <div className={`cove-data-bite__container${config.fontSize ? ' font-' + config.fontSize : ''}`} flow={config.biteFlow}>
         {showBite && 'graphic' === config.biteStyle && isTop &&
           <div className="cove-data-bite__callout">

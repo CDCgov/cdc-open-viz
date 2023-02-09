@@ -30,7 +30,7 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
 // Visualization
 const WaffleChart = ({ configObj, configUrl }) => {
-  const { config, missingRequiredSections } = useConfigStore()
+  const { config } = useConfigStore()
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
@@ -197,7 +197,8 @@ const WaffleChart = ({ configObj, configUrl }) => {
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   return <>
-    {!missingRequiredSections && (<>
+    {config.missingRequiredSections && <>Missing data in sections</>}
+    {!config.missingRequiredSections && (<>
       <div
         className={`cove-waffle-chart__container${config.orientation === 'vertical' ? ' cove-waffle-chart__container--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
         <div className="cove-waffle-chart__visualization" style={{ width: setRatio() }}>

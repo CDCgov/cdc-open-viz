@@ -61,7 +61,7 @@ GuidanceBlock.Content = GuidanceContent
 GuidanceBlock.propTypes = {
   /** Specify an internal/external link that is opened when users click the Guidance Block */
   linkTo: PropTypes.string,
-  /** Display an icon by your block by supplying a valid Icon component code; see the Components/UI/Icon section for options */
+  /** Display an icon by your block by supplying a valid Icon component code; see the [Components/UI/Icon](../?path=/docs/components-ui-icon--docs) section for options */
   icon: PropTypes.string,
   /** Specify the `target` namespace for the link to use when opened. `_blank` can be used to open the link in a new tab */
   target: PropTypes.string,
