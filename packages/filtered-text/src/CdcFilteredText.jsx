@@ -17,10 +17,10 @@ import FilteredText from './components/FilteredText'
 import './scss/cove-filtered-text.scss'
 
 // Visualization
-const CdcFilteredText = ({ config: configObj, configUrl, setConfig, isWizard = false }) => {
+const CdcFilteredText = ({ config: configObj, configUrl, setConfig: setWizardConfig, isWizard = false }) => {
   return (
     <ErrorBoundary component="CdcFilteredText">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
+      <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults}>
         <View EditorPanels={EditorPanels} isWizard={isWizard}>
           <Component className="cove-filtered-text">
             <FilteredText/>

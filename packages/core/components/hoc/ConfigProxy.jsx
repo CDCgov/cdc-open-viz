@@ -11,7 +11,7 @@ import { useConfigStore } from '../../stores/configStore'
 import dataTransform from '../../helpers/dataTransform'
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
-const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, children }) => {
+const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
   const { setConfigDefaults, updateConfig } = useConfigStore()
 
@@ -86,6 +86,8 @@ const ConfigProxy = ({ configObj, configUrl, defaults = null, runtime = null, ch
     if (!cycle) {
       fetchConfig()
         .then((newConfig) => {
+          // Pass up to Editor if needed
+          if (setWizardConfig) setWizardConfig(newConfig)
           updateConfig(newConfig, runtime) // Set final config data in ConfigContext, TODO: COVE Refactor - is this being parsed properly? Is runtime being attached?
           setLoadingConfig(false) // Tell subcomponents that the config is ready
         })
