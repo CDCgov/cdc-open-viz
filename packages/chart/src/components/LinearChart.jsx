@@ -162,6 +162,7 @@ export default function LinearChart() {
     }
 
     if (config.visualizationType === 'Paired Bar') {
+      const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
         data.map(d => d[config.series[0].dataKey])
@@ -173,7 +174,7 @@ export default function LinearChart() {
 
       // group one
       var g1xScale = scaleLinear({
-        domain: [0, Math.max(groupOneMax, groupTwoMax)],
+        domain: [0, Math.max(groupOneMax, groupTwoMax) * offset],
         range: [xMax / 2, 0]
       })
 
