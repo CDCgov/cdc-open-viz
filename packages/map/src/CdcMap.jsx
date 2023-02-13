@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import * as d3 from 'd3'
 
 // IE11
@@ -242,6 +242,22 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     obj.data.fromColumn = fromColumn
   })
+
+  const generateRuntimeLegendHash = () => {
+    return hashObj({
+      color: state.color,
+      customColors: state.customColors,
+      numberOfItems: state.legend.numberOfItems,
+      type: state.legend.type,
+      separateZero: state.legend.separateZero ?? false,
+      primary: state.columns.primary.name,
+      categoryValuesOrder: state.legend.categoryValuesOrder,
+      specialClasses: state.legend.specialClasses,
+      geoType: state.general.geoType,
+      data: state.data,
+      ...runtimeFilters
+    })
+  }
 
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
@@ -1256,24 +1272,23 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.general.statePicked])
 
-  
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
-  
+
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
       setState({
-          ...state,
+        ...state,
         dataTable: {
-            ...state.dataTable,
-            title: "Data Table"
-          }
-        })
+          ...state.dataTable,
+          title: 'Data Table'
+        }
+      })
     }
   }, [state.dataTable])
 
@@ -1295,19 +1310,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeLegend,
-      ...runtimeFilters
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     const hashData = hashObj({
       columns: state.columns,
@@ -1336,21 +1339,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state])
 
   useEffect(() => {
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData)
+      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
   }, [runtimeData])
@@ -1412,6 +1405,38 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setRuntimeFilters,
     innerContainerRef
   }
+
+  // Only recalculate county map when needed
+  const countyMapMemo = useMemo(() => {
+    if (runtimeData.fromHash && runtimeLegend.fromHash && 'us-county' === general.geoType) {
+      // If Category Values Order is not valid, wait for recalculation to redraw
+      let valid = true
+      if ('category' === state.legend.type) {
+        if (state.legend.categoryValuesOrder) {
+          runtimeLegend.forEach(item => {
+            if (!item.special && state.legend.categoryValuesOrder.indexOf(item.value) === -1) {
+              valid = false
+            }
+          })
+          let runtimeLegendKeys = runtimeLegend.map(item => item.value)
+          state.legend.categoryValuesOrder.forEach(category => {
+            if (runtimeLegendKeys.indexOf(category) === -1) {
+              valid = false
+            }
+          })
+        } else {
+          valid = false
+        }
+      }
+
+      if (valid) {
+        return <CountyMap supportedCountries={supportedCountries} {...mapProps} />
+      } else {
+        ;<></>
+      }
+    }
+    return <></>
+  }, [runtimeData.fromHash, runtimeLegend.fromHash, state.general.geoBorderColor])
 
   if (!mapProps.data || !state.data) return <Loading />
 
@@ -1486,7 +1511,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                     {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
-                    {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
+                    {'us-county' === general.geoType && countyMapMemo}
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                   </section>
                 )}
