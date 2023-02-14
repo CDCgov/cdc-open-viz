@@ -1220,6 +1220,7 @@ const EditorPanel = () => {
                       <TextField value={config.yAxis.label} section='yAxis' fieldName='label' label='Label' updateField={updateField} />
                       {config.runtime.seriesKeys && config.runtime.seriesKeys.length === 1 && <CheckBox value={config.isLegendValue} fieldName='isLegendValue' label='Use Legend Value in Hover' updateField={updateField} />}
                       <TextField value={config.yAxis.numTicks} placeholder='Auto' type='number' section='yAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
+                      {config.visualizationType === 'Paired Bar' && <TextField value={config.yAxis.tickRotation || 0} type='number' min='0' section='yAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       <TextField
                         value={config.yAxis.size}
                         type='number'
@@ -1239,7 +1240,6 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-
                       <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
@@ -1773,8 +1773,8 @@ const EditorPanel = () => {
                     {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
                     {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
                     {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
-                    <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                    {/* {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />} */}
+                    {/* <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' /> */}
                   </fieldset>
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />

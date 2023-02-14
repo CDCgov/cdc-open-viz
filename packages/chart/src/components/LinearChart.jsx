@@ -463,16 +463,16 @@ export default function LinearChart() {
           <>
             <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <Group className='bottom-axis'>
                     {props.ticks.map((tick, i) => {
-                      const tickWidth = xMax / props.ticks.length
+                      const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                      const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
-                            <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                            <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                               {formatNumber(tick.formattedValue)}
                             </Text>
                           )}
@@ -495,17 +495,17 @@ export default function LinearChart() {
               numTicks={config.runtime.xAxis.numTicks || undefined}
             >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <>
                     <Group className='bottom-axis'>
                       {props.ticks.map((tick, i) => {
-                        const tickWidth = xMax / props.ticks.length
+                        const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                        const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                         return (
                           <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
-                              <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                              <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                                 {tick.formattedValue}
                               </Text>
                             )}
