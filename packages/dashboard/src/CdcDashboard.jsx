@@ -183,8 +183,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
 
     updateConfig(newConfig, datasets)
     setLoading(false)
-
-    console.log("CdcDash newConfig=",newConfig)
   }
 
   const filterData = (filters, data) => {
@@ -295,8 +293,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
     setConfig(newConfig)
-
-    console.log("CdcDash clear config with newConfig",newConfig)
   }
 
   // Load data when component first mounts
@@ -318,8 +314,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
 
     setConfig(updatedConfig)
-    
-    console.log("updateChildConfig with updatedConfig",updatedConfig)
   }
 
   const Filters = () => {
@@ -506,7 +500,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       )
     }
   } else {
-    console.log("CdcDash ELSE case config=",config)
     body = (
       <>
         {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />}
@@ -559,7 +552,6 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                         const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
                         const tableLink = <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>
-                        console.log("Dashboard visualConfig=",visualizationConfig)
 
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
