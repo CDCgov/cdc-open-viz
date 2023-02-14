@@ -8,31 +8,31 @@
   {
     "name": "Saturn",
     "Radius": "9.14",
-    "Diameter": "18",
+    "Diameter": "NA",
     "distance": "0"
   },
   {
     "name": "Uranus",
-    "Radius": "-10",
+    "Radius": null,
     "Diameter": "8",
     "distance": "0"
   },
   {
     "name": "Neptune",
-    "Radius": "3.86",
+    "Radius": "1,123",
     "Diameter": "7",
     "distance": "0"
   },
   {
     "name": "Earth",
-    "Radius": "1",
+    "Radius": "1,345",
     "Diameter": "2",
     "distance": "0"
   },
   {
     "name": "Venus",
     "Radius": "0.950",
-    "Diameter": "2",
+    "Diameter": "2.",
     "distance": "0"
   },
   {

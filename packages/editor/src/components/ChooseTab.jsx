@@ -184,12 +184,21 @@ export default function ChooseTab() {
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
         </li>
+        {/* temporarily hiding these */}
         {/* <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<GenericIcon />} />
             </Tooltip.Target>
             <Tooltip.Content>Display a box plot</Tooltip.Content>
+          </Tooltip>
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Scatter Plot' type='chart' subType='Scatter Plot' orientation='vertical' icon={<GenericIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display a scatter plot</Tooltip.Content>
           </Tooltip>
         </li> */}
       </ul>

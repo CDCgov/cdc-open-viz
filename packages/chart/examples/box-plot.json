@@ -40,7 +40,6 @@
     "numTicks": "",
     "label": "Observations"
   },
-  "boxplot": [],
   "topAxis": {
     "hasLine": false
   },
@@ -80,6 +79,7 @@
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
+    "hide": true,
     "dynamicLegend": false,
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
@@ -111,7 +111,7 @@
   "dataDescription": {
     "horizontal": false,
     "series": false,
-    "singleRow": false,
+    "singleRow": true,
     "xKey": "Group_Category",
     "valueKey": "Value"
   },

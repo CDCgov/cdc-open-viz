@@ -14,7 +14,7 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => {}
+  const announceChange = text => { }
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.filters
@@ -48,7 +48,7 @@ const useFilters = () => {
 }
 
 const Filters = () => {
-  const { config } = useContext(Context)
+  const { config } = useContext(ConfigContext)
   const { handleApplyButton, changeFilterActive, announceChange, sortAsc, sortDesc, showApplyButton, handleReset } = useFilters()
   const { filters } = config
   const buttonText = 'Apply Filters'
@@ -105,13 +105,7 @@ const Filters = () => {
 
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      {config.filters.length > 0 && (
-        <>
-          <h3 className='filters-section__title'>Filters</h3>
-          <hr />
-        </>
-      )}
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px' }}>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
         <FilterList />
         {config.filters.length > 0 && (
           <div className='filter-section__buttons' style={{ width: '100%' }}>
