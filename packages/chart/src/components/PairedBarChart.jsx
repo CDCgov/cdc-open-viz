@@ -15,6 +15,7 @@ const PairedBarChart = ({ width, height }) => {
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const halfWidth = width / 2
   const fontSize = { small: 16, medium: 18, large: 20 }
+  const offset = 1.02 // Offset of the left bar from the Axis
 
   const groupOne = {
     parentKey: config.dataDescription.seriesKey,
@@ -39,7 +40,7 @@ const PairedBarChart = ({ width, height }) => {
   }
 
   const xScale = scaleLinear({
-    domain: [0, Math.max(groupOne.max, groupTwo.max)],
+    domain: [0, Math.max(groupOne.max * offset, groupTwo.max)],
     range: [0, halfWidth]
   })
 
