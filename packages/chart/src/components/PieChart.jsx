@@ -18,8 +18,10 @@ const enterUpdateTransition = ({ startAngle, endAngle }) => ({
 })
 
 export default function PieChart() {
-  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, config, dimensions, seriesHighlight, colorScale, formatNumber, currentViewport, handleChartAriaLabels, cleanData } = useContext(ConfigContext)
 
+  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
 
@@ -145,7 +147,7 @@ export default function PieChart() {
     <ErrorBoundary component='PieChart'>
       <svg width={width} height={height} className={`animated-pie group ${config.animate === false || animatedPie ? 'animated' : ''}`} role='img' aria-label={handleChartAriaLabels(config)}>
         <Group top={centerY} left={centerX}>
-          <Pie data={filteredData || data} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
+          <Pie data={filteredData || cleanedData} pieValue={d => d[config.runtime.yAxis.dataKey]} pieSortValues={() => -1} innerRadius={radius - donutThickness} outerRadius={radius}>
             {pie => <AnimatedPie {...pie} getKey={d => d.data[config.runtime.xAxis.dataKey]} />}
           </Pie>
         </Group>

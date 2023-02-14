@@ -7,6 +7,7 @@ import { Text } from '@visx/text'
 import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
+import CoveScatterPlot from './ScatterPlot'
 import BarChart from './BarChart'
 import LineChart from './LineChart'
 import ConfigContext from '../ConfigContext'
@@ -60,7 +61,7 @@ export default function LinearChart() {
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
-  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   let xScale
@@ -130,8 +131,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
+            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+          })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -161,6 +162,7 @@ export default function LinearChart() {
     }
 
     if (config.visualizationType === 'Paired Bar') {
+      const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
         data.map(d => d[config.series[0].dataKey])
@@ -172,7 +174,7 @@ export default function LinearChart() {
 
       // group one
       var g1xScale = scaleLinear({
-        domain: [0, Math.max(groupOneMax, groupTwoMax)],
+        domain: [0, Math.max(groupOneMax, groupTwoMax) * offset],
         range: [xMax / 2, 0]
       })
 
@@ -181,6 +183,15 @@ export default function LinearChart() {
         domain: g1xScale.domain(),
         range: [xMax / 2, xMax]
       })
+    }
+
+    if (config.visualizationType === 'Scatter Plot') {
+      if (config.xAxis.type === 'continuous') {
+        xScale = scaleLinear({
+          domain: [0, Math.max.apply(null, xScale.domain())],
+          range: [0, xMax]
+        })
+      }
     }
   }
 
@@ -217,13 +228,13 @@ export default function LinearChart() {
     let minYValue
     let maxYValue
     let allOutliers = []
-    let allLowerBounds = config.boxplot.map(plot => plot.columnMin)
-    let allUpperBounds = config.boxplot.map(plot => plot.columnMax)
+    let allLowerBounds = config.boxplot.plots.map(plot => plot.columnMin)
+    let allUpperBounds = config.boxplot.plots.map(plot => plot.columnMax)
 
     minYValue = Math.min(...allLowerBounds)
     maxYValue = Math.max(...allUpperBounds)
 
-    const hasOutliers = config.boxplot.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier)))
+    const hasOutliers = config.boxplot.plots.map(b => b.columnOutliers.map(outlier => allOutliers.push(outlier))) && !config.boxplot.hideOutliers
 
     if (hasOutliers) {
       let outlierMin = Math.min(...allOutliers)
@@ -255,6 +266,10 @@ export default function LinearChart() {
     ReactTooltip.rebuild()
   })
 
+  const handleTick = tick => {
+    return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
+  }
+
   return isNaN(width) ? (
     <></>
   ) : (
@@ -263,35 +278,35 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+            const from = xScale(parseDate(region.from).getTime())
+            const to = xScale(parseDate(region.to).getTime())
+            const width = to - from
 
-              return (
-                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
+            return (
+              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                <path
+                  stroke='#333'
+                  d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
+                />
+                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                  {region.label}
+                </Text>
+              </Group>
+            )
+          })
           : ''}
 
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
-          <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size)} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
+          <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
             {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -324,15 +339,8 @@ export default function LinearChart() {
                         )}
 
                         {config.orientation === 'horizontal' && config.visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
-                          <Text transform={`translate(${-15}, ${tick.from.y}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'middle'} textAnchor={'end'}>
+                          <Text transform={`translate(${tick.to.x - 5}, ${tick.to.y - minY + Number(config.barHeight) / 2}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} textAnchor={'end'} verticalAnchor='middle'>
                             {tick.formattedValue}
-                          </Text>
-                        )}
-
-                        {config.orientation === 'horizontal' && config.visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
-                          // 17 is a magic number from the offset in barchart.
-                          <Text transform={`translate(${-15}, ${tick.from.y}) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation : 0})`} verticalAnchor={config.isLollipopChart ? 'middle' : 'middle'} textAnchor={'end'}>
-                            {formatNumber(tick.formattedValue)}
                           </Text>
                         )}
 
@@ -409,7 +417,16 @@ export default function LinearChart() {
 
         {/* X axis */}
         {config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Spark Line' && (
-          <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={handleBottomTickFormatting} scale={xScale} stroke='#333' tickStroke='#333' numTicks={countNumOfTicks('xAxis')}>
+          <AxisBottom
+            top={config.runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
+            left={Number(config.runtime.yAxis.size)}
+            label={config.runtime.xAxis.label}
+            tickFormat={handleBottomTickFormatting}
+            scale={xScale}
+            stroke='#333'
+            tickStroke='#333'
+            numTicks={countNumOfTicks('xAxis')}
+          >
             {props => {
               const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
               return (
@@ -445,18 +462,27 @@ export default function LinearChart() {
 
         {config.visualizationType === 'Paired Bar' && (
           <>
-            <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
+            <AxisBottom
+              top={yMax}
+              left={Number(config.runtime.yAxis.size)}
+              label={config.runtime.xAxis.label}
+              tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber}
+              scale={g1xScale}
+              stroke='#333'
+              tickStroke='#333'
+              numTicks={config.runtime.xAxis.numTicks || undefined}
+            >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <Group className='bottom-axis'>
                     {props.ticks.map((tick, i) => {
-                      const tickWidth = xMax / props.ticks.length
+                      const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                      const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
-                            <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                            <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                               {formatNumber(tick.formattedValue)}
                             </Text>
                           )}
@@ -479,17 +505,17 @@ export default function LinearChart() {
               numTicks={config.runtime.xAxis.numTicks || undefined}
             >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <>
                     <Group className='bottom-axis'>
                       {props.ticks.map((tick, i) => {
-                        const tickWidth = xMax / props.ticks.length
+                        const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                        const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                         return (
                           <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
-                              <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                              <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                                 {tick.formattedValue}
                               </Text>
                             )}
@@ -499,7 +525,7 @@ export default function LinearChart() {
                       {!config.runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
                     </Group>
                     <Group>
-                      <Text transform={`translate(${xMax / 2}, ${yMax + 20}) rotate(-${0})`} verticalAnchor='start' textAnchor={'middle'} stroke='#333'>
+                      <Text x={xMax / 2} y={config.xAxis.labelOffset} stroke='#333' textAnchor={'middle'} verticalAnchor='start'>
                         {config.runtime.xAxis.label}
                       </Text>
                     </Group>
@@ -512,18 +538,20 @@ export default function LinearChart() {
         {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
 
         {/* Bar chart */}
-        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
+        {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />
           </>
         )}
 
         {/* Line chart */}
-        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && (
+        {config.visualizationType !== 'Bar' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
           <>
             <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
           </>
         )}
+
+        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
 
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>

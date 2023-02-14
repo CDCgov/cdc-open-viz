@@ -15,11 +15,11 @@ import ReactTooltip from 'react-tooltip'
 import useReduceData from '../hooks/useReduceData'
 
 import ConfigContext from '../ConfigContext'
-
+  
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, handleChartAriaLabels } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
-  const { minValue, maxValue } = useReduceData(config, data)
+  const { minValue, maxValue } = useReduceData(config, data, ConfigContext)
 
   const margin = { top: 5, right: 10, bottom: 10, left: 10 }
   const height = parentHeight
@@ -37,7 +37,44 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   const isMaxValid = Number(enteredMaxValue) >= Number(maxValue)
   const isMinValid = Number(enteredMinValue) <= Number(minValue)
 
-  if (data) {
+
+  // REMOVE bad data points from the data set
+  // Examples: NA, N/A, "1,234", "anystring"
+  // - if you dont call this on data into LineGroup below, for example
+  // then entire data series are removed because of the defined statement
+  // i.e. if a series has any bad data points the entire series wont plot
+   const cleanData = (data, testing = false) => {
+    let cleanedup = []
+    if (testing) console.log('## Data to clean=', data)
+    data.forEach(function (d, i) {
+      let cleanedSeries = {}
+      Object.keys(d).forEach(function (key) {
+        if (key === 'Date') {
+          // pass thru the dates
+          cleanedSeries[key] = d[key]
+        } else {
+          // remove comma and dollar signs
+          let tmp = d[key] != null && d[key] != '' ? d[key].replace(/[,\$]/g, '') : ''
+          if (testing) console.log("tmp no comma or $", tmp)
+          if ((tmp !== '' && tmp !== null && !isNaN(tmp)) || (tmp !== '' && tmp !== null && /\d+\.?\d*/.test(tmp))) {
+            cleanedSeries[key] = tmp
+          } else {
+            // return nothing to skip bad data point
+            cleanedSeries[key] = '' // returning blank fixes broken chart draw
+          }
+        }
+      })
+      cleanedup.push(cleanedSeries)
+    })
+    if (testing) console.log('## cleanedData =', cleanedup)
+    return cleanedup
+   }
+  
+  // Just do this once up front otherwise we end up 
+  // calling clean several times on same set of data (TT)
+  const cleanedData = cleanData(data, config.xAxis.dataKey);
+
+  if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
@@ -52,7 +89,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
       max += paddingValue
     }
 
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
+    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
 
     if (config.runtime.horizontal) {
       xScale = scaleLinear({
@@ -89,7 +126,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   }
 
   const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]]
-
+  
   useEffect(() => {
     ReactTooltip.rebuild()
   })
@@ -108,7 +145,7 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {data.map((d, dataIndex) => {
+              {cleanedData.map((d, dataIndex) => {
                 let yAxisTooltip = config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ${formatNumber(getYAxisData(d, seriesKey))}` : formatNumber(getYAxisData(d, seriesKey))
                 let xAxisTooltip = config.runtime.xAxis.label ? `${config.runtime.xAxis.label}: ${d[config.runtime.xAxis.dataKey]}` : d[config.runtime.xAxis.dataKey]
 
@@ -142,20 +179,20 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
               })}
               <LinePath
                 curve={allCurves.curveLinear}
-                data={data}
+                data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
                 y={d => yScale(getYAxisData(d, seriesKey))}
                 stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                 strokeWidth={2}
                 strokeOpacity={1}
                 shapeRendering='geometricPrecision'
-                marker-end={`url(#${'arrow'}--${index})`}
+                markerEnd={`url(#${'arrow'}--${index})`}
               />
               <MarkerArrow
                 id={`arrow--${index}`}
                 refX={2}
                 size={6}
-                marker-end={`url(#${'arrow'}--${index})`}
+                markerEnd={`url(#${'arrow'}--${index})`}
                 strokeOpacity={1}
                 fillOpacity={1}
                 // stroke={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}

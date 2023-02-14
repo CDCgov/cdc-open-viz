@@ -1,6 +1,6 @@
 {
   "type": "chart",
-  "title": "Example Bar Chart",
+  "title": "Scatter Plot",
   "theme": "theme-blue",
   "animate": false,
   "fontSize": "medium",
@@ -18,11 +18,12 @@
     "right": 5
   },
   "yAxis": {
+    "dataKey": "y",
     "hideAxis": false,
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "150",
+    "size": 50,
     "gridLines": true,
     "min": "",
     "max": "",
@@ -30,27 +31,28 @@
     "tickLabelColor": "#333",
     "tickColor": "#333",
     "rightHideAxis": true,
-    "rightAxisSize": 0,
+    "rightAxisSize": 50,
     "rightLabelOffsetSize": 0,
     "rightAxisLabelColor": "#333",
     "rightAxisTickLabelColor": "#333",
     "rightAxisTickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "label": "Y Axis Example Label"
+    "label": "Y Axis"
   },
+  "boxplot": [],
   "topAxis": {
     "hasLine": false
   },
-  "barThickness": "0.6",
+  "barThickness": 0.35,
   "barHeight": 25,
   "height": 300,
   "xAxis": {
-    "type": "categorical",
+    "type": "continuous",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
-    "size": "59",
+    "size": 75,
     "tickRotation": 0,
     "min": "",
     "max": "",
@@ -59,17 +61,16 @@
     "tickColor": "#333",
     "isLegendValue": false,
     "numTicks": "",
-    "dataKey": "Date",
-    "label": "X Axis Example Label"
+    "dataKey": "x",
+    "label": "X Axis"
   },
   "table": {
-    "label": "Data Type by Date",
-    "expanded": false,
+    "label": "Data Table",
+    "expanded": true,
     "limitHeight": false,
     "height": "",
     "caption": "",
-    "show": true,
-    "download": true
+    "show": true
   },
   "orientation": "vertical",
   "legend": {
@@ -83,20 +84,20 @@
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
-    "dynamicLegendChartMessage": "Select Options from the Legend",
-    "label": "Type of Data"
+    "dynamicLegendChartMessage": "Select Options from the Legend"
   },
   "exclusions": {
     "active": false,
     "keys": []
   },
-  "palette": "qualitative-bold",
+  "palette": "qualitative1",
   "isPaletteReversed": false,
   "labels": false,
   "dataFormat": {
     "commas": false,
     "prefix": "",
-    "suffix": " units"
+    "suffix": "",
+    "useFormat": false
   },
   "confidenceKeys": {},
   "visual": {
@@ -104,77 +105,32 @@
     "accent": true,
     "background": true
   },
-  "data": [
-    {
-      "Date": "1/15/2016",
-      "Data 1": "900",
-      "Data 2": "135",
-      "Data 3": "300",
-      "Data 4": "95",
-      "Data 5": "120",
-      "Data 6": "3100"
-    },
-    {
-      "Date": "2/15/2016",
-      "Data 1": "4000",
-      "Data 2": "90",
-      "Data 3": "240",
-      "Data 4": "60",
-      "Data 5": "160",
-      "Data 6": "2000"
-    },
-    {
-      "Date": "3/15/2016",
-      "Data 1": "5000",
-      "Data 2": "300",
-      "Data 3": "290",
-      "Data 4": "100",
-      "Data 5": "200",
-      "Data 6": "2500"
-    },
-    {
-      "Date": "4/15/2016",
-      "Data 1": "12000",
-      "Data 2": "160",
-      "Data 3": "230",
-      "Data 4": "180",
-      "Data 5": "160",
-      "Data 6": "2200"
-    },
-    {
-      "Date": "5/15/2016",
-      "Data 1": "8000",
-      "Data 2": "350",
-      "Data 3": "300",
-      "Data 4": "150",
-      "Data 5": "130",
-      "Data 6": "1000"
-    },
-    {
-      "Date": "6/15/2016",
-      "Data 1": "9000",
-      "Data 2": "-2200",
-      "Data 3": "320",
-      "Data 4": "100",
-      "Data 5": "220",
-      "Data 6": "-3000"
-    }
-  ],
-  "visualizationType": "Bar",
+  "dataUrl": "/examples/scatterplot-continuous.csv",
+  "visualizationType": "Scatter Plot",
+  "description": "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false,
+    "singleRow": false,
+    "xKey": "Group_Category",
+    "valueKey": "Value"
+  },
   "series": [
     {
-      "dataKey": "Data 1",
+      "dataKey": "y1",
       "type": "Bar"
     },
     {
-      "dataKey": "Data 2",
+      "dataKey": "y2",
       "type": "Bar"
     },
     {
-      "dataKey": "Data 3",
+      "dataKey": "y3",
+      "type": "Bar"
+    },
+    {
+      "dataKey": "y4",
       "type": "Bar"
     }
-  ],
-  "description": "This example shows a bar chart created in the visualization editor in WCMS",
-  "dataCutoff": "0"
+  ]
 }
