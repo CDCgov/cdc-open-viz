@@ -37,7 +37,8 @@ export default {
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
     numTicks: '',
-    axisPadding: 0
+    axisPadding: 0,
+    tickRotation: 0
   },
   boxplot: {
     plots: [],
