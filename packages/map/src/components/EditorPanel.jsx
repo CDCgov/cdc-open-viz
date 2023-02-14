@@ -168,6 +168,16 @@ const EditorPanel = props => {
         })
         break
 
+      case 'toggleDataTableLink':
+        setState({
+          ...state,
+          table: {
+            ...state.table,
+            showDataTableLink: value
+          }
+        })
+        break
+      
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -2246,7 +2256,7 @@ const EditorPanel = props => {
                         }}
                       />
                       <span className='edit-label'>
-                        Show Table
+                        Show Data Table
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -2278,16 +2288,30 @@ const EditorPanel = props => {
                       />
                       <span className='edit-label'>Map loads with data table expanded</span>
                     </label>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.table.showDownloadUrl}
-                        onChange={event => {
-                          handleEditorChanges('toggleDataUrl', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Enable Link to Dataset</span>
-                    </label>
+                    {isDashboard &&
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDataTableLink}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataTableLink', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show Data Table Name & Link</span>
+                      </label>
+                    }
+                    {isDashboard &&
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.table.showDownloadUrl}
+                          onChange={event => {
+                            handleEditorChanges('toggleDataUrl', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show URL to Automatically Updated Data</span>
+                      </label>
+                    }
                     <label className='checkbox'>
                       <input
                         type='checkbox'
@@ -2296,7 +2320,7 @@ const EditorPanel = props => {
                           handleEditorChanges('toggleDownloadButton', event.target.checked)
                         }}
                       />
-                      <span className='edit-label'>Enable Download CSV Button</span>
+                      <span className='edit-label'>Show Download CSV Link</span>
                     </label>
                     {/* <label className='checkbox'>
                       <input

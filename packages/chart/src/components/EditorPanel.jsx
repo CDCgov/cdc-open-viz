@@ -286,10 +286,10 @@ const EditorPanel = () => {
     }
   }
 
-  const updateField = (section, subsection, fieldName, newValue) => {
-    console.log('new value', newValue)
-    console.log('section', section)
-    console.log('sub', subsection)
+  const updateField = (section, subsection, fieldName, newValue, testing = true) => {
+    if (testing) console.log('fieldName, new value', fieldName, newValue)
+    if (testing) console.log('section', section)
+    if (testing) console.log('sub', subsection)
 
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
@@ -330,7 +330,7 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-    console.log('section value', sectionValue)
+    if (testing) console.log('section value', sectionValue)
 
     if (null !== subsection) {
       if (isArray) {
@@ -348,6 +348,8 @@ const EditorPanel = () => {
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
+
+    console.log("Chart EditorPanel updateConfig=",updatedConfig)
   }
 
   const [displayPanel, setDisplayPanel] = useState(true)
@@ -569,6 +571,7 @@ const EditorPanel = () => {
     if (setParentConfig) {
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
+      console.log("## EditorPanel newConfig=",newConfig)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1929,7 +1932,7 @@ const EditorPanel = () => {
                     value={config.table.show}
                     section='table'
                     fieldName='show'
-                    label='Show Table'
+                    label='Show Data Table'
                     updateField={updateField}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -1964,8 +1967,9 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.limitHeight} section='table' fieldName='limitHeight' label='Limit Table Height' updateField={updateField} />
                   {config.table.limitHeight && <TextField value={config.table.height} section='table' fieldName='height' label='Data Table Height' type='number' min='0' max='500' placeholder='Height(px)' updateField={updateField} />}
                   <CheckBox value={config.table.expanded} section='table' fieldName='expanded' label='Expanded by Default' updateField={updateField} />
-                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Display Download Button' updateField={updateField} />
-                  <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
+                  {isDashboard && <CheckBox value={config.table.showDataTableLink} section='table' fieldName='showDataTableLink' label='Show Data Table Name & Link' updateField={updateField} />}
+                  {isDashboard && <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Show URL to Automatically Updated Data' updateField={updateField} />}
+                  <CheckBox value={config.table.download} section='table' fieldName='download' label='Show Download CSV Link' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
                   <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
