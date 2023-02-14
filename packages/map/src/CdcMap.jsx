@@ -1440,6 +1440,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }
 
   const tabId = handleMapTabbing()
+  
+  // this only shows in Dashboard config mode and only if Show Table is also set
+  const tableLink = <a href={`#data-table-${config.dataKey}`}>{config.dataKey} (Go to Table)</a>
 
   return (
     <Context.Provider value={mapProps}>
@@ -1514,7 +1517,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
             {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
 
-            {link && link}
+            {/* Link */}
+            {isDashboard && config.dataTable.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
 
             {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
 

@@ -46,7 +46,7 @@ import './scss/main.scss'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
-
+  
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
@@ -699,6 +699,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let body = <Loading />
 
   if (!loading) {
+    const tableLink = <a href={`#data-table-${config.dataKey}`}>{config.dataKey} (Go to Table)</a>
     body = (
       <>
         {isEditor && <EditorPanel />}
@@ -744,7 +745,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {!config.legend.hide && config.visualizationType !== 'Spark Line' && <Legend />}
             </div>
             {/* Link */}
-            {link && link}
+            {isDashboard && config.table && config.table.show && config.table.showDataTableLink ? tableLink : link && link}
+
             {/* Description */}
             {description && config.visualizationType !== 'Spark Line' && <div className='subtext'>{parse(description)}</div>}
 
