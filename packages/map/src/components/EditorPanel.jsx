@@ -241,6 +241,7 @@ const EditorPanel = props => {
           }
         })
         break
+      
       case 'expandDataTable':
         setState({
           ...state,
