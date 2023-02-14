@@ -2192,6 +2192,26 @@ const EditorPanel = props => {
                     <AccordionItemButton>Data Table</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
+                        onChange={event => {
+                          handleEditorChanges('showDataTable', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>
+                        Show Data Table
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                    </label>
                     <TextField
                       value={dataTable.title}
                       updateField={updateField}
@@ -2247,26 +2267,6 @@ const EditorPanel = props => {
                       }
                       type='textarea'
                     />
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={state.dataTable.forceDisplay !== undefined ? state.dataTable.forceDisplay : !isDashboard}
-                        onChange={event => {
-                          handleEditorChanges('showDataTable', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>
-                        Show Data Table
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Data tables are required for 508 compliance. When choosing to hide this data table, replace with your own version.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </span>
-                    </label>
                     <label className='checkbox'>
                       <input
                         type='checkbox'
