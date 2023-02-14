@@ -35,7 +35,9 @@ import iconLinkExternal from '../assets/icon-link-external.svg'
 import iconMapAl from '../assets/icon-map-alabama.svg'
 import iconMapFolded from '../assets/icon-map-folded.svg'
 import iconMapUsa from '../assets/icon-map-usa.svg'
+import iconMapUsaRegions from '../assets/icon-map-usa-regions.svg'
 import iconMapWorld from '../assets/icon-map-world.svg'
+import iconMapWorldAsia from '../assets/icon-map-world-asia.svg'
 import iconMinus from '../assets/icon-minus.svg'
 import iconMove from '../assets/icon-move.svg'
 import iconPlus from '../assets/icon-plus.svg'
@@ -84,7 +86,9 @@ const iconHash = {
   'mapAl': iconMapAl,
   'mapFolded': iconMapFolded,
   'mapUsa': iconMapUsa,
+  'mapUsaRegions': iconMapUsaRegions,
   'mapWorld': iconMapWorld,
+  'mapWorldAsia': iconMapWorldAsia,
   'minus': iconMinus,
   'move': iconMove,
   'plus': iconPlus,

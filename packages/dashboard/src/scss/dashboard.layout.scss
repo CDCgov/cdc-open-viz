@@ -1,0 +1,48 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+$blue-light: #8bc6f7;
+$UI-red: #f74242;
+
+.cove-dashboard {
+}
+
+.cove-dashboard__sidebar {
+  padding: 0.875rem;
+  background-color: #fff;
+  border-right: #c7c7c7 1px solid;
+  overflow-y: auto;
+}
+
+.cove-dashboard__sidebar-title {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: $blue;
+}
+
+.cove-dashboard__header,
+.cove-dashboard__content {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+}
+
+.cove-dashboard__header {
+  padding: 0 1rem;
+  background-color: #ddd;
+  border-bottom: #c7c7c7 1px solid;
+}
+
+.cove-dashboard__data-table {
+  display: inline-block;
+  width: 100%;
+  margin: 15px 0 0;
+}
+
+.cove-dashboard__viz-grid {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 2rem;
+}
+
+

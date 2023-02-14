@@ -4,9 +4,13 @@ import PropTypes from 'prop-types'
 // Styles
 import '../../styles/v2/components/ui/alert.scss'
 
-const AlertBox = ({ type = 'basic', inline = false, children }) => {
+const AlertBox = ({ type = 'basic', inline = false, children, className, attributes }) => {
   return (
-    <div className={`cove-alert cove-alert--${type}` + (inline ? ' cove-alert--inline' : '')}>
+    <div className={
+        `cove-alert cove-alert--${type}`
+        + (inline ? ' cove-alert--inline' : '')
+        + (className ? ' ' + className : '')
+      } {...attributes}>
       {children}
     </div>
   )

@@ -51,7 +51,7 @@ const Modal = ({
           padding: !modalHeaderChildren ? '0' : null,
           minHeight: !modalHeaderChildren ? 'unset' : null
         }}>
-          {modalHeaderChildren && modalHeaderChildren.props.children}
+          {modalHeaderChildren && modalHeaderChildren?.props?.children}
           {showClose &&
             <button className="cove-modal--close"
                     onClick={(e) => {
@@ -65,7 +65,7 @@ const Modal = ({
       }
 
       <div className="cove-modal__content">
-        {modalContentChildren && modalContentChildren.props.children}
+        {modalContentChildren && modalContentChildren?.props?.children}
       </div>
 
       {modalFooterChildren &&
@@ -73,7 +73,7 @@ const Modal = ({
           boxShadow: dividerBorder(showDividerBottom),
           paddingTop: showDividerBottom ? '1rem' : null
         }}>
-          {modalFooterChildren.props.children}
+          {modalFooterChildren?.props?.children}
         </div>
       }
     </div>

@@ -11,15 +11,12 @@ import '../../styles/v2/components/element/guidance-block.scss'
 const GuidanceTitle = () => null
 const GuidanceContent = () => null
 
-const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor, children, ...attributes }) => {
+const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor, children, className, ...attributes }) => {
 
   //Parse, organize, and pull "slotted" children data from subcomponents
   const childNodes = Children.toArray(children)
   const guidanceTitleChildren = childNodes.find(child => child?.type === GuidanceTitle)
   const guidanceContentChildren = childNodes.find(child => child?.type === GuidanceContent)
-
-  const filteredAttrs = { ...attributes }
-  delete filteredAttrs.className //Remove classes from object, spread without conflicting with hardcoded classNames
 
   return (<>
     {accentColor && (
@@ -30,10 +27,10 @@ const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor, children,
       </style>
     )}
     <a
-      className="cove-guidance-block"
+      className={`cove-guidance-block${className ? ' ' + className : ''}`}
       href={linkTo || '#'}
       target={target}
-      {...filteredAttrs}
+      {...attributes}
     >
       {icon && (
         <div className="cove-guidance-block__icon" style={{ color: accentColor ? accentColor : null }}>

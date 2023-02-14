@@ -244,7 +244,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
   }
 
   return (
-    <div aria-level='2' role='heading' className={`editor-heading${subEditor ? ' sub-dashboard-viz' : ''}`}>
+    <header className="cove-dashboard__header" role='heading' aria-level='2'>
       {subEditor ? (
         <div className='heading-1 back-to' onClick={back} style={{ cursor: 'pointer' }}>
           <span>&#8592;</span> Back to Dashboard
@@ -362,9 +362,8 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
             )}
           </div>
         </div >
-      )
-      }
-    </div >
+      )}
+    </header >
   )
 }
 

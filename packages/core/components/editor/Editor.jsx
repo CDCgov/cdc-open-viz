@@ -86,13 +86,19 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
 
     if (viewportCommandKey) {
-      // Ignore non-numeric keys
-      if (!!key.code.match(/^\d+$/)) key.preventDefault()
+      let keyIndex = key.key
 
-      const keyIndex = key.key - 1
-      if (keyIndex <= breakpoints.length)
-        viewportPreviewController(breakpoints[keyIndex])
-    } else {
+      // Validates that the hotkey pressed is a number, and that
+      // the number is within the range of the provided breakpoint list range.
+      if (!isNaN(keyIndex)) {
+        if (keyIndex <= breakpoints.length) {
+          key.preventDefault()
+          viewportPreviewController(breakpoints[keyIndex - 1])
+        }
+      }
+    }
+
+    if (!viewportCommandKey) {
       if (!editorPanelRef.current.contains(document.activeElement)) {
         if (key.code === 'KeyG') setDisplayGrid(display => !display)
         if (key.code === 'KeyR') resetPreview()

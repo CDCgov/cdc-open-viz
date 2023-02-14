@@ -1854,7 +1854,7 @@ const EditorPanel = props => {
                           Additional Category
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>You can provide additional categories to ensure they appear in the legend</p>
@@ -2185,7 +2185,7 @@ const EditorPanel = props => {
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            <Icon display='questionCircle' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>Label is required for Data Table for 508 Compliance</p>

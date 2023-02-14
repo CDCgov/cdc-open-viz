@@ -119,13 +119,13 @@ const EditorPanels = () => {
   // Panels -----------------------------------------------
   const panelGeneral = (
     <Accordion.Section label="General">
+      <InputText label="Title" configField="title" placeholder="Data bite Title"/>
+
       <InputSelect label="Data bite Style" options={BITE_LOCATIONS} configField="biteStyle" initialDisabled/>
 
       {[ 'graphic' ].includes(config.biteStyle) &&
         <InputSelect label="Graphic Position" options={IMAGE_POSITIONS} configField="bitePosition" initialDisabled/>
       }
-
-      <InputText label="Title" configField="title" placeholder="Data bite Title"/>
 
       <InputText label="Message" configField="biteBody" type="textarea" tooltip={<>
         <p>

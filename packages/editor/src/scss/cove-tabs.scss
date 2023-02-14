@@ -1,0 +1,90 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+.cove-tabs {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: 100%;
+}
+
+.cove-tabs__tab-list {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.cove-tabs__tab {
+  display: flex;
+  flex: 1 1 0;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 3rem;
+  padding: 0.75rem 0;
+  font-size: 0.875rem;
+  line-height: 1em;
+  text-align: center;
+  color: $baseColor;
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: $lightGray;
+    transition: all 400ms $transition-expo-out;
+  }
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &.active {
+    color: $blue;
+
+    &::after {
+      top: calc(100% - 5px);
+      height: 5px;
+      background-color: $blue;
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  &.cove-tabs__tab--fullsize {
+    color: #333;
+    background-color: $lightestGray;
+    border-right: 1px solid $lightGray;
+    border-bottom: 1px solid $lightGray;
+
+    &::after {
+      display: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &.active {
+      color: $white;
+      background-color: $mediumGray;
+    }
+  }
+}
+
+.cove-tabs__content {
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow-y: scroll;
+  transform: scale(1);
+}

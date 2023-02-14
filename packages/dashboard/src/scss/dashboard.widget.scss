@@ -1,0 +1,121 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+$blue-light: #8bc6f7;
+$UI-red: #f74242;
+
+.cove-dashboard__widget {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid $lightGray;
+  border-radius: 3px;
+  cursor: move;
+  transition: border-color 200ms $transition-expo-out;
+
+  &:hover {
+    border-color: darken($lightGray, 20%);
+  }
+
+  @at-root {
+    .cove-dashboard__viz-grid #{&} {
+      height: auto;
+      aspect-ratio: 1/0.8;
+      box-shadow: 0 0 15px -5px #ccc;
+    }
+
+    .cove-dashboard__viz-grid #{&}:hover {
+      border-color: $blue;
+    }
+  }
+}
+
+.cove-dashboard__widget--content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  max-height: 100%;
+  padding: 0.5rem;
+  font-family: sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-align: center;
+  color: $darkGray;
+
+  @at-root .cove-dashboard__viz-grid #{&} {
+    font-size: 0.75rem;
+  }
+}
+
+.cove-dashboard__widget-icon {
+  &.cove-icon {
+    margin-bottom: 0.5em;
+
+    @at-root .cove-dashboard__viz-grid #{&} {
+      width: 50px;
+      height: 50px;
+    }
+
+    @at-root .cove-dashboard__builder__row #{&} {
+      flex-grow: 1;
+      width: 100%;
+      max-width: 100px;
+      height: auto;
+      max-height: 80px;
+    }
+  }
+}
+
+.cove-dashboard__widget-label {
+}
+
+.cove-dashboard__widget--move-icon {
+  &.cove-icon {
+    position: absolute;
+    top: 0.3em;
+    left: 0.3em;
+    width: 10px;
+    color: $lightGray;
+
+    @at-root .cove-dashboard__widget:hover #{&} {
+      color: darken($lightGray, 20%);
+    }
+  }
+}
+
+.cove-dashboard__widget-menu {
+  display: flex;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.cove-dashboard__widget-menu--item {
+  display: block;
+  width: 28px;
+  height: 28px;
+  color: $mediumGray;
+  user-select: none;
+  cursor: pointer;
+
+  + .cove-dashboard__widget-menu--item {
+    margin-left: 0.75rem;
+  }
+
+  > button {
+    padding: 6px;
+    background-color: transparent;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+
+    .cove-icon {
+      pointer-events: none;
+    }
+  }
+}

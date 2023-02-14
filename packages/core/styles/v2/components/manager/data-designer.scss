@@ -5,9 +5,9 @@
     padding: 1em;
 
     .dataset-selector {
-      margin: 0 0.5em;
-      padding: 0.5em;
       max-width: 10em;
+      padding: 0.5em;
+      margin: 0 0.5em;
     }
   }
 
@@ -17,6 +17,8 @@
 }
 
 .cove-data-designer__container {
+  margin-bottom: 2rem;
+
   .fw-bold {
     font-weight: bold;
   }
@@ -44,11 +46,11 @@
   }
 
   .cove-card {
-    position: relative;
-    text-align: left;
     box-sizing: border-box;
-    border: 0;
+    position: relative;
     padding: 1em;
+    text-align: left;
+    border: 0;
 
     &::after {
       content: '';
@@ -70,8 +72,8 @@
   }
 
   p {
-    font-size: 0.8rem;
     margin-bottom: 1rem;
+    font-size: 0.8rem;
   }
 
   table + table {
@@ -79,14 +81,14 @@
   }
 
   table {
+    border-collapse: collapse;
     font-size: 0.8rem;
     background-color: #fff;
     border: 1px solid $lightGray;
-    border-collapse: collapse;
 
     th {
-      color: white;
       text-align: left;
+      color: white;
       background-color: $primary;
     }
 
@@ -97,4 +99,47 @@
       border-bottom: 1px solid $lightGray;
     }
   }
+}
+
+.cove-data-designer__ignored-keys {
+  display: flex;
+  flex-flow: row wrap;
+  padding-left: 0;
+  list-style-type: none;
+
+  li {
+    margin-right: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.cove-data-designer__ignored-keys-tag.cove-button {
+  justify-content: space-between;
+  min-height: unset;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #d73636;
+  background-color: #ffe2e2;
+  border: 1px solid #ffc4c4;
+  border-radius: 20px;
+  outline: none !important;
+
+  &:focus::after {
+    border-radius: 20px !important;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #fff;
+    background-color: #d73636;
+    border: 1px solid #d73636;
+  }
+}
+
+.cove-data-designer__ignored-keys-tag--name {
+  margin-right: 0.75rem;
+}
+
+.cove-data-designer__ignored-keys-tag--icon {
 }

@@ -1770,11 +1770,11 @@ const EditorPanel = () => {
 
                   <fieldset className='fieldset fieldset--boxplot'>
                     <legend className=''>Box Plot Settings</legend>
-                    {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend?.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
-                    <TextField type='textarea' value={config.boxplot.legend?.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                    {config.visualizationType === 'Box Plot' && <Select value={config.boxplot?.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
+                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot?.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
+                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot?.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
+                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot?.legend?.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
+                    <TextField type='textarea' value={config.boxplot?.legend?.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                   </fieldset>
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />

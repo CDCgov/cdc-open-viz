@@ -1,0 +1,197 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+$blue-light: #8bc6f7;
+$UI-red: #f74242;
+
+.cove-dashboard__builder {
+  padding: 2rem 3rem;
+}
+
+.cove-dashboard__builder__row {
+  position: relative;
+
+  &:hover {
+    .cove-dashboard__builder__row-menu__button {
+      background-color: $blue;
+
+      &:hover {
+        background-color: lighten($blue, 8%);
+      }
+
+      &.cove-dashboard__builder__row-menu__button--edit {
+        background-color: transparent;
+      }
+
+      &.cove-dashboard__builder__row-menu__button--remove:hover {
+        background-color: $UI-red;
+      }
+    }
+
+    .cove-dashboard__builder__row-content {
+      border-color: $blue;
+    }
+  }
+
+  + .cove-dashboard__builder__row {
+    margin-top: 2rem;
+  }
+}
+
+.cove-dashboard__builder__row-menu {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  position: relative;
+  bottom: -1px;
+  color: #fff;
+  transition: opacity 300ms $transition-expo-out;
+  user-select: none;
+  z-index: 1;
+}
+
+.cove-dashboard__builder__row-menu__button {
+  display: flex;
+  padding: 0.2rem 0.3rem;
+  line-height: 0;
+  background-color: #c2c2c2;
+  border: 0;
+  border-radius: 3px 3px 0 0;
+  outline: none;
+  transition: background-color 300ms $transition-expo-out;
+  transform: scaleZ(1);
+  cursor: pointer;
+  backface-visibility: hidden;
+
+  + .cove-dashboard__builder__row-menu__button {
+    margin-left: 0.2em;
+  }
+
+  &[data-disabled="true"] {
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  > svg {
+    height: 20px;
+  }
+}
+
+.cove-dashboard__builder__row-menu__button--remove {
+  &:hover {
+    background-color: $UI-red;
+  }
+}
+
+.cove-dashboard__builder__row-layout-utils {
+  display: flex;
+  justify-content: flex-start;
+  width: 25px;
+  margin: 0;
+  list-style: none;
+  transition: width 200ms $transition-expo-out;
+  overflow: hidden;
+  z-index: 1;
+  padding-inline-start: 0;
+
+  @at-root .cove-dashboard__builder__row-menu__button:hover > #{&} {
+    transition: width 200ms $transition-expo-out;
+    width: 142px;
+  }
+}
+
+.cove-dashboard__builder__row-layout-utils--item {
+  &:not([data-selected="true"]) {
+    display: none;
+  }
+
+  > svg {
+    width: 25px;
+    height: auto;
+    max-height: 20px;
+    opacity: .7;
+  }
+
+  &:hover {
+    > svg {
+      opacity: 1;
+    }
+  }
+
+  @at-root .cove-dashboard__builder__row-menu__button:hover #{&} {
+    display: flex;
+
+    + .cove-dashboard__builder__row-layout-utils--item {
+      margin-left: 4px;
+    }
+  }
+}
+
+.cove-dashboard__builder__row-content {
+  display: flex;
+  flex-flow: row;
+  position: relative;
+  top: 0;
+  padding: 1rem;
+  background-color: #f2f2f2;
+  border: 1px solid #c2c2c2;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  transition: border 300ms $transition-expo-out;
+  transform: scaleZ(1);
+  user-select: none;
+  backface-visibility: hidden;
+
+  &.can-drop {
+    border-color: $blue-light;
+  }
+}
+
+.cove-dashboard__builder__column {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 180px;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  background-color: transparent;
+  border: 2px dashed #c2c2c2;
+
+  &.cove-dashboard__builder__column--drop {
+    background-color: #e8f4ff;
+    background-image: none;
+    border: 2px dashed $blue-light;
+  }
+
+  &.cove-dashboard__builder__column--populated {
+    background: none;
+    border: 2px solid transparent;
+  }
+}
+
+.cove-dashboard__builder__column-size--12 {
+  width: 100%;
+}
+
+.cove-dashboard__builder__column-size--8 {
+  width: 66.666%;
+}
+
+.cove-dashboard__builder__column-size--6 {
+  width: 50%;
+}
+
+.cove-dashboard__builder__column-size--4 {
+  width: 33.333%;
+}
+
+.cove-dashboard__builder__column__text {
+  padding: 0.5rem;
+  font-size: 13px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 19px;
+  text-align: center;
+  color: $mediumGray;
+}

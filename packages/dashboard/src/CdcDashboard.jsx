@@ -1,43 +1,45 @@
 import React, { useState, useEffect, useCallback } from 'react'
 
-// IE11
-import 'core-js/stable'
-import 'whatwg-fetch'
-import ResizeObserver from 'resize-observer-polyfill'
-
+// Third Party
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-
 import parse from 'html-react-parser'
 
-import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
+// Context
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
-import Overlay from '@cdc/core/components/ui/Overlay'
-import Loading from '@cdc/core/components/loader/Loading'
-import dataTransform from '@cdc/core/helpers/dataTransform'
-import { getViewport } from '@cdc/core/helpers/coveHelpers'
+// Data
+import defaults from './data/initial-state'
 
+// Helpers
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
+import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
+import dataTransform from '@cdc/core/helpers/dataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+
+// Components - Core
+import Loading from '@cdc/core/components/loader/Loading'
+import MediaControls from '@cdc/core/components/ui/MediaControls'
+import Overlay from '@cdc/core/components/ui/Overlay'
+
+// Components - Local
+import Builder from './components/builder/Builder'
+import BuilderWidget from './components/builder/Builder.Widget'
+import DataTable from './components/DataTable'
+import Header from './components/Header'
+
+// Styles
+// import './scss/main.scss'
+import './scss/cove-dashboard.scss'
+
+// Visualization
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
 import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
-
-import Grid from './components/Grid'
-import Header from './components/Header'
-import defaults from './data/initial-state'
-import Widget from './components/Widget'
-import DataTable from './components/DataTable'
-import MediaControls from '@cdc/core/components/ui/MediaControls'
-
-import './scss/main.scss'
-import '@cdc/core/styles/v2/main.scss'
-
-/* eslint-disable react-hooks/exhaustive-deps */
 
 const addVisualization = (type, subType) => {
   let modalWillOpen = type === 'markup-include' ? false : true
@@ -77,39 +79,40 @@ const addVisualization = (type, subType) => {
 }
 
 const VisualizationsPanel = () => (
-  <div className='visualizations-panel'>
-    <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
-    <span className='subheading-3'>Chart</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-      <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-      <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
+  <div className="cove-dashboard__sidebar">
+    <p className="mb-2" style={{ fontSize: '14px' }}>
+      Click and drag an item onto the grid to add it to your dashboard.
+    </p>
+    <div className="cove-dashboard__sidebar-title">Chart</div>
+    <div className="cove-dashboard__viz-grid">
+      <BuilderWidget addVisualization={() => addVisualization('chart', 'Bar')} type="Bar"/>
+      <BuilderWidget addVisualization={() => addVisualization('chart', 'Line')} type="Line"/>
+      <BuilderWidget addVisualization={() => addVisualization('chart', 'Pie')} type="Pie"/>
     </div>
-    <span className='subheading-3'>Map</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-      <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-      <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
+    <div className="cove-dashboard__sidebar-title">Map</div>
+    <div className="cove-dashboard__viz-grid">
+      <BuilderWidget addVisualization={() => addVisualization('map', 'us')} type="us"/>
+      <BuilderWidget addVisualization={() => addVisualization('map', 'world')} type="world"/>
+      <BuilderWidget addVisualization={() => addVisualization('map', 'single-state')} type="single-state"/>
     </div>
-    <span className='subheading-3'>Misc.</span>
-    <div className='drag-grid'>
-      <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-      <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
-      <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-      <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
+    <div className="cove-dashboard__sidebar-title">Misc</div>
+    <div className="cove-dashboard__viz-grid">
+      <BuilderWidget addVisualization={() => addVisualization('data-bite', '')} type="data-bite"/>
+      <BuilderWidget addVisualization={() => addVisualization('waffle-chart', '')} type="waffle-chart"/>
+      <BuilderWidget addVisualization={() => addVisualization('markup-include', '')} type="markup-include"/>
+      <BuilderWidget addVisualization={() => addVisualization('filtered-text', '')} type="filtered-text"/>
     </div>
   </div>
 )
 
 export default function CdcDashboard({ configUrl = '', config: configObj = undefined, isEditor = false, setConfig: setParentConfig }) {
-  const [config, setConfig] = useState(configObj ?? {})
-  const [data, setData] = useState([])
-  const [filteredData, setFilteredData] = useState()
-  const [loading, setLoading] = useState(true)
-  const [preview, setPreview] = useState(false)
-  const [tabSelected, setTabSelected] = useState(0)
-  const [currentViewport, setCurrentViewport] = useState('lg')
-  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [ config, setConfig ] = useState(configObj ?? {})
+  const [ data, setData ] = useState([])
+  const [ filteredData, setFilteredData ] = useState()
+  const [ loading, setLoading ] = useState(true)
+  const [ preview, setPreview ] = useState(false)
+  const [ tabSelected, setTabSelected ] = useState(0)
+  const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const { title, description } = config.dashboard || config
 
@@ -305,7 +308,7 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (setParentConfig && isEditor) {
       setParentConfig(config)
     }
-  }, [config])
+  }, [ config ])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     let updatedConfig = { ...config }
@@ -335,7 +338,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => {}
+    const announceChange = text => {
+    }
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (!singleFilter.showDropdown) return <></>
@@ -351,12 +355,12 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
       })
 
       return (
-        <section className='dashboard-filters-section' key={`${singleFilter.key}-filtersection-${index}`}>
+        <section className="dashboard-filters-section" key={`${singleFilter.key}-filtersection-${index}`}>
           <label htmlFor={`filter-${index}`}>{singleFilter.key}</label>
           <select
             id={`filter-${index}`}
-            className='filter-select'
-            data-index='0'
+            className="filter-select"
+            data-index="0"
             value={singleFilter.active}
             onChange={val => {
               changeFilterActive(index, val.target.value)
@@ -370,22 +374,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     })
   }
 
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width)
-
-      setCurrentViewport(newViewport)
-    }
-  })
-
-  const outerContainerRef = useCallback(node => {
-    if (node !== null) {
-      resizeObserver.observe(node)
-    }
-  }, [])
-
   // Prevent render if loading
-  if (loading) return <Loading />
+  if (loading) return <Loading/>
 
   let body = null
 
@@ -435,16 +425,16 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
           case 'chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Chart' />
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
+                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true}/>
               </>
             )
             break
           case 'map':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Map' />
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
+                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true}/>
               </>
             )
             break
@@ -452,32 +442,32 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
             visualizationConfig = { ...visualizationConfig, newViz: true }
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Data Bite' />
-                <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
+                <CdcDataBite key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/>
               </>
             )
             break
           case 'waffle-chart':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Waffle Chart' />
-                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
+                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/>
               </>
             )
             break
           case 'markup-include':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Markup Include' />
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
+                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/>
               </>
             )
             break
           case 'filtered-text':
             body = (
               <>
-                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor='Filtered Text' />
-                <CdcFilteredText key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true} />
+                <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
+                <CdcFilteredText key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateConfig} isDashboard={true}/>
               </>
             )
             break
@@ -491,10 +481,10 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     if (!subVisualizationEditing) {
       body = (
         <DndProvider backend={HTML5Backend}>
-          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />
-          <div className='layout-container'>
-            <VisualizationsPanel />
-            <Grid />
+          <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>
+          <div className="cove-dashboard__content">
+            <VisualizationsPanel/>
+            <Builder/>
           </div>
         </DndProvider>
       )
@@ -502,21 +492,20 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
   } else {
     body = (
       <>
-        {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview} />}
+        {isEditor && <Header tabSelected={tabSelected} setTabSelected={setTabSelected} preview={preview} setPreview={setPreview}/>}
         <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
           {/* Title */}
           {title && (
-            <div role='heading' aria-level='3' className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
+            <div role="heading" aria-level="3" className={`dashboard-title ${config.dashboard.theme ?? 'theme-blue'}`}>
               {title}
             </div>
           )}
           {/* Description */}
-          {description && <div className='subtext'>{parse(description)}</div>}
+          {description && <div className="subtext">{parse(description)}</div>}
           {/* Filters */}
           {config.dashboard.sharedFilters && (
-            <div className='cove-dashboard-filters'>
-              {' '}
-              <Filters />
+            <div className="cove-dashboard-filters">
+              <Filters/>
             </div>
           )}
 
@@ -639,13 +628,17 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               })}
 
           {/* Image or PDF Inserts */}
-          <section className='download-buttons'>
-            {config.table.downloadImageButton && <MediaControls.Button title='Download Dashboard as Image' type='image' state={config} text='Download Dashboard Image' elementToCapture={imageId} />}
-            {config.table.downloadPdfButton && <MediaControls.Button title='Download Dashboard as PDF' type='pdf' state={config} text='Download Dashboard PDF' elementToCapture={imageId} />}
+          <section>
+            {config.table.downloadImageButton &&
+              <MediaControls.Button title="Download Dashboard as Image" type="image" state={config} text="Download Dashboard Image" elementToCapture={imageId}/>
+            }
+            {config.table.downloadPdfButton &&
+              <MediaControls.Button title="Download Dashboard as PDF" type="pdf" state={config} text="Download Dashboard PDF" elementToCapture={imageId}/>
+            }
           </section>
 
           {/* Data Table */}
-          {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId} />}
+          {config.table && config.data && <DataTable data={config.data} config={config} imageRef={imageId}/>}
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
@@ -684,8 +677,8 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
               let dataFileSourceType = config.datasets[datasetKey]?.dataFileSourceType
 
               return (
-                <div className='multi-table-container' id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
-                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}></DataTable>
+                <div className="cove-dashboard__data-table" id={`data-table-${datasetKey}`} key={`data-table-${datasetKey}`}>
+                  <DataTable data={filteredTableData || config.datasets[datasetKey].data} downloadData={config.datasets[datasetKey].data} dataFileSourceType={dataFileSourceType} datasetKey={datasetKey} config={config} imageRef={imageId}/>
                 </div>
               )
             })}
@@ -703,19 +696,16 @@ export default function CdcDashboard({ configUrl = '', config: configObj = undef
     loading,
     updateConfig,
     setParentConfig,
-    setPreview,
-    outerContainerRef
+    setPreview
   }
-
-  const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
 
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={contextValues}>
-        <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
+        <div className="cove cove-dashboard" data-download-id={imageId}>
           {body}
         </div>
-        <Overlay />
+        <Overlay/>
       </ConfigContext.Provider>
     </GlobalContextProvider>
   )

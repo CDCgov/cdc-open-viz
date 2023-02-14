@@ -23,6 +23,8 @@ import { colorPalettesChart as colorPalettes } from '../../core/data/colorPalett
 
 import { publish, subscribe, unsubscribe } from '@cdc/core/helpers/events'
 
+import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+
 import SparkLine from './components/SparkLine'
 import Legend from './components/Legend'
 import DataTable from './components/DataTable'
@@ -65,6 +67,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   // Destructure items from config for more readable JSX
   const { legend, title, description, visualizationType } = config
+  const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
@@ -727,7 +730,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
               {config.visualizationType === 'Spark Line' && (
                 <>
                   {description && <div className='subtext'>{parse(description)}</div>}
-                  <div>
+                  <div style={sparkLineStyles}>
                     <ParentSize>
                       {parent => (
                         <>

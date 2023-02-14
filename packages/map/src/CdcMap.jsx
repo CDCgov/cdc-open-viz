@@ -1258,14 +1258,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.general.statePicked])
 
-  
+
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
-  
+
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
     if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
@@ -1452,7 +1452,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <div role='heading' className={'map-title ' + general.headerColor} tabIndex='0' aria-level='2'>
+                <div role='heading' className={`map-title${general.headerColor ? ' theme-' + general.headerColor : ''}`} tabIndex='0' aria-level='2'>
                   <sup>{general.superTitle}</sup>
                   <div>{parse(title)}</div>
                 </div>

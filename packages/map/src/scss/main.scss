@@ -1,5 +1,5 @@
-@import "@cdc/core/styles/base";
-@import "@cdc/core/styles/heading-colors";
+@import "@cdc/core/styles/v1/base";
+@import "@cdc/core/styles/v1/heading-colors";
 @import "variables";
 @import "editor-panel";
 @import "filters";
@@ -30,6 +30,9 @@
   border: 0;
   text-align: left;
   max-width: 100%;
+  position: relative;
+  z-index: 1;
+
   .btn {
     padding: .375em .75em;
     border-radius: .3em;

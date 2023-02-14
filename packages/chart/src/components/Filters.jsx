@@ -105,13 +105,7 @@ const Filters = () => {
 
   return (
     <section className={`filters-section`} style={{ display: 'block', width: '100%' }}>
-      {config.filters.length > 0 && (
-        <>
-          <h3 className='filters-section__title'>Filters</h3>
-          <hr />
-        </>
-      )}
-      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px' }}>
+      <div className='filters-section__wrapper' style={{ flexWrap: 'wrap', display: 'flex', gap: '7px 15px', marginTop: '15px' }}>
         <FilterList />
         {config.filters.length > 0 && (
           <div className='filter-section__buttons' style={{ width: '100%' }}>

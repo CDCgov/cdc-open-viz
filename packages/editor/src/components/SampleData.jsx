@@ -1,4 +1,6 @@
 import React, { useContext } from 'react'
+
+// Context
 import SampleDataContext from '../samples/SampleDataContext'
 
 // Data Samples
@@ -48,14 +50,14 @@ const sampleData = {
 }
 
 // Single Button
-const Button = ({ text, fileName, data }) => {
+const SampleDataButton = ({ text, fileName, data }) => {
   const { editingDataset, loadData } = useContext(SampleDataContext)
   const handleClick = e => loadData(new Blob([data], { type: 'text/csv' }), fileName, editingDataset)
   const handleKeyDown = e => e.keyCode === 13 && loadData(new Blob([data], { type: 'text/csv' }), fileName, editingDataset)
+
   // prettier-ignore
   return (
     <button
-      className='link link-upload'
       onClick={handleClick}
       onKeyDown={handleKeyDown}>
       {text}
@@ -63,26 +65,22 @@ const Button = ({ text, fileName, data }) => {
   )
 }
 
-// Map Buttons
-const MapSampleDataButtons = () => {
-  return sampleData.maps.map(sample => <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />)
-}
-
-// Chart Buttons
-const ChartSampleDataButtons = () => {
-  return sampleData.charts.map(sample => <Button key={sample.fileName} text={sample.text} fileName={sample.fileName} data={sample.data} />)
+const GenerateSampleDataList = ({ samples }) => {
+  return samples.map(sample => <li key={sample.fileName}>
+    <SampleDataButton text={sample.text} fileName={sample.fileName} data={sample.data} />
+  </li>)
 }
 
 // All Buttons
-const Buttons = () => {
+const List = () => {
   const { config } = useContext(SampleDataContext)
 
   return (
     <>
-      <h3 className='heading-3'>Load Sample Data:</h3>
-      <ul className='sample-data-list'>
-        {config.type !== 'map' && <ChartSampleDataButtons />}
-        {config.type !== 'chart' && <MapSampleDataButtons />}
+      <h3 className="cove-heading--3 mb-0">Load Sample Data:</h3>
+      <ul className='cove-wizard__data-samples'>
+        {config.type !== 'map' && <GenerateSampleDataList samples={sampleData.charts} />}
+        {config.type !== 'chart' && <GenerateSampleDataList samples={sampleData.maps} />}
       </ul>
     </>
   )
@@ -90,6 +88,6 @@ const Buttons = () => {
 
 const SampleData = () => null
 SampleData.data = sampleData
-SampleData.Buttons = Buttons
+SampleData.List = List
 
 export default SampleData

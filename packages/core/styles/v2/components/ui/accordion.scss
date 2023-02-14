@@ -18,6 +18,7 @@
 
 .cove-accordion__button {
   display: flex;
+  box-sizing: border-box;
   justify-content: space-between;
   position: relative;
   width: 100%;

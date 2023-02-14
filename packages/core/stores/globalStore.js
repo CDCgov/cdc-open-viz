@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware'
 
 export const useGlobalStore = create(devtools((set) => ({
     // Global State
-    viewMode: 'component',
+    viewMode: '',
     os: navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null,
     overlay: {
       object: null,

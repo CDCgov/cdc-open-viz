@@ -64,9 +64,14 @@
 }
 
 .cove-overlay__container {
-  display: block;
+  display: flex;
+  box-sizing: border-box;
+  justify-content: center;
   width: 100%;
   max-width: 600px;
+  max-height: 100%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
   transform: translateY(25px);
   opacity: 0;
   z-index: 1;

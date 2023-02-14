@@ -1,0 +1,726 @@
+// Shift down for top level Dashboard bar when in edit mode
+.layout-container,
+.editor-panel + .cdc-dashboard-inner-container,
+.editor-heading + .cdc-open-viz-module {
+  position: relative;
+  top: 3em;
+
+  .editor-panel {
+    top: 3em;
+  }
+
+  .editor-toggle {
+    top: 3.5em;
+  }
+}
+
+.editor-panel {
+  //TODO: Remove after COVE refactor
+  display: flex;
+
+  flex-direction: column;
+  position: fixed;
+  top: 48px;
+  bottom: 0;
+  left: 0;
+  width: $editorWidth;
+  background: #fff;
+  overflow-y: overlay;
+  z-index: 8;
+
+  &.cove {
+    @import '@cdc/core/styles/v2/components/ui/tooltip.scss';
+  }
+
+  .two-col-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+
+    > label {
+      width: 48%;
+      margin-top: 0 !important;
+    }
+  }
+
+  .helper-tooltip {
+    max-width: 300px;
+    padding: 5px;
+  }
+
+  .helper {
+    align-self: center;
+    position: relative;
+    width: 17px;
+    height: 17px;
+    margin-top: -0.3rem;
+    margin-left: 0.3rem;
+    border: none !important;
+    box-shadow: none !important;
+    opacity: 0.7;
+    cursor: pointer;
+
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .divider-heading {
+    display: block;
+    margin-top: 1em;
+    font-size: 1em;
+  }
+
+  .series-list {
+    list-style: none;
+    border: $lightGray 1px solid;
+
+    &:empty {
+      border: none !important;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3em 0.5em;
+      font-size: 0.9em;
+
+      &:hover {
+        background-color: $lightestGray;
+      }
+
+      span {
+        font-size: 0.8em;
+        color: #f00;
+        cursor: pointer;
+      }
+
+      + li {
+        border-top: $lightGray 1px solid;
+      }
+    }
+  }
+
+  .accordion__heading {
+    background: $lightestGray;
+  }
+
+  .accordion__item {
+    select {
+      text-transform: capitalize;
+    }
+
+    .number-narrow {
+      width: 75px;
+      min-width: auto;
+    }
+  }
+
+  .form-container {
+    flex-grow: 1;
+    border-right: $lightGray 1px solid;
+  }
+
+  .guidance-link {
+    padding: 0.75em 1em;
+    margin: 2em 1em 0;
+
+    svg {
+      width: 60px;
+      height: 60px; // IE11
+      margin-right: 1rem;
+      color: $blue;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+
+  .warning {
+    padding: 0.75em 1em;
+    margin: 1em 0;
+    font-size: 0.8em;
+    color: #d8000c;
+    background-color: #ffd2d2;
+    border: #d8000c 1px solid;
+    border-radius: 0.4em;
+
+    strong {
+      display: block;
+      font-weight: 600;
+    }
+  }
+
+  .accordion__button {
+    position: relative;
+    width: 100%;
+    padding: 0.3em 1em;
+    font-size: 1em;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .accordion__panel:first-child {
+    margin-top: 0;
+  }
+
+  .accordion__button:before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 7px;
+    height: 7px;
+    margin-right: 1em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transition: 0.1s all;
+    transform: rotate(-45deg);
+    transform: rotate(-45deg) translateY(-50%);
+  }
+
+  .accordion__button[aria-expanded='true']::before,
+  .accordion__button[aria-selected='true']::before {
+    margin-right: 1.3em;
+    transition: 0.1s all;
+    transform: rotate(45deg) translateY(-50%);
+  }
+
+  .accordion__panel {
+    padding: 1em 1.25em 2em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    animation: fadein 0.2s ease-in;
+
+    h5 {
+      font-size: 0.8em;
+    }
+  }
+
+  .advanced {
+    padding: 0 1em 1em;
+    text-align: left;
+
+    p {
+      font-size: 0.8rem;
+    }
+
+    .advanced-toggle-link {
+      display: block;
+      padding-top: 1em;
+      text-align: left;
+      text-decoration: underline;
+      cursor: pointer;
+
+      span {
+        display: inline-block;
+        padding-right: 5px;
+        font-family: monospace;
+        text-decoration: none;
+      }
+
+      &:hover {
+        color: rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    textarea {
+      box-sizing: border-box;
+      width: 100%;
+      height: 400px;
+      padding: 0.5em;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  }
+
+  @keyframes fadein {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .heading-2 {
+    position: relative;
+    padding: 0.6em 1em;
+    font-size: 1.1em;
+    color: #fff;
+    background: #565656;
+    border-bottom: #565656 3px solid;
+    z-index: 3;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &:not(:first-child) {
+      margin-top: 1em;
+    }
+
+    span.edit-label {
+      display: block;
+      margin-bottom: 0.3em;
+    }
+
+    span.column-heading {
+      font-size: 1em;
+    }
+
+    &.checkbox {
+      display: flex;
+
+      span {
+        display: inline;
+      }
+
+      input {
+        display: inline;
+        width: inherit;
+        margin-left: 0;
+      }
+    }
+  }
+
+  input[type='text'],
+  input[role='combobox'],
+  input[type='number'],
+  textarea {
+    min-width: 100%;
+    max-width: 100%; // Doing this prevents width of textarea from being changed
+  }
+
+  textarea {
+    min-height: 140px;
+  }
+
+  .header .color-palette li {
+    width: 21px;
+    height: 21px;
+    margin-right: 2.8px;
+    border-radius: 40px;
+  }
+
+  .color-palette {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    padding: 0;
+    margin: 0.5em 0 0 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      position: relative;
+      width: 45px;
+      height: 23px;
+      margin-right: 4px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      cursor: pointer;
+
+      .click-target {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+
+      &.selected {
+        border: rgba(0, 0, 0, 0.8) 2px solid;
+      }
+
+      span {
+        width: 33.3%;
+      }
+    }
+  }
+
+  fieldset {
+    display: block;
+  }
+
+  .primary-fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  ul.column-edit {
+    list-style: none;
+
+    li {
+      margin-top: 1em;
+    }
+
+    .three-col {
+      display: flex;
+      justify-content: space-between;
+
+      > label {
+        display: inline-block;
+        width: 30%;
+        margin-top: 0;
+
+        input[type='text'],
+        input[type='number'] {
+          width: 50px;
+        }
+      }
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  .emove-column {
+    float: right;
+    margin: 0 auto;
+    font-size: 0.7em;
+    font-weight: bold;
+    line-height: 1.6em;
+    text-decoration: underline;
+    text-transform: uppercase;
+    color: #c32b2b;
+    border: 0;
+    border-radius: 5px;
+    outline: 0;
+    transition: 0.1s all;
+    cursor: pointer;
+  }
+
+  .edit-block {
+    padding-left: 1em;
+    border-left: rgba(0, 0, 0, 0.2) 4px solid;
+    transition: 0.2s all;
+
+    &:not(:first-child) {
+      margin-top: 2em;
+    }
+
+    input[type='text'],
+    input[type='number'] {
+      font-size: 1em;
+    }
+
+    label {
+      margin-top: 0;
+    }
+
+    label + label {
+      margin-top: 1em;
+    }
+
+    &:hover {
+      border-left: rgba(0, 0, 0, 0.7) 4px solid;
+      transition: 0.2s all;
+    }
+  }
+
+  span.subtext {
+    display: block;
+    font-weight: normal;
+    text-transform: none;
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  .btn {
+    margin-top: 1em;
+  }
+
+  .sort-list {
+    list-style: none;
+
+    > li {
+      margin-right: 0.3em;
+      margin-bottom: 0.3em;
+    }
+  }
+
+  .sort-list li > div {
+    display: block;
+    box-sizing: border-box;
+    padding: 0.4em 0.6em;
+    margin-bottom: 0.3em;
+    font-size: 0.8em;
+    background: #f1f1f1;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    cursor: move;
+  }
+
+  .info {
+    padding-top: 10px;
+    font-size: 0.8em;
+    font-style: italic;
+    line-height: 1.4em;
+  }
+
+  .react-tags__search {
+    width: 100%;
+  }
+
+  .react-tags {
+    position: relative;
+    cursor: text;
+    /* clicking anywhere will focus the input */
+    input.react-tags__search-input {
+      font-size: 0.8rem;
+    }
+
+    span {
+      display: inline;
+    }
+  }
+
+  .react-tags.is-focused {
+    border-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .react-tags__selected {
+    display: inline;
+  }
+
+  .react-tags__selected-tag {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0.4em 0.6em;
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+    font-size: 0.8em;
+    background: #f1f1f1;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+  }
+
+  .react-tags__selected-tag:after {
+    content: '\2715';
+    margin-left: 8px;
+    color: #aaa;
+  }
+
+  .react-tags__selected-tag:hover,
+  .react-tags__selected-tag:focus {
+    border-color: #b1b1b1;
+  }
+
+  .react-tags__search {
+    display: inline-block;
+
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__search {
+      /* this will become the offsetParent for suggestions */
+      position: relative;
+    }
+  }
+
+  .react-tags__search input {
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+
+    /* emove styles and layout from this element */
+    padding: 0.5em 0.3em;
+    margin: 0;
+    font-size: inherit;
+
+    /* match the font styles */
+    line-height: inherit;
+    outline: none;
+  }
+
+  .react-tags__search input::-ms-clear {
+    display: none;
+  }
+
+  .react-tags__suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__suggestions {
+      width: 240px;
+    }
+  }
+
+  .react-tags__suggestions ul {
+    padding: 0;
+    margin: 4px -1px;
+    list-style: none;
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .react-tags__suggestions li {
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .react-tags__suggestions li mark {
+    font-weight: 600;
+    text-decoration: underline;
+    background: none;
+  }
+
+  .react-tags__suggestions li:hover {
+    background: #eee;
+    cursor: pointer;
+  }
+
+  .react-tags__suggestions li.is-active {
+    background: #b7cfe0;
+  }
+
+  .react-tags__suggestions li.is-disabled {
+    opacity: 0.5;
+    cursor: auto;
+  }
+
+  .current-viz-list {
+    padding-left: 1.25em;
+    margin: 0.5em 0;
+
+    li button {
+      float: right;
+      margin: 0 0.5em;
+      border: 1px solid gray;
+    }
+  }
+
+  .viz-icon {
+    padding: 10px;
+    margin: 1em;
+    color: #565656;
+    background-color: #fff;
+    border: #797979 1px solid;
+
+    span {
+      margin-top: 1em;
+      font-size: 1em;
+      text-transform: none;
+    }
+
+    &:hover {
+      background: #f2f2f2;
+      transition: 0.2s all;
+    }
+
+    svg {
+      display: block;
+      box-sizing: border-box;
+      width: 100px;
+      height: 75px;
+      margin: 0.5em auto;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+}
+
+.editor-toggle {
+  position: fixed;
+  top: calc(3em + 10px);
+  left: 307px;
+  width: 25px;
+  height: 25px;
+  font-size: 1em;
+  color: #000;
+  background: #f2f2f2;
+  border: 0;
+  border-radius: 60px;
+  transition: 0.1s background;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  cursor: pointer;
+  z-index: 99;
+
+  &:before {
+    content: '\00ab';
+    position: absolute;
+    top: 43%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.collapsed {
+    left: 1em;
+    margin-left: 0;
+
+    &:before {
+      content: '\00bb';
+    }
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+}
+
+.editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
+  padding-left: $editorWidth;
+}
+
+.subheading-3 {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.drag-grid {
+  display: flex;
+  column-gap: 0.5em;
+  row-gap: 0.5em;
+  flex-wrap: wrap;
+
+  .widget {
+    width: 120px;
+    height: 100px;
+    padding: 0;
+    margin: 0;
+    cursor: move;
+
+    .widget__drag {
+      display: none;
+    }
+
+    .widget__content {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8em;
+
+      svg {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0.5em;
+      }
+    }
+  }
+}

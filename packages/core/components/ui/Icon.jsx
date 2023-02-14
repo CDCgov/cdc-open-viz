@@ -5,11 +5,10 @@ import iconHash from '../../data/iconHash'
 // Styles
 import '../../styles/v2/components/ui/icon.scss'
 
-const Icon = ({ display = null, base, alt = '', size, color, style, ...attributes }) => {
+const Icon = ({ display = null, base, alt = '', size, color, style, className, ...attributes }) => {
   const IconObj = iconHash[display] || null
 
-  const filteredAttrs = { ...attributes }
-  delete filteredAttrs.className
+  const classNameList = 'cove-icon' + (className ? ' ' + className : '')
 
   const styles = {
     ...style,
@@ -22,11 +21,11 @@ const Icon = ({ display = null, base, alt = '', size, color, style, ...attribute
     <>
       {IconObj && <>
         {base
-          ? <IconObj title={alt} style={styles} {...filteredAttrs}/>
+          ? <IconObj className={classNameList} title={alt} style={styles} {...attributes}/>
           : (
-            <span className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`} style={styles} {...filteredAttrs}>
-            <IconObj title={alt}/>
-          </span>
+            <span className={classNameList} style={styles} {...attributes}>
+              <IconObj title={alt}/>
+            </span>
           )
         }
       </>

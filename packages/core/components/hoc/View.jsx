@@ -9,6 +9,7 @@ import { useGlobalStore } from '../../stores/globalStore'
 // Components - Core
 import Editor from '../editor/Editor'
 import Overlay from '../ui/Overlay'
+import RenderFallback from '../loader/RenderFallback'
 
 // Styles
 import '../../styles/v2/main.scss'
@@ -51,15 +52,16 @@ const View = ({ EditorPanels, isWizard, children }) => {
       break
     case 'wizard':
       view = (
-        <div className="cove" ref={coveAnchor}>
+        <>
           <Editor EditorPanels={EditorPanels}>
             {children}
           </Editor>
           <Overlay/>
-        </div>
+        </>
       )
       break
     default:
+      view = <RenderFallback/>
       break
   }
 

@@ -1,18 +1,4 @@
-@at-root html .cove {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-
-  &:focus-within {
-    scroll-behavior: smooth;
-  }
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@import "../themes/theme-colors";
 
 h1,
 h2,
@@ -41,6 +27,13 @@ picture {
   max-width: 100%;
 }
 
+small {
+  display: block;
+  font-size: .8rem;
+  font-style: italic;
+  color: $mediumGray;
+}
+
 sub, sup {
   position: relative;
   font-size: 75%;
@@ -54,19 +47,4 @@ sup {
 
 sub {
   bottom: -0.25em;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @at-root html:focus-within .cove {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
 }

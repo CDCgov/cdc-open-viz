@@ -1,13 +1,16 @@
 @import "../../utils/variables";
 
 .cove-modal {
+  max-height: 100%;
   background-color: #fff;
   border-radius: 5px;
+  overflow: scroll;
   box-shadow: 3px 3px 10px rgb(0 0 0 / 20%);
 }
 
 .cove-modal__header {
   display: block;
+  box-sizing: border-box;
   position: relative;
   min-height: 2.25rem;
   padding: 1rem 2.5rem 1.5rem 1rem;

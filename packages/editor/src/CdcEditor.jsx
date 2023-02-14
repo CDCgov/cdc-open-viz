@@ -4,36 +4,69 @@ import React, { useState, useEffect, useCallback } from 'react'
 import 'core-js/stable'
 import ResizeObserver from 'resize-observer-polyfill'
 
-import { getViewport } from '@cdc/core/helpers/coveHelpers'
-
+// Context
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import ConfigContext from './ConfigContext'
 
+// Helpers
+import { getViewport } from '@cdc/core/helpers/coveHelpers'
+
+// Components - Core
 import Overlay from '@cdc/core/components/ui/Overlay'
 
-import DataImport from './components/DataImport'
-import ChooseTab from './components/ChooseTab'
-import ConfigureTab from './components/ConfigureTab'
-import TabPane from './components/TabPane'
+// Components - Local
 import Tabs from './components/Tabs'
+import TabVizSelect from './components/Tab.Viz.Select'
+import TabVizData from './components/Tab.Viz.Data'
+import TabVizConfig from './components/Tab.Viz.Config'
+// import TabVizConfigure from 'components/Tab.Viz.Configure'
+// import TabPane from './components/TabPane'
 
-import './scss/main.scss'
+// Styles
+import './scss/cove-wizard.scss'
 
-export default function CdcEditor({ config: configObj = { newViz: true }, hostname, containerEl, sharepath }) {
-  const [config, setConfig] = useState(configObj)
-  const [tempConfig, setTempConfig] = useState(null)
-  const [errors, setErrors] = useState([])
+const CdcEditor = ({ config: configObj = { newViz: true }, hostname, containerEl, sharepath }) => {
+  const [ config, setConfig ] = useState(configObj)
+  const [ tempConfig, setTempConfig ] = useState(null)
+  const [ errors, setErrors ] = useState([])
 
-  const [currentViewport, setCurrentViewport] = useState('lg')
-  const [dimensions, setDimensions] = useState([])
+  const [ activeTab, setActiveTab ] = useState(0)
 
-  let startingTab = 0
+  const [ currentViewport, setCurrentViewport ] = useState('lg')
+  const [ dimensions, setDimensions ] = useState([])
 
-  if (config.data && config.type) {
-    startingTab = 2
-  }
+  useEffect(() => {
+    if (config.data && config.type) setActiveTab(2)
+    return () => {
+    }
+  }, [ config.data, config.type ])
 
-  // Legacy support - dashboards using a single dataset
+  /** OpenVizWrapper Config Logic ---------------------------------------------------------------------------------------------------------------------------
+   * This section is used to emit an event containing the updated config settings. These settings are applied to a hidden input field in WCMS, so they
+   * can be processed, and saved, in the system environment.
+   *
+   * Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
+   */
+  useEffect(() => {
+    if (null !== tempConfig) {
+      const parsedData = JSON.stringify(tempConfig)
+      // Emit the data in a regular JS event so it can be consumed by anything.
+      const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
+      window.dispatchEvent(event)
+    }
+  }, [ tempConfig ])
+
+  useEffect(() => {
+    const parsedData = JSON.stringify(config)
+    // Emit the data in a regular JS event, so it can be consumed by anything.
+    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
+    window.dispatchEvent(event)
+  }, [ config ])
+
+  /** --------------------------------------------------------------------------------------------------------------- End OpenVizWrapper Config Logic */
+
+  // TODO: COVE Refactor - Lift this into the coveUpdateWorker
+  // Legacy support - Migrate dashboard data using a single dataset per visualization
   if (config.type === 'dashboard') {
     let legacyUpdateNeeded = false
     let newConfig
@@ -81,13 +114,11 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     }
   }
 
-  const [globalActive, setGlobalActive] = useState(startingTab)
-
-  const resizeObserver = new ResizeObserver(([container]) => {
+  const resizeObserver = new ResizeObserver(([ container ]) => {
     let { width, height } = container.contentRect
     let newViewport = getViewport(width)
 
-    setDimensions([width, height])
+    setDimensions([ width, height ])
     setCurrentViewport(newViewport)
   })
 
@@ -96,29 +127,6 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
       resizeObserver.observe(node)
     }
   }, [])
-
-  // Temp Config is for changes made in the components proper - to prevent render cycles. Regular config is for changes made in the first two tabs.
-  useEffect(() => {
-    if (null !== tempConfig) {
-      const parsedData = JSON.stringify(tempConfig)
-      // Emit the data in a regular JS event so it can be consumed by anything.
-      const event = new CustomEvent('updateVizConfig', { detail: parsedData, bubbles: true })
-      window.dispatchEvent(event)
-    }
-  }, [tempConfig])
-
-  useEffect(() => {
-    const parsedData = JSON.stringify(config)
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: parsedData })
-    window.dispatchEvent(event)
-  }, [config])
-
-  useEffect(() => {
-    if (globalActive > -1) {
-      setGlobalActive(-1)
-    }
-  }, [globalActive])
 
   const maxFileSize = 10 // Represents number of MB. Maybe move this to a prop eventually but static for now.
 
@@ -142,8 +150,8 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
     errorMessages,
     maxFileSize,
     hostname,
-    globalActive,
-    setGlobalActive,
+    activeTab,
+    setActiveTab,
     tempConfig,
     setTempConfig,
     sharepath
@@ -164,22 +172,23 @@ export default function CdcEditor({ config: configObj = { newViz: true }, hostna
   return (
     <GlobalContextProvider>
       <ConfigContext.Provider value={state}>
-        <div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>
-          <Tabs className='top-level' startingTab={globalActive}>
-            <TabPane title='1. Choose Visualization Type' className='choose-type'>
-              <ChooseTab />
-            </TabPane>
-            <TabPane title='2. Import Data' className='data-designer' disableRule={!config.type}>
-              <DataImport />
-            </TabPane>
-
-            <TabPane title='3. Configure' className='configure' disableRule={configureDisabled}>
-              <ConfigureTab containerEl={containerEl} />
-            </TabPane>
+        <div className="cove cove-fullscreen">
+          {/*<div className={`cdc-open-viz-module cdc-editor ${currentViewport}`} ref={outerContainerRef}>*/}
+          <Tabs startingTab={activeTab} fullsize>
+            <Tabs.Content title="1. Choose Visualization Type">
+              <TabVizSelect/>
+            </Tabs.Content>
+            <Tabs.Content title="2. Import Data" className="cove-wizard__data-designer" disableRule={!config.type}>
+              <TabVizData/>
+            </Tabs.Content>
+            <Tabs.Content title="3. Configure" disableRule={configureDisabled}>
+              <TabVizConfig containerEl={containerEl}/>
+            </Tabs.Content>
           </Tabs>
+          <Overlay/>
         </div>
       </ConfigContext.Provider>
-      <Overlay />
     </GlobalContextProvider>
   )
 }
+export default CdcEditor

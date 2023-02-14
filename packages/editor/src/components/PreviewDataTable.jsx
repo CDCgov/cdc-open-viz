@@ -1,54 +1,82 @@
-import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
-import { useTable, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination } from 'react-table'
-import ConfigContext from '../ConfigContext'
+import React, { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+// Third Party
 import { useDebounce } from 'use-debounce'
+import { useBlockLayout, useGlobalFilter, usePagination, useResizeColumns, useSortBy, useTable } from 'react-table'
 
-// Core
+// Helpers
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 
-const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
-  const [filterValue, setFilterValue] = useState(globalFilter)
+// Context
+import ConfigContext from '../ConfigContext'
 
-  const [debouncedValue] = useDebounce(filterValue, 200)
+// Components - Core
+import Button from '@cdc/core/components/element/Button'
+import Icon from '@cdc/core/components/ui/Icon'
+import InputGroup from '@cdc/core/components/input/InputGroup'
+
+// Styles
+import '@cdc/core/styles/v2/components/element/data-table.scss'
+
+const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }) => {
+  const [ filterValue, setFilterValue ] = useState(globalFilter)
+  const [ debouncedValue ] = useDebounce(filterValue, 200)
 
   useEffect(() => {
     if ('string' === typeof debouncedValue && debouncedValue !== globalFilter) {
       setGlobalFilter(debouncedValue ?? '')
     }
-  }, [debouncedValue])
+  }, [ debouncedValue ])
 
   const onChange = e => {
     setFilterValue(e.target.value)
   }
 
-  return <input className='filter' value={filterValue} onChange={onChange} type='search' placeholder='Filter...' disabled={disabled} />
+  // return <input className='filter' value={filterValue} onChange={onChange} type='search' placeholder='Filter...' disabled={disabled} />
+  return (
+    <InputGroup label={<Icon display="filterBars" style={{ opacity: '0.5' }}/>} flow="right" clear>
+      <input
+        type="search"
+        className="cove-input cove-input--search"
+        placeholder="Filter..."
+        onChange={onChange}
+        value={filterValue}
+        disabled={disabled}
+      />
+    </InputGroup>
+  )
 })
 
-const Header = memo(({ globalFilter, data, setGlobalFilter }) => (
-  <header className='data-table-header'>
-    <h2>Data Preview</h2>
-    <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data} />
+const Header = memo(({ globalFilter, data = null, setGlobalFilter }) => (
+  <header className="cove-data-table__header">
+    <div className="cove-grid">
+      <div className="cove-grid__col--6">
+        <h2 className="cove-heading--2 align-self-center mb-0">Data Preview</h2>
+      </div>
+      <div className="cove-grid__col--6">
+        <TableFilter globalFilter={globalFilter || ''} setGlobalFilter={setGlobalFilter} disabled={null === data}/>
+      </div>
+    </div>
   </header>
 ))
 
 const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pageNumber, totalPages }) => (
-  <footer className='data-table-pagination'>
-    <ul>
-      <li>
-        <button onClick={() => previousPage()} className='btn btn-prev' disabled={!canPreviousPage} title='Previous Page'></button>
-      </li>
-      <li>
-        <button onClick={() => nextPage()} className='btn btn-next' disabled={!canNextPage} title='Next Page'></button>
-      </li>
-    </ul>
-    <span>
-      Page {pageNumber} of {totalPages}
-    </span>
+  <footer className="cove-data-table__footer">
+    <div className="cove-data-table__pagination">
+      <Button title="Previous Page" className="px-1 py-0 mr-1" onClick={() => previousPage()} disabled={!canPreviousPage} flexCenter>
+        <Icon display="caretUp" size={24} style={{ transform: 'rotate(-90deg)' }}/>
+      </Button>
+      <Button title="Next Page" className="px-1 py-0 mr-1" onClick={() => nextPage()} disabled={!canNextPage} flexCenter>
+        <Icon display="caretUp" size={24} style={{ transform: 'rotate(90deg)' }}/>
+      </Button>
+      <span className="cove-data-table__pagination--index">
+        Page {pageNumber} of {totalPages}
+      </span>
+    </div>
   </footer>
 ))
 
 const PreviewDataTable = ({ data }) => {
-  const [tableData, setTableData] = useState(data ?? [])
+  const [ tableData, setTableData ] = useState(data ?? [])
   const { setErrors, errorMessages, config } = useContext(ConfigContext)
 
   const tableColumns = useMemo(() => {
@@ -56,20 +84,18 @@ const PreviewDataTable = ({ data }) => {
     if (columns.length > 0 && columns.includes('')) {
       // todo find a way to call the errors. Currently they are in DataImport.js
       // maybe these can be moved to a file? but then we need a way to add settings like size...
-      setErrors([errorMessages.emptyCols])
+      setErrors([ errorMessages.emptyCols ])
     }
 
     return columns.map((columnName, idx) => {
-      const columnConfig = {
+      return {
         id: `column-${columnName}`,
         accessor: row => row[columnName],
         Header: columnName,
         width: 250
       }
-
-      return columnConfig
     })
-  }, [tableData])
+  }, [ tableData ])
 
   // This adds a columns property just like the D3 function for JSON parsing.
   const generateColumns = useCallback(data => {
@@ -84,7 +110,7 @@ const PreviewDataTable = ({ data }) => {
     })
 
     // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
-    const newData = [...data]
+    const newData = [ ...data ]
 
     if (Array.isArray(newData)) {
       newData.columns = columns
@@ -93,16 +119,14 @@ const PreviewDataTable = ({ data }) => {
   }, [])
 
   useEffect(() => {
-    if (!data) {
-      return
-    }
+    if (!data || (Array.isArray(data) && data.length === 0)) return
 
-    let newData = [...data]
+    let newData = [ ...data ]
 
     newData = generateColumns(newData)
     validateFipsCodeLength(newData)
     setTableData(newData)
-  }, [data, generateColumns])
+  }, [ data, generateColumns ])
 
   const {
     getTableProps,
@@ -117,12 +141,16 @@ const PreviewDataTable = ({ data }) => {
     pageOptions,
     nextPage,
     previousPage
-  } = useTable({ columns: tableColumns, data: tableData, initialState: { pageSize: 25 } }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination)
+  } = useTable({
+    columns: tableColumns,
+    data: tableData,
+    initialState: { pageSize: 25 }
+  }, useBlockLayout, useGlobalFilter, useSortBy, useResizeColumns, usePagination)
 
   const NoData = () => (
-    <section className='no-data-message'>
+    <section className="cove-data-table__no-data--message">
       <section>
-        <h3>No Data</h3>
+        <h3 className="cove-heading--2 mb-1">No Data</h3>
         <p>Import data to preview</p>
       </section>
     </section>
@@ -130,68 +158,23 @@ const PreviewDataTable = ({ data }) => {
 
   const PlaceholderTable = () => {
     return (
-      <section className='no-data'>
-        <NoData />
-        <div className='table-container'>
-          <table className='editor data-table' role='table'>
+      <section className="cove-data-table__no-data">
+        <NoData/>
+        <div className="cove-data-table__table-wrapper">
+          <table className="cove-data-table__table" role="table">
             <thead>
-              <tr role='row'>
-                <th scope='col' colSpan='1' role='columnheader'></th>
-                <th scope='col' colSpan='1' role='columnheader'></th>
-                <th scope='col' colSpan='1' role='columnheader'></th>
-              </tr>
+            <tr role="row">
+              <th scope="col" colSpan="1" role="columnheader"/>
+              <th scope="col" colSpan="1" role="columnheader"/>
+            </tr>
             </thead>
             <tbody>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
+            {[ ...Array(10) ].map((e, i) => (
+              <tr role="row" key={i}>
+                <td role="cell"/>
+                <td role="cell"/>
               </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
-              <tr role='row'>
-                <td role='cell'></td>
-                <td role='cell'></td>
-                <td role='cell'></td>
-              </tr>
+            ))}
             </tbody>
           </table>
         </div>
@@ -199,40 +182,54 @@ const PreviewDataTable = ({ data }) => {
     )
   }
 
-  if (!data) return [<Header key='header' />, <PlaceholderTable key='table' />]
+  if (!data) return (
+    <div className="cove-data-table">
+      <Header key="header"/>
+      <PlaceholderTable key="table"/>
+    </div>
+  )
 
-  const footerProps = { previousPage, nextPage, canPreviousPage, canNextPage, pageNumber: pageIndex + 1, totalPages: pageOptions.length }
+  const footerProps = {
+    previousPage,
+    nextPage,
+    canPreviousPage,
+    canNextPage,
+    pageNumber: pageIndex + 1,
+    totalPages: pageOptions.length
+  }
 
   const Table = () => (
     <>
-      <section className='data-table-container'>
-        <div className='table-container'>
-          <table className='data-table' {...getTableProps()} aria-hidden='true'>
+      <section className="cove-data-table__content">
+        <div className="cove-data-table__table-wrapper">
+          <table className="cove-data-table__table" {...getTableProps()} aria-hidden="true">
             <thead>
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th scope='col' {...column.getHeaderProps(column.getSortByToggleProps())} className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''} title={column.Header}>
-                      {column.render('Header')}
-                      <div {...column.getResizerProps()} className='resizer' />
-                    </th>
-                  ))}
-                </tr>
-              ))}
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th scope="col" {...column.getHeaderProps(column.getSortByToggleProps())}
+                      className={column.isSorted ? column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc' : ''}
+                      title={column.Header}>
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className="resizer"/>
+                  </th>
+                ))}
+              </tr>
+            ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map(row => {
-                prepareRow(row)
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => (
-                      <td {...cell.getCellProps()} title={cell.value}>
-                        {cell.render('Cell')}
-                      </td>
-                    ))}
-                  </tr>
-                )
-              })}
+            {page.map((row) => {
+              prepareRow(row)
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} title={cell.value}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              )
+            })}
             </tbody>
           </table>
         </div>
@@ -241,7 +238,12 @@ const PreviewDataTable = ({ data }) => {
     </>
   )
 
-  return [<Header key='header' data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter} />, <Table key='table' />]
+  return (
+    <div className="cove-data-table">
+      <Header key="header" data={data} setGlobalFilter={setGlobalFilter} globalFilter={globalFilter}/>
+      <Table key="table"/>
+    </div>
+  )
 }
 
 export default PreviewDataTable

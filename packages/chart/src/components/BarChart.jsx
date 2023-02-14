@@ -9,7 +9,7 @@ import { BarStackHorizontal } from '@visx/shape'
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
-  // Just do this once up front otherwise we end up 
+  // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey);
 
@@ -136,7 +136,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
       <Group left={parseFloat(config.runtime.yAxis.size)}>
         {/* Stacked Vertical */}
         {config.visualizationSubType === 'stacked' && !isHorizontal && (
-          <BarStack data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={(d) => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
+          <BarStack data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} x={d => d[config.runtime.xAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale}>
             {barStacks =>
               barStacks.reverse().map(barStack =>
                 barStack.bars.map(bar => {
@@ -199,7 +199,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
         {/* Stacked Horizontal */}
         {config.visualizationSubType === 'stacked' && isHorizontal && (
           <>
-            <BarStackHorizontal data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={(d) => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
+            <BarStackHorizontal data={cleanedData} keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys} height={yMax} y={d => d[config.runtime.yAxis.dataKey]} xScale={xScale} yScale={yScale} color={colorScale} offset='none'>
               {barStacks =>
                 barStacks.map(barStack =>
                   updateBars(barStack.bars).map((bar, index) => {
@@ -446,7 +446,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             ;
                             {orientation === 'vertical' && (
                               <Text display={config.labels && displayBar ? 'block' : 'none'} opacity={transparentBar ? 0.5 : 1} x={barWidth * (bar.index + 0.5) + offset} y={barY - 5} fill={barColor} textAnchor='middle'>
-                                {bar.value}
+                                {formatNumber(bar.value)}
                               </Text>
                             )}
                             ;

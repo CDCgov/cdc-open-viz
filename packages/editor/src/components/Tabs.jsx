@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { Children, useState, useEffect } from 'react'
 
-const Tabs = ({ children, startingTab = 0, className, changeTab = null }) => {
-  const [active, setActive] = useState(startingTab)
+// Styles
+import '../scss/cove-tabs.scss'
 
-  let containerClassName = 'tabs'
+// Define the "slots" to be populated by subcomponents
+const TabsContent = () => null
 
-  if (className) {
-    containerClassName = `tabs ${className}`
-  }
+// Component
+const Tabs = ({ children, startingTab = 0, className, changeTab = null, fullsize, ...attributes }) => {
+  const [ active, setActive ] = useState(startingTab)
 
   const setActiveTab = (disabled, index) => {
     if (false === disabled) {
@@ -15,41 +16,54 @@ const Tabs = ({ children, startingTab = 0, className, changeTab = null }) => {
     }
   }
 
-  useEffect(() => {
-    if (startingTab > -1) {
-      setActive(startingTab)
-    }
-  }, [startingTab])
+  //Parse, organize, and pull "slotted" children data from subcomponents
+  const childNodes = Children.toArray(children)
+  const tabsContentChildren = childNodes.filter(child => child?.type === TabsContent)
 
-  const tabs = children.map(({ props }, i) => {
-    let classes = 'nav-item'
-
+  const tabList = children.map(({ props }, i) => {
     let disabled = props.disableRule || false
 
-    if (disabled) {
-      classes += ' disabled'
-    }
-
-    if (i === active) {
-      classes += ' active'
-    }
+    let classes = ''
+    classes += fullsize ? ' cove-tabs__tab--fullsize' : ''
+    classes += disabled ? ' disabled' : ''
+    classes += i === active ? ' active' : ''
 
     return (
-      <li onClick={() => setActiveTab(disabled, i)} key={props.title} className={classes}>
+      <button
+        className={`cove-tabs__tab${classes}`}
+        onClick={() => setActiveTab(disabled, i)}
+        role="tab"
+        key={i}
+      >
         {props.icon}
         {props.title}
-      </li>
+      </button>
     )
   })
 
+  const tabsClassList = className ? ' ' + className : ''
+
+  useEffect(() => {
+    if (startingTab > -1) setActive(startingTab)
+  }, [ startingTab ])
+
   return (
     <>
-      <nav className={containerClassName}>
-        <ul className='nav nav-fill'>{tabs}</ul>
-      </nav>
-      {children[active]}
+      <div className={`cove-tabs${tabsClassList}`} {...attributes}>
+        <nav className="cove-tabs__tab-list">
+          {tabList}
+        </nav>
+        {tabsContentChildren &&
+          <div className={`cove-tabs__content${tabsContentChildren[active]?.props.className ? ' ' + tabsContentChildren[active]?.props.className : ''}`}>
+            {tabsContentChildren[active]?.props.children}
+          </div>
+        }
+      </div>
     </>
   )
 }
+
+//Create subcomponents as "slots" within component namespace
+Tabs.Content = TabsContent
 
 export default Tabs

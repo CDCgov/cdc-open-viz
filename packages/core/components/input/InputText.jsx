@@ -106,7 +106,7 @@ const InputText = (
 
 InputText.propTypes = {
   label: PropTypes.string,
-  type: PropTypes.oneOf([ 'text', 'textarea', 'number', 'date' ]),
+  type: PropTypes.oneOf([ 'text', 'search', 'textarea', 'number', 'date' ]),
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number
