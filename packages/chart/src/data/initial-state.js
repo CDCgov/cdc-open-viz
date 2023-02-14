@@ -100,7 +100,8 @@ export default {
     limitHeight: false,
     height: '',
     caption: '',
-    showDownloadUrl: false
+    showDownloadUrl: false,
+    showDataTableLink: true,
   },
   orientation: 'vertical',
   legend: {
