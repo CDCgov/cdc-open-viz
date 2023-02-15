@@ -287,9 +287,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    console.log('new value', newValue)
-    console.log('section', section)
-    console.log('sub', subsection)
 
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
