@@ -5,7 +5,10 @@ $blue-light: #8bc6f7;
 $UI-red: #f74242;
 
 .cove-dashboard__builder {
+  box-sizing: border-box;
+  height: 100%;
   padding: 2rem 3rem;
+  overflow-y: auto;
 }
 
 .cove-dashboard__builder__row {

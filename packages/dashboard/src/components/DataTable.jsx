@@ -8,6 +8,7 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 
 export default function DataTable(props) {
   const { data, downloadData, datasetKey, config, dataFileSourceType } = props
+
   const [tableExpanded, setTableExpanded] = useState(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 

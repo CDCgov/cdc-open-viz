@@ -3,9 +3,9 @@ import React, { useContext, useRef, useEffect } from 'react'
 // Third Party
 import { useDrag } from 'react-dnd'
 
-// Context
+// Store
 import { useGlobalStore } from '@cdc/core/stores/globalStore'
-import ConfigContext from '../../ConfigContext'
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/dataTransform'
@@ -68,8 +68,8 @@ const vizHash = {
 }
 
 const BuilderWidget = ({ data = {}, addVisualization, type }) => {
-  const { overlay, openOverlay, toggleOverlay } = useGlobalStore()
-  const { rows, visualizations, config, updateConfig } = useContext(ConfigContext)
+  const { openOverlay, toggleOverlay } = useGlobalStore()
+  const { config, updateConfig } = useConfigStore()
 
   const dataRef = useRef()
   dataRef.current = data
@@ -82,6 +82,8 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
     if (!result) return null
 
     const { rowIdx, colIdx } = result
+    let rows = config.rows
+    let visualizations = config.visualizations
 
     if (undefined !== data.rowIdx) {
       rows[data.rowIdx][data.colIdx].widget = null // Wipe from old position
@@ -106,6 +108,9 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   })
 
   const deleteWidget = () => {
+    let rows = config.rows
+    let visualizations = config.visualizations
+
     rows[data.rowIdx][data.colIdx].widget = null
 
     delete visualizations[data.uid]
@@ -122,12 +127,14 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   }
 
   const editWidget = () => {
+    let visualizations = config.visualizations
     visualizations[data.uid].editing = true
 
     updateConfig({ ...config, visualizations })
   }
 
   const changeDataset = (uid, value) => {
+    let visualizations = config.visualizations
     delete visualizations[uid].dataDescription
     delete visualizations[uid].formattedData
 
@@ -201,6 +208,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
 
   useEffect(() => {
     if (data.openModal) {
+      let visualizations = config.visualizations
       openOverlay(dataDesignerModal(dataRef.current))
 
       visualizations[data.uid].openModal = false
@@ -245,7 +253,8 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
           <Icon className="cove-dashboard__widget-icon" display={vizHash[type].icon} base />
           <span className="cove-dashboard__widget-label">{vizHash[type].label}</span>
           {data.newViz && (
-            <span onClick={editWidget} className='config-needed'>
+            <span onClick={editWidget} className='cove-dashboard__widget__alert-config'>
+              <Icon className="mr-1" display="tools"/>
               Configuration needed
             </span>
           )}

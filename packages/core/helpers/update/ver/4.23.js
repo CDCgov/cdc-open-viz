@@ -6,7 +6,7 @@ const update423 = (config) => {
   if (!config.validated || config.validated < ver) {
 
     // Convert theme definition in config to color only
-    if (newConfig.theme.includes("theme-")) {
+    if (newConfig.theme && newConfig.theme.includes("theme-")) {
       newConfig.theme = newConfig.theme.split('-')[1]
     }
 

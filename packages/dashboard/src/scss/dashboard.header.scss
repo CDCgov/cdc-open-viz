@@ -1,0 +1,106 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+.cove-dashboard__header {
+  background-color: #ddd;
+  border-bottom: #c7c7c7 1px solid;
+}
+
+.cove-dashboard__header-wrapper {
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-right: 1px solid #acacac;
+}
+
+.cove-dashboard__header-back {
+  padding: 0;
+  margin-right: 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-style: inherit;
+  line-height: 2em;
+  text-align: left;
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  user-select: none;
+}
+
+.cove-dashboard__header-nav {
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cove-dashboard__header-nav__list {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  border-bottom: #c7c7c7 1px solid;
+}
+
+.cove-dashboard__header-nav__list--item {
+  display: block;
+  position: relative;
+  padding: 0 1.5rem 5px;
+  margin-bottom: -1px;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #565656;
+  transition: color 200ms $transition-expo-out;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: #00579d;
+    transition: height 200ms $transition-expo-out;
+    transform-origin: bottom;
+  }
+
+  &[data-active="true"] {
+    color: #00579d;
+
+    &::after {
+      height: 3px;
+    }
+  }
+}
+
+.cove-dashboard__header-nav__content {
+  padding-top: 0.375rem;
+  padding-bottom: 0.5rem;
+}
+
+.cove-dashboard__header-nav__content-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0px, 200px));
+  align-items: start;
+
+  .cove-input__checkbox-group {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.cove-dashboard__header-nav__content-options--item {
+
+  + .cove-dashboard__header-nav__content-options--item {
+    margin-left: 0.5rem;
+  }
+
+  .cove-input {
+    padding: 0.125rem;
+    margin-bottom: 0;
+    width: auto;
+  }
+}

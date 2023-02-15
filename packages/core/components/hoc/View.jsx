@@ -9,70 +9,59 @@ import { useGlobalStore } from '../../stores/globalStore'
 // Components - Core
 import Editor from '../editor/Editor'
 import Overlay from '../ui/Overlay'
-import RenderFallback from '../loader/RenderFallback'
 
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ EditorPanels, isWizard, children }) => {
+const View = ({ EditorPanels, isDashboard: isDashboardVal, isWizard: isWizardVal, children }) => {
   const { viewMode, setViewMode } = useGlobalStore()
 
   const winLocation = window.location.href
 
   useEffect(() => {
-    if (winLocation.includes('editor=true')) return setViewMode('editor')
-    if (isWizard) return setViewMode('wizard') //Supplied by Wizard (previously named Editor)
+    if (winLocation.includes('editor=true')) setViewMode('isEditor', true)
+    if (isDashboardVal) setViewMode('isDashboard', true) //Supplied by Dashboard entry
+    if (isWizardVal) setViewMode('isWizard', true) //Supplied by Wizard entry (previously named Editor)
     return () => {}
-  }, [winLocation, isWizard, setViewMode])
+  }, [ winLocation, isDashboardVal, isWizardVal, setViewMode ])
 
-  // Define the anchor ref to attach the Overlay/Modals to
-  const coveAnchor = useRef()
+  const { isEditor, isDashboard, isPreview, isWizard } = viewMode
 
-  let view = <>No views match the provided view mode.</>
+  // Define the anchor ref to attach Overlay/Modals
+  const overlayAnchor = useRef()
 
-  // Render the display of the component based on the generated viewMode value in globalStore
-  switch (viewMode) {
-    case 'component':
-      view = (
-        <div className="cove" ref={coveAnchor}>
-          {children}
-          <Overlay/>
-        </div>
-      )
-      break
-    case 'editor':
-      view = (
-        <div className="cove" ref={coveAnchor}>
-          <Editor EditorPanels={EditorPanels}>
-            {children}
-          </Editor>
-          <Overlay/>
-        </div>
-      )
-      break
-    case 'wizard':
-      view = (
-        <>
-          <Editor EditorPanels={EditorPanels}>
-            {children}
-          </Editor>
-          <Overlay/>
-        </>
-      )
-      break
-    default:
-      view = <RenderFallback/>
-      break
+  let view = <>{children}</>
+
+  // Render the display of the component editor, based on the generated viewMode value in globalStore
+  if (
+    (isEditor && (!isDashboard && !isWizard)) || // If editor mode is enabled, but not in Dashboard or Wizard views
+    (isEditor && isDashboard && !isPreview) || // If editor mode is enabled, and in Dashboard view, but not in preview mode
+    isWizard // If in the Wizard view
+  ) {
+    view = (
+      <Editor EditorPanels={EditorPanels}>
+        {children}
+      </Editor>
+    )
   }
 
-  return <>
-    {view}
-  </>
+  return (
+    <div className="cove" ref={overlayAnchor}>
+      {view}
+      <Overlay/>
+    </div>
+  )
 }
 
 View.propTypes = {
-  /** **[External]** Defined in the `globalStore` - Sets the current view of the user, depending on the environment settings detected */
-  viewMode: PropTypes.oneOf([ 'component', 'editor', 'wizard' ]),
+  /** **[External]** Defined in the `globalStore` - Sets the Editor view mode for the component */
+  'viewMode.isEditor': PropTypes.bool,
+  /** **[External]** Defined in the `globalStore` - Sets the Dashboard view mode for the component */
+  'viewMode.isDashboard': PropTypes.bool,
+  /** **[External]** Defined in the `globalStore` - Sets the Dashboard's Preview view mode for the component */
+  'viewMode.isPreview': PropTypes.bool,
+  /** **[External]** Defined in the `globalStore` - Sets the Wizard view mode for the component */
+  'viewMode.isWizard': PropTypes.bool,
   /** The React component export of the EditorPanels for the component */
   EditorPanels: PropTypes.func
 }

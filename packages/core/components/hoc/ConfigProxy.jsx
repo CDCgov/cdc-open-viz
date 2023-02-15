@@ -13,25 +13,24 @@ import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
 const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children }) => {
   const { viewMode } = useGlobalStore((state) => state)
-  const { setConfigDefaults, updateConfig, setUpdateWizardConfig, updateWizardConfig } = useConfigStore()
+  const { setConfigDefaults, updateConfig, setUpdateWizardConfig } = useConfigStore()
 
-  const [cycle, setCycle] = useState(false)
-  const [loadingConfig, setLoadingConfig] = useState(true)
+  const [ cycled, setCycled ] = useState(false)
+  const [ loadingConfig, setLoadingConfig ] = useState(true)
 
   const transform = new dataTransform()
 
   const reloadConfig = () => {
     setLoadingConfig(true)
-    setCycle(false)
+    setCycled(false)
   }
 
   useEffect(() => {
-    setUpdateWizardConfig(setWizardConfig)
-  }, [setWizardConfig]);
+    if (setWizardConfig) setUpdateWizardConfig(setWizardConfig)
+  }, [ setUpdateWizardConfig, setWizardConfig ])
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {
-      console.log(url)
       let urlObj = null
       try {
         const res = await fetch(url)
@@ -84,23 +83,23 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
       // Make config entry for table visibility - TODO: COVE Refactor - May no longer need with global context inclusion of view mode?
       if (newConfig.table && undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === viewMode
 
+      if (runtime) runtime(newConfig) // If provided a runtime function, run it on newConfig to transform
+
       return newConfig
     }
 
-    if (!cycle) {
+    if (!cycled) {
       fetchConfig()
         .then((newConfig) => {
-          // Pass up to Editor if needed
-          // if (setUpdateWizardConfig) updateWizardConfig(newConfig)
-          updateConfig(newConfig, runtime) // Set final config data in ConfigContext, TODO: COVE Refactor - is this being parsed properly? Is runtime being attached?
+          updateConfig(newConfig) // Set final config data in configStore
           setLoadingConfig(false) // Tell subcomponents that the config is ready
         })
         .catch(console.error)
         .finally(() => {
-          setCycle(true) // Switch to end the useLoadConfig cycle
+          setCycled(true) // Stop the useLoadConfig cycle
         })
     }
-  }, [cycle, configObj, configUrl])
+  }, [ cycled, configObj, configUrl ])
 
   return (loadingConfig ? <></> : children)
 }
@@ -112,7 +111,7 @@ ConfigProxy.propTypes = {
   configUrl: PropTypes.string,
   /** A json object containing any default, baseline values for a visualization. */
   defaults: PropTypes.object,
-  /** A visualization-specific function that is run against the resolved *configObj* or *configURL* object; returns a modified object based off those processed values */
+  /** A visualization-specific function, or hook, that is run against the resolved *configObj* or *configURL* object; returns a modified object with those processed values */
   runtime: PropTypes.func,
 }
 

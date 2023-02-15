@@ -1,24 +1,33 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import ConfigContext from '../ConfigContext'
+import { useConfigStore } from '@cdc/core/stores/configStore'
+import { useGlobalStore } from '@cdc/core/stores/globalStore'
 
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+
 import Modal from '@cdc/core/components/ui/Modal'
+import InputText from '@cdc/core/components/input/InputText'
+
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import dataTransform from '@cdc/core/helpers/dataTransform'
+import InputCheckbox from '@cdc/core/components/input/InputCheckbox.jsx'
+import Button from '@cdc/core/components/element/Button.jsx'
+
 
 const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = null }) => {
-  const { config, updateConfig, setParentConfig } = useContext(ConfigContext)
+  const { config, updateConfig, updateWizardConfig } = useConfigStore()
+  const { openOverlay, toggleOverlay } = useGlobalStore()
 
-  const { overlay } = useGlobalContext()
+  const [ columns, setColumns ] = useState([])
 
-  const [columns, setColumns] = useState([])
+  const transform = new dataTransform()
 
-  const changeConfigValue = (parentObj, key, value) => {
+  /*const changeConfigValue = (parentObj, key, value) => {
     let newConfig = { ...config }
     if (!newConfig[parentObj]) newConfig[parentObj] = {}
     newConfig[parentObj][key] = value
 
     updateConfig(newConfig)
-  }
+  }*/
 
   const setTab = index => {
     setTabSelected(index)
@@ -46,7 +55,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     updateConfig({ ...config, dashboard: dashboardConfig })
 
-    overlay?.actions.toggleOverlay()
+    toggleOverlay()
   }
 
   const convertStateToConfig = (type = 'JSON') => {
@@ -54,9 +63,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
     delete strippedState.newViz
     delete strippedState.runtime
 
-    if (type === 'JSON') {
-      return JSON.stringify(strippedState)
-    }
+    if (type === 'JSON') return JSON.stringify(strippedState)
 
     return strippedState
   }
@@ -66,17 +73,15 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
     // Emit the data in a regular JS event so it can be consumed by anything.
     const event = new CustomEvent('updateVizConfig', { detail: parsedData })
-
     window.dispatchEvent(event)
 
     // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig('object')
-      setParentConfig(newConfig)
-    }
+    if (updateWizardConfig)
+      updateWizardConfig(convertStateToConfig('object'))
 
+    return () => {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config])
+  }, [ config ])
 
   useEffect(() => {
     const runSetColumns = async () => {
@@ -106,17 +111,19 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       setColumns(Object.keys(columns))
     }
 
-    runSetColumns()
-  }, [config.datasets])
+    if (config.datasets) runSetColumns()
+    return () => {}
+  }, [ config.datasets ])
 
   const filterModal = (filter, index) => {
+    console.log(config)
     const saveChanges = () => {
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter
 
       updateConfig({ ...config, dashboard: tempConfig })
 
-      overlay?.actions.toggleOverlay()
+      toggleOverlay()
     }
 
     const updateFilterProp = (name, index, value) => {
@@ -124,7 +131,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
 
       newFilter[name] = value
 
-      overlay?.actions.openOverlay(filterModal(newFilter, index))
+      openOverlay(filterModal(newFilter, index))
     }
 
     const addFilterUsedBy = (filter, index, value) => {
@@ -145,10 +152,10 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       <Modal>
         <Modal.Content>
           <h2>Dashboard Filter Settings</h2>
-          <fieldset className='shared-filter-modal' key={filter.columnName + index}>
+          <fieldset className="shared-filter-modal" key={filter.columnName + index}>
             <button
-              type='button'
-              className='btn btn-primary remove-column'
+              type="button"
+              className="btn btn-primary remove-column"
               onClick={() => {
                 removeFilter(index)
               }}
@@ -156,14 +163,14 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               Remove Filter
             </button>
             <label>
-              <span className='edit-label column-heading'>Filter: </span>
+              <span className="edit-label column-heading">Filter: </span>
               <select
                 value={filter.columnName}
                 onChange={e => {
                   updateFilterProp('columnName', index, e.target.value)
                 }}
               >
-                <option value=''>- Select Option -</option>
+                <option value="">- Select Option -</option>
                 {columns.map(dataKey => (
                   <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
                     {dataKey}
@@ -172,9 +179,9 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               </select>
             </label>
             <label>
-              <span className='edit-label column-heading'>Label: </span>
+              <span className="edit-label column-heading">Label: </span>
               <input
-                type='text'
+                type="text"
                 value={filter.key}
                 onChange={e => {
                   updateFilterProp('key', index, e.target.value)
@@ -182,9 +189,9 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               />
             </label>
             <label>
-              <span className='edit-label column-heading'>Show Dropdown</span>
+              <span className="edit-label column-heading">Show Dropdown</span>
               <input
-                type='checkbox'
+                type="checkbox"
                 defaultChecked={filter.showDropdown === true}
                 onChange={e => {
                   updateFilterProp('showDropdown', index, !filter.showDropdown)
@@ -192,9 +199,9 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               />
             </label>
             <label>
-              <span className='edit-label column-heading'>Set By: </span>
+              <span className="edit-label column-heading">Set By: </span>
               <select value={filter.setBy} onChange={e => updateFilterProp('setBy', index, e.target.value)}>
-                <option value=''>- Select Option -</option>
+                <option value="">- Select Option -</option>
                 {Object.keys(config.visualizations).map(vizKey => (
                   <option value={vizKey} key={`set-by-select-item-${vizKey}`}>
                     {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}
@@ -203,12 +210,17 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               </select>
             </label>
             <label>
-              <span className='edit-label column-heading'>Used By:</span>
+              <span className="edit-label column-heading">Used By:</span>
               <ul>
                 {filter.usedBy &&
                   filter.usedBy.map(vizKey => (
                     <li key={`used-by-list-item-${vizKey}`}>
-                      <span>{config.visualizations[vizKey].general && config.visualizations[vizKey].general.title ? config.visualizations[vizKey].general.title : config.visualizations[vizKey].title || vizKey}</span>{' '}
+                      <span>
+                        {config.visualizations[vizKey].general && config.visualizations[vizKey].general.title
+                          ? config.visualizations[vizKey].general.title
+                          : config.visualizations[vizKey].title || vizKey
+                        }
+                      </span>
                       <button
                         onClick={e => {
                           e.preventDefault()
@@ -221,7 +233,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                   ))}
               </ul>
               <select onChange={e => addFilterUsedBy(filter, index, e.target.value)}>
-                <option value=''>- Select Option -</option>
+                <option value="">- Select Option -</option>
                 {Object.keys(config.visualizations)
                   .filter(vizKey => filter.setBy !== vizKey && (!filter.usedBy || filter.usedBy.indexOf(vizKey) === -1) && !config.visualizations[vizKey].usesSharedFilter)
                   .map(vizKey => (
@@ -232,78 +244,63 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
               </select>
             </label>
           </fieldset>
-          <button type='button' className='btn btn-primary' style={{ display: 'inline-block', 'margin-right': '1em' }} onClick={overlay?.actions.toggleOverlay}>
+          <Button style={{ marginRight: '1em' }} onClick={toggleOverlay}>
             Cancel
-          </button>
-          <button type='button' className='btn btn-primary' style={{ display: 'inline-block' }} onClick={saveChanges}>
+          </Button>
+          <Button onClick={saveChanges}>
             Save
-          </button>
+          </Button>
         </Modal.Content>
       </Modal>
     )
   }
 
   return (
-    <header className="cove-dashboard__header" role='heading' aria-level='2'>
-      {subEditor ? (
-        <div className='heading-1 back-to' onClick={back} style={{ cursor: 'pointer' }}>
-          <span>&#8592;</span> Back to Dashboard
-        </div>
-      ) : (
-        <div className='heading-1'>
-          Dashboard Editor
-          <br />
-          {<input type='text' placeholder='Enter Dashboard Name Here' defaultValue={config.dashboard.title} onChange={e => changeConfigValue('dashboard', 'title', e.target.value)} />}
-        </div>
-      )}
+    <header className="cove-dashboard__header" role="heading" aria-level="2">
+      <div className="cove-dashboard__header-wrapper">
+        {subEditor ? (
+          <button className="cove-dashboard__header-back" onClick={back} style={{ cursor: 'pointer' }}>
+            <span>&#8592;</span> Back to Dashboard
+          </button>
+        ) : (
+          <>
+            <p className="mb-1">Dashboard Editor</p>
+            <InputText className="mb-0" type="text" placeholder="Enter Dashboard Name Here" configField={[ 'dashboard', 'title' ]}/>
+          </>
+        )}
+      </div>
       {!subEditor && (
-        <div className="toggle-bar__wrapper">
-          <ul className='toggle-bar'>
-            <li
-              className={tabSelected === 0 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(0)
-              }}
-            >
+        <div className="cove-dashboard__header-nav">
+          <ul className="cove-dashboard__header-nav__list">
+            <li className="cove-dashboard__header-nav__list--item" data-active={tabSelected === 0} onClick={() => {
+              setTab(0)
+            }}>
               Dashboard Description
             </li>
-            <li
-              className={tabSelected === 1 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(1)
-              }}
-            >
+            <li className="cove-dashboard__header-nav__list--item" data-active={tabSelected === 1} onClick={() => setTab(1)}>
               Dashboard Filters
             </li>
-            <li
-              className={tabSelected === 2 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(2)
-              }}
-            >
+            <li className="cove-dashboard__header-nav__list--item" data-active={tabSelected === 2} onClick={() => setTab(2)}>
               Data Table Settings
             </li>
-            <li
-              className={tabSelected === 3 ? 'active' : 'inactive'}
-              onClick={() => {
-                setTab(3)
-              }}
-            >
+            <li className="cove-dashboard__header-nav__list--item" data-active={tabSelected === 3} onClick={() => setTab(3)}>
               Dashboard Preview
             </li>
           </ul>
-          <div className='heading-body'>
-            {tabSelected === 0 && <input type='text' className='description-input' placeholder='Type a dashboard description here.' defaultValue={config.dashboard.description} onChange={e => changeConfigValue('dashboard', 'description', e.target.value)} />}
+          <div className="cove-dashboard__header-nav__content">
+            {tabSelected === 0 &&
+              <InputText className="description-input mb-0" type="text" placeholder="Type a dashboard description here." configField={[ 'dashboard', 'description' ]}/>
+            }
             {tabSelected === 1 && (
               <>
-                {config.dashboard.sharedFilters &&
-                  config.dashboard.sharedFilters.map((sharedFilter, index) => (
-                    <span className='shared-filter-button' key={`shared-filter-${sharedFilter.key}`}>
+                {config.dashboard?.sharedFilters &&
+                  config.dashboard?.sharedFilters.map((sharedFilter, index) => (
+                    <span className="shared-filter-button" key={`shared-filter-${sharedFilter.key}`}>
                       <a
-                        href='#'
+                        href="#"
                         onClick={e => {
                           e.preventDefault()
-                          overlay?.actions.openOverlay(filterModal(sharedFilter, index))
+                          openOverlay(filterModal(sharedFilter, index))
                         }}
                       >
                         {sharedFilter.key}
@@ -317,16 +314,17 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
             {tabSelected === 2 && (
               <>
 
-                <div className="wrap">
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.show} onChange={e => changeConfigValue('table', 'show', e.target.checked)} />
-                    Show Table
-                  </label><br />
-
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.expanded} onChange={e => changeConfigValue('table', 'expanded', e.target.checked)} />
-                    Expanded by Default
-                  </label><br />
+                <div className="cove-dashboard__header-nav__content-options">
+                  <InputCheckbox className="cove-dashboard__header-nav__content-options--item" label="Show Table" configField={[ 'table', 'show' ]}/>
+                  <InputCheckbox className="cove-dashboard__header-nav__content-options--item" label="Expanded by Default" configField={[ 'table', 'expanded' ]}/>
+                  <div className="cove-dashboard__header-nav__content-options--item">
+                    <InputCheckbox label="Limit Table Height" configField={[ 'table', 'limitHeight' ]}/>
+                    {config.table?.limitHeight &&
+                      <InputText className="table-height-input" type="text" placeholder="Height (px)" configField={[ 'table', 'height' ]}/>
+                    }
+                  </div>
+                  <InputCheckbox className="cove-dashboard__header-nav__content-options--item" label="Show CSV Button" configField={[ 'table', 'download' ]}/>
+                  <InputCheckbox className="cove-dashboard__header-nav__content-options--item" label="Show Link to Dataset" configField={[ 'table', 'showDownloadUrl' ]}/>
                 </div>
 
                 {/* <div className="wrap">
@@ -339,31 +337,12 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
                     Show Image Button
                   </label>
                 </div> */}
-
-                <div className="wrap">
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.limitHeight} onChange={e => changeConfigValue('table', 'limitHeight', e.target.checked)} />
-                    Limit Table Height
-                  </label>
-                  {config.table.limitHeight && <input class='table-height-input' type='text' placeholder='Height (px)' defaultValue={config.table.height} onChange={e => changeConfigValue('table', 'height', e.target.value)} />}
-                </div>
-
-                <div className="wrap">
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.download} onChange={e => changeConfigValue('table', 'download', e.target.checked)} />
-                    Show CSV Button
-                  </label>
-                  <label>
-                    <input type='checkbox' defaultChecked={config.table.showDownloadUrl} onChange={e => changeConfigValue('table', 'showDownloadUrl', e.target.checked)} />
-                    Show Link to Dataset
-                  </label>
-                </div>
               </>
             )}
           </div>
-        </div >
+        </div>
       )}
-    </header >
+    </header>
   )
 }
 

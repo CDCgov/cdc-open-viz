@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { useDrop } from 'react-dnd'
 
-// Context
-import ConfigContext from '../../ConfigContext'
+// Store
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
 // Components - Local
 import BuilderWidget from './Builder.Widget'
 
 const BuilderColumn = ({ data, rowIdx, colIdx }) => {
-  const { visualizations } = useContext(ConfigContext)
+  const { config } = useConfigStore()
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'vis-widget',
@@ -24,7 +24,7 @@ const BuilderColumn = ({ data, rowIdx, colIdx }) => {
     })
   }))
 
-  const widget = data.widget ? visualizations[data.widget] : null
+  const widget = data.widget ? config.visualizations[data.widget] : null
 
   let classNames = ['cove-dashboard__builder__column-size--' + data.width]
 

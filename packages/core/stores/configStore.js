@@ -44,10 +44,8 @@ export const useConfigStore = create(
           })
         ),
       updateConfig: config => set(state => ({ config: { ...state.config, ...config } })),
-      updateConfigField: (fieldPayload, setValue) => {
-        set(produce(state => merge(state, { config: setConfigKeyValue(fieldPayload, setValue) })))
-      },
-      updateWizardConfig: () => {},
+      updateConfigField: (fieldPayload, setValue) => set(produce(state => merge(state, { config: setConfigKeyValue(fieldPayload, setValue) }))),
+      updateWizardConfig: null,
       setUpdateWizardConfig: updateFunction => set(state => ({ updateWizardConfig: updateFunction }))
     }),
     {

@@ -1,20 +1,22 @@
-import React, { useContext } from 'react'
-import BuilderRow from './Builder.Row'
+import React from 'react'
 
-import ConfigContext from '../../ConfigContext'
+// Store
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
+// Components - Core
 import Button from '@cdc/core/components/element/Button'
 
+// Components - Local
+import BuilderRow from './Builder.Row'
+
 const Builder = () => {
-  const { rows, config, updateConfig } = useContext(ConfigContext)
+  const { config, updateConfig } = useConfigStore()
 
   const addRow = () => {
     updateConfig({
-      ...config,
       rows: [
-        ...rows,
+        ...config.rows,
         [{ width: 12 }, { equalHeight: false }, {}, {}]
-        //[{width: 12}, {}, {}]      ],
       ],
       uuid: Date.now()
     })
@@ -22,7 +24,7 @@ const Builder = () => {
 
   return (
     <div className='cove-dashboard__builder'>
-      {rows.map((row, idx) => (
+      {config.rows.map((row, idx) => (
         <BuilderRow row={row} idx={idx} uuid={row.uuid} key={idx} />
       ))}
       <Button className="mt-4" onClick={addRow} fluid>

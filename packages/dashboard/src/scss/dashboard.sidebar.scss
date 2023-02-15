@@ -1,0 +1,17 @@
+@import "@cdc/core/styles/v2/themes/theme-colors";
+@import "@cdc/core/styles/v2/utils/variables";
+
+.cove-dashboard__sidebar {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0.875rem;
+  background-color: #fff;
+  border-right: #c7c7c7 1px solid;
+  overflow-y: auto;
+}
+
+.cove-dashboard__sidebar-title {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: $blue;
+}

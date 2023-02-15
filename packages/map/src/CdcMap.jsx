@@ -27,8 +27,7 @@ import Loading from '@cdc/core/components/loader/Loading'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/dataTransform'
-import { getViewport } from '@cdc/core/helpers/coveHelpers'
-import { numberFromString } from '@cdc/core/helpers/coveHelpers'
+import { getViewport, numberFromString } from '@cdc/core/helpers/coveHelpers'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
 // Child Components

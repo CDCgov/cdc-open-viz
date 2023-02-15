@@ -5,32 +5,24 @@ $blue-light: #8bc6f7;
 $UI-red: #f74242;
 
 .cove-dashboard {
-}
+  display: grid;
+  grid-template-rows: 6rem auto;
+  height: 100vh;
 
-.cove-dashboard__sidebar {
-  padding: 0.875rem;
-  background-color: #fff;
-  border-right: #c7c7c7 1px solid;
-  overflow-y: auto;
-}
-
-.cove-dashboard__sidebar-title {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  color: $blue;
+  &.cove-dashboard--subviz {
+    grid-template-rows: 3rem auto;
+  }
 }
 
 .cove-dashboard__header,
 .cove-dashboard__content {
   display: grid;
   grid-template-columns: 350px 1fr;
+  height: auto;
+  overflow: hidden;
 }
 
-.cove-dashboard__header {
-  padding: 0 1rem;
-  background-color: #ddd;
-  border-bottom: #c7c7c7 1px solid;
-}
+
 
 .cove-dashboard__data-table {
   display: inline-block;

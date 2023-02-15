@@ -13,8 +13,8 @@ $UI-red: #f74242;
   background-color: #fff;
   border: 1px solid $lightGray;
   border-radius: 3px;
-  cursor: move;
   transition: border-color 200ms $transition-expo-out;
+  cursor: move;
 
   &:hover {
     border-color: darken($lightGray, 20%);
@@ -50,6 +50,16 @@ $UI-red: #f74242;
   @at-root .cove-dashboard__viz-grid #{&} {
     font-size: 0.75rem;
   }
+}
+
+.cove-dashboard__widget__alert-config {
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: $red;
+  border: 1px solid;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 .cove-dashboard__widget-icon {

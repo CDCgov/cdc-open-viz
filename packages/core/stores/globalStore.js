@@ -3,7 +3,12 @@ import { devtools } from 'zustand/middleware'
 
 export const useGlobalStore = create(devtools((set) => ({
     // Global State
-    viewMode: '',
+    viewMode: {
+      isEditor: false,
+      isDashboard: false,
+      isPreview: false,
+      isWizard: false
+    },
     os: navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null,
     overlay: {
       object: null,
@@ -13,7 +18,12 @@ export const useGlobalStore = create(devtools((set) => ({
     dimensions: null,
 
     // Actions
-    setViewMode: (view) => set(() => ({ viewMode: view })),
+    setViewMode: (view, value) => set(( state ) => ({
+      viewMode: {
+        ...state.viewMode,
+        [view]: value
+      }
+    })),
     setDimensions: (dimensions) => set(() => ({ dimensions: dimensions })),
 
     // Overlay Actions
@@ -26,6 +36,6 @@ export const useGlobalStore = create(devtools((set) => ({
   }),
   {
     enabled: true,
-    name: "GlobalStore"
+    name: 'GlobalStore'
   }
 ))

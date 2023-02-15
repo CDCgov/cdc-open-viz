@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 
-// Context
-import { useGlobalContext } from '@cdc/core/components/GlobalContext'
-import ConfigContext from '../../ConfigContext'
+// Store
+import { useGlobalStore } from '@cdc/core/stores/globalStore'
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Modal from '@cdc/core/components/ui/Modal'
@@ -13,8 +13,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import BuilderColumn from './Builder.Column'
 
 const RowMenu = ({ rowIdx, row }) => {
-  const { overlay } = useGlobalContext()
-  const { rows, config, updateConfig } = useContext(ConfigContext)
+  const { config, updateConfig } = useConfigStore()
+  const { openOverlay } = useGlobalStore()
 
   const getCurr = () => {
     let res = []
@@ -30,7 +30,7 @@ const RowMenu = ({ rowIdx, row }) => {
   const [equalHeight, setEqualHeight] = useState(false)
 
   const setRowLayout = layout => {
-    const newRows = [...rows]
+    const newRows = [...config.rows]
     const r = newRows[rowIdx]
 
     for (let i = 0; i < r.length; i++) {
@@ -42,12 +42,13 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const moveRow = (dir = 'down') => {
-    if (rowIdx === rows.length - 1 && dir === 'down') return
+    let rows = config.rows
+    if (rowIdx === config.rows.length - 1 && dir === 'down') return
 
     let newIdx = dir === 'down' ? rowIdx + 1 : rowIdx - 1
 
     // Swap
-    const temp = rows[newIdx]
+    const temp = config.rows[newIdx]
 
     rows[newIdx] = row
     rows[rowIdx] = temp
@@ -83,6 +84,7 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const deleteRow = () => {
+    let rows = config.rows
     rows.splice(rowIdx, 1) // Just delete the row. Don't delete the instantiated widgets for now.
 
     updateConfig({ ...config, rows })
@@ -128,16 +130,16 @@ const RowMenu = ({ rowIdx, row }) => {
       </div>
       <div className='spacer'></div>
       {/*<button className={'row-menu__btn'} title="Row Settings"*/}
-      {/*        onClick={() => overlay?.actions.openOverlay(rowSettings)}>*/}
+      {/*        onClick={() => openOverlay(rowSettings)}>*/}
       {/*  <Icon display="edit" color="#fff" size={25}/>*/}
       {/*</button>*/}
       <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx === 0} title='Move Row Up' onClick={() => moveRow('up')}>
         <Icon display='caretUp' color='#fff' size={25} base />
       </button>
-      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx + 1 === rows.length} title='Move Row Down' onClick={() => moveRow('down')}>
+      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx + 1 === config.rows.length} title='Move Row Down' onClick={() => moveRow('down')}>
         <Icon display='caretDown' color='#fff' size={25} base />
       </button>
-      <button className="cove-dashboard__builder__row-menu__button cove-dashboard__builder__row-menu__button--remove" data-disabled={rowIdx === 0 && rows.length === 1} title='Delete Row' onClick={deleteRow}>
+      <button className="cove-dashboard__builder__row-menu__button cove-dashboard__builder__row-menu__button--remove" data-disabled={rowIdx === 0 && config.rows.length === 1} title='Delete Row' onClick={deleteRow}>
         <Icon display='close' color='#fff' size={25} base />
       </button>
     </nav>
