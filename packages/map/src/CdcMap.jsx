@@ -162,6 +162,22 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.mapPosition, setPosition])
 
+  const generateRuntimeLegendHash = () => {
+    return hashObj({
+      color: state.color,
+      customColors: state.customColors,
+      numberOfItems: state.legend.numberOfItems,
+      type: state.legend.type,
+      separateZero: state.legend.separateZero ?? false,
+      primary: state.columns.primary.name,
+      categoryValuesOrder: state.legend.categoryValuesOrder,
+      specialClasses: state.legend.specialClasses,
+      geoType: state.general.geoType,
+      data: state.data,
+      ...runtimeFilters
+    })
+  }
+
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
       let newViewport = getViewport(entry.contentRect.width)
@@ -1256,24 +1272,23 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.general.statePicked])
 
-  
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
   }, [state])
-  
+
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
       setState({
-          ...state,
+        ...state,
         dataTable: {
-            ...state.dataTable,
-            title: "Data Table"
-          }
-        })
+          ...state.dataTable,
+          title: 'Data Table'
+        }
+      })
     }
   }, [state.dataTable])
 
@@ -1295,19 +1310,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data,
-      ...runtimeLegend,
-      ...runtimeFilters
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     const hashData = hashObj({
       columns: state.columns,
@@ -1336,21 +1339,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   }, [state])
 
   useEffect(() => {
-    const hashLegend = hashObj({
-      color: state.color,
-      customColors: state.customColors,
-      numberOfItems: state.legend.numberOfItems,
-      type: state.legend.type,
-      separateZero: state.legend.separateZero ?? false,
-      categoryValuesOrder: state.legend.categoryValuesOrder,
-      specialClasses: state.legend.specialClasses,
-      geoType: state.general.geoType,
-      data: state.data
-    })
+    const hashLegend = generateRuntimeLegendHash()
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData)
+      const legend = generateRuntimeLegend(state, runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
   }, [runtimeData])
@@ -1410,7 +1403,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     handleMapAriaLabels,
     runtimeFilters,
     setRuntimeFilters,
-    innerContainerRef
+    innerContainerRef,
+    currentViewport
   }
 
   if (!mapProps.data || !state.data) return <Loading />
