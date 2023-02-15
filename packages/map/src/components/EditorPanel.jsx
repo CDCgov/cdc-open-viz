@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import ReactTooltip from 'react-tooltip'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 
 import colorPalettes from '@cdc/core/data/colorPalettes'
@@ -936,7 +936,7 @@ const EditorPanel = props => {
         })
         let runtimeLegendKeys = runtimeLegend.map(item => item.value);
         state.legend.categoryValuesOrder.forEach(category => {
-          if(runtimeLegendKeys.indexOf(category) === -1){
+          if (runtimeLegendKeys.indexOf(category) === -1) {
             valid = false;
           }
         });
