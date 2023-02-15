@@ -4,7 +4,7 @@ import React from 'react'
 import defaults from './data/initial-state'
 
 // Hooks
-import useDashboardRuntime from '../hooks/useDashboardRuntime'
+// import useDashboardRuntime from '../hooks/useDashboardRuntime'
 
 // Components - Core
 import ConfigProxy from '@cdc/core/components/hoc/ConfigProxy'
@@ -20,7 +20,7 @@ import './scss/cove-dashboard.scss'
 const CdcDashboard = ({ config: configObj = undefined, configUrl, isWizard = false, setConfig: setWizardConfig }) => {
   return (
   <ErrorBoundary component="CdcDashboard">
-    <ConfigProxy configObj={configObj} configUrl={configUrl} runtime={useDashboardRuntime} setWizardConfig={setWizardConfig} defaults={defaults}>
+    <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults}>
       <View isDashboard={true} isWizard={isWizard}>
         <Dashboard/>
       </View>

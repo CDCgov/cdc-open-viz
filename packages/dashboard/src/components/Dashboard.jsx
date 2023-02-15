@@ -9,9 +9,14 @@ import parse from 'html-react-parser'
 import { useGlobalStore } from '@cdc/core/stores/globalStore'
 import { useConfigStore } from '@cdc/core/stores/configStore'
 
+// Context
+import DashboardContext from '../DashboardContext'
+
 // Helpers
-import filterData from '@cdc/core/helpers/filterData'
+import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import dataTransform from '@cdc/core/helpers/dataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import filterData from '@cdc/core/helpers/filterData'
 
 // Components - Core
 import MediaControls from '@cdc/core/components/ui/MediaControls'
@@ -22,7 +27,6 @@ import BuilderWidget from './builder/Builder.Widget'
 import DataTable from './DataTable'
 import Header from './Header'
 
-
 // Visualization
 import CdcMap from '@cdc/map'
 import CdcChart from '@cdc/chart'
@@ -30,6 +34,7 @@ import CdcDataBite from '@cdc/data-bite'
 import CdcWaffleChart from '@cdc/waffle-chart'
 import CdcMarkupInclude from '@cdc/markup-include'
 import CdcFilteredText from '@cdc/filtered-text'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback.jsx'
 
 const addVisualization = (type, subType) => {
   let modalWillOpen = type === 'markup-include' ? false : true
@@ -98,17 +103,88 @@ const VisualizationsPanel = () => (
 const Dashboard = () => {
   const { viewMode } = useGlobalStore()
   const { config, updateConfig, updateWizardConfig } = useConfigStore()
-
+  const [data, setData] = useState([])
   const { title, description } = config.dashboard || config
 
   const [ filteredData, setFilteredData ] = useState()
+  const [loading, setLoading] = useState(true)
   const [ preview, setPreview ] = useState(false)
 
   const [ tabSelected, setTabSelected ] = useState(0)
   const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const transform = new dataTransform()
+
+  const processData = async config => {
+    let dataset = config.formattedData || config.data
+
+    if (config.dataUrl) {
+      dataset = fetchRemoteData(`${config.dataUrl}?v=${cacheBustingString()}`)
+
+      if (dataset && config.dataDescription) {
+        try {
+          dataset = transform.autoStandardize(data)
+          dataset = transform.developerStandardize(data, config.dataDescription)
+        } catch (e) {
+          //Data not able to be standardized, leave as is
+        }
+      }
+    }
+
+    return dataset
+  }
+
   let isSubEditor = useRef(false)
+
+  const loadConfig = async () => {
+    let newConfig = { ...config }
+    let datasets = {}
+
+    if (config.datasets) {
+      await Promise.all(
+        Object.keys(config.datasets).map(async key => {
+          datasets[key] = await processData(config.datasets[key])
+        })
+      )
+    } else {
+      let dataKey = newConfig.dataFileName || 'backwards-compatibility'
+      datasets[dataKey] = await processData(config)
+
+      let datasetsFull = {}
+      datasetsFull[dataKey] = {
+        data: datasets[dataKey],
+        dataDescription: newConfig.dataDescription
+      }
+      newConfig.datasets = datasetsFull
+
+      Object.keys(newConfig.visualizations).forEach(vizKey => {
+        newConfig.visualizations[vizKey].dataKey = dataKey
+        newConfig.visualizations[vizKey].dataDescription = newConfig.dataDescription
+        newConfig.visualizations[vizKey].formattedData = newConfig.formattedData
+      })
+
+      delete newConfig.data
+      delete newConfig.dataUrl
+      delete newConfig.dataFileName
+      delete newConfig.dataFileSourceType
+      delete newConfig.dataDescription
+      delete newConfig.formattedData
+
+      if (newConfig.dashboard && newConfig.dashboard.filters) {
+        newConfig.dashboard.sharedFilters = newConfig.dashboard.sharedFilters || []
+        newConfig.dashboard.filters.forEach(filter => {
+          newConfig.dashboard.sharedFilters.push({ ...filter, key: filter.label, showDropdown: true, usedBy: Object.keys(newConfig.visualizations) })
+        })
+
+        delete newConfig.dashboard.filters
+      }
+    }
+
+    setData(datasets)
+
+    updateConfigFilters(newConfig, datasets)
+    setLoading(false)
+  }
 
   const setSharedFilter = (key, datum) => {
     let newConfig = { ...config }
@@ -127,13 +203,83 @@ const Dashboard = () => {
       if (applicableFilters.length > 0) {
         const visualization = newConfig.visualizations[visualizationKey]
 
-        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || config.data[visualization.dataKey])
+        newFilteredData[visualizationKey] = filterData(applicableFilters, visualization.formattedData || data[visualization.dataKey])
       }
     })
 
     setFilteredData(newFilteredData)
     updateConfig(newConfig)
   }
+
+  // Gets filer values from dataset
+  const generateValuesForFilter = (columnName, data = this.state.data) => {
+    const values = []
+
+    Object.keys(data).forEach(key => {
+      data[key].forEach(row => {
+        const value = row[columnName]
+        if (value && false === values.includes(value)) {
+          values.push(value)
+        }
+      })
+    })
+
+    return values
+  }
+
+  const updateConfigFilters = (newConfig, dataOverride = null) => {
+    let newFilteredData = {}
+    let visualizationKeys = Object.keys(newConfig.visualizations)
+
+    if (newConfig.dashboard.sharedFilters) {
+      newConfig.dashboard.sharedFilters.forEach((filter, i) => {
+        for (let j = 0; j < visualizationKeys.length; j++) {
+          if (visualizationKeys[j] === filter.setBy) {
+            const filterValues = generateValuesForFilter(filter.columnName, dataOverride || data)
+
+            if (newConfig.dashboard.sharedFilters[i].order === 'asc') {
+              filterValues.sort()
+            }
+            if (newConfig.dashboard.sharedFilters[i].order === 'desc') {
+              filterValues.sort().reverse()
+            }
+
+            newConfig.dashboard.sharedFilters[i].values = filterValues
+            if (filterValues.length > 0) {
+              newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0]
+            }
+            break
+          }
+        }
+
+        if ((!newConfig.dashboard.sharedFilters[i].values || newConfig.dashboard.sharedFilters[i].values.length === 0) && newConfig.dashboard.sharedFilters[i].showDropdown) {
+          newConfig.dashboard.sharedFilters[i].values = generateValuesForFilter(filter.columnName, dataOverride || data)
+          if (newConfig.dashboard.sharedFilters[i].values.length > 0) {
+            newConfig.dashboard.sharedFilters[i].active = newConfig.dashboard.sharedFilters[i].active || newConfig.dashboard.sharedFilters[i].values[0]
+          }
+        }
+      })
+
+      visualizationKeys.forEach(visualizationKey => {
+        let applicableFilters = newConfig.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1)
+
+        if (applicableFilters.length > 0) {
+          newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
+        }
+      })
+    }
+
+    setFilteredData(newFilteredData)
+
+    //Enforce default values that need to be calculated at runtime
+    newConfig.runtime = {}
+    updateConfig(newConfig)
+  }
+
+  // Load data when component first mounts
+  useEffect(() => {
+    loadConfig()
+  }, [])
 
   // Pass up to <CdcEditor /> if it exists when config state changes
   useEffect(() => {
@@ -199,6 +345,9 @@ const Dashboard = () => {
     })
   }
 
+  // Prevent render if loading
+  if (loading) return <RenderFallback/>
+
   let body = null
 
   // Editor mode
@@ -218,7 +367,7 @@ const Dashboard = () => {
           visualizationConfig.formattedData = visualizationConfig.data
         }
       } else {
-        visualizationConfig.data = config.data[dataKey]
+        visualizationConfig.data = data[dataKey]
         if (visualizationConfig.formattedData) {
           visualizationConfig.originalFormattedData = visualizationConfig.formattedData
           visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
@@ -361,7 +510,7 @@ const Dashboard = () => {
                             visualizationConfig.formattedData = visualizationConfig.data
                           }
                         } else {
-                          visualizationConfig.data = config.data[dataKey]
+                          visualizationConfig.data = data[dataKey]
                           if (visualizationConfig.formattedData) {
                             visualizationConfig.originalFormattedData = visualizationConfig.formattedData
                             visualizationConfig.formattedData = transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) || visualizationConfig.data
@@ -371,8 +520,6 @@ const Dashboard = () => {
                         const setsSharedFilter = config.dashboard.sharedFilters && config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
                         const setSharedFilterValue = setsSharedFilter ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active : undefined
                         const tableLink = <a href={`#data-table-${visualizationConfig.dataKey}`}>{visualizationConfig.dataKey} (Go to Table)</a>
-
-                        console.log(config.rows)
 
                         return (
                           <React.Fragment key={`vis__${index}__${colIndex}`}>
@@ -470,9 +617,9 @@ const Dashboard = () => {
           </section>
 
           {/* Data Table */}
-          {/*{config.table && config.data &&
+          {config.table && config.data &&
             <DataTable data={config.data} config={config} imageRef={imageId}/>
-          }*/}
+          }
           {config.table &&
             config.datasets &&
             Object.keys(config.datasets).map(datasetKey => {
@@ -521,22 +668,16 @@ const Dashboard = () => {
     )
   }
 
-  /*const contextValues = {
-          config,
-          rawData: data,
-    data: filteredData ?? data,
-          visualizations: config.visualizations,
-    rows: config.rows,
-          loading,
-          updateConfig,
-          setParentConfig,
-    setPreview
-  }*/
+  const contextValues = {
+    data: filteredData ?? data
+  }
 
   return (
-    <div className={`cove-dashboard${isSubEditor.current ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
-      {body}
-    </div>
+    <DashboardContext.Provider value={contextValues}>
+      <div className={`cove-dashboard${isSubEditor.current ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
+        {body}
+      </div>
+    </DashboardContext.Provider>
   )
 }
 
