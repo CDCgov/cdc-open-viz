@@ -26,8 +26,6 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map(s => {
 
-          console.log('ITEM', item)
-          console.log('series', s)
           return (
             <circle
               key={`${dataIndex}`}
