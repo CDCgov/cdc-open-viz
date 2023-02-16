@@ -29,9 +29,7 @@ export default function LinearChart() {
   const cleanedData = cleanData(data, config.xAxis.dataKey)
   
   let [width] = dimensions
-  console.log("### calling useReduceData",config,cleanedData)
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
-  console.log("LinearChart: minValue, maxValue, cleanedData",minValue, maxValue,cleanedData)
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
