@@ -1273,10 +1273,17 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.1.0.tgz#0a1dee4bbce87ff71602625d33f711cafd8afc08"
   integrity sha512-zbsLwtnHo84w1Kc8rScAo5GMk1GdecSlrflIbfnEBJwvTSj1SL6kkOYV+nHraMCPEy+RNZZUaZyL8JosDGCtGQ==
 
-"@floating-ui/core@^1.2.1":
+"@floating-ui/core@^1.1.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.2.1.tgz#074182a1d277f94569c50a6b456e62585d463c8e"
   integrity sha512-LSqwPZkK3rYfD7GKoIeExXOyYx6Q1O4iqZWwIehDNuv3Dv425FIAE8PRwtAx1imEolFTHgBEcoFHm9MDnYgPCg==
+
+"@floating-ui/dom@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.1.1.tgz#66aa747e15894910869bf9144fc54fc7d6e9f975"
+  integrity sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==
+  dependencies:
+    "@floating-ui/core" "^1.1.0"
 
 "@floating-ui/dom@^1.0.1":
   version "1.1.0"
@@ -1284,13 +1291,6 @@
   integrity sha512-TSogMPVxbRe77QCj1dt8NmRiJasPvuc+eT5jnJ6YpLqgOD2zXc5UA3S1qwybN+GVCDNdKfpKy1oj8RpzLJvh6A==
   dependencies:
     "@floating-ui/core" "^1.0.5"
-
-"@floating-ui/dom@^1.0.4":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.2.1.tgz#8f93906e1a3b9f606ce78afb058e874344dcbe07"
-  integrity sha512-Rt45SmRiV8eU+xXSB9t0uMYiQ/ZWGE/jumse2o3i5RGlyvcbqOF4q+1qBnzLE2kZ5JGhq0iMkcGXUKbFe7MpTA==
-  dependencies:
-    "@floating-ui/core" "^1.2.1"
 
 "@gar/promisify@^1.1.3":
   version "1.1.3"
@@ -8207,12 +8207,12 @@ react-tag-autocomplete@^6.0.0:
   resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-6.3.0.tgz#ce064bbab77b4daf7706be1c08413e7d0335ff4d"
   integrity sha512-MUBVUFh5eOqshUm5NM20qp7zXk8TzSiKO4GoktlFzBLIOLs356npaMKtL02bm0nFV2f1zInUrXn1fq6+i5YX0w==
 
-react-tooltip@5.7.2:
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-5.7.2.tgz#d6896c4e2264f73be135377fbc7685c8b5bb1e3d"
-  integrity sha512-Lv6SCgDCejnjs8EKEFW0f+5V0KXbgZYAQvbhMNleF2AJfcXsLn1EbL9XeCoCDeMziHCaC/HxOBnsw+xbMmZ3Og==
+react-tooltip@5.8.0-beta.0:
+  version "5.8.0-beta.0"
+  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-5.8.0-beta.0.tgz#5fda61befa088818621e0cd83c4ff6f9aa92b470"
+  integrity sha512-sBZFK+mPpSpt5HRHS41Kv4NxxgQjR/mAte1PGWz6x52855bqVgX0q8UgyjjibRgYFS177MkLjUo8SPOZfABeWA==
   dependencies:
-    "@floating-ui/dom" "^1.0.4"
+    "@floating-ui/dom" "1.1.1"
     classnames "^2.3.2"
 
 react-transition-group@^4.3.0:
