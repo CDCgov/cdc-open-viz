@@ -2,13 +2,8 @@ import React, { useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ReactTooltip from 'react-tooltip'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
-  useEffect(() => {
-    ReactTooltip.hide()
-  }, [runtimeData])
-
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.

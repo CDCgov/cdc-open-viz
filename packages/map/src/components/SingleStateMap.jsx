@@ -20,7 +20,7 @@ let { features: counties } = feature(testJSON, testJSON.objects.counties)
 let { features: states } = feature(testJSON, testJSON.objects.states)
 
 const SingleStateMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, runtimeLegend, generateColorsArray, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   const projection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
   const cityListProjection = geoAlbersUsaTerritories().translate([WIDTH / 2, HEIGHT / 2])
@@ -32,8 +32,6 @@ const SingleStateMap = props => {
   const [strokeWidth, setStrokeWidth] = useState(0.75)
   let mapColorPalette = colorPalettes[state.color] || '#fff'
   let focusedBorderColor = mapColorPalette[3]
-
-  useEffect(() => rebuildTooltips())
 
   const path = geoPath().projection(projection)
 

@@ -28,7 +28,7 @@ const Rect = ({ label, text, stroke, strokeWidth, ...props }) => {
 }
 
 const UsaRegionMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, titleCase, handleCircleClick, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, handleMapAriaLabels } = props
 
   // "Choose State" options
   const [extent, setExtent] = useState(null)
@@ -53,8 +53,6 @@ const UsaRegionMap = props => {
 
     setTerritoriesData(territoriesList)
   }, [data])
-
-  useEffect(() => rebuildTooltips())
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 

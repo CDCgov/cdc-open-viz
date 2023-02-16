@@ -1,16 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import ReactTooltip from 'react-tooltip'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import { useDebounce } from 'use-debounce'
 
+// Third Party
+import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { useDebounce } from 'use-debounce'
+// import ReactTags from 'react-tag-autocomplete'
+
+// Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
+
+// Hooks
 import { useColorPalette } from '../hooks/useColorPalette'
 
+// Components - Core
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import Icon from '@cdc/core/components/ui/Icon'
+import InputToggle from '@cdc/core/components/inputs/InputToggle'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Waiting from '@cdc/core/components/Waiting'
 
+// Assets
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
 import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg'
 import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'
@@ -18,14 +30,6 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
-
-import InputToggle from '@cdc/core/components/inputs/InputToggle'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
-
-import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-
-// import ReactTags from 'react-tag-autocomplete'
 
 const TextField = ({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
@@ -462,19 +466,16 @@ const EditorPanel = props => {
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
           loadConfig(worldDefaultConfig)
-          ReactTooltip.rebuild()
           break
         }
 
         if (true === loadedDefault && 'us' === value) {
           loadConfig(usaDefaultConfig)
-          ReactTooltip.rebuild()
           break
         }
 
         if (true === loadedDefault && 'us-county' === value) {
           loadConfig(countyDefaultConfig)
-          ReactTooltip.rebuild()
           break
         }
 
@@ -491,7 +492,6 @@ const EditorPanel = props => {
                 forceDisplay: true
               }
             })
-            ReactTooltip.rebuild()
             break
           case 'us-region':
             setState({
@@ -505,7 +505,6 @@ const EditorPanel = props => {
                 forceDisplay: true
               }
             })
-            ReactTooltip.rebuild()
             break
           case 'world':
             setState({
@@ -552,7 +551,6 @@ const EditorPanel = props => {
             break
         }
 
-        ReactTooltip.rebuild()
         break
       case 'singleColumnLegend':
         setState({
@@ -1086,7 +1084,7 @@ const EditorPanel = props => {
         <TextField value={state.filters[index].label} section='filters' subsection={index} fieldName='label' label='Label' updateField={updateField} />
         <label>
           <span className='edit-label column-heading'>
-            Filter Column{' '}
+            Filter Column
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -1242,7 +1240,7 @@ const EditorPanel = props => {
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} data-html2canvas-ignore></button>
 
       <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'} data-html2canvas-ignore>
-        <ReactTooltip html={true} multiline={true} />
+        {/*<ReactTooltip html={true} multiline={true} />*/}
         <span className='base-label'>Configure Map</span>
         <section className='form-container'>
           <form>

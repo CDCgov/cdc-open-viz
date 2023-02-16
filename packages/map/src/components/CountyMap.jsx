@@ -62,7 +62,7 @@ function CountyMapChecks(prevState, nextState) {
 const CountyMap = props => {
   let mapData = states.concat(counties)
 
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, rebuildTooltips, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   console.log(data)
 
@@ -89,9 +89,6 @@ const CountyMap = props => {
 
   let focusedBorderColor = mapColorPalette[3]
   let geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
-
-  // Use Effect
-  useEffect(() => rebuildTooltips())
 
   const geoLabel = (geo, projection) => {
     let [ x, y ] = projection(geoCentroid(geo))
