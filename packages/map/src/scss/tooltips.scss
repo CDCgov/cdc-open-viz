@@ -8,12 +8,19 @@
   font-size: 1em;
   border-radius: 4px;
   padding: 8px 12px;
+  z-index: 1;
+
   &:before, &:after {
     display: none;
   }
 
   &.capitalize dl {
     text-transform: capitalize;
+  }
+
+  [class*="styles-module_arrow"] {
+    border-left: 1px solid #b2b2b2;
+    border-bottom: 1px solid #b2b2b2;
   }
 
   dl dt:not(:empty)::after {
