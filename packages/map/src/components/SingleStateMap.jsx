@@ -108,7 +108,7 @@ const SingleStateMap = props => {
       // For some reason, these two geos are breaking the display.
       if (geoDisplayName === 'Franklin City' || geoDisplayName === 'Waynesboro') return null
 
-      const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+      const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
       if (legendColors && legendColors[0] !== '#000000') {
         let styles = {
@@ -128,13 +128,26 @@ const SingleStateMap = props => {
         }
 
         return (
-          <g data-for='tooltip' data-tip={tooltip} key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`} css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
+          <g
+            key={`key--${county.id}`}
+            className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
+            css={styles}
+            onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            data-tooltip-id="tooltip"
+            data-tooltip-html={toolTip}
+          >
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )
       } else {
         return (
-          <g data-for='tooltip' data-tip={tooltip} key={`key--${county.id}`} className={`county county--${geoDisplayName.split(' ').join('')}`} style={{ fill: '#e6e6e6' }}>
+          <g
+            key={`key--${county.id}`}
+            className={`county county--${geoDisplayName.split(' ').join('')}`}
+            style={{ fill: '#e6e6e6' }}
+            data-tooltip-id="tooltip"
+            data-tooltip-html={toolTip}
+          >
             <path tabIndex={-1} className={`county`} stroke={geoStrokeColor} d={countyPath} strokeWidth={0.75 / scale} />
           </g>
         )

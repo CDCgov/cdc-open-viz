@@ -3,9 +3,9 @@ import React, { useState, useEffect, useCallback } from 'react'
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { useDebounce } from 'use-debounce'
 // import ReactTags from 'react-tag-autocomplete'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 // Data
 import colorPalettes from '@cdc/core/data/colorPalettes'
@@ -198,12 +198,6 @@ const EditorPanel = props => {
             ...state.general,
             allowMapZoom: value
           }
-        })
-        break
-      case 'hideGeoColumnInTooltip':
-        setState({
-          ...state,
-          [property]: value
         })
         break
       case 'hidePrimaryColumnInTooltip':

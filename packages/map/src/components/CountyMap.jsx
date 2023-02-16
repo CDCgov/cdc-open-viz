@@ -301,7 +301,7 @@ const CountyMap = props => {
 
         // If a legend applies, return it with appropriate information.
         if (legendColors && legendColors[0] !== '#000000') {
-          const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+          const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
           styles = {
             fill: legendColors[0],
@@ -323,8 +323,6 @@ const CountyMap = props => {
           return (
             <g
               tabIndex="-1"
-              data-for="tooltip"
-              data-tip={tooltip}
               key={`county--${key}`}
               className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
               css={styles}
@@ -343,6 +341,8 @@ const CountyMap = props => {
                   focusGeo(stateFipsCode, geo)
                 }
               }
+              data-tooltip-id="tooltip"
+              data-tooltip-html={toolTip}
             >
               <path tabIndex={-1} className={`county county--${geoDisplayName}`} stroke={geoStrokeColor} d={path} strokeWidth=".5"/>
             </g>
