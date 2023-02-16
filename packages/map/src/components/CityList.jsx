@@ -3,14 +3,9 @@ import { useState, useEffect } from 'react'
 import { jsx } from '@emotion/react'
 import { supportedCities } from '../data/supported-geos'
 import { scaleLinear } from 'd3-scale'
-import ReactTooltip from 'react-tooltip'
 
 const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeoName, applyLegendToRow, projection, titleCase, setSharedFilterValue, isFilterValueSupported, isGeoCodeMap }) => {
   const [citiesData, setCitiesData] = useState({})
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   useEffect(() => {
     if (!isGeoCodeMap) {
@@ -77,10 +72,24 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
       fillOpacity: state.general.type === 'bubble' ? 0.4 : 1
     }
 
-    const circle = <circle data-tip={toolTip} data-for='tooltip' cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius} title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} {...additionalProps} />
+    const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius}
+                           title='Click for more information'
+                           onClick={() => geoClickHandler(cityDisplayName, geoData)}
+                           data-tooltip-html={toolTip}
+                           data-tooltip-id='tooltip'
+                           {...additionalProps}
+    />
 
     const pin = (
-      <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z' title='Click for more information' onClick={() => geoClickHandler(cityDisplayName, geoData)} data-tip={toolTip} data-for='tooltip' strokeWidth={2} stroke={'black'} {...additionalProps}></path>
+      <path className='marker' d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+            title='Click for more information'
+            onClick={() => geoClickHandler(cityDisplayName, geoData)}
+            strokeWidth={2}
+            stroke={'black'}
+            data-tooltip-html={toolTip}
+            data-tooltip-id='tooltip'
+            {...additionalProps}
+      />
     )
 
     let transform = ''
