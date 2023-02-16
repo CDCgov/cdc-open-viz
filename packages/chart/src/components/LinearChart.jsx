@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
@@ -261,10 +261,6 @@ export default function LinearChart() {
       padding: 0.4
     })
   }
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   const handleTick = tick => {
     return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
@@ -555,7 +551,7 @@ export default function LinearChart() {
 
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
