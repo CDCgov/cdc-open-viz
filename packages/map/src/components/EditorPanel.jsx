@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 
 // Third Party
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 // import ReactTags from 'react-tag-autocomplete'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -200,6 +200,7 @@ const EditorPanel = props => {
           }
         })
         break
+
       case 'hidePrimaryColumnInTooltip':
         setState({
           ...state,
@@ -928,7 +929,7 @@ const EditorPanel = props => {
         })
         let runtimeLegendKeys = runtimeLegend.map(item => item.value);
         state.legend.categoryValuesOrder.forEach(category => {
-          if(runtimeLegendKeys.indexOf(category) === -1){
+          if (runtimeLegendKeys.indexOf(category) === -1) {
             valid = false;
           }
         });
@@ -1234,7 +1235,7 @@ const EditorPanel = props => {
       <button className={displayPanel ? `editor-toggle` : `editor-toggle collapsed`} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick} data-html2canvas-ignore></button>
 
       <section className={displayPanel ? 'editor-panel cove' : 'hidden editor-panel cove'} data-html2canvas-ignore>
-        {/*<ReactTooltip html={true} multiline={true} />*/}
+        <ReactTooltip multiline={true} />
         <span className='base-label'>Configure Map</span>
         <section className='form-container'>
           <form>
