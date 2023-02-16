@@ -11,7 +11,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, colorPalettes, formatDate, isNumber, cleanData, getTextWidth, parseDate } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
 
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
@@ -184,8 +184,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
-                          data-tip={tooltip}
-                          data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          data-tooltip-html={tooltip}
+                          data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         ></foreignObject>
                       </Group>
                     </>
@@ -248,8 +248,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                             style={{ background: bar.color, border: `${config.barHasBorder === 'true' ? barBorderWidth : 0}px solid #333`, ...style }}
                             opacity={transparentBar ? 0.5 : 1}
                             display={displayBar ? 'block' : 'none'}
-                            data-tip={tooltip}
-                            data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                           ></foreignObject>
 
                           {orientation === 'horizontal' && visualizationSubType === 'stacked' && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel && (
@@ -404,8 +404,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                               }}
                               opacity={transparentBar ? 0.5 : 1}
                               display={displayBar ? 'block' : 'none'}
-                              data-tip={tooltip}
-                              data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                              data-tooltip-html={tooltip}
+                              data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                             ></foreignObject>
                             {orientation === 'horizontal' && !config.isLollipopChart && displayNumbersOnBar && (
                               <Text // prettier-ignore
@@ -457,8 +457,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 r={lollipopShapeSize / 2}
                                 fill={barColor}
                                 key={`circle--${bar.index}`}
-                                data-tip={tooltip}
-                                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                                data-tooltip-html={tooltip}
+                                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                                 style={{ filter: 'unset', opacity: 1 }}
                               />
                             )}
@@ -470,8 +470,8 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                                 height={lollipopShapeSize}
                                 fill={barColor}
                                 key={`circle--${bar.index}`}
-                                data-tip={tooltip}
-                                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                                data-tooltip-html={tooltip}
+                                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                                 style={{ opacity: 1, filter: 'unset' }}
                               >
                                 <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />

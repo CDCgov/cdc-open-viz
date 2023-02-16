@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
@@ -129,8 +130,8 @@ export default function LinearChart() {
       yScale =
         config.runtime.xAxis.type === 'date'
           ? scaleLinear({
-              domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
-            })
+            domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)]
+          })
           : scalePoint({ domain: xAxisDataMapped, padding: 0.5 })
 
       seriesScale = scalePoint({
@@ -272,30 +273,30 @@ export default function LinearChart() {
         {/* Higlighted regions */}
         {config.regions
           ? config.regions.map(region => {
-              if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
+            if (!Object.keys(region).includes('from') || !Object.keys(region).includes('to')) return null
 
-              const from = xScale(parseDate(region.from).getTime())
-              const to = xScale(parseDate(region.to).getTime())
-              const width = to - from
+            const from = xScale(parseDate(region.from).getTime())
+            const to = xScale(parseDate(region.to).getTime())
+            const width = to - from
 
-              return (
-                <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
-                  <path
-                    stroke='#333'
-                    d={`M${from} -5
+            return (
+              <Group className='regions' left={Number(config.runtime.yAxis.size)} key={region.label}>
+                <path
+                  stroke='#333'
+                  d={`M${from} -5
                           L${from} 5
                           M${from} 0
                           L${to} 0
                           M${to} -5
                           L${to} 5`}
-                  />
-                  <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-                  <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-                    {region.label}
-                  </Text>
-                </Group>
-              )
-            })
+                />
+                <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+                <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+                  {region.label}
+                </Text>
+              </Group>
+            )
+          })
           : ''}
 
         {/* Y axis */}
@@ -415,7 +416,7 @@ export default function LinearChart() {
             top={config.runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(config.runtime.yAxis.size)}
             label={config.runtime.xAxis.label}
-            tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
+            tickFormat={handleBottomTickFormatting}
             scale={xScale}
             stroke='#333'
             tickStroke='#333'
@@ -456,18 +457,27 @@ export default function LinearChart() {
 
         {config.visualizationType === 'Paired Bar' && (
           <>
-            <AxisBottom top={yMax} left={Number(config.runtime.yAxis.size)} label={config.runtime.xAxis.label} tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber} scale={g1xScale} stroke='#333' tickStroke='#333' numTicks={config.runtime.xAxis.numTicks || undefined}>
+            <AxisBottom
+              top={yMax}
+              left={Number(config.runtime.yAxis.size)}
+              label={config.runtime.xAxis.label}
+              tickFormat={config.runtime.xAxis.type === 'date' ? formatDate : formatNumber}
+              scale={g1xScale}
+              stroke='#333'
+              tickStroke='#333'
+              numTicks={config.runtime.xAxis.numTicks || undefined}
+            >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <Group className='bottom-axis'>
                     {props.ticks.map((tick, i) => {
-                      const tickWidth = xMax / props.ticks.length
+                      const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                      const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                       return (
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                           {!config.runtime.yAxis.hideLabel && (
-                            <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                            <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                               {formatNumber(tick.formattedValue)}
                             </Text>
                           )}
@@ -490,17 +500,17 @@ export default function LinearChart() {
               numTicks={config.runtime.xAxis.numTicks || undefined}
             >
               {props => {
-                const axisCenter = (props.axisToPoint.x - props.axisFromPoint.x) / 2
                 return (
                   <>
                     <Group className='bottom-axis'>
                       {props.ticks.map((tick, i) => {
-                        const tickWidth = xMax / props.ticks.length
+                        const angle = tick.index !== 0 ? config.yAxis.tickRotation : 0
+                        const textAnchor = tick.index !== 0 && config.yAxis.tickRotation && config.yAxis.tickRotation > 0 ? 'end' : 'middle'
                         return (
                           <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                             {!config.runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
                             {!config.runtime.yAxis.hideLabel && (
-                              <Text transform={`translate(${tick.to.x}, ${tick.to.y}) rotate(-${60})`} verticalAnchor='start' textAnchor={'end'} width={config.runtime.xAxis.tickRotation && config.runtime.xAxis.tickRotation !== '0' ? undefined : tickWidth}>
+                              <Text x={tick.to.x} y={tick.to.y} angle={-angle} verticalAnchor='start' textAnchor={textAnchor}>
                                 {tick.formattedValue}
                               </Text>
                             )}
@@ -540,6 +550,7 @@ export default function LinearChart() {
 
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )

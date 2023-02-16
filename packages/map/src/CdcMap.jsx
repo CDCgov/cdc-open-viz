@@ -10,41 +10,45 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 
+// Helpers
+import { publish } from '@cdc/core/helpers/events'
+
 // Data
-import colorPalettes from '../../core/data/colorPalettes'
-import ExternalIcon from './images/external-link.svg'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
-import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import MediaControls from '@cdc/core/components/ui/MediaControls'
-
-// Sass
-import './scss/main.scss'
-import './scss/btn.scss'
-
-// Core
-import Loading from '@cdc/core/components/loader/Loading'
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
+import colorPalettes from '../../core/data/colorPalettes'
+import initialState from './data/initial-state'
 
 // Helpers
-import dataTransform from '@cdc/core/helpers/dataTransform'
 import { getViewport, numberFromString } from '@cdc/core/helpers/coveHelpers'
+import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 
-// Child Components
-import Sidebar from './components/Sidebar'
+// Components - Core
+import MediaControls from '@cdc/core/components/ui/MediaControls'
+import Loading from '@cdc/core/components/loader/Loading'
+
+// Components - Local
+import Context from './context'
+import Filters from './components/Filters'
 import Modal from './components/Modal'
-import EditorPanel from './components/EditorPanel' // Future: Lazy
-import UsaMap from './components/UsaMap' // Future: Lazy
-import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import Sidebar from './components/Sidebar'
+
 import CountyMap from './components/CountyMap' // Future: Lazy
 import DataTable from './components/DataTable' // Future: Lazy
+import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
-import Filters from './components/Filters'
-import Context from './context'
+import UsaMap from './components/UsaMap' // Future: Lazy
+import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import WorldMap from './components/WorldMap' // Future: Lazy
 
-import { publish } from '@cdc/core/helpers/events'
+// Assets
+import ExternalIcon from './images/external-link.svg'
+
+// Styles
+import './scss/main.scss'
+import './scss/btn.scss'
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -58,7 +62,7 @@ const generateColorsArray = (color = '#000000', special = false) => {
   let colorObj = chroma(color)
   let hoverColor = special ? colorObj.brighten(0.5).hex() : colorObj.saturate(1.3).hex()
 
-  return [color, hoverColor, colorObj.darken(0.3).hex()]
+  return [ color, hoverColor, colorObj.darken(0.3).hex() ]
 }
 
 const hashObj = row => {
@@ -110,19 +114,19 @@ const getUniqueValues = (data, columnName) => {
 
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new dataTransform()
-  const [state, setState] = useState({ ...initialState })
-  const [loading, setLoading] = useState(true)
-  const [currentViewport, setCurrentViewport] = useState()
-  const [runtimeFilters, setRuntimeFilters] = useState([])
-  const [runtimeLegend, setRuntimeLegend] = useState([])
-  const [runtimeData, setRuntimeData] = useState({ init: true })
-  const [modal, setModal] = useState(null)
-  const [accessibleStatus, setAccessibleStatus] = useState('')
-  const [filteredCountryCode, setFilteredCountryCode] = useState()
-  const [position, setPosition] = useState(state.mapPosition)
-  const [coveLoadedHasRan, setCoveLoadedHasRan] = useState(false)
-  const [container, setContainer] = useState()
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
+  const [ state, setState ] = useState({ ...initialState })
+  const [ loading, setLoading ] = useState(true)
+  const [ currentViewport, setCurrentViewport ] = useState()
+  const [ runtimeFilters, setRuntimeFilters ] = useState([])
+  const [ runtimeLegend, setRuntimeLegend ] = useState([])
+  const [ runtimeData, setRuntimeData ] = useState({ init: true })
+  const [ modal, setModal ] = useState(null)
+  const [ accessibleStatus, setAccessibleStatus ] = useState('')
+  const [ filteredCountryCode, setFilteredCountryCode ] = useState()
+  const [ position, setPosition ] = useState(state.mapPosition)
+  const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
+  const [ container, setContainer ] = useState()
+  const [ imageId, setImageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -133,7 +137,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const coordinates = countryCoordinates[filteredCountryCode]
         const long = coordinates[1]
         const lat = coordinates[0]
-        const reversedCoordinates = [long, lat]
+        const reversedCoordinates = [ long, lat ]
 
         setState({
           ...state,
@@ -143,7 +147,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     } catch (e) {
       console.error('Failed to set world map zoom.')
     }
-  }, [filteredCountryCode])
+  }, [ filteredCountryCode ])
 
   useEffect(() => {
     setTimeout(() => {
@@ -155,13 +159,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         setRuntimeData(tmpData)
       }
     }, 100)
-  }, [filteredCountryCode])
+  }, [ filteredCountryCode ])
 
   useEffect(() => {
     if (state.mapPosition) {
       setPosition(state.mapPosition)
     }
-  }, [state.mapPosition, setPosition])
+  }, [ state.mapPosition, setPosition ])
 
   const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -262,16 +266,16 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let dataSet = obj.legend.unified ? obj.data : Object.values(runtimeData)
 
     const colorDistributions = {
-      1: [1],
-      2: [1, 3],
-      3: [1, 3, 5],
-      4: [0, 2, 4, 6],
-      5: [0, 2, 4, 6, 7],
-      6: [0, 2, 3, 4, 5, 7],
-      7: [0, 2, 3, 4, 5, 6, 7],
-      8: [0, 2, 3, 4, 5, 6, 7, 8],
-      9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-      10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      1: [ 1 ],
+      2: [ 1, 3 ],
+      3: [ 1, 3, 5 ],
+      4: [ 0, 2, 4, 6 ],
+      5: [ 0, 2, 4, 6, 7 ],
+      6: [ 0, 2, 3, 4, 5, 7 ],
+      7: [ 0, 2, 3, 4, 5, 6, 7 ],
+      8: [ 0, 2, 3, 4, 5, 6, 7, 8 ],
+      9: [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ],
+      10: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
     }
 
     const applyColorToLegend = legendIdx => {
@@ -291,7 +295,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
       // Special Classes (No Data)
       if (result[legendIdx].special) {
-        const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses)
+        const specialClassColors = chroma.scale([ '#D4D4D4', '#939393' ]).colors(specialClasses)
 
         return specialClassColors[legendIdx]
       }
@@ -398,7 +402,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (undefined === value) continue
 
         if (false === uniqueValues.has(value)) {
-          uniqueValues.set(value, [hashObj(row)])
+          uniqueValues.set(value, [ hashObj(row) ])
           count++
         } else {
           uniqueValues.get(value).push(hashObj(row))
@@ -407,7 +411,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         if (count === 10) break // Can only have 10 categorical items for now
       }
 
-      let sorted = [...uniqueValues.keys()]
+      let sorted = [ ...uniqueValues.keys() ]
 
       if (obj.legend.additionalCategories) {
         obj.legend.additionalCategories.forEach(additionalCategory => {
@@ -558,7 +562,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
         let scale = d3
           .scaleQuantile()
-          .domain([...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name])))]) // min/max values
+          .domain([ ...new Set(dataSet.map(item => Math.round(item[state.columns.primary.name]))) ]) // min/max values
           .range(colorRange) // set range to our colors array
 
         let breaks = scale.quantiles()
@@ -831,7 +835,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         return Object.keys(obj).length === 0
       }
 
-      let filters = [...runtimeFilters]
+      let filters = [ ...runtimeFilters ]
 
       filters[idx] = { ...filters[idx] }
       filters[idx].active = activeValue
@@ -968,14 +972,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
     if ('jsx' === returnType) {
-      toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
+      toolTipText = [ <div key="modal-content">{parse(toolTipText)}</div> ]
 
       if (state.columns.hasOwnProperty('navigate') && row[state.columns.navigate.name]) {
         toolTipText.push(
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-          <span className='navigation-link' key='modal-navigation-link' onClick={() => navigationHandler(row[state.columns.navigate.name])}>
+          <span className="navigation-link" key="modal-navigation-link" onClick={() => navigationHandler(row[state.columns.navigate.name])}>
             {state.tooltips.linkLabel}
-            <ExternalIcon className='inline-icon ml-1' />
+            <ExternalIcon className="inline-icon ml-1"/>
           </span>
         )
       }
@@ -1012,7 +1016,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   // This resets all active legend toggles.
   const resetLegendToggles = async () => {
-    let newLegend = [...runtimeLegend]
+    let newLegend = [ ...runtimeLegend ]
 
     newLegend.forEach(legendItem => {
       delete legendItem.disabled
@@ -1248,35 +1252,34 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       publish('cove_loaded', { config: state })
       setCoveLoadedHasRan(true)
     }
-  }, [state, container])
+  }, [ state, container ])
 
   useEffect(() => {
     if (state.data) {
       let newData = generateRuntimeData(state)
       setRuntimeData(newData)
     }
-  }, [state.general.statePicked])
-
+  }, [ state.general.statePicked ])
 
   useEffect(() => {
     // When geotype changes - add UID
     if (state.data && state.columns.geo.name) {
       addUIDs(state, state.columns.geo.name)
     }
-  }, [state])
+  }, [ state ])
 
   // DEV-769 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (state.dataTable?.title === "" || state.dataTable?.title === undefined) {
+    if (state.dataTable?.title === '' || state.dataTable?.title === undefined) {
       setState({
-          ...state,
+        ...state,
         dataTable: {
-            ...state.dataTable,
-            title: "Data Table"
-          }
-        })
+          ...state.dataTable,
+          title: 'Data Table'
+        }
+      })
     }
-  }, [state.dataTable])
+  }, [ state.dataTable ])
 
   useEffect(() => {
     // UID
@@ -1334,7 +1337,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, newRuntimeData || runtimeData, hashLegend)
       setRuntimeLegend(legend)
     }
-  }, [state])
+  }, [ state ])
 
   useEffect(() => {
     const hashLegend = hashObj({
@@ -1354,13 +1357,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       const legend = generateRuntimeLegend(state, runtimeData)
       setRuntimeLegend(legend)
     }
-  }, [runtimeData])
+  }, [ runtimeData ])
 
   if (config) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       loadConfig(config)
-    }, [config.data])
+    }, [ config.data ])
   }
 
   // Destructuring for more readable JSX
@@ -1368,14 +1371,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const { title = '', subtext = '' } = general
 
   // Outer container classes
-  let outerContainerClasses = ['cdc-open-viz-module', 'cdc-map-outer-container', currentViewport]
+  let outerContainerClasses = [ 'cdc-open-viz-module', 'cdc-map-outer-container', currentViewport ]
 
   if (className) {
     outerContainerClasses.push(className)
   }
 
   // Map container classes
-  let mapContainerClasses = ['map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none']
+  let mapContainerClasses = [ 'map-container', state.legend.position, state.general.type, state.general.geoType, 'outline-none' ]
 
   if (modal) {
     mapContainerClasses.push('modal-background')
@@ -1413,7 +1416,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     innerContainerRef
   }
 
-  if (!mapProps.data || !state.data) return <Loading />
+  if (!mapProps.data || !state.data) return <Loading/>
 
   const hasDataTable = state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading
 
@@ -1444,27 +1447,34 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   return (
     <Context.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
-        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
+        {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}/>}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
+              <ReactTooltip
+                place="right"
+                variant="light"
+                float={true}
+                className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`}
+              />
+            }
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <div role='heading' className={`map-title${general.headerColor ? ' theme-' + general.headerColor : ''}`} tabIndex='0' aria-level='2'>
+                <div role="heading" className={`map-title${general.headerColor ? ' theme-' + general.headerColor : ''}`} tabIndex="0" aria-level="2">
                   <sup>{general.superTitle}</sup>
                   <div>{parse(title)}</div>
                 </div>
               </header>
             )}
 
-            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
+            <div>{general.introText && <section className="introText">{parse(general.introText)}</section>}</div>
 
-            <Filters />
+            <Filters/>
 
             <div
-              role='button'
-              tabIndex='0'
+              role="button"
+              tabIndex="0"
               className={mapContainerClasses.join(' ')}
               onClick={e => closeModal(e)}
               onKeyDown={e => {
@@ -1473,21 +1483,21 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 }
               }}
             >
-              <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
+              <a id="skip-geo-container" className="cdcdataviz-sr-only-focusable" href={tabId}>
                 Skip Over Map Container
               </a>
 
               {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <section className='geography-container outline-none' ref={mapSvg} tabIndex='0'>
+              <section className="geography-container outline-none" ref={mapSvg} tabIndex="0">
                 {currentViewport && (
-                  <section className='geography-container' ref={mapSvg}>
-                    {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
+                  <section className="geography-container" ref={mapSvg}>
+                    {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal}/>}
                     {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                     {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
-                    {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
+                    {'data' === general.type && logo && <img src={logo} alt="" className="map-logo"/>}
                   </section>
                 )}
               </section>
@@ -1512,15 +1522,15 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               )}
             </div>
 
-            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)} />}
+            {'navigation' === general.type && <NavigationMenu mapTabbingID={tabId} displayGeoName={displayGeoName} data={runtimeData} options={general} columns={state.columns} navigationHandler={val => navigationHandler(val)}/>}
 
             {link && link}
 
-            {subtext.length > 0 && <p className='subtext'>{parse(subtext)}</p>}
+            {subtext.length > 0 && <p className="subtext">{parse(subtext)}</p>}
 
-            <MediaControls.Section classes={['download-buttons']}>
-              {state.general.showDownloadImgButton && <MediaControls.Button text='Download Image' title='Download Chart as Image' type='image' state={state} elementToCapture={imageId} />}
-              {state.general.showDownloadPdfButton && <MediaControls.Button text='Download PDF' title='Download Chart as PDF' type='pdf' state={state} elementToCapture={imageId} />}
+            <MediaControls.Section classes={[ 'download-buttons' ]}>
+              {state.general.showDownloadImgButton && <MediaControls.Button text="Download Image" title="Download Chart as Image" type="image" state={state} elementToCapture={imageId}/>}
+              {state.general.showDownloadPdfButton && <MediaControls.Button text="Download PDF" title="Download Chart as PDF" type="pdf" state={state} elementToCapture={imageId}/>}
             </MediaControls.Section>
 
             {state.runtime.editorErrorMessage.length === 0 && true === dataTable.forceDisplay && general.type !== 'navigation' && false === loading && (
@@ -1552,11 +1562,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
               />
             )}
 
-            {general.footnotes && <section className='footnotes'>{parse(general.footnotes)}</section>}
+            {general.footnotes && <section className="footnotes">{parse(general.footnotes)}</section>}
           </section>
         )}
 
-        <div aria-live='assertive' className='cdcdataviz-sr-only'>
+        <div aria-live="assertive" className="cdcdataviz-sr-only">
           {accessibleStatus}
         </div>
       </div>

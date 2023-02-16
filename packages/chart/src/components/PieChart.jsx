@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
 import { animated, useTransition, interpolate } from 'react-spring'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import Pie from '@visx/shape/lib/shapes/Pie'
 import chroma from 'chroma-js'
@@ -21,8 +22,8 @@ export default function PieChart() {
 
   const cleanedData = cleanData(data, config.xAxis.dataKey);
 
-  const [ filteredData, setFilteredData ] = useState(undefined)
-  const [ animatedPie, setAnimatePie ] = useState(false)
+  const [filteredData, setFilteredData] = useState(undefined)
+  const [animatedPie, setAnimatePie] = useState(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -80,8 +81,8 @@ export default function PieChart() {
                   })
                 )}
                 fill={colorScale(arc.data[config.runtime.xAxis.dataKey])}
-                data-tip={tooltip}
-                data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                data-tooltip-html={tooltip}
+                data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               />
             </Group>
           )
@@ -147,7 +148,8 @@ export default function PieChart() {
           </Pie>
         </Group>
       </svg>
-      <div ref={triggerRef}/>
+      <div ref={triggerRef} />
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
     </ErrorBoundary>
   )
 }

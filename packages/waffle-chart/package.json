@@ -30,7 +30,6 @@
     "chroma-js": "^2.1.0",
     "html-react-parser": "^3.0.8",
     "react-accessible-accordion": "^3.3.4",
-    "use-debounce": "^6.0.1",
     "whatwg-fetch": "^3.6.2"
   },
   "peerDependencies": {

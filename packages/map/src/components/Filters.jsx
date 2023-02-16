@@ -15,7 +15,7 @@ const useFilters = () => {
     return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
   }
 
-  const announceChange = text => {}
+  const announceChange = text => { }
 
   const changeFilterActive = (index, value) => {
     let newFilters = config.filters
