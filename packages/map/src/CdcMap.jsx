@@ -1279,9 +1279,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.dataTable])
 
-    // When geo label override changes
+  // When geo label override changes
+  // - redo the tooltips
   useEffect(() => {
-    // redo the tooltips
     applyTooltipsToGeo();
   }, [state.general.geoLabelOverride])
   
