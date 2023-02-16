@@ -62,7 +62,7 @@ function CountyMapChecks(prevState, nextState) {
 const CountyMap = props => {
   let mapData = states.concat(counties)
 
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, rebuildTooltips, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
   console.log(data)
 
@@ -89,9 +89,6 @@ const CountyMap = props => {
 
   let focusedBorderColor = mapColorPalette[3]
   let geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
-
-  // Use Effect
-  useEffect(() => rebuildTooltips())
 
   const geoLabel = (geo, projection) => {
     let [ x, y ] = projection(geoCentroid(geo))
@@ -304,7 +301,7 @@ const CountyMap = props => {
 
         // If a legend applies, return it with appropriate information.
         if (legendColors && legendColors[0] !== '#000000') {
-          const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+          const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
           styles = {
             fill: legendColors[0],
@@ -326,8 +323,6 @@ const CountyMap = props => {
           return (
             <g
               tabIndex="-1"
-              data-for="tooltip"
-              data-tip={tooltip}
               key={`county--${key}`}
               className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[state.columns.geo.name]}`}
               css={styles}
@@ -346,6 +341,8 @@ const CountyMap = props => {
                   focusGeo(stateFipsCode, geo)
                 }
               }
+              data-tooltip-id="tooltip"
+              data-tooltip-html={toolTip}
             >
               <path tabIndex={-1} className={`county county--${geoDisplayName}`} stroke={geoStrokeColor} d={path} strokeWidth=".5"/>
             </g>

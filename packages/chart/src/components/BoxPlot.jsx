@@ -64,7 +64,7 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                     stroke: 'black',
                     strokeWidth: config.boxplot.borders === 'true' ? 1 : 0
                   },
-                  'data-tip': 'cool'
+                  'data-tooltip-html': 'cool'
                 }}
                 maxProps={{
                   style: {
@@ -73,8 +73,8 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
                 }}
                 container
                 containerProps={{
-                  'data-tip': handleTooltip(d),
-                  'data-for': tooltip_id
+                  'data-tooltip-html': handleTooltip(d),
+                  'data-tooltip-id': tooltip_id
                 }}
               />
             </>
