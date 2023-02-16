@@ -23,15 +23,22 @@ import useTopAxis from '../hooks/useTopAxis'
 
 // TODO: Move scaling functions into hooks to manage complexity
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, cleanData, updateConfig } = useContext(ConfigContext)
+  // Just do this once up front otherwise we end up
+  // calling clean several times on same set of data (TT)
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
+  
   let [width] = dimensions
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  console.log("### calling useReduceData",config,cleanedData)
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, cleanedData)
+  console.log("LinearChart: minValue, maxValue, cleanedData",minValue, maxValue,cleanedData)
   const [animatedChart, setAnimatedChart] = useState(false)
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+
   // Make sure the chart is visible if in the editor
   useEffect(() => {
     const element = document.querySelector('.isEditor')
@@ -58,7 +65,7 @@ export default function LinearChart() {
   const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, cleanedData, updateConfig })
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -72,7 +79,7 @@ export default function LinearChart() {
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
-  if (data) {
+  if (cleanedData) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
@@ -106,10 +113,10 @@ export default function LinearChart() {
       max += paddingValue
     }
 
-    let xAxisDataMapped = data.map(d => getXAxisData(d))
+    let xAxisDataMapped = cleanedData.map(d => getXAxisData(d))
 
     if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-      const dataKey = data.map(item => item[config.series[0].dataKey])
+      const dataKey = cleanedData.map(item => item[config.series[0].dataKey])
       const maxDataVal = Math.max(...dataKey).toString().length
 
       switch (true) {
@@ -165,11 +172,11 @@ export default function LinearChart() {
       const offset = 1.02 // Offset of the ticks/values from the Axis
       let groupOneMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[0].dataKey])
+        cleanedData.map(d => d[config.series[0].dataKey])
       )
       let groupTwoMax = Math.max.apply(
         Math,
-        data.map(d => d[config.series[1].dataKey])
+        cleanedData.map(d => d[config.series[1].dataKey])
       )
 
       // group one
@@ -214,7 +221,7 @@ export default function LinearChart() {
     let tickCount = undefined
 
     if (axis === 'yAxis') {
-      tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      tickCount = isHorizontal && !numTicks ? cleanedData.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
     }
 
     if (axis === 'xAxis') {
@@ -245,7 +252,7 @@ export default function LinearChart() {
       if (outlierMax > maxYValue) maxYValue = outlierMax
     }
 
-    const seriesNames = data.map(d => d[config.xAxis.dataKey])
+    const seriesNames = cleanedData.map(d => d[config.xAxis.dataKey])
 
     // Set Scales
     yScale = scaleLinear({

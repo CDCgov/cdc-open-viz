@@ -18,10 +18,14 @@ function useReduceData(config, data) {
   const getMaxValueFromData = () => {
     let max // will hold max number from data.
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) && config.visualizationSubType === 'stacked') {
-
+console.log("### entering getMaxValueFromData config.visualizationType, DATA IN",config.visualizationType, data)
       const yTotals = data.reduce((allTotals, xValue) => {
+        console.log("xValue",xValue)
         const totalYValues = config.runtime.seriesKeys.reduce((yTotal, k) => {
-          yTotal += Number(xValue[k])
+          if (isNumber(cleanChars(xValue[k]))) {
+            yTotal += Number(cleanChars(xValue[k]))
+          }
+          console.log("k, xValue[k], yTotal=",k, xValue[k], yTotal)
           return yTotal
         }, 0)
 
@@ -34,28 +38,33 @@ function useReduceData(config, data) {
 
       max = Math.max(...yTotals)
     } else if (config.visualizationType === 'Bar' && config.series && config.series.dataKey) {
+      console.log("### entering 2")
       max = Math.max(...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0)))
       //max = Math.max(...data.map(d => Number(d[config.series.dataKey])))
     } else if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       let total = []
-
+console.log("### entering 3 data=",data)
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
         // get barSeries max Values added to each other
         data.map(function (d, index) {
           const totalYValues = config.runtime.barSeriesKeys.reduce((yTotal, k) => {
-            yTotal += Number(d[k])
+             console.log("xValue,k",xValue,k)
+            if (isNumber(cleanChars(xValue[k]))) {
+              yTotal += Number(cleanChars(d[k]))
+            }
             return yTotal
           }, 0)
           total.push(totalYValues)
         })
         // get lineSeries largest values
-        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => Number(cleanChars(d[key]))))))
+        const lineMax = Math.max(...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
 
         const barMax = Math.max(...total)
 
         max = Number(barMax) > Number(lineMax) ? barMax : lineMax
       }
     } else {
+      console.log("### entering 4")
       max = Math.max(...data.map(d => Math.max(...config.runtime.seriesKeys.map(key => (isNumber(d[key]) ? Number(cleanChars(d[key])) : 0)))))
     }
     return max
