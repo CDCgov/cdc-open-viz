@@ -151,7 +151,6 @@ const EditorPanel = props => {
           }
         })
         break
-
       case 'showEqualNumber':
         setState({
           ...state,
@@ -161,7 +160,6 @@ const EditorPanel = props => {
           }
         })
         break
-
       case 'hideGeoColumnInTooltip':
         setState({
           ...state,
@@ -171,7 +169,6 @@ const EditorPanel = props => {
           }
         })
         break
-
       case 'toggleDataUrl':
         setState({
           ...state,
@@ -181,7 +178,6 @@ const EditorPanel = props => {
           }
         })
         break
-
       case 'toggleExtraBubbleBorder':
         setState({
           ...state,
@@ -200,13 +196,21 @@ const EditorPanel = props => {
           }
         })
         break
-
       case 'hidePrimaryColumnInTooltip':
         setState({
           ...state,
           general: {
             ...state.general,
             [property]: value
+          }
+        })
+        break
+      case 'geoLabelOverride':
+        setState({
+          ...state,
+          general: {
+            ...state.general,
+            geoLabelOverride: value
           }
         })
         break
@@ -1500,28 +1504,57 @@ const EditorPanel = props => {
                   <AccordionItemButton>Columns</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <label className='edit-block geo'>
-                    <span className='edit-label column-heading'>
-                      Geography
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                    <select
-                      value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
-                      onChange={event => {
-                        editColumn('geo', 'name', event.target.value)
-                      }}
-                    >
-                      {columnsOptions}
-                    </select>
-                  </label>
-
+                  <fieldset className='primary-fieldset edit-block'>
+                    <label>
+                      <span className='edit-label column-heading'>
+                        Geography
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Select the source column containing the map location names or, for county-level maps, the FIPS codes.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                      <select
+                        value={state.columns.geo ? state.columns.geo.name : columnsOptions[0]}
+                        onChange={event => {
+                          editColumn('geo', 'name', event.target.value)
+                        }}
+                      >
+                        {columnsOptions}
+                      </select>
+                    </label>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={state.general.hideGeoColumnInTooltip || false}
+                        onChange={event => {
+                          handleEditorChanges('hideGeoColumnInTooltip', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Hide Geography Column Name in Tooltip</span>
+                    </label>
+                    <TextField
+                      value={state.general.geoLabelOverride}
+                      section='general'
+                      fieldName='geoLabelOverride'
+                      label='Geography Label'
+                      className='edit-label'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Enter a geography label for use in tooltips.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  </fieldset>
                   {'navigation' !== state.general.type && (
                     <fieldset className='primary-fieldset edit-block'>
                       <label>
@@ -1545,12 +1578,22 @@ const EditorPanel = props => {
                           {columnsOptions}
                         </select>
                       </label>
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={state.general.hidePrimaryColumnInTooltip || false}
+                          onChange={event => {
+                            handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Hide Data Column Name in Tooltip</span>
+                      </label>
                       <TextField
                         value={columns.primary.label}
                         section='columns'
                         subsection='primary'
                         fieldName='label'
-                        label='Label'
+                        label='Data Label'
                         updateField={updateField}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2391,27 +2434,8 @@ const EditorPanel = props => {
                     <span className='edit-label'>Show Title</span>
                   </label>
 
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.hideGeoColumnInTooltip || false}
-                      onChange={event => {
-                        handleEditorChanges('hideGeoColumnInTooltip', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Hide Geography Column Name in Tooltip</span>
-                  </label>
 
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={state.general.hidePrimaryColumnInTooltip || false}
-                      onChange={event => {
-                        handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Hide Primary Column Name in Tooltip</span>
-                  </label>
+
                   {'navigation' === state.general.type && (
                     <label className='checkbox'>
                       <input
