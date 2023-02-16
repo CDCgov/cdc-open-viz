@@ -196,12 +196,7 @@ const EditorPanel = props => {
           }
         })
         break
-      case 'hideGeoColumnInTooltip':
-        setState({
-          ...state,
-          [property]: value
-        })
-        break
+
       case 'hidePrimaryColumnInTooltip':
         setState({
           ...state,
