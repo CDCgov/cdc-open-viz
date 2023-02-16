@@ -6,7 +6,7 @@ import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
 // Third party
-import { Tooltip } from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
 
@@ -127,8 +127,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const [ coveLoadedHasRan, setCoveLoadedHasRan ] = useState(false)
   const [ container, setContainer ] = useState()
   const [ imageId, setImageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`) // eslint-disable-line
-
-  const [ tooltipAnchor, setTooltipAnchor ] = useState()
 
   let legendMemo = useRef(new Map())
   let innerContainerRef = useRef()
@@ -1403,7 +1401,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const mapProps = {
     state,
     data: runtimeData,
-    setTooltipAnchor,
     applyTooltipsToGeo,
     closeModal,
     navigationHandler,
@@ -1463,11 +1460,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
-              <Tooltip anchorId={tooltipAnchor}
-                       place='right'
-                       variant='light'
-                       float={true}
-                       className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}${tooltipAnchor ? ' styles-module_show__2NboJ' : ''}`}
+              <ReactTooltip id="tooltip"
+                            place="right"
+                            variant="light"
+                            float={true}
+                            className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`}
               />
             }
             {state.general.title && (

@@ -531,7 +531,11 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
+
+        {/* Paired Bar chart */}
+        {config.visualizationType === 'Paired Bar' &&
+          <PairedBarChart width={xMax} height={yMax} />
+        }
 
         {/* Bar chart */}
         {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
@@ -547,9 +551,15 @@ export default function LinearChart() {
           </>
         )}
 
-        {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
+        {/* Scatter Plot chart */}
+        {config.visualizationType === 'Scatter Plot' &&
+          <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />
+        }
 
-        {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
+        {/* Box Plot chart */}
+        {config.visualizationType === 'Box Plot' &&
+          <CoveBoxPlot xScale={xScale} yScale={yScale} />
+        }
       </svg>
       <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
