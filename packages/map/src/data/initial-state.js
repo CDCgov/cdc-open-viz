@@ -11,6 +11,7 @@ export default {
     territoriesLabel: 'Territories',
     language: 'en',
     geoType: 'single-state',
+    geoLabelOverride: '',
     hasRegions: false,
     expandDataTable: true,
     fullBorder: false,

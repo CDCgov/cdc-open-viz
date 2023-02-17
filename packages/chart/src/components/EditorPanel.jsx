@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
 
@@ -287,9 +287,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-    console.log('new value', newValue)
-    console.log('section', section)
-    console.log('sub', subsection)
 
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
@@ -1768,14 +1765,16 @@ const EditorPanel = () => {
                     </>
                   )}
 
-                  <fieldset className='fieldset fieldset--boxplot'>
-                    <legend className=''>Box Plot Settings</legend>
-                    {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
-                    {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
-                    <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
-                  </fieldset>
+                  {config.visualizationType === 'Box Plot' &&
+                    <fieldset fieldset className='fieldset fieldset--boxplot'>
+                      <legend className=''>Box Plot Settings</legend>
+                      {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
+                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotOutlierValues} fieldName='plotOutlierValues' section='boxplot' label='Plot Outliers' updateField={updateField} />}
+                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.plotNonOutlierValues} fieldName='plotNonOutlierValues' section='boxplot' label='Plot non-outlier values' updateField={updateField} />}
+                      {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
+                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
+                    </fieldset>
+                  }
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1977,7 +1976,7 @@ const EditorPanel = () => {
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
-    </ErrorBoundary>
+    </ErrorBoundary >
   )
 }
 
