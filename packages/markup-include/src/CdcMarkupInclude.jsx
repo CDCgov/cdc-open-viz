@@ -17,11 +17,11 @@ import MarkupInclude from './components/MarkupInclude'
 import './scss/cove-markup-include.scss'
 
 // Visualization
-const CdcMarkupInclude = ({ config: configObj, configUrl, setConfig: setWizardConfig, isWizard = false }) => {
+const CdcMarkupInclude = ({ config: configObj, configUrl, setConfig: setWizardConfig }) => {
   return (
     <ErrorBoundary component="CdcMarkupInclude">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults}>
-        <View EditorPanels={EditorPanels} isWizard={isWizard}>
+      <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults} origin="MarkupInclude">
+        <View EditorPanels={EditorPanels}>
           <Component className="cove-markup-include">
             <MarkupInclude/>
           </Component>

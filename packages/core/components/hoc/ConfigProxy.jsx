@@ -11,9 +11,9 @@ import { useConfigStore } from '../../stores/configStore'
 import dataTransform from '../../helpers/dataTransform'
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
-const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children }) => {
+const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children, origin = '' }) => {
   const { viewMode } = useGlobalStore((state) => state)
-  const { setConfigDefaults, updateConfig, setUpdateWizardConfig } = useConfigStore()
+  const { setConfigDefaults, updateConfig, updateWizardConfig, setUpdateWizardConfig } = useConfigStore()
 
   const [ cycled, setCycled ] = useState(false)
   const [ loadingConfig, setLoadingConfig ] = useState(true)
@@ -26,8 +26,8 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
   }
 
   useEffect(() => {
-    if (setWizardConfig) setUpdateWizardConfig(setWizardConfig)
-  }, [ setUpdateWizardConfig, setWizardConfig ])
+    if (setWizardConfig && !updateWizardConfig) setUpdateWizardConfig(setWizardConfig)
+  }, [ setWizardConfig, setUpdateWizardConfig, updateWizardConfig ])
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {

@@ -15,7 +15,7 @@ import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { useColorPalette } from '../hooks/useColorPalette'
 
 // Components - Core
-import AdvancedEditor from '@cdc/core/components/editor/AdvancedEditor'
+import EditorPanelAdvanced from '@cdc/core/components/editor/EditorPanelAdvanced'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/input/InputToggle'
@@ -30,12 +30,6 @@ import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import worldDefaultConfig from '../../examples/default-world.json'
 import usaDefaultConfig from '../../examples/default-usa.json'
 import countyDefaultConfig from '../../examples/default-county.json'
-
-import InputToggle from '@cdc/core/components/input/InputToggle'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
-import Icon from '@cdc/core/components/ui/Icon'
-
-import EditorPanelAdvanced from '@cdc/core/components/editor/EditorPanelAdvanced'
 
 // import ReactTags from 'react-tag-autocomplete'
 

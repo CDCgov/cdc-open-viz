@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Context
-import { useConfigStore } from '@cdc/core/stores/configStore.js'
+import { useConfigStore } from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'

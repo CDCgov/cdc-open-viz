@@ -8,7 +8,7 @@ import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import QuestionIcon from '@cdc/core/assets/icon-question-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
-import ConfigContext from '../ConfigContext'
+import DashboardContext from '../DashboardContext'
 
 const Helper = ({ text }) => {
   return (
@@ -128,7 +128,7 @@ const Select = memo(({ label, value, options, fieldName, section = null, subsect
 })
 
 const EditorPanels = memo(() => {
-  const { config, updateConfig, loading, rawData, setParentConfig, setEditing } = useContext(ConfigContext)
+  const { config, updateConfig, loading, rawData, setParentConfig, setEditing } = useContext(DashboardContext)
 
   const enforceRestrictions = updatedConfig => {
     // TODO

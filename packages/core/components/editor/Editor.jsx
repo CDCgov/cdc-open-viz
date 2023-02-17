@@ -17,9 +17,9 @@ import SplashError from '../ui/SplashError'
 import '../../styles/v2/components/editor.scss'
 import '../../styles/v2/components/element/editor-utils.scss'
 
-const Editor = ({ EditorPanels, children, setParentConfig }) => {
+const Editor = ({ EditorPanels, children }) => {
   const { os } = useGlobalStore()
-  const { config, setConfig, updateConfig, updateWizardConfig } = useConfigStore()
+  const { config, updateConfig, updateWizardConfig } = useConfigStore()
   const { missingRequiredSections } = config
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
@@ -39,6 +39,13 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
     delete strippedState.newViz
     return strippedState
   }
+
+  // If a subcomponent is being consumbed by Wizard or Dashboard, the update function
+  // is received by the ConfigProxy and registered in the store.
+  // The function is then used below when the config is updated.
+  useEffect(() => {
+    if (updateWizardConfig) updateWizardConfig(convertStateToConfig())
+  }, [ updateWizardConfig ])
 
   // Set and clean up the event listener for the hotkeys
   useEffect(() => {
@@ -69,12 +76,6 @@ const Editor = ({ EditorPanels, children, setParentConfig }) => {
   useEffect(() => {
     if (showConfirm === false) updateConfig(convertStateToConfig())
   }, [ showConfirm ])
-
-  // If a subcomponent of Wizard or Dashboard, pass config
-  // up to said parent, if the component's config is updated.
-  useEffect(() => {
-    if (updateWizardConfig) updateWizardConfig(convertStateToConfig())
-  }, [ config, updateWizardConfig ])
 
   const viewportPreviewController = useCallback((breakpoint) => {
     return setViewportPreview(prevState => prevState !== breakpoint ? breakpoint : null)

@@ -101,19 +101,23 @@ const VisualizationsPanel = () => (
 )
 
 const Dashboard = () => {
-  const { viewMode } = useGlobalStore()
+  const { viewMode, setViewMode } = useGlobalStore()
   const { config, updateConfig, updateWizardConfig } = useConfigStore()
-  const [data, setData] = useState([])
   const { title, description } = config.dashboard || config
 
+  const [ data, setData ] = useState([])
   const [ filteredData, setFilteredData ] = useState()
-  const [loading, setLoading] = useState(true)
+  const [ loading, setLoading ] = useState(true)
   const [ preview, setPreview ] = useState(false)
-
   const [ tabSelected, setTabSelected ] = useState(0)
   const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const transform = new dataTransform()
+
+
+  useEffect(() => {
+    setViewMode('isDashboard', true)
+  }, [ setViewMode ])
 
   const processData = async config => {
     let dataset = config.formattedData || config.data
@@ -430,7 +434,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} isWizard={true} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} />
               </>
             )
             break
@@ -578,11 +582,9 @@ const Dashboard = () => {
                                 <CdcMarkupInclude
                                   key={col.widget}
                                   config={visualizationConfig}
-                                  isEditor={false}
                                   setConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
-                                  isDashboard={true}
                                 />
                               )}
                               {visualizationConfig.type === 'filtered-text' && (

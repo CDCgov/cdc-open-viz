@@ -13,17 +13,15 @@ import Overlay from '../ui/Overlay'
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ EditorPanels, isDashboard: isDashboardVal, isWizard: isWizardVal, children }) => {
+const View = ({ EditorPanels, children }) => {
   const { viewMode, setViewMode } = useGlobalStore()
 
   const winLocation = window.location.href
 
   useEffect(() => {
     if (winLocation.includes('editor=true')) setViewMode('isEditor', true)
-    if (isDashboardVal) setViewMode('isDashboard', true) //Supplied by Dashboard entry
-    if (isWizardVal) setViewMode('isWizard', true) //Supplied by Wizard entry (previously named Editor)
     return () => {}
-  }, [ winLocation, isDashboardVal, isWizardVal, setViewMode ])
+  }, [ winLocation, setViewMode ])
 
   const { isEditor, isDashboard, isPreview, isWizard } = viewMode
 

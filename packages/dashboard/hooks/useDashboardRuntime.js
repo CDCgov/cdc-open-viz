@@ -1,4 +1,8 @@
-// Helpers
+// COVE Refactor - This hook should be used at some point to run any runtime functions on the data.
+// The below does not work, but serves as an example of how Dashboard data should be pre-processed
+// following a proper refactor.
+
+/*// Helpers
 import { cacheBustingString } from '@cdc/core/helpers/coveHelpers'
 import dataTransform from '@cdc/core/helpers/dataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -94,6 +98,8 @@ const useDashboardRuntime = async (newConfig) => {
           if (visualizationKeys[j] === filter.setBy) {
             const filterValues = generateValuesForFilter(filter.columnName, newConfig.data)
 
+            console.log(filterValues)
+
             if (newConfig.dashboard.sharedFilters[i].order === 'asc') {
               filterValues.sort()
             }
@@ -135,4 +141,4 @@ const useDashboardRuntime = async (newConfig) => {
   }
 }
 
-export default useDashboardRuntime
+export default useDashboardRuntime*/

@@ -20,7 +20,7 @@ import './scss/cove-dashboard.scss'
 const CdcDashboard = ({ config: configObj = undefined, configUrl, isWizard = false, setConfig: setWizardConfig }) => {
   return (
   <ErrorBoundary component="CdcDashboard">
-    <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults}>
+    <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults} origin="Dashboard">
       <View isDashboard={true} isWizard={isWizard}>
         <Dashboard/>
       </View>
