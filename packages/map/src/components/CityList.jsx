@@ -76,7 +76,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
                            title='Click for more information'
                            onClick={() => geoClickHandler(cityDisplayName, geoData)}
                            data-tooltip-html={toolTip}
-                           data-tooltip-id='tooltip'
+                           data-tooltip-id="tooltip"
                            {...additionalProps}
     />
 
@@ -87,7 +87,7 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
             strokeWidth={2}
             stroke={'black'}
             data-tooltip-html={toolTip}
-            data-tooltip-id='tooltip'
+            data-tooltip-id="tooltip"
             {...additionalProps}
       />
     )
