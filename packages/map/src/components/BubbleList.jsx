@@ -62,7 +62,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
               data-tooltip-html={toolTip}
-              data-tooltip-id='tooltip'
+              data-tooltip-id="tooltip"
             />
 
             {state.visual.extraBubbleBorder && (
@@ -89,7 +89,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
                 data-tooltip-html={toolTip}
-                data-tooltip-id='tooltip'
+                data-tooltip-id="tooltip"
               />
             )}
           </>
@@ -156,7 +156,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
               data-tooltip-html={toolTip}
-              data-tooltip-id='tooltip'
+              data-tooltip-id="tooltip"
             />
             {state.visual.extraBubbleBorder && (
               <circle
@@ -183,7 +183,7 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
                 data-tooltip-html={toolTip}
-                data-tooltip-id='tooltip'
+                data-tooltip-id="tooltip"
               />
             )}
           </>
