@@ -55,7 +55,7 @@ export default function LinearChart() {
   }
   const { horizontal: heightHorizontal } = config.heights
   const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
-  const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
+  const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
@@ -181,7 +181,8 @@ export default function LinearChart() {
       // group 2
       var g2xScale = scaleLinear({
         domain: g1xScale.domain(),
-        range: [xMax / 2, xMax]
+        range: [xMax / 2, xMax],
+        nice: true
       })
     }
 
@@ -526,7 +527,7 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
+        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
 
         {/* Bar chart */}
         {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
