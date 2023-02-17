@@ -13,7 +13,7 @@ import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
-  // Just do this once up front otherwise we end up 
+  // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey);
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
@@ -32,6 +32,10 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   }
 
   const handleAxisFormating = (axis = 'left', label, value) => {
+
+    // if this is an x axis category/date value return without doing any formatting.
+    if (label === config.runtime.xAxis.label) return value;
+
     axis = String(axis).toLocaleLowerCase()
     if (label) {
       return `${label}: ${formatNumber(value, axis)}`
@@ -107,8 +111,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                         cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                        data-tip={tooltip}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={tooltip}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
                   )
@@ -125,8 +129,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
                     : // is dynamic legend
                     config.legend.dynamicLegend
-                    ? colorPalettes[config.palette][index]
-                    : // fallback
+                      ? colorPalettes[config.palette][index]
+                      : // fallback
                       '#000'
                 }
                 strokeWidth={2}

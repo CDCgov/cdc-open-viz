@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -69,7 +69,7 @@ const nudges = {
 }
 
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, rebuildTooltips, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
 
   let isFilterValueSupported = false
 
@@ -114,8 +114,6 @@ const UsaMap = props => {
 
     setTerritoriesData(territoriesList)
   }, [data])
-
-  useEffect(() => rebuildTooltips())
 
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
@@ -168,7 +166,10 @@ const UsaMap = props => {
         }
       }
 
-      return <Shape key={label} label={label} css={styles} text={styles.color} data-tip={toolTip} data-for='tooltip' strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)} />
+      return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
+                    data-tooltip-id="tooltip"
+                    data-tooltip-html={toolTip}
+      />
     }
   })
 
@@ -238,6 +239,7 @@ const UsaMap = props => {
       // names must be equal
       return 0
     })
+
     const geosJsx = geographies.map(({ feature: geo, path = '' }) => {
       const key = isHex ? geo.properties.iso + '-hex-group' : geo.properties.iso + '-group'
 
@@ -286,9 +288,14 @@ const UsaMap = props => {
         if ((state.columns.navigate && geoData[state.columns.navigate.name]) || state.tooltips.appearanceType === 'click') {
           styles.cursor = 'pointer'
         }
+
         return (
           <g data-name={geoName} key={key}>
-            <g data-for='tooltip' data-tip={tooltip} className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}>
+            <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
+               id={geoName}
+               data-tooltip-id='tooltip'
+               data-tooltip-html={tooltip}
+               >
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
             </g>

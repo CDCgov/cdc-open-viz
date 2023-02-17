@@ -26,8 +26,6 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map(s => {
 
-          console.log('ITEM', item)
-          console.log('series', s)
           return (
             <circle
               key={`${dataIndex}`}
@@ -38,8 +36,8 @@ const CoveScatterPlot = ({ xScale, yScale, getXAxisData, getYAxisData }) => {
               opacity={1}
               style={pointStyles}
               fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[s] : s) : '#000'}
-              data-tip={handleTooltip(item, s)}
-              data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+              data-tooltip-html={handleTooltip(item, s)}
+              data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
             />
           )
         })
