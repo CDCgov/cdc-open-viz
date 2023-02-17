@@ -13,6 +13,7 @@ import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import { Base64 } from 'js-base64'
+import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -767,7 +768,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
-  
   const contextValues = {
     getXAxisData,
     getYAxisData,
