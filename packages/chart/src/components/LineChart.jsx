@@ -15,7 +15,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig } = useContext(ConfigContext)
   // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
-  const cleanedData = cleanData(data, config.xAxis.dataKey);
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleLineType = lineType => {
@@ -32,9 +32,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   }
 
   const handleAxisFormating = (axis = 'left', label, value) => {
-
     // if this is an x axis category/date value return without doing any formatting.
-    if (label === config.runtime.xAxis.label) return value;
+    if (label === config.runtime.xAxis.label) return value
 
     axis = String(axis).toLocaleLowerCase()
     if (label) {
@@ -86,12 +85,12 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
-                  d[seriesKey] !== null &&
-                  isNumber(d[seriesKey]) &&
-                  isNumber(getYAxisData(d, seriesKey)) &&
-                  isNumber(getXAxisData(d)) &&
-                  isNumber(yScaleRight(getXAxisData(d))) &&
-                  isNumber(yScale(getXAxisData(d))) && (
+                  d[seriesKey] !== null && (
+                    // isNumber(d[seriesKey]) &&
+                    // isNumber(getYAxisData(d, seriesKey)) &&
+                    // isNumber(getXAxisData(d)) &&
+                    // isNumber(yScaleRight(getXAxisData(d))) &&
+                    // isNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text
@@ -129,8 +128,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey)
                     : // is dynamic legend
                     config.legend.dynamicLegend
-                      ? colorPalettes[config.palette][index]
-                      : // fallback
+                    ? colorPalettes[config.palette][index]
+                    : // fallback
                       '#000'
                 }
                 strokeWidth={2}
