@@ -46,7 +46,7 @@
     "react-accessible-accordion": "^3.3.4",
     "react-spring": "^8.0.27",
     "react-table": "^7.5.0",
-    "react-tooltip": "5.8",
+    "react-tooltip": "5.8.2-beta.1",
     "use-debounce": "^6.0.1",
     "whatwg-fetch": "^3.6.2"
   },
