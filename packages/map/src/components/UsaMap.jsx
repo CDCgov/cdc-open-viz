@@ -365,4 +365,4 @@ const UsaMap = props => {
   )
 }
 
-export default memo(UsaMap)
+export default UsaMap

@@ -8242,10 +8242,10 @@ react-tag-autocomplete@^6.0.0:
   resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-6.3.0.tgz#ce064bbab77b4daf7706be1c08413e7d0335ff4d"
   integrity sha512-MUBVUFh5eOqshUm5NM20qp7zXk8TzSiKO4GoktlFzBLIOLs356npaMKtL02bm0nFV2f1zInUrXn1fq6+i5YX0w==
 
-react-tooltip@5.8:
-  version "5.8.1"
-  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-5.8.1.tgz#2b1ea9f5cb24578964a5c0a7ce9b183f5cb7dfd9"
-  integrity sha512-q30ARh/WwtcwNiZpzfYWFUmgZl6acRas/n7uhK6pXDiIWG6Xcklic0WFzHQLlvIGNeYbCY//h/RFdyBemfhZyQ==
+react-tooltip@5.8.2-beta.1:
+  version "5.8.2-beta.1"
+  resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-5.8.2-beta.1.tgz#389cab265bd2acc5578a7c865e7c4455b714b79f"
+  integrity sha512-AirLTDwqkIFIotnxuuDLvkTyQhEnk/VYj90PtHRuzxp9EMfITG9hGxX+HfplRCgQiIPGdtZ+R/OEmKTuxyEtvg==
   dependencies:
     "@floating-ui/dom" "1.1.1"
     classnames "^2.3.2"
