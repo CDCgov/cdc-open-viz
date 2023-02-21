@@ -327,8 +327,6 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-    console.log('section value', sectionValue)
-
     if (null !== subsection) {
       if (isArray) {
         sectionValue = [...config[section]]
@@ -727,8 +725,24 @@ const EditorPanel = () => {
                     config.visualizationType !== 'Pie' && <CheckBox value={config.labels} fieldName='labels' label='Display label on data' updateField={updateField} />
                   )}
                   {config.visualizationType === 'Pie' && <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />}
-
-                  <TextField value={config.title} fieldName='title' label='Title' updateField={updateField} />
+                  <TextField
+                      value={config.title}
+                      updateField={updateField}
+                      fieldName='title'
+                      label='Chart Title'
+                      placeholder='Chart Title'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Title is required to set the name of the download file but can be hidden using the option below.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                  />
+                  <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
                   <TextField
                     value={config.superTitle}
                     updateField={updateField}
@@ -1967,7 +1981,24 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  <TextField value={config.table.label} section='table' fieldName='label' label='Label' updateField={updateField} />
+                  <TextField
+                      value={config.table.title}
+                      updateField={updateField}
+                      section='dataTable'
+                      fieldName='title'
+                      label='Data Table Title'
+                      placeholder='Data Table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Label is required for Data Table for 508 Compliance</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                   {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                 </AccordionItemPanel>
               </AccordionItem>
