@@ -497,18 +497,18 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }, [config.title])
 
-  // DEV-769 make "Data Table" both a required field and default value
+  // DEV-3221 make "Data Table" both a required field and default value
   useEffect(() => {
-    if (config.dataTable?.title === "" || config.dataTable?.title === undefined) {
+    if (config.table?.label === "" || config.table?.label === undefined) {
       setConfig({
           ...config,
-        dataTable: {
-            ...config.dataTable,
-            title: "Data Table"
+        table: {
+            ...config.table,
+            label: "Data Table"
           }
         })
     }
-  }, [config.dataTable])
+  }, [config.table])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {

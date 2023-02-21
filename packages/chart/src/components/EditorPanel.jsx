@@ -1938,6 +1938,24 @@ const EditorPanel = () => {
                   <AccordionItemButton>Data Table</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
+                 <TextField
+                      value={config.table.label}
+                      updateField={updateField}
+                      section='table'
+                      fieldName='label'
+                      label='Data Table Title'
+                      placeholder='Data Table'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Label is required for Data Table for 508 Compliance</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                   <CheckBox
                     value={config.table.show}
                     section='table'
@@ -1955,6 +1973,7 @@ const EditorPanel = () => {
                       </Tooltip>
                     }
                   />
+                  {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
                   <TextField
                     value={config.table.caption}
                     updateField={updateField}
@@ -1981,26 +2000,7 @@ const EditorPanel = () => {
                   <CheckBox value={config.table.showDownloadUrl} section='table' fieldName='showDownloadUrl' label='Display Link to Dataset' updateField={updateField} />
                   {/* <CheckBox value={config.table.showDownloadImgButton} section='table' fieldName='showDownloadImgButton' label='Display Image Button' updateField={updateField} /> */}
                   {/* <CheckBox value={config.table.showDownloadPdfButton} section='table' fieldName='showDownloadPdfButton' label='Display PDF Button' updateField={updateField} /> */}
-                  <TextField
-                      value={config.table.title}
-                      updateField={updateField}
-                      section='dataTable'
-                      fieldName='title'
-                      label='Data Table Title'
-                      placeholder='Data Table'
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Label is required for Data Table for 508 Compliance</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  {config.visualizationType !== 'Pie' && <TextField value={config.table.indexLabel} section='table' fieldName='indexLabel' label='Index Column Header' updateField={updateField} />}
-                </AccordionItemPanel>
+                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
           </form>
