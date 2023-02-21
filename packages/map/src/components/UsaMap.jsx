@@ -293,7 +293,7 @@ const UsaMap = props => {
           <g data-name={geoName} key={key}>
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
                id={geoName}
-               data-tooltip-id='tooltip'
+               data-tooltip-id="tooltip"
                data-tooltip-html={tooltip}
                >
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
@@ -365,4 +365,4 @@ const UsaMap = props => {
   )
 }
 
-export default memo(UsaMap)
+export default UsaMap

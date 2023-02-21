@@ -36,7 +36,7 @@ import Loading from '@cdc/core/components/Loading'
 import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
-import Context from './context'
+import ConfigContext from './context'
 import Filters from './components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
@@ -1453,12 +1453,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tabId = handleMapTabbing()
 
   return (
-    <Context.Provider value={mapProps}>
+    <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' variant='light' float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
+              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
+            }
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1468,8 +1470,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-
-            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
+            {general.introText &&
+              <section className='introText'>{parse(general.introText)}</section>
+            }
 
             <Filters />
 
@@ -1571,7 +1574,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {accessibleStatus}
         </div>
       </div>
-    </Context.Provider>
+    </ConfigContext.Provider>
   )
 }
 
