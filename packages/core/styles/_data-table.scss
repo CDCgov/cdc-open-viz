@@ -19,17 +19,12 @@ div.data-table-heading {
   background-position: right 0.7em center;
   background-repeat: no-repeat;
 
-  .icon-minus, .icon-plus {
+  svg {
     position: absolute;
     height: 100%;
     width: 15px;
-    top: calc(0.5em - 6px);
+    top: 0;
     right: 1em;
-  }
-
-  .icon-plus {
-    display: none;
-    top: 0.5em;
   }
 
   &:focus {
@@ -41,14 +36,6 @@ div.data-table-heading {
     background-position: right 0.7em center;
     background-repeat: no-repeat;
     border-bottom: $lightGray 1px solid;
-
-    .icon-plus {
-      display: block;
-    }
-
-    .icon-minus {
-      display: none;
-    }
   }
 }
 
