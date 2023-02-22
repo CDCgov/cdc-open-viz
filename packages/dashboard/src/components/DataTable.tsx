@@ -3,6 +3,7 @@ import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-tab
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -118,6 +119,7 @@ export default function DataTable(props) {
               }
             }}
           >
+            <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
             {config.table.label}
             {datasetKey ? `: ${datasetKey}` : ''}
           </div>
