@@ -15,9 +15,6 @@ div.data-table-heading {
   border: $lightGray 1px solid;
   border-bottom: 0;
   cursor: pointer;
-  background-size: 15px 15px; // Need to define both for IE11
-  background-position: right 0.7em center;
-  background-repeat: no-repeat;
 
   svg {
     position: absolute;
@@ -30,12 +27,6 @@ div.data-table-heading {
   &:focus {
     z-index: 2;
     position: relative;
-  }
-  &.collapsed {
-    background-size: 15px 15px; // Need to define both for IE11
-    background-position: right 0.7em center;
-    background-repeat: no-repeat;
-    border-bottom: $lightGray 1px solid;
   }
 }
 
