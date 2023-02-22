@@ -5,6 +5,7 @@ import { Base64 } from 'js-base64'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 
@@ -223,6 +224,7 @@ export default function DataTable() {
             }
           }}
         >
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>
