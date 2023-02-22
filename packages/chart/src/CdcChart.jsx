@@ -48,6 +48,7 @@ import './scss/main.scss'
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
 
+
   const [loading, setLoading] = useState(true)
   const [colorScale, setColorScale] = useState(null)
   const [config, setConfig] = useState({})
@@ -486,6 +487,29 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }, [config, stateData])
 
+  // DEV-3218 make "Chart Title" both a required field and default value
+  useEffect(() => {
+    if (config?.title === "" || config?.title === undefined) {
+      setConfig({
+          ...config,
+          title: "Chart Title"
+        })
+    }
+  }, [config.title])
+
+  // DEV-3221 make "Data Table" both a required field and default value
+  useEffect(() => {
+    if (config.table?.label === "" || config.table?.label === undefined) {
+      setConfig({
+          ...config,
+        table: {
+            ...config.table,
+            label: "Data Table"
+          }
+        })
+    }
+  }, [config.table])
+
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = label => {
     const newSeriesHighlight = []
@@ -707,7 +731,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           <div className='cdc-chart-inner-container'>
             {/* Title */}
 
-            {title && (
+            {title && config.showTitle && (
               <div role='heading' className={`chart-title ${config.theme} cove-component__header`} aria-level={2}>
                 {config && <sup className='superTitle'>{parse(config.superTitle || '')}</sup>}
                 <div>{parse(title)}</div>
