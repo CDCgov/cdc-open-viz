@@ -301,12 +301,7 @@ const DataTable = props => {
             }
           }}
         >
-          <div className="icon-minus">
-            <Icon display="minus" base/>
-          </div>
-          <div className="icon-plus">
-            <Icon display="plus" base/>
-          </div>
+          <Icon display={expanded ? 'minus' : 'plus'} base/>
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>

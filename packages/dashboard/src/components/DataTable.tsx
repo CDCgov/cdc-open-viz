@@ -119,12 +119,7 @@ export default function DataTable(props) {
               }
             }}
           >
-            <div className="icon-minus">
-              <Icon display="minus" base/>
-            </div>
-            <div className="icon-plus">
-              <Icon display="plus" base/>
-            </div>
+            <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
             {config.table.label}
             {datasetKey ? `: ${datasetKey}` : ''}
           </div>
