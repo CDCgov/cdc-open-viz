@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, memo, useCallback } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -307,6 +308,7 @@ const DataTable = props => {
             }
           }}
         >
+          <Icon display={expanded ? 'minus' : 'plus'} base/>
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
