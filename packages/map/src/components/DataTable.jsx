@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo, memo, useCallback } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import ExternalIcon from '../images/external-link.svg' // TODO: Move to Icon component
-import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/LegendCircle'
@@ -152,11 +151,12 @@ const DataTable = props => {
   const DownloadButton = memo(() => {
 
     let csvData;
-
-    //If not World map, then try FIPS type lookup and add new col with full name
-    if (state.general.geoType !== 'world') {
+    if (state.general.geoType === 'us-county' || state.general.geoType === 'single-state') {
+      // if county or single state have to look up based on fips codes
+      csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row['FIPS Codes']), ...row })))
+    } else if(state.general.geoType !== 'world' && state.general.geoType !== 'us-region' && state.general.geoType !== 'us') {
+      //If not World or US region map, then try FIPS type lookup and add new col with full name
       csvData = Papa.unparse(rawData.map(row => ({ FullGeoName: displayGeoName(row.STATE), ...row })))
-      //csvData = Papa.unparse(rawData.map( row => ({FullGeoName: displayGeoName(row.STATE), ...row }) ))
     } else {
       csvData = Papa.unparse(rawData)
     }
@@ -308,7 +308,6 @@ const DataTable = props => {
             }
           }}
         >
-          <Icon display={expanded ? 'minus' : 'plus'} base/>
           {tableTitle}
         </div>
         <div className='table-container' style={{ maxHeight: state.dataTable.limitHeight && `${state.dataTable.height}px`, overflowY: 'scroll' }}>
