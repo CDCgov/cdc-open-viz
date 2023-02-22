@@ -1046,6 +1046,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   // Attempts to find the corresponding value
   const displayGeoName = key => {
     let value = key
+
     // Map to first item in values array which is the preferred label
     if (stateKeys.includes(value)) {
       value = titleCase(supportedStates[key][0])
@@ -1084,6 +1085,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     if (true === Object.keys(dict).includes(value)) {
       value = dict[value]
     }
+
     return titleCase(value)
   }
 
