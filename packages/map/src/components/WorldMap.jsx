@@ -72,6 +72,11 @@ const WorldMap = props => {
           Reset Filters
         </button>
       )}
+      {state.general.type === 'world-geocode' && (
+        <button onClick={() => handleReset(state, setState, setRuntimeData, generateRuntimeData)} className='reset' aria-label='Reset Zoom'>
+          Reset Zoom
+        </button>
+      )}
     </div>
   )
 
@@ -201,7 +206,7 @@ const WorldMap = props => {
           </ZoomableGroup>
         </svg>
       )}
-      {(state.general.type === 'data' || (state.general.type === 'bubble' && hasZoom)) && <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />}
+      {(state.general.type === 'data' || (state.general.type === 'world-geocode' && hasZoom) || (state.general.type === 'bubble' && hasZoom)) && <ZoomControls position={position} setPosition={setPosition} setRuntimeData={setRuntimeData} state={state} setState={setState} generateRuntimeData={generateRuntimeData} />}
     </ErrorBoundary>
   )
 }
