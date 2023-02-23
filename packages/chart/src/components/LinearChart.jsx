@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
@@ -55,7 +55,7 @@ export default function LinearChart() {
   }
   const { horizontal: heightHorizontal } = config.heights
   const height = config.aspectRatio ? width * config.aspectRatio : config.heights[config.orientation]
-  const xMax = width - config.runtime.yAxis.size - config.yAxis.rightAxisSize
+  const xMax = width - config.runtime.yAxis.size - (config.visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = height - (config.orientation === 'horizontal' ? 0 : config.runtime.xAxis.size)
 
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data, updateConfig })
@@ -181,7 +181,8 @@ export default function LinearChart() {
       // group 2
       var g2xScale = scaleLinear({
         domain: g1xScale.domain(),
-        range: [xMax / 2, xMax]
+        range: [xMax / 2, xMax],
+        nice: true
       })
     }
 
@@ -261,10 +262,6 @@ export default function LinearChart() {
       padding: 0.4
     })
   }
-
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   const handleTick = tick => {
     return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
@@ -421,7 +418,7 @@ export default function LinearChart() {
             top={config.runtime.horizontal ? Number(heightHorizontal) + Number(config.xAxis.axisPadding) : yMax + Number(config.xAxis.axisPadding)}
             left={Number(config.runtime.yAxis.size)}
             label={config.runtime.xAxis.label}
-            tickFormat={tick => (config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick)}
+            tickFormat={handleBottomTickFormatting}
             scale={xScale}
             stroke='#333'
             tickStroke='#333'
@@ -526,7 +523,9 @@ export default function LinearChart() {
             </AxisBottom>
           </>
         )}
-        {config.visualizationType === 'Paired Bar' && <PairedBarChart width={xMax} height={yMax} />}
+
+        {/* Paired Bar chart */}
+        {config.visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
 
         {/* Bar chart */}
         {config.visualizationType !== 'Line' && config.visualizationType !== 'Paired Bar' && config.visualizationType !== 'Box Plot' && config.visualizationType !== 'Scatter Plot' && (
@@ -542,11 +541,13 @@ export default function LinearChart() {
           </>
         )}
 
+        {/* Scatter Plot chart */}
         {config.visualizationType === 'Scatter Plot' && <CoveScatterPlot xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} />}
 
+        {/* Box Plot chart */}
         {config.visualizationType === 'Box Plot' && <CoveBoxPlot xScale={xScale} yScale={yScale} />}
       </svg>
-      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} html={true} type='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
+      <ReactTooltip id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`} variant='light' arrowColor='rgba(0,0,0,0)' className='tooltip' />
       <div className='animation-trigger' ref={triggerRef} />
     </ErrorBoundary>
   )
