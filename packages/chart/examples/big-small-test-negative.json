@@ -277,22 +277,22 @@
     },
     {
       "Category": "3",
-      "Values": "1.5",
+      "Values": "2.5",
       "Filter": "Small"
     },
     {
       "Category": "4",
-      "Values": "1.7",
+      "Values": "-2",
       "Filter": "Small"
     },
     {
       "Category": "5",
-      "Values": "2",
+      "Values": "1.5",
       "Filter": "Small"
     },
     {
       "Category": "6",
-      "Values": "2",
+      "Values": "-1.8",
       "Filter": "Small"
     },
     {
@@ -302,7 +302,7 @@
     },
     {
       "Category": "8",
-      "Values": "0.4",
+      "Values": "-1.3",
       "Filter": "Small"
     }
   ],
