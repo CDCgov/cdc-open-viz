@@ -1107,6 +1107,20 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setSharedFilter(state.uid, value)
     }
 
+    // If world-geocode map zoom to geo point
+    if ('world-geocode' === state.general.type) {
+
+      let lat = value[state.columns.latitude.name]
+      let long = value[state.columns.longitude.name]
+
+      console.log('lat', lat)
+      console.log('long', long)
+      setState({
+        ...state,
+        mapPosition: { coordinates: [long, lat], zoom: 3 }
+      })
+    }
+
     // If modals are set or we are on a mobile viewport, display modal
     if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
       setModal({

@@ -2540,7 +2540,7 @@ const EditorPanel = props => {
                       )
                     })}
                   </ul>
-                  {'us-geocode' === state.general.type && (
+                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
                     <label>
                       Geocode Settings
                       <TextField type='number' value={state.visual.geoCodeCircleSize} section='visual' max='10' fieldName='geoCodeCircleSize' label='Geocode Circle Size' updateField={updateField} />
