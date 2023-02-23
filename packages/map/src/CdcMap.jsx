@@ -6,44 +6,49 @@ import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
 // Third party
-import ReactTooltip from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
+import 'react-tooltip/dist/react-tooltip.css'
+
+// Helpers
+import { publish } from '@cdc/core/helpers/events'
 
 // Data
-import colorPalettes from '../../core/data/colorPalettes'
-import ExternalIcon from './images/external-link.svg'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
-import initialState from './data/initial-state'
 import { countryCoordinates } from './data/country-coordinates'
-import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
+import colorPalettes from '../../core/data/colorPalettes'
+import initialState from './data/initial-state'
+
+// Assets
+import ExternalIcon from './images/external-link.svg'
 
 // Sass
 import './scss/main.scss'
 import './scss/btn.scss'
 
 // Core
-import Loading from '@cdc/core/components/Loading'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
-import getViewport from '@cdc/core/helpers/getViewport'
-import numberFromString from '@cdc/core/helpers/numberFromString'
+import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import getViewport from '@cdc/core/helpers/getViewport'
+import Loading from '@cdc/core/components/Loading'
+import numberFromString from '@cdc/core/helpers/numberFromString'
 
 // Child Components
-import Sidebar from './components/Sidebar'
+import ConfigContext from './context'
+import Filters from './components/Filters'
 import Modal from './components/Modal'
-import EditorPanel from './components/EditorPanel' // Future: Lazy
-import UsaMap from './components/UsaMap' // Future: Lazy
-import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import Sidebar from './components/Sidebar'
+
 import CountyMap from './components/CountyMap' // Future: Lazy
 import DataTable from './components/DataTable' // Future: Lazy
+import EditorPanel from './components/EditorPanel' // Future: Lazy
 import NavigationMenu from './components/NavigationMenu' // Future: Lazy
-import WorldMap from './components/WorldMap' // Future: Lazy
 import SingleStateMap from './components/SingleStateMap' // Future: Lazy
-import Filters from './components/Filters'
-import Context from './context'
-
-import { publish } from '@cdc/core/helpers/events'
+import UsaMap from './components/UsaMap' // Future: Lazy
+import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
+import WorldMap from './components/WorldMap' // Future: Lazy
 
 // Data props
 const stateKeys = Object.keys(supportedStates)
@@ -938,12 +943,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
+    // check the override
+    stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
 
     if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
       let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
 
-      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
+      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
@@ -1292,6 +1299,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [state.dataTable])
 
+  // When geo label override changes
+  // - redo the tooltips
+  useEffect(() => {
+    applyTooltipsToGeo()
+  }, [state.general.geoLabelOverride])
+
   useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
@@ -1381,7 +1394,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const mapProps = {
     state,
     data: runtimeData,
-    rebuildTooltips: ReactTooltip.rebuild,
     applyTooltipsToGeo,
     closeModal,
     navigationHandler,
@@ -1436,12 +1448,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tabId = handleMapTabbing()
 
   return (
-    <Context.Provider value={mapProps}>
+    <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
+              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
+            }
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1451,8 +1465,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-
-            <div>{general.introText && <section className='introText'>{parse(general.introText)}</section>}</div>
+            {general.introText &&
+              <section className='introText'>{parse(general.introText)}</section>
+            }
 
             <Filters />
 
@@ -1554,7 +1569,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {accessibleStatus}
         </div>
       </div>
-    </Context.Provider>
+    </ConfigContext.Provider>
   )
 }
 

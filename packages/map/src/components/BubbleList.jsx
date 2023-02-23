@@ -2,13 +2,8 @@ import React, { useEffect } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
-import ReactTooltip from 'react-tooltip'
 
 export const BubbleList = ({ data: dataImport, state, projection, applyLegendToRow, applyTooltipsToGeo, handleCircleClick, runtimeData, displayGeoName }) => {
-  useEffect(() => {
-    ReactTooltip.hide()
-  }, [runtimeData])
-
   const maxDataValue = Math.max(...dataImport.map(d => d[state.columns.primary.name]))
   const hasBubblesWithZeroOnMap = state.visual.showBubbleZeros ? 0 : 1
   // sort runtime data. Smaller bubbles should appear on top.
@@ -45,8 +40,6 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
           <>
             <circle
               key={`circle-${countryName.replace(' ', '')}`}
-              data-tip={toolTip}
-              data-for='tooltip'
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -68,13 +61,13 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+              data-tooltip-id="tooltip"
+              data-tooltip-html={toolTip}
             />
 
             {state.visual.extraBubbleBorder && (
               <circle
                 key={`circle-${countryName.replace(' ', '')}`}
-                data-tip={toolTip}
-                data-for='tooltip'
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0} // || 0 handles error on loads where the data isn't ready
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -95,6 +88,8 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+                data-tooltip-id="tooltip"
+                data-tooltip-html={toolTip}
               />
             )}
           </>
@@ -139,8 +134,6 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
           <>
             <circle
               key={`circle-${stateName.replace(' ', '')}`}
-              data-tip={toolTip}
-              data-for='tooltip'
               className='bubble'
               cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
               cy={projection(coordinates)[1] || 0}
@@ -162,12 +155,12 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
               }}
               transform={transform}
               style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+              data-tooltip-id="tooltip"
+              data-tooltip-html={toolTip}
             />
             {state.visual.extraBubbleBorder && (
               <circle
                 key={`circle-${stateName.replace(' ', '')}`}
-                data-tip={toolTip}
-                data-for='tooltip'
                 className='bubble'
                 cx={projection(coordinates)[0] || 0} // || 0 handles error on loads where the data isn't ready
                 cy={projection(coordinates)[1] || 0}
@@ -189,6 +182,8 @@ export const BubbleList = ({ data: dataImport, state, projection, applyLegendToR
                 }}
                 transform={transform}
                 style={{ transition: 'all .25s ease-in-out', cursor: 'pointer' }}
+                data-tooltip-id="tooltip"
+                data-tooltip-html={toolTip}
               />
             )}
           </>

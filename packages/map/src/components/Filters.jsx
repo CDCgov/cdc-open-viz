@@ -29,7 +29,8 @@ const useFilters = () => {
     setShowApplyButton(false)
   }
 
-  const handleReset = () => {
+  const handleReset = (e) => {
+    e.preventDefault()
     let newFilters = runtimeFilters
 
     // reset to first item in values array.

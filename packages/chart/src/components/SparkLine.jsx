@@ -10,12 +10,10 @@ import { MarkerArrow } from '@visx/marker'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
-import ReactTooltip from 'react-tooltip'
-
 import useReduceData from '../hooks/useReduceData'
 
 import ConfigContext from '../ConfigContext'
-  
+
 export default function SparkLine({ width: parentWidth, height: parentHeight }) {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, seriesHighlight, formatNumber, colorScale, isNumber, handleChartAriaLabels } = useContext(ConfigContext)
   let width = parentWidth
@@ -69,8 +67,8 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
     if (testing) console.log('## cleanedData =', cleanedup)
     return cleanedup
    }
-  
-  // Just do this once up front otherwise we end up 
+
+  // Just do this once up front otherwise we end up
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey);
 
@@ -126,10 +124,6 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
   }
 
   const handleSparkLineTicks = [xScale.domain()[0], xScale.domain()[xScale.domain().length - 1]]
-  
-  useEffect(() => {
-    ReactTooltip.rebuild()
-  })
 
   return (
     <ErrorBoundary component='SparkLine'>
@@ -170,8 +164,8 @@ export default function SparkLine({ width: parentWidth, height: parentHeight }) 
                         cy={yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                        data-tip={tooltip}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={tooltip}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     )}
                   </Group>
