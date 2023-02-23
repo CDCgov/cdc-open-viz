@@ -225,6 +225,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         const geoName = row[obj.columns.geo.name]
 
         uid = countryKeys.find(key => supportedCountries[key].includes(geoName))
+
+        // Cities
+        if (!uid && 'world-geocode' === state.general.type) {
+          uid = cityKeys.find(key => key === geoName.toUpperCase())
+        }
       }
 
       // County Check
@@ -927,6 +932,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
+
     // check the override
     stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
 
@@ -937,9 +943,10 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
+
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
 
-    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode') && undefined !== row) {
+    if (('data' === state.general.type || state.general.type === 'bubble' || state.general.type === 'us-geocode' || state.general.type === 'world-geocode') && undefined !== row) {
       toolTipText += `<dl>`
 
       Object.keys(state.columns).forEach(columnKey => {
