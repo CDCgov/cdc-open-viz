@@ -1113,8 +1113,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let lat = value[state.columns.latitude.name]
       let long = value[state.columns.longitude.name]
 
-      console.log('lat', lat)
-      console.log('long', long)
       setState({
         ...state,
         mapPosition: { coordinates: [long, lat], zoom: 3 }
