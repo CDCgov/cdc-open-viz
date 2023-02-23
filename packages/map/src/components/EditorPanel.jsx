@@ -418,6 +418,15 @@ const EditorPanel = props => {
               }
             })
             break
+          case 'world-geocode':
+            setState({
+              ...state,
+              general: {
+                ...state.general,
+                type: value
+              }
+            })
+            break
           case 'data':
             setState({
               ...state,
@@ -698,11 +707,11 @@ const EditorPanel = props => {
       columnList.push('Navigation')
     }
 
-    if ('us-geocode' === state.general.type && '' === state.columns.latitude.name) {
+    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.latitude.name) {
       columnList.push('Latitude')
     }
 
-    if ('us-geocode' === state.general.type && '' === state.columns.longitude.name) {
+    if ((('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && '' === state.columns.longitude.name) {
       columnList.push('Longitude')
     }
 
@@ -1349,7 +1358,8 @@ const EditorPanel = props => {
                       }}
                     >
                       <option value='data'>Data</option>
-                      <option value='us-geocode'>United States Geocode</option>
+                      {state.general.geoType === 'us-county' && <option value='us-geocode'>Geocode</option>}
+                      {state.general.geoType === 'world' && <option value='world-geocode'>Geocode</option>}
                       <option value='navigation'>Navigation</option>
                       {(state.general.geoType === 'world' || state.general.geoType === 'us') && <option value='bubble'>Bubble</option>}
                     </select>
@@ -1677,8 +1687,7 @@ const EditorPanel = props => {
                       </label>
                     </fieldset>
                   )}
-
-                  {'us-geocode' === state.general.type && (
+                  {(('us-geocode' === state.general.type) || ('world-geocode' === state.general.type)) && (
                     <>
                       <label>Latitude Column</label>
                       <select
@@ -2581,20 +2590,21 @@ const EditorPanel = props => {
                     </label>
                   )}
                   {state.general.geoType === 'us' ||
-                    (state.general.geoType === 'us-county' && (
-                      <label>
-                        <span className='edit-label'>City Style</span>
-                        <select
-                          value={state.visual.cityStyle || false}
-                          onChange={event => {
-                            handleEditorChanges('handleCityStyle', event.target.value)
-                          }}
-                        >
-                          <option value='circle'>Circle</option>
-                          <option value='pin'>Pin</option>
-                        </select>
-                      </label>
-                    ))}
+                    (state.general.geoType === 'us-county' ||
+                      (state.general.geoType === 'world') && (
+                        <label>
+                          <span className='edit-label'>City Style</span>
+                          <select
+                            value={state.visual.cityStyle || false}
+                            onChange={event => {
+                              handleEditorChanges('handleCityStyle', event.target.value)
+                            }}
+                          >
+                            <option value='circle'>Circle</option>
+                            <option value='pin'>Pin</option>
+                          </select>
+                        </label>
+                      ))}
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>

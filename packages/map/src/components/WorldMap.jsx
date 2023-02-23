@@ -1,4 +1,4 @@
-import { useEffect, memo } from 'react'
+import { memo } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -16,7 +16,21 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
+  const {
+    state,
+    applyTooltipsToGeo,
+    data,
+    geoClickHandler,
+    applyLegendToRow,
+    displayGeoName,
+    supportedCountries,
+    setState, setRuntimeData,
+    generateRuntimeData,
+    setFilteredCountryCode,
+    position, setPosition,
+    hasZoom,
+    handleMapAriaLabels,
+    titleCase } = props
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
@@ -76,7 +90,7 @@ const WorldMap = props => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
       const geoKey = geo.properties.iso
 
-      if (!geoKey) return
+      if (!geoKey) return null;
 
       const geoData = data[geoKey]
 
@@ -104,13 +118,13 @@ const WorldMap = props => {
 
         styles = {
           ...styles,
-          fill: legendColors[0],
+          fill: state.general.type !== 'world-geocode' ? legendColors[0] : '#E6E6E6',
           cursor: 'default',
           '&:hover': {
-            fill: legendColors[1]
+            fill: state.general.type !== 'world-geocode' ? legendColors[1] : '#E6E6E6'
           },
           '&:active': {
-            fill: legendColors[2]
+            fill: state.general.type !== 'world-geocode' ? legendColors[2] : '#E6E6E6'
           }
         }
 
@@ -136,7 +150,20 @@ const WorldMap = props => {
     })
 
     // Cities
-    geosJsx.push(<CityList projection={projection} key='cities' data={data} state={state} geoClickHandler={geoClickHandler} applyTooltipsToGeo={applyTooltipsToGeo} displayGeoName={displayGeoName} applyLegendToRow={applyLegendToRow} isGeoCodeMap={state.general.type === 'us-geocode'} />)
+    geosJsx.push(
+      <CityList
+        applyLegendToRow={applyLegendToRow}
+        applyTooltipsToGeo={applyTooltipsToGeo}
+        data={data}
+        displayGeoName={displayGeoName}
+        geoClickHandler={geoClickHandler}
+        isGeoCodeMap={state.general.type === 'world-geocode'}
+        key='cities'
+        projection={projection}
+        state={state}
+        titleCase={titleCase}
+      />
+    )
 
     // Bubbles
     if (state.general.type === 'bubble') {
