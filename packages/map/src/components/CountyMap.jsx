@@ -1,10 +1,13 @@
 import React, { useEffect, memo, useRef } from 'react'
-import Loading from '@cdc/core/components/Loading'
 
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
+import debounce from 'lodash.debounce'
+
+import Loading from '@cdc/core/components/Loading'
+import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+
 import topoJSON from '../data/county-map.json'
 
 const sortById = (a, b) => {
@@ -49,7 +52,7 @@ function CountyMapChecks(prevState, nextState) {
 }
 
 const CountyMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
+  const { state, runtimeLegend, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels } = props
 
   useEffect(() => {
     if (containerEl) {
@@ -153,7 +156,7 @@ const CountyMap = props => {
   }
 
   const drawCanvas = (focusId, center) => {
-    if (canvasRef.current) {
+    if (canvasRef.current && runtimeLegend.length > 0) {
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       const path = geoPath(projection, context)
@@ -166,9 +169,11 @@ const CountyMap = props => {
       // If we are rendering the map without a zoom on a state, hide the reset button
       if (!focusId) {
         canvas.setAttribute('data-focus', null)
+        canvas.setAttribute('data-center', null)
         if (resetButton.current) resetButton.current.style.display = 'none'
       } else {
         canvas.setAttribute('data-focus', focusId)
+        canvas.setAttribute('data-center', JSON.stringify(center))
         if (resetButton.current) resetButton.current.style.display = 'block'
       }
 
@@ -212,6 +217,20 @@ const CountyMap = props => {
 
   useEffect(() => {
     drawCanvas()
+
+    const onResize = () => {
+      if (canvasRef.current) {
+        drawCanvas(canvasRef.current.getAttribute('data-focus') === 'null' ? undefined : canvasRef.current.getAttribute('data-focus'), canvasRef.current.getAttribute('data-center') ? JSON.parse(canvasRef.current.getAttribute('data-center')) : undefined)
+      }
+    }
+
+    const debounceOnResize = debounce(onResize, 300)
+
+    setTimeout(() => {
+      window.addEventListener('resize', debounceOnResize)
+    }, 300)
+
+    return () => window.removeEventListener('resize', debounceOnResize)
   })
 
   if (!data) <Loading />
