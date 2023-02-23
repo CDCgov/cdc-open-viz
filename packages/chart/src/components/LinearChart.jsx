@@ -63,11 +63,8 @@ export default function LinearChart() {
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  //const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const getYAxisData = (d, seriesKey) => {
-    console.log("LinearChart getYAxisData d, seriesKey, d[seriesKey]",d, seriesKey,d[seriesKey])
-    return d[seriesKey]
-  }
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
+
   let xScale
   let yScale
   let seriesScale
@@ -81,8 +78,6 @@ export default function LinearChart() {
   if (data) {
     min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
-
-    console.log("LinearChart max, enteredMaxValue, Number.MIN_VALUE",max, enteredMaxValue)
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
@@ -106,8 +101,6 @@ export default function LinearChart() {
       // if all values in data are negative set max = 0
       max = existPositiveValue ? maxValue : 0
     }
-
-    console.log("max down below=", max)
     
     //Adds Y Axis data padding if applicable
     if (config.runtime.yAxis.paddingPercent) {

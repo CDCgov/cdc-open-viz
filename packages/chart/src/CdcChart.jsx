@@ -71,8 +71,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const { barBorderClass, lineDatapointClass, contentClasses, innerContainerClasses, sparkLineStyles } = useDataVizClasses(config)
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
-
-  console.log("##CdcChart config.data=", config.data)
   
   const handleChartAriaLabels = (state, testing = false) => {
     if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
@@ -131,7 +129,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         data = transform.developerStandardize(data, response.dataDescription)
       }
     }
-console.log("###CdcChart data after import",data) // data NOT rounded here keep going
+
     if (data) {
       setStateData(data)
       setExcludedData(data)
@@ -599,8 +597,6 @@ console.log("###CdcChart data after import",data) // data NOT rounded here keep 
     let original = num
     let stringFormattingOptions
 
-    //console.log("###config.dataFormat.commas, roundTo, rightRoundTo",config.dataFormat.commas,roundTo, rightRoundTo)
-
     if (axis !== 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
@@ -773,12 +769,7 @@ console.log("###CdcChart data after import",data) // data NOT rounded here keep 
   }
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  const getYAxisData = (d, seriesKey) => {
-    console.log("###CdcChart getYAxisData d, seriesKey, d[seriesKey]",d, seriesKey,d[seriesKey])
-    return d[seriesKey]
-  }
-
-  console.log("###stateData=", stateData)
+  const getYAxisData = (d, seriesKey) => d[seriesKey]
   
   const contextValues = {
     getXAxisData,
