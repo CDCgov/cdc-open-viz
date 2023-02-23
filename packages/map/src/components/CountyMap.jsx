@@ -119,6 +119,17 @@ const CountyMap = props => {
     let currentTooltipIndex = parseInt(tooltipRef.current.getAttribute('data-index'))
     //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
     if (isNaN(currentTooltipIndex) || !geoContains(mapData[currentTooltipIndex], pointCoordinates)) {
+      const context = canvas.getContext('2d')
+      const path = geoPath(projection, context)
+      if (!isNaN(currentTooltipIndex)) {
+        context.fillStyle = applyLegendToRow(data[mapData[currentTooltipIndex].id])[0]
+        context.strokeStyle = geoStrokeColor
+        context.beginPath()
+        path(mapData[currentTooltipIndex])
+        context.fill()
+        context.stroke()
+      }
+
       let focusedState = canvas.getAttribute('data-focus')
       let hoveredState
       let county
@@ -143,6 +154,20 @@ const CountyMap = props => {
 
       // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
       if (county && data[county.id]) {
+        context.fillStyle = 'white'
+        context.strokeStyle = 'white'
+        context.beginPath()
+        path(mapData[countyIndex])
+        context.fill()
+        context.stroke()
+
+        context.fillStyle = applyLegendToRow(data[county.id])[1]
+        context.strokeStyle = geoStrokeColor
+        context.beginPath()
+        path(mapData[countyIndex])
+        context.fill()
+        context.stroke()
+
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = e.clientY + 'px'
         tooltipRef.current.style.left = e.clientX + 'px'
