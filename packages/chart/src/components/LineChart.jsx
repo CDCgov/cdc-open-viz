@@ -18,6 +18,8 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
+  //console.log("LineChart ###CleanedData=", cleanedData)
+  
   const handleLineType = lineType => {
     switch (lineType) {
       case 'dashed-sm':
@@ -86,11 +88,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null && (
-                    // isNumber(d[seriesKey]) &&
-                    // isNumber(getYAxisData(d, seriesKey)) &&
-                    // isNumber(getXAxisData(d)) &&
-                    // isNumber(yScaleRight(getXAxisData(d))) &&
-                    // isNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
                       {/* Render legend */}
                       <Text

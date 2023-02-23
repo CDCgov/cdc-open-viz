@@ -25,6 +25,7 @@ import useTopAxis from '../hooks/useTopAxis'
 export default function LinearChart() {
   const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig } = useContext(ConfigContext)
   let [width] = dimensions
+
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
 
@@ -62,8 +63,11 @@ export default function LinearChart() {
   const { hasTopAxis } = useTopAxis(config)
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
-
+  //const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const getYAxisData = (d, seriesKey) => {
+    console.log("LinearChart getYAxisData d, seriesKey, d[seriesKey]",d, seriesKey,d[seriesKey])
+    return d[seriesKey]
+  }
   let xScale
   let yScale
   let seriesScale
@@ -72,9 +76,13 @@ export default function LinearChart() {
   const isMaxValid = existPositiveValue ? enteredMaxValue >= maxValue : enteredMaxValue >= 0
   const isMinValid = (enteredMinValue <= 0 && minValue >= 0) || (enteredMinValue <= minValue && minValue < 0)
 
+  let max = 0; // need outside the if statement
+  let min = 0;
   if (data) {
-    let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
-    let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+    min = enteredMinValue && isMinValid ? enteredMinValue : minValue
+    max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+
+    console.log("LinearChart max, enteredMaxValue, Number.MIN_VALUE",max, enteredMaxValue)
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
@@ -99,6 +107,8 @@ export default function LinearChart() {
       max = existPositiveValue ? maxValue : 0
     }
 
+    console.log("max down below=", max)
+    
     //Adds Y Axis data padding if applicable
     if (config.runtime.yAxis.paddingPercent) {
       let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
@@ -209,6 +219,9 @@ export default function LinearChart() {
   }
 
   const countNumOfTicks = axis => {
+
+
+    
     // function get number of ticks based on bar type & users value
     const isHorizontal = config.orientation === 'horizontal'
     const { numTicks } = config.runtime[axis]
@@ -216,6 +229,8 @@ export default function LinearChart() {
 
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
+      // DEV 3163 - to fix edge case of small numbers with decimals
+      if (tickCount > max) tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max); // cap it and round it its not an integer
     }
 
     if (axis === 'xAxis') {
@@ -304,7 +319,7 @@ export default function LinearChart() {
         {/* Y axis */}
         {config.visualizationType !== 'Spark Line' && (
           <AxisLeft scale={yScale} left={Number(config.runtime.yAxis.size) - config.yAxis.axisPadding} label={config.runtime.yAxis.label} stroke='#333' tickFormat={tick => handleLeftTickFormatting(tick)} numTicks={countNumOfTicks('yAxis')}>
-            {props => {
+              {props => {
               const axisCenter = config.runtime.horizontal ? (props.axisToPoint.y - props.axisFromPoint.y) / 2 : (props.axisFromPoint.y - props.axisToPoint.y) / 2
               const horizontalTickOffset = yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
               return (
