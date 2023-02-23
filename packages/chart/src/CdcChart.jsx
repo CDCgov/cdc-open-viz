@@ -72,6 +72,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  console.log("##CdcChart config.data=", config.data)
+  
   const handleChartAriaLabels = (state, testing = false) => {
     if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
     try {
@@ -129,7 +131,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         data = transform.developerStandardize(data, response.dataDescription)
       }
     }
-
+console.log("###CdcChart data after import",data) // data NOT rounded here keep going
     if (data) {
       setStateData(data)
       setExcludedData(data)
@@ -597,6 +599,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let stringFormattingOptions
 
+    //console.log("###config.dataFormat.commas, roundTo, rightRoundTo",config.dataFormat.commas,roundTo, rightRoundTo)
+
     if (axis !== 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
@@ -631,7 +635,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
-    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+    //
+    // DEV 3163 edge case for small numbers with decimals
+    // - if roundTo undefined which means it is blank, then do not round
+    if ((roundTo === undefined) || (axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -766,8 +773,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
+  const getYAxisData = (d, seriesKey) => {
+    console.log("###CdcChart getYAxisData d, seriesKey, d[seriesKey]",d, seriesKey,d[seriesKey])
+    return d[seriesKey]
+  }
 
+  console.log("###stateData=", stateData)
+  
   const contextValues = {
     getXAxisData,
     getYAxisData,
