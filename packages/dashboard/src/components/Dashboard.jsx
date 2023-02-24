@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef } from 'react'
 // Third Party
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { shallow } from 'zustand/shallow'
 import parse from 'html-react-parser'
 
 // Store
-import { useGlobalStore } from '@cdc/core/stores/globalStore'
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useGlobalStore from '@cdc/core/stores/globalStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Context
 import DashboardContext from '../DashboardContext'
@@ -101,8 +102,20 @@ const VisualizationsPanel = () => (
 )
 
 const Dashboard = () => {
-  const { viewMode, setViewMode } = useGlobalStore()
-  const { config, updateConfig, updateWizardConfig } = useConfigStore()
+  // Store Selectors
+  const { viewMode, setViewMode } = useGlobalStore(state => ({
+    viewMode: state.viewMode,
+    setViewMode: state.setViewMode
+  }))
+
+  const { config, setConfig, updateConfig, updateConfigField, updateParentConfig } = useConfigStore(state => ({
+    config: state.config,
+    setConfig: state.setConfig,
+    updateConfig: state.updateConfig,
+    updateConfigField: state.updateConfigField,
+    updateParentConfig: state.updateParentConfig
+  }), shallow)
+
   const { title, description } = config.dashboard || config
 
   const [ data, setData ] = useState([])
@@ -113,7 +126,6 @@ const Dashboard = () => {
   const [ imageId ] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const transform = new dataTransform()
-
 
   useEffect(() => {
     setViewMode('isDashboard', true)
@@ -212,7 +224,7 @@ const Dashboard = () => {
     })
 
     setFilteredData(newFilteredData)
-    updateConfig(newConfig)
+    setConfig(newConfig)
   }
 
   // Gets filer values from dataset
@@ -235,7 +247,7 @@ const Dashboard = () => {
     let newFilteredData = {}
     let visualizationKeys = Object.keys(newConfig.visualizations)
 
-    if (newConfig.dashboard.sharedFilters) {
+    /*if (newConfig.dashboard.sharedFilters) {
       newConfig.dashboard.sharedFilters.forEach((filter, i) => {
         for (let j = 0; j < visualizationKeys.length; j++) {
           if (visualizationKeys[j] === filter.setBy) {
@@ -271,13 +283,13 @@ const Dashboard = () => {
           newFilteredData[visualizationKey] = filterData(applicableFilters, newConfig.visualizations[visualizationKey].formattedData || newConfig.visualizations[visualizationKey].data || (dataOverride || data)[newConfig.visualizations[visualizationKey].dataKey])
         }
       })
-    }
+    }*/
 
     setFilteredData(newFilteredData)
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
-    updateConfig(newConfig)
+    setConfig(newConfig)
   }
 
   // Load data when component first mounts
@@ -287,18 +299,18 @@ const Dashboard = () => {
 
   // Pass up to <CdcEditor /> if it exists when config state changes
   useEffect(() => {
-    if (updateWizardConfig && viewMode.isWizard) {
-      updateWizardConfig(config)
+    if (updateParentConfig && viewMode.isWizard) {
+      updateParentConfig(config)
     }
   }, [ config ])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
-    let updatedConfig = { ...config }
-
-    updatedConfig.visualizations[visualizationKey] = newConfig
-    updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
-
-    updateConfig(updatedConfig)
+    updateConfig({
+      visualizations: {
+        ...config.visualizations,
+        [visualizationKey]: { ...newConfig }
+      }
+    })
   }
 
   const Filters = () => {
@@ -307,7 +319,7 @@ const Dashboard = () => {
 
       dashboardConfig.sharedFilters[index].active = value
 
-      updateConfig({ ...config, dashboard: dashboardConfig })
+      setConfig({ ...config, dashboard: dashboardConfig })
 
       let newFilteredData = {}
       Object.keys(config.visualizations).forEach(key => {
@@ -320,7 +332,8 @@ const Dashboard = () => {
       setFilteredData(newFilteredData)
     }
 
-    const announceChange = text => {}
+    const announceChange = text => {
+    }
 
     return config.dashboard.sharedFilters.map((singleFilter, index) => {
       if (singleFilter.showDropdown) {
@@ -386,14 +399,15 @@ const Dashboard = () => {
         subVisualizationEditing = true
 
         const back = () => {
-          const newConfig = { ...config }
-          delete newConfig.visualizations[visualizationKey].editing
-          updateConfig(newConfig)
+          updateConfigField([ 'visualizations', visualizationKey, 'editing' ], false)
         }
 
         const updateSubConfig = newConfig => {
-          let dataCorrectedConfig = visualizationConfig.originalFormattedData ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData } : newConfig
+          let dataCorrectedConfig = visualizationConfig.originalFormattedData
+            ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData }
+            : { ...newConfig }
           updateChildConfig(visualizationKey, dataCorrectedConfig)
+          // updateConfig(newConfig)
         }
 
         switch (visualizationConfig.type) {
@@ -401,7 +415,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Chart"/>
-                <CdcChart key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isDashboard={true}/>
+                <CdcChart key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} isEditor={true} isDashboard={true}/>
               </>
             )
             break
@@ -409,7 +423,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Map"/>
-                <CdcMap key={visualizationKey} config={visualizationConfig} isEditor={true} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isDashboard={true}/>
+                <CdcMap key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} setSharedFilter={setsSharedFilter ? setSharedFilter : undefined} setSharedFilterValue={setSharedFilterValue} isEditor={true} isDashboard={true}/>
               </>
             )
             break
@@ -418,7 +432,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
-                <CdcDataBite key={visualizationKey} config={visualizationConfig} isWizard={true} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcDataBite key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break
@@ -426,7 +440,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
-                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} isWizard={true} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break
@@ -434,7 +448,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} />
+                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} setParentConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break
@@ -442,7 +456,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
-                <CdcFilteredText key={visualizationKey} config={visualizationConfig} isWizard={true} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcFilteredText key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break

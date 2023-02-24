@@ -1,3 +1,5 @@
+import React from 'react'
+
 // Third Party
 import parse from 'html-react-parser'
 import PropTypes from 'prop-types'

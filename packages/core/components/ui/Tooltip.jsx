@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import React, { useId } from 'react'
 
 // Third Party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -28,7 +28,7 @@ const Tooltip = ({
 
   const generateTriggerEvent = (trigger) => {
     const eventList = {
-      'hover': null,
+      'hover': 'hover',
       'focus': 'focus',
       'click': 'click focus'
     }
@@ -37,17 +37,23 @@ const Tooltip = ({
 
   return (
     <span className="cove-tooltip" style={style} {...attributes}>
-      <a id={uid} className="cove-tooltip--target"
+      <a className="cove-tooltip--target"
+         data-tooltip-id={uid}
          data-tooltip-float={float}
          data-tooltip-place={place}
-         data-tooltip-events={generateTriggerEvent()}
+         data-tooltip-events={generateTriggerEvent(trigger)}
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>
-      <ReactTooltip
-        id={uid} anchorId={uid}
-        className={'cove-tooltip__content' + (' place-' + place) + (!float ? ' cove-tooltip__content--animated' : '') + (trigger === 'click' ? ' interactive' : '') + (border ? (' cove-tooltip--border') : '') + (shadow ? ' has-shadow' : '')}
-        globalEventOff="click"
+      <ReactTooltip id={uid}
+        className={
+          'cove-tooltip__content'
+            + (' place-' + place)
+            + (!float ? ' cove-tooltip__content--animated' : '')
+            + (trigger === 'click' ? ' interactive' : '')
+            + (border ? (' cove-tooltip--border') : '')
+            + (shadow ? ' has-shadow' : '')
+        }
       >
         {tooltipContentChildren ? tooltipContentChildren.props.children : null}
       </ReactTooltip>

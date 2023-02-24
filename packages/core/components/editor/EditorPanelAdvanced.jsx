@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
+// Components
 import Icon from '../ui/Icon'
 
 export const EditorPanelAdvanced = ({ loadConfig, state, convertStateToConfig }) => {

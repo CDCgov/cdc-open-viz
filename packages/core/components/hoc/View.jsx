@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
 
 // Store
-import { useGlobalStore } from '../../stores/globalStore'
+import useGlobalStore from '../../stores/globalStore'
 
 // Components - Core
 import Editor from '../editor/Editor'
@@ -13,14 +13,19 @@ import Overlay from '../ui/Overlay'
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ EditorPanels, children }) => {
-  const { viewMode, setViewMode } = useGlobalStore()
+const View = ({ editorPanels, children }) => {
+  // Store Selectors
+  const { viewMode, setViewMode } = useGlobalStore(state => ({
+    viewMode: state.viewMode,
+    setViewMode: state.setViewMode
+  }))
 
   const winLocation = window.location.href
 
   useEffect(() => {
     if (winLocation.includes('editor=true')) setViewMode('isEditor', true)
-    return () => {}
+    return () => {
+    }
   }, [ winLocation, setViewMode ])
 
   const { isEditor, isDashboard, isPreview, isWizard } = viewMode
@@ -37,7 +42,7 @@ const View = ({ EditorPanels, children }) => {
     isWizard // If in the Wizard view
   ) {
     view = (
-      <Editor EditorPanels={EditorPanels}>
+      <Editor editorPanels={editorPanels}>
         {children}
       </Editor>
     )

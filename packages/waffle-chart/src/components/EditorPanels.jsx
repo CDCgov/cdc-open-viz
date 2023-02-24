@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import { configStore } from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -18,7 +18,7 @@ import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
 
 const EditorPanels = () => {
-  const { config, setMissingRequiredSections, updateConfig } = useConfigStore()
+  const { config, setMissingRequiredSections, updateConfig } = configStore()
 
   // No sections required, setting to false
   useEffect(() => {

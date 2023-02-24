@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
 // Store
-import { useGlobalStore } from '@cdc/core/stores/globalStore'
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useGlobalStore from '@cdc/core/stores/globalStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Modal from '@cdc/core/components/ui/Modal'
@@ -13,8 +13,14 @@ import Icon from '@cdc/core/components/ui/Icon'
 import BuilderColumn from './Builder.Column'
 
 const RowMenu = ({ rowIdx, row }) => {
-  const { config, updateConfig } = useConfigStore()
-  const { openOverlay } = useGlobalStore()
+  // Store Selectors
+  const openOverlay = useGlobalStore(state => state.openOverlay)
+
+  const { config, updateConfig, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateConfigField: state.updateConfigField
+  }))
 
   const getCurr = () => {
     let res = []
@@ -26,44 +32,47 @@ const RowMenu = ({ rowIdx, row }) => {
     return res.join('')
   }
 
-  const [curr, setCurr] = useState(getCurr())
-  const [equalHeight, setEqualHeight] = useState(false)
+  const [ curr, setCurr ] = useState(getCurr())
+  const [ equalHeight, setEqualHeight ] = useState(false)
 
-  const setRowLayout = layout => {
-    const newRows = [...config.rows]
-    const r = newRows[rowIdx]
+  const setRowLayout = (layout) => {
+    let rows = [ ...config.rows[rowIdx] ]
 
-    for (let i = 0; i < r.length; i++) {
-      r[i].width = layout[i] ?? null
+    let newRow = []
+
+    for (let i = 0; i < rows.length; i++) {
+      newRow.push({ ...rows[i], width: layout[i] ?? null })
     }
 
-    updateConfig({ ...config, rows: newRows })
+    updateConfigField(['rows', rowIdx], newRow)
     setCurr(layout.join(''))
   }
 
   const moveRow = (dir = 'down') => {
-    let rows = config.rows
+    const processImmutableRowArr = (rowData) => {
+      let arr = []
+      for (let i = 0; i < rowData.length; i++) {
+        arr.push({ ...rowData[i] })
+      }
+      return arr
+    }
+
     if (rowIdx === config.rows.length - 1 && dir === 'down') return
 
     let newIdx = dir === 'down' ? rowIdx + 1 : rowIdx - 1
 
-    // Swap
-    const temp = config.rows[newIdx]
+    let rows = [...config.rows]
+    rows[newIdx] = processImmutableRowArr(row)
+    rows[rowIdx] = processImmutableRowArr(config.rows[newIdx])
 
-    rows[newIdx] = row
-    rows[rowIdx] = temp
+    updateConfig({ rows: rows })
 
-    rows[newIdx].uuid = Date.now()
-    rows[rowIdx].uuid = Date.now()
-
-    updateConfig({ ...config, rows })
-
-    // TODO: Migrate this animation to a React animation library once one is selected for COVE. This is pretty minor so can stay for now.
+    //Animate Row Movement
     let calcRowMove = dir === 'down' ? 202 : -202
     let calcRowMove2 = dir === 'down' ? -202 : 202
 
-    let rowEle = document.querySelector("[data-row-id='" + rowIdx + "']")
-    let rowNewEle = document.querySelector("[data-row-id='" + newIdx + "']")
+    let rowEle = document.querySelector('[data-row-id=\'' + rowIdx + '\']')
+    let rowNewEle = document.querySelector('[data-row-id=\'' + newIdx + '\']')
 
     rowEle.style.pointerEvents = 'none'
     rowNewEle.style.pointerEvents = 'none'
@@ -84,10 +93,10 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const deleteRow = () => {
-    let rows = config.rows
+    let rows = [ ...config.rows ]
     rows.splice(rowIdx, 1) // Just delete the row. Don't delete the instantiated widgets for now.
 
-    updateConfig({ ...config, rows })
+    updateConfig({ rows: rows })
   }
 
   const rowItemsHeight = () => {
@@ -97,19 +106,44 @@ const RowMenu = ({ rowIdx, row }) => {
   }
 
   const layoutList = [
-    <li className="cove-dashboard__builder__row-layout-utils--item" data-selected={curr === '12'} onClick={() => setRowLayout([12])} key='12' title='1 Column'>
+    <li className="cove-dashboard__builder__row-layout-utils--item"
+        title="1 Column"
+        data-selected={curr === '12'}
+        onClick={() => setRowLayout([ 12 ])}
+        key="12"
+    >
       <Icon display="col-12" base/>
     </li>,
-    <li className="cove-dashboard__builder__row-layout-utils--item" data-selected={curr === '66'} onClick={() => setRowLayout([6, 6])} key='66' title='2 Columns'>
+    <li className="cove-dashboard__builder__row-layout-utils--item"
+        title="2 Columns"
+        data-selected={curr === '66'}
+        onClick={() => setRowLayout([ 6, 6 ])}
+        key="66"
+    >
       <Icon display="col-6" base/>
     </li>,
-    <li className="cove-dashboard__builder__row-layout-utils--item" data-selected={curr === '444'} onClick={() => setRowLayout([4, 4, 4])} key='444' title='3 Columns'>
+    <li className="cove-dashboard__builder__row-layout-utils--item"
+        title="3 Columns"
+        data-selected={curr === '444'}
+        onClick={() => setRowLayout([ 4, 4, 4 ])}
+        key="444"
+    >
       <Icon display="col-4" base/>
     </li>,
-    <li className="cove-dashboard__builder__row-layout-utils--item" data-selected={curr === '48'} onClick={() => setRowLayout([4, 8])} key='48' title='2 Columns'>
+    <li className="cove-dashboard__builder__row-layout-utils--item"
+        title="2 Columns"
+        data-selected={curr === '48'}
+        onClick={() => setRowLayout([ 4, 8 ])}
+        key="48"
+    >
       <Icon display="col-4-8" base/>
     </li>,
-    <li className="cove-dashboard__builder__row-layout-utils--item" data-selected={curr === '84'} onClick={() => setRowLayout([8, 4])} key='84' title='2 Columns'>
+    <li className="cove-dashboard__builder__row-layout-utils--item"
+        title="2 Columns"
+        data-selected={curr === '84'}
+        onClick={() => setRowLayout([ 8, 4 ])}
+        key="84"
+    >
       <Icon display="col-8-4" base/>
     </li>
   ]
@@ -118,29 +152,29 @@ const RowMenu = ({ rowIdx, row }) => {
     <Modal>
       <Modal.Header>Row Settings</Modal.Header>
       <Modal.Content>
-        <InputToggle label='Visualizations in this row should be equal height' fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}></InputToggle>
+        <InputToggle label="Visualizations in this row should be equal height" fieldName={`toggleEqualHeight${rowIdx}`} value={row.equalHeight ? row.equalHeight : false} updateField={rowItemsHeight}></InputToggle>
       </Modal.Content>
     </Modal>
   )
 
   return (
-    <nav className='cove-dashboard__builder__row-menu'>
-      <div className='cove-dashboard__builder__row-menu__button'>
-        <ul className='cove-dashboard__builder__row-layout-utils'>{layoutList}</ul>
+    <nav className="cove-dashboard__builder__row-menu">
+      <div className="cove-dashboard__builder__row-menu__button">
+        <ul className="cove-dashboard__builder__row-layout-utils">{layoutList}</ul>
       </div>
-      <div className='spacer'></div>
+      <div className="spacer"></div>
       {/*<button className={'row-menu__btn'} title="Row Settings"*/}
       {/*        onClick={() => openOverlay(rowSettings)}>*/}
       {/*  <Icon display="edit" color="#fff" size={25}/>*/}
       {/*</button>*/}
-      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx === 0} title='Move Row Up' onClick={() => moveRow('up')}>
-        <Icon display='caretUp' color='#fff' size={25} base />
+      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx === 0} title="Move Row Up" onClick={() => moveRow('up')}>
+        <Icon display="caretUp" color="#fff" size={25} base/>
       </button>
-      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx + 1 === config.rows.length} title='Move Row Down' onClick={() => moveRow('down')}>
-        <Icon display='caretDown' color='#fff' size={25} base />
+      <button className="cove-dashboard__builder__row-menu__button" data-disabled={rowIdx + 1 === config.rows.length} title="Move Row Down" onClick={() => moveRow('down')}>
+        <Icon display="caretDown" color="#fff" size={25} base/>
       </button>
-      <button className="cove-dashboard__builder__row-menu__button cove-dashboard__builder__row-menu__button--remove" data-disabled={rowIdx === 0 && config.rows.length === 1} title='Delete Row' onClick={deleteRow}>
-        <Icon display='close' color='#fff' size={25} base />
+      <button className="cove-dashboard__builder__row-menu__button cove-dashboard__builder__row-menu__button--remove" data-disabled={rowIdx === 0 && config.rows.length === 1} title="Delete Row" onClick={deleteRow}>
+        <Icon display="close" color="#fff" size={25} base/>
       </button>
     </nav>
   )
@@ -148,13 +182,13 @@ const RowMenu = ({ rowIdx, row }) => {
 
 const BuilderRow = ({ row, idx: rowIdx, uuid }) => {
   return (
-    <div className='cove-dashboard__builder__row' data-row-id={rowIdx}>
-      <RowMenu rowIdx={rowIdx} row={row} />
-      <div className='cove-dashboard__builder__row-content'>
+    <div className="cove-dashboard__builder__row" data-row-id={rowIdx}>
+      <RowMenu rowIdx={rowIdx} row={row}/>
+      <div className="cove-dashboard__builder__row-content">
         {row
           .filter(column => column.width)
           .map((column, colIdx) => (
-            <BuilderColumn data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx} />
+            <BuilderColumn data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx}/>
           ))}
       </div>
     </div>

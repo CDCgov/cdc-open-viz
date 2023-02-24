@@ -17,10 +17,10 @@ import WaffleChart from './components/WaffleChart.jsx'
 import './scss/cove-waffle-chart.scss'
 
 // Visualization
-const CdcWaffleChart = ({ config: configObj, configUrl, setConfig: setWizardConfig, isWizard }) => {
+const CdcWaffleChart = ({ config: configObj, configUrl, setConfig: setParentConfig, isWizard }) => {
   return (
     <ErrorBoundary component="CdcWaffleChart">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} setWizardConfig={setWizardConfig} defaults={defaults}>
+      <ConfigProxy configObj={configObj} configUrl={configUrl} setParentConfig={setParentConfig} defaults={defaults}>
         <View EditorPanels={EditorPanels} isWizard={isWizard}>
           <Component className="cove-waffle-chart">
             <WaffleChart/>

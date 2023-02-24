@@ -1,3 +1,6 @@
+import React from 'react'
+
+// Third Party
 import PropTypes from 'prop-types'
 
 // Styles
@@ -46,7 +49,7 @@ const Ghost = ({ display }) => {
 
 Ghost.propTypes = {
   /** Specifies the design to be used for component ghosting */
-  display: PropTypes.oneOf(['editor', 'component'])
+  display: PropTypes.oneOf([ 'editor', 'component' ])
 }
 
 export default Ghost

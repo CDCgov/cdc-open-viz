@@ -1,6 +1,6 @@
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
-import { useConfigStore } from '../../../stores/configStore'
+import useConfigStore from '../../../stores/configStore'
 
 import ConfigProxy from '../ConfigProxy'
 
@@ -56,7 +56,7 @@ const exampleJson = {
 ```
 The `config` value of the `configStore` can then be accessed, and used to reference the config options that were previously defined in the JSON.
 ```jsx
-const { config } = useConfigStore()
+const config = useConfigStore(state => state.config)
 return (
   <ConfigProxy configObj={...exampleJson}>
     <div className="example-wrapper">
@@ -70,7 +70,7 @@ return (
 ```
 
 export const Template = ({ ...args }) => {
-  const { config } = useConfigStore()
+  const config = useConfigStore(state => state.config)
   return (
     <ConfigProxy {...args}>
       <div className="example-wrapper">

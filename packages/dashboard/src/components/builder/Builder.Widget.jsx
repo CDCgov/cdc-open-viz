@@ -4,8 +4,8 @@ import React, { useRef, useEffect } from 'react'
 import { useDrag } from 'react-dnd'
 
 // Store
-import { useGlobalStore } from '@cdc/core/stores/globalStore'
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useGlobalStore from '@cdc/core/stores/globalStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Helpers
 import dataTransform from '@cdc/core/helpers/dataTransform'
@@ -18,58 +18,67 @@ import Modal from '@cdc/core/components/ui/Modal'
 
 const vizHash = {
   'data-bite': {
-    icon: "databite",
+    icon: 'databite',
     label: 'Data Bite'
   },
   'waffle-chart': {
-    icon: "grid",
+    icon: 'grid',
     label: 'Waffle Chart'
   },
   'markup-include': {
-    icon: "code",
+    icon: 'code',
     label: 'Markup Include'
   },
   Bar: {
-    icon: "chartBar",
+    icon: 'chartBar',
     label: 'Bar'
   },
   Line: {
-    icon: "chartLine",
+    icon: 'chartLine',
     label: 'Line'
   },
   'Spark Line': {
-    icon: "chartLine",
+    icon: 'chartLine',
     label: 'Spark Line'
   },
   Pie: {
-    icon: "chartPie",
+    icon: 'chartPie',
     label: 'Pie'
   },
   us: {
-    icon: "mapUsa",
+    icon: 'mapUsa',
     label: 'United States (State/County Level)'
   },
   'us-county': {
-    icon: "mapUsa",
+    icon: 'mapUsa',
     label: 'United States (State/County Level)'
   },
   world: {
-    icon: "mapWorld",
+    icon: 'mapWorld',
     label: 'World'
   },
   'single-state': {
-    icon: "mapAl",
+    icon: 'mapAl',
     label: 'U.S. State'
   },
   'filtered-text': {
-    icon: "filteredText",
+    icon: 'filteredText',
     label: 'Filtered Text'
   }
 }
 
 const BuilderWidget = ({ data = {}, addVisualization, type }) => {
-  const { openOverlay, toggleOverlay } = useGlobalStore()
-  const { config, updateConfig } = useConfigStore()
+  // Store Selectors
+  const { openOverlay, toggleOverlay } = useGlobalStore(state => ({
+    openOverlay: state.openOverlay,
+    toggleOverlay: state.toggleOverlay
+  }))
+
+  const { config, updateConfig, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateConfigField: state.updateConfigField
+  }))
 
   const dataRef = useRef()
   dataRef.current = data
@@ -82,24 +91,19 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
     if (!result) return null
 
     const { rowIdx, colIdx } = result
-    let rows = config.rows
-    let visualizations = config.visualizations
 
     if (undefined !== data.rowIdx) {
-      rows[data.rowIdx][data.colIdx].widget = null // Wipe from old position
-
-      rows[rowIdx][colIdx].widget = data.uid // Add to new row and col
+      updateConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null) // Wipe from old position
+      updateConfigField([ 'rows', rowIdx, colIdx, 'widget' ], data.uid) // Add to new row and col
     } else {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      visualizations[newViz.uid] = newViz // Add to widgets collection
-      rows[rowIdx][colIdx].widget = newViz.uid // Store reference in rows collection under the specific column
+      updateConfigField([ 'visualizations', newViz.uid ], newViz) // Add to widgets collection
+      updateConfigField([ 'rows', rowIdx, colIdx, 'widget' ], newViz.uid) // Store reference in rows collection under the specific column
     }
-
-    updateConfig({ ...config, rows, visualizations })
   }
 
-  const [{ isDragging, ...collected }, drag] = useDrag({
+  const [ { isDragging, ...collected }, drag ] = useDrag({
     type: 'vis-widget',
     end: handleWidgetMove,
     collect: monitor => ({
@@ -108,39 +112,51 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   })
 
   const deleteWidget = () => {
-    let rows = config.rows
+    /*let rows = config.rows
     let visualizations = config.visualizations
 
     rows[data.rowIdx][data.colIdx].widget = null
 
-    delete visualizations[data.uid]
+    delete visualizations[data.uid]*/
 
-    if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
-      config.dashboard.sharedFilters.forEach(sharedFilter => {
+    updateConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null)
+
+    /*const uid = data.uid
+    let { [uid]: _, ...rest } = config.visualizations
+
+    updateConfigField('visualizations', rest)*/
+
+    /*if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
+      const filters = [ ...config.dashboard.sharedFilters ]
+      filters.forEach(sharedFilter => {
         if (sharedFilter.usedBy.indexOf(data.uid) !== -1) {
           sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1)
         }
       })
-    }
+      updateConfigField(['dashboard', 'sharedFilters'], filters)
+    }*/
 
-    updateConfig({ ...config, rows, visualizations })
+    /*updateConfig({ ...config, rows, visualizations })*/
   }
 
   const editWidget = () => {
-    let visualizations = config.visualizations
-    visualizations[data.uid].editing = true
-
-    updateConfig({ ...config, visualizations })
+    updateConfigField([ 'visualizations', data.uid, 'editing' ], true)
   }
 
   const changeDataset = (uid, value) => {
-    let visualizations = config.visualizations
-    delete visualizations[uid].dataDescription
-    delete visualizations[uid].formattedData
+    let targetVisualization = {[uid]: { ...config.visualizations[uid] } }
+    delete targetVisualization[uid].dataDescription
+    delete targetVisualization[uid].formattedData
 
-    visualizations[uid].dataKey = value
+    targetVisualization[uid].dataKey = value
 
-    updateConfig({ ...config, visualizations })
+    console.log(config.visualizations)
+    updateConfig({
+      visualizations: {
+        ...config.visualizations,
+        ...targetVisualization
+      }
+    })
   }
 
   const updateDescriptionProp = async (visualizationKey, datasetKey, key, value) => {
@@ -172,17 +188,17 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
     return (
       <Modal>
         <Modal.Content>
-          <div className='dataset-selector-container'>
+          <div className="dataset-selector-container">
             Select a dataset:&nbsp;
             <select
-              className='dataset-selector'
+              className="dataset-selector"
               defaultValue={dataKey}
               onChange={e => {
                 changeDataset(data.uid, e.target.value)
                 openOverlay(dataDesignerModal(data, e.target.value || ''))
               }}
             >
-              <option value=''>Select a dataset</option>
+              <option value="">Select a dataset</option>
               {config.datasets && Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
             </select>
           </div>
@@ -197,7 +213,7 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
             />
           )}
           {configureData.formattedData && (
-            <button style={{ margin: '1rem' }} className='cove-button' onClick={() => toggleOverlay()}>
+            <button style={{ margin: '1rem' }} className="cove-button" onClick={() => toggleOverlay()}>
               Continue
             </button>
           )}
@@ -208,52 +224,48 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
 
   useEffect(() => {
     if (data.openModal) {
-      let visualizations = config.visualizations
       openOverlay(dataDesignerModal(dataRef.current))
-
-      visualizations[data.uid].openModal = false
-
-      updateConfig({ ...config, visualizations })
+      updateConfigField([ 'visualizations', data.uid, 'openModal' ], false)
     }
-  }, [data.openModal])
+  }, [ data.openModal ])
 
   return (
     <>
-      <div className='cove-dashboard__widget' ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
-        <Icon display='move' className='cove-dashboard__widget--move-icon'/>
-        <div className='cove-dashboard__widget--content'>
+      <div className="cove-dashboard__widget" ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }} {...collected}>
+        <Icon display="move" className="cove-dashboard__widget--move-icon"/>
+        <div className="cove-dashboard__widget--content">
           {data.rowIdx !== undefined && (
-            <div className='cove-dashboard__widget-menu'>
+            <div className="cove-dashboard__widget-menu">
               {((data.dataKey && data.dataDescription && data.formattedData) || type === 'markup-include') && (
                 <div className="cove-dashboard__widget-menu--item">
-                  <button title='Configure Visualization' onClick={editWidget}>
-                    <Icon display="tools" base />
+                  <button title="Configure Visualization" onClick={editWidget}>
+                    <Icon display="tools" base/>
                   </button>
                 </div>
               )}
               {type !== 'markup-include' && (
                 <div className="cove-dashboard__widget-menu--item">
                   <button
-                    title='Configure Data'
+                    title="Configure Data"
                     onClick={() => {
                       openOverlay(dataDesignerModal(data))
                     }}
                   >
-                    <Icon display="gear" size={14} base />
+                    <Icon display="gear" size={14} base/>
                   </button>
                 </div>
               )}
-              <div className='cove-dashboard__widget-menu--item'>
+              <div className="cove-dashboard__widget-menu--item">
                 <button style={{ padding: '3px 4px' }} title="Remove Visualization" onClick={deleteWidget}>
-                  <Icon display='close' size={20} base />
+                  <Icon display="close" size={20} base/>
                 </button>
               </div>
             </div>
           )}
-          <Icon className="cove-dashboard__widget-icon" display={vizHash[type].icon} base />
+          <Icon className="cove-dashboard__widget-icon" display={vizHash[type].icon} base/>
           <span className="cove-dashboard__widget-label">{vizHash[type].label}</span>
           {data.newViz && (
-            <span onClick={editWidget} className='cove-dashboard__widget__alert-config'>
+            <span onClick={editWidget} className="cove-dashboard__widget__alert-config">
               <Icon className="mr-1" display="tools"/>
               Configuration needed
             </span>

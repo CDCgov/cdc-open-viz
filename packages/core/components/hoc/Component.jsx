@@ -1,12 +1,12 @@
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 // Third Party
 import parse from 'html-react-parser'
 import PropTypes from 'prop-types'
 
 // Store
-import { useGlobalStore } from '../../stores/globalStore'
-import { useConfigStore } from '../../stores/configStore'
+import useGlobalStore from '../../stores/globalStore'
+import useConfigStore from '../../stores/configStore'
 
 // Components
 import Icon from '../ui/Icon'
@@ -16,14 +16,17 @@ import Tooltip from '../ui/Tooltip'
 import '../../styles/v2/components/component.scss'
 
 const Component = ({ className, children, exampleConfig, ...attributes }) => {
-  const { setDimensions } = useGlobalStore()
-  const { config, updateConfig } = useConfigStore()
+  // Store Selectors
+  const setDimensions = useGlobalStore(state => state.setDimensions)
+
+  const { config, updateConfig } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig
+  }))
 
   // Provide an example configObj for documentation purposes
   useEffect(() => {
     if (exampleConfig) updateConfig(exampleConfig)
-    return () => {
-    }
   }, [ exampleConfig ])
 
   // Observe changes to component container sizes for use with SVG renders
@@ -39,7 +42,8 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
       })
       outerContainerObserver.observe(outerContainerRef.current)
     }
-    return () => {}
+    return () => {
+    }
   })
 
   // Component Attributes
@@ -109,7 +113,7 @@ Component.propTypes = {
   /** Additional classes to be appended to the component */
   className: PropTypes.string,
   config: PropTypes.shape({
-    theme: PropTypes.oneOf([ 'blue', 'purple', 'brown', 'teal', 'pink', 'orange', 'slate', 'indigo', 'cyan', 'green', 'amber']),
+    theme: PropTypes.oneOf([ 'blue', 'purple', 'brown', 'teal', 'pink', 'orange', 'slate', 'indigo', 'cyan', 'green', 'amber' ]),
     /** Set a custom title for the component; defaults to a `config.title` entry for the component config */
     title: PropTypes.string,
     description: PropTypes.string,

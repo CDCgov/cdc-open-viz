@@ -2,7 +2,12 @@ module.exports = {
   env: {
     browser: true
   },
-  extends: ['react-app', 'plugin:jsx-a11y/recommended', 'prettier', 'plugin:storybook/recommended'],
+  extends: [
+    'react-app',
+    'plugin:jsx-a11y/recommended',
+    'prettier',
+    'plugin:storybook/recommended'
+  ],
   rules: {
     'import/no-named-as-default': 0,
     'no-labels': 0,

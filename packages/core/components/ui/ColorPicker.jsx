@@ -1,5 +1,7 @@
+import React from 'react'
+
 // Store
-import { useConfigStore } from '../../stores/configStore'
+import useConfigStore from '../../stores/configStore'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -19,13 +21,17 @@ import { capitalizeFirstLetter } from '../../helpers/coveHelpers'
 import '../../styles/v2/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
-  const { config, updateConfig } = useConfigStore()
+  // Store Selectors
+  const { config, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfigField: state.updateConfigField
+  }))
 
   const customAttrs = color === config.theme && { 'data-selected': true }
 
   return (
     <button className="cove-color-picker__button" {...customAttrs} onClick={() => {
-      updateConfig({ theme: color })
+      updateConfigField("theme", color)
     }}>
       <div className="cove-color-picker__color" style={{ backgroundColor: THEME_COLORS[color].primary }}/>
       <div className="cove-color-picker__color--ring"/>
@@ -54,7 +60,7 @@ const ColorPicker = ({ label, colors = THEME_COLORS, tooltip, colorTooltip }) =>
         {/* Use two separate maps to resolve key warnings */}
         {colorTooltip ?
           parseColors(colors).map((color, index) => (
-            <Tooltip position="bottom" key={index}>
+            <Tooltip place="bottom" key={index}>
               <Tooltip.Target>
                 <ColorButton color={color}/>
               </Tooltip.Target>

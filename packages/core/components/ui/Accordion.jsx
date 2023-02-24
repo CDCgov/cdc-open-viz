@@ -1,4 +1,4 @@
-import { Children } from 'react'
+import React, { Children, useState, useEffect } from 'react'
 
 // Third Party
 import {
@@ -22,8 +22,15 @@ import '../../styles/v2/components/ui/accordion.scss'
 const AccordionSection = () => null
 
 const Accordion = ({ children }) => {
-  const childNodes = Children.toArray(children)
-  const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || children
+  const [ activeChildren, setActiveChildren ] = useState(children)
+
+  useEffect(() => {
+    setActiveChildren(children)
+  }, [ children ])
+
+
+  const childNodes = Children.toArray(activeChildren)
+  const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || activeChildren
 
   const warningIcon = <Icon className="cove-icon--warning" display="warningCircle" size={14}/>
 

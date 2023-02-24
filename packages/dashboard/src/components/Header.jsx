@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import { useConfigStore } from '@cdc/core/stores/configStore'
-import { useGlobalStore } from '@cdc/core/stores/globalStore'
+import useGlobalStore from '@cdc/core/stores/globalStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 
 import Modal from '@cdc/core/components/ui/Modal'
@@ -14,8 +14,17 @@ import Button from '@cdc/core/components/element/Button.jsx'
 
 
 const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = null }) => {
-  const { config, updateConfig, updateWizardConfig } = useConfigStore()
-  const { openOverlay, toggleOverlay } = useGlobalStore()
+  // Store Selectors
+  const { openOverlay, toggleOverlay } = useGlobalStore(state =>({
+    openOverlay: state.openOverlay,
+    toggleOverlay: state.toggleOverlay
+  }))
+
+  const { config, updateConfig, updateParentConfig } = useConfigStore(state =>({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateParentConfig: state.updateParentConfig
+  }))
 
   const [ columns, setColumns ] = useState([])
 
@@ -75,9 +84,9 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
     const event = new CustomEvent('updateVizConfig', { detail: parsedData })
     window.dispatchEvent(event)
 
-    // Pass up to Editor if needed
-    if (updateWizardConfig)
-      updateWizardConfig(convertStateToConfig('object'))
+    // Pass from Dashboard up to Editor if needed
+    if (updateParentConfig)
+      updateParentConfig(convertStateToConfig('object'))
 
     return () => {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +121,8 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
     }
 
     if (config.datasets) runSetColumns()
-    return () => {}
+    return () => {
+    }
   }, [ config.datasets ])
 
   const filterModal = (filter, index) => {

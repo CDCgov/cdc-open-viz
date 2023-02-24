@@ -6,7 +6,7 @@ import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import { configStore } from '@cdc/core/stores/configStore'
 
 // Constants
 import THEME_COLORS from '@cdc/core/data/componentThemes'
@@ -30,7 +30,7 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
 // Visualization
 const WaffleChart = ({ configObj, configUrl }) => {
-  const { config } = useConfigStore()
+  const { config } = configStore()
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate

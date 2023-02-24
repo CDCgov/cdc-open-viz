@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+
+// Third Party
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStore } from '../../stores/configStore'
+import useConfigStore from '../../stores/configStore'
 
 // Components
 import Icon from '../ui/Icon'
@@ -26,7 +28,8 @@ const returnObjKeyValue = (key, obj) => {
 }
 
 const ListGroupItem = ({ textValueKey, listData, canClear, options, optionsSection, optionsSubsection, removeAction, index }) => {
-  const { updateConfigField } = useConfigStore()
+  // Store Selectors
+  const updateConfigField = useConfigStore(state => state.updateConfigField)
 
   const [ textWidth, setTextWidth ] = useState(0)
 

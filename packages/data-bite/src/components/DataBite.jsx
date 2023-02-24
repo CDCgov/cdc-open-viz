@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import parse from 'html-react-parser'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Data
 import {
@@ -30,7 +30,7 @@ import CircleCallout from '../components/CircleCallout'
 
 // Visualization
 const DataBite = () => {
-  const { config } = useConfigStore()
+  const config = useConfigStore(state => state.config)
 
   const calculateDataBite = (includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate

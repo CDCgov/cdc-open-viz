@@ -1,3 +1,5 @@
+import React from 'react'
+
 // Components
 import Label from '../element/Label'
 

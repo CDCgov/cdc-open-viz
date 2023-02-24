@@ -1,5 +1,9 @@
+import React from 'react'
+
+// Third Party
 import PropTypes from 'prop-types'
 
+// Data
 import iconHash from '../../data/iconHash'
 
 // Styles

@@ -1,6 +1,6 @@
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/blocks';
 
-import { useGlobalStore } from '../../../stores/globalStore'
+import useGlobalStore from '../../../stores/globalStore'
 
 import Button from '../../element/Button'
 import Modal from '../Modal'
@@ -93,7 +93,7 @@ Modals can be customized to fix various display requirements, depending on the s
 <Canvas>
   <Story name="Interaction">
     {() => {
-      const { openOverlay } = useGlobalStore()
+      const openOverlay = useGlobalStore(state => state.openOverlay)
 
       return <>
         <Button onClick={() => openOverlay(<Modal fontTheme={'light'} headerBgColor={'#824c88'}>
@@ -118,7 +118,7 @@ Modals can be customized to fix various display requirements, depending on the s
 <Canvas>
   <Story name="BgCloseDisabled">
     {() => {
-      const { openOverlay } = useGlobalStore()
+      const openOverlay = useGlobalStore(state => state.openOverlay)
 
       return <>
         <Button onClick={() => openOverlay(<Modal fontTheme={'light'} headerBgColor={'#824c88'}>

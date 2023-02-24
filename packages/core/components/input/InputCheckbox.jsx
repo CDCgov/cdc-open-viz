@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStore } from '../../stores/configStore'
+import useConfigStore from '../../stores/configStore'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -14,7 +14,7 @@ import Label from '../element/Label'
 // Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputCheckbox = (
+const InputCheckbox = memo((
   {
     label,
     labelPosition = 'right',
@@ -28,8 +28,10 @@ const InputCheckbox = (
     className, ...attributes
   }
 ) => {
-
-  const { config, updateConfigField } = useConfigStore()
+  const { config, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfigField: state.updateConfigField
+  }))
 
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
@@ -70,7 +72,7 @@ const InputCheckbox = (
       }
     </div>
   )
-}
+})
 
 InputCheckbox.propTypes = {
   label: PropTypes.string,

@@ -1,4 +1,6 @@
-import { Children } from 'react'
+import React, { Children } from 'react'
+
+// Third Party
 import PropTypes from 'prop-types'
 
 // Components - Core
@@ -7,7 +9,7 @@ import Icon from '../ui/Icon'
 // Styles
 import '../../styles/v2/components/element/guidance-block.scss'
 
-//Define the "slots" to be populated by subcomponents
+// Slots
 const GuidanceTitle = () => null
 const GuidanceContent = () => null
 

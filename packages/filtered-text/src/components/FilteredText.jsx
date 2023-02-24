@@ -2,11 +2,11 @@
 import parse from 'html-react-parser'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import { configStore } from '@cdc/core/stores/configStore'
 
 // Visualization
 const FilteredText = ({ configObj, configUrl }) => {
-  const { config } = useConfigStore()
+  const { config } = configStore()
 
   const filteredText = () => {
     let filteredData = []

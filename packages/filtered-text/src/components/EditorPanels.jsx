@@ -1,5 +1,5 @@
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import { configStore } from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -11,7 +11,7 @@ import Label from '@cdc/core/components/element/Label'
 import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 
 const EditorPanels = () => {
-  const { config, updateConfig } = useConfigStore()
+  const { config, updateConfig } = configStore()
 
   // Filters -----------------------------------------------
   const addNewFilter = () => {

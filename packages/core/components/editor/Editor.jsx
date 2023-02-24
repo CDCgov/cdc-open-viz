@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 // Store
-import { useGlobalStore } from '../../stores/globalStore'
-import { useConfigStore } from '../../stores/configStore'
+import useGlobalStore from '../../stores/globalStore'
+import useConfigStore from '../../stores/configStore'
 
 // Data
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'
 
 // Components - Local
-import Accordion from '../ui/Accordion'
 import Button from '../element/Button'
 import Icon from '../ui/Icon'
 import SplashError from '../ui/SplashError'
@@ -17,10 +16,16 @@ import SplashError from '../ui/SplashError'
 import '../../styles/v2/components/editor.scss'
 import '../../styles/v2/components/element/editor-utils.scss'
 
-const Editor = ({ EditorPanels, children }) => {
-  const { os } = useGlobalStore()
-  const { config, updateConfig, updateWizardConfig } = useConfigStore()
-  const { missingRequiredSections } = config
+const Editor = ({ editorPanels, children }) => {
+  // Store Selectors
+  const os = useGlobalStore((store) => store.os)
+
+  const { config, updateConfig, updateParentConfig, missingRequiredSections } = useConfigStore(state =>({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateParentConfig: state.updateParentConfig,
+    missingRequiredSections: state.config.missingRequiredSections
+  }))
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ displayGrid, setDisplayGrid ] = useState(false)
@@ -44,8 +49,8 @@ const Editor = ({ EditorPanels, children }) => {
   // is received by the ConfigProxy and registered in the store.
   // The function is then used below when the config is updated.
   useEffect(() => {
-    if (updateWizardConfig) updateWizardConfig(convertStateToConfig())
-  }, [ updateWizardConfig ])
+    if (updateParentConfig) updateParentConfig(convertStateToConfig())
+  }, [ updateParentConfig ])
 
   // Set and clean up the event listener for the hotkeys
   useEffect(() => {
@@ -57,13 +62,6 @@ const Editor = ({ EditorPanels, children }) => {
   useEffect(() => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [ viewportPreview ])
-
-  // Update the local config object, if the component config context changes
-  /*
-    useEffect(() => {
-      setConfig({ ...contextConfig })
-    }, [ contextConfig ])
-  */
 
   // If missing any required sections, enable the confirmation window,
   // and keep active until receiving confirmation.
@@ -100,7 +98,7 @@ const Editor = ({ EditorPanels, children }) => {
     }
 
     if (!viewportCommandKey) {
-      if (!editorPanelRef.current.contains(document.activeElement)) {
+      if (editorPanelRef.current && !editorPanelRef.current.contains(document.activeElement)) {
         if (key.code === 'KeyG') setDisplayGrid(display => !display)
         if (key.code === 'KeyR') resetPreview()
       }
@@ -165,7 +163,7 @@ const Editor = ({ EditorPanels, children }) => {
 
   let view = <>{children}</>
 
-  if (EditorPanels) {
+  if (editorPanels) {
     view = (
       <div className={`cove-editor${displayPanel ? ' panel-shown' : ''}`}>
         <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
@@ -174,9 +172,7 @@ const Editor = ({ EditorPanels, children }) => {
           <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
           <div className="cove-editor__panel-container">
             <section className="cove-editor__panel-config">
-              <Accordion>
-                {EditorPanels().props.children.map((panel) => panel)}
-              </Accordion>
+              {editorPanels}
             </section>
           </div>
         </section>

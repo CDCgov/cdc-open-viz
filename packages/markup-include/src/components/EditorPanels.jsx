@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-// Context
-import { useConfigStore } from '@cdc/core/stores/configStore'
+// Store
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -11,7 +11,28 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/input/InputText'
 
 const EditorPanels = () => {
-  const { config } = useConfigStore()
+  // Store Selectors
+  const { config, updateConfig, updateParentConfig } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateParentConfig: state.updateParentConfig
+  }))
+
+  const [ tempConfig, setTempConfig ] = useState(config)
+
+  // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
+  useEffect(() => {
+    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
+      let tempConfig = {...config}
+      delete tempConfig.newViz
+      setTempConfig(tempConfig)
+    }
+  }, [ config, tempConfig ])
+
+  // Pass tempConfig settings back up to parent, if one exists
+  useEffect(() => {
+    if (updateParentConfig) updateParentConfig(tempConfig)
+  }, [ tempConfig, updateParentConfig ])
 
   const panelGeneral = (
     <Accordion.Section label="General">
@@ -25,12 +46,12 @@ const EditorPanels = () => {
     </Accordion.Section>
   )
 
-  return (
-    <>
+  return <>
+    <Accordion>
       {panelGeneral}
-      {EditorPanelGlobal()}
-    </>
-  )
+      {EditorPanelGlobal}
+    </Accordion>
+  </>
 }
 
 export default EditorPanels

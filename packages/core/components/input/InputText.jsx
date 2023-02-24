@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, memo } from 'react'
 
 // Third Party
 import { useDebounce } from 'use-debounce'
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStore } from '../../stores/configStore'
+import useConfigStore from '../../stores/configStore'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -16,7 +16,7 @@ import Label from '../element/Label'
 // Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputText = (
+const InputText = memo((
   {
     label,
     type = 'text',
@@ -29,10 +29,13 @@ const InputText = (
     min, max, className, ...attributes
   }
 ) => {
+  // Store Selectors
+  const { config, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfigField: state.updateConfigField
+  }))
 
-  const { config, updateConfigField } = useConfigStore()
-
-  //Input will only accept either an inline value from the element, or a value from a connected config key
+  // Input will only accept either an inline value from the element, or a value from a connected config key
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render
   const [ value, setValue ] = useState(configField ? (getConfigKeyValue(configField, config) || '') : inlineValue || '')
   const [ debouncedValue ] = useDebounce(value, 300)
@@ -102,7 +105,7 @@ const InputText = (
       {formElement}
     </>
   )
-}
+})
 
 InputText.propTypes = {
   label: PropTypes.string,

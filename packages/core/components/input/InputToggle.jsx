@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
 
 // Store
-import { useConfigStore } from '../../stores/configStore'
+import useConfigStore from '../../stores/configStore'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -15,7 +15,7 @@ import Label from '../element/Label'
 // Styles
 import '../../styles/v2/components/input/index.scss'
 
-const InputToggle = ({
+const InputToggle = memo(({
                        label,
                        labelPosition = 'left',
                        tooltip,
@@ -27,13 +27,16 @@ const InputToggle = ({
                        value: inlineValue,
                        className, ...attributes
                      }) => {
-
-  const { config, updateConfigField } = useConfigStore()
+  // Store Selectors
+  const { config, updateConfigField } = useConfigStore(state => ({
+    config: state.config,
+    updateConfigField: state.updateConfigField
+  }))
 
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || false)
 
-  //Set initial value
+  // Set initial value
   useEffect(() => {
     if (configField) {
       if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets value
@@ -87,7 +90,7 @@ const InputToggle = ({
       </div>
     </>
   )
-}
+})
 
 InputToggle.propTypes = {
   /** Add label to the input field */

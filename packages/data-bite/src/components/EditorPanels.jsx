@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react'
 
 // Context
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/element/Button'
-import ColorPicker from '@cdc/core/components/ui/ColorPicker'
 import EditorPanelGlobal from '@cdc/core/components/editor/EditorPanelGlobal'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
@@ -19,7 +18,11 @@ import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 import { BITE_LOCATIONS, DATA_FUNCTIONS, DATA_OPERATORS, IMAGE_POSITIONS } from '../data/consts'
 
 const EditorPanels = () => {
-  const { config, setMissingRequiredSections, updateConfig } = useConfigStore()
+  const { config, updateConfig, setMissingRequiredSections } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    setMissingRequiredSections: state.config.setMissingRequiredSections,
+  }))
 
   const requiredSections = [
     config.dataColumn,

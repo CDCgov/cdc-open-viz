@@ -2,13 +2,13 @@ import React from 'react'
 import { useDrop } from 'react-dnd'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Components - Local
 import BuilderWidget from './Builder.Widget'
 
 const BuilderColumn = ({ data, rowIdx, colIdx }) => {
-  const { config } = useConfigStore()
+  const config = useConfigStore( store => store.config)
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: 'vis-widget',

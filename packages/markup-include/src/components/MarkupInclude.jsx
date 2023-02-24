@@ -1,11 +1,11 @@
 import { useEffect, useCallback, useState, useRef } from 'react'
 
 // Third Party
-import axios from 'axios'
 import { Markup } from 'interweave'
+import axios from 'axios'
 
 // Store
-import { useConfigStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Data
 import demoMarkup from '../templates/demoMarkup'
@@ -17,8 +17,9 @@ import { publish } from '@cdc/core/helpers/events'
 import AlertBox from '@cdc/core/components/ui/AlertBox'
 
 // Visualization
-const MarkupInclude = ({ configObj, configUrl }) => {
-  const { config } = useConfigStore()
+const MarkupInclude = () => {
+  // Store Selectors
+  const config = useConfigStore((state) => state.config)
 
   const [ urlMarkup, setUrlMarkup ] = useState('')
   const [ markupError, setMarkupError ] = useState(null)

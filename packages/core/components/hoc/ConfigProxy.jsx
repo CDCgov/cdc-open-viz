@@ -1,33 +1,33 @@
-import { useState, useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
 
 // Store
-import { useGlobalStore } from '../../stores/globalStore'
-import { useConfigStore } from '../../stores/configStore'
+import useGlobalStore from '../../stores/globalStore'
+import useConfigStore from '../../stores/configStore'
 
 // Helpers
 import dataTransform from '../../helpers/dataTransform'
 import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
-const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, runtime = null, children, origin = '' }) => {
-  const { viewMode } = useGlobalStore((state) => state)
-  const { setConfigDefaults, updateConfig, updateWizardConfig, setUpdateWizardConfig } = useConfigStore()
+const ConfigProxy = ({ configObj, configUrl, setParentConfig, defaults = null, runtime = null, children }) => {
+  // Store Selectors
+  const viewMode = useGlobalStore((state) => state.viewMode)
 
-  const [ cycled, setCycled ] = useState(false)
-  const [ loadingConfig, setLoadingConfig ] = useState(true)
+  const { setConfigDefaults, updateConfig, updateParentConfig, setUpdateParentConfig } = useConfigStore(state =>({
+    setConfigDefaults: state.setConfigDefaults,
+    updateConfig: state.updateConfig,
+    updateParentConfig: state.updateParentConfig,
+    setUpdateParentConfig: state.setUpdateParentConfig
+  }))
+
+  const cycled = useRef(false)
+  const loadingConfig = useRef(true)
 
   const transform = new dataTransform()
 
-  const reloadConfig = () => {
-    setLoadingConfig(true)
-    setCycled(false)
-  }
-
-  useEffect(() => {
-    if (setWizardConfig && !updateWizardConfig) setUpdateWizardConfig(setWizardConfig)
-  }, [ setWizardConfig, setUpdateWizardConfig, updateWizardConfig ])
+  if (setParentConfig && !updateParentConfig) setUpdateParentConfig(setParentConfig)
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {
@@ -88,20 +88,20 @@ const ConfigProxy = ({ configObj, configUrl, setWizardConfig, defaults = null, r
       return newConfig
     }
 
-    if (!cycled) {
+    if (!cycled.current) {
       fetchConfig()
         .then((newConfig) => {
           updateConfig(newConfig) // Set final config data in configStore
-          setLoadingConfig(false) // Tell subcomponents that the config is ready
+          loadingConfig.current = false // Tell subcomponents that the config is ready
         })
         .catch(console.error)
         .finally(() => {
-          setCycled(true) // Stop the useLoadConfig cycle
+          cycled.current = true // Stop the config load cycle
         })
     }
-  }, [ cycled, configObj, configUrl ])
+  }, [ configObj, configUrl ])
 
-  return (loadingConfig ? <></> : children)
+  return (loadingConfig.current ? <></> : children)
 }
 
 ConfigProxy.propTypes = {
