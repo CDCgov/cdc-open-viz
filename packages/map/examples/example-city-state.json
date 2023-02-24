@@ -28,8 +28,8 @@
       "fipsCode": "01",
       "stateName": "Alabama"
     },
-    "showDownloadImgButton": true,
-    "showDownloadPdfButton": true
+    "showDownloadImgButton": false,
+    "showDownloadPdfButton": false
   },
   "type": "map",
   "color": "yelloworangered",
