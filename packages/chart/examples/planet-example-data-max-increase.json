@@ -2,7 +2,7 @@
   {
     "name": "Jupiter",
     "Radius": "10.97",
-    "Diameter": "22",
+    "Diameter": "25.1",
     "distance": "0"
   },
   {
@@ -13,8 +13,8 @@
   },
   {
     "name": "Uranus",
-    "Radius": "-10",
-    "Diameter": "8",
+    "Radius": "-4",
+    "Diameter": "-30",
     "distance": "0"
   },
   {
