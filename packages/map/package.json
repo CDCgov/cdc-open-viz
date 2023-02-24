@@ -35,7 +35,6 @@
     "d3-zoom": "^3.0.0",
     "html-react-parser": "^3.0.8",
     "html2canvas": "^1.0.0-rc.7",
-    "html2pdf.js": "^0.9.2",
     "papaparse": "^5.3.0",
     "react-accessible-accordion": "^3.0.1",
     "react-table": "^7.5.0",
