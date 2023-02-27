@@ -232,14 +232,20 @@
   }
 
   .tooltip {
-    background-color: #fff;
-    border: rgba(0, 0, 0, 0.3) 1px solid !important;
-    box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
-    line-height: 1.4em;
-    font-size: 1em !important;
-    border-radius: 4px !important;
-    padding: 8px 12px !important;
+    border: rgba(0,0,0,.3) 1px solid;
+    box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
     opacity: 1;
+    line-height: 1.4em;
+    font-size: 1em;
+    border-radius: 4px;
+    padding: 8px 12px;
+    z-index: 1;
+
+    .react-tooltip-arrow {
+      border-bottom: rgba(0,0,0,.3) 1px solid;
+      border-right: rgba(0,0,0,.3) 1px solid;
+      backface-visibility: hidden;
+    }
   }
 
   .region-table {
@@ -557,6 +563,7 @@
 
       .horizontal rect,
       .horizontal foreignObject {
+        opacity: 0;
         animation: growBarH 0.5s linear forwards;
         animation-play-state: paused;
       }
@@ -593,11 +600,24 @@
 
   @keyframes growBarH {
     from {
+      opacity: 1;
       transform: scale(0, 1);
     }
 
     to {
+      opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  .fieldset--boxplot {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 10px;
+
+    label {
+      margin: 5px 0;
     }
   }
 }

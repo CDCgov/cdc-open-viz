@@ -55,6 +55,7 @@ const EditorPanel = memo(props => {
   }
 
   const missingRequiredSections = () => {
+    
     return false
   }
 

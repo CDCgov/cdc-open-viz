@@ -12,10 +12,16 @@ import ConfigContext from '../ConfigContext'
 import useRightAxis from '../hooks/useRightAxis'
 
 export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, xMax, yMax, seriesStyle = 'Line' }) {
-  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, updateConfig, handleLineType } = useContext(ConfigContext)
+  const { colorPalettes, transformedData: data, colorScale, seriesHighlight, config, formatNumber, formatDate, parseDate, isNumber, cleanData, updateConfig, handleLineType } = useContext(ConfigContext)
+  // Just do this once up front otherwise we end up
+  // calling clean several times on same set of data (TT)
+  const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
 
   const handleAxisFormating = (axis = 'left', label, value) => {
+    // if this is an x axis category/date value return without doing any formatting.
+    if (label === config.runtime.xAxis.label) return value
+
     axis = String(axis).toLocaleLowerCase()
     if (label) {
       return `${label}: ${formatNumber(value, axis)}`
@@ -25,7 +31,9 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
   return (
     <ErrorBoundary component='LineChart'>
-      <Group left={config.runtime.yAxis.size}>
+      <Group left={config.runtime.yAxis.size ? parseInt(config.runtime.yAxis.size) : 66}>
+        {' '}
+        {/* left - expects a number not a string */}
         {(config.runtime.lineSeriesKeys || config.runtime.seriesKeys).map((seriesKey, index) => {
           let lineType = config.series.filter(item => item.dataKey === seriesKey)[0].type
           const seriesData = config.series.filter(item => item.dataKey === seriesKey)
@@ -37,7 +45,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
               opacity={config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(seriesKey) === -1 ? 0.5 : 1}
               display={config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(seriesKey) !== -1 ? 'block' : 'none'}
             >
-              {data.map((d, dataIndex) => {
+              {cleanedData.map((d, dataIndex) => {
                 // Find the series object from the config.series array that has a dataKey matching the seriesKey variable.
                 const series = config.series.find(({ dataKey }) => dataKey === seriesKey)
                 const { axis } = series
@@ -60,11 +68,18 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     ${xAxisTooltip}
                   </div>`
                 let circleRadii = 4.5
+
                 return (
                   d[seriesKey] !== undefined &&
                   d[seriesKey] !== '' &&
                   d[seriesKey] !== null && (
+                    // isNumber(d[seriesKey]) &&
+                    // isNumber(getYAxisData(d, seriesKey)) &&
+                    // isNumber(getXAxisData(d)) &&
+                    // isNumber(yScaleRight(getXAxisData(d))) &&
+                    // isNumber(yScale(getXAxisData(d))) &&
                     <Group key={`series-${seriesKey}-point-${dataIndex}`}>
+                      {/* Render legend */}
                       <Text
                         display={config.labels ? 'block' : 'none'}
                         x={xScale(getXAxisData(d))}
@@ -78,12 +93,12 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                       <circle
                         key={`${seriesKey}-${dataIndex}`}
                         r={circleRadii}
-                        cx={xScale(getXAxisData(d))}
+                        cx={Number(xScale(getXAxisData(d)))}
                         cy={seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey))}
                         fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
                         style={{ fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000' }}
-                        data-tip={tooltip}
-                        data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                        data-tooltip-html={tooltip}
+                        data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                       />
                     </Group>
                   )
@@ -92,7 +107,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
 
               <LinePath
                 curve={allCurves.curveLinear}
-                data={data}
+                data={cleanedData}
                 x={d => xScale(getXAxisData(d))}
                 y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                 stroke={
@@ -109,14 +124,14 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                 shapeRendering='geometricPrecision'
                 strokeDasharray={lineType ? handleLineType(lineType) : 0}
                 defined={(item, i) => {
-                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                  return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null && item[config.runtime.seriesLabels[seriesKey]] !== undefined
                 }}
               />
               {config.animate && (
                 <LinePath
                   className='animation'
                   curve={allCurves.curveLinear}
-                  data={data}
+                  data={cleanedData}
                   x={d => xScale(getXAxisData(d))}
                   y={d => (seriesAxis === 'Right' ? yScaleRight(getYAxisData(d, seriesKey)) : yScale(getYAxisData(d, seriesKey)))}
                   stroke='#fff'
@@ -125,7 +140,7 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return item[config.runtime.seriesLabels[seriesKey]] !== '' && item[config.runtime.seriesLabels[seriesKey]] !== null
+                    return isNumber(item[config.runtime.seriesLabels[seriesKey]])
                   }}
                 />
               )}
@@ -152,7 +167,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
             </Group>
           )
         })}
-
         {/* Message when dynamic legend and nothing has been picked */}
         {config.legend.dynamicLegend && seriesHighlight.length === 0 && (
           <Text x={xMax / 2} y={yMax / 2} fill='black' textAnchor='middle' color='black'>

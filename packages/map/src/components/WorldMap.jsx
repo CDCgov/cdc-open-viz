@@ -16,7 +16,7 @@ const { features: world } = feature(topoJSON, topoJSON.objects.countries)
 let projection = geoMercator()
 
 const WorldMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, rebuildTooltips, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
+  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedCountries, setState, setRuntimeData, generateRuntimeData, setFilteredCountryCode, position, setPosition, hasZoom, handleMapAriaLabels } = props
 
   // TODO Refactor - state should be set together here to avoid rerenders
   // Resets to original data & zooms out
@@ -68,8 +68,6 @@ const WorldMap = props => {
     setFilteredCountryCode(newRuntimeData[0].uid)
   }
 
-  useEffect(() => rebuildTooltips())
-
   const handleMoveEnd = position => {
     setPosition(position)
   }
@@ -102,7 +100,7 @@ const WorldMap = props => {
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000' && state.general.type !== 'bubble') {
-        const tooltip = applyTooltipsToGeo(geoDisplayName, geoData)
+        const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
 
         styles = {
           ...styles,
@@ -121,7 +119,16 @@ const WorldMap = props => {
           styles.cursor = 'pointer'
         }
 
-        return <Geo key={i + '-geo'} css={styles} data-for='tooltip' data-tip={tooltip} path={path} stroke={geoStrokeColor} strokeWidth={strokeWidth} onClick={() => geoClickHandler(geoDisplayName, geoData)} />
+        return <Geo
+          key={i + '-geo'}
+          css={styles}
+          path={path}
+          stroke={geoStrokeColor}
+          strokeWidth={strokeWidth}
+          onClick={() => geoClickHandler(geoDisplayName, geoData)}
+          data-tooltip-id="tooltip"
+          data-tooltip-html={toolTip}
+        />
       }
 
       // Default return state, just geo with no additional information

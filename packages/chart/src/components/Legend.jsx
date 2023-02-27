@@ -7,7 +7,7 @@ import LegendCircle from '@cdc/core/components/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, setFilteredData, colorPalettes, rawData, setConfig } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -106,11 +106,18 @@ const Legend = () => {
 
     return uniqeLabels
   }
+  // in small screens update config legend position.
+  useEffect(() => {
+    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
+      setConfig({ ...config, legend: { position: 'bottom' } })
+    }
+    return () => setConfig({ ...config, legend: { position: 'right' } })
+  }, [currentViewport])
 
   if (!legend) return
 
   if (!legend.dynamicLegend)
-    return (
+    return config.visualizationType !== 'Box Plot' ? (
       <aside
         style={{ marginTop: config.legend.position === 'bottom' && config.orientation === 'horizontal' ? `${config.runtime.xAxis.size}px` : '0px', marginBottom: config.legend.position === 'bottom' ? '15px' : '0px' }}
         id='legend'
@@ -172,119 +179,124 @@ const Legend = () => {
           )}
         </LegendOrdinal>
       </aside>
+    ) : (
+      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+        {config.boxplot.legend.displayHowToReadText && <h3>{config.boxplot.legend.howToReadText}</h3>}
+      </aside>
     )
-
   return (
-    <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
-      {legend.label && <h2>{parse(legend.label)}</h2>}
-      {legend.description && <p>{parse(legend.description)}</p>}
+    config.visualizationType !== 'Box Plot' && (
+      <aside id='legend' className={containerClasses.join(' ')} role='region' aria-label='legend' tabIndex={0}>
+        {legend.label && <h2>{parse(legend.label)}</h2>}
+        {legend.description && <p>{parse(legend.description)}</p>}
 
-      <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
-        {labels => {
-          if (
-            Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length && // legend items are less than limit
-            dynamicLegendItems.length !== config.runtime.seriesLabelsAll.length
-          ) {
-            // legend items are equal to series length
-            return (
-              <select className='dynamic-legend-dropdown' onChange={e => handleDynamicLegendChange(e)}>
-                <option className={'all'} tabIndex={0} value={JSON.stringify({ text: config.legend.dynamicLegendDefaultText })}>
-                  {config.legend.dynamicLegendDefaultText}
-                </option>
-                {labels.map((label, i) => {
-                  let className = 'legend-item'
-                  let itemName = label.datum
-                  let inDynamicList = false
+        <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
+          {labels => {
+            if (
+              Number(config.legend.dynamicLegendItemLimit) > dynamicLegendItems.length && // legend items are less than limit
+              dynamicLegendItems.length !== config.runtime.seriesLabelsAll.length
+            ) {
+              // legend items are equal to series length
+              return (
+                <select className='dynamic-legend-dropdown' onChange={e => handleDynamicLegendChange(e)}>
+                  <option className={'all'} tabIndex={0} value={JSON.stringify({ text: config.legend.dynamicLegendDefaultText })}>
+                    {config.legend.dynamicLegendDefaultText}
+                  </option>
+                  {labels.map((label, i) => {
+                    let className = 'legend-item'
+                    let itemName = label.datum
+                    let inDynamicList = false
 
-                  // Filter excluded data keys from legend
-                  if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-                    return
-                  }
-
-                  if (config.runtime.seriesLabels) {
-                    let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                    itemName = config.runtime.seriesKeys[index]
-                  }
-
-                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                    className += ' inactive'
-                  }
-
-                  dynamicLegendItems.map(listItem => {
-                    if (listItem.text === label.text) {
-                      inDynamicList = true
+                    // Filter excluded data keys from legend
+                    if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+                      return
                     }
-                  })
 
-                  if (inDynamicList) return true
-                  let palette = colorPalettes[config.palette]
+                    if (config.runtime.seriesLabels) {
+                      let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                      itemName = config.runtime.seriesKeys[index]
+                    }
 
-                  label.value = palette[dynamicLegendItems.length]
+                    if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                      className += ' inactive'
+                    }
 
-                  return (
-                    <option className={className} tabIndex={0} value={JSON.stringify(label)}>
+                    dynamicLegendItems.map(listItem => {
+                      if (listItem.text === label.text) {
+                        inDynamicList = true
+                      }
+                    })
+
+                    if (inDynamicList) return true
+                    let palette = colorPalettes[config.palette]
+
+                    label.value = palette[dynamicLegendItems.length]
+
+                    return (
+                      <option className={className} tabIndex={0} value={JSON.stringify(label)}>
+                        {label.text}
+                      </option>
+                    )
+                  })}
+                </select>
+              )
+            } else {
+              return config.legend.dynamicLegendItemLimitMessage
+            }
+          }}
+        </LegendOrdinal>
+
+        <div className='dynamic-legend-list'>
+          {dynamicLegendItems.map((label, i) => {
+            let className = ['legend-item']
+            let itemName = label.text
+            let palette = colorPalettes[config.palette]
+
+            // Filter excluded data keys from legend
+            if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
+              return
+            }
+
+            if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
+              let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+              itemName = config.runtime.seriesKeys[index]
+            }
+
+            if (seriesHighlight.length > 0 && !seriesHighlight.includes(itemName)) {
+              className.push('inactive')
+            }
+
+            if (seriesHighlight.length === 0 && config.legend.dynamicLegend) {
+              className.push('inactive')
+            }
+
+            return (
+              <>
+                <LegendItem className={className.join(' ')} tabIndex={0} key={`dynamic-legend-item-${i}`} alignItems='center'>
+                  <button
+                    className='btn-wrapper'
+                    onClick={() => {
+                      highlight(label)
+                    }}
+                  >
+                    <LegendCircle fill={palette[i]} config={config} />
+                    <LegendLabel align='space-between' margin='4px 0 0 4px'>
                       {label.text}
-                    </option>
-                  )
-                })}
-              </select>
+                    </LegendLabel>
+                  </button>
+                  <button onClick={() => removeDynamicLegendItem(label)}>x</button>
+                </LegendItem>
+              </>
             )
-          } else {
-            return config.legend.dynamicLegendItemLimitMessage
-          }
-        }}
-      </LegendOrdinal>
-
-      <div className='dynamic-legend-list'>
-        {dynamicLegendItems.map((label, i) => {
-          let className = ['legend-item']
-          let itemName = label.text
-          let palette = colorPalettes[config.palette]
-
-          // Filter excluded data keys from legend
-          if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
-            return
-          }
-
-          if (config.runtime.seriesLabels && !config.legend.dynamicLegend) {
-            let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-            itemName = config.runtime.seriesKeys[index]
-          }
-
-          if (seriesHighlight.length > 0 && !seriesHighlight.includes(itemName)) {
-            className.push('inactive')
-          }
-
-          if (seriesHighlight.length === 0 && config.legend.dynamicLegend) {
-            className.push('inactive')
-          }
-
-          return (
-            <>
-              <LegendItem className={className.join(' ')} tabIndex={0} key={`dynamic-legend-item-${i}`} alignItems='center'>
-                <button
-                  className='btn-wrapper'
-                  onClick={() => {
-                    highlight(label)
-                  }}
-                >
-                  <LegendCircle fill={palette[i]} config={config} />
-                  <LegendLabel align='space-between' margin='4px 0 0 4px'>
-                    {label.text}
-                  </LegendLabel>
-                </button>
-                <button onClick={() => removeDynamicLegendItem(label)}>x</button>
-              </LegendItem>
-            </>
-          )
-        })}
-      </div>
-      {seriesHighlight.length < dynamicLegendItems.length && (
-        <button className={`legend-reset legend-reset--dynamic ${config.theme}`} onClick={highlightReset} tabIndex={0}>
-          Reset
-        </button>
-      )}
-    </aside>
+          })}
+        </div>
+        {seriesHighlight.length < dynamicLegendItems.length && (
+          <button className={`legend-reset legend-reset--dynamic ${config.theme}`} onClick={highlightReset} tabIndex={0}>
+            Reset
+          </button>
+        )}
+      </aside>
+    )
   )
 }
 
