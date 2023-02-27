@@ -818,7 +818,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     handleLineType,
     isNumber,
     cleanData,
-    imageId,
     getTextWidth
   }
 

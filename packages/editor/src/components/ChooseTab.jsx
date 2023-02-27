@@ -185,7 +185,7 @@ export default function ChooseTab() {
           </Tooltip>
         </li>
         {/* temporarily hiding these */}
-        {/* <li>
+        <li>
           <Tooltip>
             <Tooltip.Target>
               <IconButton label='Box Plot' type='chart' subType='Box Plot' orientation='vertical' icon={<GenericIcon />} />
@@ -200,7 +200,15 @@ export default function ChooseTab() {
             </Tooltip.Target>
             <Tooltip.Content>Display a scatter plot</Tooltip.Content>
           </Tooltip>
-        </li> */}
+        </li>
+        <li>
+          <Tooltip>
+            <Tooltip.Target>
+              <IconButton label='Area Chart' type='chart' subType='Area Chart' orientation='vertical' icon={<GenericIcon />} />
+            </Tooltip.Target>
+            <Tooltip.Content>Display an area chart</Tooltip.Content>
+          </Tooltip>
+        </li>
       </ul>
 
       <div className='heading-2'>Maps</div>
