@@ -673,6 +673,15 @@ const EditorPanel = props => {
           }
         })
         break
+      case 'territoriesAlwaysShow':
+        setState({
+            ...state,
+            general: {
+              ...state.general,
+              territoriesAlwaysShow: value
+            }
+          })
+        break
       default:
         console.warn(`Did not recognize editor property.`)
         break
@@ -1491,6 +1500,18 @@ const EditorPanel = props => {
                     }
                   />
                   {'us' === state.general.geoType && <TextField value={general.territoriesLabel} updateField={updateField} section='general' fieldName='territoriesLabel' label='Territories Label' placeholder='Territories' />}
+                  {'us' === state.general.geoType &&
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={general.territoriesAlwaysShow || false}
+                        onChange={event => {
+                          handleEditorChanges('territoriesAlwaysShow', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Show All Territories</span>
+                    </label>
+                  }
                   {/* <label className="checkbox mt-4">
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
