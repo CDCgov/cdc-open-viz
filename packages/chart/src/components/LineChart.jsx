@@ -17,8 +17,6 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
   const { yScaleRight } = useRightAxis({ config, yMax, data, updateConfig })
-
-  //console.log("LineChart ###CleanedData=", cleanedData)
   
   const handleLineType = lineType => {
     switch (lineType) {

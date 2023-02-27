@@ -212,9 +212,6 @@ export default function LinearChart() {
   }
 
   const countNumOfTicks = axis => {
-
-
-    
     // function get number of ticks based on bar type & users value
     const isHorizontal = config.orientation === 'horizontal'
     const { numTicks } = config.runtime[axis]
@@ -223,7 +220,10 @@ export default function LinearChart() {
     if (axis === 'yAxis') {
       tickCount = isHorizontal && !numTicks ? data.length : isHorizontal && numTicks ? numTicks : !isHorizontal && !numTicks ? undefined : !isHorizontal && numTicks && numTicks
       // DEV 3163 - to fix edge case of small numbers with decimals
-      if (tickCount > max) tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max); // cap it and round it its not an integer
+      if (tickCount > max) {
+          // cap it and round it its not an integer
+          tickCount = min < 0 ? Math.round(max) * 2 : Math.round(max); 
+      } 
     }
 
     if (axis === 'xAxis') {
