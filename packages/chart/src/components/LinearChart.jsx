@@ -268,8 +268,6 @@ export default function LinearChart() {
     return config.runtime.xAxis.type === 'date' ? formatDate(tick) : config.orientation === 'horizontal' ? formatNumber(tick) : tick
   }
 
-  console.log('yMax', yMax)
-
   return isNaN(width) ? (
     <></>
   ) : (

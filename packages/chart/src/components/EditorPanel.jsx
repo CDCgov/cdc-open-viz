@@ -1657,25 +1657,23 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  {config.visualizationType !== 'Box Plot' &&
-                    <CheckBox
-                      value={config.legend.hide}
-                      section='legend'
-                      fieldName='hide'
-                      label='Hide Legend'
-                      updateField={updateField}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  }
+                  <CheckBox
+                    value={config.legend.hide}
+                    section='legend'
+                    fieldName='hide'
+                    label='Hide Legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <CheckBox value={config.legend.showLegendValuesTooltip} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
