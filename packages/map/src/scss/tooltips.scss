@@ -1,19 +1,25 @@
 /* Tooltip Styles - overrides some default ones provided by <ReactTooltip /> */
 .tooltip {
-  opacity: 1 !important;
-  border: rgba(0,0,0,.3) 1px solid;
-  box-shadow: rgba(0,0,0,.1) 3px 3px 7px;
-  opacity: 1;
-  line-height: 1.4em;
-  font-size: 1em;
-  border-radius: 4px;
   padding: 8px 12px;
+  font-size: 1em;
+  line-height: 1.4em;
+  border: rgba(0, 0, 0, .3) 1px solid;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, .1) 3px 3px 7px;
+  opacity: 1;
+  z-index: 10;
+
   &:before, &:after {
     display: none;
   }
 
   &.capitalize dl {
     text-transform: capitalize;
+  }
+
+  [class*="styles-module_arrow"] {
+    border-right: 1px solid #b2b2b2;
+    border-bottom: 1px solid #b2b2b2;
   }
 
   dl dt:not(:empty)::after {

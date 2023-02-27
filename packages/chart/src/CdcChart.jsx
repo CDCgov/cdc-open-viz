@@ -13,6 +13,7 @@ import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import { Base64 } from 'js-base64'
+import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
 import ConfigContext from './ConfigContext'
@@ -39,6 +40,8 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import isNumber from '@cdc/core/helpers/isNumber'
+import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
 
@@ -58,7 +61,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   const [container, setContainer] = useState()
   const [coveLoadedEventRan, setCoveLoadedEventRan] = useState(false)
   const [dynamicLegendItems, setDynamicLegendItems] = useState([])
-  const [imageId, setImageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
+  const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
 
   const legendGlyphSize = 15
   const legendGlyphSizeHalf = legendGlyphSize / 2
@@ -228,8 +231,6 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     if (newConfig.visualizationType === 'Box Plot' && newConfig.series) {
-      console.log('hit', newConfig)
-
       // stats
       let allKeys = data.map(d => d[newConfig.xAxis.dataKey])
       let allValues = data.map(d => Number(d[newConfig?.series[0]?.dataKey]))
@@ -241,40 +242,57 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       }
 
       const groups = uniqueArray(allKeys)
+      let tableData = []
       const plots = []
 
       // group specific statistics
       // prevent re-renders
-      groups.map((g, index) => {
+      groups.forEach((g, index) => {
         if (!g) return
         // filter data by group
         let filteredData = data.filter(item => item[newConfig.xAxis.dataKey] === g)
         let filteredDataValues = filteredData.map(item => Number(item[newConfig?.series[0]?.dataKey]))
-
-        const q1 = d3.quantile(filteredDataValues, 0.25)
-        const q3 = d3.quantile(filteredDataValues, 0.75)
+        // let filteredDataValues = filteredData.map(item => Number(item[newConfig.yAxis.dataKey]))
+        const q1 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.firstQuartilePercentage) / 100)
+        const q3 = d3.quantile(filteredDataValues, parseFloat(newConfig.boxplot.thirdQuartilePercentage) / 100)
         const iqr = q3 - q1
         const lowerBounds = q1 - (q3 - q1) * 1.5
         const upperBounds = q3 + (q3 - q1) * 1.5
         const outliers = filteredDataValues.filter(v => v < lowerBounds || v > upperBounds)
+        let nonOutliers = filteredDataValues
+
+        nonOutliers = nonOutliers.filter(item => !outliers.includes(item))
+
         plots.push({
           columnCategory: g,
-          columnMean: d3.mean(filteredDataValues),
+          columnMax: Number(q3 + 1.5 * iqr).toFixed(2),
+          columnThirdQuartile: q3.toFixed(2),
           columnMedian: d3.median(filteredDataValues),
-          columnFirstQuartile: q1,
-          columnThirdQuartile: q3,
-          columnMin: q1 - 1.5 * iqr,
-          columnMax: q3 + 1.5 * iqr,
-          columnIqr: iqr,
+          columnFirstQuartile: q1.toFixed(2),
+          columnMin: Number(q1 - 1.5 * iqr).toFixed(2),
+          columnCount: filteredDataValues.reduce((partialSum, a) => partialSum + a, 0),
+          columnSd: d3.deviation(filteredDataValues).toFixed(2),
+          columnMean: d3.mean(filteredDataValues).toFixed(2),
+          columnIqr: iqr.toFixed(2),
           columnOutliers: outliers,
-          values: filteredDataValues
+          values: filteredDataValues,
+          nonOutlierValues: nonOutliers
         })
+      })
+
+      // make deep copy so we can remove some fields for data
+      // this appears to be the easiest option instead of running logic against the datatable cell...
+      tableData = JSON.parse(JSON.stringify(plots))
+      tableData.map(table => {
+        delete table.columnIqr
+        delete table.nonOutlierValues
       })
 
       // any other data we can add to boxplots
       newConfig.boxplot['allValues'] = allValues
       newConfig.boxplot['categories'] = groups
-      newConfig.boxplot.push(...plots)
+      newConfig.boxplot.plots = plots
+      newConfig.boxplot.tableData = tableData
     }
 
     if (newConfig.visualizationType === 'Combo' || 'Area Chart' && newConfig.series) {
@@ -408,13 +426,13 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
    * Another useEffect listens to externalFilterChanges and updates the config.
    */
   useEffect(() => {
-    const handleFilterData = (e) => {
+    const handleFilterData = e => {
       let tmp = []
       tmp.push(e.detail)
       setExternalFilters(tmp)
     }
 
-    subscribe('cove_filterData', (e) => handleFilterData(e))
+    subscribe('cove_filterData', e => handleFilterData(e))
 
     return () => {
       unsubscribe('cove_filterData', handleFilterData)
@@ -524,7 +542,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
-  const parseDate = (dateString) => {
+  const parseDate = dateString => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
     if (!date) {
       config.runtime.editorErrorMessage = `Error parsing date "${dateString}". Try reviewing your data and date parse settings in the X Axis section.`
@@ -534,7 +552,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
   }
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return timeFormat(config.runtime[section].dateDisplayFormat)(date)
   }
 
@@ -563,6 +581,16 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         </a>
       )
     }
+  }
+
+  // function calculates the width of given text and its font-size
+  function getTextWidth(text, font) {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    context.font = font || getComputedStyle(document.body).font
+
+    return Math.ceil(context.measureText(text).width)
   }
 
   // Format numeric data based on settings in config
@@ -616,7 +644,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     // Use commas also updates bars and the data table
     // We can't use commas when we're formatting the dataFormatted number
     // Example: commas -> 12,000; abbreviated -> 12k (correct); abbreviated & commas -> 12 (incorrect)
-    if (axis === 'left' && commas && abbreviated) {
+    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
       num = num
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
@@ -660,7 +688,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     Combo: <LinearChart />,
     Pie: <PieChart />,
     'Box Plot': <LinearChart />,
-    'Area Chart': <LinearChart />
+    'Area Chart': <LinearChart />,
+    'Scatter Plot': <LinearChart />
   }
 
   const missingRequiredSections = () => {
@@ -750,7 +779,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     )
   }
 
-  const getXAxisData = (d) => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
+  const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
   const contextValues = {
@@ -786,7 +815,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     setDynamicLegendItems,
     filterData,
     imageId,
-    handleLineType
+    handleLineType,
+    isNumber,
+    cleanData,
+    imageId,
+    getTextWidth
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]

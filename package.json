@@ -13,9 +13,9 @@
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "@types/resize-observer-browser": "^0.1.5",
-    "@visx/group": "^2.1.0",
-    "@visx/heatmap": "^2.1.0",
-    "@visx/scale": "^2.1.0",
+    "@visx/group": "^3.0.0",
+    "@visx/heatmap": "^3.0.0",
+    "@visx/scale": "^3.0.0",
     "@vitejs/plugin-react": "^3.0.0",
     "babel-eslint": "^10.1.0",
     "d3-composite-projections": "^1.4.0",
@@ -31,7 +31,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "html-react-parser": "^3.0.8",
     "husky": "^4.3.0",
-    "lerna": "^6.4.1",
+    "lerna": "^6.5.1",
     "lint-staged": "^10.4.0",
     "mini-svg-data-uri": "^1.2.3",
     "pathe": "^1.1.0",
@@ -63,8 +63,7 @@
     "publish": "npx lerna publish"
   },
   "dependencies": {
-    "@visx/legend": "^2.10.0",
-    "@visx/responsive": "^2.10.0",
-    "@visx/xychart": "^3.0.0"
+    "@visx/legend": "^3.0.0",
+    "@visx/responsive": "^2.10.0"
   }
 }

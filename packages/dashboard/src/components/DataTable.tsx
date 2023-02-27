@@ -1,20 +1,23 @@
-import React, { useContext, useEffect, useState, useMemo, memo } from 'react'
+import React, { useEffect, useState, useMemo, memo } from 'react'
 import { useTable, useSortBy, useResizeColumns, useBlockLayout } from 'react-table'
 import Papa from 'papaparse'
 import { Base64 } from 'js-base64'
 import CoveMediaControls from '@cdc/core/components/CoveMediaControls'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
+/* eslint-disable react-hooks/exhaustive-deps */
+
 export default function DataTable(props) {
-  const { data, datasetKey, config, imageRef, dataFileSourceType } = props
+  const { data, downloadData, datasetKey, config, dataFileSourceType } = props
   const [tableExpanded, setTableExpanded] = useState<boolean>(config.table ? config.table.expanded : false)
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
   const DownloadButton = memo(({ data }: any) => {
     const fileName = `${config.title ? config.title.substring(0, 50) : 'cdc-open-viz'}.csv`
 
-    const csvData = Papa.unparse(data)
+    const csvData = Papa.unparse(downloadData || data)
 
     const saveBlob = () => {
       //@ts-ignore
@@ -44,7 +47,7 @@ export default function DataTable(props) {
         }
       ]
     } else {
-      Object.keys(data[0]).map(key => {
+      Object.keys(data[0]).forEach(key => {
         const newCol = {
           Header: key,
           Cell: ({ row }) => {
@@ -94,6 +97,8 @@ export default function DataTable(props) {
       <CoveMediaControls.Section classes={['download-links']}>
         {config.table.showDownloadUrl && dataFileSourceType === 'url' && (
           <a className='dashboard-download-link' href={config.datasets[datasetKey].dataFileName} title='Link to View Dataset' target='_blank'>
+            {' '}
+            {/* eslint-disable-line */}
             Link to View Dataset
           </a>
         )}
@@ -114,6 +119,7 @@ export default function DataTable(props) {
               }
             }}
           >
+            <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
             {config.table.label}
             {datasetKey ? `: ${datasetKey}` : ''}
           </div>
@@ -141,9 +147,12 @@ export default function DataTable(props) {
                       <tr {...row.getRowProps()}>
                         {row.cells &&
                           row.cells.map(cell => (
-                            <td tabIndex='0' {...cell.getCellProps()}>
-                              {cell.render('Cell')}
-                            </td>
+                            <>
+                              {/* eslint-disable-next-line */}
+                              <td tabIndex='0' {...cell.getCellProps()}>
+                                {cell.render('Cell')}
+                              </td>
+                            </>
                           ))}
                       </tr>
                     )
