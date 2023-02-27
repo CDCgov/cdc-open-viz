@@ -79,7 +79,6 @@
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
-    "hide": true,
     "dynamicLegend": false,
     "dynamicLegendDefaultText": "Show All",
     "dynamicLegendItemLimit": 5,
