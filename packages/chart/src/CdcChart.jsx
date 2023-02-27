@@ -634,7 +634,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     //
     // DEV 3163 edge case for small numbers with decimals
     // - if roundTo undefined which means it is blank, then do not round
-    if ((roundTo === undefined) || (axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+    if ((axis === 'left' && commas && abbreviated) || (axis === 'bottom' && commas && abbreviated)) {
+      num = num
+    } else if (roundTo === undefined)  { // if you put this in if statement above, commas dont work
       num = num
     } else {
       num = num.toLocaleString('en-US', stringFormattingOptions)
