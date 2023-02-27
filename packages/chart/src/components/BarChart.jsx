@@ -13,6 +13,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
 
+  // DEV-3263 if Confidence Intervals then you need to increase yMax to account for them
+  console.log("yMax",yMax)
+  console.log("data",data)
+/*   data.keys(config.confidenceKeys).length > 0
+    ? data.map(d => {
+
+        let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+        let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+    }) */
+  //yMax = 
+
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -78,13 +89,17 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     // calculate height of container based height, space and fontSize of labels
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
 
+console.log("heights",heights)
+console.log("config.confidenceKeys",config.confidenceKeys)
+console.log("totalHeight",totalHeight)
+
     if (isHorizontal) {
       config.heights.horizontal = totalHeight
     }
 
     // return new updated bars/groupes
     return barsArr.map((bar, i) => {
-      // set bars Y dynamycly to handle space between bars
+      // set bars Y dynamically to handle space between bars
       let y = 0
       bar.index !== 0 && (y = (barHeight + barSpace + labelHeight) * i)
 
@@ -497,7 +512,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     <path
                       key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
                       stroke='#333'
-                      strokeWidth='2px'
+                      strokeWidth='px'
                       d={`
                   M${xPos - tickWidth} ${upperPos}
                   L${xPos + tickWidth} ${upperPos}

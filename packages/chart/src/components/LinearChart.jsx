@@ -28,6 +28,9 @@ export default function LinearChart() {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
 
+  console.log("LinearChart data",data)
+  console.log("LinearChart config",config)
+
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -75,6 +78,18 @@ export default function LinearChart() {
   if (data) {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
+
+    // do we need to consider Confidence Intervals?
+    if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
+      let ciYMax = 0;
+      if (config.hasOwnProperty('confidenceKeys')) {
+        let upperCIValues = data.map(function(d) { 
+          return d[config.confidenceKeys.upper]; 
+        })
+        ciYMax = Math.max.apply(Math, upperCIValues)
+        if (ciYMax > max) max = ciYMax
+      } 
+    }
 
     if ((config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && !isAllLine)) && min > 0) {
       min = 0
