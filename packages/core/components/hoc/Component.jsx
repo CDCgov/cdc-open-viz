@@ -77,7 +77,7 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
           <header className="cove-component__header" role="heading" aria-hidden="true" aria-level={2}>
             {parse(config.title)}
             {config.tooltip && config.tooltip !== '' && <>
-              <Tooltip>
+              <Tooltip place="left">
                 <Tooltip.Target>
                   <Icon display="questionCircle"/>
                 </Tooltip.Target>

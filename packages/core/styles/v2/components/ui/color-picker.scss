@@ -16,6 +16,10 @@
   outline: 0;
   cursor: pointer;
 
+  &:focus {
+    outline: none;
+  }
+
   > * {
     pointer-events: none;
     user-select: none;

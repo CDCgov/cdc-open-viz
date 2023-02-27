@@ -17,11 +17,11 @@ import EditorPanels from './components/EditorPanels'
 import './scss/cove-data-bite.scss'
 
 // Visualization
-const CdcDataBite = ({ config: configObj, configUrl, setConfig: setParentConfig, isWizard = false }) => {
+const CdcDataBite = ({ config: configObj, configUrl, setParentConfig }) => {
   return (
     <ErrorBoundary component="CdcDataBite">
       <ConfigProxy configObj={configObj} configUrl={configUrl} setParentConfig={setParentConfig} defaults={defaults}>
-        <View EditorPanels={EditorPanels} isWizard={isWizard}>
+        <View editorPanels={<EditorPanels/>}>
           <Component className="cove-data-bite">
             <DataBite/>
           </Component>

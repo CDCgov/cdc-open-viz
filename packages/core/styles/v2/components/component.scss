@@ -24,6 +24,10 @@ $componentBorderRadius: 3px;
   height: auto;
   border-radius: $componentBorderRadius;
   overflow: hidden;
+
+  @at-root .cove-component[data-accent] #{&} {
+    transition: border-color 200ms ease;
+  }
 }
 
 .cove-component__header {
@@ -36,7 +40,6 @@ $componentBorderRadius: 3px;
   border-bottom-style: solid;
   border-bottom-color: #d2d2d2;
   transition: background-color 200ms ease, border-color 200ms ease;
-  //border-radius: $componentBorderRadius $componentBorderRadius 0 0;
 
   .cove-tooltip {
     position: absolute;
@@ -114,26 +117,34 @@ $componentBorderRadius: 3px;
 // Apply Themes
 @each $theme-name, $theme-colors in $theme {
   .cove-theme--#{$theme-name} {
+    &.cove-component .cove-component__container {
+      border-color: string.unquote(nth($theme-colors, 1));
+    }
+
     &.cove-component[data-border="theme"] .cove-component__container {
       border: 1px solid string.unquote(nth($theme-colors, 1));
     }
 
     &.cove-component[data-accent="top"] .cove-component__container {
-      border-top: 0.75rem solid string.unquote(nth($theme-colors, 1));
+      border-top-width: 0.5rem;
+      border-top-style: solid;
       box-shadow: 0 3px 0 string.unquote(nth($theme-colors, 2)) inset;
       padding-top: 3px;
     }
 
     &.cove-component[data-accent="right"] .cove-component__container {
-      border-right: 0.5rem solid string.unquote(nth($theme-colors, 1));
+      border-right-width: 0.5rem;
+      border-right-style: solid;
     }
 
     &.cove-component[data-accent="bottom"] .cove-component__container {
-      border-bottom: 0.5rem solid string.unquote(nth($theme-colors, 1));
+      border-bottom-width: 0.5rem;
+      border-bottom-style: solid;
     }
 
     &.cove-component[data-accent="left"] .cove-component__container {
-      border-left: 0.5rem solid string.unquote(nth($theme-colors, 1));
+      border-left-width: 0.5rem;
+      border-left-style: solid;
     }
 
     .cove-component__header {

@@ -1,58 +1,44 @@
+import React, { useEffect, useState } from 'react'
+
 // Store
-import { configStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
+
+// Helpers
+import getDataColumns from '@cdc/core/helpers/data/getDataColumns'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
-import Button from '@cdc/core/components/element/Button'
-import EditorPanelGlobal from '@cdc/core/components/editor/EditorPanelGlobal'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import InputText from '@cdc/core/components/input/InputText'
 import InputSelect from '@cdc/core/components/input/InputSelect'
-import Label from '@cdc/core/components/element/Label'
-import SectionBlock from '@cdc/core/components/ui/SectionBlock'
+import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
 
 const EditorPanels = () => {
-  const { config, updateConfig } = configStore()
+  // Store Selectors
+  const { config, updateParentConfig } = useConfigStore(state => ({
+    config: state.config,
+    updateParentConfig: state.updateParentConfig
+  }))
 
-  // Filters -----------------------------------------------
-  const addNewFilter = () => {
-    let filters = config.filters ? [ ...config.filters ] : []
-    filters.push({ values: [] })
-    updateConfig({ ...config, filters })
-  }
+  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
+  const [ tempConfig, setTempConfig ] = useState(config)
 
-  const removeFilter = (index) => {
-    let filters = [ ...config.filters ]
-    filters.splice(index, 1)
-    updateConfig({ ...config, filters })
-  }
-
-  const updateFilterProp = (name, index, value) => {
-    let filters = [ ...config.filters ]
-    filters[index][name] = value
-    updateConfig({ ...config, filters })
-  }
-
-  const getColumns = (filter = true) => {
-    let columns = {}
-    config.data.map(row => Object.keys(row).forEach(columnName => columns[columnName] = true))
-    return Object.keys(columns)
-  }
-
-  const getFilterColumnValues = (index) => {
-    let filterDataOptions = []
-    const filterColumnName = config.filters[index].columnName
-    if (config.data && filterColumnName) {
-      config.data.forEach(function (row) {
-        if (undefined !== row[filterColumnName] && -1 === filterDataOptions.indexOf(row[filterColumnName])) {
-          filterDataOptions.push(row[filterColumnName])
-        }
-      })
-      filterDataOptions.sort()
+  useEffect(() => {
+    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
+    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
+      let tempConfig = { ...config }
+      delete tempConfig.newViz
+      setTempConfig(tempConfig)
     }
-    return filterDataOptions
-  }
+  }, [ config, tempConfig ])
 
-  // Panels -----------------------------------------------
+  useEffect(() => {
+    // Pass tempConfig settings back up to parent, if one exists
+    if (updateParentConfig) updateParentConfig(tempConfig)
+  }, [ tempConfig, updateParentConfig ])
+
+
+  /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
     <Accordion.Section label="General">
       <InputText label="Title" placeholder="Filterable Text Title" configField="title"/>
@@ -61,44 +47,22 @@ const EditorPanels = () => {
 
   const panelData = (
     <Accordion.Section label="Data">
-      <InputSelect label="Text Column" options={getColumns()} configField="textColumn" initialDisabled/>
+      <InputSelect label="Text Column" options={getDataColumns(config.data)} configField="textColumn" initialDisabled/>
 
       <hr className="cove-editor__divider"/>
 
-      <Label tooltip={`To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").`}>
-        Data Point Filters
-      </Label>
-      {config.filters && config.filters.map((filter, index) => (
-        <SectionBlock key={index}>
-          <Button className="cove-button--remove" onClick={() => {
-            removeFilter(index)
-          }}>Remove</Button>
+      <PanelFilters/>
 
-          <InputSelect label="Column" options={getColumns()} initial="Select data column" onChange={(e) => {
-            updateFilterProp('columnName', index, e.target.value)
-          }} value={filter.columnName}/>
-
-          <InputSelect label="Column Value" options={getFilterColumnValues(index)} initial="Select column value" onChange={(e) => {
-            updateFilterProp('columnValue', index, e.target.value)
-          }} value={filter.columnValue} disabled={!config.filters[index].columnName}/>
-        </SectionBlock>
-      ))}
-
-      {(!config.filters || config.filters.length === 0) &&
-        <p className="my-2" style={{ fontStyle: 'italic', textAlign: 'center' }}>There are currently no filters.</p>
-      }
-
-      <Button onClick={addNewFilter} fluid>Add Filter</Button>
     </Accordion.Section>
   )
 
-  return (
-    <>
+  return <>
+    <Accordion>
       {panelGeneral}
       {panelData}
-      {EditorPanelGlobal()}
-    </>
-  )
+      {PanelGlobal}
+    </Accordion>
+  </>
 }
 
 export default EditorPanels

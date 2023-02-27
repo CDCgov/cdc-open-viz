@@ -34,10 +34,14 @@ const Accordion = ({ children }) => {
 
   const warningIcon = <Icon className="cove-icon--warning" display="warningCircle" size={14}/>
 
+  const checkValidTrue = (value) => {
+    return value === undefined || value === true;
+  }
+
   return (
     <AccordionComponent allowZeroExpanded={true}>
       {accordionSections && accordionSections.map((section, index) => (
-        <AccordionItem className="cove-accordion__item" key={index}>
+        <AccordionItem className="cove-accordion__item" style={checkValidTrue(section.props.showIf) ? {} : { visibility: 'hidden', display: 'none' }} key={index}>
           <AccordionItemHeading className="cove-accordion__heading">
             <AccordionItemButton className="cove-accordion__button">
               <span className="cove-accordion__button--text">

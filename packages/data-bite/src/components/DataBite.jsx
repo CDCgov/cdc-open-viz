@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 // Third Party
 import parse from 'html-react-parser'
@@ -15,11 +15,7 @@ import {
   DATA_FUNCTION_MAX,
   DATA_FUNCTION_MIN,
   DATA_FUNCTION_MODE,
-  DATA_FUNCTION_RANGE,
-  IMAGE_POSITION_LEFT,
-  IMAGE_POSITION_RIGHT,
-  IMAGE_POSITION_TOP,
-  IMAGE_POSITION_BOTTOM
+  DATA_FUNCTION_RANGE
 } from '../data/consts.js'
 
 // Helpers
@@ -27,6 +23,7 @@ import { numberFromString, applyPrecision } from '@cdc/core/helpers/coveHelpers'
 
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
+import DataBiteImage from './DataBite.Image.jsx'
 
 // Visualization
 const DataBite = () => {
@@ -216,91 +213,30 @@ const DataBite = () => {
       if (config.dataFormat.commas) {
         dataBite = applyLocaleString(dataBite)
       }
-      // Optional
-      // return config.dataFormat.prefix + dataBite + config.dataFormat.suffix;
 
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite
     } else {
-      //Rounding and formatting for ranges happens earlier.
 
+      //Rounding and formatting for ranges happens earlier.
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite
     }
   }
 
-  const DataImage = useCallback(() => {
-    let operators = {
-      '<': (a, b) => {
-        return a < b
-      },
-      '>': (a, b) => {
-        return a > b
-      },
-      '<=': (a, b) => {
-        return a <= b
-      },
-      '>=': (a, b) => {
-        return a >= b
-      },
-      '≠': (a, b) => {
-        return a !== b
-      },
-      '=': (a, b) => {
-        return a === b
-      }
-    }
-    let imageSource = config.imageData.url
-    let imageAlt = config.imageData.alt
-
-    if ('dynamic' === config.imageData.display && config.imageData.options && config.imageData.options?.length > 0) {
-      let targetVal = Number(calculateDataBite(false))
-      let argumentActive = false
-
-      config.imageData.options.forEach((option, index) => {
-        let argumentArr = option.arguments
-        let { source, alt } = option
-
-        if (false === argumentActive && argumentArr.length > 0) {
-          if (argumentArr[0].operator.length > 0 && argumentArr[0].threshold.length > 0) {
-            if (operators[argumentArr[0].operator](targetVal, argumentArr[0].threshold)) {
-              if (undefined !== argumentArr[1]) {
-                if (argumentArr[1].operator?.length > 0 && argumentArr[1].threshold?.length > 0) {
-                  if (operators[argumentArr[1].operator](targetVal, argumentArr[1].threshold)) {
-                    imageSource = source
-                    if (alt !== '' && alt !== undefined) {
-                      imageAlt = alt
-                    }
-                    argumentActive = true
-                  }
-                }
-              } else {
-                imageSource = source
-                if (alt !== '' && alt !== undefined) {
-                  imageAlt = alt
-                }
-                argumentActive = true
-              }
-            }
-          }
-        }
-      })
-    }
-
-    return imageSource.length > 0 && 'graphic' !== config.biteStyle && 'none' !== config.imageData.display
-      ? <img alt={imageAlt} src={imageSource} className="bite-image callout"/>
-      : null
-  }, [ config.imageData ])
+  const DataImage = useCallback(() => (
+    <DataBiteImage calculateDataBite={calculateDataBite}/>
+  ), [ config ])
 
 
   let isTop = false
   let isBottom = false
 
   switch (config.bitePosition) {
-    case IMAGE_POSITION_LEFT:
-    case IMAGE_POSITION_RIGHT:
-    case IMAGE_POSITION_TOP:
+    case "left":
+    case "right":
+    case "top":
       isTop = true
       break
-    case IMAGE_POSITION_BOTTOM:
+    case "bottom":
       isBottom = true
       break
     default:
@@ -312,13 +248,15 @@ const DataBite = () => {
   return <>
     {config.missingRequiredSections && <>Missing data in sections</>}
     {!config.missingRequiredSections && (<>
-      <div className={`cove-data-bite__container${config.fontSize ? ' font-' + config.fontSize : ''}`} flow={config.biteFlow}>
+      <div className={`cove-data-bite__container${config.fontSize ? ' font-' + config.fontSize : ''}`} flow={config.bitePosition}>
         {showBite && 'graphic' === config.biteStyle && isTop &&
           <div className="cove-data-bite__callout">
             <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={config.biteFontSize}/>
           </div>
         }
-        {isTop && <DataImage/>}
+        {isTop &&
+          <DataImage/>
+        }
         <div className="cove-data-bite__content">
           {showBite && 'title' === config.biteStyle &&
             <div className="cove-data-bite__value" style={{ fontSize: config.biteFontSize + 'px' }}>{calculateDataBite()}</div>
@@ -333,7 +271,9 @@ const DataBite = () => {
             <p className="cove-data-bite__subtext">{parse(config.subtext)}</p>
           }
         </div>
-        {isBottom && <DataImage/>}
+        {isBottom &&
+          <DataImage/>
+        }
         {showBite && 'graphic' === config.biteStyle && !isTop &&
           <div className="cove-data-bite__callout">
             <CircleCallout theme={config.theme} text={calculateDataBite()} biteFontSize={config.biteFontSize}/>

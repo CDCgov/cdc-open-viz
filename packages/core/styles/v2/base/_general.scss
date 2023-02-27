@@ -5,17 +5,118 @@
   z-index: 1;
 
   .cove-input {
+    margin-bottom: 0;
     color: #767e85;
     background-color: transparent;
     border: 0;
     border-bottom: 2px solid #d9dbdd;
     border-radius: 0;
-    margin-bottom: 0;
 
     &:active,
     &:focus {
       border: 0;
       border-bottom: 2px solid #005eaa;
     }
+  }
+}
+
+.cove-ternary {
+  position: relative;
+  padding: 0.5rem;
+  background-color: #eaeaea;
+  border-radius: 8px;
+}
+
+.cove-ternary__label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #005eaa;
+}
+
+.cove-ternary__condition {
+  position: relative;
+  text-align: center;
+  border: 2px dashed #a7adb3;
+  border-radius: 8px;
+
+  .cove-input {
+    font-weight: bold;
+    color: #727c85;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+}
+
+.cove-ternary,
+.cove-ternary__condition {
+  margin-bottom: 1.5rem;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 0;
+    height: 1.5rem;
+    border-left: 2px dashed #a7adb3;
+    transform: translateX(-50%);
+    z-index: -1;
+    backface-visibility: hidden;
+  }
+
+  .cove-input {
+    text-align: center;
+  }
+}
+
+.cove-ternary__condition--final {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 2.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #a7adb3;
+  border: 2px solid transparent;
+  border-radius: 8px;
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: -1.75rem;
+    left: 50%;
+    border-top: 10px solid #a7adb3;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    transform: translateX(-50%);
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 0;
+    height: 1.5rem;
+    border-left: 2px solid #a7adb3;
+    transform: translateX(-50%);
+    backface-visibility: hidden;
+  }
+
+  .cove-input {
+    font-weight: bold;
+    color: #fff;
+    background-color: transparent;
   }
 }

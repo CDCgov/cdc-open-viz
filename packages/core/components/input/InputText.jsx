@@ -26,7 +26,7 @@ const InputText = memo((
 
     configField,
     value: inlineValue,
-    min, max, className, ...attributes
+    min, max, className, onChange, ...attributes
   }
 ) => {
   // Store Selectors
@@ -73,7 +73,7 @@ const InputText = memo((
   }
 
   //TODO: COVE Refactor - Expand to support any additional onChange events included with the call to this component
-  const onChange = (e) => {
+  const onChangeHandler = (e) => {
     switch (type) {
       case 'number':
         if (isNumberWithinBounds(e.target.value)) {
@@ -85,13 +85,15 @@ const InputText = memo((
       default:
         setValue(e.target.value)
     }
+    // If supplied a custom onChange event, run after setting the debounced value
+    if (onChange) onChange(e)
   }
 
   let inputAttrs = {
     className: `cove-input${'textarea' === type ? ' cove-input--textarea' : ''}${className ? ' ' + className : ''}`,
     type,
     placeholder,
-    onChange,
+    onChange: onChangeHandler,
     ...attributes
   }
 
@@ -101,7 +103,9 @@ const InputText = memo((
 
   return (
     <>
-      {label && <Label tooltip={tooltip} onClick={() => inputRef.current.focus()}>{label}</Label>}
+      {label &&
+        <Label tooltip={tooltip} onClick={() => inputRef.current.focus()}>{label}</Label>
+      }
       {formElement}
     </>
   )

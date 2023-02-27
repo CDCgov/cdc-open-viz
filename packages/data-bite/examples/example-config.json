@@ -4,7 +4,7 @@
   "dataBite": "",
   "dataFunction": "Mean (Average)",
   "dataColumn": "Insured Rate",
-  "bitePosition": "Left",
+  "bitePosition": "left",
   "biteFontSize": "24",
   "imageData": {
     "display": "none",

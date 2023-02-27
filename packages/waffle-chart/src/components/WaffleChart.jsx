@@ -6,7 +6,7 @@ import { Group } from '@visx/group'
 import { Circle, Bar } from '@visx/shape'
 
 // Store
-import { configStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 // Constants
 import THEME_COLORS from '@cdc/core/data/componentThemes'
@@ -29,8 +29,8 @@ import calculateNodePosition from '../helpers/calculateNodePosition'
 import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
 // Visualization
-const WaffleChart = ({ configObj, configUrl }) => {
-  const { config } = configStore()
+const WaffleChart = () => {
+  const config = useConfigStore(state => state.config)
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
@@ -170,7 +170,7 @@ const WaffleChart = ({ configObj, configUrl }) => {
     return waffleData.map((node, key) => (
       node.shape === 'square'
         ? <Bar className="cove-waffle-chart__node"
-               style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
+               style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + 'fill 200ms ease 0s', fillOpacity: node.opacity }}
                x={node.x} y={node.y}
                width={nodeWidthNum} height={nodeWidthNum}
                fill={node.color}
@@ -178,7 +178,7 @@ const WaffleChart = ({ configObj, configUrl }) => {
         />
         : node.shape === 'person' ?
           <path
-            style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`, transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
+            style={{ transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`, transition: calculateWaffleAnimation(key, prevVal, newVal) + 'fill 200ms ease 0s', fillOpacity: node.opacity }}
             fill={node.color} fillOpacity={node.opacity} key={key}
             d="M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
                           0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,
@@ -186,13 +186,13 @@ const WaffleChart = ({ configObj, configUrl }) => {
           </path>
           :
           <Circle className="cove-waffle-chart__node"
-                  style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + "fill 200ms ease 0s", fillOpacity: node.opacity }}
+                  style={{ transition: calculateWaffleAnimation(key, prevVal, newVal) + 'fill 200ms ease 0s', fillOpacity: node.opacity }}
                   cx={node.x} cy={node.y} r={nodeWidthNum / 2}
                   fill={node.color}
                   data-step={key} key={key}
           />
     ))
-  }, [config.shape, config.theme, dataPercentage, prevVal, newVal, nodeSpacerNum, nodeWidthNum ])
+  }, [ config.shape, config.theme, dataPercentage, prevVal, newVal, nodeSpacerNum, nodeWidthNum ])
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 

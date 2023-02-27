@@ -4,7 +4,7 @@ export default {
   subtext: '',
   type: 'data-bite',
   biteStyle: 'graphic',
-  bitePosition: 'Left',
+  bitePosition: 'left',
   biteFontSize: 24,
   fontSize: 'medium',
   biteBody: '',

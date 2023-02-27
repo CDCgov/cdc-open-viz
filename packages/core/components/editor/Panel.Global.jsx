@@ -21,7 +21,7 @@ const accentOptions = {
   left: 'Left',
 }
 
-const EditorPanelGlobal = (
+const PanelGlobal = (
   <Accordion.Section label="Component">
     <InputText type="text" configField="tooltip" label="Tooltip"/>
     <InputSelect configField={[ 'visual', 'border' ]} options={optionsObj} label="Border"/>
@@ -32,4 +32,4 @@ const EditorPanelGlobal = (
   </Accordion.Section>
 )
 
-export default EditorPanelGlobal
+export default PanelGlobal

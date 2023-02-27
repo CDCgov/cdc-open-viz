@@ -1,27 +1,53 @@
-import { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // Store
-import { configStore } from '@cdc/core/stores/configStore'
+import useConfigStore from '@cdc/core/stores/configStore'
+
+// Helpers
+import { getDataColumns } from '@cdc/core/helpers/data/index'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
-import Button from '@cdc/core/components/element/Button'
-import EditorPanelGlobal from '@cdc/core/components/editor/EditorPanelGlobal'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import InputText from '@cdc/core/components/input/InputText'
 import Label from '@cdc/core/components/element/Label'
-import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
 // Constants
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
+import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
 
 const EditorPanels = () => {
-  const { config, setMissingRequiredSections, updateConfig } = configStore()
+  const { config, updateConfig, updateParentConfig, setMissingRequiredSections } = useConfigStore(state => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    updateParentConfig: state.updateParentConfig,
+    setMissingRequiredSections: state.setMissingRequiredSections
+  }))
 
-  // No sections required, setting to false
+  /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
+  const [ tempConfig, setTempConfig ] = useState(config)
+
   useEffect(() => {
+    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
+    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
+      let tempConfig = { ...config }
+      delete tempConfig.newViz
+      setTempConfig(tempConfig)
+    }
+  }, [ config, tempConfig ])
+
+  useEffect(() => {
+    // Pass tempConfig settings back up to parent, if one exists
+    if (updateParentConfig) updateParentConfig(tempConfig)
+  }, [ tempConfig, updateParentConfig ])
+
+
+  /** Component Effects -------------------------------------------------------------------------- */
+  useEffect(() => {
+    // No sections required, setting to false
     setMissingRequiredSections(false)
   }, [])
 
@@ -41,46 +67,8 @@ const EditorPanels = () => {
     }
   }, [ config.dataConditionalOperator, config.dataConditionalComparate ])
 
-  // Filters -----------------------------------------------
-  const addNewFilter = () => {
-    let filters = config.filters ? [ ...config.filters ] : []
-    filters.push({ values: [] })
-    updateConfig({ ...config, filters })
-  }
 
-  const removeFilter = (index) => {
-    let filters = [ ...config.filters ]
-    filters.splice(index, 1)
-    updateConfig({ ...config, filters })
-  }
-
-  const updateFilterProp = (name, index, value) => {
-    let filters = [ ...config.filters ]
-    filters[index][name] = value
-    updateConfig({ ...config, filters })
-  }
-
-  const getColumns = (filter = true) => {
-    let columns = {}
-    config.data.map(row => Object.keys(row).forEach(columnName => columns[columnName] = true))
-    return Object.keys(columns)
-  }
-
-  const getFilterColumnValues = (index) => {
-    let filterDataOptions = []
-    const filterColumnName = config.filters[index].columnName
-    if (config.data && filterColumnName) {
-      config.data.forEach(function (row) {
-        if (undefined !== row[filterColumnName] && -1 === filterDataOptions.indexOf(row[filterColumnName])) {
-          filterDataOptions.push(row[filterColumnName])
-        }
-      })
-      filterDataOptions.sort()
-    }
-    return filterDataOptions
-  }
-
-  // Panels -----------------------------------------------
+  /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
     <Accordion.Section label="General">
       <InputText label="Title" placeholder="Waffle Chart Title" configField="title"/>
@@ -94,16 +82,36 @@ const EditorPanels = () => {
   const panelData = (
     <Accordion.Section label="Data">
       <SectionWrapper label="Numerator">
-        <InputSelect label="Data Column" options={getColumns()} configField="dataColumn" initialDisabled/>
-        <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataFunction" initialDisabled/>
+        <InputSelect
+          label="Data Column"
+          options={getDataColumns(config.data)}
+          configField="dataColumn"
+          initialDisabled
+        />
+        <InputSelect
+          label="Data Function"
+          options={DATA_FUNCTIONS}
+          configField="dataFunction"
+          initialDisabled
+        />
 
         <Label>Data Conditional</Label>
         <div className="cove-grid cove-grid--gap--2 mb-3">
           <div className="cove-grid__col--4">
-            <InputSelect className="mb-0" options={getColumns()} configField="dataConditionalColumn" initialDisabled/>
+            <InputSelect
+              className="mb-0"
+              options={getDataColumns(config.data)}
+              configField="dataConditionalColumn"
+              initialDisabled
+            />
           </div>
           <div className="cove-grid__col--4">
-            <InputSelect className="mb-0" options={DATA_OPERATORS} configField="dataConditionalOperator" initialDisabled/>
+            <InputSelect
+              className="mb-0"
+              options={DATA_OPERATORS}
+              configField="dataConditionalOperator"
+              initialDisabled
+            />
           </div>
           <div className="cove-grid__col--4">
             <InputText className="mb-0" configField="dataConditionalComparate"/>
@@ -132,8 +140,16 @@ const EditorPanels = () => {
         }
         {config.customDenom &&
           <>
-            <InputSelect label="Data Column" options={getColumns()} configField="dataDenomColumn"/>
-            <InputSelect label="Data Function" options={DATA_FUNCTIONS} configField="dataDenomFunction"/>
+            <InputSelect
+              label="Data Column"
+              options={getDataColumns(config.data)}
+              configField="dataDenomColumn"
+            />
+            <InputSelect
+              label="Data Function"
+              options={DATA_FUNCTIONS}
+              configField="dataDenomFunction"
+            />
           </>
         }
       </SectionWrapper>
@@ -157,30 +173,7 @@ const EditorPanels = () => {
 
   const panelFilters = (
     <Accordion.Section label="Filters">
-      <Label tooltip={`To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a column called "Sex").`}>
-        Data Point Filters
-      </Label>
-      {config.filters && config.filters.map((filter, index) => (
-        <SectionBlock key={index}>
-          <Button className="cove-button--remove" onClick={() => {
-            removeFilter(index)
-          }}>Remove</Button>
-
-          <InputSelect label="Column" options={getColumns()} initial="Select data column" onChange={(e) => {
-            updateFilterProp('columnName', index, e.target.value)
-          }} value={filter.columnName}/>
-
-          <InputSelect label="Column Value" options={getFilterColumnValues(index)} initial="Select column value" onChange={(e) => {
-            updateFilterProp('columnValue', index, e.target.value)
-          }} value={filter.columnValue} disabled={!config.filters[index].columnName}/>
-        </SectionBlock>
-      ))}
-
-      {(!config.filters || config.filters.length === 0) &&
-        <p className="my-2" style={{ fontStyle: 'italic', textAlign: 'center' }}>There are currently no filters.</p>
-      }
-
-      <Button onClick={addNewFilter} fluid>Add Filter</Button>
+      <PanelFilters/>
     </Accordion.Section>
   )
 
@@ -199,7 +192,7 @@ const EditorPanels = () => {
 
       <InputSelect label="Layout" options={[ 'horizontal', 'vertical' ]} configField="orientation"/>
 
-      <Label tooltip={"Change the font size of the output value returned from the Data"}>Data Value Font Size</Label>
+      <Label tooltip={'Change the font size of the output value returned from the Data'}>Data Value Font Size</Label>
       <div className="cove-grid cove-grid--gap--2 mb-3">
         <div className="cove-grid__col--6">
           <InputText className="mb-0" type="number" configField="fontSize"/>
@@ -209,20 +202,24 @@ const EditorPanels = () => {
         </div>
       </div>
 
-      <InputSelect label="Overall Font Size" tooltip={"Change the overall font size of the entire component."} options={[ 'small', 'medium', 'large' ]} configField="overallFontSize"/>
-
+      <InputSelect
+        label="Overall Font Size"
+        tooltip={'Change the overall font size of the entire component.'}
+        options={[ 'small', 'medium', 'large' ]}
+        configField="overallFontSize"
+      />
     </Accordion.Section>
   )
 
-  return (
-    <>
+  return <>
+    <Accordion>
       {panelGeneral}
       {panelData}
       {panelFilters}
       {panelVisual}
-      {EditorPanelGlobal()}
-    </>
-  )
+      {PanelGlobal}
+    </Accordion>
+  </>
 }
 
 export default EditorPanels

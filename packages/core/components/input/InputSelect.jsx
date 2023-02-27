@@ -72,10 +72,10 @@ const InputSelect = memo((
     if (!isInitial(eventValue)) {
       // Update a config field value, if configField array was supplied
       if (configField) updateConfigField(configField, eventValue)
-
-      // Run any additional onChange functions supplied
-      if (onChange) onChange(e)
     }
+
+    // Run any additional onChange functions supplied
+    if (onChange) onChange(e)
 
     // Resets selected option to default if initialSnap is set
     // Used for multiple select options to add one, snap back to start, and allow another option to be selected;

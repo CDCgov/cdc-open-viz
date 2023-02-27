@@ -23,16 +23,12 @@ export const BITE_LOCATIONS = {
   'body': 'Value before Message'
 }
 
-export const IMAGE_POSITION_LEFT = 'Left'
-export const IMAGE_POSITION_RIGHT = 'Right'
-export const IMAGE_POSITION_TOP = 'Top'
-export const IMAGE_POSITION_BOTTOM = 'Bottom'
-export const IMAGE_POSITIONS = [
-  IMAGE_POSITION_LEFT,
-  IMAGE_POSITION_RIGHT,
-  IMAGE_POSITION_TOP,
-  IMAGE_POSITION_BOTTOM
-]
+export const IMAGE_POSITIONS = {
+  'left': 'Left',
+  'right': 'Right',
+  'top': 'Top',
+  'bottom': 'Bottom',
+}
 
 export const DATA_OPERATOR_LESS = '<'
 export const DATA_OPERATOR_GREATER = '>'

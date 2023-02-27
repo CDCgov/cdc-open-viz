@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce'
 
 import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
-import EditorPanelAdvanced from '@cdc/core/components/editor/EditorPanelAdvanced'
+import PanelAdvanced from '@cdc/core/components/editor/Panel.Advanced.jsx'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { useColorPalette } from '../hooks/useColorPalette'
@@ -1971,7 +1971,7 @@ const EditorPanel = () => {
               </AccordionItem>
             </Accordion>
           </form>
-          {config.type !== 'Spark Line' && <EditorPanelAdvanced loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
+          {config.type !== 'Spark Line' && <PanelAdvanced loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
     </ErrorBoundary>
