@@ -694,6 +694,18 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
+  const enabledChartTypes = [
+    'Pie',
+    'Line',
+    'Bar',
+    'Combo',
+    'Paired Bar',
+    'Spark Line',
+    'Area Chart',
+    'Scatter Plot',
+    'Box Plot'
+  ]
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -713,7 +725,7 @@ const EditorPanel = () => {
                   <AccordionItemButton>General</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line']} />
+                  <Select value={config.visualizationType} fieldName='visualizationType' label='Chart Type' updateField={updateField} options={enabledChartTypes} />
 
                   {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <Select value={config.visualizationSubType || 'Regular'} fieldName='visualizationSubType' label='Chart Subtype' updateField={updateField} options={['regular', 'stacked']} />}
                   {config.visualizationType === 'Bar' && <Select value={config.orientation || 'vertical'} fieldName='orientation' label='Orientation' updateField={updateField} options={['vertical', 'horizontal']} />}
@@ -897,13 +909,17 @@ const EditorPanel = () => {
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
                                               </div>
                                               <span>
-                                                <span className='series-list__dropdown'>{typeDropdown}</span>
-                                                <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
-                                                {config.series && config.series.length > 1 && (
-                                                  <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                    &#215;
-                                                  </button>
-                                                )}
+                                                {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') &&
+                                                  <>
+                                                    <span className='series-list__dropdown'>{typeDropdown}</span>
+                                                    <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
+                                                    {config.series && config.series.length > 1 && (
+                                                      <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                        &#215;
+                                                      </button>
+                                                    )}
+                                                  </>
+                                                }
                                               </span>
                                             </div>
                                           </li>
