@@ -19,7 +19,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "html2canvas": "^1.4.1",
-    "html2pdf.js": "^0.10.1",
     "papaparse": "^5.3.0",
     "prop-types": "^15.8.1",
     "react-accessible-accordion": "^5.0.0",
