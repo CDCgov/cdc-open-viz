@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BoxPlot } from '@visx/stats'
 import { Group } from '@visx/group'
 import ConfigContext from '../ConfigContext'
@@ -8,18 +8,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { transformedData: data, config, setConfig } = useContext(ConfigContext)
 
-  useEffect(() => {
-    if (config.visualizationType === 'Box Plot') {
-      console.log('setting config')
-      setConfig({
-        ...config,
-        legend: {
-          ...config.legend,
-          hide: true
-        }
-      })
-    }
-  }, [config])
+
 
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)

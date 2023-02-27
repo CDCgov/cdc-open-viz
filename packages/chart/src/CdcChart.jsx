@@ -149,6 +149,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     }
 
     let newConfig = { ...defaults, ...response }
+    if (newConfig.visualizationType === 'Box Plot') {
+      newConfig.legend.hide = true
+    }
     if (undefined === newConfig.table.show) newConfig.table.show = !isDashboard
     updateConfig(newConfig, data)
   }
