@@ -76,7 +76,8 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
       type='checkbox'
       name={fieldName}
       checked={value}
-      onChange={() => {
+      onChange={(e) => {
+        e.preventDefault()
         updateField(section, subsection, fieldName, !value)
       }}
       {...attributes}
@@ -316,6 +317,7 @@ const EditorPanel = () => {
       return
     }
 
+
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
@@ -327,7 +329,6 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-    console.log('section value', sectionValue)
 
     if (null !== subsection) {
       if (isArray) {
@@ -340,8 +341,10 @@ const EditorPanel = () => {
       }
     }
 
+
     let updatedConfig = { ...config, [section]: sectionValue }
 
+    console.log('section value', updatedConfig)
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
@@ -564,6 +567,7 @@ const EditorPanel = () => {
   useEffect(() => {
     // Pass up to Editor if needed
     if (setParentConfig) {
+      console.log('setting parent config')
       const newConfig = convertStateToConfig()
       setParentConfig(newConfig)
     }
@@ -1657,24 +1661,26 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  <CheckBox
-                    value={config.legend.hide}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <CheckBox value={config.legend.showLegendValuesTooltip} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
+                  {config.visualizationType !== "Box Plot" &&
+                    <CheckBox
+                      value={config.legend.hide ? true : false}
+                      section='legend'
+                      fieldName='hide'
+                      label='Hide Legend'
+                      updateField={updateField}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  }
+                  <CheckBox value={config.legend.showLegendValuesTooltip ? true : false} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
                     <Select value={config.legend.colorCode} section='legend' fieldName='colorCode' label='Color code by category' initial='Select' updateField={updateField} options={getDataValueOptions(data)} />

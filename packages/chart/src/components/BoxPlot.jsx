@@ -7,9 +7,6 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 const CoveBoxPlot = ({ xScale, yScale }) => {
   const { transformedData: data, config, setConfig } = useContext(ConfigContext)
-
-
-
   const boxWidth = xScale.bandwidth()
   const constrainedWidth = Math.min(40, boxWidth)
   const color_0 = colorPalettesChart[config?.palette][0] ? colorPalettesChart[config?.palette][0] : '#000'
@@ -25,6 +22,18 @@ const CoveBoxPlot = ({ xScale, yScale }) => {
       ${config.boxplot.labels.median}: ${d.columnMedian}
     `
   }
+
+  useEffect(() => {
+    if (config.legend.hide === false) {
+      setConfig({
+        ...config,
+        legend: {
+          ...config.legend,
+          hide: true
+        }
+      })
+    }
+  }, []);
   return (
     <ErrorBoundary component='BoxPlot'>
       <Group className='boxplot' key={`boxplot-group`}>
