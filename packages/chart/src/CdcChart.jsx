@@ -72,6 +72,14 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const handleChartTabbing = config.showSidebar ? `#legend` : config?.title ? `#dataTableSection__${config.title.replace(/\s/g, '')}` : `#dataTableSection`
 
+  const sortAsc = (a, b) => {
+    return a.toString().localeCompare(b.toString(), 'en', { numeric: true })
+  }
+
+  const sortDesc = (a, b) => {
+    return b.toString().localeCompare(a.toString(), 'en', { numeric: true })
+  }
+
   const handleChartAriaLabels = (state, testing = false) => {
     if (testing) console.log(`handleChartAriaLabels Testing On:`, state)
     try {
@@ -188,7 +196,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.filters.forEach((filter, index) => {
         let filterValues = []
 
-        filterValues = filter.orderedValues || generateValuesForFilter(filter.columnName, newExcludedData)
+        filterValues = filter.orderedValues || generateValuesForFilter(filter.columnName, newExcludedData).sort(filter.order === 'desc' ? sortDesc : sortAsc)
 
         newConfig.filters[index].values = filterValues
         // Initial filter should be active
