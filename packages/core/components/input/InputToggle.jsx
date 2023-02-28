@@ -25,13 +25,10 @@ const InputToggle = memo(({
 
                        configField,
                        value: inlineValue,
-                       className, ...attributes
+                       className, onClick, ...attributes
                      }) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || false)
@@ -61,7 +58,10 @@ const InputToggle = memo(({
     return typeArr[toggleType] || ''
   }
 
-  const onClickHandler = () => setValue(value => !value)
+  const onClickHandler = (e) => {
+    setValue(value => !value)
+    onClick && onClick(e)
+  }
 
   const tooltipCheck = () => {
     if (tooltip) return { 'data-has-tooltip': true }
@@ -72,7 +72,7 @@ const InputToggle = memo(({
 
   const TooltipLabel = () => (
     <div className="cove-input__toggle-group__label" {...tooltipArgs}>
-      <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
+      <Label tooltip={tooltip} onClick={onClickHandler}>{label}</Label>
     </div>
   )
 

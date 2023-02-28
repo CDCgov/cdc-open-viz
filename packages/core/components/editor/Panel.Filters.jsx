@@ -14,10 +14,7 @@ import SectionBlock from '../ui/SectionBlock'
 
 const PanelFilters = () => {
   // Store Selectors
-  const { config, updateConfig } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig
-  }))
+  const { config, updateConfig } = useConfigStore()
 
   const addNewFilter = () => {
     let newFilters = config.filters ? [ ...config.filters ] : []

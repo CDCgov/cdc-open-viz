@@ -20,12 +20,7 @@ const Editor = ({ editorPanels, children }) => {
   // Store Selectors
   const os = useGlobalStore((store) => store.os)
 
-  const { config, updateConfig, updateParentConfig, missingRequiredSections } = useConfigStore(state =>({
-    config: state.config,
-    updateConfig: state.updateConfig,
-    updateParentConfig: state.updateParentConfig,
-    missingRequiredSections: state.config.missingRequiredSections
-  }))
+  const { config, updateConfig, updateParentConfig } = useConfigStore()
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
   const [ displayGrid, setDisplayGrid ] = useState(false)
@@ -66,9 +61,9 @@ const Editor = ({ editorPanels, children }) => {
   // If missing any required sections, enable the confirmation window,
   // and keep active until receiving confirmation.
   useEffect(() => {
-    if (missingRequiredSections === true) setShowConfirm(true)
-    if (missingRequiredSections === false && showConfirm === true) setShowConfirm(false)
-  }, [ missingRequiredSections, showConfirm ])
+    if (config.missingRequiredSections === true) setShowConfirm(true)
+    if (config.missingRequiredSections === false && showConfirm === true) setShowConfirm(false)
+  }, [ config.missingRequiredSections, showConfirm ])
 
   // If there is no longer a confirmation, update the component's config.
   useEffect(() => {

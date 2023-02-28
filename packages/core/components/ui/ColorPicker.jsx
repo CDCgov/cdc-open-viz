@@ -22,10 +22,7 @@ import '../../styles/v2/components/ui/color-picker.scss'
 
 const ColorButton = ({ color }) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   const customAttrs = color === config.theme && { 'data-selected': true }
 

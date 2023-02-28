@@ -1,3 +1,4 @@
+import fetchAsyncUrl from './fetchAsyncUrl'
 import getDataColumns from './getDataColumns'
 
-export { getDataColumns }
+export { fetchAsyncUrl, getDataColumns }

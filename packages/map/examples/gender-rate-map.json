@@ -4,7 +4,7 @@
     "subtext": "Map subtext: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "type": "data",
     "geoType": "us",
-    "headerColor": "cyan",
+    "headerColor": "theme-cyan",
     "showSidebar": true,
     "showTitle": true,
     "showDownloadButton": true,

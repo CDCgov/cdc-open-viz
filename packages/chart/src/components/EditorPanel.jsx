@@ -7,7 +7,7 @@ import { useDebounce } from 'use-debounce'
 
 import ConfigContext from '../ConfigContext'
 import WarningImage from '../images/warning.svg'
-import PanelAdvanced from '@cdc/core/components/editor/Panel.Advanced.jsx'
+import PanelAdvanced from '@cdc/core/components/editor/Panel.Advanced'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import { useColorPalette } from '../hooks/useColorPalette'

@@ -13,6 +13,7 @@ import { format } from 'd3-format'
 import Papa from 'papaparse'
 import parse from 'html-react-parser'
 import { Base64 } from 'js-base64'
+import 'react-tooltip/dist/react-tooltip.css'
 
 // Primary Components
 import ConfigContext from './ConfigContext'

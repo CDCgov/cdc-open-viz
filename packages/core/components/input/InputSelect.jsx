@@ -29,10 +29,7 @@ const InputSelect = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) || '' : inlineValue)
 

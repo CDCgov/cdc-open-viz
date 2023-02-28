@@ -7,7 +7,7 @@ import LegendCircle from '@cdc/core/components/element/LegendCircle'
 import useLegendClasses from './../hooks/useLegendClasses'
 
 const Legend = () => {
-  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, setFilteredData, colorPalettes, rawData, setConfig } = useContext(ConfigContext)
+  const { config, legend, colorScale, seriesHighlight, highlight, highlightReset, setSeriesHighlight, dynamicLegendItems, setDynamicLegendItems, transformedData: data, colorPalettes, rawData, setConfig, currentViewport } = useContext(ConfigContext)
 
   const { innerClasses, containerClasses } = useLegendClasses(config)
 
@@ -106,6 +106,13 @@ const Legend = () => {
 
     return uniqeLabels
   }
+  // in small screens update config legend position.
+  useEffect(() => {
+    if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
+      setConfig({ ...config, legend: { ...config.legend, position: 'bottom' } })
+    }
+    setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
+  }, [currentViewport])
 
   if (!legend) return
 

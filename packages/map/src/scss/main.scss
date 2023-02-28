@@ -7,7 +7,7 @@
 .cdc-map-outer-container {
   position: relative;
   display: flex; // Needed for the main content
-  transform: scaleZ(1);
+  isolation: isolate;
 
   .loading > div.la-ball-beat {
     margin-top: 20%;

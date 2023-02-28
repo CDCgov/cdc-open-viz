@@ -29,7 +29,7 @@ const returnObjKeyValue = (key, obj) => {
 
 const ListGroupItem = ({ textValueKey, listData, canClear, options, optionsSection, optionsSubsection, removeAction, index }) => {
   // Store Selectors
-  const updateConfigField = useConfigStore(state => state.updateConfigField)
+  const { updateConfigField } = useConfigStore()
 
   const [ textWidth, setTextWidth ] = useState(0)
 

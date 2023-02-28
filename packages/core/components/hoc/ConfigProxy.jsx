@@ -1,97 +1,27 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, Suspense } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
 
 // Store
 import useConfigStore from '../../stores/configStore'
-
-// Helpers
-import dataTransform from '../../helpers/dataTransform'
-import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
+import RenderFallback from '../loader/RenderFallback'
 
 const ConfigProxy = ({ configObj, configUrl, setParentConfig, defaults = null, runtime = null, children }) => {
   // Store Selectors
-  const { setConfigDefaults, updateConfig } = useConfigStore(state =>({
-    setConfigDefaults: state.setConfigDefaults,
-    updateConfig: state.updateConfig
-  }))
-
-  const cycled = useRef(false)
-  const loadingConfig = useRef(true)
-
-  const transform = new dataTransform()
+  const { fetchConfig, processConfigDefaults, runConfigUpdater } = useConfigStore(state => state)
 
   useEffect(() => {
-    const fetchConfigUrl = async (url) => {
-      let urlObj = null
-      try {
-        const res = await fetch(url)
-        const text = await res.text()
-        urlObj = JSON.parse(text)
-      } catch (err) {
-        console.error('Supplied config URL is not in JSON format - invalid address?')
-      }
-      return urlObj
-    }
+    fetchConfig(configObj, configUrl) // Get initial configObj, or object from configUrl
+    processConfigDefaults(defaults) // Update the config with defaults
+    runConfigUpdater() // Run the updater for config entry maintenance
+  }, [configObj, configUrl, defaults, fetchConfig, processConfigDefaults, runConfigUpdater])
 
-    const fetchConfig = async () => {
-      // If defaults exist, store the default config context object in ConfigContext
-      if (defaults) setConfigDefaults({ ...defaults })
-
-      // Check if "data" is included through a URL, or directly, and set value
-      let response = configObj || await fetchConfigUrl(configUrl) || {}
-
-      let responseData = response.formattedData || response.data || []
-
-      // If a data URL is provided, fetch data then return. Overrides any previous data set.
-      if (response.dataUrl) {
-        const dataString = await fetch(response.dataUrl)
-        responseData = await dataString.json()
-
-        // If data from the URL has a "data description", use the standardization functions on that returned data
-        if (response.dataDescription) {
-          responseData = transform.autoStandardize(responseData)
-          responseData = transform.developerStandardize(responseData, response.dataDescription)
-        }
-      }
-
-      // If defaults exist, create the new config object with shallow merge of defaults and data
-      let newConfig = defaults ? { ...defaults, ...response } : { ...response }
-
-      // If defaults exist, create new keys on newConfig from defaults that don't exist
-      if (defaults) {
-        Object.keys(defaults).forEach(key => {
-          if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-            newConfig[key] = { ...defaults[key], ...newConfig[key] }
-          }
-        })
-      }
-
-      // Validates config file and updates any previous entries into new format
-      newConfig = coveUpdateWorker(newConfig)
-
-      newConfig.data = responseData // Attach data to newConfig
-
-      if (runtime) runtime(newConfig) // If provided a runtime function, run it on newConfig to transform
-
-      return newConfig
-    }
-
-    if (!cycled.current) {
-      fetchConfig()
-        .then((newConfig) => {
-          updateConfig(newConfig) // Set final config data in component
-          loadingConfig.current = false // Tell subcomponents that the config is ready
-        })
-        .catch(console.error)
-        .finally(() => {
-          cycled.current = true // Stop the config load cycle
-        })
-    }
-  }, [ configObj, configUrl ])
-
-  return (loadingConfig.current ? <></> : children)
+  return (
+    <Suspense fallback={<RenderFallback/>}>
+      {children}
+    </Suspense>
+  )
 }
 
 ConfigProxy.propTypes = {

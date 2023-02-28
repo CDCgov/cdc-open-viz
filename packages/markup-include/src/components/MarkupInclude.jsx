@@ -19,7 +19,7 @@ import AlertBox from '@cdc/core/components/ui/AlertBox'
 // Visualization
 const MarkupInclude = () => {
   // Store Selectors
-  const config = useConfigStore((state) => state.config)
+  const { config } = useConfigStore()
 
   const [ urlMarkup, setUrlMarkup ] = useState('')
   const [ markupError, setMarkupError ] = useState(null)

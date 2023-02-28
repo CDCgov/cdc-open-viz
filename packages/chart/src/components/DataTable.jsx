@@ -223,6 +223,7 @@ export default function DataTable() {
             }
           }}
         >
+          <Icon display={tableExpanded ? 'minus' : 'plus'} base/>
           {config.table.label}
         </div>
         <div className='table-container' hidden={!tableExpanded} style={{ maxHeight: config.table.limitHeight && `${config.table.height}px`, overflowY: 'scroll' }}>

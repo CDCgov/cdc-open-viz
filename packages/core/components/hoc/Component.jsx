@@ -19,10 +19,7 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
   // Store Selectors
   const setDimensions = useGlobalStore(state => state.setDimensions)
 
-  const { config, updateConfig } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig
-  }))
+  const { config, updateConfig } = useConfigStore()
 
   // Provide an example configObj for documentation purposes
   useEffect(() => {

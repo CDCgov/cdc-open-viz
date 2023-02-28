@@ -167,8 +167,7 @@ const UsaMap = props => {
       }
 
       return <Shape key={label} label={label} css={styles} text={styles.color} strokeWidth={1.5} textColor={textColor} onClick={() => geoClickHandler(territory, territoryData)}
-                    onMouseEnter={() => setTooltipAnchor(label)}
-                    onMouseLeave={() => setTooltipAnchor(null)}
+                    data-tooltip-id="tooltip"
                     data-tooltip-html={toolTip}
       />
     }
@@ -293,9 +292,9 @@ const UsaMap = props => {
         return (
           <g data-name={geoName} key={key}>
             <g className='geo-group' css={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)}
-               id={geoName} data-tooltip-html={tooltip}
-               onMouseEnter={() => setTooltipAnchor(geoName)}
-               onMouseLeave={() => setTooltipAnchor(null)}
+               id={geoName}
+               data-tooltip-id="tooltip"
+               data-tooltip-html={tooltip}
                >
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
               {(isHex || showLabel) && geoLabel(geo, legendColors[0], projection)}

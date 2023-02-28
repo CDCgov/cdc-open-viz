@@ -9,6 +9,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
+import 'react-tooltip/dist/react-tooltip.css'
 
 // Helpers
 import { publish } from '@cdc/core/helpers/events'
@@ -29,7 +30,7 @@ import MediaControls from '@cdc/core/components/ui/MediaControls'
 import Loading from '@cdc/core/components/loader/Loading'
 
 // Components - Local
-import Context from './context'
+import ConfigContext from './context'
 import Filters from './components/Filters'
 import Modal from './components/Modal'
 import Sidebar from './components/Sidebar'
@@ -927,12 +928,14 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Adds geo label, ie State: Georgia
     let stateOrCounty = state.general.geoType === 'us' ? 'State: ' : state.general.geoType === 'us-county' || state.general.geoType === 'single-state' ? 'County: ' : ''
+    // check the override
+    stateOrCounty = state.general.geoLabelOverride !== '' ? state.general.geoLabelOverride + ': ' : stateOrCounty
 
     if (state.general.geoType === 'us-county' && state.general.type !== 'us-geocode') {
       let stateFipsCode = row[state.columns.geo.name].substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
 
-      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>State:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
+      toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>Location:  ${stateName}</strong><br/>` : `<strong>${stateName}</strong><br/>`
     }
 
     toolTipText += !state.general.hideGeoColumnInTooltip ? `<strong>${stateOrCounty}${displayGeoName(geoName)}</strong>` : `<strong>${displayGeoName(geoName)}</strong>`
@@ -1281,6 +1284,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
   }, [ state.dataTable ])
 
+  // When geo label override changes
+  // - redo the tooltips
+  useEffect(() => {
+    applyTooltipsToGeo()
+  }, [state.general.geoLabelOverride])
+
   useEffect(() => {
     // UID
     if (state.data && state.columns.geo.name && state.columns.geo.name !== state.data.fromColumn) {
@@ -1445,18 +1454,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const tabId = handleMapTabbing()
 
   return (
-    <Context.Provider value={mapProps}>
+    <ConfigContext.Provider value={mapProps}>
       <div className={outerContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])}/>}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
             {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType &&
-              <ReactTooltip
-                place="right"
-                variant="light"
-                float={true}
-                className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`}
-              />
+              <ReactTooltip id="tooltip" variant="light" float={true} className={`${tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'}`} />
             }
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
@@ -1467,8 +1471,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                 </div>
               </header>
             )}
-
-            <div>{general.introText && <section className="introText">{parse(general.introText)}</section>}</div>
+            {general.introText &&
+              <section className='introText'>{parse(general.introText)}</section>
+            }
 
             <Filters/>
 
@@ -1570,7 +1575,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           {accessibleStatus}
         </div>
       </div>
-    </Context.Provider>
+    </ConfigContext.Provider>
   )
 }
 

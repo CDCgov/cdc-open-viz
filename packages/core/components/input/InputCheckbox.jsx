@@ -28,10 +28,7 @@ const InputCheckbox = memo((
     className, ...attributes
   }
 ) => {
-  const { config, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
   const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')

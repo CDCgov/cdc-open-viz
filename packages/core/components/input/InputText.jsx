@@ -30,10 +30,7 @@ const InputText = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   // Input will only accept either an inline value from the element, or a value from a connected config key
   const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render

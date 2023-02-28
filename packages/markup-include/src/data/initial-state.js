@@ -3,7 +3,7 @@ export default {
   showHeader: false,
   type: 'markup-include',
   srcUrl: '#example',
-  theme: 'blue',
+  theme: 'theme-blue',
   visual: {
     border: 'default',
     accent: 'none',

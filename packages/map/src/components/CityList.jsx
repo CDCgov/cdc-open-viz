@@ -75,8 +75,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
     const circle = <circle cx={0} cy={0} r={state.general.type === 'bubble' ? size(geoData[state.columns.primary.name]) : radius}
                            title='Click for more information'
                            onClick={() => geoClickHandler(cityDisplayName, geoData)}
+                           data-tooltip-id="tooltip"
                            data-tooltip-html={toolTip}
-                           data-tooltip-id='tooltip'
                            {...additionalProps}
     />
 
@@ -86,8 +86,8 @@ const CityList = ({ data, state, geoClickHandler, applyTooltipsToGeo, displayGeo
             onClick={() => geoClickHandler(cityDisplayName, geoData)}
             strokeWidth={2}
             stroke={'black'}
+            data-tooltip-id="tooltip"
             data-tooltip-html={toolTip}
-            data-tooltip-id='tooltip'
             {...additionalProps}
       />
     )

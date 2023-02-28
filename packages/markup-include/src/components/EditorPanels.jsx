@@ -6,9 +6,9 @@ import useConfigStore from '@cdc/core/stores/configStore'
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import AlertBox from '@cdc/core/components/ui/AlertBox'
-import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/input/InputText'
+import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 
 
 // COVE Refactor - TODO: Rename and lift this into core helpers
@@ -16,16 +16,13 @@ const isConfigEqual = (a, b) => (JSON.stringify(a) === JSON.stringify(b))
 
 const EditorPanels = ({ config: configFromParent, setParentConfig }) => {
   // Store Selectors
-  const { config } = useConfigStore(state => ({
-    config: state.config
-  }))
+  const { config } = useConfigStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   const [ configCache, setConfigCache ] = useState(configFromParent)
 
   useEffect(() => {
-    console.log('got config from parent', configFromParent)
-    // Update tempConfig cache if configFromParent changes
+    // Update configCache cache if configFromParent changes
     let newConfig = { ...configFromParent }
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
     delete newConfig.newViz
@@ -33,7 +30,7 @@ const EditorPanels = ({ config: configFromParent, setParentConfig }) => {
   }, [ configFromParent ])
 
   useEffect(() => {
-    // Pass tempConfig settings back up to parent, if one exists
+    // Pass configCache settings back up to parent, if one exists
     if (setParentConfig && !isConfigEqual(configCache, config.visualizations[configFromParent.uid]))
       setParentConfig(configCache)
   }, [ configCache, setParentConfig ])
