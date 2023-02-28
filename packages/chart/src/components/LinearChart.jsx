@@ -28,13 +28,11 @@ export default function LinearChart() {
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
   const [animatedChart, setAnimatedChart] = useState(false)
 
-  console.log("LinearChart data",data)
-  console.log("LinearChart config",config)
-
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
   })
+  
   // Make sure the chart is visible if in the editor
   useEffect(() => {
     const element = document.querySelector('.isEditor')
@@ -79,7 +77,7 @@ export default function LinearChart() {
     let min = enteredMinValue && isMinValid ? enteredMinValue : minValue
     let max = enteredMaxValue && isMaxValid ? enteredMaxValue : Number.MIN_VALUE
 
-    // do we need to consider Confidence Intervals?
+    // DEV-3263 - If Confidence Intervals in data, then need to account for increased height in max for YScale
     if (config.visualizationType === 'Bar' || config.visualizationType === 'Combo') {
       let ciYMax = 0;
       if (config.hasOwnProperty('confidenceKeys')) {
@@ -87,7 +85,7 @@ export default function LinearChart() {
           return d[config.confidenceKeys.upper]; 
         })
         ciYMax = Math.max.apply(Math, upperCIValues)
-        if (ciYMax > max) max = ciYMax
+        if (ciYMax > max) max = ciYMax // bump up the max
       } 
     }
 
