@@ -11,23 +11,20 @@ import { Group } from '@visx/group'
 import * as allCurves from '@visx/curve'
 import { useTooltip, useTooltipInPortal, defaultStyles } from '@visx/tooltip'
 import { localPoint } from '@visx/event'
+import { bisector } from 'd3-array'
+
 
 const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   const DEBUG = false
-  const { transformedData: data, config, handleLineType } = useContext(ConfigContext)
+  const { transformedData: data, config, handleLineType, parseDate, formatDate, setConfig, formatNumber, seriesHighlight } = useContext(ConfigContext)
   const { tooltipData, showTooltip } = useTooltip()
+
 
   let isEditor = window.location.href.includes('editor=true')
 
-  const tooltipStyles = {
-    ...defaultStyles,
-    fontSize: '13px',
-    borderRadius: '4px',
-    minWidth: '100px',
-    textAlign: 'left'
-  }
+
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
-    detectBounds: false,
+    detectBounds: true,
     // when tooltip containers are scrolled, this will correctly update the Tooltip position
     scroll: true
   })
@@ -37,20 +34,38 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
   const getXValueFromCoordinate = x => {
-    let eachBand = xScale.step()
-    let numerator = x
-    let denominator = eachBand
-    let innerOffset = eachBand - barThicknessAdjusted
-    const index = Math.floor(Number(numerator) / eachBand)
-    console.table({
-      eachBand,
-      numerator,
-      denominator,
-      innerOffset,
-      index
-    })
-    return xScale.domain()[index - 1] // fixes off by 1 error
+    if (config.xAxis.type === 'categorical') {
+      let eachBand = xScale.step()
+      let numerator = x
+      let denominator = eachBand
+      let innerOffset = eachBand - barThicknessAdjusted
+      const index = Math.floor(Number(numerator) / eachBand)
+      // console.table({
+      //   eachBand,
+      //   numerator,
+      //   denominator,
+      //   innerOffset,
+      //   index
+      // })
+      return xScale.domain()[index - 1] // fixes off by 1 error
+    }
+
+    if (config.xAxis.type === 'date') {
+      const bisectDate = bisector((d) => parseDate(d[config.xAxis.dataKey])).left;
+      const x0 = xScale.invert(x);
+      const index = bisectDate(config.data, x0, 1);
+      const d0 = config.data[index - 1] // unsure about these bisecting items at the moment.
+      const d1 = config.data[index - 1] // unsure about these bisecting items at the moment.
+      const d = d0 // unsure about these bisecting items at the moment.
+      const val = parseDate(config.data[index - 1][config.xAxis.dataKey]);
+      return val;
+    }
   }
+
+  // bounds
+  console.log('xMax', xMax)
+  console.log('yMax', yMax)
+
 
   const handleMouseOver = useCallback(
     (e, data) => {
@@ -58,38 +73,51 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       // get the svg coordinates of the mouse
       // and get the closest values
       const eventSvgCoords = localPoint(e)
-      const { x } = eventSvgCoords
+      const { x, y } = eventSvgCoords
+
       let closestXScaleValue = getXValueFromCoordinate(x)
-      const yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
+      let formattedDate = formatDate(closestXScaleValue)
+
+      let yScaleValues
+      if (config.xAxis.type === 'categorical') {
+        yScaleValues = data.filter(d => d[config.xAxis.dataKey] === closestXScaleValue)
+      } else {
+        yScaleValues = data.filter(d => d[config.xAxis.dataKey] === formattedDate)
+      }
+
       let seriesToInclude = []
       let yScaleMaxValues = []
       let itemsToLoop = [config.runtime.xAxis.dataKey, ...config.runtime.seriesKeys]
+
 
       itemsToLoop.map(seriesKey => {
         Object.entries(yScaleValues[0]).forEach((item) => item[0] === seriesKey && seriesToInclude.push(item))
       })
 
       // filter out the series that aren't added to the map.
-      console.log('series to include', seriesToInclude)
       seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
-
-      console.log('series', Object.fromEntries(seriesToInclude))
       seriesToInclude = Object.fromEntries(seriesToInclude)
+      console.log('y max', seriesToInclude)
+
 
       let tooltipData = {}
       tooltipData.data = seriesToInclude
-      console.log('tooltip data', tooltipData)
-      tooltipData.dataXPosition = 10
-      tooltipData.dataYPosition = yMax + 10
-
+      console.log('isEditor', isEditor)
+      console.log('isEditor', x + 20 + isEditor ? 300 : 0)
+      console.log('isEditor', x)
+      tooltipData.dataXPosition = isEditor ? 300 + x + 20 : x + 20
+      tooltipData.dataYPosition = y - 20
 
       let tooltipInformation = {
         tooltipData: tooltipData,
         tooltipTop: 0,
         tooltipValues: yScaleValues,
-        tooltipLeft: 20
+        tooltipLeft: x
       }
+
+      console.log('tooltip information', tooltipInformation.tooltipData)
       showTooltip(tooltipInformation)
+
     },
     [showTooltip]
   )
@@ -98,6 +126,12 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
   let leftOffset = isEditor ? 300 : 0 + Number(config.yAxis.size) + 16
   const tooltipOffset = { top: titleOffset, left: leftOffset }
 
+  const tooltip = (listArr) => {
+    return listArr[0] === config.xAxis.dataKey ?
+      `${listArr[0]}: ${listArr[1]}`
+      : `${listArr[0]}: ${formatNumber(listArr[1], 'left')}`
+  }
+
   return (
     data && (
       <ErrorBoundary component='AreaChart'>
@@ -105,16 +139,19 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
           {config.series.map((s, index) => {
             let seriesColor = colorPalettesChart[config.palette][index]
             let curveType = allCurves[s.lineType]
+            let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
+            let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
 
-            console.log('s', s.type)
-            console.log('handled', handleLineType(s.type))
+            console.log({ transparentArea, displayArea, seriesHighlight, s })
+
+            data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
 
             return (
               <>
                 {/* prettier-ignore */}
                 <LinePath
                   data={data}
-                  x={d => xScale(d[config.xAxis.dataKey])}
+                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
                   stroke={seriesColor}
                   strokeWidth={2}
@@ -127,10 +164,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 {/* prettier-ignore */}
                 <AreaClosed
                   key={'area-chart'}
-                  fill={seriesColor}
-                  fillOpacity={0.5}
+                  fill={displayArea ? seriesColor : 'transparent'}
+                  fillOpacity={transparentArea ? .25 : .5}
                   data={data}
-                  x={d => xScale(d[config.xAxis.dataKey])}
+                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
                   yScale={yScale}
                   curve={curveType}
@@ -139,7 +176,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 />
 
                 <Bar
-                  x={d => xScale(d[config.xAxis.dataKey])}
+                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
                   y={d => yScale(d[config.series[index].dataKey])}
                   yScale={yScale}
                   width={xMax}
@@ -149,12 +186,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
                 />
-                {console.log('tooo000000ltip', tooltipData?.data ? tooltipData?.data : null)}
                 {tooltipData &&
                   <circle
-                    cx={xScale(tooltipData.data[config.xAxis.dataKey])}
+                    cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
                     cy={yScale(tooltipData.data[s.dataKey])}
-                    dataTestx={d => Number(xScale(d[config.xAxis.dataKey]))}
                     r={4.5}
                     opacity={1}
                     fillOpacity={1}
@@ -181,14 +216,20 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                       />
                     )
                   })}
+                {console.log(tooltipData)}
 
                 {tooltipData && (
-                  <TooltipInPortal key={Math.random()} top={tooltipOffset.top} left={tooltipOffset.left} style={tooltipStyles}>
+                  <TooltipInPortal
+                    key={Math.random()}
+                    top={tooltipData.dataYPosition}
+                    left={tooltipData.dataXPosition}
+                    style={defaultStyles}
+                  >
                     <Group x={config.yAxis.size + 10} y={0}>
                       <ul style={{ listStyle: 'none', paddingLeft: 'unset' }}>
                         {Object.entries(tooltipData.data).map(item => (
                           <li>
-                            {item[0]} {item[1]}
+                            {tooltip(item)}
                           </li>
                         ))}
                       </ul>

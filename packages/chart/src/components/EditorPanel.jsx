@@ -17,9 +17,11 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
+import * as allCurves from '@visx/curve'
+
+console.log('alllll curves', allCurves)
 
 /* eslint-disable react-hooks/rules-of-hooks */
-
 const TextField = memo(({ label, tooltip, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', i = null, min = null, ...attributes }) => {
   const [value, setValue] = useState(stateValue)
 
@@ -901,6 +903,7 @@ const EditorPanel = () => {
                                         <option value='curveLinear'>Linear</option>
                                         <option value='curveNatural'>Natural</option>
                                         <option value='curveStep'>Step</option>
+                                        {Object.keys(allCurves).map(curveName => <option value={curveName}>{curveName}</option>)}
                                       </select>
                                     )
 
