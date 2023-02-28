@@ -284,6 +284,10 @@ const EditorPanel = () => {
     if (updatedConfig.table.show === undefined) {
       updatedConfig.table.show = !isDashboard
     }
+    // DEV-3293 - Force combo to always be vertical
+    if (updatedConfig.visualizationType === 'Combo') {
+      updatedConfig.orientation = "vertical"
+    }
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
