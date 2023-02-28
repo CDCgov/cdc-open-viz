@@ -48,7 +48,7 @@
   "barSpace": 20,
   "height": 300,
   "xAxis": {
-    "type": "categorical",
+    "type": "date",
     "hideAxis": false,
     "hideLabel": false,
     "hideTicks": false,
@@ -99,10 +99,11 @@
   "isPaletteReversed": false,
   "labels": false,
   "dataFormat": {
-    "commas": false,
+    "commas": true,
     "prefix": "",
     "suffix": " units",
-    "useFormat": true
+    "useFormat": true,
+    "abbreviated": true
   },
   "confidenceKeys": {},
   "visual": {
@@ -112,7 +113,7 @@
   },
   "data": [
     {
-      "Date": "1/15/2016",
+      "Date": "01/15/2016",
       "Data 1": "900",
       "Data 2": "135",
       "Data 3": "300",
@@ -121,7 +122,7 @@
       "Data 6": "310"
     },
     {
-      "Date": "2/15/2016",
+      "Date": "02/15/2016",
       "Data 1": "4000",
       "Data 2": "90",
       "Data 3": "240",
@@ -130,7 +131,7 @@
       "Data 6": "2000"
     },
     {
-      "Date": "3/15/2016",
+      "Date": "03/15/2016",
       "Data 1": "500",
       "Data 2": "300",
       "Data 3": "290",
@@ -139,7 +140,7 @@
       "Data 6": "250"
     },
     {
-      "Date": "4/15/2016",
+      "Date": "04/15/2016",
       "Data 1": "1200",
       "Data 2": "160",
       "Data 3": "230",
@@ -148,7 +149,7 @@
       "Data 6": "220"
     },
     {
-      "Date": "5/15/2016",
+      "Date": "05/15/2016",
       "Data 1": "8000",
       "Data 2": "350",
       "Data 3": "300",
@@ -157,7 +158,7 @@
       "Data 6": "100"
     },
     {
-      "Date": "6/15/2016",
+      "Date": "06/15/2016",
       "Data 1": "9000",
       "Data 2": "220",
       "Data 3": "320",

@@ -4,7 +4,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
-import { scaleLinear, scalePoint, scaleBand } from '@visx/scale'
+import { scaleLinear, scalePoint, scaleBand, scaleTime } from '@visx/scale'
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 
 import CoveScatterPlot from './ScatterPlot'
@@ -159,6 +159,13 @@ export default function LinearChart() {
       seriesScale = scalePoint({
         domain: config.runtime.barSeriesKeys || config.runtime.seriesKeys,
         range: [0, xMax]
+      })
+    }
+
+    if (config.visualizationType === 'Area Chart' && config.xAxis.type === 'date') {
+      xScale = scaleTime({
+        domain: [Math.min(...xAxisDataMapped), Math.max(...xAxisDataMapped)],
+        range: [0, xMax],
       })
     }
 
