@@ -19,9 +19,14 @@ const sortById = (a, b) => {
 // DATA
 const { features: counties } = feature(topoJSON, topoJSON.objects.counties)
 const { features: states } = feature(topoJSON, topoJSON.objects.states)
+
+// Sort states/counties data to ensure that countyIndecies logic below works
 states.sort(sortById)
 counties.sort(sortById)
 const mapData = states.concat(counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
+
+// For each state, find the beginning index and end index of the counties in that state in the mapData array
+// For use in hover logic (only check counties for hover in the state that is being hovered, instead of checking all counties)
 const countyIndecies = {}
 states.forEach(state => {
   let minIndex = mapData.length - 1
@@ -40,6 +45,7 @@ states.forEach(state => {
 // CREATE STATE LINES
 const projection = geoAlbersUsaTerritories()
 
+// Ensures county map is only rerendered when it needs to (when one of the variables below is updated)
 function CountyMapChecks(prevState, nextState) {
   const equalNumberOptIn = prevState.state.general.equalNumberOptIn && nextState.state.general.equalNumberOptIn
   const equalColumnName = prevState.state.general.type && nextState.state.general.type
@@ -80,6 +86,7 @@ const CountyMap = props => {
     const y = e.clientY - canvasBounds.top
     const pointCoordinates = projection.invert([x, y])
 
+    // Use d3 geoContains method to find the state geo data that the user clicked inside
     let clickedState
     for (let i = 0; i < states.length; i++) {
       if (geoContains(states[i], pointCoordinates)) {
@@ -88,6 +95,7 @@ const CountyMap = props => {
       }
     }
 
+    // If the user clicked outside of all states, no behavior
     if (clickedState) {
       // If a county within the state was also clicked and has data, call parent click handler
       if (countyIndecies[clickedState.id]) {
@@ -181,6 +189,7 @@ const CountyMap = props => {
     }
   }
 
+  // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
   const drawCanvas = (focusId, center) => {
     if (canvasRef.current && runtimeLegend.length > 0) {
       const canvas = canvasRef.current
@@ -198,32 +207,43 @@ const CountyMap = props => {
         canvas.setAttribute('data-center', null)
         if (resetButton.current) resetButton.current.style.display = 'none'
       } else {
+        // Saves focus info in case redraw is needed without changing focus (resize)
         canvas.setAttribute('data-focus', focusId)
         canvas.setAttribute('data-center', JSON.stringify(center))
         if (resetButton.current) resetButton.current.style.display = 'block'
       }
 
+      // Centers the projection on the paramter passed
       if (center) {
         projection.scale(canvas.width * 2.5)
         let offset = projection(center)
         projection.translate([-offset[0] + canvas.width, -offset[1] + canvas.height])
       }
 
+      // Erases previous renderings before redrawing map
       context.clearRect(0, 0, canvas.width, canvas.height)
 
+      // Enforces stroke style of the county lines
       context.lineWidth = 0.85
       context.strokeStyle = geoStrokeColor
 
       let focusIndex = -1
+      // Iterates through each state/county topo and renders it
       mapData.forEach((geo, i) => {
+        // If invalid geo item, don't render
         if (!geo.id) return
+        // If the map is focused on one state, don't render counties that are not in that state
         if (focusId && geo.id.length > 2 && geo.id.indexOf(focusId) !== 0) return
+
+        // Gets numeric data associated with the topo data for this state/county
         const geoData = data[geo.id]
 
+        // Marks that the focused state was found for the logic below
         if (geo.id === focusId) {
           focusIndex = i
         }
 
+        // Renders state/county
         context.fillStyle = geoData !== undefined ? applyLegendToRow(geoData)[0] : '#EEE'
         context.beginPath()
         path(geo)
@@ -231,6 +251,7 @@ const CountyMap = props => {
         context.stroke()
       })
 
+      // If the focused state is found in the geo data, render it with a thicker outline
       if (focusIndex !== -1) {
         context.lineWidth = 2
         context.strokeStyle = 'black'
@@ -241,6 +262,8 @@ const CountyMap = props => {
     }
   }
 
+  // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
+  // The resize function so it includes the latest state variables
   useEffect(() => {
     drawCanvas()
 
@@ -252,27 +275,19 @@ const CountyMap = props => {
 
     const debounceOnResize = debounce(onResize, 300)
 
-    setTimeout(() => {
-      window.addEventListener('resize', debounceOnResize)
-    }, 300)
+    window.addEventListener('resize', debounceOnResize)
 
     return () => window.removeEventListener('resize', debounceOnResize)
   })
 
+  // If runtimeData is not defined, show loader
   if (!data) <Loading />
+
   return (
     <ErrorBoundary component='CountyMap'>
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: '100%'
-        }}
-        aria-label={handleMapAriaLabels(state)}
-        onMouseMove={canvasHover}
-        onClick={canvasClick}
-      ></canvas>
-      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip' style={{ position: 'fixed', backgroundColor: 'white', pointerEvents: 'none', display: 'none' }}></div>
-      <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} style={{ display: 'none' }} tabIndex='0'>
+      <canvas ref={canvasRef} aria-label={handleMapAriaLabels(state)} onMouseMove={canvasHover} onClick={canvasClick}></canvas>
+      <div ref={tooltipRef} id='canvas-tooltip' className='tooltip'></div>
+      <button className={`btn btn--reset`} onClick={onReset} ref={resetButton} tabIndex='0'>
         Reset Zoom
       </button>
     </ErrorBoundary>
