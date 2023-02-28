@@ -68,7 +68,7 @@ const TextField = ({ label, section = null, subsection = null, fieldName, update
 }
 
 const EditorPanel = props => {
-  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend } = props
+  const { state, columnsInData = [], loadConfig, setState, isDashboard, setParentConfig, setRuntimeFilters, runtimeFilters, runtimeLegend, changeFilterActive} = props
 
   const { general, columns, legend, dataTable, tooltips } = state
 
@@ -1109,6 +1109,7 @@ const EditorPanel = props => {
             value={filter.order}
             onChange={e => {
               changeFilter(index, 'filterOrder', e.target.value)
+              changeFilterActive(index, filter.values[0])
             }}
           >
             {filterOptions.map((option, index) => {
