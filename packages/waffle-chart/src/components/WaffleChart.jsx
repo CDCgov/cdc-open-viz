@@ -228,5 +228,4 @@ const WaffleChart = () => {
   </>
 }
 
-
 export default WaffleChart

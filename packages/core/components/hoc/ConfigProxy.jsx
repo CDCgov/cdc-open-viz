@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
-import useGlobalStore from '../../stores/globalStore'
 import useConfigStore from '../../stores/configStore'
 
 // Helpers
@@ -13,21 +12,15 @@ import coveUpdateWorker from '../../helpers/update/coveUpdateWorker'
 
 const ConfigProxy = ({ configObj, configUrl, setParentConfig, defaults = null, runtime = null, children }) => {
   // Store Selectors
-  const viewMode = useGlobalStore((state) => state.viewMode)
-
-  const { setConfigDefaults, updateConfig, updateParentConfig, setUpdateParentConfig } = useConfigStore(state =>({
+  const { setConfigDefaults, updateConfig } = useConfigStore(state =>({
     setConfigDefaults: state.setConfigDefaults,
-    updateConfig: state.updateConfig,
-    updateParentConfig: state.updateParentConfig,
-    setUpdateParentConfig: state.setUpdateParentConfig
+    updateConfig: state.updateConfig
   }))
 
   const cycled = useRef(false)
   const loadingConfig = useRef(true)
 
   const transform = new dataTransform()
-
-  if (setParentConfig && !updateParentConfig) setUpdateParentConfig(setParentConfig)
 
   useEffect(() => {
     const fetchConfigUrl = async (url) => {
@@ -80,9 +73,6 @@ const ConfigProxy = ({ configObj, configUrl, setParentConfig, defaults = null, r
 
       newConfig.data = responseData // Attach data to newConfig
 
-      // Make config entry for table visibility - TODO: COVE Refactor - May no longer need with global context inclusion of view mode?
-      if (newConfig.table && undefined === newConfig.table.show) newConfig.table.show = 'dashboard' === viewMode
-
       if (runtime) runtime(newConfig) // If provided a runtime function, run it on newConfig to transform
 
       return newConfig
@@ -91,7 +81,7 @@ const ConfigProxy = ({ configObj, configUrl, setParentConfig, defaults = null, r
     if (!cycled.current) {
       fetchConfig()
         .then((newConfig) => {
-          updateConfig(newConfig) // Set final config data in configStore
+          updateConfig(newConfig) // Set final config data in component
           loadingConfig.current = false // Tell subcomponents that the config is ready
         })
         .catch(console.error)
@@ -112,7 +102,7 @@ ConfigProxy.propTypes = {
   /** A json object containing any default, baseline values for a visualization. */
   defaults: PropTypes.object,
   /** A visualization-specific function, or hook, that is run against the resolved *configObj* or *configURL* object; returns a modified object with those processed values */
-  runtime: PropTypes.func,
+  runtime: PropTypes.func
 }
 
 export default ConfigProxy

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useCallback, useRef } from 'react'
 
 // Third Party
 import PropTypes from 'prop-types'
@@ -13,7 +13,7 @@ import Overlay from '../ui/Overlay'
 // Styles
 import '../../styles/v2/main.scss'
 
-const View = ({ editorPanels, children }) => {
+const View = ({ editorPanels, isPreview, children }) => {
   // Store Selectors
   const { viewMode, setViewMode } = useGlobalStore(state => ({
     viewMode: state.viewMode,
@@ -28,29 +28,38 @@ const View = ({ editorPanels, children }) => {
     }
   }, [ winLocation, setViewMode ])
 
-  const { isEditor, isDashboard, isPreview, isWizard } = viewMode
+  const { isEditor, isDashboard, isWizard } = viewMode
 
   // Define the anchor ref to attach Overlay/Modals
   const overlayAnchor = useRef()
 
-  let view = <>{children}</>
+  const ReturnView = useCallback(() => {
+      // Render the display of the component editor, based on the generated viewMode value in globalStore
+      if (
+        (isEditor && (!isDashboard && !isWizard)) || // If editor mode is enabled, but not in Dashboard or Wizard views
+        (isEditor && isDashboard && !isPreview) || // If editor mode is enabled, and in Dashboard view, but not in preview mode
+        isWizard // If in the Wizard view
+      ) {
+        return (
+          <Editor editorPanels={editorPanels}>
+            {children}
+          </Editor>
+        )
+      }
+      return <>{children}</>
+    },
+    [ isEditor, isDashboard, isWizard, isPreview ]
+  )
 
-  // Render the display of the component editor, based on the generated viewMode value in globalStore
-  if (
-    (isEditor && (!isDashboard && !isWizard)) || // If editor mode is enabled, but not in Dashboard or Wizard views
-    (isEditor && isDashboard && !isPreview) || // If editor mode is enabled, and in Dashboard view, but not in preview mode
-    isWizard // If in the Wizard view
-  ) {
-    view = (
-      <Editor editorPanels={editorPanels}>
-        {children}
-      </Editor>
-    )
-  }
-
+  if (isDashboard || isWizard) return (
+    <>
+      <ReturnView/>
+      <Overlay/>
+    </>
+  )
   return (
     <div className="cove" ref={overlayAnchor}>
-      {view}
+      <ReturnView/>
       <Overlay/>
     </div>
   )

@@ -9,8 +9,8 @@ import InputText from '@cdc/core/components/input/InputText'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import dataTransform from '@cdc/core/helpers/dataTransform'
-import InputCheckbox from '@cdc/core/components/input/InputCheckbox.jsx'
-import Button from '@cdc/core/components/element/Button.jsx'
+import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
+import Button from '@cdc/core/components/element/Button'
 
 
 const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = null }) => {
@@ -131,7 +131,7 @@ const Header = ({ setPreview, tabSelected, setTabSelected, back, subEditor = nul
       let tempConfig = { ...config.dashboard }
       tempConfig.sharedFilters[index] = filter
 
-      updateConfig({ ...config, dashboard: tempConfig })
+      updateConfig({ dashboard: tempConfig })
 
       toggleOverlay()
     }

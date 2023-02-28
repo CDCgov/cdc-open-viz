@@ -10,11 +10,17 @@ $editorAnimationTimer: 400ms;
   position: relative;
   height: 100vh;
   max-height: 100%;
-  transform: scale(1); //Set baseline for fixed position
   overflow: hidden;
+  isolation: isolate;
 
-  @at-root .cove-tabs #{&} {
-    height: calc(100vh - #{$wizardTabsHeight});
+  @at-root {
+    .cove-dashboard #{&} {
+      height: calc(100vh - 3rem);
+    }
+
+    .cove-tabs #{&} {
+      height: calc(100vh - #{$wizardTabsHeight});
+    }
   }
 }
 
@@ -102,7 +108,8 @@ $editorAnimationTimer: 400ms;
   overflow: hidden auto;
 }
 
-.cove-editor__panel-config {}
+.cove-editor__panel-config {
+}
 
 .cove-editor__divider {
   margin-top: 1.5rem;
@@ -140,6 +147,10 @@ $editorAnimationTimer: 400ms;
   transition: max-width $editorAnimationTimer $transition-expo-out;
 
   @at-root {
+    .cove-dashboard #{&} {
+      min-height: calc(100vh - 3rem);
+    }
+
     .cove-tabs #{&} {
       min-height: calc(100vh - #{$wizardTabsHeight});
     }

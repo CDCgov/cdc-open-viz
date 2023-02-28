@@ -28,7 +28,6 @@ const Accordion = ({ children }) => {
     setActiveChildren(children)
   }, [ children ])
 
-
   const childNodes = Children.toArray(activeChildren)
   const accordionSections = childNodes.filter(child => child?.type === AccordionSection) || activeChildren
 

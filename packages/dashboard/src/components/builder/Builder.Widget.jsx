@@ -112,31 +112,17 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
   })
 
   const deleteWidget = () => {
-    /*let rows = config.rows
-    let visualizations = config.visualizations
-
-    rows[data.rowIdx][data.colIdx].widget = null
-
-    delete visualizations[data.uid]*/
-
     updateConfigField([ 'rows', data.rowIdx, data.colIdx, 'widget' ], null)
 
-    /*const uid = data.uid
-    let { [uid]: _, ...rest } = config.visualizations
-
-    updateConfigField('visualizations', rest)*/
-
-    /*if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
-      const filters = [ ...config.dashboard.sharedFilters ]
+    if (config.dashboard.sharedFilters && config.dashboard.sharedFilters.length > 0) {
+      let filters = [ ...config.dashboard.sharedFilters ]
       filters.forEach(sharedFilter => {
         if (sharedFilter.usedBy.indexOf(data.uid) !== -1) {
           sharedFilter.usedBy.splice(sharedFilter.usedBy.indexOf(data.uid), 1)
         }
       })
       updateConfigField(['dashboard', 'sharedFilters'], filters)
-    }*/
-
-    /*updateConfig({ ...config, rows, visualizations })*/
+    }
   }
 
   const editWidget = () => {
@@ -150,7 +136,6 @@ const BuilderWidget = ({ data = {}, addVisualization, type }) => {
 
     targetVisualization[uid].dataKey = value
 
-    console.log(config.visualizations)
     updateConfig({
       visualizations: {
         ...config.visualizations,

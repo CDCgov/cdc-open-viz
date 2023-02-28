@@ -20,9 +20,10 @@ import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
 import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
 
 const EditorPanels = () => {
-  const { config, updateConfig, updateParentConfig, setMissingRequiredSections } = useConfigStore(state => ({
+  // Store Selectors
+  const { config, updateConfigField, updateParentConfig, setMissingRequiredSections } = useConfigStore(state => ({
     config: state.config,
-    updateConfig: state.updateConfig,
+    updateConfigField: state.updateConfigField,
     updateParentConfig: state.updateParentConfig,
     setMissingRequiredSections: state.setMissingRequiredSections
   }))
@@ -56,14 +57,14 @@ const EditorPanels = () => {
     let operators = [ '<', '>', '<=', '>=' ]
     if (config.dataConditionalComparate !== '') {
       if (operators.indexOf(config.dataConditionalOperator) > -1 && isNaN(config.dataConditionalComparate)) {
-        updateConfig({ ...config, invalidComparate: true })
+        updateConfigField('invalidComparate', true )
       } else {
         if (config.invalidComparate) {
-          updateConfig({ ...config, invalidComparate: false })
+          updateConfigField('invalidComparate', false )
         }
       }
     } else {
-      updateConfig({ ...config, invalidComparate: false })
+      updateConfigField('invalidComparate', false )
     }
   }, [ config.dataConditionalOperator, config.dataConditionalComparate ])
 

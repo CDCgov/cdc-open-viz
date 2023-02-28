@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 // Store
 import useGlobalStore from '@cdc/core/stores/globalStore'
@@ -32,7 +32,7 @@ const RowMenu = ({ rowIdx, row }) => {
     return res.join('')
   }
 
-  const [ curr, setCurr ] = useState(getCurr())
+  const [ layout, setLayout ] = useState(getCurr())
   const [ equalHeight, setEqualHeight ] = useState(false)
 
   const setRowLayout = (layout) => {
@@ -45,7 +45,7 @@ const RowMenu = ({ rowIdx, row }) => {
     }
 
     updateConfigField(['rows', rowIdx], newRow)
-    setCurr(layout.join(''))
+    setLayout(layout.join(''))
   }
 
   const moveRow = (dir = 'down') => {
@@ -108,7 +108,7 @@ const RowMenu = ({ rowIdx, row }) => {
   const layoutList = [
     <li className="cove-dashboard__builder__row-layout-utils--item"
         title="1 Column"
-        data-selected={curr === '12'}
+        data-selected={layout === '12'}
         onClick={() => setRowLayout([ 12 ])}
         key="12"
     >
@@ -116,7 +116,7 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>,
     <li className="cove-dashboard__builder__row-layout-utils--item"
         title="2 Columns"
-        data-selected={curr === '66'}
+        data-selected={layout === '66'}
         onClick={() => setRowLayout([ 6, 6 ])}
         key="66"
     >
@@ -124,7 +124,7 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>,
     <li className="cove-dashboard__builder__row-layout-utils--item"
         title="3 Columns"
-        data-selected={curr === '444'}
+        data-selected={layout === '444'}
         onClick={() => setRowLayout([ 4, 4, 4 ])}
         key="444"
     >
@@ -132,7 +132,7 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>,
     <li className="cove-dashboard__builder__row-layout-utils--item"
         title="2 Columns"
-        data-selected={curr === '48'}
+        data-selected={layout === '48'}
         onClick={() => setRowLayout([ 4, 8 ])}
         key="48"
     >
@@ -140,7 +140,7 @@ const RowMenu = ({ rowIdx, row }) => {
     </li>,
     <li className="cove-dashboard__builder__row-layout-utils--item"
         title="2 Columns"
-        data-selected={curr === '84'}
+        data-selected={layout === '84'}
         onClick={() => setRowLayout([ 8, 4 ])}
         key="84"
     >
@@ -181,6 +181,12 @@ const RowMenu = ({ rowIdx, row }) => {
 }
 
 const BuilderRow = ({ row, idx: rowIdx, uuid }) => {
+  const GenerateColumn = useCallback(({ column, colIdx, rowIdx }) => (
+      <BuilderColumn columnData={column} rowIdx={rowIdx} colIdx={colIdx}/>
+    ),
+    [ row ]
+  );
+
   return (
     <div className="cove-dashboard__builder__row" data-row-id={rowIdx}>
       <RowMenu rowIdx={rowIdx} row={row}/>
@@ -188,7 +194,7 @@ const BuilderRow = ({ row, idx: rowIdx, uuid }) => {
         {row
           .filter(column => column.width)
           .map((column, colIdx) => (
-            <BuilderColumn data={column} key={`row-${uuid}-col-${colIdx}`} rowIdx={rowIdx} colIdx={colIdx}/>
+            <GenerateColumn column={column} uuid={uuid} colIdx={colIdx} rowIdx={rowIdx} key={`row-${uuid}-col-${colIdx}`}/>
           ))}
       </div>
     </div>

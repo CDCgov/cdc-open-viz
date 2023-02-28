@@ -6,7 +6,6 @@ const globalStore = (set) => ({
   viewMode: {
     isEditor: false,
     isDashboard: false,
-    isPreview: false,
     isWizard: false
   },
   os: navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null,

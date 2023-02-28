@@ -21,6 +21,7 @@ import filterData from '@cdc/core/helpers/filterData'
 
 // Components - Core
 import MediaControls from '@cdc/core/components/ui/MediaControls'
+import RenderFallback from '@cdc/core/components/loader/RenderFallback'
 
 // Components - Local
 import Builder from './builder/Builder'
@@ -28,14 +29,13 @@ import BuilderWidget from './builder/Builder.Widget'
 import DataTable from './DataTable'
 import Header from './Header'
 
-// Visualization
-import CdcMap from '@cdc/map'
-import CdcChart from '@cdc/chart'
-import CdcDataBite from '@cdc/data-bite'
-import CdcWaffleChart from '@cdc/waffle-chart'
-import CdcMarkupInclude from '@cdc/markup-include'
-import CdcFilteredText from '@cdc/filtered-text'
-import RenderFallback from '@cdc/core/components/loader/RenderFallback.jsx'
+// Visualizations
+import CdcMap from '@cdc/map/src/CdcMap'
+import CdcChart from '@cdc/chart/src/CdcChart'
+import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
+import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
+import { CdcMarkupIncludeReadonly } from '@cdc/markup-include/src/CdcMarkupInclude'
+import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 
 const addVisualization = (type, subType) => {
   let modalWillOpen = type === 'markup-include' ? false : true
@@ -403,6 +403,7 @@ const Dashboard = () => {
         }
 
         const updateSubConfig = newConfig => {
+          console.log('called updateSubConfig to set newConfig', newConfig)
           let dataCorrectedConfig = visualizationConfig.originalFormattedData
             ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData }
             : { ...newConfig }
@@ -432,7 +433,11 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Data Bite"/>
-                <CdcDataBite key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcDataBite
+                  config={visualizationConfig}
+                  setParentConfig={updateSubConfig}
+                  key={visualizationKey}
+                />
               </>
             )
             break
@@ -440,7 +445,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Waffle Chart"/>
-                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcWaffleChart key={visualizationKey} config={visualizationConfig} setParentConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break
@@ -448,7 +453,12 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
-                <CdcMarkupInclude key={visualizationKey} config={visualizationConfig} setParentConfig={updateSubConfig} isDashboard={true}/>
+                <CdcMarkupIncludeReadonly
+                  config={visualizationConfig}
+                  setParentConfig={updateSubConfig}
+                  isDashboard={true}
+                  key={visualizationKey}
+                />
               </>
             )
             break
@@ -456,7 +466,7 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Filtered Text"/>
-                <CdcFilteredText key={visualizationKey} config={visualizationConfig} setConfig={updateSubConfig} isDashboard={true}/>
+                <CdcFilteredText key={visualizationKey} config={visualizationConfig} setParentConfig={updateSubConfig} isDashboard={true}/>
               </>
             )
             break
@@ -571,45 +581,42 @@ const Dashboard = () => {
                               )}
                               {visualizationConfig.type === 'data-bite' && (
                                 <CdcDataBite
-                                  key={col.widget}
                                   config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
+                                  setParentConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
-                                  isDashboard={true}
+                                  isPreview={true}
+                                  key={col.widget}
                                 />
                               )}
                               {visualizationConfig.type === 'waffle-chart' && (
                                 <CdcWaffleChart
-                                  key={col.widget}
                                   config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
+                                  setParentConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
-                                  isDashboard={true}
-                                  link={config.table && config.table.show && config.datasets ? tableLink : undefined}
+                                  isPreview={true}
+                                  key={col.widget}
                                 />
                               )}
                               {visualizationConfig.type === 'markup-include' && (
-                                <CdcMarkupInclude
-                                  key={col.widget}
+                                <CdcMarkupIncludeReadonly
                                   config={visualizationConfig}
-                                  setConfig={newConfig => {
+                                  setParentConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
+                                  isPreview={true}
+                                  key={col.widget}
                                 />
                               )}
                               {visualizationConfig.type === 'filtered-text' && (
                                 <CdcFilteredText
-                                  key={col.widget}
                                   config={visualizationConfig}
-                                  isEditor={false}
-                                  setConfig={newConfig => {
+                                  setParentConfig={newConfig => {
                                     updateChildConfig(col.widget, newConfig)
                                   }}
-                                  isDashboard={true}
+                                  isPreview={true}
+                                  key={col.widget}
                                 />
                               )}
                             </div>
@@ -690,7 +697,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContext.Provider value={contextValues}>
-      <div className={`cove-dashboard${isSubEditor.current ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
+      <div className={`cove cove-dashboard${isSubEditor.current ? ' cove-dashboard--subviz' : ''}`} data-download-id={imageId}>
         {body}
       </div>
     </DashboardContext.Provider>
