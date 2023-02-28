@@ -13,17 +13,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   // calling clean several times on same set of data (TT)
   const cleanedData = cleanData(data, config.xAxis.dataKey)
 
-  // DEV-3263 if Confidence Intervals then you need to increase yMax to account for them
-  console.log("yMax",yMax)
-  console.log("data",data)
-/*   data.keys(config.confidenceKeys).length > 0
-    ? data.map(d => {
-
-        let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-        let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
-    }) */
-  //yMax = 
-
   const { orientation, visualizationSubType } = config
   const isHorizontal = orientation === 'horizontal'
 
@@ -88,10 +77,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
 
     // calculate height of container based height, space and fontSize of labels
     let totalHeight = barsArr.length * (barHeight + labelHeight + barSpace)
-
-console.log("heights",heights)
-console.log("config.confidenceKeys",config.confidenceKeys)
-console.log("totalHeight",totalHeight)
 
     if (isHorizontal) {
       config.heights.horizontal = totalHeight
@@ -503,25 +488,49 @@ console.log("totalHeight",totalHeight)
 
             {Object.keys(config.confidenceKeys).length > 0
               ? data.map(d => {
-                  let xPos = xScale(getXAxisData(d))
-                  let upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
-                  let lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                  let xPos, yPos
+                  let upperPos
+                  let lowerPos 
                   let tickWidth = 5
+                  // DEV-3264 Make Confidence Intervals work on horizontal bar charts
+                  if (orientation === 'horizontal') {
+                    yPos = yScale(getXAxisData(d)) - (0.75 * config.barHeight)
+                    upperPos = xScale(getYAxisData(d, config.confidenceKeys.upper))
+                    lowerPos = xScale(getYAxisData(d, config.confidenceKeys.lower))
+                    return (
+                      <path
+                        key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                        stroke='#333'
+                        strokeWidth='px'
+                        d={`
+                        M${lowerPos} ${yPos - tickWidth} 
+                        L${lowerPos} ${yPos + tickWidth} 
+                        M${lowerPos} ${yPos} 
+                        L${upperPos} ${yPos} 
+                        M${upperPos} ${yPos - tickWidth} 
+                        L${upperPos} ${yPos + tickWidth} `}
+                      />
+                    )
+                  } else {
+                    xPos = xScale(getXAxisData(d))
+                    upperPos = yScale(getYAxisData(d, config.confidenceKeys.lower))
+                    lowerPos = yScale(getYAxisData(d, config.confidenceKeys.upper))
+                    return (
+                      <path
+                        key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
+                        stroke='#333'
+                        strokeWidth='px'
+                        d={`
+                        M${xPos - tickWidth} ${upperPos}
+                        L${xPos + tickWidth} ${upperPos}
+                        M${xPos} ${upperPos}
+                        L${xPos} ${lowerPos}
+                        M${xPos - tickWidth} ${lowerPos}
+                        L${xPos + tickWidth} ${lowerPos}`}
+                      />
+                    )
+                  }
 
-                  return (
-                    <path
-                      key={`confidence-interval-${d[config.runtime.originalXAxis.dataKey]}`}
-                      stroke='#333'
-                      strokeWidth='px'
-                      d={`
-                  M${xPos - tickWidth} ${upperPos}
-                  L${xPos + tickWidth} ${upperPos}
-                  M${xPos} ${upperPos}
-                  L${xPos} ${lowerPos}
-                  M${xPos - tickWidth} ${lowerPos}
-                  L${xPos + tickWidth} ${lowerPos}`}
-                    />
-                  )
                 })
               : ''}
           </Group>
