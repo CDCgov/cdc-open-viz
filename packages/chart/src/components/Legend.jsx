@@ -111,7 +111,7 @@ const Legend = () => {
     if (currentViewport === 'sm' || currentViewport === 'xs' || config.legend.position === 'left') {
       setConfig({ ...config, legend: { position: 'bottom' } })
     }
-    return () => setConfig({ ...config, legend: { position: 'right' } })
+    return () => setConfig({ ...config, legend: { ...config.legend, position: 'right' } })
   }, [currentViewport])
 
   if (!legend) return
