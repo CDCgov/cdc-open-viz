@@ -184,6 +184,9 @@ export default function ChooseTab() {
             <Tooltip.Content>Use bars to show comparisons between data categories.</Tooltip.Content>
           </Tooltip>
         </li>
+      </ul>
+
+      <ul className='grid cove-temp'>
         {/* temporarily hiding these */}
         <li>
           <Tooltip>
