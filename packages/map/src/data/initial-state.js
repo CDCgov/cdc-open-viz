@@ -53,6 +53,7 @@ export default {
     unified: false,
     singleColumn: false,
     singleRow: false,
+    showSpecialClassesLast: false,
     dynamicDescription: false,
     type: 'equalnumber',
     numberOfItems: 3,
