@@ -1,11 +1,11 @@
-import React, { useContext, useCallback, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 
 // cdc
 import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
-// visx
+// visx & d3
 import { AreaClosed, LinePath, Bar } from '@visx/shape'
 import { Group } from '@visx/group'
 import * as allCurves from '@visx/curve'
@@ -15,38 +15,47 @@ import { bisector } from 'd3-array'
 
 
 const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
+
+  // enable various console logs in the file
   const DEBUG = false
-  const { transformedData: data, config, handleLineType, parseDate, formatDate, setConfig, formatNumber, seriesHighlight } = useContext(ConfigContext)
+
+  // import data from context
+  const {
+    transformedData: data,
+    config,
+    handleLineType,
+    parseDate,
+    formatDate,
+    formatNumber,
+    seriesHighlight
+  } = useContext(ConfigContext)
+
+  // import tooltip helpers
   const { tooltipData, showTooltip } = useTooltip()
 
-
+  // used for offset on tooltip hover
   let isEditor = window.location.href.includes('editor=true')
 
-
-  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+  // here we're inside of the svg,
+  // it appears we need to use TooltipInPortal.
+  const { TooltipInPortal } = useTooltipInPortal({
     detectBounds: true,
     // when tooltip containers are scrolled, this will correctly update the Tooltip position
     scroll: true
   })
 
+  // Draw transparent bars over the chart to get tooltip data
+  // Turn DEBUG on for additional context.
   let barThickness = xMax / config.data.length
   let barThicknessAdjusted = barThickness * (config.barThickness || 0.8)
   let offset = (barThickness * (1 - (config.barThickness || 0.8))) / 2
 
+  // Tooltip helper for getting data to the closest date/category hovered.
   const getXValueFromCoordinate = x => {
     if (config.xAxis.type === 'categorical') {
       let eachBand = xScale.step()
       let numerator = x
-      let denominator = eachBand
-      let innerOffset = eachBand - barThicknessAdjusted
       const index = Math.floor(Number(numerator) / eachBand)
-      // console.table({
-      //   eachBand,
-      //   numerator,
-      //   denominator,
-      //   innerOffset,
-      //   index
-      // })
       return xScale.domain()[index - 1] // fixes off by 1 error
     }
 
@@ -54,18 +63,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
       const bisectDate = bisector((d) => parseDate(d[config.xAxis.dataKey])).left;
       const x0 = xScale.invert(x);
       const index = bisectDate(config.data, x0, 1);
-      const d0 = config.data[index - 1] // unsure about these bisecting items at the moment.
-      const d1 = config.data[index - 1] // unsure about these bisecting items at the moment.
-      const d = d0 // unsure about these bisecting items at the moment.
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey]);
       return val;
     }
   }
-
-  // bounds
-  console.log('xMax', xMax)
-  console.log('yMax', yMax)
-
 
   const handleMouseOver = useCallback(
     (e, data) => {
@@ -91,20 +92,15 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
 
 
       itemsToLoop.map(seriesKey => {
-        Object.entries(yScaleValues[0]).forEach((item) => item[0] === seriesKey && seriesToInclude.push(item))
+        return Object.entries(yScaleValues[0]).forEach((item) => item[0] === seriesKey && seriesToInclude.push(item))
       })
 
       // filter out the series that aren't added to the map.
       seriesToInclude.map(series => yScaleMaxValues.push(Number(yScaleValues[0][series])))
       seriesToInclude = Object.fromEntries(seriesToInclude)
-      console.log('y max', seriesToInclude)
-
 
       let tooltipData = {}
       tooltipData.data = seriesToInclude
-      console.log('isEditor', isEditor)
-      console.log('isEditor', x + 20 + isEditor ? 300 : 0)
-      console.log('isEditor', x)
       tooltipData.dataXPosition = isEditor ? 300 + x + 20 : x + 20
       tooltipData.dataYPosition = y - 20
 
@@ -115,21 +111,25 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
         tooltipLeft: x
       }
 
-      console.log('tooltip information', tooltipInformation.tooltipData)
       showTooltip(tooltipInformation)
 
     },
-    [showTooltip]
+    [showTooltip] // eslint-disable-line
   )
 
-  let titleOffset = config.title ? 48.75 + 24 : 0
-  let leftOffset = isEditor ? 300 : 0 + Number(config.yAxis.size) + 16
-  const tooltipOffset = { top: titleOffset, left: leftOffset }
+  const TooltipListItem = ({ item }) => {
+    const [label, value] = item
+    return label === config.xAxis.dataKey ?
+      `${label}: ${value}`
+      : `${label}: ${formatNumber(value, 'left')}`
+  }
 
-  const tooltip = (listArr) => {
-    return listArr[0] === config.xAxis.dataKey ?
-      `${listArr[0]}: ${listArr[1]}`
-      : `${listArr[0]}: ${formatNumber(listArr[1], 'left')}`
+  const handleX = (d) => {
+    return config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])
+  }
+
+  const handleY = (d, index) => {
+    return yScale(d[config.series[index].dataKey])
   }
 
   return (
@@ -142,8 +142,6 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
             let transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s.dataKey) === -1
             let displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s.dataKey) !== -1
 
-            console.log({ transparentArea, displayArea, seriesHighlight, s })
-
             data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
 
             return (
@@ -151,7 +149,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 {/* prettier-ignore */}
                 <LinePath
                   data={data}
-                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
+                  x={d => handleX(d)}
                   y={d => yScale(d[config.series[index].dataKey])}
                   stroke={seriesColor}
                   strokeWidth={2}
@@ -159,24 +157,23 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   shapeRendering='geometricPrecision'
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.type) : 0}
-
                 />
+
                 {/* prettier-ignore */}
                 <AreaClosed
                   key={'area-chart'}
                   fill={displayArea ? seriesColor : 'transparent'}
                   fillOpacity={transparentArea ? .25 : .5}
                   data={data}
-                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
-                  y={d => yScale(d[config.series[index].dataKey])}
+                  x={d => handleX(d)}
+                  y={d => handleY(d, index)}
                   yScale={yScale}
                   curve={curveType}
                   strokeDasharray={s.type ? handleLineType(s.typ) : 0}
-
                 />
 
                 <Bar
-                  x={d => config.xAxis.type === 'date' ? xScale(parseDate(d[config.xAxis.dataKey])) : xScale(d[config.xAxis.dataKey])}
+                  x={d => handleX(d)}
                   y={d => yScale(d[config.series[index].dataKey])}
                   yScale={yScale}
                   width={xMax}
@@ -186,6 +183,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   style={DEBUG ? { stroke: 'black', strokeWidth: 2 } : {}}
                   onMouseMove={e => handleMouseOver(e, data)}
                 />
+
                 {tooltipData &&
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
@@ -199,24 +197,22 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 }
 
                 {/* bars to handle tooltips */}
-                {DEBUG &&
-                  config.data.map((item, index) => {
-                    return (
-                      <Bar
-                        className='bar-here'
-                        x={barThickness * index + offset}
-                        y={d => yScale(d[config.series[index].dataKey])}
-                        yScale={yScale}
-                        width={barThicknessAdjusted}
-                        height={yMax}
-                        fill={'transparent'}
-                        fillOpacity={1}
-                        style={{ stroke: 'black', strokeWidth: 2 }}
-                        onMouseMove={e => handleMouseOver(e, data)}
-                      />
-                    )
-                  })}
-                {console.log(tooltipData)}
+                {DEBUG && config.data.map((item, index) => {
+                  return (
+                    <Bar
+                      className='bar-here'
+                      x={barThickness * index + offset}
+                      y={d => yScale(d[config.series[index].dataKey])}
+                      yScale={yScale}
+                      width={barThicknessAdjusted}
+                      height={yMax}
+                      fill={'transparent'}
+                      fillOpacity={1}
+                      style={{ stroke: 'black', strokeWidth: 2 }}
+                      onMouseMove={e => handleMouseOver(e, data)}
+                    />
+                  )
+                })}
 
                 {tooltipData && (
                   <TooltipInPortal
@@ -229,7 +225,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                       <ul style={{ listStyle: 'none', paddingLeft: 'unset' }}>
                         {Object.entries(tooltipData.data).map(item => (
                           <li>
-                            {tooltip(item)}
+                            <TooltipListItem item={item} />
                           </li>
                         ))}
                       </ul>
