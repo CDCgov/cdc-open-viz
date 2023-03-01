@@ -646,7 +646,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     }
 
     // Equal Interval
-
     if (type === 'equalinterval' && dataSet?.length !== 0) {
       if (!dataSet || dataSet.length === 0) {
         setState({
