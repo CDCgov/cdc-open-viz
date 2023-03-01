@@ -11,9 +11,6 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 
-// Hooks
-import { useColorPalette } from '../hooks/useColorPalette'
-
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -83,8 +80,6 @@ const EditorPanel = props => {
   const [advancedToggle, setAdvancedToggle] = useState(false)
 
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
-
-  const { filteredPallets, filteredQualitative, isPaletteReversed, paletteName } = useColorPalette(colorPalettes, state)
 
   const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
@@ -915,6 +910,44 @@ const EditorPanel = props => {
     return strippedState
   }
 
+  const isReversed = state.general.palette.isReversed
+  function filterColorPalettes() {
+    let sequential = []
+    let nonSequential = []
+    for (let paletteName in colorPalettes) {
+      if (!isReversed) {
+        if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (!paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
+          sequential.push(paletteName)
+        }
+      }
+      if (isReversed) {
+        if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+          nonSequential.push(paletteName)
+        }
+        if (!paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
+          sequential.push(paletteName)
+        }
+      }
+    }
+
+    return [sequential, nonSequential]
+  }
+  const [sequential, nonSequential] = filterColorPalettes()
+
+  useEffect(() => {
+    let paletteName = ''
+    if (isReversed && !state.color.endsWith('reverse')) {
+      paletteName = state.color + 'reverse'
+    }
+    if (!isReversed && state.color.endsWith('reverse')) {
+      paletteName = state.color.slice(0, -7)
+    }
+    handleEditorChanges('color', paletteName)
+  }, [isReversed])
+
   useEffect(() => {
     setLoadedDefault(state.defaultData)
 
@@ -931,12 +964,12 @@ const EditorPanel = props => {
             valid = false
           }
         })
-        let runtimeLegendKeys = runtimeLegend.map(item => item.value);
+        let runtimeLegendKeys = runtimeLegend.map(item => item.value)
         state.legend.categoryValuesOrder.forEach(category => {
           if (runtimeLegendKeys.indexOf(category) === -1) {
-            valid = false;
+            valid = false
           }
-        });
+        })
       } else {
         valid = false
       }
@@ -1177,10 +1210,6 @@ const EditorPanel = props => {
       })
     })
   }
-
-  useEffect(() => {
-    if (paletteName) handleEditorChanges('color', paletteName)
-  }, [paletteName]) // dont add handleEditorChanges as a dependency even if it requires
 
   useEffect(() => {
     const parsedData = convertStateToConfig()
@@ -1905,35 +1934,42 @@ const EditorPanel = props => {
                           </Tooltip>
                         </span>
                       </label>
-                      {state.legend.additionalCategories && state.legend.additionalCategories.map((val, i) => (
-                        <fieldset className='edit-block' key={val}>
-                          <button
-                            className='remove-column'
-                            onClick={event => {
-                              event.preventDefault()
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories.splice(i, 1);
-                              updateField('legend', null, 'additionalCategories', updatedAdditionaCategories);
-                            }}
-                          >
-                            Remove
-                          </button>
-                          <label>
-                            <span className='edit-label column-heading'>Category</span>
-                            <TextField value={val} section="legend" subsection={null} fieldName="additionalCategories" updateField={(section, subsection, fieldName, value) => {
-                              const updatedAdditionaCategories = [...state.legend.additionalCategories];
-                              updatedAdditionaCategories[i] = value;
-                              updateField(section, subsection, fieldName, updatedAdditionaCategories)
-                            }} />
-                          </label>
-                        </fieldset>
-                      ))}
+                      {state.legend.additionalCategories &&
+                        state.legend.additionalCategories.map((val, i) => (
+                          <fieldset className='edit-block' key={val}>
+                            <button
+                              className='remove-column'
+                              onClick={event => {
+                                event.preventDefault()
+                                const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                updatedAdditionaCategories.splice(i, 1)
+                                updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <label>
+                              <span className='edit-label column-heading'>Category</span>
+                              <TextField
+                                value={val}
+                                section='legend'
+                                subsection={null}
+                                fieldName='additionalCategories'
+                                updateField={(section, subsection, fieldName, value) => {
+                                  const updatedAdditionaCategories = [...state.legend.additionalCategories]
+                                  updatedAdditionaCategories[i] = value
+                                  updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                                }}
+                              />
+                            </label>
+                          </fieldset>
+                        ))}
                       <button
                         className={'btn full-width'}
                         onClick={event => {
                           event.preventDefault()
-                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])];
-                          updatedAdditionaCategories.push('');
+                          const updatedAdditionaCategories = [...(state.legend.additionalCategories || [])]
+                          updatedAdditionaCategories.push('')
                           updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
                         }}
                       >
@@ -2434,8 +2470,6 @@ const EditorPanel = props => {
                     <span className='edit-label'>Show Title</span>
                   </label>
 
-
-
                   {'navigation' === state.general.type && (
                     <label className='checkbox'>
                       <input
@@ -2464,10 +2498,10 @@ const EditorPanel = props => {
                     <span className='edit-label'>Map Color Palette</span>
                   </label>
                   {/* <InputCheckbox  section="general" subsection="palette"  fieldName='isReversed'  size='small' label='Use selected palette in reverse order'   updateField={updateField}  value={isPaletteReversed} /> */}
-                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={isPaletteReversed} />
+                  <InputToggle type='3d' section='general' subsection='palette' fieldName='isReversed' size='small' label='Use selected palette in reverse order' updateField={updateField} value={state.general.palette.isReversed} />
                   <span>Sequential</span>
                   <ul className='color-palette'>
-                    {filteredPallets.map(palette => {
+                    {sequential.map(palette => {
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
                       }
@@ -2498,7 +2532,7 @@ const EditorPanel = props => {
                   </ul>
                   <span>Non-Sequential</span>
                   <ul className='color-palette'>
-                    {filteredQualitative.map(palette => {
+                    {nonSequential.map(palette => {
                       const colorOne = {
                         backgroundColor: colorPalettes[palette][2]
                       }
