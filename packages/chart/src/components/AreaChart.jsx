@@ -145,8 +145,10 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
             data.map(d => xScale(parseDate(d[config.xAxis.dataKey])))
 
             return (
+
               <>
                 {/* prettier-ignore */}
+                {/* this is the line that appears on top of the area chart */}
                 <LinePath
                   data={data}
                   x={d => handleX(d)}
@@ -160,6 +162,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                 />
 
                 {/* prettier-ignore */}
+                {/* filled in sections */}
                 <AreaClosed
                   key={'area-chart'}
                   fill={displayArea ? seriesColor : 'transparent'}
@@ -184,6 +187,7 @@ const CoveAreaChart = ({ xScale, yScale, yMax, xMax }) => {
                   onMouseMove={e => handleMouseOver(e, data)}
                 />
 
+                {/* circles that appear on hover */}
                 {tooltipData &&
                   <circle
                     cx={config.xAxis.type === 'categorical' ? xScale(tooltipData.data[config.xAxis.dataKey]) : xScale(parseDate(tooltipData.data[config.xAxis.dataKey]))}
