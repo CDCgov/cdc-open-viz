@@ -36,9 +36,38 @@ export default {
     rightAxisLabelColor: '#333',
     rightAxisTickLabelColor: '#333',
     rightAxisTickColor: '#333',
-    numTicks: ''
+    numTicks: '',
+    axisPadding: 0,
+    tickRotation: 0
   },
-  boxplot: [],
+  boxplot: {
+    plots: [],
+    borders: 'true',
+    firstQuartilePercentage: 25,
+    thirdQuartilePercentage: 75,
+    boxWidthPercentage: 40,
+    plotOutlierValues: false,
+    plotNonOutlierValues: true,
+    legend: {
+      showHowToReadText: false,
+      howToReadText: ''
+    },
+    labels: {
+      q1: 'Lower Quartile',
+      q2: 'q2',
+      q3: 'Upper Quartile',
+      q4: 'q4',
+      minimum: 'Minimum',
+      maximum: 'Maximum',
+      mean: 'Mean',
+      median: 'Median',
+      sd: 'Standard Deviation',
+      iqr: 'Interquartile Range',
+      count: 'Count',
+      outliers: 'Outliers',
+      values: 'Values'
+    }
+  },
   topAxis: {
     hasLine: false
   },
@@ -63,7 +92,8 @@ export default {
     tickLabelColor: '#333',
     tickColor: '#333',
     numTicks: '',
-    labelOffset: 65
+    labelOffset: 65,
+    axisPadding: 0
   },
   table: {
     label: 'Data Table',
