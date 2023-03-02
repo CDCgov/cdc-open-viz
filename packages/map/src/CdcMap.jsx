@@ -321,8 +321,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     let specialClasses = 0
     let specialClassesHash = {}
 
-    console.log("newLegendMemo1A=",newLegendMemo)
-
     // Special classes
     if (obj.legend.specialClasses.length) {
       if (typeof obj.legend.specialClasses[0] === 'object') {
@@ -394,8 +392,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
-    console.log("newLegendMemo1B=",newLegendMemo)
-
     // Category
     if ('category' === type) {
       let uniqueValues = new Map()
@@ -455,8 +451,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
         }
       })
-
-      console.log("newLegendMemo1C=",newLegendMemo)
 
       // Add color to new legend item
       for (let i = 0; i < result.length; i++) {
@@ -519,8 +513,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Equal Number
     if (type === 'equalnumber') {
-      console.log("Equal Interval line 517,legendMemo, result",legendMemo, result)
-
       // start work on changing legend functionality
       // FALSE === ignore old version for now.
       if (!state.general.equalNumberOptIn) {
@@ -551,28 +543,19 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           removedRows.forEach(row => {
             newLegendMemo.set(hashObj(row), result.length)
           })
-          console.log("newLegendMemo 2=",newLegendMemo)
-
-          console.log("result1=",result)
 
           result.push({
             min,
             max
           })
 
-          console.log("result2=",result)
-
           result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
-
-          console.log("newLegendMemo=",newLegendMemo)
         }
 
       } else {
-        console.log("else case 558")
-
         // get nums
         let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
         let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
@@ -669,9 +652,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Equal Interval
     if (type === 'equalinterval' && dataSet?.length !== 0) {
-
-      console.log("Equal Interval line 653")
-
       if (!dataSet || dataSet.length === 0) {
         setState({
           ...state,
@@ -687,13 +667,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
       let pointer = 0 // Start at beginning of dataSet
-
-      // Move all special Classes to the end
-      console.log("MOVE SPECIAL TO END: specialClasses,result",specialClasses,result)
-      let specialRows = result.filter(d => d.special === true)
-      let otherRows = result.filter(d => !d.special)
-      //debugger;
-      result = [...otherRows, ...specialRows];
 
       for (let i = 0; i < legendNumber; i++) {
         let interval = Math.abs(dataMax - dataMin) / legendNumber
@@ -720,10 +693,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         result[result.length - 1].color = applyColorToLegend(result.length - 1)
       }
     }
-
-
-
-    console.log("specialClasses,result",specialClasses,result)
 
     result.forEach((legendItem, idx) => {
       legendItem.color = applyColorToLegend(idx, specialClasses, result)
