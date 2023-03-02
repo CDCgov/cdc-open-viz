@@ -39,7 +39,7 @@
     {
       "Location": "Vehicle",
       "Group A": "100",
-      "Group B": "150",
+      "Group B": "-150",
       "Group C": "90"
     },
     {
