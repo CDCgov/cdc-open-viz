@@ -64,7 +64,7 @@ const CountyMap = props => {
 
   const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, containerEl, handleMapAriaLabels, titleCase, setSharedFilterValue, isFilterValueSupported } = props
 
-  console.log(data)
+  //console.log(data)
 
   useEffect(() => {
     if (containerEl) {
