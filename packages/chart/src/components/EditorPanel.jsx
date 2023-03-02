@@ -78,7 +78,7 @@ const CheckBox = memo(({ label, value, fieldName, section = null, subsection = n
       type='checkbox'
       name={fieldName}
       checked={value}
-      onChange={(e) => {
+      onChange={e => {
         e.preventDefault()
         updateField(section, subsection, fieldName, !value)
       }}
@@ -290,7 +290,6 @@ const EditorPanel = () => {
   }
 
   const updateField = (section, subsection, fieldName, newValue) => {
-
     if (section === 'boxplot' && subsection === 'legend') {
       updateConfig({
         ...config,
@@ -319,7 +318,6 @@ const EditorPanel = () => {
       return
     }
 
-
     if (null === section && null === subsection) {
       let updatedConfig = { ...config, [fieldName]: newValue }
       enforceRestrictions(updatedConfig)
@@ -331,7 +329,6 @@ const EditorPanel = () => {
 
     let sectionValue = isArray ? [...config[section], newValue] : { ...config[section], [fieldName]: newValue }
 
-
     if (null !== subsection) {
       if (isArray) {
         sectionValue = [...config[section]]
@@ -342,7 +339,6 @@ const EditorPanel = () => {
         sectionValue = { ...config[section], [subsection]: { ...config[section][subsection], [fieldName]: newValue } }
       }
     }
-
 
     let updatedConfig = { ...config, [section]: sectionValue }
 
@@ -700,17 +696,7 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
-  const enabledChartTypes = [
-    'Pie',
-    'Line',
-    'Bar',
-    'Combo',
-    'Paired Bar',
-    'Spark Line',
-    'Area Chart',
-    'Scatter Plot',
-    'Box Plot'
-  ]
+  const enabledChartTypes = ['Pie', 'Line', 'Bar', 'Combo', 'Paired Bar', 'Spark Line', 'Area Chart', 'Scatter Plot', 'Box Plot']
 
   return (
     <ErrorBoundary component='EditorPanel'>
@@ -877,9 +863,7 @@ const EditorPanel = () => {
                                         <option value='' default>
                                           Select
                                         </option>
-                                        {config.visualizationType === 'Combo' &&
-                                          <option value='Bar'>Bar</option>
-                                        }
+                                        {config.visualizationType === 'Combo' && <option value='Bar'>Bar</option>}
                                         <option value='Line'>Solid Line</option>
                                         <option value='dashed-sm'>Small Dashed</option>
                                         <option value='dashed-md'>Medium Dashed</option>
@@ -903,7 +887,9 @@ const EditorPanel = () => {
                                         <option value='curveLinear'>Linear</option>
                                         <option value='curveNatural'>Natural</option>
                                         <option value='curveStep'>Step</option>
-                                        {Object.keys(allCurves).map(curveName => <option value={curveName}>{curveName}</option>)}
+                                        {Object.keys(allCurves).map(curveName => (
+                                          <option value={curveName}>{curveName}</option>
+                                        ))}
                                       </select>
                                     )
 
@@ -916,7 +902,7 @@ const EditorPanel = () => {
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
                                               </div>
                                               <span>
-                                                {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') &&
+                                                {(config.visualizationType === 'Combo' || config.visualizationType === 'Area Chart') && (
                                                   <>
                                                     <span className='series-list__dropdown'>{typeDropdown}</span>
                                                     <span className='series-list__dropdown series-list__dropdown--lineType'>{lineType}</span>
@@ -926,7 +912,7 @@ const EditorPanel = () => {
                                                       </button>
                                                     )}
                                                   </>
-                                                }
+                                                )}
                                               </span>
                                             </div>
                                           </li>
@@ -1288,7 +1274,9 @@ const EditorPanel = () => {
                           </Tooltip>
                         }
                       />
-                      <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
+
+                      {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
+                      {/* <TextField value={config.yAxis.axisPadding} type='number' max={10} min={0} section='yAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
                       {config.orientation === 'horizontal' && <TextField value={config.xAxis.labelOffset} section='xAxis' fieldName='labelOffset' label='Label offset' type='number' className='number-narrow' updateField={updateField} />}
                       {config.orientation !== 'horizontal' && <CheckBox value={config.yAxis.gridLines} section='yAxis' fieldName='gridLines' label='Display Gridlines' updateField={updateField} />}
                     </>
@@ -1569,7 +1557,16 @@ const EditorPanel = () => {
                       <TextField value={config.xAxis.numTicks} placeholder='Auto' type='number' min='1' section='xAxis' fieldName='numTicks' label='Number of ticks' className='number-narrow' updateField={updateField} />
 
                       <TextField value={config.xAxis.size} type='number' min='0' section='xAxis' fieldName='size' label={config.orientation === 'horizontal' ? 'Size (Width)' : 'Size (Height)'} className='number-narrow' updateField={updateField} />
-                      <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} />
+
+                      {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
+                      {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateField} /> */}
+
+                      {config.xAxis.type === 'continuous' && (
+                        <>
+                          <CheckBox value={config.dataFormat.bottomCommas} section='dataFormat' fieldName='bottomCommas' label='Add commas' updateField={updateField} />
+                          <TextField value={config.dataFormat.bottomRoundTo} type='number' section='dataFormat' fieldName='bottomRoundTo' label='Round to decimal point' className='number-narrow' updateField={updateField} min={0} />
+                        </>
+                      )}
 
                       {config.yAxis.labelPlacement !== 'Below Bar' && <TextField value={config.xAxis.tickRotation} type='number' min='0' section='xAxis' fieldName='tickRotation' label='Tick rotation (Degrees)' className='number-narrow' updateField={updateField} />}
                       {config.orientation === 'horizontal' ? (
@@ -1664,7 +1661,7 @@ const EditorPanel = () => {
                       </>
                     )}
                   </fieldset> */}
-                  {config.visualizationType !== "Box Plot" &&
+                  {config.visualizationType !== 'Box Plot' && (
                     <CheckBox
                       value={config.legend.hide ? true : false}
                       section='legend'
@@ -1682,7 +1679,7 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
-                  }
+                  )}
                   <CheckBox value={config.legend.showLegendValuesTooltip ? true : false} section='legend' fieldName='showLegendValuesTooltip' label='Show Legend Values in Tooltip' updateField={updateField} />
 
                   {config.visualizationType === 'Bar' && config.visualizationSubType === 'regular' && config.runtime.seriesKeys.length === 1 && (
@@ -1818,7 +1815,7 @@ const EditorPanel = () => {
                     </>
                   )}
 
-                  {config.visualizationType === 'Box Plot' &&
+                  {config.visualizationType === 'Box Plot' && (
                     <fieldset fieldset className='fieldset fieldset--boxplot'>
                       <legend className=''>Box Plot Settings</legend>
                       {config.visualizationType === 'Box Plot' && <Select value={config.boxplot.borders} fieldName='borders' section='boxplot' label='Box Plot Borders' updateField={updateField} options={['true', 'false']} />}
@@ -1827,7 +1824,7 @@ const EditorPanel = () => {
                       {config.visualizationType === 'Box Plot' && <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateField} />}
                       <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateField} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
                     </fieldset>
-                  }
+                  )}
 
                   <Select value={config.fontSize} fieldName='fontSize' label='Font Size' updateField={updateField} options={['small', 'medium', 'large']} />
                   {config.visualizationType !== 'Box Plot' && config.series?.some(series => series.type === 'Bar' || series.type === 'Paired Bar') && <Select value={config.barHasBorder} fieldName='barHasBorder' label='Bar Borders' updateField={updateField} options={['true', 'false']} />}
@@ -2029,7 +2026,7 @@ const EditorPanel = () => {
           {config.type !== 'Spark Line' && <AdvancedEditor loadConfig={updateConfig} state={config} convertStateToConfig={convertStateToConfig} />}
         </section>
       </section>
-    </ErrorBoundary >
+    </ErrorBoundary>
   )
 }
 

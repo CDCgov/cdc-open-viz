@@ -230,10 +230,10 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     } else {
       newConfig.runtime.seriesKeys = newConfig.series
         ? newConfig.series.map(series => {
-          newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
-          newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
-          return series.dataKey
-        })
+            newConfig.runtime.seriesLabels[series.dataKey] = series.label || series.dataKey
+            newConfig.runtime.seriesLabelsAll.push(series.label || series.dataKey)
+            return series.dataKey
+          })
         : []
     }
 
@@ -302,7 +302,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       newConfig.boxplot.tableData = tableData
     }
 
-    if (newConfig.visualizationType === 'Combo' || 'Area Chart' && newConfig.series) {
+    if (newConfig.visualizationType === 'Combo' || ('Area Chart' && newConfig.series)) {
       newConfig.runtime.barSeriesKeys = []
       newConfig.runtime.lineSeriesKeys = []
       newConfig.series.forEach(series => {
@@ -608,8 +608,9 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
     // destructure dataFormat values
     let {
-      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, rightPrefix, rightSuffix }
+      dataFormat: { commas, abbreviated, roundTo, prefix, suffix, rightRoundTo, bottomRoundTo, rightPrefix, rightSuffix }
     } = config
+
     let formatSuffix = format('.2s')
 
     // check if value contains comma and remove it. later will add comma below.
@@ -618,17 +619,27 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     let original = num
     let stringFormattingOptions
 
-    if (axis !== 'right') {
+    if (axis === 'left') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.commas ? true : false,
         minimumFractionDigits: roundTo ? Number(roundTo) : 0,
         maximumFractionDigits: roundTo ? Number(roundTo) : 0
       }
-    } else {
+    }
+
+    if (axis === 'right') {
       stringFormattingOptions = {
         useGrouping: config.dataFormat.rightCommas ? true : false,
         minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
         maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      }
+    }
+
+    if (axis === 'bottom') {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.bottomCommas ? true : false,
+        minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
+        maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
       }
     }
 
