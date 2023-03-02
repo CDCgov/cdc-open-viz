@@ -17,16 +17,11 @@ import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
 // Constants
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../data/consts'
-import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
+import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 
-const EditorPanels = () => {
+const EditorPanels = ({ setParentConfig }) => {
   // Store Selectors
-  const { config, updateConfigField, updateParentConfig, setMissingRequiredSections } = useConfigStore(state => ({
-    config: state.config,
-    updateConfigField: state.updateConfigField,
-    updateParentConfig: state.updateParentConfig,
-    setMissingRequiredSections: state.setMissingRequiredSections
-  }))
+  const { config, updateConfigField } = useConfigStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   const [ tempConfig, setTempConfig ] = useState(config)
@@ -42,14 +37,14 @@ const EditorPanels = () => {
 
   useEffect(() => {
     // Pass tempConfig settings back up to parent, if one exists
-    if (updateParentConfig) updateParentConfig(tempConfig)
-  }, [ tempConfig, updateParentConfig ])
+    if (setParentConfig) setParentConfig(tempConfig)
+  }, [ tempConfig, setParentConfig ])
 
 
   /** Component Effects -------------------------------------------------------------------------- */
   useEffect(() => {
     // No sections required, setting to false
-    setMissingRequiredSections(false)
+    updateConfigField('missingRequiredSections', false)
   }, [])
 
   useEffect(() => {
@@ -174,7 +169,7 @@ const EditorPanels = () => {
 
   const panelFilters = (
     <Accordion.Section label="Filters">
-      <PanelFilters/>
+      <PanelComponentFilters/>
     </Accordion.Section>
   )
 

@@ -13,7 +13,7 @@ import '../../styles/v2/components/element/guidance-block.scss'
 const GuidanceTitle = () => null
 const GuidanceContent = () => null
 
-const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor, children, className, ...attributes }) => {
+const GuidanceBlock = ({ linkTo, icon, target = '_blank', accentColor = '#005eaa', children, className, ...attributes }) => {
 
   //Parse, organize, and pull "slotted" children data from subcomponents
   const childNodes = Children.toArray(children)

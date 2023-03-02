@@ -9,8 +9,12 @@ $componentBorderRadius: 3px;
   border-radius: $componentBorderRadius;
   box-shadow: rgb(0 15 30 / 25%) 0 5px 15px -5px;
 
+  &[data-title="false"] {
+    box-shadow: rgb(0 15 30 / 25%) 0 0 15px -5px;
+  }
+
   &[data-no-shadow="true"] {
-    box-shadow: none;
+    box-shadow: none !important;
   }
 
   @at-root {
@@ -41,6 +45,7 @@ $componentBorderRadius: 3px;
   border-bottom-color: #d2d2d2;
   transition: background-color 200ms ease, border-color 200ms ease;
 
+
   .cove-tooltip {
     position: absolute;
     top: 50%;
@@ -51,6 +56,8 @@ $componentBorderRadius: 3px;
   }
 
   .cove-tooltip--target {
+    padding: 0.5rem;
+    margin-right: -0.5rem;
     transition: opacity 200ms $transition-expo-out;
     opacity: 0.75;
 
@@ -67,6 +74,7 @@ $componentBorderRadius: 3px;
   border: 1px solid #ccc;
   border-radius: $componentBorderRadius;
   transition: background-color 200ms ease;
+
 
   &[data-bg="none"] {
     background-color: transparent;
@@ -106,6 +114,18 @@ $componentBorderRadius: 3px;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }
+  }
+}
+
+.cove-component__content--tooltip {
+  margin-top: -1rem;
+  text-align: right;
+
+  .cove-tooltip {
+    right: 0.5rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-right: -1rem;
   }
 }
 

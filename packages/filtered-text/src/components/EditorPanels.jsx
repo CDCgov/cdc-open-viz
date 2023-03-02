@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import useConfigStore from '@cdc/core/stores/configStore'
 
 // Helpers
+import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
 import getDataColumns from '@cdc/core/helpers/data/getDataColumns'
 
 // Components - Core
@@ -11,21 +12,18 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import InputText from '@cdc/core/components/input/InputText'
 import InputSelect from '@cdc/core/components/input/InputSelect'
-import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
+import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 
-const EditorPanels = () => {
+const EditorPanels = ({ setParentConfig }) => {
   // Store Selectors
-  const { config, updateParentConfig } = useConfigStore(state => ({
-    config: state.config,
-    updateParentConfig: state.updateParentConfig
-  }))
+  const { config } = useConfigStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
+    if (!isConfigEqual(config, tempConfig)) {
       let tempConfig = { ...config }
       delete tempConfig.newViz
       setTempConfig(tempConfig)
@@ -34,8 +32,8 @@ const EditorPanels = () => {
 
   useEffect(() => {
     // Pass tempConfig settings back up to parent, if one exists
-    if (updateParentConfig) updateParentConfig(tempConfig)
-  }, [ tempConfig, updateParentConfig ])
+    if (setParentConfig) setParentConfig(tempConfig)
+  }, [ tempConfig, setParentConfig ])
 
 
   /** Panels ------------------------------------------------------------------------------------- */
@@ -48,11 +46,8 @@ const EditorPanels = () => {
   const panelData = (
     <Accordion.Section label="Data">
       <InputSelect label="Text Column" options={getDataColumns(config.data)} configField="textColumn" initialDisabled/>
-
       <hr className="cove-editor__divider"/>
-
-      <PanelFilters/>
-
+      <PanelComponentFilters/>
     </Accordion.Section>
   )
 

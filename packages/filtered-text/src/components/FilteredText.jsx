@@ -5,8 +5,8 @@ import parse from 'html-react-parser'
 import useConfigStore from '@cdc/core/stores/configStore'
 
 // Visualization
-const FilteredText = ({ configObj, configUrl }) => {
-  const config = useConfigStore((state) => state.config)
+const FilteredText = () => {
+  const { config } = useConfigStore()
 
   const filteredText = () => {
     let filteredData = []

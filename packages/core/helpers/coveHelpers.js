@@ -24,15 +24,22 @@ const numberFromString = (value) => {
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
 
+const convertKebabToTitle = (string) => string.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+const convertPascalToCamel = (string) => string.replace(/([A-Z])/g, ($1) => $1.toLowerCase())
+
+const convertToKebab = (string) => string.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+const convertToCamel = (string) => string.replace(/([-_][a-z])/ig, ($1) => $1.toUpperCase().replace('-', '').replace('_', ''));
+const convertToPascal = (string) => convertToCamel(string).replace(/^[a-z]/, ($1) => $1.toUpperCase());
+
+
 // Dates ------------------------------------------------------------------------------------------------
 const formatDate = (format = undefined, date) => (timeFormat(format)(date))
 const parseDate = (format = undefined, dateString) => (timeParse(format)(dateString) || new Date())
 
 // Math ------------------------------------------------------------------------------------------------
 const getSum = (arr) => {
-  if (Array.isArray(arr) && arr.length > 0) {
+  if (Array.isArray(arr) && arr.length > 0)
     return arr.reduce((sum, x) => sum + x)
-  }
 }
 
 const getMean = (arr) => {
@@ -65,10 +72,24 @@ const getMode = (arr) => {
 }
 
 const applyPrecision = (value, roundToPlace) => {
-  if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace) > -1) {
-    value = Number(value).toFixed(Number(roundToPlace))
-  }
-  return value
+  if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace) > -1)
+    return Number(value).toFixed(Number(roundToPlace))
+}
+
+const convertNumberToLocaleString = (value, locale = 'en-US') => {
+  if (value === undefined || value === null) return
+  if (Number.isNaN(value) || typeof value === 'number') value = String(value)
+
+  let formattedValue = parseFloat(value).toLocaleString(locale, {
+    useGrouping: true,
+    maximumFractionDigits: 6
+  })
+
+  // Add back missing .0 in e.g. 12.0
+  const match = value.match(/\.\d*?(0*)$/)
+
+  if (match) formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0]
+  return formattedValue
 }
 
 // Events ------------------------------------------------------------------------------------------------
@@ -89,6 +110,11 @@ export {
   cacheBustingString,
   numberFromString,
   capitalizeFirstLetter,
+  convertKebabToTitle,
+  convertPascalToCamel,
+  convertToKebab,
+  convertToCamel,
+  convertToPascal,
 
   // Date
   formatDate,
@@ -100,6 +126,7 @@ export {
   getMedian,
   getMode,
   applyPrecision,
+  convertNumberToLocaleString,
 
   // Events
   subscribe,

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 
 // Store
 import useConfigStore from '../../stores/configStore'
+import { useConfigStoreContext } from '../hoc/ConfigProxy'
 
 // Helpers
 import { getConfigKeyValue } from '../../helpers/configHelpers'
@@ -30,27 +31,28 @@ const InputText = memo((
   }
 ) => {
   // Store Selectors
-  const { config, updateConfigField } = useConfigStore()
+  const { updateConfigField } = useConfigStore()
+  const { config } = useConfigStoreContext()
 
   // Input will only accept either an inline value from the element, or a value from a connected config key
-  const [ loadedConfigValue, setLoadedConfigValue ] = useState(false) //Prevents run on render
-  const [ value, setValue ] = useState(configField ? (getConfigKeyValue(configField, config) || '') : inlineValue || '')
+  const [ value, setValue ] = useState(inlineValue = '')
   const [ debouncedValue ] = useDebounce(value, 300)
 
   const inputRef = useRef(null)
 
-  useEffect(() => {
-    if (configField) {
-      if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets debounceValue
-        if (inlineValue !== debouncedValue) {
-          updateConfigField(configField, debouncedValue)
-        }
-      }
+  //Set initial value
+  const valueFromConfig = configField && getConfigKeyValue(configField, config) || false
 
-      // Initial debounceValue changed to configField value
-      // updateConfigField func is now accessible
-      setLoadedConfigValue(true)
+  useEffect(() => {
+    if (valueFromConfig) {
+      valueFromConfig !== value && setValue(getConfigKeyValue(configField, config))
+    } else {
+      setValue(inlineValue)
     }
+  }, [ config ])
+
+  useEffect(() => {
+    if (configField) updateConfigField(configField, debouncedValue)
   }, [ debouncedValue ])
 
   const isNumberWithinBounds = (val) => {

@@ -1,4 +1,4 @@
-import React, { useRef, useState, memo } from 'react'
+import React, { useRef, useEffect, useState, memo } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
@@ -24,16 +24,27 @@ const InputSelect = memo((
     tooltip,
 
     configField,
-    value: inlineValue = '',
+    value: inlineValue,
     onChange, className, ...attributes
   }
 ) => {
   // Store Selectors
   const { config, updateConfigField } = useConfigStore()
 
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) || '' : inlineValue)
+  const [ value, setValue ] = useState(inlineValue = '')
 
   const inputRef = useRef(null)
+
+  //Set initial value
+  const valueFromConfig = configField && getConfigKeyValue(configField, config) || false
+
+  useEffect(() => {
+    if (valueFromConfig) {
+      valueFromConfig !== value && setValue(getConfigKeyValue(configField, config))
+    } else {
+      setValue(inlineValue)
+    }
+  }, [ config ])
 
   const isInitial = (checkValue) => {
     return initial && (checkValue === initial || checkValue === '')

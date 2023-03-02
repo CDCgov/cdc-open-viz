@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 // Store
@@ -18,38 +18,45 @@ const InputCheckbox = memo((
   {
     label,
     labelPosition = 'right',
+    tooltip,
     size = 'small',
     activeColor = null,
     activeCheckColor = null,
-    tooltip,
 
     configField,
     value: inlineValue,
-    className, ...attributes
+    className, onClick, ...attributes
   }
 ) => {
   const { config, updateConfigField } = useConfigStore()
 
-  const [ loadedConfigValue, setLoadedConfigValue ] = useState(false)
-  const [ value, setValue ] = useState(configField ? getConfigKeyValue(configField, config) : inlineValue || '')
+  const [ value, setValue ] = useState(inlineValue = false)
+
+  const inputRef = useRef(null)
+
+  const valueFromConfig = configField && getConfigKeyValue(configField, config) !== undefined && getConfigKeyValue(configField, config)
+  const configValueIsValid = valueFromConfig || (valueFromConfig === false && valueFromConfig !== undefined)
 
   //Set initial value
   useEffect(() => {
-    if (configField) {
-      if (loadedConfigValue || value === undefined) { //Ignores the first pass when initial render sets value
-        if (inlineValue !== value) {
-          updateConfigField(configField, value)
-        }
-      }
-
-      // Initial value changed to configField value
-      // updateConfigField func is now accessible
-      setLoadedConfigValue(true)
+    if (configValueIsValid) {
+      setValue(getConfigKeyValue(configField, config))
+    } else {
+      setValue(inlineValue)
     }
+  }, [ config ])
+
+  useEffect(() => {
+    if (configValueIsValid && valueFromConfig !== value) updateConfigField(configField, value)
   }, [ value ])
 
   const onClickHandler = () => {
+    inputRef.current.click()
+  }
+
+  const onChangeHandler = (e) => {
     setValue(value => !value)
+    onClick && onClick(e)
   }
 
   return (
@@ -57,12 +64,16 @@ const InputCheckbox = memo((
       {label && labelPosition === 'left' &&
         <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>
       }
-      <div className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')} onClick={() => onClickHandler()}>
+      <div className={'cove-input__checkbox'
+        + (size === 'small' ? '--small' : size === 'large' ? '--large' : '')
+        + (value ? ' active' : '')}
+           onClick={() => onClickHandler()}
+      >
         <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
              style={value && activeColor ? { backgroundColor: activeColor } : null}>
           <Icon display="check" className="cove-input__checkbox-check" color={activeCheckColor || '#025eaa'}/>
         </div>
-        <input className="cove-input--hidden" type="checkbox" defaultChecked={value || false} readOnly/>
+        <input className="cove-input--hidden" type="checkbox" defaultChecked={value} onChange={(e) => onChangeHandler(e)} ref={inputRef} readOnly/>
       </div>
       {label && labelPosition === 'right' &&
         <Label tooltip={tooltip} onClick={() => onClickHandler()}>{label}</Label>

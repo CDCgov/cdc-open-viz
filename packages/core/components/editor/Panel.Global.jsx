@@ -2,9 +2,9 @@ import React from 'react'
 
 // Components
 import Accordion from '../ui/Accordion'
+import ColorPicker from '../ui/ColorPicker'
 import InputCheckbox from '../input/InputCheckbox'
 import InputSelect from '../input/InputSelect'
-import ColorPicker from '../ui/ColorPicker'
 import InputText from '../input/InputText'
 
 const optionsObj = {
@@ -18,12 +18,13 @@ const accentOptions = {
   top: 'Top',
   right: 'Right',
   bottom: 'Bottom',
-  left: 'Left',
+  left: 'Left'
 }
 
 const PanelGlobal = (
   <Accordion.Section label="Component">
-    <InputText type="text" configField="tooltip" label="Tooltip"/>
+    <InputText type="text" configField={[ 'tooltip', 'content' ]} label="Tooltip"/>
+    <InputSelect configField={[ 'tooltip', 'position' ]} options={{ bottom: 'Bottom', left: 'Left' }} label="Tooltip Position" initialDisabled/>
     <InputSelect configField={[ 'visual', 'border' ]} options={optionsObj} label="Border"/>
     <InputSelect configField={[ 'visual', 'accent' ]} options={accentOptions} label="Border Accent"/>
     <InputSelect configField={[ 'visual', 'background' ]} options={optionsObj} label="Background Color"/>

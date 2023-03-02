@@ -24,7 +24,6 @@ export default {
   nodeSpacer: '2',
   theme: 'blue',
   type: 'waffle-chart',
-  tooltip: '',
   visual: {
     border: 'default',
     accent: 'none',

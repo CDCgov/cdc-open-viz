@@ -14,15 +14,11 @@ import BuilderColumn from './Builder.Column'
 
 const RowMenu = ({ rowIdx, row }) => {
   // Store Selectors
-  const openOverlay = useGlobalStore(state => state.openOverlay)
+  const { openOverlay } = useGlobalStore()
 
-  const { config, updateConfig, updateConfigField } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig,
-    updateConfigField: state.updateConfigField
-  }))
+  const { config, updateConfig, updateConfigField } = useConfigStore()
 
-  const getCurr = () => {
+  const parseRowLayout = (row) => {
     let res = []
 
     for (let i = 0; i < row.length; i++) {
@@ -32,7 +28,7 @@ const RowMenu = ({ rowIdx, row }) => {
     return res.join('')
   }
 
-  const [ layout, setLayout ] = useState(getCurr())
+  const [ layout, setLayout ] = useState(parseRowLayout(row))
   const [ equalHeight, setEqualHeight ] = useState(false)
 
   const setRowLayout = (layout) => {

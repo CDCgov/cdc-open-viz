@@ -7,6 +7,9 @@ import useConfigStore from '../../stores/configStore'
 // Data
 import { COVE_BREAKPOINTS as breakpoints } from '../../data/const'
 
+// Helpers
+import { convertKebabToTitle } from '../../helpers/coveHelpers'
+
 // Components - Local
 import Button from '../element/Button'
 import Icon from '../ui/Icon'
@@ -18,8 +21,7 @@ import '../../styles/v2/components/element/editor-utils.scss'
 
 const Editor = ({ editorPanels, children }) => {
   // Store Selectors
-  const os = useGlobalStore((store) => store.os)
-
+  const { os } = useGlobalStore()
   const { config, updateConfig, updateParentConfig } = useConfigStore()
 
   const [ displayPanel, setDisplayPanel ] = useState(true)
@@ -130,7 +132,7 @@ const Editor = ({ editorPanels, children }) => {
         <section className="cove-splash__waiting__container">
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display the preview.</p>
-          <Button className="mt-2 mx-auto" disabled={missingRequiredSections} onClick={() => confirmDone()}>I'm Done</Button>
+          <Button className="mt-2 mx-auto" disabled={config.missingRequiredSections} onClick={() => confirmDone()}>I'm Done</Button>
         </section>
       </section>
     )
@@ -164,7 +166,7 @@ const Editor = ({ editorPanels, children }) => {
         <button className={`cove-editor__toggle` + (!displayPanel ? ` collapsed` : ``)}
                 title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}/>
         <section className="cove-editor__panel" tabIndex={0} ref={editorPanelRef}>
-          <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure Chart</h2>
+          <h2 className="cove-editor__panel-heading" aria-level="2" role="heading">Configure {config.type ? convertKebabToTitle(config.type) : 'Component'}</h2>
           <div className="cove-editor__panel-container">
             <section className="cove-editor__panel-config">
               {editorPanels}

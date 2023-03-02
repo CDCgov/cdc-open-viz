@@ -3,12 +3,14 @@ import { devtools } from 'zustand/middleware'
 
 // Third Party
 import { immer } from 'zustand/middleware/immer'
+import { merge as _merge } from 'lodash'
 
 // Helpers
 import { fetchAsyncUrl } from '../helpers/data'
 import { setConfigKeyValue } from '../helpers/configHelpers'
 import coveUpdateWorker from '../helpers/update/coveUpdateWorker'
 import dataTransform from '../helpers/dataTransform'
+import produce from 'immer'
 
 const transform = new dataTransform()
 
@@ -21,29 +23,45 @@ const configStore = (set, get) => ({
     data: {}
   },
 
-  // Actions
+  // Actions --------------------------------------------------------------------------------------------------------------------------------------------------------------
+  setMissingRequiredSections: (value) => set(state => {
+    state.config.missingRequiredSections = value
+  }),
+
+
+  // Config Actions -------------------------------------------------------------------------------------------------------------------------------------------------------
   setConfig: config => set(state => {
     state.config = config
-  }),
-  setConfigRuntime: runtime => set(state => {
-    state.config.runtime = runtime
-  }),
-  setData: data => set(state => {
-    state.config.data = data
-  }),
-  setMissingRequiredSections: bool => set(state => {
-    state.config.missingRequiredSections = bool
   }),
   updateConfig: config => set(state => {
     state.config = { ...state.config, ...config }
   }),
-  updateConfigField: (fieldPayload, setValue) => {
-    set((state) => {
-      state.config = {...state.config, ...setConfigKeyValue(fieldPayload, setValue)}
-    })
+  updateConfigField: (fieldPayload, setValue, merge = true) => {
+    merge
+      ? set((state) => {
+        state.config = { ..._merge(state.config, setConfigKeyValue(fieldPayload, setValue)) }
+      })
+      : set((state) => {
+        state.config = { ...state.config, ...setConfigKeyValue(fieldPayload, setValue) }
+      })
   },
 
-  // Data Fetching ------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Config Data Fetch & Processing ---------------------------------------------------------------------------------------------------------------------------------------
+  setConfigDefaults: async (defaults = null, visualizationKey = null) => {
+    // If defaults exist, create the new config object with shallow merge of defaults and data
+    if (defaults) {
+      if (visualizationKey) {
+        set(produce((state) => {
+            state.config.visualizations[visualizationKey] = { ...defaults, ...state.config.visualizations[visualizationKey] }
+          }
+        ))
+      } else {
+        get().setConfig(defaults)
+      }
+    }
+  },
+
   fetchConfig: async (configObj, configUrl) => {
     // Check if "data" is included through a URL, or directly, and set value
     let response = configObj || await fetchAsyncUrl(configUrl) || {}
@@ -66,12 +84,7 @@ const configStore = (set, get) => ({
     let newConfig = { ...response }
     newConfig.data = responseData // Attach data to newConfig
 
-    get().setConfig(newConfig) // Set newConfig to state
-  },
-
-  processConfigDefaults: async (defaults = null) => {
-    // If defaults exist, create the new config object with shallow merge of defaults and data
-    if (defaults) get().updateConfig({ ...defaults })
+    get().updateConfig(newConfig) // Set newConfig to state
   },
 
   runConfigUpdater: async () => {

@@ -5,57 +5,58 @@ import useConfigStore from '@cdc/core/stores/configStore'
 
 // Helpers
 import { getDataColumns } from '@cdc/core/helpers/data/index'
+import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
-import Button from '@cdc/core/components/element/Button'
 import PanelGlobal from '@cdc/core/components/editor/Panel.Global.jsx'
 import InputCheckbox from '@cdc/core/components/input/InputCheckbox'
 import InputSelect from '@cdc/core/components/input/InputSelect'
 import InputText from '@cdc/core/components/input/InputText'
-import Label from '@cdc/core/components/element/Label'
-import SectionBlock from '@cdc/core/components/ui/SectionBlock'
 import SectionWrapper from '@cdc/core/components/ui/SectionWrapper'
 
 // Constants
-import { BITE_LOCATIONS, DATA_FUNCTIONS, DATA_OPERATORS, IMAGE_POSITIONS } from '../data/consts'
-import PanelFilters from '@cdc/core/components/editor/Panel.Filters.jsx'
+import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS } from '../data/consts'
+import PanelComponentFilters from '@cdc/core/components/editor/Panel.Component.Filters.jsx'
 import PanelDynamicImages from './Panel.DynamicImages.jsx'
+import InputToggle from '@cdc/core/components/input/InputToggle'
 
-const EditorPanels = () => {
-  const { config, updateParentConfig, setMissingRequiredSections } = useConfigStore(state => ({
-    config: state.config,
-    updateParentConfig: state.updateParentConfig,
-    setMissingRequiredSections: state.setMissingRequiredSections,
-  }))
+
+const EditorPanels = ({ setParentConfig }) => {
+  const { config, setMissingRequiredSections } = useConfigStore()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
   const [ tempConfig, setTempConfig ] = useState(config)
 
-  // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
   useEffect(() => {
-    if (JSON.stringify(config) !== JSON.stringify(tempConfig)) {
+    // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
+    if (!isConfigEqual(config, tempConfig)) {
       let tempConfig = { ...config }
       delete tempConfig.newViz
       setTempConfig(tempConfig)
     }
   }, [ config, tempConfig ])
 
-  // Pass tempConfig settings back up to parent, if one exists
   useEffect(() => {
-    if (updateParentConfig) updateParentConfig(tempConfig)
-  }, [ tempConfig, updateParentConfig ])
+    // Pass tempConfig settings back up to parent, if one exists
+    if (setParentConfig) setParentConfig(tempConfig)
+  }, [ tempConfig, setParentConfig ])
 
-  /* --------------------------------------------------------------------------------------------- */
 
+  /** Required Sections -------------------------------------------------------------------------- */
   const requiredSections = [
+    config.title,
     config.dataColumn,
     config.dataFunction
   ]
 
   useEffect(() => {
-    if (requiredSections) setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+    const validateSections = setTimeout(() => {
+      if (requiredSections && config) setMissingRequiredSections(!requiredSections.every(isValid => !!isValid === true))
+    }, 500)
+    return clearTimeout(validateSections)
   }, [ config ])
+
 
   /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (
@@ -110,7 +111,7 @@ const EditorPanels = () => {
 
   const panelFilters = (
     <Accordion.Section label="Filters">
-      <PanelFilters/>
+      <PanelComponentFilters/>
     </Accordion.Section>
   )
 

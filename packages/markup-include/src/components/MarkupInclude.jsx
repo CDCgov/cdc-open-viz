@@ -5,7 +5,7 @@ import { Markup } from 'interweave'
 import axios from 'axios'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
 
 // Data
 import demoMarkup from '../templates/demoMarkup'
@@ -19,7 +19,7 @@ import AlertBox from '@cdc/core/components/ui/AlertBox'
 // Visualization
 const MarkupInclude = () => {
   // Store Selectors
-  const { config } = useConfigStore()
+  const { config } = useConfigStoreContext()
 
   const [ urlMarkup, setUrlMarkup ] = useState('')
   const [ markupError, setMarkupError ] = useState(null)

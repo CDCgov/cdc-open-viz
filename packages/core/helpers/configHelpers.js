@@ -3,6 +3,9 @@ import get from 'lodash.get'
 // DEV NOTE: These are global helpers assigned for setting/getting config values.
 // DO NOT modify these unless you completely understand the system, and accept all risks.
 
+// Check if two objects are equal
+export const isConfigEqual = (a, b) => (JSON.stringify(a) === JSON.stringify(b))
+
 export const setConfigKeyValue = (configKeyArray, setKeyValue) => {
   /**********************************************************************************************************
    * Returns an object, built from provided array, with final key set to the provided value.
@@ -27,7 +30,7 @@ export const getConfigKeyValue = (configKeyArray, objectToParse) => {
   // If received an array, and if only one value provided, just get the initial value and bypass reducer
   if (configKeyArray.length === 1) return objectToParse[configKeyArray[0]]
   // Drill through the object using multiple array values provided, and return the final value if found
-  if (get(objectToParse, configKeyArray.map(k => k).join('.'))) return  configKeyArray.reduce((acc, configKey) => (acc[configKey]), objectToParse)
+  if (get(objectToParse, configKeyArray.map(k => k).join('.'))) return configKeyArray.reduce((acc, configKey) => (acc[configKey]), objectToParse)
   // If nothing found, return undefined
   return undefined
 }

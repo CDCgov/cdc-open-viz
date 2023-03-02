@@ -15,7 +15,7 @@ import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { useColorPalette } from '../hooks/useColorPalette'
 
 // Components - Core
-import PanelAdvanced from '@cdc/core/components/editor/Panel.Advanced.jsx'
+import PanelComponentAdvanced from '@cdc/core/components/editor/Panel.Component.Advanced.jsx'
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/input/InputToggle'
@@ -2599,7 +2599,7 @@ const EditorPanel = props => {
               </AccordionItem>
             </Accordion>
           </form>
-          <PanelAdvanced loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
+          <PanelComponentAdvanced loadConfig={loadConfig} state={state} convertStateToConfig={convertStateToConfig} />
         </section>
       </section>
     </ErrorBoundary>

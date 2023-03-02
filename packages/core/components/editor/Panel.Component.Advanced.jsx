@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 // Components
 import Icon from '../ui/Icon'
 
-export const PanelAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
+export const PanelComponentAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
   const [ advancedToggle, setAdvancedToggle ] = useState(false)
   const [ configTextboxValue, setConfigTextbox ] = useState({})
 
@@ -57,4 +57,4 @@ export const PanelAdvanced = ({ loadConfig, state, convertStateToConfig }) => {
   )
 }
 
-export default PanelAdvanced
+export default PanelComponentAdvanced

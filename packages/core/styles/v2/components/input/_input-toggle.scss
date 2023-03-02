@@ -45,11 +45,16 @@
 .cove-input__toggle {
   display: inline-block;
   position: relative;
-  width: 40px;
-  height: 20px;
+  width: 30px;
+  height: 14px;
   padding: 3px;
   cursor: pointer;
   z-index: 0;
+
+  &.cove-input__toggle--small {
+    width: 40px;
+    height: 20px;
+  }
 
   &.cove-input__toggle--active {
     .cove-input__toggle-button {
@@ -84,8 +89,8 @@
       aspect-ratio: 1.5/1;
     }
 
-    &.cove-input__toggle--medium,
-    &.cove-input__toggle--large {
+    &.cove-input__toggle--large,
+    &.cove-input__toggle--xlarge {
       .cove-input__toggle-button {
         &::before,
         &::after {
@@ -155,7 +160,7 @@
   height: 20px;
 }
 
-.cove-input__toggle--medium {
+.cove-input__toggle--large {
   @extend .cove-input__toggle;
   width: 50px;
   height: 26px;
@@ -185,7 +190,7 @@
   }
 }
 
-.cove-input__toggle--large {
+.cove-input__toggle--xlarge {
   @extend .cove-input__toggle;
   width: 80px;
   height: 35px;

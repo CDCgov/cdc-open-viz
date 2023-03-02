@@ -16,23 +16,27 @@ import MarkupInclude from './components/MarkupInclude'
 // Styles
 import './scss/cove-markup-include.scss'
 
+
+
 // Visualization
 const CdcMarkupInclude = (
   {
     config: configObj,
     configUrl,
-    setParentConfig
+    setParentConfig,
+    visualizationKey
   }
 ) => {
+
   return (
     <ErrorBoundary component="CdcMarkupInclude">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
-        <View editorPanels={<EditorPanels setParentConfig={setParentConfig}/>}>
-          <Component className="cove-markup-include">
-            <MarkupInclude/>
-          </Component>
-        </View>
-      </ConfigProxy>
+        <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults} visualizationKey={visualizationKey}>
+          <View editorPanels={<EditorPanels setParentConfig={setParentConfig}/>}>
+            <Component className="cove-markup-include">
+              <MarkupInclude/>
+            </Component>
+          </View>
+        </ConfigProxy>
     </ErrorBoundary>
   )
 }

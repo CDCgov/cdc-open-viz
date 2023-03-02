@@ -15,10 +15,7 @@ import { DATA_OPERATORS } from '../data/consts'
 
 const PanelDynamicImages = () => {
   // Store Selectors
-  const { config, updateConfig } = useConfigStore(state => ({
-    config: state.config,
-    updateConfig: state.updateConfig
-  }))
+  const { config, updateConfig } = useConfigStore()
 
   const createDynamicImage = () => {
     let imageOptions = config.imageData.options ? [ ...config.imageData.options ] : []

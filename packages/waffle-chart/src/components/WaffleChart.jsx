@@ -30,7 +30,7 @@ import calculateWaffleAnimation from '../helpers/calculateWaffleAnimation'
 
 // Visualization
 const WaffleChart = () => {
-  const config = useConfigStore(state => state.config)
+  const { config } = useConfigStore()
 
   const calculateData = () => {
     //If either the column or function aren't set, do not calculate
@@ -192,7 +192,7 @@ const WaffleChart = () => {
                   data-step={key} key={key}
           />
     ))
-  }, [ config.shape, config.theme, dataPercentage, prevVal, newVal, nodeSpacerNum, nodeWidthNum ])
+  }, [ config ])
 
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 

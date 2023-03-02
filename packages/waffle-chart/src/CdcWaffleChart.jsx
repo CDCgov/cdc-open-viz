@@ -17,11 +17,17 @@ import WaffleChart from './components/WaffleChart.jsx'
 import './scss/cove-waffle-chart.scss'
 
 // Visualization
-const CdcWaffleChart = ({ config: configObj, configUrl, setParentConfig }) => {
+const CdcWaffleChart = (
+  {
+    config: configObj,
+    configUrl,
+    setParentConfig
+  }
+) => {
   return (
     <ErrorBoundary component="CdcWaffleChart">
-      <ConfigProxy configObj={configObj} configUrl={configUrl} setParentConfig={setParentConfig} defaults={defaults}>
-        <View editorPanels={<EditorPanels/>}>
+      <ConfigProxy configObj={configObj} configUrl={configUrl} defaults={defaults}>
+        <View editorPanels={<EditorPanels setParentConfig={setParentConfig}/>}>
           <Component className="cove-waffle-chart">
             <WaffleChart/>
           </Component>

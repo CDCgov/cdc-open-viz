@@ -19,7 +19,7 @@ import {
 } from '../data/consts.js'
 
 // Helpers
-import { numberFromString, applyPrecision } from '@cdc/core/helpers/coveHelpers'
+import { numberFromString, applyPrecision, getSum, getMean, getMedian, getMode, convertNumberToLocaleString } from '@cdc/core/helpers/coveHelpers'
 
 // Components - Core
 import CircleCallout from '../components/CircleCallout'
@@ -27,124 +27,24 @@ import DataBiteImage from './DataBite.Image.jsx'
 
 // Visualization
 const DataBite = () => {
-  const config = useConfigStore(state => state.config)
+  const { config } = useConfigStore()
 
   const calculateDataBite = (includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
-    if (!config.dataColumn || !config.dataFunction) {
-      return ''
-    }
+    if (!config.dataColumn || !config.dataFunction) return ''
 
     // filter null and 0 out from count data
     const getColumnCount = (arr) => {
       if (config.dataFormat.ignoreZeros) {
-        numericalData = numericalData.filter(item => item && item)
-        return numericalData.length
-      } else {
-        return numericalData.length
+        arr.filter(item => item && item)
+        return arr.length
       }
-    }
-
-    const getColumnSum = (arr) => {
-      // first validation
-      if (arr === undefined || arr === null) {
-        console.error('Enter valid value for getColumnSum function ')
-        return
-      }
-      // second validation
-      console.log('arr', arr)
-      if (arr.length === 0 || !Array.isArray(arr)) {
-        console.error('Arguments are not valid getColumnSum function ')
-        return
-      }
-      let sum = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        sum = arr.map(el => Number(el)).reduce((sum, x) => sum + x)
-      } else {
-        sum = Number(arr[0])
-      }
-      return applyPrecision(sum, config.dataFormat.roundToPlace)
-    }
-
-    const getColumnMean = (arr) => {
-      // add default params to escape errors on runtime
-      // first validation
-      if (arr === undefined || arr === null || !Array.isArray(arr)) {
-        console.error('Enter valid parameter getColumnMean function')
-        return
-      }
-
-      if (config.dataFormat.ignoreZeros) {
-        arr = arr.filter(num => num !== 0)
-      }
-
-      let mean = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        mean = arr.map(el => Number(el)).reduce((a, b) => a + b) / arr.length
-      } else {
-        mean = Number(arr[0])
-      }
-      return applyPrecision(mean, config.dataFormat.roundToPlace)
-    }
-
-    const getMode = (arr = []) => {
-      // add default params to escape errors on runtime
-      // this function accepts any array and returns array of strings
-      let freq = {}
-      let max = -Infinity
-
-      for (let i = 0; i < arr.length; i++) {
-        if (freq[arr[i]]) {
-          freq[arr[i]] += 1
-        } else {
-          freq[arr[i]] = 1
-        }
-
-        if (freq[arr[i]] > max) {
-          max = freq[arr[i]]
-        }
-      }
-
-      let res = []
-
-      for (let key in freq) {
-        if (freq[key] === max) res.push(key)
-      }
-
-      return res
-    }
-
-    const getMedian = arr => {
-      if (!arr.length) return
-      const mid = Math.floor(arr.length / 2),
-        nums = [ ...arr ].sort((a, b) => a - b)
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-      return applyPrecision(value, config.dataFormat.roundToPlace)
-    }
-
-    const applyLocaleString = (value) => {
-      if (value === undefined || value === null) return
-      if (Number.isNaN(value) || typeof value === 'number') {
-        value = String(value)
-      }
-      const language = 'en-US'
-      let formattedValue = parseFloat(value).toLocaleString(language, {
-        useGrouping: true,
-        maximumFractionDigits: 6
-      })
-      // Add back missing .0 in e.g. 12.0
-      const match = value.match(/\.\d*?(0*)$/)
-
-      if (match) {
-        formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0]
-      }
-      return formattedValue
+      return arr.length
     }
 
     //Optionally filter the data based on the user's filter
     let filteredData = config.data
+    let numericalData = []
 
     config.filters.map(filter => {
       if (filter.columnName && filter.columnValue) {
@@ -156,7 +56,6 @@ const DataBite = () => {
       }
     })
 
-    let numericalData = []
     // Get the column's data
     if (filteredData.length) {
       filteredData.forEach(row => {
@@ -174,13 +73,13 @@ const DataBite = () => {
         dataBite = getColumnCount(numericalData)
         break
       case DATA_FUNCTION_SUM:
-        dataBite = getColumnSum(numericalData)
+        dataBite = applyPrecision(getSum(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEAN:
-        dataBite = getColumnMean(numericalData)
+        dataBite = applyPrecision(getMean(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MEDIAN:
-        dataBite = getMedian(numericalData)
+        dataBite = applyPrecision(getMedian(numericalData), config.dataFormat.roundToPlace)
         break
       case DATA_FUNCTION_MAX:
         dataBite = Math.max(...numericalData)
@@ -197,8 +96,8 @@ const DataBite = () => {
         rangeMin = applyPrecision(rangeMin, config.dataFormat.roundToPlace)
         rangeMax = applyPrecision(rangeMax, config.dataFormat.roundToPlace)
         if (config.dataFormat.commas) {
-          rangeMin = applyLocaleString(rangeMin)
-          rangeMax = applyLocaleString(rangeMax)
+          rangeMin = convertNumberToLocaleString(rangeMin)
+          rangeMax = convertNumberToLocaleString(rangeMax)
         }
         dataBite = config.dataFormat.prefix + rangeMin + config.dataFormat.suffix + ' - ' + config.dataFormat.prefix + rangeMax + config.dataFormat.suffix
         break
@@ -211,7 +110,7 @@ const DataBite = () => {
       dataBite = applyPrecision(dataBite, config.dataFormat.roundToPlace)
 
       if (config.dataFormat.commas) {
-        dataBite = applyLocaleString(dataBite)
+        dataBite = convertNumberToLocaleString(dataBite)
       }
 
       return includePrefixSuffix ? config.dataFormat.prefix + dataBite + config.dataFormat.suffix : dataBite

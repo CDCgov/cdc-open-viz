@@ -44,9 +44,10 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
   })
 
   // Component Attributes
+  const customTitleAttrs = (!config.title || config.title === '') && { 'data-title': false }
   const customBorderAttrs = config.visual?.border !== 'default' && { 'data-border': config.visual?.border }
   const customShadowAttrs = !config.visual?.shadow && { 'data-no-shadow': true }
-  // config.visual.accent !== 'default' && (config.visual.accent === 'top' && !title ) && { 'data-accent': config.visual.accent }
+
   const customAccentAttrs = () => {
     if (config.visual?.accent === 'none' || (config.visual?.accent === 'top' && config.title)) return {}
     return { 'data-accent': config.visual?.accent }
@@ -54,6 +55,7 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
 
   const customComponentAttrs = {
     ...attributes,
+    ...customTitleAttrs,
     ...customBorderAttrs,
     ...customShadowAttrs,
     ...customAccentAttrs()
@@ -66,31 +68,44 @@ const Component = ({ className, children, exampleConfig, ...attributes }) => {
     ...customBgAttrs
   }
 
+  const tooltip = (<>
+    {config.tooltip && (config.tooltip.content && config.tooltip.content !== '') && <>
+      <Tooltip place={config.tooltip.position || 'left'}>
+        <Tooltip.Target>
+          <Icon display="questionCircle"/>
+        </Tooltip.Target>
+        <Tooltip.Content>
+          {typeof config.tooltip.content === 'object'
+            ? config.tooltip.content
+            : typeof config.tooltip.content === 'string' && (
+            <p>{parse(config.tooltip.content)}</p>
+          )}
+        </Tooltip.Content>
+      </Tooltip>
+    </>
+    }
+  </>)
+
   // Return Component
   return (
-    <div className={'cove-component' + (config.theme ? ' cove-theme--' + config.theme : ' cove-theme--blue') + (className ? ' ' + className : '')} {...customComponentAttrs}>
+    <div className={'cove-component'
+      + (config.theme ? ' cove-theme--' + config.theme : ' cove-theme--blue')
+      + (className ? ' ' + className : '')}
+         {...customComponentAttrs}
+    >
       <div className="cove-component__container">
         {config.title &&
           <header className="cove-component__header" role="heading" aria-hidden="true" aria-level={2}>
             {parse(config.title)}
-            {config.tooltip && config.tooltip !== '' && <>
-              <Tooltip place="left">
-                <Tooltip.Target>
-                  <Icon display="questionCircle"/>
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  {typeof config.tooltip === 'object'
-                    ? config.tooltip
-                    : typeof config.tooltip === 'string' && (
-                    <p>{parse(config.tooltip)}</p>
-                  )}
-                </Tooltip.Content>
-              </Tooltip>
-            </>
-            }
+            {config.title.trim().length !== 0 && tooltip}
           </header>
         }
         <div className="cove-component__content" {...customContentAttrs}>
+          {(!config.title || config.title.trim().length === 0) &&
+            <div className="cove-component__content--tooltip">
+              {tooltip}
+            </div>
+          }
           <div className="cove-component__visualization" ref={outerContainerRef}>
             {children}
           </div>

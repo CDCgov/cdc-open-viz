@@ -44,7 +44,7 @@
   @at-root {
     .cove-color-picker__button:hover,
     .cove-color-picker__button:focus,
-    .cove-color-picker__button.selected {
+    .cove-color-picker__button[data-selected="true"] {
       .cove-color-picker__color {
         transform: translate(-50%, -50%) scale(0.9);
       }
@@ -53,6 +53,7 @@
 }
 
 .cove-color-picker__color--ring {
+  box-sizing: border-box;
   background-color: transparent !important;
   border-width: 1px;
   border-style: solid;

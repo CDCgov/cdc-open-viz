@@ -22,5 +22,6 @@
   "biteStyle": "graphic",
   "subtext": "*This is an optional subtext or citation.",
   "title": "Average Insured Rate",
-  "theme": "blue"
+  "theme": "blue",
+  "bob": true
 }

@@ -34,7 +34,7 @@ import CdcMap from '@cdc/map/src/CdcMap'
 import CdcChart from '@cdc/chart/src/CdcChart'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
-import { CdcMarkupIncludeReadonly } from '@cdc/markup-include/src/CdcMarkupInclude'
+import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 
 const addVisualization = (type, subType) => {
@@ -103,18 +103,9 @@ const VisualizationsPanel = () => (
 
 const Dashboard = () => {
   // Store Selectors
-  const { viewMode, setViewMode } = useGlobalStore(state => ({
-    viewMode: state.viewMode,
-    setViewMode: state.setViewMode
-  }))
+  const { viewMode, setViewMode } = useGlobalStore()
 
-  const { config, setConfig, updateConfig, updateConfigField, updateParentConfig } = useConfigStore(state => ({
-    config: state.config,
-    setConfig: state.setConfig,
-    updateConfig: state.updateConfig,
-    updateConfigField: state.updateConfigField,
-    updateParentConfig: state.updateParentConfig
-  }), shallow)
+  const { config, setConfig, updateConfig, updateConfigField, updateParentConfig } = useConfigStore()
 
   const { title, description } = config.dashboard || config
 
@@ -403,7 +394,6 @@ const Dashboard = () => {
         }
 
         const updateSubConfig = newConfig => {
-          console.log('called updateSubConfig to set newConfig', newConfig)
           let dataCorrectedConfig = visualizationConfig.originalFormattedData
             ? { ...newConfig, formattedData: visualizationConfig.originalFormattedData }
             : { ...newConfig }
@@ -453,10 +443,10 @@ const Dashboard = () => {
             body = (
               <>
                 <Header tabSelected={tabSelected} setTabSelected={setTabSelected} back={back} subEditor="Markup Include"/>
-                <CdcMarkupIncludeReadonly
+                <CdcMarkupInclude
                   config={visualizationConfig}
                   setParentConfig={updateSubConfig}
-                  isDashboard={true}
+                  visualizationKey={visualizationKey}
                   key={visualizationKey}
                 />
               </>

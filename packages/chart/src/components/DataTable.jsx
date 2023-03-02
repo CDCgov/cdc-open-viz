@@ -5,6 +5,7 @@ import { Base64 } from 'js-base64'
 
 import ErrorBoundary from '@cdc/core/components/hoc/ErrorBoundary'
 import LegendCircle from '@cdc/core/components/element/LegendCircle'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import ConfigContext from '../ConfigContext'
 

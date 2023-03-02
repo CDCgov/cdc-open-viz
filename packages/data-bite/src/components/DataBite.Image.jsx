@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore.js'
+import useConfigStore from '@cdc/core/stores/configStore'
 
 const DataBiteImage = ({ calculateDataBite }) => {
   const { biteStyle, imageData } = useConfigStore(state => ({

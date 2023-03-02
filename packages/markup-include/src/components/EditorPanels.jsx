@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 // Store
-import useConfigStore from '@cdc/core/stores/configStore'
+import { useConfigStoreContext } from '@cdc/core/components/hoc/ConfigProxy'
+
+// Helpers
+import { isConfigEqual } from '@cdc/core/helpers/configHelpers'
 
 // Components - Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -10,30 +13,27 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/input/InputText'
 import PanelGlobal from '@cdc/core/components/editor/Panel.Global'
 
-
-// COVE Refactor - TODO: Rename and lift this into core helpers
-const isConfigEqual = (a, b) => (JSON.stringify(a) === JSON.stringify(b))
-
-const EditorPanels = ({ config: configFromParent, setParentConfig }) => {
+const EditorPanels = ({ setParentConfig }) => {
   // Store Selectors
-  const { config } = useConfigStore()
+  const { config } = useConfigStoreContext()
 
   /** PARENT CONFIG UPDATE SECTION ---------------------------------------------------------------- */
-  const [ configCache, setConfigCache ] = useState(configFromParent)
+/*  const [ tempConfig, setTempConfig ] = useState(config)
 
   useEffect(() => {
-    // Update configCache cache if configFromParent changes
-    let newConfig = { ...configFromParent }
     // Remove any newViz entries and update tempConfig cache to send to parent, if one exists
-    delete newConfig.newViz
-    setConfigCache(configFromParent)
-  }, [ configFromParent ])
+    if (!isConfigEqual(config, tempConfig)) {
+      let tempConfig = { ...config }
+      delete tempConfig.newViz
+      setTempConfig(tempConfig)
+    }
+  }, [ config, tempConfig ])
 
   useEffect(() => {
-    // Pass configCache settings back up to parent, if one exists
-    if (setParentConfig && !isConfigEqual(configCache, config.visualizations[configFromParent.uid]))
-      setParentConfig(configCache)
-  }, [ configCache, setParentConfig ])
+    // Pass tempConfig settings back up to parent, if one exists
+    if (setParentConfig) setParentConfig(tempConfig)
+  }, [ tempConfig, setParentConfig ])*/
+
 
   /** Panels ------------------------------------------------------------------------------------- */
   const panelGeneral = (

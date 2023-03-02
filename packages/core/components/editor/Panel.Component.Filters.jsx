@@ -12,7 +12,7 @@ import InputSelect from '../input/InputSelect'
 import Label from '../element/Label'
 import SectionBlock from '../ui/SectionBlock'
 
-const PanelFilters = () => {
+const PanelComponentFilters = () => {
   // Store Selectors
   const { config, updateConfig } = useConfigStore()
 
@@ -89,4 +89,4 @@ const PanelFilters = () => {
   </>
 }
 
-export default PanelFilters
+export default PanelComponentFilters
