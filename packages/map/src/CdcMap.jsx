@@ -250,7 +250,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
   const generateRuntimeLegend = useCallback((obj, runtimeData, hash) => {
     const newLegendMemo = new Map() // Reset memoization
-    const primaryCol = obj.columns.primary.name,
+    var primaryCol = obj.columns.primary.name,
       isBubble = obj.general.type === 'bubble',
       categoricalCol = obj.columns.categorical ? obj.columns.categorical.name : undefined,
       type = obj.legend.type,
@@ -291,6 +291,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
       }
 
+
       let colorIdx = legendIdx - specialClasses
 
       // Special Classes (No Data)
@@ -319,6 +320,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     let specialClasses = 0
     let specialClassesHash = {}
+
+    console.log("newLegendMemo1A=",newLegendMemo)
 
     // Special classes
     if (obj.legend.specialClasses.length) {
@@ -391,6 +394,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
+    console.log("newLegendMemo1B=",newLegendMemo)
+
     // Category
     if ('category' === type) {
       let uniqueValues = new Map()
@@ -450,6 +455,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           arr.forEach(hashedRow => newLegendMemo.set(hashedRow, lastIdx))
         }
       })
+
+      console.log("newLegendMemo1C=",newLegendMemo)
 
       // Add color to new legend item
       for (let i = 0; i < result.length; i++) {
@@ -512,6 +519,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Equal Number
     if (type === 'equalnumber') {
+      console.log("Equal Interval line 517,legendMemo, result",legendMemo, result)
+
       // start work on changing legend functionality
       // FALSE === ignore old version for now.
       if (!state.general.equalNumberOptIn) {
@@ -536,21 +545,34 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
           let min = removedRows[0][primaryCol],
             max = removedRows[removedRows.length - 1][primaryCol]
 
+
+         
+
           removedRows.forEach(row => {
             newLegendMemo.set(hashObj(row), result.length)
           })
+          console.log("newLegendMemo 2=",newLegendMemo)
+
+          console.log("result1=",result)
 
           result.push({
             min,
             max
           })
 
+          console.log("result2=",result)
+
           result[result.length - 1].color = applyColorToLegend(result.length - 1)
 
           changingNumber -= 1
           numberOfRows -= chunkAmt
+
+          console.log("newLegendMemo=",newLegendMemo)
         }
+
       } else {
+        console.log("else case 558")
+
         // get nums
         let hasZeroInData = dataSet.filter(obj => obj[state.columns.primary.name] === 0).length > 0
         let domainNums = new Set(dataSet.map(item => item[state.columns.primary.name]))
@@ -647,6 +669,9 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Equal Interval
     if (type === 'equalinterval' && dataSet?.length !== 0) {
+
+      console.log("Equal Interval line 653")
+
       if (!dataSet || dataSet.length === 0) {
         setState({
           ...state,
@@ -662,6 +687,13 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       let dataMax = dataSet[dataSet.length - 1][primaryCol]
 
       let pointer = 0 // Start at beginning of dataSet
+
+      // Move all special Classes to the end
+      console.log("MOVE SPECIAL TO END: specialClasses,result",specialClasses,result)
+      let specialRows = result.filter(d => d.special === true)
+      let otherRows = result.filter(d => !d.special)
+      //debugger;
+      result = [...otherRows, ...specialRows];
 
       for (let i = 0; i < legendNumber; i++) {
         let interval = Math.abs(dataMax - dataMin) / legendNumber
@@ -689,12 +721,32 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       }
     }
 
+
+
+    console.log("specialClasses,result",specialClasses,result)
+
     result.forEach((legendItem, idx) => {
       legendItem.color = applyColorToLegend(idx, specialClasses, result)
     })
 
     legendMemo.current = newLegendMemo
-    return result
+
+    //----------
+    // DEV-784
+    // before returning the legend result
+    // add property for bin number and set to index location
+    result.forEach((row,i) => {
+        row.bin = i  // set bin number to index
+    })
+    // Move all special legend items from "Special Classes"  to the end of the legend
+    if(state.legend.showSpecialClassesLast) {
+      let specialRows = result.filter(d => d.special === true)
+      let otherRows = result.filter(d => !d.special)
+      result = [...otherRows, ...specialRows];
+    }
+    //-----------
+
+    return result;
   })
 
   const generateRuntimeFilters = useCallback((obj, hash, runtimeFilters) => {
@@ -896,6 +948,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     return formattedValue
   }
 
+  // this is passed DOWN into the various components
+  // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
     try {
       if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
@@ -910,7 +964,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       if (legendMemo.current.has(hash)) {
         let idx = legendMemo.current.get(hash)
         if (runtimeLegend[idx]?.disabled) return false
-        return generateColorsArray(runtimeLegend[idx]?.color, runtimeLegend[idx]?.special)
+
+        // DEV-784 changed to use bin prop to get color instead of idx 
+        // bc we re-order legend when showSpecialClassesLast is checked
+        let legendBinColor = runtimeLegend.find(o => o.bin === idx)?.color;
+        return generateColorsArray(legendBinColor, runtimeLegend[idx]?.special)
       }
 
       // Fail state
@@ -1361,7 +1419,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // Legend - Update when runtimeData does
     if (hashLegend !== runtimeLegend.fromHash && undefined === runtimeData.init) {
-      const legend = generateRuntimeLegend(state, runtimeData)
+      let legend = generateRuntimeLegend(state, runtimeData)
       setRuntimeLegend(legend)
     }
   }, [runtimeData])
