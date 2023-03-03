@@ -8,10 +8,10 @@ import defaults from './data/initial-state'
 import ConfigContext from './ConfigContext'
 import parse from 'html-react-parser'
 import './scss/main.scss'
-
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
-const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
+const CdcFilteredText = ({ config: configObj, configUrl, isDashboard = false, isEditor = false, setConfig: setParentConfig }) => {
 
   const transform = new DataTransform()
   // Default States
@@ -30,6 +30,8 @@ const CdcFilteredText = ({ configObj, configUrl, isDashboard = false, isEditor =
     let response = configObj || (await (await fetch(configUrl)).json())
     // If data is included through a URL, fetch that and store
     let data = response.formattedData || response.data || {}
+
+    console.log('RESPONSE', response)
 
     if (response.dataUrl) {
       const dataString = await fetch(response.dataUrl)
