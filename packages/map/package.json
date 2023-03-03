@@ -9,7 +9,7 @@
     "start": "vite --open",
     "build": "vite build",
     "test": "vitest watch --reporter verbose",
-    "test:run": "vitest --ui",
+    "test:ui": "vitest --ui",
     "preview": "vite preview",
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/map build"
